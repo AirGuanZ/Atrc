@@ -7,6 +7,6 @@ using namespace Atrc;
 
 int main()
 {
-    [[maybe_unused]] Ray r;
+    [[maybe_unused]] RayT r;
     cout << "Hello, world!" << endl;
 }
