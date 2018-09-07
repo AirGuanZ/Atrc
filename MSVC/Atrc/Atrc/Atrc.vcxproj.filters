@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Src">
+      <UniqueIdentifier>{231a8bd7-2f5a-441d-8da2-5593d74386a8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Math">
+      <UniqueIdentifier>{19f899f2-146d-4a0c-864d-c3d06e9e448b}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\Src\Main.cpp">
+      <Filter>Src</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\Src\Math\AGZMath.h">
+      <Filter>Src\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\Math\DifferentialGeometry.h">
+      <Filter>Src\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\Math\Ray.h">
+      <Filter>Src\Math</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

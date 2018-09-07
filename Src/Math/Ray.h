@@ -39,7 +39,7 @@ public:
 
     Real t;
 
-    RayT(Real t = Real(0.0))
+    explicit RayT(Real t = Real(0.0))
         : Ray(), t(t)
     {
 
@@ -89,7 +89,7 @@ public:
              std::enable_if_t<(AGZ::TypeOpr::TypeListLength_v<Args...> >= 1 &&
                                AGZ::TypeOpr::True_v<
                                     decltype(R(std::declval<Args>()...))>), int> = 0>
-    DifferentialRayTemplate(Args&&...args)
+    explicit DifferentialRayTemplate(Args&&...args)
         : R(std::forward<Args>(args)...), hasDifferential(false)
     {
 
