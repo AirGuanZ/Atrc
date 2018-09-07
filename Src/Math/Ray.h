@@ -1,9 +1,18 @@
 #pragma once
 
-#include <utility>
+#include <type_traits>
+
 #include <Utils/Misc.h>
 
 #include "AGZMath.h"
+
+#ifdef max
+#undef max
+#endif
+
+#ifdef min
+#undef min
+#endif
 
 AGZ_NS_BEG(Atrc)
 
@@ -39,13 +48,19 @@ public:
 
     Real t;
 
-    explicit RayT(Real t = Real(0.0))
-        : Ray(), t(t)
+    RayT()
+        : RayT(0.0)
+    {
+        
+    }
+
+    explicit RayT(Real t)
+        : t(t)
     {
 
     }
 
-    RayT(const Vec3r &ori, const Vec3r &dir, Real t = Real(0.0))
+    RayT(const Vec3r &ori, const Vec3r &dir, Real t)
         : Ray(ori, dir), t(t)
     {
 
@@ -67,32 +82,33 @@ public:
     }
 };
 
-template<typename R>
-class DifferentialRayTemplate : public R
+class RayR : public RayT
 {
 public:
 
-    bool hasDifferential;
+    Real min, max;
 
-    Vec3r rxOrigin;
-    Vec3r ryOrigin;
-    Vec3r rxDirection;
-    Vec3r ryDirection;
+    RayR()
+        : min(0.0), max(0.0)
+    {
+        
+    }
 
-    DifferentialRayTemplate()
-        : hasDifferential(false)
+    RayR(Real min, Real max, Real t)
+        : RayT(t), min(min), max(max)
+    {
+        
+    }
+
+    RayR(const Vec3r &ori, const Vec3r &dir, Real min, Real max, Real t)
+        : RayT(ori, dir, t), min(min), max(max)
     {
 
     }
 
-    template<typename...Args,
-             std::enable_if_t<(AGZ::TypeOpr::TypeListLength_v<Args...> >= 1 &&
-                               AGZ::TypeOpr::True_v<
-                                    decltype(R(std::declval<Args>()...))>), int> = 0>
-    explicit DifferentialRayTemplate(Args&&...args)
-        : R(std::forward<Args>(args)...), hasDifferential(false)
+    bool IsInRange() const
     {
-
+        return min <= t && t <= max;
     }
 };
 
