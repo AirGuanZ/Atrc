@@ -68,7 +68,7 @@ public:
 };
 
 template<typename R>
-class DifferentialRayTemplate : public T
+class DifferentialRayTemplate : public R
 {
 public:
 
@@ -79,11 +79,18 @@ public:
     Vec3r rxDirection;
     Vec3r ryDirection;
 
+    DifferentialRayTemplate()
+        : hasDifferential(false)
+    {
+
+    }
+
     template<typename...Args,
-             std::enable_if_t<AGZ::TypeOpr::True_v<
-                    decltype(T(std::declval<Args>(args)...))>, int> = 0>
+             std::enable_if_t<(AGZ::TypeOpr::TypeListLength_v<Args...> >= 1 &&
+                               AGZ::TypeOpr::True_v<
+                                    decltype(R(std::declval<Args>()...))>), int> = 0>
     DifferentialRayTemplate(Args&&...args)
-        : T(std::forward<Args>(args)...), hasDifferential(false)
+        : R(std::forward<Args>(args)...), hasDifferential(false)
     {
 
     }
