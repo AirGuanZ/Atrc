@@ -17,10 +17,13 @@
     <ClInclude Include="..\..\..\Src\Math\AGZMath.h">
       <Filter>Src\Math</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Src\Math\DifferentialGeometry.h">
+    <ClInclude Include="..\..\..\Src\Math\Ray.h">
       <Filter>Src\Math</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Src\Math\Ray.h">
+    <ClInclude Include="..\..\..\Src\Math\Geometry.h">
+      <Filter>Src\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\Math\Differential.h">
       <Filter>Src\Math</Filter>
     </ClInclude>
   </ItemGroup>

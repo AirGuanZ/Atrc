@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "Math/Ray.h"
+#include "Math/Geometry.h"
 
 using namespace std;
 using namespace Atrc;

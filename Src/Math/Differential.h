@@ -26,25 +26,27 @@ public:
 
     template<typename...Args,
         std::enable_if_t<(AGZ::TypeOpr::TypeListLength_v<Args...> >= 1 &&
-                          AGZ::TypeOpr::True_v<
-                                decltype(R(std::declval<Args>()...))>),
+                          AGZ::TypeOpr::True_v<decltype(R(std::declval<Args>()...))>),
                          int> = 0>
         DifferentialRayTemplate(
-            const Vec3r &rxOrigin,    const Vec3r &ryOrigin,
-            const Vec3r &rxDirection, const Vec3r &ryDirection,
+            const Vec3r &rxOrigin,
+            const Vec3r &ryOrigin,
+            const Vec3r &rxDirection,
+            const Vec3r &ryDirection,
             Args&&...args)
         : R(std::forward<Args>(args)...),
-        hasDifferential(true),
-        rxOrigin(rxOrigin), ryOrigin(ryOrigin),
-        rxDirection(rxDirection), ryDirection(ryDirection)
+          hasDifferential(true),
+          rxOrigin(rxOrigin),
+          ryOrigin(ryOrigin),
+          rxDirection(rxDirection),
+          ryDirection(ryDirection)
     {
 
     }
 
     template<typename...Args,
         std::enable_if_t<(AGZ::TypeOpr::TypeListLength_v<Args...> >= 1 &&
-                          AGZ::TypeOpr::True_v<
-                                decltype(R(std::declval<Args>()...))>),
+                          AGZ::TypeOpr::True_v<decltype(R(std::declval<Args>()...))>),
                          int> = 0>
         explicit DifferentialRayTemplate(Args&&...args)
         : R(std::forward<Args>(args)...), hasDifferential(false)
