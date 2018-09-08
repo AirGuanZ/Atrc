@@ -23,7 +23,7 @@ public:
 
     virtual bool HasIntersection(const Ray &ray) const
     {
-        AGZ::Unreachable();
+        return EvalIntersection(ray).has_value();
     }
 
     virtual std::optional<Intersection> EvalIntersection(const Ray &ray) const
@@ -45,13 +45,19 @@ public:
         
     }
 
+    explicit Transform(const Mat4r &trans)
+        : trans_(trans), invTrans_(Inverse(trans))
+    {
+
+    }
+
     Transform(const Mat4r &trans, const Mat4r &invTrans)
         : trans_(trans), invTrans_(invTrans)
     {
         
     }
 
-    Transform(const Mat4r *trans, const Mat4r *invTrans = nullptr)
+    explicit Transform(const Mat4r *trans, const Mat4r *invTrans = nullptr)
         : trans_(AGZ::UNINITIALIZED), invTrans_(AGZ::UNINITIALIZED)
     {
         if(trans)
@@ -67,8 +73,11 @@ public:
         }
     }
 
-    Transform(const Transform &)            = default;
-    Transform &operator=(const Transform &) = default;
+    static const Transform &StaticIdentity()
+    {
+        static const Transform ret;
+        return ret;
+    }
     
     Transform operator*(const Transform &rhs) const
     {
@@ -156,7 +165,7 @@ public:
             local2World_.ApplyInverseToVector(ray.direction)));
     }
 
-    std::optional<Intersection> EvalIntersection(const Ray &ray) const override
+    Option<Intersection> EvalIntersection(const Ray &ray) const override
     {
         auto tret = obj_->EvalIntersection(Ray(
             local2World_.ApplyInverseToPoint(ray.origin),
@@ -167,6 +176,33 @@ public:
             tret->t, tret->epsilon,
             local2World_.ApplyToSurfaceLocal(tret->inct)
         };
+    }
+};
+
+class GeometryObjectWithTransform : public GeometryObject
+{
+protected:
+
+    const Transform *local2World_;
+
+public:
+
+    explicit GeometryObjectWithTransform(
+        const Transform *local2World = &Transform::StaticIdentity())
+        : local2World_(local2World)
+    {
+        AGZ_ASSERT(local2World_);
+    }
+
+    const Transform *GetTransform() const
+    {
+        return local2World_;
+    }
+
+    void SetTransform(const Transform *local2World)
+    {
+        AGZ_ASSERT(local2World);
+        local2World_ = local2World;
     }
 };
 

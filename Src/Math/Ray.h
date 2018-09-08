@@ -1,9 +1,6 @@
 #pragma once
 
-#include <type_traits>
-
-#include <Utils/Misc.h>
-
+#include "../Common.h"
 #include "AGZMath.h"
 
 #ifdef max

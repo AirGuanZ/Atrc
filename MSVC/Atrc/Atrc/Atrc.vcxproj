@@ -22,9 +22,11 @@
     <ClCompile Include="..\..\..\Src\Main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\Src\Common.h" />
     <ClInclude Include="..\..\..\Src\Math\AGZMath.h" />
     <ClInclude Include="..\..\..\Src\Math\Differential.h" />
     <ClInclude Include="..\..\..\Src\Math\Geometry.h" />
+    <ClInclude Include="..\..\..\Src\Math\Geometry\Sphere.h" />
     <ClInclude Include="..\..\..\Src\Math\Ray.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

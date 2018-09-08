@@ -1,5 +1,7 @@
 #pragma once
 
+#include <type_traits>
+
 #include "AGZMath.h"
 #include "Ray.h"
 

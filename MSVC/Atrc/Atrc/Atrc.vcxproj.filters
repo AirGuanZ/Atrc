@@ -7,6 +7,9 @@
     <Filter Include="Src\Math">
       <UniqueIdentifier>{19f899f2-146d-4a0c-864d-c3d06e9e448b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\Math\Geometry">
+      <UniqueIdentifier>{54ca4be4-ca1c-458a-b191-764fe7bfd7f1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Src\Main.cpp">
@@ -25,6 +28,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Src\Math\Differential.h">
       <Filter>Src\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\Math\Geometry\Sphere.h">
+      <Filter>Src\Math\Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\Common.h">
+      <Filter>Src</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
