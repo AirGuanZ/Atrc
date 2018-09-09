@@ -28,6 +28,7 @@
     <ClInclude Include="..\..\..\Src\Math\Geometry.h" />
     <ClInclude Include="..\..\..\Src\Math\Geometry\Sphere.h" />
     <ClInclude Include="..\..\..\Src\Math\Ray.h" />
+    <ClInclude Include="..\..\..\Src\Math\Transform.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

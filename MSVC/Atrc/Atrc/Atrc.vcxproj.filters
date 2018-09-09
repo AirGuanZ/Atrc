@@ -35,5 +35,8 @@
     <ClInclude Include="..\..\..\Src\Common.h">
       <Filter>Src</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Src\Math\Transform.h">
+      <Filter>Src\Math</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
