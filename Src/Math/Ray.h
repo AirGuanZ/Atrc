@@ -86,7 +86,7 @@ public:
     Real min, max;
 
     RayR()
-        : min(0.0), max(0.0)
+        : min(0.0), max(FP<Real>::Infinity().Value())
     {
         
     }

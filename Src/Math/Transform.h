@@ -57,7 +57,7 @@ public:
         return Transform{ trans_ * rhs.trans_, rhs.invTrans_ * invTrans_ };
     }
 
-    Transform Reverse() const
+    Transform Inverse() const
     {
         return Transform(&invTrans_, &trans_);
     }
@@ -90,6 +90,18 @@ public:
     Vec3r ApplyInverseToNormal(const Vec3r &n) const
     {
         return trans_.ApplyInverseToNormal(n);
+    }
+
+    Ray ApplyToRay(const Ray &ray) const
+    {
+        return Ray(ApplyToPoint(ray.origin),
+                   ApplyToVector(ray.direction));
+    }
+
+    Ray ApplyInverseToRay(const Ray &ray) const
+    {
+        return Ray(ApplyInverseToPoint(ray.origin),
+                   ApplyInverseToVector(ray.direction));
     }
 
     SurfaceLocal ApplyToSurfaceLocal(const SurfaceLocal &sl) const

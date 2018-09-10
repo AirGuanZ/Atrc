@@ -22,15 +22,18 @@ public:
 
     virtual ~GeometryObject() { }
 
-    virtual bool HasIntersection(const Ray &ray) const
+    virtual bool HasIntersection(
+        const Ray &ray,
+        Real minT = Real(0.0),
+        Real maxT = FP<Real>::Max()) const
     {
         return EvalIntersection(ray).has_value();
     }
 
-    virtual std::optional<Intersection> EvalIntersection(const Ray &ray) const
-    {
-        AGZ::Unreachable();
-    }
+    virtual std::optional<Intersection> EvalIntersection(
+        const Ray &ray,
+        Real minT = Real(0.0),
+        Real maxT = FP<Real>::Max()) const = 0;
 };
 
 class TransformWrapper : public GeometryObject
@@ -63,18 +66,29 @@ public:
         return obj_;
     }
 
-    bool HasIntersection(const Ray &ray) const override
+    bool HasIntersection(
+        const Ray &ray,
+        Real minT, Real maxT
+    ) const final override
     {
-        return obj_->HasIntersection(Ray(
-            local2World_.ApplyInverseToPoint(ray.origin),
-            local2World_.ApplyInverseToVector(ray.direction)));
+        return obj_->HasIntersection(
+            Ray(
+                local2World_.ApplyInverseToPoint(ray.origin),
+                local2World_.ApplyInverseToVector(ray.direction)),
+            minT, maxT);
     }
 
-    Option<Intersection> EvalIntersection(const Ray &ray) const override
+    Option<Intersection> EvalIntersection(
+        const Ray &ray,
+        Real minT, Real maxT
+    ) const final override
     {
-        auto tret = obj_->EvalIntersection(Ray(
-            local2World_.ApplyInverseToPoint(ray.origin),
-            local2World_.ApplyInverseToVector(ray.direction)));
+        auto tret = obj_->EvalIntersection(
+            Ray(
+                local2World_.ApplyInverseToPoint(ray.origin),
+                local2World_.ApplyInverseToVector(ray.direction)),
+            minT, maxT);
+
         if(!tret)
             return std::nullopt;
         return Intersection {
