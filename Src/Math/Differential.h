@@ -95,10 +95,11 @@ public:
     SurfaceLocal(
         const Vec3r &pos,
         const Vec2r &uv,
+        const Vec3r &nor,
         const Vec3r &dpdu, const Vec3r &dpdv,
         const Vec3r &dndu, const Vec3r &dndv)
         : position(pos),
-          normal(Normalize(Cross(dpdu, dpdv))),
+          normal(nor),
           uv(uv),
           dpdu(dpdu),
           dpdv(dpdv),

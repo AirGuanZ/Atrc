@@ -11,8 +11,7 @@ AGZ_NS_BEG(Atrc)
 
 struct Intersection
 {
-    float t;
-    float epsilon;
+    Real t;
     SurfaceLocal inct;
 };
 
@@ -92,7 +91,7 @@ public:
         if(!tret)
             return std::nullopt;
         return Intersection {
-            tret->t, tret->epsilon,
+            tret->t,
             local2World_.ApplyToSurfaceLocal(tret->inct)
         };
     }

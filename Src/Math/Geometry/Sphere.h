@@ -8,10 +8,9 @@
 
 AGZ_NS_BEG(Atrc)
 
-// u: theta [0, 2 * PI], v: phi [0, PI]
-// x = r * sin(u) * cos(v)
-// y = r * sin(u) * sin(phi)
-// z = r * cos(theta)
+// x = r * cos(PI * (u - 0.5)) * cos(2PI * v) =   r * sin(PI * u) * cos(2PI * v)
+// y = r * cos(PI * (u - 0.5)) * sin(2PI * v) =   r * sin(PI * u) * sin(2PI * v)
+// z = r * sin(PI * (u - 0.5))                = - r * cos(PI * u)
 class Sphere : public GeometryObjectWithTransform
 {
     Real radius_;
@@ -96,18 +95,47 @@ public:
         if(p.x == Real(0.0) && p.y == Real(0.0))
            p.x = Real(1e-5) * radius_;
 
-        Real phi = Arctan2(p.y, p.x);
-        if(phi < Real(0.0))
-            phi += Real(2.0) * PI<Real>();
-        Real theta = Arccos(Clamp(p.z / radius_,
-                            Real(-1.0), Real(1.0)));
+        Real theta = Arcsin(Clamp(p.z / radius_, Real(-1.0), Real(1.0)));
+        Real phi = (!p.x && !p.y) ? Real(0.0) : Arctan2(p.y, p.x);
 
-        Real u = phi / (Real(2.0) * PI<Real>());
-        Real v = theta / PI<Real>();
+        Real u = InvPIr * theta + Real(0.5);
+        Real v = Real(0.5) * InvPIr * phi;
 
-        // TODO
+        Real cosPIu = Cos(PIr * u), sinPIu = Sin(PIr * u);
+        Real cosPhi = Cos(phi), sinPhi = Sin(phi);
+        Real radiusPI = radius_ * PIr;
 
-        return None;
+        Vec3r dpdu(radiusPI * cosPIu * cosPhi, radiusPI * cosPIu * sinPhi, radiusPI * sinPIu);
+        Vec3r dpdv(- Real(2.0) * PIr * p.y, Real(2.0) * PIr * p.x, Real(0.0));
+
+        Vec3r normal;
+        if(theta > PIr / Real(2.0) - Real(1e-4))
+            normal = Vec3r::UNIT_Z();
+        else if(theta < -PIr / Real(2.0) + Real(1e-4))
+            normal = -Vec3r::UNIT_Z();
+        else
+            normal = Normalize(Cross(dpdu, dpdv));
+
+        // Use Weingarten Equations to compute dndu and dndv
+        // See https://en.wikipedia.org/wiki/Weingarten_equations
+        Real E = Dot(dpdu, dpdu);
+        Real F = Dot(dpdu, dpdv);
+        Real G = Dot(dpdv, dpdv);
+        Real L = Dot(normal, -PIr * PIr * p);
+        Real M = Dot(normal, Vec3r(Real(2.0) * PIr * PIr * sinPhi,
+                                  -Real(2.0)*  PIr * PIr * cosPhi,
+                                  Real(0.0)));
+        Real N = Dot(normal, Vec3r(-Real(4.0) * PIr * PIr * p.xy(), Real(0.0)));
+        Real invDem = Real(1.0) / (E * G - F * F);
+
+        Vec3r dndu = (F * M - G * L) * invDem * dpdu + (F * L - E * M) * invDem * dpdv;
+        Vec3r dndv = (F * N - G * M) * invDem * dpdu + (F * M - E * N) * invDem * dpdv;
+
+        return Intersection {
+            t,
+            local2World_->ApplyToSurfaceLocal(SurfaceLocal(
+                p, { u, v }, normal, dpdu, dpdv, dndu, dndv))
+        };
     }
 };
 

@@ -19,7 +19,7 @@ public:
     }
 
     explicit Transform(const Mat4r &trans)
-        : trans_(trans), invTrans_(Inverse(trans))
+        : trans_(trans), invTrans_(trans.Inverse())
     {
 
     }
@@ -36,13 +36,13 @@ public:
         if(trans)
         {
             trans_ = *trans;
-            invTrans_ = invTrans ? *invTrans : Inverse(trans_);
+            invTrans_ = invTrans ? *invTrans : trans_.Inverse();
         }
         else
         {
             AGZ_ASSERT(invTrans);
             invTrans_ = *invTrans;
-            trans_ = Inverse(invTrans_);
+            trans_ = invTrans_.Inverse();
         }
     }
 
@@ -108,7 +108,8 @@ public:
     {
         return SurfaceLocal(
             ApplyToPoint(sl.position), sl.uv,
-            ApplyToNormal(sl.dpdu), ApplyToNormal(sl.dpdv),
+            ApplyToNormal(sl.normal),
+            ApplyToVector(sl.dpdu), ApplyToVector(sl.dpdv),
             ApplyToNormal(sl.dndu), ApplyToNormal(sl.dndv));
     }
 };

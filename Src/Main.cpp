@@ -10,7 +10,7 @@ int main()
 {
     Transform trans;
     [[maybe_unused]]
-    TransformWrapper t(trans, new Sphere(&trans, { 1.0, 2.0, 3.0 }, 1.0));
+    TransformWrapper t(trans, new Sphere(&trans, 1.0));
 
     cout << "Hello, world!" << endl;
 }
