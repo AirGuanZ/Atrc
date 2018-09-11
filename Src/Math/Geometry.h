@@ -17,28 +17,75 @@ struct Intersection
 
 class GeometryObject
 {
+protected:
+
+    virtual bool HasIntersectionImpl(
+        const Ray &ray, Real minT, Real maxT) const
+    {
+        return EvalIntersectionImpl(ray, minT, maxT).has_value();
+    }
+
+    virtual std::optional<Intersection> EvalIntersectionImpl(
+        const Ray &ray, Real minT, Real maxT) const = 0;
+
 public:
 
-    virtual ~GeometryObject() { }
+    virtual ~GeometryObject() = default;
 
-    virtual bool HasIntersection(
+    bool HasIntersection(
         const Ray &ray,
         Real minT = Real(0.0),
         Real maxT = FP<Real>::Max()) const
     {
-        return EvalIntersection(ray).has_value();
+        return HasIntersectionImpl(ray, minT, maxT);
     }
 
-    virtual std::optional<Intersection> EvalIntersection(
+    std::optional<Intersection> EvalIntersection(
         const Ray &ray,
         Real minT = Real(0.0),
-        Real maxT = FP<Real>::Max()) const = 0;
+        Real maxT = FP<Real>::Max()) const
+    {
+        return EvalIntersectionImpl(ray, minT, maxT);
+    }
 };
 
 class TransformWrapper : public GeometryObject
 {
     Transform local2World_;
     const GeometryObject *obj_;
+
+protected:
+
+    bool HasIntersectionImpl(
+        const Ray &ray,
+        Real minT, Real maxT
+    ) const final override
+    {
+        return obj_->HasIntersection(
+            Ray(
+                local2World_.ApplyInverseToPoint(ray.origin),
+                local2World_.ApplyInverseToVector(ray.direction)),
+            minT, maxT);
+    }
+
+    Option<Intersection> EvalIntersectionImpl(
+        const Ray &ray,
+        Real minT, Real maxT
+    ) const final override
+    {
+        auto tret = obj_->EvalIntersection(
+            Ray(
+                local2World_.ApplyInverseToPoint(ray.origin),
+                local2World_.ApplyInverseToVector(ray.direction)),
+            minT, maxT);
+
+        if(!tret)
+            return std::nullopt;
+        return Intersection{
+            tret->t,
+            local2World_.ApplyToSurfaceLocal(tret->inct)
+        };
+    }
 
 public:
 
@@ -63,37 +110,6 @@ public:
     const GeometryObject *GetGeometryObject() const
     {
         return obj_;
-    }
-
-    bool HasIntersection(
-        const Ray &ray,
-        Real minT, Real maxT
-    ) const final override
-    {
-        return obj_->HasIntersection(
-            Ray(
-                local2World_.ApplyInverseToPoint(ray.origin),
-                local2World_.ApplyInverseToVector(ray.direction)),
-            minT, maxT);
-    }
-
-    Option<Intersection> EvalIntersection(
-        const Ray &ray,
-        Real minT, Real maxT
-    ) const final override
-    {
-        auto tret = obj_->EvalIntersection(
-            Ray(
-                local2World_.ApplyInverseToPoint(ray.origin),
-                local2World_.ApplyInverseToVector(ray.direction)),
-            minT, maxT);
-
-        if(!tret)
-            return std::nullopt;
-        return Intersection {
-            tret->t,
-            local2World_.ApplyToSurfaceLocal(tret->inct)
-        };
     }
 };
 

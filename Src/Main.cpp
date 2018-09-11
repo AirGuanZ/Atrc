@@ -1,5 +1,8 @@
 #include <iostream>
 
+#define AGZ_ALL_IMPL
+#include <Utils.h>
+
 #include "Math/Geometry.h"
 #include "Math/Geometry/Sphere.h"
 

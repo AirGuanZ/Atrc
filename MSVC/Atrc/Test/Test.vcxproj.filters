@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Src">
+      <UniqueIdentifier>{9f0150c3-3ab2-4005-b288-6e94cbf8df29}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Math">
+      <UniqueIdentifier>{3f63bd62-cbdc-465e-a726-de4e9e671e24}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Math\Geometry">
+      <UniqueIdentifier>{95ece055-da3f-49b1-8a76-e7d775578718}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\Test\Math\Geometry\Sphere.cpp">
+      <Filter>Src\Math\Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Test\Main.cpp" />
+    <ClCompile Include="..\..\..\Test\Math\Geometry.cpp">
+      <Filter>Src\Math</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\Test\Catch.hpp" />
+  </ItemGroup>
+</Project>
