@@ -12,10 +12,10 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\Test\Main.cpp" />
     <ClCompile Include="..\..\..\Test\Math\Geometry\Sphere.cpp">
       <Filter>Src\Math\Geometry</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Test\Main.cpp" />
     <ClCompile Include="..\..\..\Test\Math\Geometry.cpp">
       <Filter>Src\Math</Filter>
     </ClCompile>

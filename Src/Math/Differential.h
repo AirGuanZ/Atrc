@@ -87,8 +87,6 @@ public:
     Vec2r uv;
     Vec3r dpdu;
     Vec3r dpdv;
-    Vec3r dndu;
-    Vec3r dndv;
 
     SurfaceLocal() = default;
 
@@ -96,15 +94,12 @@ public:
         const Vec3r &pos,
         const Vec2r &uv,
         const Vec3r &nor,
-        const Vec3r &dpdu, const Vec3r &dpdv,
-        const Vec3r &dndu, const Vec3r &dndv)
+        const Vec3r &dpdu, const Vec3r &dpdv)
         : position(pos),
           normal(nor),
           uv(uv),
           dpdu(dpdu),
-          dpdv(dpdv),
-          dndu(dndu),
-          dndv(dndv)
+          dpdv(dpdv)
     {
 
     }

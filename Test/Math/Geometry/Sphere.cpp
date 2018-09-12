@@ -16,7 +16,15 @@ TEST_CASE("Sphere", "Math")
 
     SECTION("EvalIntersection")
     {
-        Transform rot(Mat4r::RotateZ(Deg<Real>(45))
+        REQUIRE(ApproxEq(Sphere(20)
+                            .EvalIntersection(Ray(
+                                Vec3r(-50, 0.0, 0.0),
+                                Vec3r(1.0, 0.0, 0.0)))
+                            .value().inct.normal,
+                         -Vec3r::UNIT_X(),
+                         1e-5));
+
+        Transform rot(Mat4r::RotateZ(Deg<Real>(45.567))
                     * Mat4r::RotateX(Deg<Real>(23.546)));
         REQUIRE(ApproxEq(Sphere(20, &rot)
                             .EvalIntersection(Ray(

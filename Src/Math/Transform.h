@@ -109,8 +109,7 @@ public:
         return SurfaceLocal(
             ApplyToPoint(sl.position), sl.uv,
             ApplyToNormal(sl.normal),
-            ApplyToVector(sl.dpdu), ApplyToVector(sl.dpdv),
-            ApplyToNormal(sl.dndu), ApplyToNormal(sl.dndv));
+            ApplyToVector(sl.dpdu), ApplyToVector(sl.dpdv));
     }
 };
 

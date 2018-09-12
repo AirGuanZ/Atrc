@@ -57,8 +57,7 @@ class TransformWrapper : public GeometryObject
 protected:
 
     bool HasIntersectionImpl(
-        const Ray &ray,
-        Real minT, Real maxT
+        const Ray &ray, Real minT, Real maxT
     ) const final override
     {
         return obj_->HasIntersection(
@@ -69,8 +68,7 @@ protected:
     }
 
     Option<Intersection> EvalIntersectionImpl(
-        const Ray &ray,
-        Real minT, Real maxT
+        const Ray &ray, Real minT, Real maxT
     ) const final override
     {
         auto tret = obj_->EvalIntersection(
@@ -102,7 +100,8 @@ public:
         return local2World_;
     }
 
-    void SetLocal2World(const Transform &local2World)
+    void SetLocal2World(
+        const Transform &local2World = Transform::StaticIdentity())
     {
         local2World_ = local2World;
     }

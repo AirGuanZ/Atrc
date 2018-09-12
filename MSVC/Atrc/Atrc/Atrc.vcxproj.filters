@@ -12,8 +12,8 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\Src\Main.cpp">
-      <Filter>Src</Filter>
+    <ClCompile Include="..\..\..\Src\Math\Geometry\Sphere.cpp">
+      <Filter>Src\Math\Geometry</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
