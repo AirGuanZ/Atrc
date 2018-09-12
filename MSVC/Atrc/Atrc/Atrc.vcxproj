@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\Src\Camera\SimplePerspectiveCamera.cpp" />
     <ClCompile Include="..\..\..\Src\Math\Geometry\Sphere.cpp" />
+    <ClCompile Include="..\..\..\Src\Math\Geometry\TransformWrapper.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Src\Camera\Camera.h" />
@@ -29,8 +30,11 @@
     <ClInclude Include="..\..\..\Src\Math\AGZMath.h" />
     <ClInclude Include="..\..\..\Src\Math\Differential.h" />
     <ClInclude Include="..\..\..\Src\Math\Geometry.h" />
+    <ClInclude Include="..\..\..\Src\Math\Geometry\GeometryObjectWithTransform.h" />
     <ClInclude Include="..\..\..\Src\Math\Geometry\Sphere.h" />
+    <ClInclude Include="..\..\..\Src\Math\Geometry\TransformWrapper.h" />
     <ClInclude Include="..\..\..\Src\Math\Ray.h" />
+    <ClInclude Include="..\..\..\Src\Math\Spectrum.h" />
     <ClInclude Include="..\..\..\Src\Math\Transform.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

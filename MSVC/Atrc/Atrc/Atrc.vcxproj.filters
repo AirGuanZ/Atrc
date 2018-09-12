@@ -21,6 +21,9 @@
     <ClCompile Include="..\..\..\Src\Camera\SimplePerspectiveCamera.cpp">
       <Filter>Src\Camera</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Src\Math\Geometry\TransformWrapper.cpp">
+      <Filter>Src\Math\Geometry</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Src\Math\AGZMath.h">
@@ -49,6 +52,15 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Src\Camera\Camera.h">
       <Filter>Src\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\Math\Geometry\TransformWrapper.h">
+      <Filter>Src\Math\Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\Math\Geometry\GeometryObjectWithTransform.h">
+      <Filter>Src\Math\Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\Math\Spectrum.h">
+      <Filter>Src\Math</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

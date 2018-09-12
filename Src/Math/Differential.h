@@ -77,7 +77,7 @@ using DifferentialRay  = DifferentialRayTemplate<Ray>;
 using DifferentialRayT = DifferentialRayTemplate<RayT>;
 using DifferentialRayR = DifferentialRayTemplate<RayR>;
 
-// Local geometry of a surface point
+// Local geometry information of a parameterized surface point
 class SurfaceLocal
 {
 public:

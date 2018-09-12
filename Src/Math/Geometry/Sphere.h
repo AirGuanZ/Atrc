@@ -4,7 +4,7 @@
 
 #include "../../Common.h"
 #include "../AGZMath.h"
-#include "../Geometry.h"
+#include "GeometryObjectWithTransform.h"
 
 AGZ_NS_BEG(Atrc)
 
