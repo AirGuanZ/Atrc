@@ -31,8 +31,8 @@ bool Sphere::HasIntersectionImpl(
     Real t0 = (-B + delta) * inv2A;
     Real t1 = (-B - delta) * inv2A;
 
-    return (minT <= t0 && t0 <= maxT) ||
-           (minT <= t1 && t1 <= maxT);
+    return minT <= t0 && t0 <= maxT ||
+           minT <= t1 && t1 <= maxT;
 }
 
 Option<Intersection> Sphere::EvalIntersectionImpl(
@@ -48,10 +48,7 @@ Option<Intersection> Sphere::EvalIntersectionImpl(
     delta = Sqrt(delta);
 
     Real inv2A = Real(0.5) / A;
-    Real t0 = (-B + delta) * inv2A;
-    Real t1 = (-B - delta) * inv2A;
-    if(t0 > t1)
-        std::swap(t0, t1);
+    auto [t0, t1] = std::minmax((-B + delta) * inv2A, (-B - delta) * inv2A);
 
     if(maxT < t0 || t1 < minT)
         return None;
@@ -70,18 +67,17 @@ Option<Intersection> Sphere::EvalIntersectionImpl(
     if(p.x == Real(0.0) && p.y == Real(0.0))
         p.x = Real(1e-5) * radius_;
 
-    Real sinTheta = Clamp(p.z / radius_, Real(-1.0), Real(1.0));
-
-    Real theta = Arcsin(Clamp(p.z / radius_, Real(-1.0), Real(1.0)));
     Real phi = (!p.x && !p.y) ? Real(0.0) : Arctan2(p.y, p.x);
     if(phi < 0.0)
         phi += Real(2.0) * PIr;
 
+    Real sinTheta = Clamp(p.z / radius_, Real(-1.0), Real(1.0));
+    Real theta = Arcsin(Clamp(p.z / radius_, Real(-1.0), Real(1.0)));
+
     Real u = Real(0.5) * InvPIr * phi;
     Real v = InvPIr * theta + Real(0.5);
 
-    Real cosTheta = Cos(theta);
-    Real cosPhi = Cos(phi), sinPhi = Sin(phi);
+    Real cosTheta = Cos(theta), cosPhi = Cos(phi), sinPhi = Sin(phi);
     Real radiusPI = radius_ * PIr;
 
     Vec3r dpdu(-Real(2.0) * PIr * p.y,
@@ -89,7 +85,7 @@ Option<Intersection> Sphere::EvalIntersectionImpl(
                Real(0.0));
     Vec3r dpdv(-radiusPI * sinTheta * cosPhi,
                -radiusPI * sinTheta * sinPhi,
-               radiusPI * cosTheta);
+                radiusPI * cosTheta);
 
     Vec3r normal;
     if(theta > PIr / Real(2.0) - Real(1e-4))

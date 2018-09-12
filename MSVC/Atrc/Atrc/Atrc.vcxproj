@@ -19,9 +19,12 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\Src\Camera\SimplePerspectiveCamera.cpp" />
     <ClCompile Include="..\..\..\Src\Math\Geometry\Sphere.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\Src\Camera\Camera.h" />
+    <ClInclude Include="..\..\..\Src\Camera\SimplePerspectiveCamera.h" />
     <ClInclude Include="..\..\..\Src\Common.h" />
     <ClInclude Include="..\..\..\Src\Math\AGZMath.h" />
     <ClInclude Include="..\..\..\Src\Math\Differential.h" />

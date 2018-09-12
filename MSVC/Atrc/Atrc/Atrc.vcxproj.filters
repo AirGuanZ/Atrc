@@ -10,10 +10,16 @@
     <Filter Include="Src\Math\Geometry">
       <UniqueIdentifier>{54ca4be4-ca1c-458a-b191-764fe7bfd7f1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\Camera">
+      <UniqueIdentifier>{4bc56e54-d473-463e-8319-e337d667fe08}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Src\Math\Geometry\Sphere.cpp">
       <Filter>Src\Math\Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Src\Camera\SimplePerspectiveCamera.cpp">
+      <Filter>Src\Camera</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -37,6 +43,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Src\Math\Transform.h">
       <Filter>Src\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\Camera\SimplePerspectiveCamera.h">
+      <Filter>Src\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\Camera\Camera.h">
+      <Filter>Src\Camera</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

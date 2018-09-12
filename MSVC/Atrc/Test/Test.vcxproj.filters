@@ -10,6 +10,9 @@
     <Filter Include="Src\Math\Geometry">
       <UniqueIdentifier>{95ece055-da3f-49b1-8a76-e7d775578718}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\Camera">
+      <UniqueIdentifier>{47f88770-f035-40b4-8d08-7daf5b3ba3b6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Test\Main.cpp" />
@@ -18,6 +21,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Test\Math\Geometry.cpp">
       <Filter>Src\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Test\Camera\SimplePerspectiveCamera.cpp">
+      <Filter>Src\Camera</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\Test\Camera\SimplePerspectiveCamera.cpp" />
     <ClCompile Include="..\..\..\Test\Main.cpp" />
     <ClCompile Include="..\..\..\Test\Math\Geometry.cpp" />
     <ClCompile Include="..\..\..\Test\Math\Geometry\Sphere.cpp" />

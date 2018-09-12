@@ -8,10 +8,9 @@ TEST_CASE("Sphere", "Math")
 {
     SECTION("HasIntersection")
     {
-        REQUIRE(Sphere(2.0)
-                    .HasIntersection(Ray(
-                        Vec3r(-5.0, 0.0, 0.0),
-                        Vec3r::UNIT_X())));
+        REQUIRE(Sphere(2.0).HasIntersection(Ray(
+                                Vec3r(-5.0, 0.0, 0.0),
+                                Vec3r::UNIT_X())));
     }
 
     SECTION("EvalIntersection")
