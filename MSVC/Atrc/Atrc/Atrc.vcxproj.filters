@@ -13,6 +13,15 @@
     <Filter Include="Src\Camera">
       <UniqueIdentifier>{4bc56e54-d473-463e-8319-e337d667fe08}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\Misc">
+      <UniqueIdentifier>{89a9ed88-33a6-4e94-bbf6-3b67330c8a16}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Integrator">
+      <UniqueIdentifier>{37165295-ca26-48c1-9848-6bcde3adee80}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Renderer">
+      <UniqueIdentifier>{1d4250a0-b50d-46da-b11c-029516b33538}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Src\Math\Geometry\Sphere.cpp">
@@ -59,8 +68,14 @@
     <ClInclude Include="..\..\..\Src\Math\Geometry\GeometryObjectWithTransform.h">
       <Filter>Src\Math\Geometry</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Src\Math\Spectrum.h">
-      <Filter>Src\Math</Filter>
+    <ClInclude Include="..\..\..\Src\Misc\Spectrum.h">
+      <Filter>Src\Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\Integrator\Integrator.h">
+      <Filter>Src\Integrator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\Renderer\Renderer.h">
+      <Filter>Src\Renderer</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
