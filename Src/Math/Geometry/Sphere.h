@@ -23,7 +23,7 @@ public:
 
     bool HasIntersection(const Ray &_ray) const override;
 
-    Option<Intersection> EvalIntersection(const Ray &_ray) const override;
+    Option<GeometryIntersection> EvalIntersection(const Ray &_ray) const override;
 
     Real GetRadius() const { return radius_; }
 };

@@ -22,7 +22,7 @@ public:
 
     bool HasIntersection(const Ray &ray) const override;
 
-    Option<Intersection> EvalIntersection(const Ray &ray) const override;
+    Option<GeometryIntersection> EvalIntersection(const Ray &ray) const override;
 
     const Transform &Local2World() const
     {

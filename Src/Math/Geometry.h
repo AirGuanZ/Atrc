@@ -7,7 +7,7 @@
 
 AGZ_NS_BEG(Atrc)
 
-struct Intersection
+struct GeometryIntersection
 {
     Real t;
     SurfaceLocal inct;
@@ -24,7 +24,7 @@ public:
         return EvalIntersection(ray).has_value();
     }
 
-    virtual Option<Intersection> EvalIntersection(const Ray &ray) const = 0;
+    virtual Option<GeometryIntersection> EvalIntersection(const Ray &ray) const = 0;
 };
 
 AGZ_NS_END(Atrc)

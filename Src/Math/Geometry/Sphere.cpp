@@ -33,7 +33,7 @@ bool Sphere::HasIntersection(const Ray &_ray) const
            ray.minT <= t1 && t1 <= ray.maxT;
 }
 
-Option<Intersection> Sphere::EvalIntersection(const Ray &_ray) const
+Option<GeometryIntersection> Sphere::EvalIntersection(const Ray &_ray) const
 {
     Ray ray = local2World_->ApplyInverseToRay(_ray);
     auto [A, B, C] = GetRayInctEquCoefs(radius_, ray);
@@ -91,7 +91,7 @@ Option<Intersection> Sphere::EvalIntersection(const Ray &_ray) const
     else
         normal = Normalize(Cross(dpdu, dpdv));
 
-    return Intersection{
+    return GeometryIntersection{
         t,
         local2World_->ApplyToSurfaceLocal(SurfaceLocal(
             p,{ u, v }, normal, dpdu, dpdv))
