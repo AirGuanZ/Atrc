@@ -8,9 +8,9 @@
 
 AGZ_NS_BEG(Atrc)
 
-// x = r * cos(PI * (u - 0.5)) * cos(2PI * v) = + r * sin(PI * v) * cos(2PI * u)
-// y = r * cos(PI * (u - 0.5)) * sin(2PI * v) = + r * sin(PI * v) * sin(2PI * u)
-// z = r * sin(PI * (u - 0.5))                = - r * cos(PI * v)
+// x = r * cos(PI * (u - 0.5)) * cos(2PI * v)
+// y = r * cos(PI * (u - 0.5)) * sin(2PI * v)
+// z = r * sin(PI * (u - 0.5))
 class Sphere : public GeometryObjectWithTransform
 {
     Real radius_;
