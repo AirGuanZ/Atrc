@@ -33,6 +33,9 @@
     <ClCompile Include="..\..\..\Src\Camera\PerspectiveCamera.cpp">
       <Filter>Src\Camera</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Src\Math\Geometry\TriangleAux.cpp">
+      <Filter>Src\Math\Geometry</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Src\Math\AGZMath.h">
@@ -76,6 +79,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Src\Math\Sample.h">
       <Filter>Src\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\Math\Geometry\TriangleAux.h">
+      <Filter>Src\Math\Geometry</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
