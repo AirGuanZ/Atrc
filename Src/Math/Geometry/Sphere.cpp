@@ -15,9 +15,7 @@ namespace
     }
 }
 
-bool Sphere::HasIntersectionImpl(
-    const Ray &_ray, Real minT, Real maxT
-) const
+bool Sphere::HasIntersection(const Ray &_ray) const
 {
     Ray ray = local2World_->ApplyInverseToRay(_ray);
     auto [A, B, C] = GetRayInctEquCoefs(radius_, ray);
@@ -31,13 +29,11 @@ bool Sphere::HasIntersectionImpl(
     Real t0 = (-B + delta) * inv2A;
     Real t1 = (-B - delta) * inv2A;
 
-    return minT <= t0 && t0 <= maxT ||
-           minT <= t1 && t1 <= maxT;
+    return ray.minT <= t0 && t0 <= ray.maxT ||
+           ray.minT <= t1 && t1 <= ray.maxT;
 }
 
-Option<Intersection> Sphere::EvalIntersectionImpl(
-    const Ray &_ray, Real minT, Real maxT
-) const
+Option<Intersection> Sphere::EvalIntersection(const Ray &_ray) const
 {
     Ray ray = local2World_->ApplyInverseToRay(_ray);
     auto [A, B, C] = GetRayInctEquCoefs(radius_, ray);
@@ -50,12 +46,12 @@ Option<Intersection> Sphere::EvalIntersectionImpl(
     Real inv2A = Real(0.5) / A;
     auto [t0, t1] = std::minmax((-B + delta) * inv2A, (-B - delta) * inv2A);
 
-    if(maxT < t0 || t1 < minT)
+    if(ray.maxT < t0 || t1 < ray.minT)
         return None;
     Real t;
-    if(t0 < minT)
+    if(t0 < ray.minT)
     {
-        if(t1 <= maxT)
+        if(t1 <= ray.maxT)
             t = t1;
         else
             return None;

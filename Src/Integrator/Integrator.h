@@ -11,7 +11,7 @@ public:
 
     virtual ~Integrator() = default;
 
-    virtual Spectrum Render(const Ray &r) const = 0;
+    virtual Spectrum GetRadiance(const Ray &r) const = 0;
 };
 
 AGZ_NS_END(Atrc)

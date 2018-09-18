@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Geometry.h"
+#include "../Transform.h"
 
 AGZ_NS_BEG(Atrc)
 
@@ -8,16 +9,6 @@ class TransformWrapper : public GeometryObject
 {
     Transform local2World_;
     const GeometryObject *obj_;
-
-protected:
-
-    bool HasIntersectionImpl(
-        const Ray &ray, Real minT, Real maxT
-    ) const final override;
-
-    Option<Intersection> EvalIntersectionImpl(
-        const Ray &ray, Real minT, Real maxT
-    ) const final override;
 
 public:
 
@@ -28,6 +19,10 @@ public:
     {
         AGZ_ASSERT(wrappedObj);
     }
+
+    bool HasIntersection(const Ray &ray) const override;
+
+    Option<Intersection> EvalIntersection(const Ray &ray) const override;
 
     const Transform &Local2World() const
     {

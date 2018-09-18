@@ -95,13 +95,15 @@ public:
     Ray ApplyToRay(const Ray &ray) const
     {
         return Ray(ApplyToPoint(ray.origin),
-                   ApplyToVector(ray.direction));
+                   ApplyToVector(ray.direction),
+                   ray.minT, ray.maxT, ray.depth);
     }
 
     Ray ApplyInverseToRay(const Ray &ray) const
     {
         return Ray(ApplyInverseToPoint(ray.origin),
-                   ApplyInverseToVector(ray.direction));
+                   ApplyInverseToVector(ray.direction),
+                   ray.minT, ray.maxT, ray.depth);
     }
 
     SurfaceLocal ApplyToSurfaceLocal(const SurfaceLocal &sl) const

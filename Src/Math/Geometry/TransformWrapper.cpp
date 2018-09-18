@@ -2,27 +2,14 @@
 
 AGZ_NS_BEG(Atrc)
 
-bool TransformWrapper::HasIntersectionImpl(
-    const Ray &ray, Real minT, Real maxT
-) const
+bool TransformWrapper::HasIntersection(const Ray &ray) const
 {
-    return obj_->HasIntersection(
-        Ray(
-            local2World_.ApplyInverseToPoint(ray.origin),
-            local2World_.ApplyInverseToVector(ray.direction)),
-        minT, maxT);
+    return obj_->HasIntersection(local2World_.ApplyInverseToRay(ray));
 }
 
-Option<Intersection> TransformWrapper::EvalIntersectionImpl(
-    const Ray &ray, Real minT, Real maxT
-) const
+Option<Intersection> TransformWrapper::EvalIntersection(const Ray &ray) const
 {
-    auto tret = obj_->EvalIntersection(
-        Ray(
-            local2World_.ApplyInverseToPoint(ray.origin),
-            local2World_.ApplyInverseToVector(ray.direction)),
-        minT, maxT);
-
+    auto tret = obj_->EvalIntersection(local2World_.ApplyInverseToRay(ray));
     if(!tret)
         return std::nullopt;
     return Intersection{

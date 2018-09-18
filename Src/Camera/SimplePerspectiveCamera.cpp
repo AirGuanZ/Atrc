@@ -25,7 +25,7 @@ Ray SimplePerspectiveCamera::Generate(const Vec2r &screenSample) const
 {
     Vec3r ori = scrCen_ + screenSample.x * scrX_ + screenSample.y * scrY_;
     Vec3r dir = (ori - eye_).Normalize();
-    return Ray(ori, dir);
+    return Ray::New(ori, dir);
 }
 
 AGZ_NS_END(Atrc)

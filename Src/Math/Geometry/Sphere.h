@@ -15,21 +15,15 @@ class Sphere : public GeometryObjectWithTransform
 {
     Real radius_;
 
-protected:
-
-    bool HasIntersectionImpl(
-        const Ray &_ray, Real minT, Real maxT
-    ) const override;
-
-    Option<Intersection> EvalIntersectionImpl(
-        const Ray &_ray, Real minT, Real maxT
-    ) const override;
-
 public:
 
     explicit Sphere(
         Real radius,
         const Transform *local2World = &Transform::StaticIdentity());
+
+    bool HasIntersection(const Ray &_ray) const override;
+
+    Option<Intersection> EvalIntersection(const Ray &_ray) const override;
 
     Real GetRadius() const { return radius_; }
 };

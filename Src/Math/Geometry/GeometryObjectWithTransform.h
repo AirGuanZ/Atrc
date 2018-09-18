@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Geometry.h"
+#include "../Transform.h"
 
 AGZ_NS_BEG(Atrc)
 
