@@ -1,4 +1,5 @@
 #include <Math/Geometry/Sphere.h>
+#include <Math/Transform.h>
 
 #include "../Catch.hpp"
 

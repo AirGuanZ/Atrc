@@ -15,9 +15,8 @@ namespace
     }
 }
 
-bool Sphere::HasIntersection(const Ray &_ray) const
+bool Sphere::HasIntersection(const Ray &ray) const
 {
-    Ray ray = local2World_->ApplyInverseToRay(_ray);
     auto [A, B, C] = GetRayInctEquCoefs(radius_, ray);
 
     Real delta = B * B - Real(4.0) * A * C;
@@ -33,9 +32,8 @@ bool Sphere::HasIntersection(const Ray &_ray) const
            ray.minT <= t1 && t1 <= ray.maxT;
 }
 
-Option<GeometryIntersection> Sphere::EvalIntersection(const Ray &_ray) const
+Option<GeometryIntersection> Sphere::EvalIntersection(const Ray &ray) const
 {
-    Ray ray = local2World_->ApplyInverseToRay(_ray);
     auto [A, B, C] = GetRayInctEquCoefs(radius_, ray);
 
     Real delta = B * B - Real(4.0) * A * C;
@@ -92,14 +90,12 @@ Option<GeometryIntersection> Sphere::EvalIntersection(const Ray &_ray) const
         normal = Normalize(Cross(dpdu, dpdv));
 
     return GeometryIntersection{
-        t,
-        local2World_->ApplyToSurfaceLocal(SurfaceLocal(
-            p,{ u, v }, normal, dpdu, dpdv))
+        t, SurfaceLocal(p,{ u, v }, normal, dpdu, dpdv)
     };
 }
 
-Sphere::Sphere(Real radius, const Transform *local2World)
-    : GeometryObjectWithTransform(local2World), radius_(radius)
+Sphere::Sphere(Real radius)
+    : radius_(radius)
 {
 
 }
