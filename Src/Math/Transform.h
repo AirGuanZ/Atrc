@@ -74,7 +74,7 @@ public:
 
     Vec3r ApplyToNormal(const Vec3r &n) const
     {
-        return invTrans_.ApplyInverseToNormal(n);
+        return invTrans_.ApplyInverseToNormal(n).Normalize();
     }
 
     Vec3r ApplyInverseToPoint(const Vec3r &p) const
@@ -89,21 +89,23 @@ public:
 
     Vec3r ApplyInverseToNormal(const Vec3r &n) const
     {
-        return trans_.ApplyInverseToNormal(n);
+        return trans_.ApplyInverseToNormal(n).Normalize();
     }
 
     Ray ApplyToRay(const Ray &ray) const
     {
-        return Ray(ApplyToPoint(ray.origin),
-                   ApplyToVector(ray.direction),
-                   ray.minT, ray.maxT, ray.depth);
+        return Ray(
+            ApplyToPoint(ray.origin),
+            ApplyToVector(ray.direction),
+            ray.minT, ray.maxT, ray.depth);
     }
 
     Ray ApplyInverseToRay(const Ray &ray) const
     {
-        return Ray(ApplyInverseToPoint(ray.origin),
-                   ApplyInverseToVector(ray.direction),
-                   ray.minT, ray.maxT, ray.depth);
+        return Ray(
+            ApplyInverseToPoint(ray.origin),
+            ApplyInverseToVector(ray.direction),
+            ray.minT, ray.maxT, ray.depth);
     }
 
     SurfaceLocal ApplyToSurfaceLocal(const SurfaceLocal &sl) const
