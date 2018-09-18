@@ -22,11 +22,6 @@ TEST_CASE("Transform", "Math")
                          .ApplyToVector({ 0.0,  1.0,  0.0 }),
                      1e-5));
 
-    auto L = Transform(Mat4r::RotateZ(PIr / 2))
-        .ApplyToVector({ 2.0, -1.0, 0.0 })
-        .Normalize();
-    auto R = Transform(Mat4r::Scale({ 1.0, 0.5, 1.0 }))
-        .ApplyToNormal(Vec3r(1.0, 1.0, 0.0).Normalize());
     REQUIRE(ApproxEq(Transform(Mat4r::RotateZ(PIr / 2))
                         .ApplyToVector({ 2.0, -1.0, 0.0 })
                         .Normalize(),

@@ -33,7 +33,6 @@ TEST_CASE("Sphere", "Math")
                          -Vec3r::UNIT_X(),
                          1e-5));
 
-
         Transform rot2(Mat4r::RotateZ(Deg<Real>(45.57))
                      * Mat4r::RotateX(Deg<Real>(23.546))
                      * Mat4r::Rotate(Vec3r(1.0, 2.0, 3.0).Normalize(), Deg<Real>(124.45789)));

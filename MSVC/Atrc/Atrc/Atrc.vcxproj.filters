@@ -22,16 +22,19 @@
     <Filter Include="Src\Renderer">
       <UniqueIdentifier>{1d4250a0-b50d-46da-b11c-029516b33538}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\Material">
+      <UniqueIdentifier>{3a386be9-14b5-46a3-acc1-3e00d859a8d6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Src\Math\Geometry\Sphere.cpp">
       <Filter>Src\Math\Geometry</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Src\Camera\SimplePerspectiveCamera.cpp">
-      <Filter>Src\Camera</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Src\Math\Geometry\TransformWrapper.cpp">
       <Filter>Src\Math\Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Src\Camera\PerspectiveCamera.cpp">
+      <Filter>Src\Camera</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -56,9 +59,6 @@
     <ClInclude Include="..\..\..\Src\Math\Transform.h">
       <Filter>Src\Math</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Src\Camera\SimplePerspectiveCamera.h">
-      <Filter>Src\Camera</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Src\Camera\Camera.h">
       <Filter>Src\Camera</Filter>
     </ClInclude>
@@ -76,6 +76,15 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Src\Renderer\Renderer.h">
       <Filter>Src\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\Camera\PerspectiveCamera.h">
+      <Filter>Src\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\Material\BxDF.h">
+      <Filter>Src\Material</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\Math\Sample.h">
+      <Filter>Src\Math</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

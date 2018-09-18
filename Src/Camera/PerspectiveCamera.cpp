@@ -1,8 +1,8 @@
-#include "SimplePerspectiveCamera.h"
+#include "PerspectiveCamera.h"
 
 AGZ_NS_BEG(Atrc)
 
-SimplePerspectiveCamera::SimplePerspectiveCamera(
+PerspectiveCamera::PerspectiveCamera(
     const Vec3r &eye, const Vec3r &_dir, const Vec3r &up,
     Radr FOVy, Real aspectRatio, Real distance)
     : eye_(eye), scrCen_(AGZ::UNINITIALIZED),
@@ -21,7 +21,7 @@ SimplePerspectiveCamera::SimplePerspectiveCamera(
     scrY_ = scrYSize * scrYDir;
 }
 
-Ray SimplePerspectiveCamera::Generate(const Vec2r &screenSample) const
+Ray PerspectiveCamera::Generate(const Vec2r &screenSample) const
 {
     Vec3r ori = scrCen_ + screenSample.x * scrX_ + screenSample.y * scrY_;
     Vec3r dir = (ori - eye_).Normalize();

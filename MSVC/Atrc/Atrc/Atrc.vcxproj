@@ -19,15 +19,16 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\Src\Camera\SimplePerspectiveCamera.cpp" />
+    <ClCompile Include="..\..\..\Src\Camera\PerspectiveCamera.cpp" />
     <ClCompile Include="..\..\..\Src\Math\Geometry\Sphere.cpp" />
     <ClCompile Include="..\..\..\Src\Math\Geometry\TransformWrapper.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Src\Camera\Camera.h" />
-    <ClInclude Include="..\..\..\Src\Camera\SimplePerspectiveCamera.h" />
+    <ClInclude Include="..\..\..\Src\Camera\PerspectiveCamera.h" />
     <ClInclude Include="..\..\..\Src\Common.h" />
     <ClInclude Include="..\..\..\Src\Integrator\Integrator.h" />
+    <ClInclude Include="..\..\..\Src\Material\BxDF.h" />
     <ClInclude Include="..\..\..\Src\Math\AGZMath.h" />
     <ClInclude Include="..\..\..\Src\Math\Differential.h" />
     <ClInclude Include="..\..\..\Src\Math\Geometry.h" />
@@ -35,6 +36,7 @@
     <ClInclude Include="..\..\..\Src\Math\Geometry\Sphere.h" />
     <ClInclude Include="..\..\..\Src\Math\Geometry\TransformWrapper.h" />
     <ClInclude Include="..\..\..\Src\Math\Ray.h" />
+    <ClInclude Include="..\..\..\Src\Math\Sample.h" />
     <ClInclude Include="..\..\..\Src\Math\Transform.h" />
     <ClInclude Include="..\..\..\Src\Misc\Spectrum.h" />
     <ClInclude Include="..\..\..\Src\Renderer\Renderer.h" />

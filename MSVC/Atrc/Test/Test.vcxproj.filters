@@ -22,7 +22,7 @@
     <ClCompile Include="..\..\..\Test\Math\Geometry.cpp">
       <Filter>Src\Math</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Test\Camera\SimplePerspectiveCamera.cpp">
+    <ClCompile Include="..\..\..\Test\Camera\PerspectiveCamera.cpp">
       <Filter>Src\Camera</Filter>
     </ClCompile>
   </ItemGroup>

@@ -1,9 +1,9 @@
 #pragma once
 
-#include <Utils.h>
+#include "../Math/AGZMath.h"
 
 AGZ_NS_BEG(Atrc)
 
-using Spectrum = AGZ::Math::Color3f;
+using Spectrum = Color3f;
 
 AGZ_NS_END(Atrc)
