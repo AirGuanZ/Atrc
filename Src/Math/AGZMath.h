@@ -13,6 +13,7 @@ using RealT = FP<Real>;
 using Vec2r = Vec2<Real>;
 using Vec3r = Vec3<Real>;
 using Vec4r = Vec4<Real>;
+using Mat3r = Mat3<Real>;
 using Mat4r = Mat4<Real>;
 
 using Degr = Deg<Real>;
