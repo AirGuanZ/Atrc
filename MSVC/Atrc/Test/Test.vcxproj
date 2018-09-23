@@ -23,6 +23,7 @@
     <ClCompile Include="..\..\..\Test\Main.cpp" />
     <ClCompile Include="..\..\..\Test\Math\Geometry.cpp" />
     <ClCompile Include="..\..\..\Test\Math\Geometry\Sphere.cpp" />
+    <ClCompile Include="..\..\..\Test\Math\Geometry\TriangleAux.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Test\Catch.hpp" />

@@ -10,7 +10,7 @@ bool HasIntersection(const Ray &r, const Vec3r &A, const Vec3r &B, const Vec3r &
 
 struct TriangleIntersection
 {
-    Real coefA, coefB, coefC;
+    Real coefA, coefB, coefC, t;
 };
 
 Option<TriangleIntersection> EvalIntersection(

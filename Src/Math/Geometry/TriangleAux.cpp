@@ -58,7 +58,7 @@ Option<TriangleIntersection> EvalIntersection(
        alpha < Real(0.0) || beta < Real(0.0) || coefA < Real(0.0))
         return None;
 
-    return TriangleIntersection{ coefA, alpha, beta };
+    return TriangleIntersection{ coefA, alpha, beta, t };
 }
 
 AGZ_NS_END(Atrc::TriangleAux)
