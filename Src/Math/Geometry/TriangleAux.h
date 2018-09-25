@@ -22,7 +22,7 @@ struct TriangleSurfaceLocal
     Vec3r dpdv;
 };
 
-// p = A + u * dpdu + v * dpdv
+// p = A + (u - uA) * dpdu + (v - vA) * dpdv
 TriangleSurfaceLocal EvalSurfaceLocal(
     const Vec3r &A,   const Vec3r &B,   const Vec3r &C,
     const Vec2r &uvA, const Vec2r &uvB, const Vec2r &uvC);
