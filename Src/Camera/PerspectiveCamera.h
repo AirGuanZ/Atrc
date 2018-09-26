@@ -1,11 +1,12 @@
 #pragma once
 
+#include "../Common.h"
 #include "../Math/AGZMath.h"
 #include "Camera.h"
 
 AGZ_NS_BEG(Atrc)
 
-class PerspectiveCamera : public Camera
+class PerspectiveCamera : ATRC_IMPLEMENTS Camera
 {
     Vec3r eye_, scrCen_;
     Vec3r scrX_, scrY_;

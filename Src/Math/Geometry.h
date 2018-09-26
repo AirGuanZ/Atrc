@@ -13,7 +13,7 @@ struct GeometryIntersection
     SurfaceLocal inct;
 };
 
-class GeometryObject
+ATRC_INTERFACE GeometryObject
 {
 public:
 

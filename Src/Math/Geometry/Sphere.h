@@ -11,7 +11,7 @@ AGZ_NS_BEG(Atrc)
 // x = r * cos(PI * (u - 0.5)) * cos(2PI * v)
 // y = r * cos(PI * (u - 0.5)) * sin(2PI * v)
 // z = r * sin(PI * (u - 0.5))
-class Sphere : public GeometryObject, public AGZ::Uncopiable
+class Sphere : ATRC_IMPLEMENTS GeometryObject, ATRC_PROPERTY AGZ::Uncopiable
 {
     Real radius_;
 

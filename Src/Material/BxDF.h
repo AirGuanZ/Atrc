@@ -31,7 +31,7 @@ struct BxDFSample
     Real pdf;
 };
 
-class BxDF
+ATRC_INTERFACE BxDF
 {
 public:
 

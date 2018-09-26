@@ -5,7 +5,7 @@
 
 AGZ_NS_BEG(Atrc)
 
-class Camera
+ATRC_INTERFACE Camera
 {
 public:
 

@@ -18,3 +18,7 @@ auto Some(Args&&...args)
 inline auto None = std::nullopt;
 
 AGZ_NS_END(Atrc)
+
+#define ATRC_INTERFACE class
+#define ATRC_IMPLEMENTS public
+#define ATRC_PROPERTY public

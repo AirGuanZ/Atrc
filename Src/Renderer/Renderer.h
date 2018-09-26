@@ -2,9 +2,11 @@
 
 #include <Utils.h>
 
+#include "../Common.h"
+
 AGZ_NS_BEG(Atrc)
 
-class Renderer
+ATRC_INTERFACE Renderer
 {
 public:
 

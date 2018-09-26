@@ -6,7 +6,7 @@
 
 AGZ_NS_BEG(Atrc)
 
-class TriangleMesh : public GeometryObject, public AGZ::Uncopiable
+class TriangleMesh : ATRC_IMPLEMENTS GeometryObject, ATRC_PROPERTY AGZ::Uncopiable
 {
     // IMPROVE: layout
 

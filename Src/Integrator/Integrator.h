@@ -1,11 +1,12 @@
 #pragma once
 
+#include "../Common.h"
 #include "../Math/Ray.h"
 #include "../Misc/Spectrum.h"
 
 AGZ_NS_BEG(Atrc)
 
-class Integrator
+ATRC_INTERFACE Integrator
 {
 public:
 
