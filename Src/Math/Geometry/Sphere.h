@@ -1,7 +1,5 @@
 #pragma once
 
-#include <tuple>
-
 #include "../../Common.h"
 #include "../AGZMath.h"
 #include "../Geometry.h"

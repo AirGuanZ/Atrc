@@ -83,5 +83,8 @@
     <ClInclude Include="..\..\..\Src\Math\Geometry\TriangleAux.h">
       <Filter>Src\Math\Geometry</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Src\Math\Geometry\TriangleMesh.h">
+      <Filter>Src\Math\Geometry</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

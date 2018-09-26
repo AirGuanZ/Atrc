@@ -2,9 +2,9 @@
 
 AGZ_NS_BEG(Atrc::TriangleAux)
 
-bool HasIntersection(const Ray &r, const Vec3r &A, const Vec3r &B, const Vec3r &C)
+bool HasIntersection(const Ray &r, const Vec3r &A, const Vec3r &B_A, const Vec3r &C_A)
 {
-    Vec3r B_A = B - A, C_A = C - A, _d = -r.direction;
+    Vec3r _d = -r.direction;
 
     Real detD = Mat3r::FromCols(B_A, C_A, _d).Determinant();
     if(ApproxEq(RealT(detD), RealT(Real(0.0))))
@@ -13,12 +13,12 @@ bool HasIntersection(const Ray &r, const Vec3r &A, const Vec3r &B, const Vec3r &
 
     Vec3r o_A = r.origin - A;
     Real alpha = Mat3r::FromCols(o_A, C_A, _d).Determinant() * invDetD;
-    Real beta  = Mat3r::FromCols(B_A, o_A, _d).Determinant() * invDetD;
-    Real t     = Mat3r::FromCols(B_A, C_A, o_A).Determinant() * invDetD;
+    Real beta = Mat3r::FromCols(B_A, o_A, _d).Determinant() * invDetD;
+    Real t = Mat3r::FromCols(B_A, C_A, o_A).Determinant() * invDetD;
 
     Real coefA = Real(1) - alpha - beta;
     return r.minT <= t && t <= r.maxT &&
-           coefA >= Real(0.0) && alpha >= Real(0.0) && beta >= Real(0.0);
+        coefA >= Real(0.0) && alpha >= Real(0.0) && beta >= Real(0.0);
 }
 
 // IMPROVE
@@ -39,9 +39,9 @@ bool HasIntersection(const Ray &r, const Vec3r &A, const Vec3r &B, const Vec3r &
 //     coefB = alpha
 //     coefC = beta
 Option<TriangleIntersection> EvalIntersection(
-    const Ray &r, const Vec3r &A, const Vec3r &B, const Vec3r &C)
+    const Ray &r, const Vec3r &A, const Vec3r &B_A, const Vec3r &C_A)
 {
-    Vec3r B_A = B - A, C_A = C - A, _d = -r.direction;
+    Vec3r _d = -r.direction;
 
     Real detD = Mat3r::FromCols(B_A, C_A, _d).Determinant();
     if(ApproxEq(RealT(detD), RealT(Real(0.0))))
@@ -50,12 +50,12 @@ Option<TriangleIntersection> EvalIntersection(
 
     Vec3r o_A = r.origin - A;
     Real alpha = Mat3r::FromCols(o_A, C_A, _d).Determinant() * invDetD;
-    Real beta  = Mat3r::FromCols(B_A, o_A, _d).Determinant() * invDetD;
-    Real t     = Mat3r::FromCols(B_A, C_A, o_A).Determinant() * invDetD;
+    Real beta = Mat3r::FromCols(B_A, o_A, _d).Determinant() * invDetD;
+    Real t = Mat3r::FromCols(B_A, C_A, o_A).Determinant() * invDetD;
 
     Real coefA = Real(1) - alpha - beta;
     if(t < r.minT || t > r.maxT ||
-       alpha < Real(0.0) || beta < Real(0.0) || coefA < Real(0.0))
+        alpha < Real(0.0) || beta < Real(0.0) || coefA < Real(0.0))
         return None;
 
     return TriangleIntersection{ coefA, alpha, beta, t };
@@ -74,22 +74,22 @@ Option<TriangleIntersection> EvalIntersection(
 // =>  dpdu = ((vC-vA)(B-A) - (vB-vA)(C-A)) / ((vC-vA)(uB-uA) - (vB-vA)(uC-uA))
 //     dpdv = ((uB-uA)(C-A) - (uC-uA)(B-A)) / ((uB-uA)(vC-vA) - (uC-uA)(vB-vA))
 TriangleSurfaceLocal EvalSurfaceLocal(
-    const Vec3r &A, const Vec3r &B, const Vec3r &C,
-    const Vec2r &uvA, const Vec2r &uvB, const Vec2r &uvC)
+    const Vec3r &B_A, const Vec3r &C_A,
+    const Vec2r &uvB_A, const Vec2r &uvC_A)
 {
-    Real dem = (uvC.v - uvA.v) * (uvB.u - uvA.u) - (uvB.v - uvA.v) * (uvC.u * uvA.u);
+    Real dem = uvC_A.v * uvB_A.u - uvB_A.v * uvC_A.u;
 
     if(RealT(dem).ApproxEq(Real(0)))
     {
-        Vec3r dpdu = C - A;
-        Vec3r dpdv = Cross(Cross(dpdu, B - A), dpdu);
-        return { dpdu.Normalize(), dpdv.Normalize() };
+        Vec3r norm = Cross(C_A, B_A);
+        Vec3r dpdv = Cross(norm, C_A);
+        return { norm.Normalize(), C_A.Normalize(), dpdv.Normalize() };
     }
 
     Real invDem = Real(1) / dem;
-    Vec3r dpdu = ((uvC.v - uvA.v) * (B - A) - (uvB.v - uvA.v) * (C - A)) * invDem;
-    Vec3r dpdv = ((uvB.u - uvA.u) * (C - A) - (uvC.u - uvA.u) * (B - A)) * invDem;
-    return { dpdu, dpdv };
+    Vec3r dpdu = (uvC_A.v * B_A - uvB_A.v * C_A) * invDem;
+    Vec3r dpdv = (uvB_A.u * C_A - uvC_A.u * B_A) * invDem;
+    return { Cross(C_A, B_A).Normalize(), dpdu, dpdv };
 }
 
 AGZ_NS_END(Atrc::TriangleAux)

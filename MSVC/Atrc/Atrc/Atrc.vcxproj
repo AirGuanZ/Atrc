@@ -34,6 +34,7 @@
     <ClInclude Include="..\..\..\Src\Math\Geometry.h" />
     <ClInclude Include="..\..\..\Src\Math\Geometry\Sphere.h" />
     <ClInclude Include="..\..\..\Src\Math\Geometry\TriangleAux.h" />
+    <ClInclude Include="..\..\..\Src\Math\Geometry\TriangleMesh.h" />
     <ClInclude Include="..\..\..\Src\Math\Ray.h" />
     <ClInclude Include="..\..\..\Src\Math\Sample.h" />
     <ClInclude Include="..\..\..\Src\Math\Transform.h" />

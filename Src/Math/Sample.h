@@ -9,10 +9,6 @@ struct Sample1D
     Real u;
 };
 
-struct Sample2D
-{
-    Real u;
-    Real v;
-};
+using Sample2D = Vec2r;
 
 AGZ_NS_END(Atrc)

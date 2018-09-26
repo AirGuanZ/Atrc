@@ -17,10 +17,10 @@ TEST_CASE("TriangleAux", "Math")
 
         {
             Ray r = Ray::New({ -1.0, 0.0, 0.0 }, { 1.0, 0.0, 0.0 });
-            REQUIRE(valid(r, EvalIntersection(r, { 1.0, -1.0, -1.0 },
+            REQUIRE(valid(r, EvalIntersection2(r, { 1.0, -1.0, -1.0 },
                                                  { 1.0, 1.0, 0.0 },
                                                  { 1.0, -1.0, 1.0 })));
-            REQUIRE(!EvalIntersection(r, { -2.0, -1.0, -1.0 },
+            REQUIRE(!EvalIntersection2(r, { -2.0, -1.0, -1.0 },
                                          { -2.0, 1.0, 0.0 },
                                          { -2.0, -1.0, 1.0 }));
         }
