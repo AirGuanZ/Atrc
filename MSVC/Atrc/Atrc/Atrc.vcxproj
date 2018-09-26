@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Src\Camera\PerspectiveCamera.cpp" />
+    <ClCompile Include="..\..\..\Src\Entity\GeometryEntity.cpp" />
     <ClCompile Include="..\..\..\Src\Math\Geometry\Sphere.cpp" />
     <ClCompile Include="..\..\..\Src\Math\Geometry\TriangleAux.cpp" />
     <ClCompile Include="..\..\..\Src\Math\Geometry\TriangleMesh.cpp" />

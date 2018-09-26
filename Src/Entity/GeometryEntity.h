@@ -20,10 +20,11 @@ class GeometryEntity : ATRC_IMPLEMENTS Entity, ATRC_PROPERTY AGZ::Uncopiable
 
 public:
 
-    GeometryEntity(const GeometryObject *geoObj, const Material *mat,
-                   const Transform &local2World);
+    GeometryEntity(
+        const GeometryObject *geoObj, const Material *mat,
+        const Transform &local2World);
 
-    ~GeometryEntity();
+    ~GeometryEntity() = default;
 
     bool HasIntersection(const Ray &r) const override;
 
