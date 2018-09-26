@@ -36,6 +36,9 @@
     <ClCompile Include="..\..\..\Src\Math\Geometry\TriangleAux.cpp">
       <Filter>Src\Math\Geometry</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Src\Math\Geometry\TriangleMesh.cpp">
+      <Filter>Src\Math\Geometry</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Src\Math\AGZMath.h">

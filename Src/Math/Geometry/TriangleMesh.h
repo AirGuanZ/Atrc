@@ -1,20 +1,32 @@
 #pragma once
 
+#include "../../Common.h"
 #include "../AGZMath.h"
 #include "../Geometry.h"
-#include "TriangleAux.h"
 
 AGZ_NS_BEG(Atrc)
 
-class TriangleMesh : public GeometryObject
+class TriangleMesh : public GeometryObject, public AGZ::Uncopiable
 {
-    // IMPROVE: memory layout
+    // IMPROVE: layout
+
+    // {A,  B_A,  C_A}   * triangleCount
     Vec3r *vertices_;
+    // {uvA,uvB_A,uvC_A} * triangleCount
+    // IMPROVE: saves dpdu and dpdv
     Vec2r *uvs_;
+
+    size_t verticesCount_;
 
 public:
 
-    TriangleMesh(const Vec3r *vertices, const Vec2r *uvs, size_t n);
+    TriangleMesh(const Vec3r *ABCs, const Vec2r *uvABCs, size_t triangleCount);
+
+    ~TriangleMesh();
+
+    bool HasIntersection(const Ray &ray) const override;
+
+    Option<GeometryIntersection> EvalIntersection(const Ray &ray) const override;
 };
 
 AGZ_NS_END(Atrc)

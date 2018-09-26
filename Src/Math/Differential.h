@@ -1,7 +1,5 @@
 #pragma once
 
-#include <type_traits>
-
 #include "AGZMath.h"
 #include "Ray.h"
 
@@ -13,8 +11,8 @@ class SurfaceLocal
 public:
 
     Vec3r position;
-    Vec3r normal;
     Vec2r uv;
+    Vec3r normal;
     Vec3r dpdu;
     Vec3r dpdv;
 
@@ -26,8 +24,8 @@ public:
         const Vec3r &nor,
         const Vec3r &dpdu, const Vec3r &dpdv)
         : position(pos),
-          normal(nor),
           uv(uv),
+          normal(nor),
           dpdu(dpdu),
           dpdv(dpdv)
     {
