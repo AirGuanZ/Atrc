@@ -68,12 +68,15 @@ Option<GeometryIntersection> TriangleMesh::EvalIntersection(const Ray &ray) cons
         vertices_[finalTriangleIndex + 1], vertices_[finalTriangleIndex + 2],
         uvs_[finalTriangleIndex + 1], uvs_[finalTriangleIndex + 2]);
 
+    Vec2r uv = uvs_[finalTriangleIndex]
+             + finalInct->coefB * uvs_[finalTriangleIndex + 1]
+             + finalInct->coefC * uvs_[finalTriangleIndex + 2];
+
     return GeometryIntersection{
         finalInct->t,
         SurfaceLocal(
             ray.At(finalInct->t),
-            uvs_[finalTriangleIndex] + finalInct->coefB * uvs_[finalTriangleIndex + 1]
-                                     + finalInct->coefC * uvs_[finalTriangleIndex + 2],
+            uv,
             local.normal,
             local.dpdu,
             local.dpdv

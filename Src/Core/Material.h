@@ -2,8 +2,10 @@
 
 #include <type_traits>
 #include <Utils.h>
+
+#include "../Core/Spectrum.h"
+#include "../Math/Geometry.h"
 #include "../Math/Sample.h"
-#include "../Misc/Spectrum.h"
 
 AGZ_NS_BEG(Atrc)
 
@@ -44,6 +46,15 @@ public:
     virtual BxDFSample Sample(const Vec3r &wo, const Sample2D &sample) const = 0;
 
     virtual Real PDF(const Vec3r &wi, const Vec3r &wo) const = 0;
+};
+
+ATRC_INTERFACE Material
+{
+public:
+
+    virtual ~Material() = default;
+
+    virtual BxDF *GetBxDF(const SurfaceLocal &sl) const = 0;
 };
 
 AGZ_NS_END(Atrc)

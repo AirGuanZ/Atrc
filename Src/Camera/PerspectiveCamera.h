@@ -1,8 +1,8 @@
 #pragma once
 
 #include "../Common.h"
+#include "../Core/Camera.h"
 #include "../Math/AGZMath.h"
-#include "Camera.h"
 
 AGZ_NS_BEG(Atrc)
 

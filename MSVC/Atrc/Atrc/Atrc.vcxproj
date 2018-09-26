@@ -25,11 +25,15 @@
     <ClCompile Include="..\..\..\Src\Math\Geometry\TriangleMesh.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\Src\Camera\Camera.h" />
     <ClInclude Include="..\..\..\Src\Camera\PerspectiveCamera.h" />
     <ClInclude Include="..\..\..\Src\Common.h" />
-    <ClInclude Include="..\..\..\Src\Integrator\Integrator.h" />
-    <ClInclude Include="..\..\..\Src\Material\BxDF.h" />
+    <ClInclude Include="..\..\..\Src\Core\Material.h" />
+    <ClInclude Include="..\..\..\Src\Core\Camera.h" />
+    <ClInclude Include="..\..\..\Src\Core\Entity.h" />
+    <ClInclude Include="..\..\..\Src\Core\Integrator.h" />
+    <ClInclude Include="..\..\..\Src\Core\Renderer.h" />
+    <ClInclude Include="..\..\..\Src\Core\Spectrum.h" />
+    <ClInclude Include="..\..\..\Src\Entity\GeometryEntity.h" />
     <ClInclude Include="..\..\..\Src\Math\AGZMath.h" />
     <ClInclude Include="..\..\..\Src\Math\Differential.h" />
     <ClInclude Include="..\..\..\Src\Math\Geometry.h" />
@@ -39,8 +43,6 @@
     <ClInclude Include="..\..\..\Src\Math\Ray.h" />
     <ClInclude Include="..\..\..\Src\Math\Sample.h" />
     <ClInclude Include="..\..\..\Src\Math\Transform.h" />
-    <ClInclude Include="..\..\..\Src\Misc\Spectrum.h" />
-    <ClInclude Include="..\..\..\Src\Renderer\Renderer.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

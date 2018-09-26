@@ -25,7 +25,7 @@
     <ClCompile Include="..\..\..\Test\Camera\PerspectiveCamera.cpp">
       <Filter>Src\Camera</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Test\Math\Geometry\TriangleAux.cpp">
+    <ClCompile Include="..\..\..\Test\Math\Geometry\TriangleMesh.cpp">
       <Filter>Src\Math\Geometry</Filter>
     </ClCompile>
   </ItemGroup>

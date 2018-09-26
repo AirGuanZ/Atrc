@@ -1,8 +1,8 @@
 #pragma once
 
 #include "../Common.h"
+#include "../Core/Spectrum.h"
 #include "../Math/Ray.h"
-#include "../Misc/Spectrum.h"
 
 AGZ_NS_BEG(Atrc)
 

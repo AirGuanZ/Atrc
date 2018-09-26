@@ -15,7 +15,6 @@
    $$
 
 
-
 每个Entity持有自己的Geometry、Material和Transform，Ray $r_W$来的时候先$S_W \to S_L$得到$r_L$，由Geometry给出交点以及$S_S$，把交点参数喂给Material得到BxDF，把$r_S$交给BxDF得到一系列后续采样的Ray，然后一路逆变换到$S_W$。所有权结构是这样的：
 
 ```
