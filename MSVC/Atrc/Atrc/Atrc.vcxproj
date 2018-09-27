@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\Src\Camera\PerspectiveCamera.cpp" />
     <ClCompile Include="..\..\..\Src\Entity\GeometryEntity.cpp" />
+    <ClCompile Include="..\..\..\Src\Material\PureColor.cpp" />
     <ClCompile Include="..\..\..\Src\Math\Geometry\Sphere.cpp" />
     <ClCompile Include="..\..\..\Src\Math\Geometry\TriangleAux.cpp" />
     <ClCompile Include="..\..\..\Src\Math\Geometry\TriangleMesh.cpp" />
@@ -35,6 +36,7 @@
     <ClInclude Include="..\..\..\Src\Core\Renderer.h" />
     <ClInclude Include="..\..\..\Src\Core\Spectrum.h" />
     <ClInclude Include="..\..\..\Src\Entity\GeometryEntity.h" />
+    <ClInclude Include="..\..\..\Src\Material\PureColor.h" />
     <ClInclude Include="..\..\..\Src\Math\AGZMath.h" />
     <ClInclude Include="..\..\..\Src\Math\Differential.h" />
     <ClInclude Include="..\..\..\Src\Math\Geometry.h" />
