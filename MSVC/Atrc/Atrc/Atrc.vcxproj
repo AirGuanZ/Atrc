@@ -26,6 +26,7 @@
     <ClCompile Include="..\..\..\Src\Math\Geometry\Sphere.cpp" />
     <ClCompile Include="..\..\..\Src\Math\Geometry\TriangleAux.cpp" />
     <ClCompile Include="..\..\..\Src\Math\Geometry\TriangleMesh.cpp" />
+    <ClCompile Include="..\..\..\Src\Renderer\Native1sppRenderer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Src\Camera\PerspectiveCamera.h" />
@@ -48,6 +49,7 @@
     <ClInclude Include="..\..\..\Src\Math\Ray.h" />
     <ClInclude Include="..\..\..\Src\Math\Sample.h" />
     <ClInclude Include="..\..\..\Src\Math\Transform.h" />
+    <ClInclude Include="..\..\..\Src\Renderer\Native1sppRenderer.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

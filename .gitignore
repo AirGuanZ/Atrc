@@ -22,6 +22,8 @@ bld/
 [Oo]bj/
 [Ll]og/
 
+ExampleOutput_AmbientIntegrator.png
+
 *.o
 *.d
 Build/
