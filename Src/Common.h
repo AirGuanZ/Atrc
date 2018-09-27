@@ -24,6 +24,21 @@ auto Some(T &&arg)
 
 inline auto None = std::nullopt;
 
+class Exception : public std::runtime_error
+{
+public:
+    explicit Exception(const std::string &err) : runtime_error(err) { }
+};
+
+#define DEFINE_ATRC_EXCEPTION(NAME) \
+    class NAME : public ::Atrc::Exception \
+    { \
+    public: \
+        explicit NAME(const std::string &err) : Exception(err) { } \
+    }
+
+DEFINE_ATRC_EXCEPTION(ArgumentException);
+
 AGZ_NS_END(Atrc)
 
 #define ATRC_INTERFACE class

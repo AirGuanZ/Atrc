@@ -119,5 +119,11 @@
     <ClInclude Include="..\..\..\Src\Renderer\Native1sppRenderer.h">
       <Filter>Src\Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Src\Renderer\SubareaRenderer.h">
+      <Filter>Src\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\Renderer\NativeParallelRenderer.h">
+      <Filter>Src\Renderer</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

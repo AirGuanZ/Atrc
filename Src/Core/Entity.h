@@ -22,6 +22,11 @@ public:
 
     virtual ~Entity() = default;
 
+    virtual bool IsLightSource() const
+    {
+        return false;
+    }
+
     virtual bool HasIntersection(const Ray &r) const
     {
         return EvalIntersection(r).has_value();

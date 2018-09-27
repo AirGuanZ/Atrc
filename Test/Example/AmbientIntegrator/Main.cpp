@@ -7,23 +7,24 @@
 #include <Material/PureColor.h>
 #include <Math/Geometry/Sphere.h>
 #include <Renderer/Native1sppRenderer.h>
+#include <Renderer/NativeParallelRenderer.h>
 
 using namespace Atrc;
 
-constexpr int SCR_W = 640, SCR_H = 480;
+constexpr int SCR_W = 1920, SCR_H = 1080;
 constexpr Real SCR_ASPECT = static_cast<Real>(SCR_W) / SCR_H;
+
+constexpr Vec3r CAMERA_EYE(-6.0, 0.0, 2.0), CAMERA_DIR(6.0, 0.0, -2.0), CAMERA_UP(0.0, 0.0, 1.0);
 
 int main()
 {
     PerspectiveCamera camera(
-        { -6.0, 0.0, 2.0 },
-        Vec3r(0.0, 0.0, 0.0) - Vec3r(-6.0, 0.0, 2.0),
-        { 0.0, 0.0, 1.0 },
+        CAMERA_EYE, CAMERA_DIR, CAMERA_UP,
         Deg2Rad(Degr(60.0)), SCR_ASPECT, 1.0);
 
-    PureColorMaterial matRed(SPECTRUM::RED),
+    PureColorMaterial matRed  (SPECTRUM::RED),
                       matGreen(SPECTRUM::GREEN),
-                      matBlue(SPECTRUM::BLUE),
+                      matBlue (SPECTRUM::BLUE),
                       matWhite(SPECTRUM::WHITE);
 
     Sphere sphGround(1e5), sphRed(0.2), sphGreen(0.4), sphBlue(0.6);
@@ -38,10 +39,11 @@ int main()
     scene.entities = { &entGround, &entRed, &entGreen, &entBlue };
 
     RenderTarget<Color3f> renderTarget(SCR_W, SCR_H);
-    AmbientIntegrator integrator;
-    Native1sppRenderer renderer;
 
+    AmbientIntegrator integrator;
+    NativeParallelRenderer<Native1sppSubareaRenderer> renderer;
     renderer.Render(scene, integrator, renderTarget);
 
-    AGZ::Tex::TextureFile::WriteRGBToPNG(L"ExampleOutput_AmbientIntegrator.png", AGZ::Tex::ClampedF2B(renderTarget));
+    AGZ::Tex::TextureFile::WriteRGBToPNG(
+        L"ExampleOutput_AmbientIntegrator.png", AGZ::Tex::ClampedF2B(renderTarget));
 }

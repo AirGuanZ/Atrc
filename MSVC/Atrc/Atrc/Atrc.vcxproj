@@ -50,6 +50,8 @@
     <ClInclude Include="..\..\..\Src\Math\Sample.h" />
     <ClInclude Include="..\..\..\Src\Math\Transform.h" />
     <ClInclude Include="..\..\..\Src\Renderer\Native1sppRenderer.h" />
+    <ClInclude Include="..\..\..\Src\Renderer\NativeParallelRenderer.h" />
+    <ClInclude Include="..\..\..\Src\Renderer\SubareaRenderer.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
