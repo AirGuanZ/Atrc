@@ -12,6 +12,7 @@ class TriangleMesh : ATRC_IMPLEMENTS GeometryObject, ATRC_PROPERTY AGZ::Uncopiab
 
     // {A,  B_A,  C_A}   * triangleCount
     Vec3r *vertices_;
+
     // {uvA,uvB_A,uvC_A} * triangleCount
     // IMPROVE: saves dpdu and dpdv
     Vec2r *uvs_;

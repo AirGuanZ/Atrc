@@ -6,9 +6,6 @@ AGZ_NS_BEG(Atrc)
 
 using Spectrum = Color3f;
 
-namespace SPECTRUM
-{
-    inline const Spectrum &BLACK = COLOR::BLACK;
-}
+namespace SPECTRUM = COLOR;
 
 AGZ_NS_END(Atrc)
