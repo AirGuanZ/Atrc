@@ -18,7 +18,7 @@ Spectrum PureColorBRDF::Eval(const Vec3r &wi, const Vec3r &wo) const
     return SPECTRUM::BLACK;
 }
 
-Option<BxDFSample> PureColorBRDF::Sample(const Vec3r &wo, const Sample2D &sample) const
+Option<BxDFSample> PureColorBRDF::Sample(const Vec3r &wo) const
 {
     return None;
 }

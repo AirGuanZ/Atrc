@@ -28,6 +28,9 @@
     <Filter Include="Src\Renderer">
       <UniqueIdentifier>{2966a9f7-e68e-4f89-957c-ad86c91e77ef}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\Light">
+      <UniqueIdentifier>{52bee698-8b6e-4175-9211-b3a11989bbf4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Src\Math\Geometry\Sphere.cpp">
@@ -53,6 +56,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Src\Renderer\Native1sppRenderer.cpp">
       <Filter>Src\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Src\Light\PointLight.cpp">
+      <Filter>Src\Light</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -124,6 +130,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Src\Renderer\NativeParallelRenderer.h">
       <Filter>Src\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\Core\Light.h">
+      <Filter>Src\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\Light\PointLight.h">
+      <Filter>Src\Light</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
