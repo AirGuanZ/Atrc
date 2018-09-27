@@ -17,7 +17,6 @@ enum class BxDFType : uint8_t
     Glossy       = (1 << 3),
     Specular     = (1 << 4),
     Ambient      = (1 << 5),
-    Emission     = (1 << 6),
 };
 
 inline bool HasBxDFType(BxDFType typeSet, BxDFType typeTested)

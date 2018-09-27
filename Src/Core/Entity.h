@@ -7,6 +7,7 @@
 AGZ_NS_BEG(Atrc)
 
 ATRC_INTERFACE Entity;
+ATRC_INTERFACE Light;
 
 struct EntityIntersection
 {
@@ -21,11 +22,6 @@ ATRC_INTERFACE Entity
 public:
 
     virtual ~Entity() = default;
-
-    virtual bool IsLightSource() const
-    {
-        return false;
-    }
 
     virtual bool HasIntersection(const Ray &r) const
     {
