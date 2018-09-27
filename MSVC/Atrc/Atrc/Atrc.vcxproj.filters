@@ -22,6 +22,9 @@
     <Filter Include="Src\Material">
       <UniqueIdentifier>{c2e0aa58-5350-4230-926b-6569f0fd94b7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\Integrator">
+      <UniqueIdentifier>{319a0b6a-338d-4002-bc1f-1ace338d5b9c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Src\Math\Geometry\Sphere.cpp">
@@ -41,6 +44,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Src\Material\PureColor.cpp">
       <Filter>Src\Material</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Src\Integrator\AmbientIntegrator.cpp">
+      <Filter>Src\Integrator</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -100,6 +106,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Src\Material\PureColor.h">
       <Filter>Src\Material</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\Integrator\AmbientIntegrator.h">
+      <Filter>Src\Integrator</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

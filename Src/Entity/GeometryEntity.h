@@ -24,8 +24,6 @@ public:
         const GeometryObject *geoObj, const Material *mat,
         const Transform &local2World);
 
-    ~GeometryEntity() = default;
-
     bool HasIntersection(const Ray &r) const override;
 
     Option<EntityIntersection> EvalIntersection(const Ray &r) const override;

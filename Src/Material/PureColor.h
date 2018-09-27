@@ -16,8 +16,6 @@ public:
 
     explicit PureColorBRDF(const Spectrum &color);
 
-    ~PureColorBRDF() = default;
-
     BxDFType GetType() const override;
 
     Spectrum Eval(const Vec3r &wi, const Vec3r &wo) const override;
@@ -38,8 +36,6 @@ class PureColorMaterial
 public:
 
     explicit PureColorMaterial(const Spectrum &color);
-
-    ~PureColorMaterial() = default;
 
     BxDF* GetBxDF(const SurfaceLocal &sl) const override;
 };
