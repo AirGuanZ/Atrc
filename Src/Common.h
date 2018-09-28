@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include <optional>
 #include <Utils.h>
 
@@ -23,6 +24,15 @@ auto Some(T &&arg)
 }
 
 inline auto None = std::nullopt;
+
+template<typename T>
+using RC = std::shared_ptr<T>;
+
+template<typename T, typename...Args>
+auto MakeRC(Args&&...args)
+{
+    return std::make_shared<T>(std::forward<Args>(args)...);
+}
 
 class Exception : public std::runtime_error
 {

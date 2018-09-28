@@ -9,7 +9,6 @@ Spectrum AmbientRayTracer::GetRadiance(const Scene &scene, const Ray &r) const
         return SPECTRUM::BLACK;
 
     auto ret = inct->bxdf->AmbientRadiance();
-    delete inct->bxdf;
     return ret;
 }
 

@@ -18,7 +18,7 @@ class BufferedSampleSequence
     {
         AGZ_ASSERT(basic_);
         restCount_ = static_cast<uint32_t>(buffer_.size());
-        basic_->NextN(buffer_.data(), restCount_);
+        basic_->NextN(restCount_, buffer_.data());
     }
 
 public:
@@ -41,7 +41,6 @@ public:
 
     SampleType Next() override
     {
-        AGZ_ASSERT(output);
         if(!restCount_)
             Realloc();
         AGZ_ASSERT(buffer_.size() >= restCount_ && restCount_);
@@ -52,7 +51,7 @@ public:
     {
         // IMPROVE
         for(uint32_t i = 0; i < n; ++i)
-            Next(&output[i]);
+            output[i] = Next();
     }
 };
 

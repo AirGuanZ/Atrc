@@ -31,7 +31,7 @@ class WhittedRayTracer
 public:
 
     explicit WhittedRayTracer(
-        SampleSeq2D *lightSamSeq, uint32_t lightSampleLevel = 1, uint32_t maxDepth = 5);
+        SampleSeq2D &lightSamSeq, uint32_t lightSampleLevel = 1, uint32_t maxDepth = 5);
 
     Spectrum GetRadiance(const Scene &scene, const Ray &r) const override;
 };

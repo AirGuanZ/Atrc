@@ -20,11 +20,14 @@ Option<EntityIntersection> GeometryEntity::EvalIntersection(const Ray &r) const
     auto geoInct = geometry_->EvalIntersection(local2World_.ApplyInverseToRay(r));
     if(!geoInct)
         return None;
+    auto local = local2World_.ApplyToSurfaceLocal(geoInct->local);
     return EntityIntersection{
-        geoInct.value(),
+        GeometryIntersection{
+            geoInct->t, local
+        },
         this,
         material_,
-        material_->GetBxDF(geoInct->local)
+        RC<BxDF>(material_->GetBxDF(local))
     };
 }
 

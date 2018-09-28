@@ -15,11 +15,13 @@ bool PointLight::IsDeltaLight() const
 
 LightSample PointLight::SampleTo(const Vec3r &dst, SampleSeq2D &samSeq) const
 {
-    Vec3r dis = position_ - dst;
-    Real invLengthSquare = Real(1) / dis.LengthSquare();
+    Vec3r dst2pos = position_ - dst;
+    Real invLengthSquare = Real(1) / dst2pos.LengthSquare();
     return {
         intensity_ * static_cast<decltype(intensity_.r)>(invLengthSquare),
-        position_, dis, Real(1)
+        position_,
+        dst2pos,
+        Real(1)
     };
 }
 

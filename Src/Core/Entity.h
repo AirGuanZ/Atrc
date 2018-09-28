@@ -14,7 +14,7 @@ struct EntityIntersection
     GeometryIntersection geoInct;
     const Entity *entity;
     const Material *material;
-    BxDF *bxdf;
+    RC<BxDF> bxdf;
 };
 
 ATRC_INTERFACE Entity
