@@ -27,6 +27,7 @@
     <ClCompile Include="..\..\..\Src\Math\Geometry\Sphere.cpp" />
     <ClCompile Include="..\..\..\Src\Math\Geometry\TriangleAux.cpp" />
     <ClCompile Include="..\..\..\Src\Math\Geometry\TriangleMesh.cpp" />
+    <ClCompile Include="..\..\..\Src\Math\Sample.cpp" />
     <ClCompile Include="..\..\..\Src\Renderer\Native1sppRenderer.cpp" />
   </ItemGroup>
   <ItemGroup>

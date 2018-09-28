@@ -60,6 +60,9 @@
     <ClCompile Include="..\..\..\Src\Light\PointLight.cpp">
       <Filter>Src\Light</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Src\Math\Sample.cpp">
+      <Filter>Src\Math</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Src\Math\AGZMath.h">

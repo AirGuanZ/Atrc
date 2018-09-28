@@ -4,11 +4,42 @@
 
 AGZ_NS_BEG(Atrc)
 
-struct Sample1D
+using Sample2D = Vec2r;
+
+class UniformlySampleOnHemisphere
 {
-    Real u;
+public:
+
+    static Vec3r Sample(const Sample2D &stdSample);
+
+    static Real PDF(const Vec3r &sample);
 };
 
-using Sample2D = Vec2r;
+class UniformlySampleOnSphere
+{
+public:
+
+    static Vec3r Sample(const Sample2D &stdSample);
+
+    static Real PDF(const Vec3r &sample);
+};
+
+class ZWeightedSampleOnHemisphere
+{
+public:
+
+    static Vec3r Sample(const Sample2D &stdSample);
+
+    static Real PDF(const Vec3r &sample);
+};
+
+class UniformltSampleOnCircle
+{
+public:
+
+    static Vec2r Sample(Real stdSample);
+
+    static Real PDF(const Vec2r &sample);
+};
 
 AGZ_NS_END(Atrc)

@@ -17,8 +17,6 @@ public:
 
     explicit PointLight(const Spectrum &intensity, const Vec3r &position);
 
-    ~PointLight() = default;
-
     bool IsDeltaLight() const override;
 
     LightSample SampleTo(const Vec3r &dst) const override;
