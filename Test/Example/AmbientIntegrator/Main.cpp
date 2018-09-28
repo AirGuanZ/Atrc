@@ -45,5 +45,5 @@ int main()
     renderer.Render(scene, integrator, renderTarget);
 
     AGZ::Tex::TextureFile::WriteRGBToPNG(
-        L"ExampleOutput_AmbientIntegrator.png", AGZ::Tex::ClampedF2B(renderTarget));
+        L"Output/ExampleOutput_AmbientIntegrator.png", AGZ::Tex::ClampedF2B(renderTarget));
 }

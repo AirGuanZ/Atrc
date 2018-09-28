@@ -10,7 +10,7 @@ PureColorBRDF::PureColorBRDF(const Spectrum &color)
 
 BxDFType PureColorBRDF::GetType() const
 {
-    return BxDFType::Ambient;
+    return CombingBxDFTypes(BxDFType::Ambient, BxDFType::Reflection);
 }
 
 Spectrum PureColorBRDF::Eval(const Vec3r &wi, const Vec3r &wo) const
@@ -18,7 +18,7 @@ Spectrum PureColorBRDF::Eval(const Vec3r &wi, const Vec3r &wo) const
     return SPECTRUM::BLACK;
 }
 
-Option<BxDFSample> PureColorBRDF::Sample(const Vec3r &wo) const
+Option<BxDFSample> PureColorBRDF::Sample(const Vec3r &wo, SampleSeq2D &samSeq) const
 {
     return None;
 }

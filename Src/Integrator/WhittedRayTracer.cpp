@@ -81,7 +81,7 @@ Spectrum WhittedRayTracer::Trace(
 
     return DirectIllumination(scene, r, inct.value())
          + IndirectIllumination(scene, r, inct.value(), depth)
-         + inct->bxdf->AmbientRadiance() * 0.1f;
+         + inct->bxdf->AmbientRadiance();
 }
 
 WhittedRayTracer::WhittedRayTracer(

@@ -72,6 +72,9 @@
     <ClCompile Include="..\..\..\Src\Sample\Sample.cpp">
       <Filter>Src\Sample</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Src\Material\Diffuse.cpp">
+      <Filter>Src\Material</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Src\Math\AGZMath.h">
@@ -160,6 +163,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Src\Sample\BufferedSampleSequence.h">
       <Filter>Src\Sample</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\Material\Diffuse.h">
+      <Filter>Src\Material</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

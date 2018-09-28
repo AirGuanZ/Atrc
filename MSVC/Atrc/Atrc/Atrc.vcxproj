@@ -25,6 +25,7 @@
     <ClCompile Include="..\..\..\Src\Integrator\AmbientRayTracer.cpp" />
     <ClCompile Include="..\..\..\Src\Integrator\WhittedRayTracer.cpp" />
     <ClCompile Include="..\..\..\Src\Light\PointLight.cpp" />
+    <ClCompile Include="..\..\..\Src\Material\Diffuse.cpp" />
     <ClCompile Include="..\..\..\Src\Material\PureColor.cpp" />
     <ClCompile Include="..\..\..\Src\Math\Geometry\Sphere.cpp" />
     <ClCompile Include="..\..\..\Src\Math\Geometry\TriangleAux.cpp" />
@@ -46,6 +47,7 @@
     <ClInclude Include="..\..\..\Src\Integrator\AmbientRayTracer.h" />
     <ClInclude Include="..\..\..\Src\Integrator\WhittedRayTracer.h" />
     <ClInclude Include="..\..\..\Src\Light\PointLight.h" />
+    <ClInclude Include="..\..\..\Src\Material\Diffuse.h" />
     <ClInclude Include="..\..\..\Src\Material\PureColor.h" />
     <ClInclude Include="..\..\..\Src\Math\AGZMath.h" />
     <ClInclude Include="..\..\..\Src\Math\Differential.h" />

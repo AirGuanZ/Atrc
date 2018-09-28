@@ -2,11 +2,10 @@
 
 #include "../Common.h"
 #include "../Core/Material.h"
-#include "../Core/Spectrum.h"
 
 AGZ_NS_BEG(Atrc)
 
-class PureColorBRDF
+class DiffuseBRDF
     : ATRC_IMPLEMENTS BxDF,
       ATRC_PROPERTY AGZ::Uncopiable
 {
@@ -14,7 +13,7 @@ class PureColorBRDF
 
 public:
 
-    explicit PureColorBRDF(const Spectrum &color);
+    explicit DiffuseBRDF(const Spectrum &color);
 
     BxDFType GetType() const override;
 
@@ -22,12 +21,10 @@ public:
 
     Option<BxDFSample> Sample(const Vec3r &wo, SampleSeq2D &samSeq) const override;
 
-    Real PDF(const Vec3r &wi, const Vec3r &wo) const override;
-
-    Spectrum AmbientRadiance() const override;
+    Real PDF(const Vec3r &samDir, const Vec3r &wo) const override;
 };
 
-class PureColorMaterial
+class DiffuseMaterial
     : ATRC_IMPLEMENTS Material,
       ATRC_PROPERTY AGZ::Uncopiable
 {
@@ -35,9 +32,9 @@ class PureColorMaterial
 
 public:
 
-    explicit PureColorMaterial(const Spectrum &color);
+    explicit DiffuseMaterial(const Spectrum &albedo);
 
-    BxDF* GetBxDF(const SurfaceLocal &sl) const override;
+    BxDF *GetBxDF(const SurfaceLocal &sl) const override;
 };
 
 AGZ_NS_END(Atrc)
