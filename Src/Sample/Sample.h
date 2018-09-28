@@ -1,6 +1,6 @@
 #pragma once
 
-#include "AGZMath.h"
+#include "../Math/AGZMath.h"
 
 AGZ_NS_BEG(Atrc)
 

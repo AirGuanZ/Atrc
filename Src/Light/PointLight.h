@@ -20,6 +20,8 @@ public:
     bool IsDeltaLight() const override;
 
     LightSample SampleTo(const Vec3r &dst) const override;
+
+    uint32_t SampleCount(uint32_t sampleLevel) const override;
 };
 
 AGZ_NS_END(Atrc)

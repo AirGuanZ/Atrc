@@ -7,6 +7,7 @@
 #include "../Math/Ray.h"
 #include "Camera.h"
 #include "Entity.h"
+#include "Light.h"
 
 AGZ_NS_BEG(Atrc)
 
@@ -18,7 +19,7 @@ public:
 
     virtual const Camera *GetCamera() const = 0;
     virtual const std::vector<const Entity*> &GetEntities() const = 0;
-    virtual const std::vector<const Entity*> &GetLights() const = 0;
+    virtual const std::vector<const Light*> &GetLights() const = 0;
 };
 
 class SceneView
@@ -28,11 +29,11 @@ public:
 
     Camera *camera;
     std::vector<const Entity*> entities;
-    std::vector<const Entity*> lights;
+    std::vector<const Light*> lights;
 
     const Camera *GetCamera() const override { return camera; }
     const std::vector<const Entity*> &GetEntities() const override { return entities; }
-    const std::vector<const Entity*> &GetLights() const override { return lights; }
+    const std::vector<const Light*> &GetLights() const override { return lights; }
 };
 
 ATRC_INTERFACE Integrator

@@ -29,8 +29,8 @@
     <ClCompile Include="..\..\..\Src\Math\Geometry\Sphere.cpp" />
     <ClCompile Include="..\..\..\Src\Math\Geometry\TriangleAux.cpp" />
     <ClCompile Include="..\..\..\Src\Math\Geometry\TriangleMesh.cpp" />
-    <ClCompile Include="..\..\..\Src\Math\Sample.cpp" />
     <ClCompile Include="..\..\..\Src\Renderer\Native1sppRenderer.cpp" />
+    <ClCompile Include="..\..\..\Src\Sample\Sample.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Src\Camera\PerspectiveCamera.h" />
@@ -54,11 +54,11 @@
     <ClInclude Include="..\..\..\Src\Math\Geometry\TriangleAux.h" />
     <ClInclude Include="..\..\..\Src\Math\Geometry\TriangleMesh.h" />
     <ClInclude Include="..\..\..\Src\Math\Ray.h" />
-    <ClInclude Include="..\..\..\Src\Math\Sample.h" />
     <ClInclude Include="..\..\..\Src\Math\Transform.h" />
     <ClInclude Include="..\..\..\Src\Renderer\Native1sppRenderer.h" />
     <ClInclude Include="..\..\..\Src\Renderer\NativeParallelRenderer.h" />
     <ClInclude Include="..\..\..\Src\Renderer\SubareaRenderer.h" />
+    <ClInclude Include="..\..\..\Src\Sample\Sample.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

@@ -31,6 +31,9 @@
     <Filter Include="Src\Light">
       <UniqueIdentifier>{52bee698-8b6e-4175-9211-b3a11989bbf4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\Sample">
+      <UniqueIdentifier>{ca9c9d58-7afe-4333-8c76-f3491e7774b8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Src\Math\Geometry\Sphere.cpp">
@@ -57,9 +60,6 @@
     <ClCompile Include="..\..\..\Src\Light\PointLight.cpp">
       <Filter>Src\Light</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Src\Math\Sample.cpp">
-      <Filter>Src\Math</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Src\Integrator\WhittedRayTracer.cpp">
       <Filter>Src\Integrator</Filter>
     </ClCompile>
@@ -68,6 +68,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Src\Integrator\AmbientRayTracer.cpp">
       <Filter>Src\Integrator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Src\Sample\Sample.cpp">
+      <Filter>Src\Sample</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -94,9 +97,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Src\Camera\PerspectiveCamera.h">
       <Filter>Src\Camera</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Src\Math\Sample.h">
-      <Filter>Src\Math</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Src\Math\Geometry\TriangleAux.h">
       <Filter>Src\Math\Geometry</Filter>
@@ -148,6 +148,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Src\Integrator\AmbientRayTracer.h">
       <Filter>Src\Integrator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\Sample\Sample.h">
+      <Filter>Src\Sample</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

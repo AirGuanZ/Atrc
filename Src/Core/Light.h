@@ -22,6 +22,8 @@ public:
     virtual bool IsDeltaLight() const = 0;
 
     virtual LightSample SampleTo(const Vec3r &dst) const = 0;
+
+    virtual uint32_t SampleCount(uint32_t sampleLevel) const = 0;
 };
 
 AGZ_NS_END(Atrc)

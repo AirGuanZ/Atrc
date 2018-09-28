@@ -23,4 +23,9 @@ LightSample PointLight::SampleTo(const Vec3r &dst) const
     };
 }
 
+uint32_t PointLight::SampleCount(uint32_t sampleLevel) const
+{
+    return 1;
+}
+
 AGZ_NS_END(Atrc)

@@ -5,7 +5,7 @@
 
 #include "../Core/Spectrum.h"
 #include "../Math/Geometry.h"
-#include "../Math/Sample.h"
+#include "../Sample/Sample.h"
 
 AGZ_NS_BEG(Atrc)
 
