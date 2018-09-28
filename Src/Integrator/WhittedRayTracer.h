@@ -2,6 +2,7 @@
 
 #include "../Common.h"
 #include "../Core/Integrator.h"
+#include "../Sample/SampleSequence.h"
 
 AGZ_NS_BEG(Atrc)
 
@@ -9,6 +10,8 @@ class WhittedRayTracer
     : ATRC_IMPLEMENTS Integrator,
       ATRC_PROPERTY AGZ::Uncopiable
 {
+    SampleSeq2D *lightSamSeq_;
+
     uint32_t lightSampleLevel_;
     uint32_t maxDepth_;
 
@@ -27,7 +30,8 @@ class WhittedRayTracer
 
 public:
 
-    explicit WhittedRayTracer(uint32_t lightSampleLevel = 1, uint32_t maxDepth = 5);
+    explicit WhittedRayTracer(
+        SampleSeq2D *lightSamSeq, uint32_t lightSampleLevel = 1, uint32_t maxDepth = 5);
 
     Spectrum GetRadiance(const Scene &scene, const Ray &r) const override;
 };

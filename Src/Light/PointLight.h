@@ -19,7 +19,7 @@ public:
 
     bool IsDeltaLight() const override;
 
-    LightSample SampleTo(const Vec3r &dst) const override;
+    LightSample SampleTo(const Vec3r &dst, SampleSeq2D &samSeq) const override;
 
     uint32_t SampleCount(uint32_t sampleLevel) const override;
 };

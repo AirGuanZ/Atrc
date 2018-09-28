@@ -152,5 +152,14 @@
     <ClInclude Include="..\..\..\Src\Sample\Sample.h">
       <Filter>Src\Sample</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Src\Sample\GlobalSampleGenerator.h">
+      <Filter>Src\Sample</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\Sample\SampleSequence.h">
+      <Filter>Src\Sample</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\Sample\BufferedSampleSequence.h">
+      <Filter>Src\Sample</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

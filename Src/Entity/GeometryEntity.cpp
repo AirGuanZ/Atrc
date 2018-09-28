@@ -24,7 +24,7 @@ Option<EntityIntersection> GeometryEntity::EvalIntersection(const Ray &r) const
         geoInct.value(),
         this,
         material_,
-        material_->GetBxDF(geoInct->inct)
+        material_->GetBxDF(geoInct->local)
     };
 }
 

@@ -4,6 +4,7 @@
 
 AGZ_NS_BEG(Atrc)
 
+using SpectrumScalar = float;
 using Spectrum = Color3f;
 
 namespace SPECTRUM = COLOR;

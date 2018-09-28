@@ -4,6 +4,7 @@
 
 AGZ_NS_BEG(Atrc)
 
+using Sample1D = Real;
 using Sample2D = Vec2r;
 
 class UniformlySampleOnHemisphere

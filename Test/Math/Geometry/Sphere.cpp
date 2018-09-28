@@ -19,7 +19,7 @@ TEST_CASE("Sphere", "Math")
                             .EvalIntersection(Ray::New(
                                 Vec3r(-50, 0.0, 0.0),
                                 Vec3r(1.0, 0.0, 0.0)))
-                            .value().inct.normal,
+                            .value().local.normal,
                          -Vec3r::UNIT_X(),
                          1e-5));
     }

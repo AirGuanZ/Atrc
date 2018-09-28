@@ -10,7 +10,7 @@ AGZ_NS_BEG(Atrc)
 struct GeometryIntersection
 {
     Real t;
-    SurfaceLocal inct;
+    SurfaceLocal local;
 };
 
 ATRC_INTERFACE GeometryObject

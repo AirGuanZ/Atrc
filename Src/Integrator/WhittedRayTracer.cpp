@@ -6,14 +6,34 @@ Spectrum WhittedRayTracer::SingleLightIllumination(
     const Scene &scene, const Ray &r, const Light &light,
     const EntityIntersection &inct) const
 {
+    Spectrum ret = SPECTRUM::BLACK;
     uint32_t sampleCount = light.SampleCount(lightSampleLevel_);
 
     for(uint32_t i = 0; i < sampleCount; ++i)
     {
-        // TODO
+        LightSample lightSample = light.SampleTo(
+            inct.geoInct.local.position, *lightSamSeq_);
+
+        // Shadow ray test
+        Vec3r wi = lightSample.dst2pos.Normalize();
+        Real dis = (inct.geoInct.local.position - lightSample.pos).Length();
+        Ray visibilityTestRay = Ray::NewSegment(
+            inct.geoInct.local.position, wi,
+            Real(1e-5), dis - Real(1e-5));
+        if(HasIntersection(scene, visibilityTestRay))
+            continue;
+
+        // Cosine factor (lambertain law)
+        auto cosFactor = SpectrumScalar(Dot(inct.geoInct.local.normal, wi));
+        if(cosFactor <= SpectrumScalar(0))
+            continue;
+
+        Vec3r wo = -r.direction.Normalize();
+        ret += inct.bxdf->Eval(wi, wo) * cosFactor
+             * lightSample.spectrum / SpectrumScalar(lightSample.pdf);
     }
 
-    return SPECTRUM::BLACK;
+    return ret / sampleCount;
 }
 
 Spectrum WhittedRayTracer::DirectIllumination(
@@ -47,9 +67,11 @@ Spectrum WhittedRayTracer::Trace(
          + IndirectIllumination(scene, r, inct.value(), depth);
 }
 
-WhittedRayTracer::WhittedRayTracer(uint32_t lightSampleLevel, uint32_t maxDepth)
-    : lightSampleLevel_(lightSampleLevel), maxDepth_(maxDepth)
+WhittedRayTracer::WhittedRayTracer(
+    SampleSeq2D *lightSamSeq, uint32_t lightSampleLevel, uint32_t maxDepth)
+    : lightSamSeq_(lightSamSeq), lightSampleLevel_(lightSampleLevel), maxDepth_(maxDepth)
 {
+    AGZ_ASSERT(lightSamSeq);
     if(lightSampleLevel < 1)
         throw ArgumentException("WhittedRayTracer: lightSampleLevel must be non-zero");
     if(maxDepth <= 0)
