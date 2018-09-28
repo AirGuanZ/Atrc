@@ -51,9 +51,6 @@
     <ClCompile Include="..\..\..\Src\Material\PureColor.cpp">
       <Filter>Src\Material</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Src\Integrator\AmbientIntegrator.cpp">
-      <Filter>Src\Integrator</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Src\Renderer\Native1sppRenderer.cpp">
       <Filter>Src\Renderer</Filter>
     </ClCompile>
@@ -62,6 +59,15 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Src\Math\Sample.cpp">
       <Filter>Src\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Src\Integrator\WhittedRayTracer.cpp">
+      <Filter>Src\Integrator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Src\Core\Integrator.cpp">
+      <Filter>Src\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Src\Integrator\AmbientRayTracer.cpp">
+      <Filter>Src\Integrator</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -122,9 +128,6 @@
     <ClInclude Include="..\..\..\Src\Material\PureColor.h">
       <Filter>Src\Material</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Src\Integrator\AmbientIntegrator.h">
-      <Filter>Src\Integrator</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Src\Renderer\Native1sppRenderer.h">
       <Filter>Src\Renderer</Filter>
     </ClInclude>
@@ -139,6 +142,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Src\Light\PointLight.h">
       <Filter>Src\Light</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\Integrator\WhittedRayTracer.h">
+      <Filter>Src\Integrator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\Integrator\AmbientRayTracer.h">
+      <Filter>Src\Integrator</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

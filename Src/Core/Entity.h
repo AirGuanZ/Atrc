@@ -11,7 +11,7 @@ ATRC_INTERFACE Light;
 
 struct EntityIntersection
 {
-    GeometryIntersection geometryIntersection;
+    GeometryIntersection geoInct;
     const Entity *entity;
     const Material *material;
     BxDF *bxdf;

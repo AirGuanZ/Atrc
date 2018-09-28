@@ -3,7 +3,7 @@
 
 #include <Camera/PerspectiveCamera.h>
 #include <Entity/GeometryEntity.h>
-#include <Integrator/AmbientIntegrator.h>
+#include <Integrator/AmbientRayTracer.h>
 #include <Material/PureColor.h>
 #include <Math/Geometry/Sphere.h>
 #include <Renderer/Native1sppRenderer.h>
@@ -40,7 +40,7 @@ int main()
 
     RenderTarget<Color3f> renderTarget(SCR_W, SCR_H);
 
-    AmbientIntegrator integrator;
+    AmbientRayTracer integrator;
     NativeParallelRenderer<Native1sppSubareaRenderer> renderer;
     renderer.Render(scene, integrator, renderTarget);
 

@@ -37,6 +37,12 @@ public:
 
 ATRC_INTERFACE Integrator
 {
+protected:
+
+    bool HasIntersection(const Scene &scene, const Ray &r) const;
+
+    Option<EntityIntersection> EvalIntersection(const Scene &scene, const Ray &r) const;
+
 public:
 
     virtual ~Integrator() = default;
