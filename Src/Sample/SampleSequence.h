@@ -24,28 +24,29 @@ class SampleGenerator2Sequence
     : ATRC_IMPLEMENTS SampleSequence<typename SampleGenerator::SampleType>,
       ATRC_PROPERTY AGZ::Uncopiable
 {
-    SampleGenerator &generator_;
+    SampleGenerator gen_;
 
 public:
 
     using SampleType = typename SampleGenerator::SampleType;
 
-    explicit SampleGenerator2Sequence(SampleGenerator &generator)
-        : generator_(generator)
+    template<typename...Args>
+    explicit SampleGenerator2Sequence(Args&&...args)
+        : gen_(std::forward<Args>(args)...)
     {
-        
+
     }
 
     SampleType Next() override
     {
-        return generator_.Next();
+        return gen_.Next();
     }
 
     void NextN(uint32_t n, SampleType *output) override
     {
         AGZ_ASSERT(output);
         for(uint32_t i = 0; i < n; ++i)
-            output[i] = generator_.Next();
+            output[i] = gen_.Next();
     }
 };
 

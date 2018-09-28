@@ -46,8 +46,7 @@ int main()
 
     RenderTarget<Color3f> renderTarget(SCR_W, SCR_H);
 
-    GlobalSampleGenerator2D globalSamGen;
-    SampleGenerator2Sequence<GlobalSampleGenerator2D> globalSamSeq(globalSamGen);
+    SampleGenerator2Sequence<GlobalSampleGenerator2D> globalSamSeq;
     BufferedSampleSequence<Sample2D> samGen(globalSamSeq);
 
     WhittedRayTracer integrator(globalSamSeq);
