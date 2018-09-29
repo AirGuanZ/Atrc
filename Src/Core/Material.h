@@ -12,15 +12,15 @@ AGZ_NS_BEG(Atrc)
 
 enum class BxDFType : uint8_t
 {
-    Reflection   = (1 << 0),
-    Transmission = (1 << 1),
-    Diffuse      = (1 << 2),
-    Glossy       = (1 << 3),
-    Specular     = (1 << 4),
-    Ambient      = (1 << 5),
+    Reflection   = 1 << 0,
+    Transmission = 1 << 1,
+    Diffuse      = 1 << 2,
+    Glossy       = 1 << 3,
+    Specular     = 1 << 4,
+    Ambient      = 1 << 5,
 
-    AllReflection   = Reflection   | Diffuse | Glossy | Specular,
-    AllTransmission = Transmission | Diffuse | Glossy | Specular,
+    AllReflection   = Reflection    | Diffuse | Glossy | Specular,
+    AllTransmission = Transmission  | Diffuse | Glossy | Specular,
     All             = AllReflection | AllTransmission
 };
 
@@ -43,7 +43,8 @@ template<typename...T,
                 IsBxDFTypeAux, T...>, int> = 0>
 constexpr BxDFType CombineBxDFTypes(T...types)
 {
-    return static_cast<BxDFType>((... | (static_cast<std::underlying_type_t<T>>(types))));
+    return static_cast<BxDFType>(
+        (... | static_cast<std::underlying_type_t<T>>(types)));
 }
 
 struct BxDFSample
@@ -61,13 +62,15 @@ public:
 
     virtual BxDFType GetType() const = 0;
 
-    virtual Spectrum Eval(const Vec3r &wi, const Vec3r &wo) const = 0;
+    virtual Spectrum Eval(
+        const SurfaceLocal &sl, const Vec3r &wi, const Vec3r &wo) const = 0;
 
     virtual Option<BxDFSample> Sample(
         const SurfaceLocal &sl, const Vec3r &wo, SampleSeq2D &samSeq,
         BxDFType type) const = 0;
 
-    virtual Real PDF(const Vec3r &samDir, const Vec3r &wo) const = 0;
+    virtual Real PDF(
+        const SurfaceLocal &sl, const Vec3r &samDir, const Vec3r &wo) const = 0;
 
     virtual Spectrum AmbientRadiance() const
     {

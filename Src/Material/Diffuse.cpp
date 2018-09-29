@@ -13,7 +13,8 @@ BxDFType DiffuseBRDF::GetType() const
     return CombineBxDFTypes(BxDFType::Reflection, BxDFType::Diffuse);
 }
 
-Spectrum DiffuseBRDF::Eval(const Vec3r &wi, const Vec3r &wo) const
+Spectrum DiffuseBRDF::Eval(
+    const SurfaceLocal &sl, const Vec3r &wi, const Vec3r &wo) const
 {
     return color_;
 }
@@ -47,7 +48,8 @@ Option<BxDFSample> DiffuseBRDF::Sample(
     return None;
 }
 
-Real DiffuseBRDF::PDF(const Vec3r &samDir, const Vec3r &wo) const
+Real DiffuseBRDF::PDF(
+    const SurfaceLocal &sl, const Vec3r &samDir, const Vec3r &wo) const
 {
     return UniformlySampleOnHemisphere::PDF(samDir);
 }

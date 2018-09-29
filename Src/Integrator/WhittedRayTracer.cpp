@@ -31,7 +31,7 @@ Spectrum WhittedRayTracer::SingleLightIllumination(
             continue;
 
         Vec3r wo = -r.direction.Normalize();
-        Spectrum bxdfVal = inct.bxdf->Eval(wi, wo);
+        Spectrum bxdfVal = inct.bxdf->Eval(inct.geoInct.local, wi, wo);
         if(bxdfVal == SPECTRUM::BLACK)
             continue;
 
@@ -57,7 +57,7 @@ Spectrum WhittedRayTracer::IndirectIllumination(
 {
     Vec3r wo = -r.direction.Normalize();
 
-    // reflection
+    // Reflection
     auto refSample = inct.bxdf->Sample(inct.geoInct.local, wo, *lightSamSeq_,
                                        CombineBxDFTypes(BxDFType::Reflection, BxDFType::Specular));
     if(!refSample)

@@ -5,15 +5,17 @@
 
 AGZ_NS_BEG(Atrc)
 
-class DiffuseBRDF
+class IdealGlassMaterial;
+
+class IdealGlassBxDF
     : ATRC_IMPLEMENTS BxDF,
       ATRC_PROPERTY AGZ::Uncopiable
 {
-    Spectrum color_;
+    const IdealGlassMaterial *material_;
 
 public:
 
-    explicit DiffuseBRDF(const Spectrum &color);
+    explicit IdealGlassBxDF(const IdealGlassMaterial *material);
 
     BxDFType GetType() const override;
 
@@ -28,15 +30,20 @@ public:
         const SurfaceLocal &sl, const Vec3r &samDir, const Vec3r &wo) const override;
 };
 
-class DiffuseMaterial
+class IdealGlassMaterial
     : ATRC_IMPLEMENTS Material,
       ATRC_PROPERTY AGZ::Uncopiable
 {
-    Spectrum color_;
+    friend class IdealGlassBxDF;
+
+    Spectrum reflectionColor_;
+    Spectrum transmissionColor_;
+    Real refractivity_;
 
 public:
 
-    explicit DiffuseMaterial(const Spectrum &albedo);
+    explicit IdealGlassMaterial(const Spectrum &refColor, const Spectrum &transColor,
+                                Real refractivity = Real(1.55));
 
     BxDF *GetBxDF(const SurfaceLocal &sl) const override;
 };
