@@ -78,6 +78,9 @@
     <ClCompile Include="..\..\..\Src\Material\IdealGlass.cpp">
       <Filter>Src\Material</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Src\Material\FresnelFormulae.cpp">
+      <Filter>Src\Material</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Src\Math\AGZMath.h">

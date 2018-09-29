@@ -1,4 +1,5 @@
 #include "WhittedRayTracer.h"
+#include "../Material/IdealGlass.h"
 
 AGZ_NS_BEG(Atrc)
 
@@ -31,7 +32,7 @@ Spectrum WhittedRayTracer::SingleLightIllumination(
             continue;
 
         Vec3r wo = -r.direction.Normalize();
-        Spectrum bxdfVal = inct.bxdf->Eval(inct.geoInct.local, wi, wo);
+        Spectrum bxdfVal = inct.bxdf->Eval(inct, wi, wo);
         if(bxdfVal == SPECTRUM::BLACK)
             continue;
 
@@ -60,7 +61,7 @@ Spectrum WhittedRayTracer::IndirectIllumination(
 
     // Reflection
     auto refSample = inct.bxdf->Sample(
-        inct.geoInct.local, wo, *lightSamSeq_,
+        inct, wo, *lightSamSeq_,
         CombineBxDFTypes(BxDFType::Reflection, BxDFType::Specular));
     if(refSample)
     {
@@ -68,15 +69,13 @@ Spectrum WhittedRayTracer::IndirectIllumination(
             inct.geoInct.local.position,
             refSample->dir.Normalize(),
             Real(1e-5));
-        auto cosFactor = SpectrumScalar(
-            Dot(refRay.direction, inct.geoInct.local.normal));
         ret += Trace(scene, refRay, depth + 1)
-             * cosFactor * refSample->coef / SpectrumScalar(refSample->pdf);
+             * refSample->coef / SpectrumScalar(refSample->pdf);
     }
 
     // Transmission
     auto transSample = inct.bxdf->Sample(
-        inct.geoInct.local, wo, *lightSamSeq_,
+        inct, wo, *lightSamSeq_,
         CombineBxDFTypes(BxDFType::Transmission, BxDFType::Specular));
     if(transSample)
     {
@@ -84,10 +83,8 @@ Spectrum WhittedRayTracer::IndirectIllumination(
             inct.geoInct.local.position,
             transSample->dir.Normalize(),
             Real(1e-5));
-        auto cosFactor = SpectrumScalar(
-            Dot(transRay.direction, -inct.geoInct.local.normal));
         ret += Trace(scene, transRay, depth + 1)
-             * cosFactor * transSample->coef / SpectrumScalar(transSample->pdf);
+             * transSample->coef / SpectrumScalar(transSample->pdf);
     }
 
     return ret;

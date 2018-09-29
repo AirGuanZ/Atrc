@@ -26,6 +26,7 @@
     <ClCompile Include="..\..\..\Src\Integrator\WhittedRayTracer.cpp" />
     <ClCompile Include="..\..\..\Src\Light\PointLight.cpp" />
     <ClCompile Include="..\..\..\Src\Material\Diffuse.cpp" />
+    <ClCompile Include="..\..\..\Src\Material\FresnelFormulae.cpp" />
     <ClCompile Include="..\..\..\Src\Material\IdealGlass.cpp" />
     <ClCompile Include="..\..\..\Src\Material\PureColor.cpp" />
     <ClCompile Include="..\..\..\Src\Math\Geometry\Sphere.cpp" />

@@ -10,6 +10,8 @@
 
 AGZ_NS_BEG(Atrc)
 
+struct EntityIntersection;
+
 enum class BxDFType : uint8_t
 {
     Reflection   = 1 << 0,
@@ -29,7 +31,7 @@ constexpr bool HasBxDFType(BxDFType typeSet, BxDFType typeTested)
     using UT = std::underlying_type_t<BxDFType>;
     return (static_cast<UT>(typeSet) &
             static_cast<UT>(typeTested))
-           != 0;
+           == static_cast<UT>(typeTested);
 }
 
 template<typename T>
@@ -63,14 +65,14 @@ public:
     virtual BxDFType GetType() const = 0;
 
     virtual Spectrum Eval(
-        const SurfaceLocal &sl, const Vec3r &wi, const Vec3r &wo) const = 0;
+        const EntityIntersection &inct, const Vec3r &wi, const Vec3r &wo) const = 0;
 
     virtual Option<BxDFSample> Sample(
-        const SurfaceLocal &sl, const Vec3r &wo, SampleSeq2D &samSeq,
+        const EntityIntersection &sl, const Vec3r &wo, SampleSeq2D &samSeq,
         BxDFType type) const = 0;
 
     virtual Real PDF(
-        const SurfaceLocal &sl, const Vec3r &samDir, const Vec3r &wo) const = 0;
+        const EntityIntersection &sl, const Vec3r &samDir, const Vec3r &wo) const = 0;
 
     virtual Spectrum AmbientRadiance() const
     {
@@ -84,7 +86,7 @@ public:
 
     virtual ~Material() = default;
 
-    virtual BxDF *GetBxDF(const SurfaceLocal &sl) const = 0;
+    virtual RC<BxDF> GetBxDF(const SurfaceLocal &sl) const = 0;
 };
 
 AGZ_NS_END(Atrc)

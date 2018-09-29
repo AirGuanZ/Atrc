@@ -1,3 +1,4 @@
+#include "../Core/Entity.h"
 #include "PureColor.h"
 
 AGZ_NS_BEG(Atrc)
@@ -14,20 +15,20 @@ BxDFType PureColorBRDF::GetType() const
 }
 
 Spectrum PureColorBRDF::Eval(
-    const SurfaceLocal &sl, const Vec3r &wi, const Vec3r &wo) const
+    const EntityIntersection &sl, const Vec3r &wi, const Vec3r &wo) const
 {
     return SPECTRUM::BLACK;
 }
 
 Option<BxDFSample> PureColorBRDF::Sample(
-    const SurfaceLocal &sl, const Vec3r &wo, SampleSeq2D &samSeq,
+    const EntityIntersection &sl, const Vec3r &wo, SampleSeq2D &samSeq,
     BxDFType type) const
 {
     return None;
 }
 
 Real PureColorBRDF::PDF(
-    const SurfaceLocal &sl, const Vec3r &wi, const Vec3r &wo) const
+    const EntityIntersection &sl, const Vec3r &wi, const Vec3r &wo) const
 {
     return Real(0);
 }
@@ -43,9 +44,9 @@ PureColorMaterial::PureColorMaterial(const Spectrum &color)
 
 }
 
-BxDF *PureColorMaterial::GetBxDF(const SurfaceLocal &sl) const
+RC<BxDF> PureColorMaterial::GetBxDF(const SurfaceLocal &sl) const
 {
-    return new PureColorBRDF(color_);
+    return MakeRC<PureColorBRDF>(color_);
 }
 
 AGZ_NS_END(Atrc)

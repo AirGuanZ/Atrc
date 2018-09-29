@@ -28,9 +28,4 @@ inline Vec3r TransformBase(const Vec3r &dir,
     return ex * dir.x + ey * dir.y + ez * dir.z;
 }
 
-inline Vec3r ReflectedDirection(const Vec3r &normal, const Vec3r &wi)
-{
-    return Real(2) * Dot(normal, wi) * normal - wi;
-}
-
 AGZ_NS_END(Atrc)

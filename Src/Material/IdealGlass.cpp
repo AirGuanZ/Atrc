@@ -1,3 +1,4 @@
+#include "../Core/Entity.h"
 #include "FresnelFormulae.h"
 #include "IdealGlass.h"
 
@@ -16,13 +17,13 @@ BxDFType IdealGlassBxDF::GetType() const
 }
 
 Spectrum IdealGlassBxDF::Eval(
-    const SurfaceLocal &sl, const Vec3r &wi, const Vec3r &wo) const
+    const EntityIntersection &inct, const Vec3r &wi, const Vec3r &wo) const
 {
     return SPECTRUM::BLACK;
 }
 
 Option<BxDFSample> IdealGlassBxDF::Sample(
-    const SurfaceLocal &sl, const Vec3r &wo,
+    const EntityIntersection &inct, const Vec3r &wo,
     SampleSeq2D &samSeq, BxDFType type) const
 {
     // Reflection
@@ -30,7 +31,8 @@ Option<BxDFSample> IdealGlassBxDF::Sample(
     {
         BxDFSample ret;
         ret.coef = material_->reflectionColor_;
-        ret.dir  = ReflectedDirection(sl.normal, wo);
+        ret.dir  = FresnelFormulae::ReflectedDirection(
+            inct.geoInct.local.normal, wo);
         ret.pdf  = Real(1);
         return ret;
     }
@@ -38,14 +40,43 @@ Option<BxDFSample> IdealGlassBxDF::Sample(
     // Transmission
     if(HasBxDFType(type, CombineBxDFTypes(BxDFType::Transmission, BxDFType::Specular)))
     {
-        // TODO: Waiting for implementation of fresnel equations
+        Real eta_i, eta_t;
+        if(inct.geoInct.fromOutside)
+        {
+            eta_i = Real(1);
+            eta_t = material_->refractivity_;
+        }
+        else
+        {
+            eta_i = material_->refractivity_;
+            eta_t = Real(1);
+        }
+
+        auto dir = FresnelFormulae::TransmittedDirection(
+            inct.geoInct.local.normal, wo, eta_i, eta_t);
+        // Full reflection
+        if(!dir)
+        {
+            BxDFSample ret;
+            ret.coef = material_->transmissionColor_;
+            ret.dir = FresnelFormulae::ReflectedDirection(
+                inct.geoInct.local.normal, wo);
+            ret.pdf = Real(1);
+            return ret;
+        }
+
+        BxDFSample ret;
+        ret.coef = material_->transmissionColor_;
+        ret.dir = dir.value();
+        ret.pdf = Real(1);
+        return ret;
     }
 
     return None;
 }
 
 Real IdealGlassBxDF::PDF(
-    const SurfaceLocal &sl, const Vec3r &samDir, const Vec3r &wo) const
+    const EntityIntersection &inct, const Vec3r &samDir, const Vec3r &wo) const
 {
     return Real(1);
 }
@@ -58,9 +89,9 @@ IdealGlassMaterial::IdealGlassMaterial(
 
 }
 
-BxDF *IdealGlassMaterial::GetBxDF(const SurfaceLocal &sl) const
+RC<BxDF> IdealGlassMaterial::GetBxDF(const SurfaceLocal &sl) const
 {
-    return new IdealGlassBxDF(this);
+    return MakeRC<IdealGlassBxDF>(this);
 }
 
 AGZ_NS_END(Atrc)

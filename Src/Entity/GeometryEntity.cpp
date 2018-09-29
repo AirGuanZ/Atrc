@@ -27,7 +27,7 @@ Option<EntityIntersection> GeometryEntity::EvalIntersection(const Ray &r) const
         },
         this,
         material_,
-        RC<BxDF>(material_->GetBxDF(local))
+        material_->GetBxDF(local)
     };
 }
 

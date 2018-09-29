@@ -11,6 +11,7 @@
 #include <Renderer/NativeParallelRenderer.h>
 #include <Sample/BufferedSampleSequence.h>
 #include <Sample/GlobalSampleGenerator.h>
+#include "Material/IdealGlass.h"
 
 using namespace Atrc;
 

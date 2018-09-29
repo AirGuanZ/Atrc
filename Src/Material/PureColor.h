@@ -19,14 +19,14 @@ public:
     BxDFType GetType() const override;
 
     Spectrum Eval(
-        const SurfaceLocal &sl, const Vec3r &wi, const Vec3r &wo) const override;
+        const EntityIntersection &sl, const Vec3r &wi, const Vec3r &wo) const override;
 
     Option<BxDFSample> Sample(
-        const SurfaceLocal &sl, const Vec3r &wo, SampleSeq2D &samSeq,
+        const EntityIntersection &sl, const Vec3r &wo, SampleSeq2D &samSeq,
         BxDFType type) const override;
 
     Real PDF(
-        const SurfaceLocal &sl, const Vec3r &wi, const Vec3r &wo) const override;
+        const EntityIntersection &sl, const Vec3r &wi, const Vec3r &wo) const override;
 
     Spectrum AmbientRadiance() const override;
 };
@@ -41,7 +41,7 @@ public:
 
     explicit PureColorMaterial(const Spectrum &color);
 
-    BxDF* GetBxDF(const SurfaceLocal &sl) const override;
+    RC<BxDF> GetBxDF(const SurfaceLocal &sl) const override;
 };
 
 AGZ_NS_END(Atrc)

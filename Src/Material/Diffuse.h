@@ -18,14 +18,14 @@ public:
     BxDFType GetType() const override;
 
     Spectrum Eval(
-        const SurfaceLocal &sl, const Vec3r &wi, const Vec3r &wo) const override;
+        const EntityIntersection &inct, const Vec3r &wi, const Vec3r &wo) const override;
 
     Option<BxDFSample> Sample(
-        const SurfaceLocal &sl, const Vec3r &wo, SampleSeq2D &samSeq,
+        const EntityIntersection &inct, const Vec3r &wo, SampleSeq2D &samSeq,
         BxDFType type) const override;
 
     Real PDF(
-        const SurfaceLocal &sl, const Vec3r &samDir, const Vec3r &wo) const override;
+        const EntityIntersection &inct, const Vec3r &samDir, const Vec3r &wo) const override;
 };
 
 class DiffuseMaterial
@@ -38,7 +38,7 @@ public:
 
     explicit DiffuseMaterial(const Spectrum &albedo);
 
-    BxDF *GetBxDF(const SurfaceLocal &sl) const override;
+    RC<BxDF> GetBxDF(const SurfaceLocal &sl) const override;
 };
 
 AGZ_NS_END(Atrc)
