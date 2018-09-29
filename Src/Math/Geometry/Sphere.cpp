@@ -89,8 +89,15 @@ Option<GeometryIntersection> Sphere::EvalIntersection(const Ray &ray) const
     else
         normal = Normalize(Cross(dpdu, dpdv));
 
+    bool fromOutside = true;
+    if(Dot(ray.direction, normal) >= Real(0))
+    {
+        normal = -normal;
+        fromOutside = false;
+    }
+
     return GeometryIntersection{
-        t, SurfaceLocal(p,{ u, v }, normal, dpdu, dpdv)
+        t, fromOutside, SurfaceLocal(p,{ u, v }, normal, dpdu, dpdv)
     };
 }
 

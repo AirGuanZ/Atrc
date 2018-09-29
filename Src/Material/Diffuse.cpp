@@ -10,7 +10,7 @@ DiffuseBRDF::DiffuseBRDF(const Spectrum &color)
 
 BxDFType DiffuseBRDF::GetType() const
 {
-    return CombingBxDFTypes(BxDFType::Reflection, BxDFType::Diffuse);
+    return CombineBxDFTypes(BxDFType::Reflection, BxDFType::Diffuse);
 }
 
 Spectrum DiffuseBRDF::Eval(const Vec3r &wi, const Vec3r &wo) const
@@ -18,13 +18,33 @@ Spectrum DiffuseBRDF::Eval(const Vec3r &wi, const Vec3r &wo) const
     return color_;
 }
 
-Option<BxDFSample> DiffuseBRDF::Sample(const Vec3r &wo, SampleSeq2D &samSeq) const
+Option<BxDFSample> DiffuseBRDF::Sample(
+    const SurfaceLocal &sl, const Vec3r &wo, SampleSeq2D &samSeq,
+    BxDFType type) const
 {
-    BxDFSample ret;
-    ret.coef = color_;
-    ret.dir = UniformlySampleOnHemisphere::Sample(samSeq.Next());
-    ret.pdf = UniformlySampleOnHemisphere::PDF(ret.dir);
-    return ret;
+    if(Dot(wo, sl.normal) <= Real(0))
+        return None;
+
+    if(HasBxDFType(type, BxDFType::Reflection))
+    {
+        BxDFSample ret;
+        ret.coef = color_;
+
+        if(HasBxDFType(type, BxDFType::Diffuse))
+        {
+            ret.dir = TransformBase(
+                UniformlySampleOnHemisphere::Sample(samSeq.Next()),
+                sl.ex, sl.ey, sl.ez);
+            ret.pdf = UniformlySampleOnHemisphere::PDF(ret.dir);
+            return ret;
+        }
+
+        ret.dir = ReflectedDirection(sl.normal, wo);
+        ret.pdf = Real(1);
+        return ret;
+    }
+
+    return None;
 }
 
 Real DiffuseBRDF::PDF(const Vec3r &samDir, const Vec3r &wo) const

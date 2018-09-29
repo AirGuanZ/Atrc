@@ -22,4 +22,15 @@ using Radr = Rad<Real>;
 constexpr Real PIr = PI<Real>;
 constexpr Real InvPIr = Real(1.0) / PIr;
 
+inline Vec3r TransformBase(const Vec3r &dir,
+                           const Vec3r &ex, const Vec3r &ey, const Vec3r &ez)
+{
+    return ex * dir.x + ey * dir.y + ez * dir.z;
+}
+
+inline Vec3r ReflectedDirection(const Vec3r &normal, const Vec3r &wi)
+{
+    return Real(2) * Dot(normal, wi) * normal - wi;
+}
+
 AGZ_NS_END(Atrc)

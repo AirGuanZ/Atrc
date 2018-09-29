@@ -20,7 +20,9 @@ public:
 
     Spectrum Eval(const Vec3r &wi, const Vec3r &wo) const override;
 
-    Option<BxDFSample> Sample(const Vec3r &wo, SampleSeq2D &samSeq) const override;
+    Option<BxDFSample> Sample(
+        const SurfaceLocal &sl, const Vec3r &wo, SampleSeq2D &samSeq,
+        BxDFType type) const override;
 
     Real PDF(const Vec3r &wi, const Vec3r &wo) const override;
 

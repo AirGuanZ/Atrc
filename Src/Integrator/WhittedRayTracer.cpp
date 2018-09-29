@@ -31,7 +31,11 @@ Spectrum WhittedRayTracer::SingleLightIllumination(
             continue;
 
         Vec3r wo = -r.direction.Normalize();
-        ret += inct.bxdf->Eval(wi, wo) * cosFactor
+        Spectrum bxdfVal = inct.bxdf->Eval(wi, wo);
+        if(bxdfVal == SPECTRUM::BLACK)
+            continue;
+
+        ret += bxdfVal * cosFactor
              * lightSample.spectrum / SpectrumScalar(lightSample.pdf);
     }
 
@@ -47,26 +51,22 @@ Spectrum WhittedRayTracer::DirectIllumination(
     return ret;
 }
 
-namespace
-{
-    Vec3r RefDir(const Vec3r &normal, const Vec3r &wi)
-    {
-        return Real(2) * Dot(normal, wi) * normal - wi;
-    }
-}
-
 Spectrum WhittedRayTracer::IndirectIllumination(
     const Scene &scene, const Ray &r, const EntityIntersection &inct,
     uint32_t depth) const
 {
     Vec3r wo = -r.direction.Normalize();
-    auto cosFactor = SpectrumScalar(Dot(wo, inct.geoInct.local.normal));
-    if(cosFactor <= SpectrumScalar(0))
+
+    // reflection
+    auto refSample = inct.bxdf->Sample(inct.geoInct.local, wo, *lightSamSeq_,
+                                       CombineBxDFTypes(BxDFType::Reflection, BxDFType::Specular));
+    if(!refSample)
         return SPECTRUM::BLACK;
 
-    Vec3r wi = RefDir(inct.geoInct.local.normal, wo);
-    Ray refRay = Ray::NewSegment(inct.geoInct.local.position, wi, Real(1e-5));
-    return Trace(scene, refRay, depth + 1) * cosFactor * inct.bxdf->Eval(wi, wo);
+    Ray refRay = Ray::NewSegment(inct.geoInct.local.position, refSample->dir.Normalize(), Real(1e-5));
+    auto cosFactor = SpectrumScalar(Dot(refRay.direction, inct.geoInct.local.normal));
+
+    return Trace(scene, refRay, depth + 1) * cosFactor * refSample->coef / SpectrumScalar(refSample->pdf);
 }
 
 Spectrum WhittedRayTracer::Trace(

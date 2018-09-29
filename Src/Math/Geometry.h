@@ -10,6 +10,7 @@ AGZ_NS_BEG(Atrc)
 struct GeometryIntersection
 {
     Real t;
+    bool fromOutside;
     SurfaceLocal local;
 };
 

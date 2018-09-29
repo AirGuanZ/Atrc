@@ -23,7 +23,7 @@ Option<EntityIntersection> GeometryEntity::EvalIntersection(const Ray &r) const
     auto local = local2World_.ApplyToSurfaceLocal(geoInct->local);
     return EntityIntersection{
         GeometryIntersection{
-            geoInct->t, local
+            geoInct->t, geoInct->fromOutside, local
         },
         this,
         material_,

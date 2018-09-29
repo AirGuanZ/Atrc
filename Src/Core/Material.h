@@ -18,9 +18,13 @@ enum class BxDFType : uint8_t
     Glossy       = (1 << 3),
     Specular     = (1 << 4),
     Ambient      = (1 << 5),
+
+    AllReflection   = Reflection   | Diffuse | Glossy | Specular,
+    AllTransmission = Transmission | Diffuse | Glossy | Specular,
+    All             = AllReflection | AllTransmission
 };
 
-inline bool HasBxDFType(BxDFType typeSet, BxDFType typeTested)
+constexpr bool HasBxDFType(BxDFType typeSet, BxDFType typeTested)
 {
     using UT = std::underlying_type_t<BxDFType>;
     return (static_cast<UT>(typeSet) &
@@ -37,14 +41,14 @@ struct IsBxDFTypeAux
 template<typename...T,
          std::enable_if_t<AGZ::TypeOpr::All_v<
                 IsBxDFTypeAux, T...>, int> = 0>
-inline BxDFType CombingBxDFTypes(T...types)
+constexpr BxDFType CombineBxDFTypes(T...types)
 {
     return static_cast<BxDFType>((... | (static_cast<std::underlying_type_t<T>>(types))));
 }
 
 struct BxDFSample
 {
-    Vec3r dir;
+    Vec3r dir;      // Surface local坐标系中的采样方向
     Spectrum coef;
     Real pdf;
 };
@@ -59,7 +63,9 @@ public:
 
     virtual Spectrum Eval(const Vec3r &wi, const Vec3r &wo) const = 0;
 
-    virtual Option<BxDFSample> Sample(const Vec3r &wo, SampleSeq2D &samSeq) const = 0;
+    virtual Option<BxDFSample> Sample(
+        const SurfaceLocal &sl, const Vec3r &wo, SampleSeq2D &samSeq,
+        BxDFType type) const = 0;
 
     virtual Real PDF(const Vec3r &samDir, const Vec3r &wo) const = 0;
 

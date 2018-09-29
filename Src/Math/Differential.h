@@ -16,6 +16,8 @@ public:
     Vec3r dpdu;
     Vec3r dpdv;
 
+    Vec3r ex, ey, ez;
+
     SurfaceLocal() = default;
 
     SurfaceLocal(
@@ -27,9 +29,14 @@ public:
           uv(uv),
           normal(nor),
           dpdu(dpdu),
-          dpdv(dpdv)
+          dpdv(dpdv),
+          ex(AGZ::UNINITIALIZED),
+          ey(AGZ::UNINITIALIZED),
+          ez(AGZ::UNINITIALIZED)
     {
-
+        ex = dpdu.Normalize();
+        ez = normal.Normalize();
+        ey = Cross(ez, ex);
     }
 };
 

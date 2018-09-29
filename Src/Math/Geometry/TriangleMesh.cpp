@@ -72,8 +72,16 @@ Option<GeometryIntersection> TriangleMesh::EvalIntersection(const Ray &ray) cons
              + finalInct->coefB * uvs_[finalTriangleIndex + 1]
              + finalInct->coefC * uvs_[finalTriangleIndex + 2];
 
+    bool fromOutside = true;
+    if(Dot(local.normal, ray.direction) >= Real(0))
+    {
+        local.normal = -local.normal;
+        fromOutside = false;
+    }
+
     return GeometryIntersection{
         finalInct->t,
+        fromOutside,
         SurfaceLocal(
             ray.At(finalInct->t),
             uv,
