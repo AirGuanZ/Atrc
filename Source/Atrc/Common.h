@@ -68,4 +68,7 @@ using Vec4r = Vec4<Real>;
 using Mat3r = Mat3<Real>;
 using Mat4r = Mat4<Real>;
 
+using Radr = Rad<Real>;
+using Degr = Deg<Real>;
+
 AGZ_NS_END(Atrc)
