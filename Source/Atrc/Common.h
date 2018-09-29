@@ -47,8 +47,9 @@ public:
     }
 
 DEFINE_ATRC_EXCEPTION(ArgumentException);
+DEFINE_ATRC_EXCEPTION(UnreachableCodeException);
 
-// ============================= Clearer OO-related 'keyword' =============================
+// ============================= Better OO-related 'keyword' =============================
 
 #define ATRC_INTERFACE  class
 #define ATRC_IMPLEMENTS public
@@ -56,10 +57,11 @@ DEFINE_ATRC_EXCEPTION(ArgumentException);
 
 // ============================= Important forward declerations =============================
 
-ATRC_INTERFACE Camera;
-ATRC_INTERFACE Integrator;
-ATRC_INTERFACE Entity;
 ATRC_INTERFACE BxDF;
+ATRC_INTERFACE Camera;
+ATRC_INTERFACE Entity;
+ATRC_INTERFACE Integrator;
+ATRC_INTERFACE Renderer;
 
 // ============================= Export AGZ::Math =============================
 
@@ -80,7 +82,8 @@ using Degr = Deg<Real>;
 
 // ============================= Spectrum =============================
 
-using Spectrum = Color3f;
+using SS = float;
+using Spectrum = Color3<SS>;
 
 namespace SPECTRUM = COLOR;
 
@@ -88,6 +91,7 @@ namespace SPECTRUM = COLOR;
 
 struct Intersection
 {
+    Vec3r wr;
     Vec3r pos;
     Vec3r nor;
     Real t;

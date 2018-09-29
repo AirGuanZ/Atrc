@@ -21,13 +21,15 @@ constexpr BxDFType operator|(BxDFType lhs, BxDFType rhs)
     return BxDFType(lhs.value | rhs.value);
 }
 
+constexpr BxDFType BXDF_NONE         = BxDFType(0);
 constexpr BxDFType BXDF_REFLECTION   = BxDFType(1 << 0);
 constexpr BxDFType BXDF_TRANSMISSION = BxDFType(1 << 1);
 constexpr BxDFType BXDF_DIFFUSE      = BxDFType(1 << 2);
 constexpr BxDFType BXDF_GLOSSY       = BxDFType(1 << 3);
 constexpr BxDFType BXDF_SPECULAR     = BxDFType(1 << 4);
-constexpr BxDFType BXDF_ALL_REF      = BXDF_REFLECTION   | BXDF_DIFFUSE | BXDF_GLOSSY | BXDF_SPECULAR;
-constexpr BxDFType BXDF_ALL_TRANS    = BXDF_TRANSMISSION | BXDF_DIFFUSE | BXDF_GLOSSY | BXDF_SPECULAR;
+constexpr BxDFType BXDF_AMBIENT      = BxDFType(1 << 5);
+constexpr BxDFType BXDF_ALL_REF      = BXDF_REFLECTION   | BXDF_DIFFUSE | BXDF_GLOSSY | BXDF_SPECULAR | BXDF_AMBIENT;
+constexpr BxDFType BXDF_ALL_TRANS    = BXDF_TRANSMISSION | BXDF_DIFFUSE | BXDF_GLOSSY | BXDF_SPECULAR | BXDF_AMBIENT;
 
 struct BxDFSample
 {
@@ -49,6 +51,8 @@ public:
     virtual Option<BxDFSample> Sample(const Vec3r &wi, BxDFType type) const = 0;
 
     virtual Real PDF(const Vec3r &wi, const Vec3r &wo) const = 0;
+
+    virtual Spectrum AmbientRadiance(const Intersection &inct) const;
 };
 
 AGZ_NS_END(Atrc)

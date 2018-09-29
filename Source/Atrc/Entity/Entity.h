@@ -16,8 +16,6 @@ public:
     virtual Option<Intersection> EvalIntersection(const Ray &r) const = 0;
 
     virtual RC<BxDF> GetBxDF(const Intersection &inct) const = 0;
-
-    virtual Spectrum AmbientRadiance() const;
 };
 
 AGZ_NS_END(Atrc)

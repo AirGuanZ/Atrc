@@ -27,6 +27,9 @@
       <Filter>Renderer</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Source\Atrc\Atrc.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Entity\ColoredSky.h">
+      <Filter>Entity</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\Atrc\Common.cpp" />
@@ -34,6 +37,12 @@
       <Filter>Camera</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Source\Atrc\Entity\Entity.cpp">
+      <Filter>Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Material\BxDF.cpp">
+      <Filter>Material</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Entity\ColoredSky.cpp">
       <Filter>Entity</Filter>
     </ClCompile>
   </ItemGroup>
