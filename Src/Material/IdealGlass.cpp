@@ -38,7 +38,7 @@ Option<BxDFSample> IdealGlassBxDF::Sample(
     // Transmission
     if(HasBxDFType(type, CombineBxDFTypes(BxDFType::Transmission, BxDFType::Specular)))
     {
-        // TODO
+        // TODO: Waiting for implementation of fresnel equations
     }
 
     return None;
@@ -48,6 +48,19 @@ Real IdealGlassBxDF::PDF(
     const SurfaceLocal &sl, const Vec3r &samDir, const Vec3r &wo) const
 {
     return Real(1);
+}
+
+IdealGlassMaterial::IdealGlassMaterial(
+    const Spectrum &refColor, const Spectrum &transColor, Real refractivity)
+    : reflectionColor_(refColor), transmissionColor_(transColor),
+      refractivity_(refractivity)
+{
+
+}
+
+BxDF *IdealGlassMaterial::GetBxDF(const SurfaceLocal &sl) const
+{
+    return new IdealGlassBxDF(this);
 }
 
 AGZ_NS_END(Atrc)
