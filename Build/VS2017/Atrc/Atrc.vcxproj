@@ -30,7 +30,9 @@
     <ClInclude Include="..\..\..\Source\Atrc\Material\BxDF.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Math\Math.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Math\Ray.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Renderer\Native1sppSubareaRenderer.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Renderer\Renderer.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Renderer\SerialRenderer.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Renderer\SubareaRenderer.h" />
   </ItemGroup>
   <ItemGroup>
@@ -40,6 +42,7 @@
     <ClCompile Include="..\..\..\Source\Atrc\Entity\Entity.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Integrator\AmbientIntegrator.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Material\BxDF.cpp" />
+    <ClCompile Include="..\..\..\Source\Atrc\Renderer\Native1sppSubareaRenderer.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

@@ -36,6 +36,12 @@
     <ClInclude Include="..\..\..\Source\Atrc\Renderer\SubareaRenderer.h">
       <Filter>Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Renderer\SerialRenderer.h">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Renderer\Native1sppSubareaRenderer.h">
+      <Filter>Renderer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\Atrc\Common.cpp" />
@@ -53,6 +59,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Source\Atrc\Integrator\AmbientIntegrator.cpp">
       <Filter>Integrator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Renderer\Native1sppSubareaRenderer.cpp">
+      <Filter>Renderer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -12,7 +12,7 @@ public:
     virtual ~Renderer() = default;
 
     virtual void Render(
-        const Scene &scene, Integrator &integrator,
+        const Scene &scene, const Integrator &integrator,
         RenderTarget<Color3f> &output) = 0;
 };
 
