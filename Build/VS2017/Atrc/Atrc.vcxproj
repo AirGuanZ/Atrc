@@ -25,17 +25,20 @@
     <ClInclude Include="..\..\..\Source\Atrc\Common.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Entity\ColoredSky.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Entity\Entity.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Integrator\AmbientIntegrator.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Integrator\Integrator.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Material\BxDF.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Math\Math.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Math\Ray.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Renderer\Renderer.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Renderer\SubareaRenderer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\Atrc\Camera\PerspectiveCamera.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Common.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Entity\ColoredSky.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Entity\Entity.cpp" />
+    <ClCompile Include="..\..\..\Source\Atrc\Integrator\AmbientIntegrator.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Material\BxDF.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

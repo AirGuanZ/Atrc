@@ -95,6 +95,21 @@ struct Intersection
     Vec3r pos;
     Vec3r nor;
     Real t;
+
+    const Entity *entity;
+    uint32_t flag = 0;
 };
+
+inline void UpdateCloserIntersection(
+    Option<Intersection> &origin, const Option<Intersection> &newer)
+{
+    if(newer && (!origin || newer->t < origin->t))
+        origin = newer;
+}
+
+// ============================= RenderTarget =============================
+
+template<typename T>
+using RenderTarget = AGZ::Tex::Texture2D<T>;
 
 AGZ_NS_END(Atrc)

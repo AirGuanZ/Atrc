@@ -65,11 +65,12 @@ bool ColoredSky::HasIntersection(const Ray &r) const
 Option<Intersection> ColoredSky::EvalIntersection(const Ray &r) const
 {
     AGZ_ASSERT(ApproxEq(r.direction.Length(), Real(1), Real(1e-5)));
-    return Intersection{
+    return Intersection {
         -r.direction,
         Vec3r(RealT::Max()),
         -r.direction,
-        RealT::Max()
+        RealT::Max(),
+        this,
     };
 }
 

@@ -13,7 +13,7 @@ public:
 
     virtual void Render(
         const Scene &scene, Integrator &integrator,
-        AGZ::Tex::Texture2D<Color3f> &output) = 0;
+        RenderTarget<Color3f> &output) = 0;
 };
 
 AGZ_NS_END(Atrc)

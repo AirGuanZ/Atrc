@@ -10,7 +10,7 @@ class Scene
 public:
 
     const Camera *camera;
-    std::vector<Entity*> entities;
+    std::vector<const Entity*> entities;
 };
 
 ATRC_INTERFACE Integrator
