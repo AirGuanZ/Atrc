@@ -42,6 +42,9 @@
     <ClInclude Include="..\..\..\Source\Atrc\Renderer\Native1sppSubareaRenderer.h">
       <Filter>Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Renderer\ParallelRenderer.h">
+      <Filter>Renderer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\Atrc\Common.cpp" />

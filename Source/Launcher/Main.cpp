@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include <Atrc/Atrc.h>
 
 using namespace std;
@@ -25,7 +23,7 @@ int main()
     RenderTarget<Color3f> renderTarget(SCR_W, SCR_H);
 
     AmbientIntegrator integrator;
-    SerialRenderer<Native1sppSubareaRenderer> renderer;
+    ParallelRenderer<Native1sppSubareaRenderer> renderer(-1);
 
     renderer.Render(scene, integrator, renderTarget);
 

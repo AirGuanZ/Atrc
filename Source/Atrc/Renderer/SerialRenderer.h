@@ -26,7 +26,7 @@ public:
 
     void Render(
         const Scene &scene, const Integrator &integrator,
-        RenderTarget<Color3f> &output) override
+        RenderTarget<Color3f> &output) const override
     {
         AGZ_ASSERT(output.IsAvailable());
         subareaRenderer_.Render(

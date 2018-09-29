@@ -31,6 +31,7 @@
     <ClInclude Include="..\..\..\Source\Atrc\Math\Math.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Math\Ray.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Renderer\Native1sppSubareaRenderer.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Renderer\ParallelRenderer.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Renderer\Renderer.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Renderer\SerialRenderer.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Renderer\SubareaRenderer.h" />

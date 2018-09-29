@@ -13,7 +13,7 @@ public:
 
     virtual void Render(
         const Scene &scene, const Integrator &integrator,
-        RenderTarget<Color3f> &output) = 0;
+        RenderTarget<Color3f> &output) const = 0;
 };
 
 AGZ_NS_END(Atrc)

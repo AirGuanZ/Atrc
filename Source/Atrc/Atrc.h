@@ -16,6 +16,7 @@
 #include <Atrc/Material/BxDF.h>
 
 #include <Atrc/Renderer/Renderer.h>
+#include <Atrc/Renderer/ParallelRenderer.h>
 #include <Atrc/Renderer/SerialRenderer.h>
 
 #include <Atrc/Renderer/SubareaRenderer.h>
