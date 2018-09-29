@@ -28,7 +28,7 @@ int main()
     DiffuseMaterial matRed(  { 3.0f, 1.2f, 1.2f }),
                     matGreen({ 1.2f, 3.0f, 1.2f }),
                     matBlue( { 1.2f, 1.2f, 3.0f }),
-                    matWhite({ 1.2f, 1.2f, 1.2f });
+                    matWhite({ 1.0f, 1.0f, 1.0f });
 
     Sphere sphGround(1e5), sphRed(0.2), sphGreen(0.4), sphBlue(0.6);
 
@@ -37,7 +37,7 @@ int main()
                    entGreen (&sphGreen,  &matGreen, Transform(Mat4r::Translate({ 0.0, 0.3, 0.0 }))),
                    entBlue  (&sphBlue,   &matBlue,  Transform(Mat4r::Translate({ 0.1, -0.4, 0.2 })));
 
-    PointLight lightSkyblue({ 6.0f, 7.0f, 4.0f }, { -1.5, 0.0, 2.0 });
+    PointLight lightSkyblue({ 3.0f, 3.0f, 3.0f }, { -2.0, 0.0, 1.5 });
 
     SceneView scene;
     scene.camera = &camera;

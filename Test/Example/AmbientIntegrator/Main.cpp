@@ -29,7 +29,7 @@ int main()
 
     Sphere sphGround(1e5), sphRed(0.2), sphGreen(0.4), sphBlue(0.6);
 
-    GeometryEntity entGround(&sphGround, &matWhite, Transform(Mat4r::Translate({ 0.0, 0.0, -1e5 - 5.0 }))),
+    GeometryEntity entGround(&sphGround, &matWhite, Transform(Mat4r::Translate({ 0.0, 0.0, -1e5 - 1.0 }))),
                    entRed   (&sphRed,    &matRed,   Transform(Mat4r::Translate({ -0.8, 0.0, 0.2 }))),
                    entGreen (&sphGreen,  &matGreen, Transform(Mat4r::Translate({ 0.0, 0.3, 0.0 }))),
                    entBlue  (&sphBlue,   &matBlue,  Transform(Mat4r::Translate({ 0.1, -0.4, 0.2 })));
