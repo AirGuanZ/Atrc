@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Atrc/Common.h>
-#include <Atrc/Math/Ray.h>
+#include <Atrc/Math/Math.h>
 
 AGZ_NS_BEG(Atrc)
 
@@ -12,7 +12,7 @@ public:
     virtual ~Camera() = default;
 
     // Screen Sample: x: [-1, +1] y: [-1, +1]
-    virtual Ray Generate(const Vec2r &screenSample) const = 0;
+    virtual Ray GetRay(const Vec2r &screenSample) const = 0;
 };
 
 AGZ_NS_END(Atrc)

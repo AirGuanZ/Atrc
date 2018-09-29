@@ -19,14 +19,21 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\Source\Atrc\Atrc.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Camera\Camera.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Camera\PerspectiveCamera.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Common.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Entity\Entity.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Integrator\Integrator.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Material\BxDF.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Math\Math.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Math\Ray.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Renderer\Renderer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\Atrc\Camera\PerspectiveCamera.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Common.cpp" />
+    <ClCompile Include="..\..\..\Source\Atrc\Entity\Entity.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

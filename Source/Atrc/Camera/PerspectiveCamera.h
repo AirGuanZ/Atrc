@@ -16,7 +16,7 @@ public:
         const Vec3r &eye, const Vec3r &_dir, const Vec3r &up,
         Radr FOVy, Real aspectRatio, Real distance);
 
-    Ray Generate(const Vec2r &screenSample) const override;
+    Ray GetRay(const Vec2r &screenSample) const override;
 };
 
 AGZ_NS_END(Atrc)

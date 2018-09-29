@@ -21,7 +21,7 @@ PerspectiveCamera::PerspectiveCamera(
     scrY_ = scrYSize * scrYDir;
 }
 
-Ray PerspectiveCamera::Generate(const Vec2r &screenSample) const
+Ray PerspectiveCamera::GetRay(const Vec2r &screenSample) const
 {
     Vec3r ori = scrCen_ + screenSample.x * scrX_ + screenSample.y * scrY_;
     Vec3r dir = (ori - eye_).Normalize();

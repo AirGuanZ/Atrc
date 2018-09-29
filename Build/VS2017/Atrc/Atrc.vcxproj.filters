@@ -11,11 +11,30 @@
     <ClInclude Include="..\..\..\Source\Atrc\Math\Ray.h">
       <Filter>Math</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Integrator\Integrator.h">
+      <Filter>Integrator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Entity\Entity.h">
+      <Filter>Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Material\BxDF.h">
+      <Filter>Material</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Math\Math.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Renderer\Renderer.h">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Atrc.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\Atrc\Common.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Camera\PerspectiveCamera.cpp">
       <Filter>Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Entity\Entity.cpp">
+      <Filter>Entity</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -24,6 +43,18 @@
     </Filter>
     <Filter Include="Math">
       <UniqueIdentifier>{59326089-0667-4ab8-bc8b-de9358518f35}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Integrator">
+      <UniqueIdentifier>{aa4a76c9-ced9-4d36-8326-bd93f0558f6d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Entity">
+      <UniqueIdentifier>{a6245676-b949-4792-bcd9-40d4e1386de5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Material">
+      <UniqueIdentifier>{28a87713-549f-45ae-8933-d446205bc922}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Renderer">
+      <UniqueIdentifier>{7ec5721f-2976-41ba-bf6c-450ad3a76a57}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

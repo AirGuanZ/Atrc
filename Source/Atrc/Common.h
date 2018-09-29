@@ -54,6 +54,13 @@ DEFINE_ATRC_EXCEPTION(ArgumentException);
 #define ATRC_IMPLEMENTS public
 #define ATRC_PROPERTY   public
 
+// ============================= Important forward declerations =============================
+
+ATRC_INTERFACE Camera;
+ATRC_INTERFACE Integrator;
+ATRC_INTERFACE Entity;
+ATRC_INTERFACE BxDF;
+
 // ============================= Export AGZ::Math =============================
 
 using namespace AGZ::Math;
@@ -70,5 +77,20 @@ using Mat4r = Mat4<Real>;
 
 using Radr = Rad<Real>;
 using Degr = Deg<Real>;
+
+// ============================= Spectrum =============================
+
+using Spectrum = Color3f;
+
+namespace SPECTRUM = COLOR;
+
+// ============================= Geometry Intersection =============================
+
+struct Intersection
+{
+    Vec3r pos;
+    Vec3r nor;
+    Real t;
+};
 
 AGZ_NS_END(Atrc)
