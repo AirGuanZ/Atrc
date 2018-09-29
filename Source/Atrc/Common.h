@@ -96,7 +96,7 @@ struct Intersection
     Vec3r nor;
     Real t;
 
-    const Entity *entity;
+    const Entity *entity = nullptr;
     uint32_t flag = 0;
 };
 

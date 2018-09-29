@@ -45,6 +45,12 @@
     <ClInclude Include="..\..\..\Source\Atrc\Renderer\ParallelRenderer.h">
       <Filter>Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Math\CoordSys.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Math\Sphere.h">
+      <Filter>Math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\Atrc\Common.cpp" />
@@ -65,6 +71,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Source\Atrc\Renderer\Native1sppSubareaRenderer.cpp">
       <Filter>Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Math\Sphere.cpp">
+      <Filter>Math</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

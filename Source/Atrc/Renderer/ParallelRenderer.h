@@ -1,3 +1,5 @@
+#pragma once
+
 #include <mutex>
 #include <queue>
 #include <thread>
@@ -21,29 +23,28 @@ class ParallelRenderer
     
     struct Param
     {
-        const Scene &scene;
-        const Integrator &integrator;
-        RenderTarget<Color3f> &output;
-        const SubareaRenderer &subareaRenderer;
+        const Scene           *scene;
+        const Integrator      *integrator;
+        RenderTarget<Color3f> *output;
+        const SubareaRenderer *subareaRenderer;
+
+        std::mutex       *mut;
+        std::queue<Area> *tasks;
     };
     
-    static void Worker(
-        std::mutex *_mut, std::queue<Area> *_tasks, Param param)
+    static void Worker(Param param)
     {
-        auto &mut = *_mut;
-        auto &tasks = *_tasks;
-        
         for(;;)
         {
             bool done = true;
             Area area = { 0, 0, 0, 0 };
             
             {
-                std::lock_guard<std::mutex> lk(mut);
-                if(!tasks.empty())
+                std::lock_guard<std::mutex> lk(*param.mut);
+                if(!param.tasks->empty())
                 {
-                    area = tasks.front();
-                    tasks.pop();
+                    area = param.tasks->front();
+                    param.tasks->pop();
                     done = false;
                 }
             }
@@ -51,8 +52,8 @@ class ParallelRenderer
             if(done)
                 break;
 
-            param.subareaRenderer.Render(
-                param.scene, param.integrator, param.output, area);
+            param.subareaRenderer->Render(
+                *param.scene, *param.integrator, *param.output, area);
         }
     }
     
@@ -64,7 +65,7 @@ public:
     {
         if(workerCount <= 0)
             workerCount = std::thread::hardware_concurrency();
-        workerCount_ = (std::max)(1, workerCount);
+        workerCount_ = (std::max)(1, workerCount) - 1;
     }
 
     void Render(
@@ -76,8 +77,6 @@ public:
         uint32_t w = output.GetWidth();
         uint32_t h = output.GetHeight();
         
-        Param param = { scene, integrator, output, subareaRenderer_ };
-        
         std::queue<Area> tasks;
         uint32_t yStep = w >= 1024 ? 1 : 2048 / w;
         uint32_t y = 0;
@@ -85,12 +84,19 @@ public:
             tasks.push({ 0, w, y, y + yStep });
         if(y < h)
             tasks.push({ 0, w, y, h });
-        
+
         std::mutex mut;
+        Param param = {
+            &scene, &integrator, &output, &subareaRenderer_,
+            &mut, &tasks
+        };
+        
         std::vector<std::thread> workers;
-        for(int i = 1; i < workerCount_; ++i)
-            workers.emplace_back(Worker, &mut, &tasks, param);
-        Worker(&mut, &tasks, param);
+        if(workerCount_)
+            workers.reserve(workerCount_);
+        for(int i = 0; i < workerCount_; ++i)
+            workers.emplace_back(Worker, param);
+        Worker(param);
         
         for(auto &worker : workers)
             worker.join();

@@ -38,4 +38,9 @@ public:
     }
 };
 
+inline bool ValidDir(const Ray &r)
+{
+    return ApproxEq(r.direction.LengthSquare(), Real(1), Real(1e-5));
+}
+
 AGZ_NS_END(Atrc)

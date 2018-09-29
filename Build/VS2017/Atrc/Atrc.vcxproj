@@ -28,8 +28,10 @@
     <ClInclude Include="..\..\..\Source\Atrc\Integrator\AmbientIntegrator.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Integrator\Integrator.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Material\BxDF.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Math\CoordSys.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Math\Math.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Math\Ray.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Math\Sphere.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Renderer\Native1sppSubareaRenderer.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Renderer\ParallelRenderer.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Renderer\Renderer.h" />
@@ -43,6 +45,7 @@
     <ClCompile Include="..\..\..\Source\Atrc\Entity\Entity.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Integrator\AmbientIntegrator.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Material\BxDF.cpp" />
+    <ClCompile Include="..\..\..\Source\Atrc\Math\Sphere.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Renderer\Native1sppSubareaRenderer.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
