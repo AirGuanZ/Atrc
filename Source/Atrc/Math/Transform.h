@@ -163,12 +163,12 @@ inline Vec3r Transform::ApplyInverseToVector(const Vec3r &v) const
 
 inline Vec3r Transform::ApplyToNormal(const Vec3r &n) const
 {
-    return inv_.ApplyInverseToNormal(n);
+    return inv_.ApplyInverseToNormal(n).Normalize();
 }
 
 inline Vec3r Transform::ApplyInverseToNormal(const Vec3r &n) const
 {
-    return mat_.ApplyInverseToNormal(n);
+    return mat_.ApplyInverseToNormal(n).Normalize();
 }
 
 inline Ray Transform::ApplyToRay(const Ray &r) const

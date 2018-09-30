@@ -42,7 +42,7 @@ bool EvalIntersection(const Ray &r, Real radius, Intersection *inct)
         return false;
     delta = Sqrt(delta);
     
-    constexpr Real inv2A = Real(0.5);
+    constexpr auto inv2A = Real(0.5);
     Real t0 = (-B - delta) * inv2A;
     Real t1 = (-B + delta) * inv2A;
     

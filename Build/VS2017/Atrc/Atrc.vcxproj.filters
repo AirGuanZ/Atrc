@@ -75,6 +75,9 @@
     <ClInclude Include="..\..\..\Source\Atrc\Entity\MetalSphere.h">
       <Filter>Entity</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Entity\GlassSphere.h">
+      <Filter>Entity</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\Atrc\Common.cpp" />
@@ -121,6 +124,9 @@
       <Filter>Math</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Source\Atrc\Entity\MetaSphere.cpp">
+      <Filter>Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Entity\GlassSphere.cpp">
       <Filter>Entity</Filter>
     </ClCompile>
   </ItemGroup>

@@ -29,6 +29,7 @@ constexpr BxDFType BXDF_GLOSSY       = BxDFType(1 << 3);
 constexpr BxDFType BXDF_SPECULAR     = BxDFType(1 << 4);
 constexpr BxDFType BXDF_ALL_REF      = BXDF_REFLECTION   | BXDF_DIFFUSE | BXDF_GLOSSY | BXDF_SPECULAR;
 constexpr BxDFType BXDF_ALL_TRANS    = BXDF_TRANSMISSION | BXDF_DIFFUSE | BXDF_GLOSSY | BXDF_SPECULAR;
+constexpr BxDFType BXDF_ALL          = BXDF_ALL_REF | BXDF_ALL_TRANS;
 
 struct BxDFSample
 {

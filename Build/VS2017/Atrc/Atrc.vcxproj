@@ -27,6 +27,7 @@
     <ClInclude Include="..\..\..\Source\Atrc\Entity\ColoredSky.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Entity\DiffuseSphere.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Entity\Entity.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Entity\GlassSphere.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Entity\MetalSphere.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Entity\Sphere.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Integrator\AmbientIntegrator.h" />
@@ -53,6 +54,7 @@
     <ClCompile Include="..\..\..\Source\Atrc\Entity\ColoredSky.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Entity\DiffuseSphere.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Entity\Entity.cpp" />
+    <ClCompile Include="..\..\..\Source\Atrc\Entity\GlassSphere.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Entity\MetaSphere.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Entity\Sphere.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Integrator\AmbientIntegrator.cpp" />
