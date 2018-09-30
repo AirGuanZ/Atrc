@@ -78,6 +78,9 @@
     <ClInclude Include="..\..\..\Source\Atrc\Entity\GlassSphere.h">
       <Filter>Entity</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Camera\ApertureCamera.h">
+      <Filter>Camera</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\Atrc\Common.cpp" />
@@ -128,6 +131,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Source\Atrc\Entity\GlassSphere.cpp">
       <Filter>Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Camera\ApertureCamera.cpp">
+      <Filter>Camera</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

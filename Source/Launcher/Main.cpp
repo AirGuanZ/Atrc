@@ -23,16 +23,16 @@ RenderTarget<Color3b> ToSavedImage(const RenderTarget<Color3f> &origin, float ga
 
 int main()
 {
-    const Vec3r eye = { -5.0, 0.0, 0.0 };
+    const Vec3r eye = { -2.4, 4.5, 1.0 };
     const Vec3r dir = (Vec3r(0.0) - eye).Normalize();
-    PerspectiveCamera camera(
+    ApertureCamera camera(
         eye, dir, { 0.0, 0.0, 1.0 },
-        Degr(90.0), SCR_ASPECT_RATIO, 1.0);
+        Degr(90.0), SCR_ASPECT_RATIO, 0.13, 3.6069);
 
     ColoredSky sky({ 0.4f, 0.7f, 0.9f }, { 1.0f, 1.0f, 1.0f });
     DiffuseSphere ground(200.0, Transform::Translate({ 0.0, 0.0, -200.0 - 1.0 }) , { 0.4f, 0.8f, 0.4f });
     DiffuseSphere centreBall(1.0, TRANSFORM_IDENTITY, { 0.7f, 0.7f, 0.7f });
-    MetalSphere rightMetalSphere(1.0, Transform::Translate({ 0.0, -2.0, 0.0 }),
+    MetalSphere rightMetalSphere(1.0, Transform::Translate({ -3.0, -2.0, 0.0 }),
                                  { 1.0f, 0.3f, 0.3f }, 0.2);
     GlassSphere leftGlassSphere(1.0, Transform::Translate({ 0.0, 2.0, 0.0 }),
                                 { 0.8f, 0.8f, 0.8f }, { 0.8f, 0.8f, 0.8f }, 1.5);
@@ -47,7 +47,7 @@ int main()
     PathTracer integrator(20);
 
     //ParallelRenderer<Native1sppSubareaRenderer> renderer(-1);
-    ParallelRenderer<JitteredSubareaRenderer> renderer(-1, 100);
+    ParallelRenderer<JitteredSubareaRenderer> renderer(-1, 1000);
     renderer.Render(scene, integrator, renderTarget);
 
     AGZ::Tex::TextureFile::WriteRGBToPNG("Output.png", ToSavedImage(renderTarget, 2.2f));

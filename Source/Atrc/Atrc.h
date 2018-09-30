@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Atrc/Camera/ApertureCamera.h>
 #include <Atrc/Camera/PerspectiveCamera.h>
 
 #include <Atrc/Math/Math.h>

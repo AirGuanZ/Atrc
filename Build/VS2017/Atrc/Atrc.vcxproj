@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Source\Atrc\Atrc.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Camera\ApertureCamera.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Camera\Camera.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Camera\PerspectiveCamera.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Common.h" />
@@ -48,6 +49,7 @@
     <ClInclude Include="..\..\..\Source\Atrc\Renderer\SubareaRenderer.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\Source\Atrc\Camera\ApertureCamera.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Camera\PerspectiveCamera.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Common.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Entity\AmbientSphere.cpp" />

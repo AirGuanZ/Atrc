@@ -10,14 +10,14 @@ namespace
         : ATRC_IMPLEMENTS BxDF,
           ATRC_PROPERTY AGZ::Uncopiable
     {
-        CoordSys localCoord_;
+        Vec3r nor_;
         Spectrum color_;
         Real roughness_;
 
     public:
 
         explicit MetalBxDF(const Intersection &inct, const Spectrum &color, Real roughness)
-            : localCoord_(CoordSys::FromZ(inct.nor)), color_(color), roughness_(roughness)
+            : nor_(inct.nor), color_(color), roughness_(roughness)
         {
             
         }
@@ -35,12 +35,12 @@ namespace
         Option<BxDFSample> Sample(const Vec3r &wi, BxDFType type) const override
         {
             if(type.Contains(BXDF_REFLECTION | BXDF_SPECULAR) &&
-                Dot(wi, localCoord_.ez) > Real(0))
+                Dot(wi, nor_) > Real(0))
             {
-                Vec3r dir = Real(2) * Dot(localCoord_.ez, wi) * localCoord_.ez - wi;
+                Vec3r dir = Real(2) * Dot(nor_, wi) * nor_ - wi;
                 if(roughness_)
                     dir = (dir + roughness_ * CommonSampler::Uniform_InUnitSphere::Sample().sample).Normalize();
-                Real cos = Dot(dir, localCoord_.ez);
+                Real cos = Dot(dir, nor_);
                 if(cos <= Real(0))
                     return None;
                 return BxDFSample{ dir, color_ / SS(cos), Real(1) };

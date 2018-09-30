@@ -29,7 +29,7 @@ namespace
         : ATRC_IMPLEMENTS BxDF,
           ATRC_PROPERTY AGZ::Uncopiable
     {
-        CoordSys local_;
+        Vec3r nor_;
         Spectrum reflColor_, refrColor_;
         Real refIdx_;
 
@@ -37,7 +37,7 @@ namespace
 
         explicit GlassBxDF(
             const Intersection &inct, const Spectrum &reflColor, const Spectrum &refrColor, Real refIdx)
-            : local_(CoordSys::FromZ(inct.nor)), reflColor_(reflColor), refrColor_(refrColor), refIdx_(refIdx)
+            : nor_(inct.nor), reflColor_(reflColor), refrColor_(refrColor), refIdx_(refIdx)
         {
             
         }
@@ -54,20 +54,20 @@ namespace
 
         Option<BxDFSample> Sample(const Vec3r &wi, BxDFType type) const override
         {
-            Real dot = Dot(wi, local_.ez), absDot = Abs(dot);
+            Real dot = Dot(wi, nor_), absDot = Abs(dot);
             Real niDivNt, cosine = absDot;
 
             Vec3r nor(AGZ::UNINITIALIZED);
             if(dot < 0)
             {
                 niDivNt = refIdx_;
-                nor = -local_.ez;
+                nor = -nor_;
                 cosine *= refIdx_;
             }
             else
             {
                 niDivNt = 1 / refIdx_;
-                nor = local_.ez;
+                nor = nor_;
             }
 
             if(type.Contains(BXDF_TRANSMISSION | BXDF_SPECULAR))
