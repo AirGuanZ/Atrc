@@ -5,17 +5,19 @@ AGZ_NS_BEG(Atrc)
 ApertureCamera::ApertureCamera(
     const Vec3r &eye, const Vec3r &_dir, const Vec3r &up,
     Radr FOVy, Real aspectRatio, Real apertureRadius, Real focusDis)
-    : eye_(eye), dir_(_dir.Normalize()), scrCen_(AGZ::UNINITIALIZED),
+    : eye_(eye), scrCen_(AGZ::UNINITIALIZED), dir_(_dir.Normalize()),
       scrX_(AGZ::UNINITIALIZED), scrY_(AGZ::UNINITIALIZED),
       scrXDir_(AGZ::UNINITIALIZED), scrYDir_(AGZ::UNINITIALIZED),
       apertureRadius_(apertureRadius), focusDis_(focusDis)
 {
-    scrCen_ = eye_ + dir_;
+    constexpr Real distance = 0.02;
+
+    scrCen_ = eye_ + distance * dir_;
 
     scrXDir_ = Cross(dir_, up).Normalize();
     scrYDir_ = Cross(scrXDir_, dir_);
 
-    Real scrYSize = Tan(Real(0.5) * FOVy);
+    Real scrYSize = distance * Tan(Real(0.5) * FOVy);
     Real scrXSize = scrYSize * aspectRatio;
 
     scrX_ = scrXSize * scrXDir_;

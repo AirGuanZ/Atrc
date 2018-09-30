@@ -26,7 +26,6 @@ bld/
 *.d
 .vscode/
 Build/*.png
-Diary/
 
 # Visual Studio 2015 cache/options directory
 .vs/
