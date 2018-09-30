@@ -57,6 +57,9 @@
     <ClInclude Include="..\..\..\Source\Atrc\Math\Transform.h">
       <Filter>Math</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Renderer\JitteredSubareaRenderer.h">
+      <Filter>Renderer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\Atrc\Common.cpp" />
@@ -83,6 +86,12 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Source\Atrc\Entity\AmbientSphere.cpp">
       <Filter>Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Integrator\Integrator.cpp">
+      <Filter>Integrator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Renderer\JitteredSubareaRenderer.cpp">
+      <Filter>Renderer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -15,6 +15,10 @@ public:
 
 ATRC_INTERFACE Integrator
 {
+protected:
+
+    static bool FindClosestIntersection(const Scene &scene, const Ray &r, Intersection *inct);
+
 public:
 
     virtual ~Integrator() = default;

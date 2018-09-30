@@ -21,4 +21,5 @@
 #include <Atrc/Renderer/SerialRenderer.h>
 
 #include <Atrc/Renderer/SubareaRenderer.h>
+#include <Atrc/Renderer/JitteredSubareaRenderer.h>
 #include <Atrc/Renderer/Native1sppSubareaRenderer.h>
