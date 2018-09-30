@@ -80,7 +80,7 @@ using Mat4r = Mat4<Real>;
 using Radr = Rad<Real>;
 using Degr = Deg<Real>;
 
-inline Real Rand() { return Random::Uniform(Real(0), Real(1)); }
+inline Real Rand() { return Random::Uniform(0.0, 1.0); }
 
 // ============================= Spectrum =============================
 
@@ -97,6 +97,8 @@ struct Intersection
     Vec3r pos;
     Vec3r nor;
     Real t;
+    
+    Vec2r uv;
 
     const Entity *entity = nullptr;
     uint32_t flag = 0;

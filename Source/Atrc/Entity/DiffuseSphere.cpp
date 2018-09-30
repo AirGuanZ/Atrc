@@ -28,7 +28,7 @@ namespace
 
         Spectrum Eval(const Vec3r &wi, const Vec3r &wo) const override
         {
-            if(Dot(wi, localCoord_.ez) > Real(0) && Dot(wo, localCoord_.ez) > Real(0))
+            if(Dot(wi, localCoord_.ez) > 0.0 && Dot(wo, localCoord_.ez) > 0.0)
                 return color_;
             return SPECTRUM::BLACK;
         }
@@ -36,7 +36,7 @@ namespace
         Option<BxDFSample> Sample(const Vec3r &wi, BxDFType type) const override
         {
             if(type.Contains(BXDF_REFLECTION | BXDF_DIFFUSE) &&
-               Dot(wi, localCoord_.ez) > Real(0))
+               Dot(wi, localCoord_.ez) > 0.0)
             {
                 auto [dir, pdf] = CommonSampler::ZWeighted_OnUnitHemisphere::Sample();
                 return BxDFSample{ localCoord_.C2W(dir), color_, pdf };

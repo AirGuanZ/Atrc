@@ -7,29 +7,29 @@ Uniform_InUnitSphere::Result Uniform_InUnitSphere::Sample()
     for(;;)
     {
         Vec3r sample(
-            Real(2) * Rand() - Real(1),
-            Real(2) * Rand() - Real(1),
-            Real(2) * Rand() - Real(1));
-        if(sample.LengthSquare() <= Real(1))
-            return { sample, Real(4) / Real(3) * PI<Real> };
+            2.0 * Rand() - 1.0,
+            2.0 * Rand() - 1.0,
+            2.0 * Rand() - 1.0);
+        if(sample.LengthSquare() <= 1.0)
+            return { sample, 4.0 / 3.0 * PI<Real> };
     }
 }
 
 Real Uniform_InUnitSphere::PDF(const Vec3r &sample)
 {
-    return Real(4) / Real(3) * PI<Real>;
+    return 4.0 / 3.0 * PI<Real>;
 }
 
 ZWeighted_OnUnitHemisphere::Result ZWeighted_OnUnitHemisphere::Sample()
 {
     // IMPROVE
-    Real phi = Real(2) * PI<Real> * Rand();
+    Real phi = 2.0 * PI<Real> * Rand();
 
     Real V = Rand();
-    Real theta = Arccos(Real(1) - V);
+    Real theta = Arccos(1.0 - V);
 
     Real sinTheta = Sin(theta);
-    Real cosTheta = Sqrt(std::max(Real(0), Real(1) - sinTheta * sinTheta));
+    Real cosTheta = Sqrt(std::max(0.0, 1.0 - sinTheta * sinTheta));
 
     return { { cosTheta * Cos(phi), cosTheta * Sin(phi), sinTheta }, sinTheta };
 }

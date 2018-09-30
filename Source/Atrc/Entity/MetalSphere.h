@@ -15,7 +15,7 @@ class MetalSphere
 
 public:
 
-    MetalSphere(Real radius, const Transform &local2World, const Spectrum &color, Real roughness = Real(0));
+    MetalSphere(Real radius, const Transform &local2World, const Spectrum &color, Real roughness = 0.0);
 
     RC<BxDF> GetBxDF(const Intersection &inct) const override;
 };

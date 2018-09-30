@@ -36,10 +36,10 @@
     <ClInclude Include="..\..\..\Source\Atrc\Integrator\PathTracer.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Material\BxDF.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Math\CoordSys.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Math\Geometry.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Math\Math.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Math\Ray.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Math\CommonSampler.h" />
-    <ClInclude Include="..\..\..\Source\Atrc\Math\GeometrySphere.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Math\Transform.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Renderer\JitteredSubareaRenderer.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Renderer\Native1sppSubareaRenderer.h" />
@@ -64,7 +64,7 @@
     <ClCompile Include="..\..\..\Source\Atrc\Integrator\PathTracer.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Material\BxDF.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Math\CommonSampler.cpp" />
-    <ClCompile Include="..\..\..\Source\Atrc\Math\GeometrySphere.cpp" />
+    <ClCompile Include="..\..\..\Source\Atrc\Math\Geometry.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Renderer\JitteredSubareaRenderer.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Renderer\Native1sppSubareaRenderer.cpp" />
   </ItemGroup>

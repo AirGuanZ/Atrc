@@ -14,13 +14,13 @@ void JitteredSubareaRenderer::Render(
     RenderTarget<Color3f> &output, const Subarea &area) const
 {
     auto pw = output.GetWidth(), ph = output.GetHeight();
-    Real xBaseCoef = Real(2) / pw, yBaseCoef = Real(2) / ph;
+    Real xBaseCoef = 2.0 / pw, yBaseCoef = 2.0 / ph;
     for(uint32_t py = area.yBegin; py < area.yEnd; ++py)
     {
-        Real yBase = Real(1) - Real(2) * py / ph;
+        Real yBase = 1.0 - 2.0 * py / ph;
         for(uint32_t px = area.xBegin; px < area.xEnd; ++px)
         {
-            Real xBase = Real(2) * px / pw - Real(1);
+            Real xBase = 2.0 * px / pw - 1.0;
 
             Spectrum pixel = SPECTRUM::BLACK;
             for(uint32_t i = 0; i < spp_; ++i)

@@ -69,9 +69,6 @@
     <ClInclude Include="..\..\..\Source\Atrc\Entity\Sphere.h">
       <Filter>Entity</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\Atrc\Math\GeometrySphere.h">
-      <Filter>Math</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Source\Atrc\Entity\MetalSphere.h">
       <Filter>Entity</Filter>
     </ClInclude>
@@ -80,6 +77,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Source\Atrc\Camera\ApertureCamera.h">
       <Filter>Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Math\Geometry.h">
+      <Filter>Math</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -123,9 +123,6 @@
     <ClCompile Include="..\..\..\Source\Atrc\Entity\Sphere.cpp">
       <Filter>Entity</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Source\Atrc\Math\GeometrySphere.cpp">
-      <Filter>Math</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Source\Atrc\Entity\MetaSphere.cpp">
       <Filter>Entity</Filter>
     </ClCompile>
@@ -134,6 +131,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Source\Atrc\Camera\ApertureCamera.cpp">
       <Filter>Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Math\Geometry.cpp">
+      <Filter>Math</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -85,30 +85,30 @@ inline Transform Transform::RotateZ(Radr angle)
 
 inline Transform Transform::Scale(const Vec3r &s)
 {
-    Vec3r invS(Real(1) / s.x, Real(1) / s.y, Real(1) / s.z);
+    Vec3r invS(1.0 / s.x, 1.0 / s.y, 1.0 / s.z);
     return Transform(Mat4r::Scale(s), Mat4r::Scale(invS));
 }
 
 inline Transform Transform::ScaleX(Real s)
 {
-    Vec3r SV(s, Real(1), Real(1)), invSV(Real(1) / s, Real(1), Real(1));
+    Vec3r SV(s, 1.0, 1.0), invSV(1.0 / s, 1.0, 1.0);
     return Transform(Mat4r::Scale(SV), Mat4r::Scale(invSV));
 }
 
 inline Transform Transform::ScaleY(Real s)
 {
-    Vec3r SV(Real(1), s, Real(1)), invSV(Real(1), Real(1) / s, Real(1));
+    Vec3r SV(1.0, s, 1.0), invSV(1.0, 1.0 / s, 1.0);
     return Transform(Mat4r::Scale(SV), Mat4r::Scale(invSV));
 }
 
 inline Transform Transform::ScaleZ(Real s)
 {
-    Vec3r SV(Real(1), Real(1), s), invSV(Real(1), Real(1), Real(1) / s);
+    Vec3r SV(1.0, 1.0, s), invSV(1.0, 1.0, 1.0 / s);
     return Transform(Mat4r::Scale(SV), Mat4r::Scale(invSV));
 }
 
 inline Transform::Transform()
-    : mat_(Real(1)), inv_(Real(1))
+    : mat_(1.0), inv_(1.0)
 {
 
 }
@@ -193,7 +193,7 @@ inline Intersection Transform::ApplyToIntersection(const Intersection &inct) con
         ApplyToVector(inct.wr),
         ApplyToPoint(inct.pos),
         ApplyToNormal(inct.nor),
-        inct.t, inct.entity, inct.flag
+        inct.t, inct.uv, inct.entity, inct.flag
     };
 }
 
@@ -203,7 +203,7 @@ inline Intersection Transform::ApplyInverseToIntersection(const Intersection &in
         ApplyInverseToVector(inct.wr),
         ApplyInverseToPoint(inct.pos),
         ApplyInverseToNormal(inct.nor),
-        inct.t, inct.entity, inct.flag
+        inct.t, inct.uv, inct.entity, inct.flag
     };
 }
 

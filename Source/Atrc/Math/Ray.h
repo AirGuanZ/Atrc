@@ -21,10 +21,10 @@ public:
 
     Real minT, maxT;
 
-    Ray(const Vec3r &ori, const Vec3r &dir, Real minT = Real(0), Real maxT = RealT::Infinity())
+    Ray(const Vec3r &ori, const Vec3r &dir, Real minT = 0.0, Real maxT = RealT::Infinity())
         : origin(ori), direction(dir), minT(minT), maxT(maxT)
     {
-        AGZ_ASSERT(ApproxEq(dir.Length(), Real(1), Real(1e-5)));
+        AGZ_ASSERT(ApproxEq(dir.Length(), 1.0, 1e-5));
     }
 
     Vec3r At(Real t) const
@@ -40,7 +40,7 @@ public:
 
 inline bool ValidDir(const Ray &r)
 {
-    return ApproxEq(r.direction.LengthSquare(), Real(1), Real(1e-5));
+    return ApproxEq(r.direction.LengthSquare(), 1.0, 1e-5);
 }
 
 AGZ_NS_END(Atrc)

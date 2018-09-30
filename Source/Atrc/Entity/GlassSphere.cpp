@@ -9,8 +9,8 @@ namespace
     bool Refract(const Vec3r &wi, const Vec3r &nor, Real niDivNt, Vec3r *refracted)
     {
         Real t = -Dot(wi, nor);
-        Real jdg = Real(1) - niDivNt * niDivNt * (1 - t * t);
-        if(jdg > Real(0))
+        Real jdg = 1.0 - niDivNt * niDivNt * (1 - t * t);
+        if(jdg > 0.0)
         {
             *refracted = niDivNt * (-wi - t * nor) - Sqrt(jdg) * nor;
             return true;

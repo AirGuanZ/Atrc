@@ -17,7 +17,7 @@ ApertureCamera::ApertureCamera(
     scrXDir_ = Cross(dir_, up).Normalize();
     scrYDir_ = Cross(scrXDir_, dir_);
 
-    Real scrYSize = distance * Tan(Real(0.5) * FOVy);
+    Real scrYSize = distance * Tan(0.5 * FOVy);
     Real scrXSize = scrYSize * aspectRatio;
 
     scrX_ = scrXSize * scrXDir_;

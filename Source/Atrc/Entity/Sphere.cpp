@@ -19,7 +19,7 @@ bool Sphere::EvalIntersection(const Ray &r, Intersection *inct) const
     if(!Geometry::Sphere::EvalIntersection(
         local2World_.ApplyInverseToRay(r), radius_, inct))
         return false;
-
+    
     *inct = local2World_.ApplyToIntersection(*inct);
     inct->entity = this;
     inct->flag = 0;

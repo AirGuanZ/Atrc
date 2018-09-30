@@ -1,4 +1,4 @@
-#include <Atrc/Math/GeometrySphere.h>
+#include <Atrc/Math/Geometry.h>
 
 AGZ_NS_BEG(Atrc::Geometry::Sphere)
 
@@ -6,11 +6,11 @@ namespace
 {
     // |o + td|^2 = r^2 => t^2 + Bt + C = 0
     // Returns (B, C)
-    inline std::tuple<Real, Real> Coefs(const Ray &r, Real radius)
+    std::tuple<Real, Real> Coefs(const Ray &r, Real radius)
     {
         AGZ_ASSERT(ValidDir(r));
         return {
-            Real(2) * Dot(r.direction, r.origin),
+            2.0 * Dot(r.direction, r.origin),
             r.origin.LengthSquare() - radius * radius
         };
     }
@@ -19,12 +19,12 @@ namespace
 bool HasIntersection(const Ray &r, Real radius)
 {
     auto [B, C] = Coefs(r, radius);
-    Real delta = B * B - Real(4) * C;
-    if(delta < Real(0))
+    Real delta = B * B - 4.0 * C;
+    if(delta < 0.0)
         return false;
     delta = Sqrt(delta);
     
-    constexpr Real inv2A = Real(0.5);
+    constexpr Real inv2A = 0.5;
     Real t0 = (-B - delta) * inv2A;
     Real t1 = (-B + delta) * inv2A;
     
@@ -37,12 +37,12 @@ bool EvalIntersection(const Ray &r, Real radius, Intersection *inct)
     AGZ_ASSERT(inct && ValidDir(r));
     
     auto [B, C] = Coefs(r, radius);
-    Real delta = B * B - Real(4) * C;
-    if(delta < Real(0))
+    Real delta = B * B - 4.0 * C;
+    if(delta < 0.0)
         return false;
     delta = Sqrt(delta);
     
-    constexpr auto inv2A = Real(0.5);
+    constexpr auto inv2A = 0.5;
     Real t0 = (-B - delta) * inv2A;
     Real t1 = (-B + delta) * inv2A;
     
@@ -58,10 +58,24 @@ bool EvalIntersection(const Ray &r, Real radius, Intersection *inct)
     else
         t = t0;
     
+    Vec3r pos = r.At(t);
+    
+    Real phi = (!pos.x && !pos.y) ?
+                0.0 : Arctan2(pos.y, pos.x);
+    if(phi < 0.0)
+        phi += 2.0 * PI<Real>;
+    
+    Real sinTheta = Clamp(pos.z / radius, -1.0, 1.0);
+    Real theta = Arcsin(sinTheta);
+    
+    Real u = 0.5 * InvPI<Real> * phi;
+    Real v = InvPI<Real> * theta + 0.5;
+    
     inct->wr  = -r.direction;
-    inct->pos = r.At(t);
+    inct->pos = pos;
     inct->nor = inct->pos.Normalize();
     inct->t   = t;
+    inct->uv  = Vec2r(u, v);
     
     return true;
 }

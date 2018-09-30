@@ -35,15 +35,15 @@ namespace
         Option<BxDFSample> Sample(const Vec3r &wi, BxDFType type) const override
         {
             if(type.Contains(BXDF_REFLECTION | BXDF_SPECULAR) &&
-                Dot(wi, nor_) > Real(0))
+                Dot(wi, nor_) > 0.0)
             {
-                Vec3r dir = Real(2) * Dot(nor_, wi) * nor_ - wi;
+                Vec3r dir = 2.0 * Dot(nor_, wi) * nor_ - wi;
                 if(roughness_)
                     dir = (dir + roughness_ * CommonSampler::Uniform_InUnitSphere::Sample().sample).Normalize();
                 Real cos = Dot(dir, nor_);
-                if(cos <= Real(0))
+                if(cos <= 0.0)
                     return None;
-                return BxDFSample{ dir, color_ / SS(cos), Real(1) };
+                return BxDFSample{ dir, color_ / SS(cos), 1.0 };
             }
             return None;
         }
