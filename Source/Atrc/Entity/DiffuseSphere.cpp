@@ -1,7 +1,6 @@
 #include <Atrc/Entity/DiffuseSphere.h>
 #include <Atrc/Material/BxDF.h>
 #include <Atrc/Math/Math.h>
-#include "AmbientSphere.h"
 
 AGZ_NS_BEG(Atrc)
 
@@ -47,29 +46,10 @@ namespace
     };
 }
 
-DiffuseSphere::DiffuseSphere(Real radius, const Spectrum &color, const Transform &local2World)
-    : radius_(radius), diffuseColor_(color), local2World_(local2World)
+DiffuseSphere::DiffuseSphere(Real radius, const Transform &local2World, const Spectrum &color)
+    : Sphere(radius, local2World), diffuseColor_(color)
 {
 
-}
-
-bool DiffuseSphere::HasIntersection(const Ray &r) const
-{
-    return Geometry::Sphere::HasIntersection(
-        local2World_.ApplyInverseToRay(r), radius_);
-}
-
-bool DiffuseSphere::EvalIntersection(const Ray &r, Intersection *inct) const
-{
-    if(!Geometry::Sphere::EvalIntersection(
-        local2World_.ApplyInverseToRay(r), radius_, inct))
-        return false;
-
-    *inct = local2World_.ApplyToIntersection(*inct);
-    inct->entity = this;
-    inct->flag = 0;
-
-    return true;
 }
 
 RC<BxDF> DiffuseSphere::GetBxDF(const Intersection &inct) const

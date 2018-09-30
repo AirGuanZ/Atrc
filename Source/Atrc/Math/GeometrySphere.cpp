@@ -1,4 +1,4 @@
-#include <Atrc/Math/Sphere.h>
+#include <Atrc/Math/GeometrySphere.h>
 
 AGZ_NS_BEG(Atrc::Geometry::Sphere)
 

@@ -8,12 +8,16 @@ constexpr uint32_t SCR_H = 480;
 
 constexpr Real SCR_ASPECT_RATIO = static_cast<Real>(SCR_W) / SCR_H;
 
-RenderTarget<Color3f> GammaCorrection(const RenderTarget<Color3f> &origin, float gamma)
+RenderTarget<Color3b> ToSavedImage(const RenderTarget<Color3f> &origin, float gamma)
 {
     float index = 1.0f / gamma;
     return origin.Map([=](const Color3f &c)
     {
-        return c.Map([=](float f) { return Pow(f, index); });
+        return c.Map([=](float f)
+        {
+            return static_cast<uint8_t>(
+                Clamp(Pow(f, index), 0.0f, 1.0f) * 255);
+        });
     });
 }
 
@@ -24,24 +28,26 @@ int main()
         Degr(90.0), SCR_ASPECT_RATIO, 1.0);
 
     ColoredSky sky({ 0.4f, 0.7f, 0.9f }, { 1.0f, 1.0f, 1.0f });
-    DiffuseSphere ground(200.0, { 0.4f, 0.8f, 0.4f }, Transform::Translate({ 0.0, 0.0, -200.0 - 1.0 }));
-    DiffuseSphere centreBall(1.0, { 0.7f, 0.7f, 0.7f }, TRANSFORM_IDENTITY);
+    DiffuseSphere ground(200.0, Transform::Translate({ 0.0, 0.0, -200.0 - 1.0 }) , { 0.4f, 0.8f, 0.4f });
+    DiffuseSphere centreBall(1.0, TRANSFORM_IDENTITY, { 0.7f, 0.7f, 0.7f });
+    MetalSphere leftMetalSphere(1.0, Transform::Translate({ 0.0, 2.0, 0.0 }), { 0.8f, 0.8f, 0.8f }, 0.0);
+    MetalSphere rightMetalSphere(1.0, Transform::Translate({ 0.0, -2.0, 0.0 }), { 1.0f, 0.3f, 0.3f }, 0.2);
 
     Scene scene;
     scene.camera = &camera;
-    scene.entities = { &ground, &centreBall, &sky };
+    scene.entities = { &ground, &centreBall, &leftMetalSphere, &rightMetalSphere, &sky };
 
     RenderTarget<Color3f> renderTarget(SCR_W, SCR_H);
 
     //AmbientIntegrator integrator;
-    PathTracer integrator(4);
+    PathTracer integrator(20);
 
     // ParallelRenderer<Native1sppSubareaRenderer> renderer(-1);
-    ParallelRenderer<JitteredSubareaRenderer> renderer(-1, 1000);
+    ParallelRenderer<JitteredSubareaRenderer> renderer(-1, 200);
 
     renderer.Render(scene, integrator, renderTarget);
 
     AGZ::Tex::TextureFile::WriteRGBToPNG(
-        "Output/SinglePathTracedDiffuseSphere.png",
-        AGZ::Tex::ClampedF2B(GammaCorrection(renderTarget, 2.2f)));
+        "Output/PathTracedMetalSphere.png",
+        ToSavedImage(renderTarget, 2.2f));
 }

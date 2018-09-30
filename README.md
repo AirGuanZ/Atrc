@@ -2,4 +2,4 @@
 
 ## Screenshots
 
-![SinglePathTracedDiffuseSphere](./Build/Output/SinglePathTracedDiffuseSphere.png)
+![SinglePathTracedDiffuseSphere](./Screenshots/Output0.png)

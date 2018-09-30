@@ -48,9 +48,6 @@
     <ClInclude Include="..\..\..\Source\Atrc\Math\CoordSys.h">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\Atrc\Math\Sphere.h">
-      <Filter>Math</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Source\Atrc\Entity\AmbientSphere.h">
       <Filter>Entity</Filter>
     </ClInclude>
@@ -68,6 +65,15 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Source\Atrc\Integrator\PathTracer.h">
       <Filter>Integrator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Entity\Sphere.h">
+      <Filter>Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Math\GeometrySphere.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Entity\MetalSphere.h">
+      <Filter>Entity</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -90,9 +96,6 @@
     <ClCompile Include="..\..\..\Source\Atrc\Renderer\Native1sppSubareaRenderer.cpp">
       <Filter>Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Source\Atrc\Math\Sphere.cpp">
-      <Filter>Math</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Source\Atrc\Entity\AmbientSphere.cpp">
       <Filter>Entity</Filter>
     </ClCompile>
@@ -110,6 +113,15 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Source\Atrc\Integrator\PathTracer.cpp">
       <Filter>Integrator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Entity\Sphere.cpp">
+      <Filter>Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Math\GeometrySphere.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Entity\MetaSphere.cpp">
+      <Filter>Entity</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

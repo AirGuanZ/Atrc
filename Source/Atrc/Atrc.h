@@ -15,6 +15,7 @@
 #include <Atrc/Entity/AmbientSphere.h>
 #include <Atrc/Entity/ColoredSky.h>
 #include <Atrc/Entity/DiffuseSphere.h>
+#include <Atrc/Entity/MetalSphere.h>
 
 #include <Atrc/Material/BxDF.h>
 

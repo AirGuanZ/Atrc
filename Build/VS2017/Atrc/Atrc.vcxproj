@@ -27,6 +27,8 @@
     <ClInclude Include="..\..\..\Source\Atrc\Entity\ColoredSky.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Entity\DiffuseSphere.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Entity\Entity.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Entity\MetalSphere.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Entity\Sphere.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Integrator\AmbientIntegrator.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Integrator\Integrator.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Integrator\PathTracer.h" />
@@ -35,7 +37,7 @@
     <ClInclude Include="..\..\..\Source\Atrc\Math\Math.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Math\Ray.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Math\CommonSampler.h" />
-    <ClInclude Include="..\..\..\Source\Atrc\Math\Sphere.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Math\GeometrySphere.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Math\Transform.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Renderer\JitteredSubareaRenderer.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Renderer\Native1sppSubareaRenderer.h" />
@@ -51,12 +53,14 @@
     <ClCompile Include="..\..\..\Source\Atrc\Entity\ColoredSky.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Entity\DiffuseSphere.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Entity\Entity.cpp" />
+    <ClCompile Include="..\..\..\Source\Atrc\Entity\MetaSphere.cpp" />
+    <ClCompile Include="..\..\..\Source\Atrc\Entity\Sphere.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Integrator\AmbientIntegrator.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Integrator\Integrator.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Integrator\PathTracer.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Material\BxDF.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Math\CommonSampler.cpp" />
-    <ClCompile Include="..\..\..\Source\Atrc\Math\Sphere.cpp" />
+    <ClCompile Include="..\..\..\Source\Atrc\Math\GeometrySphere.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Renderer\JitteredSubareaRenderer.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Renderer\Native1sppSubareaRenderer.cpp" />
   </ItemGroup>

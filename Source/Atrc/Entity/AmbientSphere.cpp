@@ -41,29 +41,10 @@ namespace
     };
 }
 
-AmbientSphere::AmbientSphere(Real radius, const Spectrum &color, const Transform &local2World)
-    : radius_(radius), ambientColor_(color), local2World_(local2World)
+AmbientSphere::AmbientSphere(Real radius, const Transform &local2World, const Spectrum &color)
+    : Sphere(radius, local2World), ambientColor_(color)
 {
 
-}
-
-bool AmbientSphere::HasIntersection(const Ray &r) const
-{
-    return Geometry::Sphere::HasIntersection(
-        local2World_.ApplyInverseToRay(r), radius_);
-}
-
-bool AmbientSphere::EvalIntersection(const Ray &r, Intersection *inct) const
-{
-    if(!Geometry::Sphere::EvalIntersection(
-        local2World_.ApplyInverseToRay(r), radius_, inct))
-        return false;
-
-    *inct = local2World_.ApplyToIntersection(*inct);
-    inct->entity = this;
-    inct->flag = 0;
-
-    return true;
 }
 
 RC<BxDF> AmbientSphere::GetBxDF(const Intersection &inct) const

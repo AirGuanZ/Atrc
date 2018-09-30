@@ -6,15 +6,16 @@
 
 AGZ_NS_BEG(Atrc)
 
-class DiffuseSphere
+class MetalSphere
     : ATRC_PROPERTY AGZ::Uncopiable,
       public Sphere
 {
-    Spectrum diffuseColor_;
+    Spectrum reflectedColor_;
+    Real roughness_;
 
 public:
 
-    DiffuseSphere(Real radius, const Transform &local2World, const Spectrum &color);
+    MetalSphere(Real radius, const Transform &local2World, const Spectrum &color, Real roughness = Real(0));
 
     RC<BxDF> GetBxDF(const Intersection &inct) const override;
 };
