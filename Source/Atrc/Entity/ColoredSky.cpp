@@ -66,10 +66,10 @@ bool ColoredSky::EvalIntersection(const Ray &r, Intersection *inct) const
 {
     AGZ_ASSERT(ApproxEq(r.direction.Length(), Real(1), Real(1e-5)));
 
-    inct->wr = -r.direction;
-    inct->pos = Vec3r(RealT::Max());
-    inct->nor = -r.direction;
-    inct->t = RealT::Max();
+    inct->wr     = -r.direction;
+    inct->pos    = Vec3r(RealT::Max());
+    inct->nor    = -r.direction;
+    inct->t      = RealT::Max();
     inct->entity = this;
 
     return true;

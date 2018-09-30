@@ -13,6 +13,16 @@ public:
 
     struct FromInv_t { };
 
+    static Transform Translate(const Vec3r &v);
+    static Transform Rotate(const Vec3r &axis, Radr angle);
+    static Transform RotateX(Radr angle);
+    static Transform RotateY(Radr angle);
+    static Transform RotateZ(Radr angle);
+    static Transform Scale(const Vec3r &s);
+    static Transform ScaleX(Real s);
+    static Transform ScaleY(Real s);
+    static Transform ScaleZ(Real s);
+
     Transform();
 
     explicit Transform(const Mat4r &mat);
@@ -44,6 +54,58 @@ public:
 inline Transform::FromInv_t FROM_INV;
 
 inline Transform TRANSFORM_IDENTITY(Mat4r::IDENTITY());
+
+inline Transform Transform::Translate(const Vec3r &v)
+{
+    return Transform(Mat4r::Translate(v), Mat4r::Translate(-v));
+}
+
+inline Transform Transform::Rotate(const Vec3r &axis, Radr angle)
+{
+    return Transform(Mat4r::Rotate(axis, angle), Mat4r::Rotate(axis, -angle));
+}
+
+inline Transform Transform::RotateX(Radr angle)
+{
+    Mat4r m = Mat4r::RotateX(angle);
+    return Transform(m, m.Transpose());
+}
+
+inline Transform Transform::RotateY(Radr angle)
+{
+    Mat4r m = Mat4r::RotateY(angle);
+    return Transform(m, m.Transpose());
+}
+
+inline Transform Transform::RotateZ(Radr angle)
+{
+    Mat4r m = Mat4r::RotateZ(angle);
+    return Transform(m, m.Transpose());
+}
+
+inline Transform Transform::Scale(const Vec3r &s)
+{
+    Vec3r invS(Real(1) / s.x, Real(1) / s.y, Real(1) / s.z);
+    return Transform(Mat4r::Scale(s), Mat4r::Scale(invS));
+}
+
+inline Transform Transform::ScaleX(Real s)
+{
+    Vec3r SV(s, Real(1), Real(1)), invSV(Real(1) / s, Real(1), Real(1));
+    return Transform(Mat4r::Scale(SV), Mat4r::Scale(invSV));
+}
+
+inline Transform Transform::ScaleY(Real s)
+{
+    Vec3r SV(Real(1), s, Real(1)), invSV(Real(1), Real(1) / s, Real(1));
+    return Transform(Mat4r::Scale(SV), Mat4r::Scale(invSV));
+}
+
+inline Transform Transform::ScaleZ(Real s)
+{
+    Vec3r SV(Real(1), Real(1), s), invSV(Real(1), Real(1), Real(1) / s);
+    return Transform(Mat4r::Scale(SV), Mat4r::Scale(invSV));
+}
 
 inline Transform::Transform()
     : mat_(Real(1)), inv_(Real(1))
@@ -120,8 +182,8 @@ inline Ray Transform::ApplyToRay(const Ray &r) const
 inline Ray Transform::ApplyInverseToRay(const Ray &r) const
 {
     return Ray(
-        ApplyToPoint(r.origin),
-        ApplyToVector(r.direction),
+        ApplyInverseToPoint(r.origin),
+        ApplyInverseToVector(r.direction),
         r.minT, r.maxT);
 }
 

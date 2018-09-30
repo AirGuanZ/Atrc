@@ -11,6 +11,7 @@
 #include <Atrc/Integrator/AmbientIntegrator.h>
 
 #include <Atrc/Entity/Entity.h>
+#include <Atrc/Entity/AmbientSphere.h>
 #include <Atrc/Entity/ColoredSky.h>
 
 #include <Atrc/Material/BxDF.h>
