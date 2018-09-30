@@ -36,13 +36,6 @@ namespace
             return None;
         }
 
-        [[noreturn]] Real PDF(const Vec3r &wi, const Vec3r &wo) const override
-        {
-            throw UnreachableCodeException(
-                "ColoredSkyBRDF has type BXDF_NONE, "
-                "thus ColoredSkyBRDF::PDF shouldn't be called");
-        }
-
         Spectrum AmbientRadiance(const Intersection &inct) const override
         {
             SS t = SS(0.5) * SS(inct.wr.z) + SS(0.5);

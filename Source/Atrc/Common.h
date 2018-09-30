@@ -80,6 +80,8 @@ using Mat4r = Mat4<Real>;
 using Radr = Rad<Real>;
 using Degr = Deg<Real>;
 
+inline Real Rand() { return Random::Uniform(Real(0), Real(1)); }
+
 // ============================= Spectrum =============================
 
 using SS = float;

@@ -1,0 +1,38 @@
+#include <Atrc/Entity/Entity.h>
+#include <Atrc/Material/BxDF.h>
+#include <Atrc/Integrator/PathTracer.h>
+
+AGZ_NS_BEG(Atrc)
+
+Spectrum PathTracer::Trace(const Scene &scene, const Ray &r, uint32_t depth) const
+{
+    if(depth > maxDepth_)
+        return SPECTRUM::BLACK;
+
+    Intersection inct;
+    if(!FindClosestIntersection(scene, r, &inct))
+        return SPECTRUM::BLACK;
+
+    auto bxdf = inct.entity->GetBxDF(inct);
+    auto bxdfSample = bxdf->Sample(-r.direction, BXDF_ALL_REF);
+    if(!bxdfSample)
+        return bxdf->AmbientRadiance(inct);
+
+    auto newRay = Ray(inct.pos, bxdfSample->dir, Real(1e-5));
+    return bxdfSample->coef * Trace(scene, newRay, depth + 1)
+         * SS(Dot(inct.nor, bxdfSample->dir) / bxdfSample->pdf)
+         + bxdf->AmbientRadiance(inct);
+}
+
+PathTracer::PathTracer(uint32_t maxDepth)
+    : maxDepth_(maxDepth)
+{
+    AGZ_ASSERT(maxDepth >= 1);
+}
+
+Spectrum PathTracer::GetRadiance(const Scene &scene, const Ray &r) const
+{
+    return Trace(scene, r, 1);
+}
+
+AGZ_NS_END(Atrc)

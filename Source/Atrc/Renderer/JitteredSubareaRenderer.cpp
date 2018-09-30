@@ -25,8 +25,8 @@ void JitteredSubareaRenderer::Render(
             Spectrum pixel = SPECTRUM::BLACK;
             for(uint32_t i = 0; i < spp_; ++i)
             {
-                Real xOffset = xBaseCoef * Random::Uniform(Real(0), Real(1));
-                Real yOffset = -yBaseCoef * Random::Uniform(Real(0), Real(1));
+                Real xOffset = xBaseCoef * Rand();
+                Real yOffset = -yBaseCoef * Rand();
                 pixel += integrator.GetRadiance(
                     scene, scene.camera->GetRay({ xBase + xOffset, yBase + yOffset }));
             }

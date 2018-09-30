@@ -60,6 +60,15 @@
     <ClInclude Include="..\..\..\Source\Atrc\Renderer\JitteredSubareaRenderer.h">
       <Filter>Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Entity\DiffuseSphere.h">
+      <Filter>Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Math\CommonSampler.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Integrator\PathTracer.h">
+      <Filter>Integrator</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\Atrc\Common.cpp" />
@@ -92,6 +101,15 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Source\Atrc\Renderer\JitteredSubareaRenderer.cpp">
       <Filter>Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Entity\DiffuseSphere.cpp">
+      <Filter>Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Math\CommonSampler.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Integrator\PathTracer.cpp">
+      <Filter>Integrator</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

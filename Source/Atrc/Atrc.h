@@ -9,10 +9,12 @@
 
 #include <Atrc/Integrator/Integrator.h>
 #include <Atrc/Integrator/AmbientIntegrator.h>
+#include <Atrc/Integrator/PathTracer.h>
 
 #include <Atrc/Entity/Entity.h>
 #include <Atrc/Entity/AmbientSphere.h>
 #include <Atrc/Entity/ColoredSky.h>
+#include <Atrc/Entity/DiffuseSphere.h>
 
 #include <Atrc/Material/BxDF.h>
 
