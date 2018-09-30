@@ -13,7 +13,7 @@ public:
 
     virtual bool HasIntersection(const Ray &r) const;
 
-    virtual Option<Intersection> EvalIntersection(const Ray &r) const = 0;
+    virtual bool EvalIntersection(const Ray &r, Intersection *inct) const = 0;
 
     virtual RC<BxDF> GetBxDF(const Intersection &inct) const = 0;
 };

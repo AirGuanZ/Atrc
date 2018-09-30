@@ -6,15 +6,21 @@ AGZ_NS_BEG(Atrc)
 
 Spectrum AmbientIntegrator::GetRadiance(const Scene &scene, const Ray &r) const
 {
-    Option<Intersection> inct = None;
+    Intersection inct; bool incted = false;
     for(const Entity *ent : scene.entities)
-        UpdateCloserIntersection(inct, ent->EvalIntersection(r));
+    {
+        Intersection newInct;
+        if(ent->EvalIntersection(r, &newInct))
+        {
+            if(!incted || newInct.t < inct.t)
+                inct = newInct;
+            incted = true;
+        }
+    }
 
-    if(!inct)
+    if(!incted)
         return SPECTRUM::BLACK;
-
-    const Intersection &tInct = *inct;
-    return tInct.entity->GetBxDF(tInct)->AmbientRadiance(tInct);
+    return inct.entity->GetBxDF(inct)->AmbientRadiance(inct);
 }
 
 AGZ_NS_END(Atrc)

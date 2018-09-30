@@ -2,18 +2,22 @@
 
 #include <Atrc/Common.h>
 #include <Atrc/Entity/Entity.h>
+#include <Atrc/Math/Math.h>
 
 AGZ_NS_BEG(Atrc)
 
-class ColoredSky
+class AmbientSphere
     : ATRC_IMPLEMENTS Entity,
       ATRC_PROPERTY AGZ::Uncopiable
 {
-    Spectrum top_, bottom_;
+    Real radius_;
+    Spectrum ambientColor_;
+
+    Transform local2World_;
 
 public:
 
-    ColoredSky(const Spectrum &top, const Spectrum &bottom);
+    AmbientSphere(Real radius, const Spectrum &color, const Transform &local2World);
 
     bool HasIntersection(const Ray &r) const override;
 

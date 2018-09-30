@@ -51,6 +51,12 @@
     <ClInclude Include="..\..\..\Source\Atrc\Math\Sphere.h">
       <Filter>Math</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Entity\AmbientSphere.h">
+      <Filter>Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Math\Transform.h">
+      <Filter>Math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\Atrc\Common.cpp" />
@@ -74,6 +80,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Source\Atrc\Math\Sphere.cpp">
       <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Entity\AmbientSphere.cpp">
+      <Filter>Entity</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

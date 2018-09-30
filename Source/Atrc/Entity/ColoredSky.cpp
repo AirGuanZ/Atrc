@@ -62,16 +62,17 @@ bool ColoredSky::HasIntersection(const Ray &r) const
     return true;
 }
 
-Option<Intersection> ColoredSky::EvalIntersection(const Ray &r) const
+bool ColoredSky::EvalIntersection(const Ray &r, Intersection *inct) const
 {
     AGZ_ASSERT(ApproxEq(r.direction.Length(), Real(1), Real(1e-5)));
-    return Intersection {
-        -r.direction,
-        Vec3r(RealT::Max()),
-        -r.direction,
-        RealT::Max(),
-        this,
-    };
+
+    inct->wr = -r.direction;
+    inct->pos = Vec3r(RealT::Max());
+    inct->nor = -r.direction;
+    inct->t = RealT::Max();
+    inct->entity = this;
+
+    return true;
 }
 
 RC<BxDF> ColoredSky::GetBxDF(const Intersection &inct) const

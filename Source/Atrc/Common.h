@@ -100,13 +100,6 @@ struct Intersection
     uint32_t flag = 0;
 };
 
-inline void UpdateCloserIntersection(
-    Option<Intersection> &origin, const Option<Intersection> &newer)
-{
-    if(newer && (!origin || newer->t < origin->t))
-        origin = newer;
-}
-
 // ============================= RenderTarget =============================
 
 template<typename T>

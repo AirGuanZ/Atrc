@@ -23,6 +23,7 @@
     <ClInclude Include="..\..\..\Source\Atrc\Camera\Camera.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Camera\PerspectiveCamera.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Common.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Entity\AmbientSphere.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Entity\ColoredSky.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Entity\Entity.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Integrator\AmbientIntegrator.h" />
@@ -32,6 +33,7 @@
     <ClInclude Include="..\..\..\Source\Atrc\Math\Math.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Math\Ray.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Math\Sphere.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Math\Transform.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Renderer\Native1sppSubareaRenderer.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Renderer\ParallelRenderer.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Renderer\Renderer.h" />
@@ -41,6 +43,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\Atrc\Camera\PerspectiveCamera.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Common.cpp" />
+    <ClCompile Include="..\..\..\Source\Atrc\Entity\AmbientSphere.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Entity\ColoredSky.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Entity\Entity.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Integrator\AmbientIntegrator.cpp" />

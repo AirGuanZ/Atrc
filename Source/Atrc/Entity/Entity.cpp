@@ -4,7 +4,8 @@ AGZ_NS_BEG(Atrc)
 
 bool Entity::HasIntersection(const Ray &r) const
 {
-    return EvalIntersection(r).has_value();
+    Intersection inct;
+    return EvalIntersection(r, &inct);
 }
 
 AGZ_NS_END(Atrc)
