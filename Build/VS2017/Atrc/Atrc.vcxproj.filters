@@ -81,6 +81,9 @@
     <ClInclude Include="..\..\..\Source\Atrc\Math\Geometry.h">
       <Filter>Math</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Math\AABB.h">
+      <Filter>Math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\Atrc\Common.cpp" />

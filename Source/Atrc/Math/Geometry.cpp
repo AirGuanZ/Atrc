@@ -81,3 +81,60 @@ bool EvalIntersection(const Ray &r, Real radius, Intersection *inct)
 }
 
 AGZ_NS_END(Atrc::Geometry::Sphere)
+
+AGZ_NS_BEG(Atrc::Geometry::Triangle)
+
+bool HasIntersection(const Vec3r &A, const Vec3r &B_A, const Vec3r &C_A, const Ray &r)
+{
+    Vec3r wr = -r.direction;
+    Real detD = Mat3r::FromCols(B_A, C_A, wr).Determinant();
+    if(ApproxEq(RealT(detD), RealT(0.0)))
+        return false;
+    Real invDetD = 1.0 / detD;
+
+    Vec3r o_A = r.origin - A;
+    Real t = invDetD * Mat3r::FromCols(B_A, C_A, o_A).Determinant();
+    if(t < r.minT || t > r.maxT)
+        return false;
+
+    Real alpha = invDetD * Mat3r::FromCols(o_A, C_A, wr).Determinant();
+    Real beta  = invDetD * Mat3r::FromCols(B_A, o_A, wr).Determinant();
+    return 0.0 <= alpha && 0.0 <= beta && alpha + beta <= 1.0;
+}
+
+bool EvalIntersection(
+    const Vec3r &A, const Vec3r &B_A, const Vec3r &C_A,
+    const Vec2r &pA, const Vec2r &pB_A, const Vec2r &pC_A,
+    const Ray &r, Intersection *inct)
+{
+    AGZ_ASSERT(inct);
+
+    Vec3r wr = -r.direction;
+    Real detD = Mat3r::FromCols(B_A, C_A, wr).Determinant();
+    if(ApproxEq(RealT(detD), RealT(0.0)))
+        return false;
+    Real invDetD = 1.0 / detD;
+
+    Vec3r o_A = r.origin - A;
+    Real t = invDetD * Mat3r::FromCols(B_A, C_A, o_A).Determinant();
+    if(t < r.minT || t > r.maxT)
+        return false;
+
+    Real alpha = invDetD * Mat3r::FromCols(o_A, C_A, wr).Determinant();
+    if(alpha < 0.0)
+        return false;
+
+    Real beta  = invDetD * Mat3r::FromCols(B_A, o_A, wr).Determinant();
+    if(beta < 0.0 || alpha + beta > 1.0)
+        return false;
+
+    inct->wr  = -r.direction;
+    inct->pos = r.At(t);
+    inct->nor = Cross(C_A, B_A).Normalize();
+    inct->t   = t;
+    inct->uv  = pA + alpha * pB_A + beta * pC_A;
+
+    return true;
+}
+
+AGZ_NS_END(Atrc::Geometry::Triangle)

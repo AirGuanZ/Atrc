@@ -44,10 +44,10 @@ int main()
     RenderTarget<Color3f> renderTarget(SCR_W, SCR_H);
 
     //AmbientIntegrator integrator;
-    PathTracer integrator(20);
+    PathTracer integrator(10);
 
     //ParallelRenderer<Native1sppSubareaRenderer> renderer(-1);
-    ParallelRenderer<JitteredSubareaRenderer> renderer(-1, 100);
+    ParallelRenderer<JitteredSubareaRenderer> renderer(-1, 20);
     renderer.Render(scene, integrator, renderTarget);
 
     AGZ::Tex::TextureFile::WriteRGBToPNG("Output.png", ToSavedImage(renderTarget, 2.2f));

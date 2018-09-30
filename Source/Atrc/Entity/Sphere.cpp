@@ -27,4 +27,14 @@ bool Sphere::EvalIntersection(const Ray &r, Intersection *inct) const
     return true;
 }
 
+AABB Sphere::GetBoundingBox() const
+{
+    Vec3r r1 = local2World_.ApplyToPoint(Vec3r(-radius_)),
+          r2 = local2World_.ApplyToPoint(Vec3r(radius_));
+    auto [x1, x2] = std::minmax(r1.x, r2.x);
+    auto [y1, y2] = std::minmax(r1.y, r2.y);
+    auto [z1, z2] = std::minmax(r1.z, r2.z);
+    return { { x1, y1, z1 }, { x2, y2, z2 } };
+}
+
 AGZ_NS_END(Atrc)

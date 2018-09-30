@@ -68,6 +68,11 @@ bool ColoredSky::EvalIntersection(const Ray &r, Intersection *inct) const
     return true;
 }
 
+AABB ColoredSky::GetBoundingBox() const
+{
+    return AABB();
+}
+
 RC<BxDF> ColoredSky::GetBxDF(const Intersection &inct) const
 {
     return NewRC<ColoredSkyBRDF>(top_, bottom_);

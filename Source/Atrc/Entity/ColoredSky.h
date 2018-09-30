@@ -19,6 +19,8 @@ public:
 
     bool EvalIntersection(const Ray &r, Intersection *inct) const override;
 
+    AABB GetBoundingBox() const override;
+
     RC<BxDF> GetBxDF(const Intersection &inct) const override;
 };
 

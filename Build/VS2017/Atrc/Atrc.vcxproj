@@ -35,6 +35,7 @@
     <ClInclude Include="..\..\..\Source\Atrc\Integrator\Integrator.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Integrator\PathTracer.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Material\BxDF.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Math\AABB.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Math\CoordSys.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Math\Geometry.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Math\Math.h" />

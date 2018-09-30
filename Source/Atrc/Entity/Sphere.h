@@ -21,6 +21,8 @@ public:
     bool HasIntersection(const Ray &r) const override;
 
     bool EvalIntersection(const Ray &r, Intersection *inct) const override;
+
+    AABB GetBoundingBox() const override;
 };
 
 AGZ_NS_END(Atrc)
