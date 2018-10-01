@@ -31,4 +31,15 @@ Option<BxDFSample> DiffuseBxDF::Sample(const Vec3r &wi, BxDFType type) const
     return None;
 }
 
+DiffuseGen::DiffuseGen(const Spectrum &color)
+    : color_(color)
+{
+
+}
+
+RC<BxDF> DiffuseGen::GetBxDF(const Intersection &inct) const
+{
+    return NewRC<DiffuseBxDF>(inct, color_);
+}
+
 AGZ_NS_END(Atrc)

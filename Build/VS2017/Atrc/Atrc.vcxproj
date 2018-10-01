@@ -32,12 +32,14 @@
     <ClInclude Include="..\..\..\Source\Atrc\Entity\GeometryTemplate\Sphere.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Entity\GeometryTemplate\TriangleBVH.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Entity\GlassSphere.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Entity\MatGeoEntity.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Entity\MetalSphere.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Integrator\AmbientIntegrator.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Integrator\Integrator.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Integrator\PathTracer.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Material\Ambient.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Material\BxDF.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Material\BxDFGen.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Material\Diffuse.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Material\Glass.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Material\Metal.h" />
