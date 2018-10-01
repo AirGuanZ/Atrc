@@ -104,7 +104,6 @@ bool HasIntersection(const Vec3r &A, const Vec3r &B_A, const Vec3r &C_A, const R
 
 bool EvalIntersection(
     const Vec3r &A, const Vec3r &B_A, const Vec3r &C_A,
-    const Vec2r &pA, const Vec2r &pB_A, const Vec2r &pC_A,
     const Ray &r, Intersection *inct)
 {
     AGZ_ASSERT(inct);
@@ -132,7 +131,7 @@ bool EvalIntersection(
     inct->pos = r.At(t);
     inct->nor = Cross(C_A, B_A).Normalize();
     inct->t   = t;
-    inct->uv  = pA + alpha * pB_A + beta * pC_A;
+    inct->uv  = Vec2r(alpha, beta);
 
     return true;
 }

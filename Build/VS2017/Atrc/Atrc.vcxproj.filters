@@ -66,9 +66,6 @@
     <ClInclude Include="..\..\..\Source\Atrc\Integrator\PathTracer.h">
       <Filter>Integrator</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\Atrc\Entity\Sphere.h">
-      <Filter>Entity</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Source\Atrc\Entity\MetalSphere.h">
       <Filter>Entity</Filter>
     </ClInclude>
@@ -83,6 +80,27 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Source\Atrc\Math\AABB.h">
       <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Material\Metal.h">
+      <Filter>Material</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Material\Glass.h">
+      <Filter>Material</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Material\Diffuse.h">
+      <Filter>Material</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Entity\GeometryTemplate\SmoothTriangle.h">
+      <Filter>Entity\GeometryTemplate</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Entity\GeometryTemplate\Sphere.h">
+      <Filter>Entity\GeometryTemplate</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Entity\GeometryTemplate\TriangleBVH.h">
+      <Filter>Entity\GeometryTemplate</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Material\Ambient.h">
+      <Filter>Material</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -123,12 +141,6 @@
     <ClCompile Include="..\..\..\Source\Atrc\Integrator\PathTracer.cpp">
       <Filter>Integrator</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Source\Atrc\Entity\Sphere.cpp">
-      <Filter>Entity</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\Atrc\Entity\MetaSphere.cpp">
-      <Filter>Entity</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Source\Atrc\Entity\GlassSphere.cpp">
       <Filter>Entity</Filter>
     </ClCompile>
@@ -137,6 +149,27 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Source\Atrc\Math\Geometry.cpp">
       <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Material\Metal.cpp">
+      <Filter>Material</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Entity\MetalSphere.cpp">
+      <Filter>Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Material\Glass.cpp">
+      <Filter>Material</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Material\Diffuse.cpp">
+      <Filter>Material</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Entity\GeometryTemplate\SmoothTriangle.cpp">
+      <Filter>Entity\GeometryTemplate</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Entity\GeometryTemplate\Sphere.cpp">
+      <Filter>Entity\GeometryTemplate</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Material\Ambient.cpp">
+      <Filter>Material</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -157,6 +190,9 @@
     </Filter>
     <Filter Include="Renderer">
       <UniqueIdentifier>{7ec5721f-2976-41ba-bf6c-450ad3a76a57}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Entity\GeometryTemplate">
+      <UniqueIdentifier>{5cd37857-779e-4aea-bb9a-eb7b0b64d282}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Atrc/Common.h>
-#include <Atrc/Entity/Sphere.h>
+#include <Atrc/Entity/GeometryTemplate/Sphere.h>
 #include <Atrc/Math/Math.h>
 
 AGZ_NS_BEG(Atrc)

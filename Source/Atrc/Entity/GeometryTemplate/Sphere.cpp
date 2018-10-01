@@ -1,4 +1,4 @@
-#include <Atrc/Entity/Sphere.h>
+#include <Atrc/Entity/GeometryTemplate/Sphere.h>
 
 AGZ_NS_BEG(Atrc)
 
