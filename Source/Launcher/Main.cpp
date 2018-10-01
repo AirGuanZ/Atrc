@@ -30,13 +30,14 @@ int main()
         Degr(90.0), SCR_ASPECT_RATIO);
 
     ColoredSky sky({ 0.4f, 0.7f, 0.9f }, { 1.0f, 1.0f, 1.0f });
-    DiffuseSphere ground(200.0, Transform::Translate({ 0.0, 0.0, -200.0 - 1.0 }) , { 0.4f, 0.8f, 0.4f });
-    //DiffuseSphere centreBall(1.0, TRANSFORM_IDENTITY, { 0.7f, 0.7f, 0.7f });
-    MatGeoEntity<Sphere> centreBall(NewRC<DiffuseGen>(Spectrum(0.7f, 0.7f, 0.7f)), 1.0, TRANSFORM_IDENTITY);
-    MetalSphere rightMetalSphere(1.0, Transform::Translate({ 0.0, -2.0, 0.0 }),
-                                 { 1.0f, 0.3f, 0.3f }, 0.2);
-    GlassSphere leftGlassSphere(1.0, Transform::Translate({ 0.0, 2.0, 0.0 }),
-                                { 0.8f, 0.8f, 0.8f }, { 0.8f, 0.8f, 0.8f }, 1.5);
+    MatGeoEntity<Sphere> ground(NewRC<DiffuseMaterial>(Spectrum(0.4f, 0.8f, 0.4f)),
+                                200.0, Transform::Translate({ 0.0, 0.0, -201.0 }));
+    MatGeoEntity<Sphere> centreBall(NewRC<DiffuseMaterial>(Spectrum(0.7f, 0.7f, 0.7f)),
+                                    1.0, TRANSFORM_IDENTITY);
+    MatGeoEntity<Sphere> rightMetalSphere(NewRC<MetalMaterial>(Spectrum(1.0f, 0.3f, 0.3f), 0.2),
+                                          1.0, Transform::Translate({ 0.0, -2.0, 0.0 }));
+    MatGeoEntity<Sphere> leftGlassSphere(NewRC<GlassMaterial>(Spectrum(0.8f, 0.8f, 0.8f)),
+                                         1.0, Transform::Translate({ 0.0, 2.0, 0.0 }));
 
     Scene scene;
     scene.camera = &camera;

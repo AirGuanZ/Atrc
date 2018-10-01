@@ -5,11 +5,11 @@
 
 AGZ_NS_BEG(Atrc)
 
-ATRC_INTERFACE BxDFGenerator
+ATRC_INTERFACE Material
 {
 public:
 
-    virtual ~BxDFGenerator() = default;
+    virtual ~Material() = default;
 
     virtual RC<BxDF> GetBxDF(const Intersection &inct) const = 0;
 };

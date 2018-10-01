@@ -2,6 +2,7 @@
 
 #include <Atrc/Common.h>
 #include <Atrc/Material/BxDF.h>
+#include <Atrc/Material/Material.h>
 
 AGZ_NS_BEG(Atrc)
 
@@ -22,6 +23,19 @@ public:
     Option<BxDFSample> Sample(const Vec3r &wi, BxDFType type) const override;
 
     Spectrum AmbientRadiance(const Intersection &inct) const override;
+};
+
+class AmbientMaterial
+    : ATRC_IMPLEMENTS Material,
+      ATRC_PROPERTY AGZ::Uncopiable
+{
+    Spectrum color_;
+
+public:
+
+    explicit AmbientMaterial(const Spectrum &color);
+
+    RC<BxDF> GetBxDF(const Intersection &inct) const override;
 };
 
 AGZ_NS_END(Atrc)

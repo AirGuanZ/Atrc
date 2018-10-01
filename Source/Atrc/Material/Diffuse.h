@@ -2,7 +2,7 @@
 
 #include <Atrc/Common.h>
 #include <Atrc/Material/BxDF.h>
-#include <Atrc/Material/BxDFGen.h>
+#include <Atrc/Material/Material.h>
 #include <Atrc/Math/Math.h>
 
 AGZ_NS_BEG(Atrc)
@@ -25,15 +25,15 @@ public:
     Option<BxDFSample> Sample(const Vec3r &wi, BxDFType type) const override;
 };
 
-class DiffuseGen
-    : ATRC_IMPLEMENTS BxDFGenerator,
+class DiffuseMaterial
+    : ATRC_IMPLEMENTS Material,
       ATRC_PROPERTY AGZ::Uncopiable
 {
     Spectrum color_;
 
 public:
 
-    explicit DiffuseGen(const Spectrum &color);
+    explicit DiffuseMaterial(const Spectrum &color);
 
     RC<BxDF> GetBxDF(const Intersection &inct) const override;
 };

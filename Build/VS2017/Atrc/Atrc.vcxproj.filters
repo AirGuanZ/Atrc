@@ -102,11 +102,11 @@
     <ClInclude Include="..\..\..\Source\Atrc\Material\Ambient.h">
       <Filter>Material</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\Atrc\Material\BxDFGen.h">
-      <Filter>Material</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Source\Atrc\Entity\MatGeoEntity.h">
       <Filter>Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Material\Material.h">
+      <Filter>Material</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

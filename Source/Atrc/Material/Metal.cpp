@@ -35,4 +35,15 @@ Option<BxDFSample> MetalBxDF::Sample(const Vec3r &wi, BxDFType type) const
     return None;
 }
 
+MetalMaterial::MetalMaterial(const Spectrum &color, Real roughness)
+    : color_(color), roughness_(roughness)
+{
+    
+}
+
+RC<BxDF> MetalMaterial::GetBxDF(const Intersection &inct) const
+{
+    return NewRC<MetalBxDF>(inct, color_, roughness_);
+}
+
 AGZ_NS_END(Atrc)

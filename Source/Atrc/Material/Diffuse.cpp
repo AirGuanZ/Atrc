@@ -31,13 +31,13 @@ Option<BxDFSample> DiffuseBxDF::Sample(const Vec3r &wi, BxDFType type) const
     return None;
 }
 
-DiffuseGen::DiffuseGen(const Spectrum &color)
+DiffuseMaterial::DiffuseMaterial(const Spectrum &color)
     : color_(color)
 {
 
 }
 
-RC<BxDF> DiffuseGen::GetBxDF(const Intersection &inct) const
+RC<BxDF> DiffuseMaterial::GetBxDF(const Intersection &inct) const
 {
     return NewRC<DiffuseBxDF>(inct, color_);
 }

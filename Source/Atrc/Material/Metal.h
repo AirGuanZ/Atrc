@@ -2,6 +2,7 @@
 
 #include <Atrc/Common.h>
 #include <Atrc/Material/BxDF.h>
+#include <Atrc/Material/Material.h>
 
 AGZ_NS_BEG(Atrc)
 
@@ -22,6 +23,20 @@ public:
     Spectrum Eval(const Vec3r &wi, const Vec3r &wo) const override;
 
     Option<BxDFSample> Sample(const Vec3r &wi, BxDFType type) const override;
+};
+
+class MetalMaterial
+    : ATRC_IMPLEMENTS Material,
+      ATRC_PROPERTY AGZ::Uncopiable
+{
+    Spectrum color_;
+    Real roughness_;
+
+public:
+
+    MetalMaterial(const Spectrum &color, Real roughness);
+
+    RC<BxDF> GetBxDF(const Intersection &inct) const override;
 };
 
 AGZ_NS_END(Atrc)

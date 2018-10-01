@@ -88,4 +88,16 @@ Option<BxDFSample> GlassBxDF::Sample(const Vec3r &wi, BxDFType type) const
     return None;
 }
 
+GlassMaterial::GlassMaterial(const Spectrum &reflColor, const Spectrum &refrColor, Real refIdx)
+    : reflColor_(reflColor), refrColor_(refrColor), refIdx_(refIdx)
+{
+
+}
+
+RC<BxDF> GlassMaterial::GetBxDF(const Intersection &inct) const
+{
+    return NewRC<GlassBxDF>(inct, reflColor_, refrColor_, refIdx_);
+}
+
+
 AGZ_NS_END(Atrc)

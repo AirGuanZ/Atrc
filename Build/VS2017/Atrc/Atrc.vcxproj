@@ -39,7 +39,7 @@
     <ClInclude Include="..\..\..\Source\Atrc\Integrator\PathTracer.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Material\Ambient.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Material\BxDF.h" />
-    <ClInclude Include="..\..\..\Source\Atrc\Material\BxDFGen.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Material\Material.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Material\Diffuse.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Material\Glass.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Material\Metal.h" />

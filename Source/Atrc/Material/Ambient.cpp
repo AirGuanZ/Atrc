@@ -28,4 +28,15 @@ Spectrum AmbientBRDF::AmbientRadiance(const Intersection &inct) const
     return color_;
 }
 
+AmbientMaterial::AmbientMaterial(const Spectrum &color)
+    : color_(color)
+{
+    
+}
+
+RC<BxDF> AmbientMaterial::GetBxDF(const Intersection &inct) const
+{
+    return NewRC<AmbientBRDF>(color_);
+}
+
 AGZ_NS_END(Atrc)

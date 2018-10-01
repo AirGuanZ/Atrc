@@ -2,7 +2,7 @@
 
 #include <Atrc/Common.h>
 #include <Atrc/Entity/Entity.h>
-#include <Atrc/Material/BxDFGen.h>
+#include <Atrc/Material/Material.h>
 
 AGZ_NS_BEG(Atrc)
 
@@ -12,12 +12,12 @@ class MatGeoEntity
     : ATRC_PROPERTY AGZ::Uncopiable,
       public GeoTpl
 {
-    RC<BxDFGenerator> mat_;
+    RC<Material> mat_;
 
 public:
 
     template<typename...Args>
-    explicit MatGeoEntity(RC<BxDFGenerator> mat, Args&&...args)
+    explicit MatGeoEntity(RC<Material> mat, Args&&...args)
         : GeoTpl(std::forward<Args>(args)...), mat_(mat)
     {
         
