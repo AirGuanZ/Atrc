@@ -3,8 +3,8 @@
 using namespace std;
 using namespace Atrc;
 
-constexpr uint32_t SCR_W = 1920;
-constexpr uint32_t SCR_H = 1080;
+constexpr uint32_t SCR_W = 640;
+constexpr uint32_t SCR_H = 480;
 
 constexpr Real SCR_ASPECT_RATIO = static_cast<Real>(SCR_W) / SCR_H;
 
@@ -23,14 +23,13 @@ RenderTarget<Color3b> ToSavedImage(const RenderTarget<Color3f> &origin, float ga
 
 int main()
 {
-    const Vec3r eye = { -5.0, 0.0, 0.0 };
+    const Vec3r eye = { -7.5, 0.0, 0.0 };
     const Vec3r dir = (Vec3r(0.0) - eye).Normalize();
     PerspectiveCamera camera(
         eye, dir, { 0.0, 0.0, 1.0 },
-        Degr(90.0), SCR_ASPECT_RATIO);
+        Degr(60.0), SCR_ASPECT_RATIO);
 
-    //ColoredSky sky({ 0.4f, 0.7f, 0.9f }, { 1.0f, 1.0f, 1.0f });
-    ColoredSky sky({ 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f });
+    ColoredSky sky({ 0.4f, 0.7f, 0.9f }, { 1.0f, 1.0f, 1.0f });
     MatGeoEntity<Sphere> ground(NewRC<DiffuseMaterial>(Spectrum(0.4f, 0.8f, 0.4f)),
                                 200.0, Transform::Translate({ 0.0, 0.0, -201.0 }));
     MatGeoEntity<Sphere> centreBall(NewRC<DiffuseMaterial>(Spectrum(0.7f, 0.7f, 0.7f)),
@@ -50,17 +49,15 @@ int main()
     {
         nor, nor, nor
     };
-    MatGeoEntity<SmoothTriangle> simpleTriangle(NewRC<AmbientMaterial>(Spectrum(1.4f))
-        /*NewRC<MetalMaterial>(Spectrum(0.9f), 0.0)*/, triVtcs, nors);
-    MatGeoEntity<Sphere> lightSphere(NewRC<AmbientMaterial>(Spectrum(1.5f)),
-                                     0.5, Transform::Translate({ -0.6, 3.0, 2.0 }));
+    MatGeoEntity<SmoothTriangle> simpleTriangle(
+        NewRC<MetalMaterial>(Spectrum(0.9f), 0.0), triVtcs, nors);
 
     Scene scene;
     scene.camera = &camera;
     scene.entities = { 
         &ground,
         &centreBall, &leftGlassSphere, &rightMetalSphere,
-        &simpleTriangle, &lightSphere,
+        &simpleTriangle,
         &sky };
 
     RenderTarget<Color3f> renderTarget(SCR_W, SCR_H);
@@ -69,7 +66,7 @@ int main()
     PathTracer integrator(10);
 
     //ParallelRenderer<Native1sppSubareaRenderer> renderer(-1);
-    ParallelRenderer<JitteredSubareaRenderer> renderer(4, 500);
+    ParallelRenderer<JitteredSubareaRenderer> renderer(4, 20);
     renderer.Render(scene, integrator, renderTarget);
 
     AGZ::Tex::TextureFile::WriteRGBToPNG("Output.png", ToSavedImage(renderTarget, 2.2f));
