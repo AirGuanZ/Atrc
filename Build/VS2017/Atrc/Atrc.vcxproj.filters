@@ -96,9 +96,6 @@
     <ClInclude Include="..\..\..\Source\Atrc\Entity\GeometryTemplate\Sphere.h">
       <Filter>Entity\GeometryTemplate</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\Atrc\Entity\GeometryTemplate\TriangleBVH.h">
-      <Filter>Entity\GeometryTemplate</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Source\Atrc\Material\Ambient.h">
       <Filter>Material</Filter>
     </ClInclude>
@@ -107,6 +104,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Source\Atrc\Material\Material.h">
       <Filter>Material</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Entity\GeometryTemplate\TriangleBVH.h">
+      <Filter>Entity</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

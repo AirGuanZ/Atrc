@@ -19,6 +19,7 @@
 #include <Atrc/Entity/DiffuseSphere.h>
 #include <Atrc/Entity/GlassSphere.h>
 #include <Atrc/Entity/MetalSphere.h>
+#include <Atrc/Entity/TriangleBVH.h>
 
 #include <Atrc/Material/Ambient.h>
 #include <Atrc/Material/Diffuse.h>

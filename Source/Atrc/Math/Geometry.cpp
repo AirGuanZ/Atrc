@@ -136,4 +136,20 @@ bool EvalIntersection(
     return true;
 }
 
+AABB ToBoundingBox(const Vec3r &A, const Vec3r &B, const Vec3r &C)
+{
+    return {
+        {
+            Min(A.x, Min(B.x, C.x)),
+            Min(A.y, Min(B.y, C.y)),
+            Min(A.z, Min(B.z, C.z))
+        },
+        {
+            Max(A.x, Max(B.x, C.x)),
+            Max(A.y, Max(B.y, C.y)),
+            Max(A.z, Max(B.z, C.z))
+        }
+    };
+}
+
 AGZ_NS_END(Atrc::Geometry::Triangle)

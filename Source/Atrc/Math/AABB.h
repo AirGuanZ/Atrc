@@ -1,5 +1,7 @@
 #pragma once
 
+#include <initializer_list>
+
 #include <Atrc/Common.h>
 
 AGZ_NS_BEG(Atrc)
@@ -9,7 +11,7 @@ class AABB
 public:
 
     Vec3r low, high;
-
+    
     bool Contains(const AABB &contained) const
     {
         return low.x <= contained.low.x   &&
@@ -18,6 +20,16 @@ public:
                contained.high.x <= high.x &&
                contained.high.y <= high.y &&
                contained.high.z <= high.z;
+    }
+    
+    void Expand(const Vec3r &p)
+    {
+        low.x  = Min(p.x, low.x);
+        low.y  = Min(p.y, low.y);
+        low.z  = Min(p.z, low.z);
+        high.x = Max(p.x, high.x);
+        high.y = Max(p.y, high.y);
+        high.z = Max(p.z, high.z);
     }
 };
 
