@@ -21,6 +21,8 @@ public:
 
     AABB GetBoundingBox() const override;
 
+    Real SurfaceArea() const override;
+
     RC<BxDF> GetBxDF(const Intersection &inct) const override;
 };
 

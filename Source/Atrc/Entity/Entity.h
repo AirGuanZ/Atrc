@@ -17,6 +17,8 @@ public:
 
     virtual AABB GetBoundingBox() const = 0;
 
+    virtual Real SurfaceArea() const = 0;
+
     virtual RC<BxDF> GetBxDF(const Intersection &inct) const = 0;
 };
 

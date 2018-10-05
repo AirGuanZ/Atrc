@@ -21,6 +21,8 @@ public:
     bool EvalIntersection(const Ray &r, Intersection *inct) const override;
     
     AABB GetBoundingBox() const override;
+
+    Real SurfaceArea() const override;
 };
 
 AGZ_NS_END(Atrc)

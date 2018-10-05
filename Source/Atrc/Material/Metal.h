@@ -8,7 +8,7 @@ AGZ_NS_BEG(Atrc)
 
 class MetalBxDF
     : ATRC_IMPLEMENTS BxDF,
-    ATRC_PROPERTY AGZ::Uncopiable
+      ATRC_PROPERTY AGZ::Uncopiable
 {
     Vec3r nor_;
     Spectrum color_;

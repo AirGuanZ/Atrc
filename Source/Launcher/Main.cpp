@@ -23,11 +23,11 @@ RenderTarget<Color3b> ToSavedImage(const RenderTarget<Color3f> &origin, float ga
 
 int main()
 {
-    const Vec3r eye = { -7.5, 0.0, 0.0 };
+    const Vec3r eye = { -5.0, 0.0, 0.0 };
     const Vec3r dir = (Vec3r(0.0) - eye).Normalize();
     PerspectiveCamera camera(
         eye, dir, { 0.0, 0.0, 1.0 },
-        Degr(60.0), SCR_ASPECT_RATIO);
+        Degr(90.0), SCR_ASPECT_RATIO);
 
     ColoredSky sky({ 0.4f, 0.7f, 0.9f }, { 1.0f, 1.0f, 1.0f });
     MatGeoEntity<Sphere> ground(NewRC<DiffuseMaterial>(Spectrum(0.4f, 0.8f, 0.4f)),
@@ -39,25 +39,11 @@ int main()
     MatGeoEntity<Sphere> leftGlassSphere(NewRC<GlassMaterial>(Spectrum(0.8f, 0.8f, 0.8f)),
                                          1.0, Transform::Translate({ 0.0, 2.0, 0.0 }));
 
-    Vec3r triVtcs[3] = {
-        { 2.0, -4.0, -1.2 },
-        { 0.0, -4.0, 2.0 },
-        { -2.0, -4.0, -1.2 }
-    };
-    Vec3r nor = Cross(triVtcs[2] - triVtcs[0], triVtcs[1] - triVtcs[0]).Normalize();
-    Vec3r nors[3] =
-    {
-        nor, nor, nor
-    };
-    MatGeoEntity<SmoothTriangle> simpleTriangle(
-        NewRC<MetalMaterial>(Spectrum(0.9f), 0.0), triVtcs, nors);
-
     Scene scene;
     scene.camera = &camera;
     scene.entities = { 
         &ground,
         &centreBall, &leftGlassSphere, &rightMetalSphere,
-        &simpleTriangle,
         &sky };
 
     RenderTarget<Color3f> renderTarget(SCR_W, SCR_H);

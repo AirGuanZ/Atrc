@@ -105,7 +105,7 @@
     <ClInclude Include="..\..\..\Source\Atrc\Material\Material.h">
       <Filter>Material</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\Atrc\Entity\GeometryTemplate\TriangleBVH.h">
+    <ClInclude Include="..\..\..\Source\Atrc\Entity\TriangleBVH.h">
       <Filter>Entity</Filter>
     </ClInclude>
   </ItemGroup>
@@ -176,6 +176,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Source\Atrc\Material\Ambient.cpp">
       <Filter>Material</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Entity\TriangleBVH.cpp">
+      <Filter>Entity</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

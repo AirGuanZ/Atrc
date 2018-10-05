@@ -15,42 +15,9 @@ class TriangleBVH
     : ATRC_IMPLEMENTS Entity,
       ATRC_PROPERTY AGZ::Uncopiable
 {
-    struct InternalTriangle
-    {
-        Vec3r A, B_A, C_A;
-        Vec3r nA, nB_nA, nC_nA;
-        Vec2r tA, tB_tA, tC_tA;
-    };
-    
-    struct Node
-    {
-        bool isLeaf;
-        union
-        {
-            struct
-            {
-                AABB bound;
-                size_t offset;
-            } internal;
-            
-            struct
-            {
-                size_t startOffset;
-                size_t primCount;
-            }
-        };
-    };
-
-    std::vector<InternalTriangle> tris_;
-    std::vector<Node> nodes_;
-    
-    RC<Material> mat_;
-    
-    static constexpr MAX_LEAF_SIZE = 4;
-    
-    void InitBVH(const Vetex *vertices, size_t triangleCount);
-    
 public:
+
+    static constexpr size_t MAX_LEAF_SIZE = 4;
 
     struct Vertex
     {
@@ -58,21 +25,63 @@ public:
         Vec3r nor;
         Vec2r tex;
     };
-    
+
     struct Triangle
     {
         Vertex vertices[3];
     };
 
-    TriangleBVH(const Vertex *vertices, size_t triangleCount, RC<Material> mat);
+    struct Node
+    {
+        bool isLeaf;
+        union
+        {
+            struct
+            {
+                struct
+                {
+                    struct { Real x, y, z; } low;
+                    struct { Real x, y, z; } high;
+                } bound;
+                size_t offset;
+            } internal;
 
-    ~TriangleBVH();
+            struct
+            {
+                size_t startOffset;
+                size_t primCount;
+            } leaf;
+        };
+    };
+
+    struct InternalTriangle
+    {
+        Vec3r A, B_A, C_A;
+        Vec3r nA, nB_nA, nC_nA;
+        Vec2r tA, tB_tA, tC_tA;
+    };
+
+private:
+
+    Real surfaceArea_;
+    std::vector<InternalTriangle> tris_;
+    std::vector<Node> nodes_;
+    
+    RC<Material> mat_;
+    
+    void InitBVH(const Vertex *vertices, size_t triangleCount);
+    
+public:
+
+    TriangleBVH(const Vertex *vertices, size_t triangleCount, RC<Material> mat);
     
     bool HasIntersection(const Ray &r) const override;
     
     bool EvalIntersection(const Ray &r, Intersection *inct) const override;
     
     AABB GetBoundingBox() const override;
+
+    Real SurfaceArea() const override;
 
     RC<BxDF> GetBxDF(const Intersection &inct) const override;
 };

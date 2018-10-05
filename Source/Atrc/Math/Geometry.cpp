@@ -152,4 +152,9 @@ AABB ToBoundingBox(const Vec3r &A, const Vec3r &B, const Vec3r &C)
     };
 }
 
+Real SurfaceArea(const Vec3r &A, const Vec3r &B, const Vec3r &C)
+{
+    return 0.5 * Cross(B - A, C - A).Length();
+}
+
 AGZ_NS_END(Atrc::Geometry::Triangle)

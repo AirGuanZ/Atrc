@@ -30,10 +30,10 @@
     <ClInclude Include="..\..\..\Source\Atrc\Entity\Entity.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Entity\GeometryTemplate\SmoothTriangle.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Entity\GeometryTemplate\Sphere.h" />
-    <ClInclude Include="..\..\..\Source\Atrc\Entity\GeometryTemplate\TriangleBVH.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Entity\GlassSphere.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Entity\MatGeoEntity.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Entity\MetalSphere.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Entity\TriangleBVH.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Integrator\AmbientIntegrator.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Integrator\Integrator.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Integrator\PathTracer.h" />
@@ -69,6 +69,7 @@
     <ClCompile Include="..\..\..\Source\Atrc\Entity\GeometryTemplate\Sphere.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Entity\GlassSphere.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Entity\MetalSphere.cpp" />
+    <ClCompile Include="..\..\..\Source\Atrc\Entity\TriangleBVH.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Integrator\AmbientIntegrator.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Integrator\Integrator.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Integrator\PathTracer.cpp" />

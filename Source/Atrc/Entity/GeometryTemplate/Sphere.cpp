@@ -37,4 +37,9 @@ AABB Sphere::GetBoundingBox() const
     return { { x1, y1, z1 }, { x2, y2, z2 } };
 }
 
+Real Sphere::SurfaceArea() const
+{
+    return 4 * PI<Real> * radius_ * radius_;
+}
+
 AGZ_NS_END(Atrc)

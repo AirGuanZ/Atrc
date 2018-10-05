@@ -4,9 +4,12 @@ AGZ_NS_BEG(Atrc)
 
 namespace
 {
+    using Vertex = TriangleBVH::Vertex;
+
     struct Tri
     {
-        size_t id;
+        size_t id = 0;
+        Real surfaceArea = 0.0;
         AABB bounding;
         Vec3r centroid;
     };
@@ -35,46 +38,14 @@ namespace
     constexpr Axis Y = 1;
     constexpr Axis Z = 2;
     
-    Axis SelectAxisWithMaxExtent(const AABB &bound)
+    Axis SelectAxisWithMaxExtent(const Vec3r &delta)
     {
-        Vec3r delta = bound.high - bound.low;
         AGZ_ASSERT(delta.x >= 0 && delta.y >= 0 && delta.z >= 0);
         if(delta.x < delta.y)
             return delta.y < delta.z ? Z : Y;
         return delta.x < delta.z ? Z : X;
     }
-}
 
-TriangleBVH(const Vertex *vertices, size_t triangleCount; RC<Material> mat)
-    : mat_(mat)
-{
-    InitBVH(vertices, triangleCount);
-}
-
-struct MappedTriangles
-{
-    const Vertex *vertices;
-    const std::vector<Tri> &triInfo;
-    std::vector<size_t> &triIdxMap;
-    
-    const Vertex *GetTriangle(size_t i) const
-    {
-        AGZ_ASSERT(3 * i < triIdxMap.size());
-        return triIdxMap[triIdxMap[3 * i]];
-    }
-    
-    const Tri &GetInfo(size_t i) const
-    {
-        AGZ_ASSERT(i < triInfo.size());
-        return triInfo[i];
-    }
-    
-    void SwapTriangle(size_t i, size_t j)
-    {
-        AGZ_ASSERT(3 * i < triIdxMap.size() && 3 * j < triIdxMap.size());
-        std::swap(triIdxMap[i], triIdxMap[j]);
-    }
-    
     TempNode *FillLeaf(TempNode *ret, size_t start, size_t n)
     {
         ret->isLeaf = true;
@@ -82,33 +53,215 @@ struct MappedTriangles
         ret->leaf.primCount = n;
         return ret;
     }
-};
 
-TempNode *Build(
-    MappedTriangles &tris,
-    SmallObjArena<TempNode> &nodeArena,
-    size_t startIdx, size_t endIdx, size_t *nodeCount)
+    struct MappedTriangles
+    {
+        const Vertex *vertices;
+        const std::vector<Tri> &triInfo;
+        std::vector<size_t> &triIdxMap;
+
+        MappedTriangles(
+            const Vertex *vertices, const std::vector<Tri> &triInfo, std::vector<size_t> &triIdxMap)
+            : vertices(vertices), triInfo(triInfo), triIdxMap(triIdxMap)
+        {
+
+        }
+
+        const Vertex *GetTriangle(size_t i) const
+        {
+            AGZ_ASSERT(3 * i < triIdxMap.size());
+            return &vertices[triIdxMap[3 * i]];
+        }
+
+        const Tri &GetInfo(size_t i) const
+        {
+            AGZ_ASSERT(i < triInfo.size());
+            return triInfo[i];
+        }
+    };
+
+    TempNode *Build(
+        MappedTriangles &tris,
+        AGZ::SmallObjArena<TempNode> &nodeArena,
+        size_t startIdx, size_t endIdx, size_t *nodeCount)
+    {
+        AGZ_ASSERT(startIdx < endIdx && nodeCount);
+
+        size_t primCount = endIdx - startIdx;
+        if(primCount < TriangleBVH::MAX_LEAF_SIZE)
+        {
+            *nodeCount = 1;
+            return FillLeaf(nodeArena.Alloc(), startIdx, primCount);
+        }
+
+        // Select the splitting axis
+        // If all centriods are the same, create a leaf node
+
+        AABB centroidBound = { tris.GetInfo(startIdx).centroid, tris.GetInfo(startIdx).centroid };
+        for(size_t i = startIdx + 1; i < endIdx; ++i)
+            centroidBound.Expand(tris.GetInfo(i).centroid);
+
+        Vec3r centroidDelta = centroidBound.high - centroidBound.low;
+        Axis splitAxis = SelectAxisWithMaxExtent(centroidDelta);
+        if(centroidBound.low[splitAxis] >= centroidBound.high[splitAxis])
+        {
+            *nodeCount = 1;
+            return FillLeaf(nodeArena.Alloc(), startIdx, primCount);
+        }
+
+        AABB allBound = Geometry::Triangle::ToBoundingBox(
+            tris.GetTriangle(startIdx)[0].pos,
+            tris.GetTriangle(startIdx)[1].pos,
+            tris.GetTriangle(startIdx)[2].pos);
+        for(size_t i = startIdx + 1; i < endIdx; ++i)
+        {
+            allBound.Expand(tris.GetTriangle(i)[0].pos);
+            allBound.Expand(tris.GetTriangle(i)[1].pos);
+            allBound.Expand(tris.GetTriangle(i)[2].pos);
+        }
+
+        // Find the best partition position in buckets
+
+        constexpr int BUCKET_COUNT = 16;
+        struct Bucket
+        {
+            int count = 0;
+            AABB bound;
+        } buckets[BUCKET_COUNT];
+
+        for(size_t i = startIdx; i < endIdx; ++i)
+        {
+            auto n = static_cast<int>((tris.GetInfo(i).centroid - centroidBound.low)[splitAxis]
+                / centroidDelta[splitAxis] * BUCKET_COUNT);
+            n = Clamp(n, 0, BUCKET_COUNT - 1);
+
+            ++buckets[n].count;
+            buckets[n].bound.Expand(tris.GetInfo(i).centroid);
+        }
+
+        Real cost[BUCKET_COUNT - 1], invAllBoundArea = 1 / allBound.SurfaceArea();
+        for(int splitPos = 0; splitPos < BUCKET_COUNT - 1; ++splitPos)
+        {
+            AABB blow, bhigh;
+            int clow = 0, chigh = 0;
+
+            for(int i = 0; i <= splitPos; ++i)
+            {
+                clow += buckets[i].count;
+                blow = blow | buckets[i].bound;
+            }
+
+            for(int i = splitPos + 1; i < BUCKET_COUNT; ++i)
+            {
+                chigh += buckets[i].count;
+                bhigh = bhigh | buckets[i].bound;
+            }
+
+            cost[splitPos] = 0.125 + invAllBoundArea *
+                (clow * blow.SurfaceArea() + chigh * bhigh.SurfaceArea());
+        }
+
+        int tSplitPos = 0;
+        for(int splitPos = 1; splitPos < BUCKET_COUNT - 1; ++splitPos)
+        {
+            if(cost[splitPos] < cost[tSplitPos])
+                tSplitPos = splitPos;
+        }
+
+        if(cost[tSplitPos] < primCount)
+        {
+            *nodeCount = 1;
+            return FillLeaf(nodeArena.Alloc(), startIdx, primCount);
+        }
+
+        // Split triangles and build two subtrees recursively
+
+        auto midElem = std::partition(
+            &tris.triIdxMap[startIdx], &tris.triIdxMap[endIdx],
+            [&](size_t idx)
+        {
+            auto n = static_cast<int>((tris.triInfo[idx].centroid - centroidBound.low)[splitAxis]
+                / centroidDelta[splitAxis] * BUCKET_COUNT);
+            n = Clamp(n, 0, BUCKET_COUNT - 1);
+            return n <= tSplitPos;
+        });
+
+        size_t splitIdx = midElem - &tris.triIdxMap[startIdx];
+        if(splitIdx == startIdx || splitIdx == endIdx)
+        {
+            *nodeCount = 1;
+            return FillLeaf(nodeArena.Alloc(), startIdx, primCount);
+        }
+
+        size_t leftNodeCount = 0, rightNodeCount = 0;
+        TempNode *ret = nodeArena.Alloc();
+        ret->isLeaf = false;
+        ret->internal.bound = allBound;
+        ret->internal.left = Build(tris, nodeArena, startIdx, splitIdx, &leftNodeCount);
+        ret->internal.right = Build(tris, nodeArena, splitIdx, endIdx, &rightNodeCount);
+        *nodeCount = leftNodeCount + rightNodeCount + 1;
+
+        return ret;
+    }
+
+    void CompactBVHIntoArray(
+        std::vector<TriangleBVH::Node> &nodes,
+        std::vector<TriangleBVH::InternalTriangle> &tris,
+        const TriangleBVH::Vertex *vertices,
+        const TempNode *tree, const std::vector<size_t> &triIdxMap)
+    {
+        if(tree->isLeaf)
+        {
+            TriangleBVH::Node node;
+            node.isLeaf = true;
+            node.leaf.startOffset = tris.size();
+            node.leaf.primCount = tree->leaf.primCount;
+            nodes.push_back(node);
+
+            size_t endOffset = tree->leaf.startOffset + tree->leaf.primCount;
+            for(size_t i = tree->leaf.startOffset; i < endOffset; ++i)
+            {
+                auto *tri = &vertices[3 * triIdxMap[i]];
+                TriangleBVH::InternalTriangle intTri;
+                intTri.A     = tri[0].pos;
+                intTri.B_A   = tri[1].pos - tri[0].pos;
+                intTri.C_A   = tri[2].pos - tri[0].pos;
+                intTri.nA    = tri[0].nor;
+                intTri.nB_nA = tri[1].nor - tri[0].nor;
+                intTri.nC_nA = tri[2].nor - tri[0].nor;
+                intTri.tA    = tri[0].tex;
+                intTri.tB_tA = tri[1].tex - tri[0].tex;
+                intTri.tC_tA = tri[2].tex - tri[0].tex;
+                tris.push_back(intTri);
+            }
+        }
+        else
+        {
+            TriangleBVH::Node node;
+            auto &b = tree->internal.bound;
+            node.isLeaf = false;
+            node.internal.bound = {
+                { b.low.x,  b.low.y,  b.low.z },
+                { b.high.x, b.high.y, b.high.z }
+            };
+
+            size_t nodeIdx = nodes.size();
+            nodes.push_back(node);
+
+            CompactBVHIntoArray(
+                nodes, tris, vertices, tree->internal.left, triIdxMap);
+            
+            nodes[nodeIdx].internal.offset = nodes.size();
+            CompactBVHIntoArray(
+                nodes, tris, vertices, tree->internal.right, triIdxMap);
+        }
+    }
+}
+
+TriangleBVH::TriangleBVH(const Vertex *vertices, size_t triangleCount, RC<Material> mat)
+    : surfaceArea_(0.0), mat_(mat)
 {
-    AGZ_ASSERT(startIdx < endIdx && nodeCount);
-    
-    size_t primCount = endIdx - startIdx;
-    
-    if(primCount < MAX_LEAF_SIZE)
-        return FillLeaf(nodeArena.Alloc(), startIdx, primCount);
-    
-    // Select the splitting axis
-    // If all centriods are the same, create a leaf node
-    
-    AABB centroidBound = { tris.GetInfo[startIdx].centroid, tris.GetInfo[startIdx].centroid };
-    for(size_t i = startIdx + 1; i < endIdx; ++i)
-        centroidBound.Expand(tris.GetInfo[i].centroid);
-    
-    Axis splitAxis = SelectAxisWithMaxExtent(bound);
-    if(centroidBound.low[splitAxis] == centroidBound.high[splitAxis])
-        return FillLeaf(nodeArena.Alloc(), startIdx, primCount);
-    
-    // TODO
-    return nullptr;
+    InitBVH(vertices, triangleCount);
 }
 
 /*
@@ -119,12 +272,17 @@ void TriangleBVH::InitBVH(const Vertex *vertices, size_t triangleCount)
 {
     if(!triangleCount)
         return;
-    
+
     std::vector<Tri> triInfo(triangleCount);
     std::vector<size_t> triIdxMap(triangleCount);
     for(size_t i = 0, j = 0; i < triangleCount; ++i, j += 3)
     {
+        Real sa = Geometry::Triangle::SurfaceArea(
+            vertices[j].pos, vertices[j + 1].pos, vertices[j + 2].pos);
+        surfaceArea_ += sa;
+
         triInfo[i].id = i;
+        triInfo[i].surfaceArea = sa;
         triInfo[i].bounding = Geometry::Triangle::ToBoundingBox(
             vertices[j].pos, vertices[j + 1].pos, vertices[j + 2].pos);
         triInfo[i].centroid = 0.5 * (triInfo[i].bounding.low + triInfo[i].bounding.high);
@@ -132,14 +290,17 @@ void TriangleBVH::InitBVH(const Vertex *vertices, size_t triangleCount)
         triIdxMap[i] = i;
     }
     
-    SmallObjArena<TempNode> tNodeArena(32);
+    AGZ::SmallObjArena<TempNode> tNodeArena(64);
     size_t nodeCount = 0;
-    
+    MappedTriangles mappedTriangles{ vertices, triInfo, triIdxMap };
     TempNode *root = Build(
-        MappedTriangles{ vertices, triInfo, triIdxMap }, triInfo, tNodeArena,
-        0, triangleCount - 1, &nodeCount);
-    
-    // TODO
+        mappedTriangles, tNodeArena, 0, triangleCount - 1, &nodeCount);
+
+    nodes_.clear();
+    tris_.clear();
+    nodes_.reserve(nodeCount);
+    tris_.reserve(triangleCount);
+    CompactBVHIntoArray(nodes_, tris_, vertices, root, triIdxMap);
 }
 
 AGZ_NS_END(Atrc)

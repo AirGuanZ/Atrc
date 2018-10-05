@@ -73,6 +73,11 @@ AABB ColoredSky::GetBoundingBox() const
     return AABB();
 }
 
+Real ColoredSky::SurfaceArea() const
+{
+    return RealT::Infinity();
+}
+
 RC<BxDF> ColoredSky::GetBxDF(const Intersection &inct) const
 {
     return NewRC<ColoredSkyBRDF>(top_, bottom_);

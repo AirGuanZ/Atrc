@@ -10,8 +10,16 @@ class AABB
 {
 public:
 
-    Vec3r low, high;
-    
+    Vec3r low = Vec3r(RealT::Max()), high = Vec3r(RealT::Min());
+
+    static AABB EMPTY_AABB()
+    {
+        return {
+            Vec3r(RealT::Max()),
+            Vec3r(RealT::Min())
+        };
+    }
+
     bool Contains(const AABB &contained) const
     {
         return low.x <= contained.low.x   &&
@@ -30,6 +38,14 @@ public:
         high.x = Max(p.x, high.x);
         high.y = Max(p.y, high.y);
         high.z = Max(p.z, high.z);
+    }
+
+    Real SurfaceArea() const
+    {
+        Vec3r delta = high - low;
+        if(delta.x <= 0.0 || delta.y <= 0.0 || delta.z <= 0.0)
+            return 0.0;
+        return 2 * (delta.x * delta.y + delta.y * delta.z + delta.z * delta.x);
     }
 };
 

@@ -22,4 +22,6 @@ bool EvalIntersection(
 
 AABB ToBoundingBox(const Vec3r &A, const Vec3r &B, const Vec3r &C);
 
+Real SurfaceArea(const Vec3r &A, const Vec3r &B, const Vec3r &C);
+
 AGZ_NS_END(Atrc::Geometry::Triangle)
