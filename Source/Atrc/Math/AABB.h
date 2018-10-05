@@ -1,8 +1,7 @@
 #pragma once
 
-#include <initializer_list>
-
 #include <Atrc/Common.h>
+#include <Atrc/Math/Ray.h>
 
 AGZ_NS_BEG(Atrc)
 
@@ -46,6 +45,11 @@ public:
         if(delta.x <= 0.0 || delta.y <= 0.0 || delta.z <= 0.0)
             return 0.0;
         return 2 * (delta.x * delta.y + delta.y * delta.z + delta.z * delta.x);
+    }
+
+    bool HasIntersection(const Ray &r) const
+    {
+
     }
 };
 

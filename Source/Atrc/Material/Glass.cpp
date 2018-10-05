@@ -94,7 +94,7 @@ GlassMaterial::GlassMaterial(const Spectrum &reflColor, const Spectrum &refrColo
 
 }
 
-RC<BxDF> GlassMaterial::GetBxDF(const Intersection &inct) const
+RC<BxDF> GlassMaterial::GetBxDF(const Intersection &inct, const Vec2r &matParam) const
 {
     return NewRC<GlassBxDF>(inct, reflColor_, refrColor_, refIdx_);
 }

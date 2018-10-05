@@ -303,4 +303,44 @@ void TriangleBVH::InitBVH(const Vertex *vertices, size_t triangleCount)
     CompactBVHIntoArray(nodes_, tris_, vertices, root, triIdxMap);
 }
 
+bool TriangleBVH::HasIntersection(const Ray &r) const
+{
+    // TODO
+    return false;
+}
+
+AABB TriangleBVH::GetBoundingBox() const
+{
+    if(nodes_.empty())
+        return AABB();
+    if(nodes_[0].isLeaf)
+    {
+        AABB ret = Geometry::Triangle::ToBoundingBox(
+            tris_[0].A, tris_[0].A + tris_[0].B_A, tris_[0].A + tris_[0].C_A);
+        for(size_t i = 1; i < tris_.size(); ++i)
+        {
+            ret = ret | Geometry::Triangle::ToBoundingBox(
+                tris_[i].A, tris_[i].A + tris_[i].B_A, tris_[i].A + tris_[i].C_A);
+        }
+        return ret;
+    }
+
+    auto &b = nodes_[0].internal.bound;
+    return {
+        { b.low.x,  b.low.y,  b.low.z },
+        { b.high.x, b.high.y, b.high.z }
+    };
+}
+
+Real TriangleBVH::SurfaceArea() const
+{
+    return surfaceArea_;
+}
+
+RC<BxDF> TriangleBVH::GetBxDF(const Intersection &inct) const
+{
+    const InternalTriangle &tri = tris_[inct.flag];
+    return mat_->GetBxDF(inct, tri.tA + tri.tB_tA * inct.uv.u + tri.tC_tA * inct.uv.v);
+}
+
 AGZ_NS_END(Atrc)

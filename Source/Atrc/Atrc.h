@@ -11,14 +11,8 @@
 #include <Atrc/Entity/GeometryTemplate/Sphere.h>
 #include <Atrc/Entity/GeometryTemplate/SmoothTriangle.h>
 
-#include <Atrc/Entity/MatGeoEntity.h>
-
 #include <Atrc/Entity/ColoredSky.h>
-
-#include <Atrc/Entity/AmbientSphere.h>
-#include <Atrc/Entity/DiffuseSphere.h>
-#include <Atrc/Entity/GlassSphere.h>
-#include <Atrc/Entity/MetalSphere.h>
+#include <Atrc/Entity/MatGeoEntity.h>
 #include <Atrc/Entity/TriangleBVH.h>
 
 #include <Atrc/Material/Ambient.h>

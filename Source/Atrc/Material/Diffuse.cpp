@@ -37,7 +37,7 @@ DiffuseMaterial::DiffuseMaterial(const Spectrum &color)
 
 }
 
-RC<BxDF> DiffuseMaterial::GetBxDF(const Intersection &inct) const
+RC<BxDF> DiffuseMaterial::GetBxDF(const Intersection &inct, const Vec2r &matParam) const
 {
     return NewRC<DiffuseBxDF>(inct, color_);
 }

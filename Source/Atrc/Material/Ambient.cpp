@@ -34,7 +34,7 @@ AmbientMaterial::AmbientMaterial(const Spectrum &color)
     
 }
 
-RC<BxDF> AmbientMaterial::GetBxDF(const Intersection &inct) const
+RC<BxDF> AmbientMaterial::GetBxDF(const Intersection &inct, const Vec2r &matParam) const
 {
     return NewRC<AmbientBRDF>(color_);
 }

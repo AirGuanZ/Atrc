@@ -25,7 +25,7 @@ public:
 
     RC<BxDF> GetBxDF(const Intersection &inct) const override
     {
-        return mat_->GetBxDF(inct);
+        return mat_->GetBxDF(inct, inct.uv);
     }
 };
 

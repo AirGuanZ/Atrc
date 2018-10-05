@@ -48,29 +48,17 @@
     <ClInclude Include="..\..\..\Source\Atrc\Math\CoordSys.h">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\Atrc\Entity\AmbientSphere.h">
-      <Filter>Entity</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Source\Atrc\Math\Transform.h">
       <Filter>Math</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Source\Atrc\Renderer\JitteredSubareaRenderer.h">
       <Filter>Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\Atrc\Entity\DiffuseSphere.h">
-      <Filter>Entity</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Source\Atrc\Math\CommonSampler.h">
       <Filter>Math</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Source\Atrc\Integrator\PathTracer.h">
       <Filter>Integrator</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Source\Atrc\Entity\MetalSphere.h">
-      <Filter>Entity</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Source\Atrc\Entity\GlassSphere.h">
-      <Filter>Entity</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Source\Atrc\Camera\ApertureCamera.h">
       <Filter>Camera</Filter>
@@ -129,26 +117,17 @@
     <ClCompile Include="..\..\..\Source\Atrc\Renderer\Native1sppSubareaRenderer.cpp">
       <Filter>Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Source\Atrc\Entity\AmbientSphere.cpp">
-      <Filter>Entity</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Source\Atrc\Integrator\Integrator.cpp">
       <Filter>Integrator</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Source\Atrc\Renderer\JitteredSubareaRenderer.cpp">
       <Filter>Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Source\Atrc\Entity\DiffuseSphere.cpp">
-      <Filter>Entity</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Source\Atrc\Math\CommonSampler.cpp">
       <Filter>Math</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Source\Atrc\Integrator\PathTracer.cpp">
       <Filter>Integrator</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\Atrc\Entity\GlassSphere.cpp">
-      <Filter>Entity</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Source\Atrc\Camera\ApertureCamera.cpp">
       <Filter>Camera</Filter>
@@ -158,9 +137,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Source\Atrc\Material\Metal.cpp">
       <Filter>Material</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\Atrc\Entity\MetalSphere.cpp">
-      <Filter>Entity</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Source\Atrc\Material\Glass.cpp">
       <Filter>Material</Filter>
