@@ -49,7 +49,28 @@ public:
 
     bool HasIntersection(const Ray &r) const
     {
+        Real t0 = r.minT, t1 = r.maxT;
+        for(int i = 0; i < 3; ++i)
+        {
+            if(RealT(r.direction[i]).ApproxEq(0))
+            {
+                if(r.origin[i] < low[i] || r.origin[i] > high[i])
+                    return false;
+                continue;
+            }
 
+            Real invDir = 1 / r.direction[i];
+            Real n = (low[i] - r.origin[i]) * invDir;
+            Real f = (high[i] - r.origin[i]) * invDir;
+            if(n > f)
+                std::swap(n, f);
+            f *= (1 + 1e-5);
+            t0 = Max(n, t0);
+            t1 = Min(f, t1);
+            if(t0 > t1)
+                return false;
+        }
+        return true;
     }
 };
 

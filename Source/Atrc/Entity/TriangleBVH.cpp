@@ -208,7 +208,8 @@ namespace
         std::vector<TriangleBVH::Node> &nodes,
         std::vector<TriangleBVH::InternalTriangle> &tris,
         const TriangleBVH::Vertex *vertices,
-        const TempNode *tree, const std::vector<size_t> &triIdxMap)
+        const TempNode *tree, const std::vector<size_t> &triIdxMap,
+        AGZ::SmallObjArena<AABB> &boundArena)
     {
         if(tree->isLeaf)
         {
@@ -240,7 +241,8 @@ namespace
             TriangleBVH::Node node;
             auto &b = tree->internal.bound;
             node.isLeaf = false;
-            node.internal.bound = {
+            node.internal.bound = boundArena.Alloc();
+            *node.internal.bound = {
                 { b.low.x,  b.low.y,  b.low.z },
                 { b.high.x, b.high.y, b.high.z }
             };
@@ -249,19 +251,13 @@ namespace
             nodes.push_back(node);
 
             CompactBVHIntoArray(
-                nodes, tris, vertices, tree->internal.left, triIdxMap);
+                nodes, tris, vertices, tree->internal.left, triIdxMap, boundArena);
             
             nodes[nodeIdx].internal.offset = nodes.size();
             CompactBVHIntoArray(
-                nodes, tris, vertices, tree->internal.right, triIdxMap);
+                nodes, tris, vertices, tree->internal.right, triIdxMap, boundArena);
         }
     }
-}
-
-TriangleBVH::TriangleBVH(const Vertex *vertices, size_t triangleCount, RC<Material> mat)
-    : surfaceArea_(0.0), mat_(mat)
-{
-    InitBVH(vertices, triangleCount);
 }
 
 /*
@@ -300,19 +296,97 @@ void TriangleBVH::InitBVH(const Vertex *vertices, size_t triangleCount)
     tris_.clear();
     nodes_.reserve(nodeCount);
     tris_.reserve(triangleCount);
-    CompactBVHIntoArray(nodes_, tris_, vertices, root, triIdxMap);
+    CompactBVHIntoArray(nodes_, tris_, vertices, root, triIdxMap, boundArena_);
+}
+
+bool TriangleBVH::HasIntersectionAux(const Ray &r, size_t nodeIdx) const
+{
+    AGZ_ASSERT(nodeIdx < nodes_.size());
+    const auto &node = nodes_[nodeIdx];
+    if(node.isLeaf)
+    {
+        size_t endOffset = node.leaf.startOffset + node.leaf.primCount;
+        for(size_t i = node.leaf.startOffset; i < endOffset; ++i)
+        {
+            const auto &tri = tris_[i];
+            if(Geometry::Triangle::HasIntersection(tri.A, tri.B_A, tri.C_A, r))
+                return true;
+        }
+        return false;
+    }
+
+    if(!node.internal.bound->HasIntersection(r))
+        return false;
+
+    return HasIntersectionAux(r, nodeIdx + 1) ||
+           HasIntersectionAux(r, node.internal.offset);
+}
+
+bool TriangleBVH::EvalIntersectionAux(const Ray &r, size_t nodeIdx, Intersection *inct) const
+{
+    AGZ_ASSERT(nodeIdx < nodes_.size());
+    const auto &node = nodes_[nodeIdx];
+
+    if(node.isLeaf)
+    {
+        bool ret = false;
+        size_t endOffset = node.leaf.startOffset + node.leaf.primCount;
+        for(size_t i = node.leaf.startOffset; i < endOffset; ++i)
+        {
+            Intersection tInct;
+            const auto &tri = tris_[i];
+            if(Geometry::Triangle::EvalIntersection(tri.A, tri.B_A, tri.C_A, r, &tInct)
+                && (!ret || tInct.t < inct->t))
+            {
+                ret = true;
+                *inct = tInct;
+            }
+        }
+        return ret;
+    }
+
+    if(!node.internal.bound->HasIntersection(r))
+        return false;
+
+    if(EvalIntersectionAux(r, nodeIdx + 1, inct))
+    {
+        Intersection tInct;
+        if(EvalIntersectionAux(r, node.internal.offset, &tInct) && tInct.t < inct->t)
+            *inct = tInct;
+        return true;
+    }
+
+    return EvalIntersectionAux(r, node.internal.offset, inct);
+}
+
+TriangleBVH::TriangleBVH(
+    const Vertex *vertices, size_t triangleCount,
+    RC<Material> mat, const Transform &local2World)
+    : boundArena_(32), surfaceArea_(0.0), mat_(mat), local2World_(local2World)
+{
+    InitBVH(vertices, triangleCount);
 }
 
 bool TriangleBVH::HasIntersection(const Ray &r) const
 {
-    // TODO
-    return false;
+    if(nodes_.empty())
+        return false;
+    return HasIntersectionAux(local2World_.ApplyInverseToRay(r), 0);
+}
+
+bool TriangleBVH::EvalIntersection(const Ray &r, Intersection *inct) const
+{
+    if(nodes_.empty() || !EvalIntersectionAux(local2World_.ApplyInverseToRay(r), 0, inct))
+        return false;
+    *inct = local2World_.ApplyToIntersection(*inct);
+    return true;
 }
 
 AABB TriangleBVH::GetBoundingBox() const
 {
     if(nodes_.empty())
         return AABB();
+
     if(nodes_[0].isLeaf)
     {
         AABB ret = Geometry::Triangle::ToBoundingBox(
@@ -325,11 +399,7 @@ AABB TriangleBVH::GetBoundingBox() const
         return ret;
     }
 
-    auto &b = nodes_[0].internal.bound;
-    return {
-        { b.low.x,  b.low.y,  b.low.z },
-        { b.high.x, b.high.y, b.high.z }
-    };
+    return *nodes_[0].internal.bound;
 }
 
 Real TriangleBVH::SurfaceArea() const

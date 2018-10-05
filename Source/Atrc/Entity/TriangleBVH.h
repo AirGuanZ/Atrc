@@ -38,11 +38,7 @@ public:
         {
             struct
             {
-                struct
-                {
-                    struct { Real x, y, z; } low;
-                    struct { Real x, y, z; } high;
-                } bound;
+                AABB *bound;
                 size_t offset;
             } internal;
 
@@ -63,17 +59,26 @@ public:
 
 private:
 
+    AGZ::SmallObjArena<AABB> boundArena_;
+
     Real surfaceArea_;
     std::vector<InternalTriangle> tris_;
     std::vector<Node> nodes_;
-    
+
     RC<Material> mat_;
+    Transform local2World_;
     
     void InitBVH(const Vertex *vertices, size_t triangleCount);
+
+    bool HasIntersectionAux(const Ray &r, size_t nodeIdx) const;
+
+    bool EvalIntersectionAux(const Ray &r, size_t nodeIdx, Intersection *inct) const;
     
 public:
 
-    TriangleBVH(const Vertex *vertices, size_t triangleCount, RC<Material> mat);
+    TriangleBVH(
+        const Vertex *vertices, size_t triangleCount,
+        RC<Material> mat, const Transform &local2World);
     
     bool HasIntersection(const Ray &r) const override;
     
