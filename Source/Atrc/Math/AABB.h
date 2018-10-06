@@ -60,8 +60,8 @@ public:
             }
 
             Real invDir = 1 / r.direction[i];
-            Real n = (low[i] - r.origin[i]) * invDir;
-            Real f = (high[i] - r.origin[i]) * invDir;
+            Real n = invDir * (low[i] - r.origin[i]);
+            Real f = invDir * (high[i] - r.origin[i]);
             if(n > f)
                 std::swap(n, f);
             f *= (1 + 1e-5);

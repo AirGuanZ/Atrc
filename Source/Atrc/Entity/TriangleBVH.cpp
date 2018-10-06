@@ -69,8 +69,8 @@ namespace
 
         const Vertex *GetTriangle(size_t i) const
         {
-            AGZ_ASSERT(3 * i < triIdxMap.size());
-            return &vertices[triIdxMap[3 * i]];
+            AGZ_ASSERT(i < triIdxMap.size());
+            return &vertices[3 * triIdxMap[i]];
         }
 
         const Tri &GetInfo(size_t i) const
@@ -286,7 +286,7 @@ void TriangleBVH::InitBVH(const Vertex *vertices, size_t triangleCount)
         triIdxMap[i] = i;
     }
     
-    AGZ::SmallObjArena<TempNode> tNodeArena(64);
+    AGZ::SmallObjArena<TempNode> tNodeArena;
     size_t nodeCount = 0;
     MappedTriangles mappedTriangles{ vertices, triInfo, triIdxMap };
     TempNode *root = Build(
@@ -340,8 +340,12 @@ bool TriangleBVH::EvalIntersectionAux(const Ray &r, size_t nodeIdx, Intersection
             {
                 ret = true;
                 *inct = tInct;
+                inct->flag = i;
+                inct->nor = (tri.nA + inct->uv.u * tri.nB_nA + inct->uv.v * tri.nC_nA).Normalize();
             }
         }
+        if(ret)
+            inct->entity = this;
         return ret;
     }
 
@@ -362,9 +366,29 @@ bool TriangleBVH::EvalIntersectionAux(const Ray &r, size_t nodeIdx, Intersection
 TriangleBVH::TriangleBVH(
     const Vertex *vertices, size_t triangleCount,
     RC<Material> mat, const Transform &local2World)
-    : boundArena_(32), surfaceArea_(0.0), mat_(mat), local2World_(local2World)
+    : surfaceArea_(0.0), mat_(mat), local2World_(local2World)
 {
     InitBVH(vertices, triangleCount);
+}
+
+TriangleBVH::TriangleBVH(
+    const AGZ::Model::GeometryMesh &mesh, RC<Material> mat, const Transform &local2World)
+    : surfaceArea_(0.0), mat_(mat), local2World_(local2World)
+{
+    AGZ_ASSERT(mesh.vertices.size() % 3 == 0);
+
+    auto vertices = mesh.vertices
+    | AGZ::Map([](const AGZ::Model::GeometryMesh::Vertex &v)
+        {
+            Vertex ret;
+            ret.pos = v.pos;
+            ret.tex = v.tex.uv();
+            ret.nor = v.nor;
+            return ret;
+        })
+    | AGZ::Collect<std::vector<Vertex>>();
+
+    InitBVH(vertices.data(), vertices.size() / 3);
 }
 
 bool TriangleBVH::HasIntersection(const Ray &r) const

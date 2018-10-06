@@ -9,8 +9,6 @@
 
 AGZ_NS_BEG(Atrc)
 
-struct TriangleBVHData;
-
 class TriangleBVH
     : ATRC_IMPLEMENTS Entity,
       ATRC_PROPERTY AGZ::Uncopiable
@@ -79,11 +77,16 @@ public:
     TriangleBVH(
         const Vertex *vertices, size_t triangleCount,
         RC<Material> mat, const Transform &local2World);
+
+    TriangleBVH(
+        const AGZ::Model::GeometryMesh &mesh, RC<Material> mat,
+        const Transform &local2World);
     
     bool HasIntersection(const Ray &r) const override;
     
     bool EvalIntersection(const Ray &r, Intersection *inct) const override;
-    
+
+    // FIXME
     AABB GetBoundingBox() const override;
 
     Real SurfaceArea() const override;

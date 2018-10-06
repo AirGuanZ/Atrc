@@ -82,6 +82,11 @@ using Degr = Deg<Real>;
 
 inline Real Rand() { return Random::Uniform(0.0, 1.0); }
 
+// ============================= Export AGZ::String =============================
+
+using AGZ::Str8;
+using AGZ::WStr;
+
 // ============================= Spectrum =============================
 
 using SS = float;

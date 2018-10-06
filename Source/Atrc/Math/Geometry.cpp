@@ -129,7 +129,6 @@ bool EvalIntersection(
 
     inct->wr  = -r.direction;
     inct->pos = r.At(t);
-    inct->nor = Cross(C_A, B_A).Normalize();
     inct->t   = t;
     inct->uv  = Vec2r(alpha, beta);
 

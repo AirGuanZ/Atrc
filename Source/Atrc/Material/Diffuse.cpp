@@ -25,7 +25,7 @@ Option<BxDFSample> DiffuseBxDF::Sample(const Vec3r &wi, BxDFType type) const
     if(type.Contains(BXDF_REFLECTION | BXDF_DIFFUSE) &&
         Dot(wi, localCoord_.ez) > 0.0)
     {
-        auto[dir, pdf] = CommonSampler::ZWeighted_OnUnitHemisphere::Sample();
+        auto [dir, pdf] = CommonSampler::ZWeighted_OnUnitHemisphere::Sample();
         return BxDFSample{ localCoord_.C2W(dir), color_, pdf };
     }
     return None;

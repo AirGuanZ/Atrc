@@ -24,6 +24,7 @@
     <ClInclude Include="..\..\..\Source\Atrc\Camera\Camera.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Camera\PerspectiveCamera.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Common.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Entity\BruteforceTriangleMesh.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Entity\ColoredSky.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Entity\Entity.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Entity\GeometryTemplate\SmoothTriangle.h" />
@@ -39,6 +40,7 @@
     <ClInclude Include="..\..\..\Source\Atrc\Material\Diffuse.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Material\Glass.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Material\Metal.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Material\Normal.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Math\AABB.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Math\CoordSys.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Math\Geometry.h" />
@@ -57,6 +59,7 @@
     <ClCompile Include="..\..\..\Source\Atrc\Camera\ApertureCamera.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Camera\PerspectiveCamera.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Common.cpp" />
+    <ClCompile Include="..\..\..\Source\Atrc\Entity\BruteforceTriangleMesh.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Entity\ColoredSky.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Entity\Entity.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Entity\GeometryTemplate\SmoothTriangle.cpp" />
@@ -70,6 +73,7 @@
     <ClCompile Include="..\..\..\Source\Atrc\Material\Diffuse.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Material\Glass.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Material\Metal.cpp" />
+    <ClCompile Include="..\..\..\Source\Atrc\Material\Normal.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Math\CommonSampler.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Math\Geometry.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Renderer\JitteredSubareaRenderer.cpp" />

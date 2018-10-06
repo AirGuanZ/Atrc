@@ -3,8 +3,8 @@
 using namespace std;
 using namespace Atrc;
 
-constexpr uint32_t SCR_W = 640;
-constexpr uint32_t SCR_H = 480;
+constexpr uint32_t SCR_W = 120;
+constexpr uint32_t SCR_H = 90;
 
 constexpr Real SCR_ASPECT_RATIO = static_cast<Real>(SCR_W) / SCR_H;
 
@@ -20,6 +20,42 @@ RenderTarget<Color3b> ToSavedImage(const RenderTarget<Color3f> &origin, float ga
         });
     });
 }
+
+WStr boxOBJContent =
+R"___(
+# Blender v2.79 (sub 0) OBJ File: ''
+# www.blender.org
+mtllib untitled.mtl
+o Cube
+v -1.000000 1.000000 -1.000000
+v 1.000000 1.000000 -1.000000
+v 1.000000 -1.000000 -1.000000
+v -1.000000 -1.000000 -1.000000
+v -0.999999 1.000000 1.000000
+v 1.000001 0.999999 1.000000
+v 1.000000 -1.000000 1.000000
+v -1.000000 -1.000000 1.000000
+vn 0.0000 0.0000 -1.0000
+vn 0.0000 0.0000 1.0000
+vn 0.0000 1.0000 -0.0000
+vn 1.0000 0.0000 -0.0000
+vn -0.0000 -1.0000 -0.0000
+vn -1.0000 0.0000 0.0000
+usemtl Material
+s off
+f 2//1 4//1 1//1
+f 8//2 6//2 5//2
+f 5//3 2//3 1//3
+f 6//4 3//4 2//4
+f 3//5 8//5 4//5
+f 1//6 8//6 5//6
+f 2//1 3//1 4//1
+f 8//2 7//2 6//2
+f 5//3 6//3 2//3
+f 6//4 7//4 3//4
+f 3//5 7//5 8//5
+f 1//6 4//6 8//6
+)___";
 
 int main()
 {
@@ -39,11 +75,17 @@ int main()
     MatGeoEntity<Sphere> leftGlassSphere(NewRC<GlassMaterial>(Spectrum(0.8f, 0.8f, 0.8f)),
                                          1.0, Transform::Translate({ 0.0, 2.0, 0.0 }));
 
+    AGZ::Model::WavefrontObj boxOBJ;
+    AGZ::Model::WavefrontObjFile::LoadFromMemory(boxOBJContent, &boxOBJ);
+    auto boxMesh = boxOBJ.ToGeometryMeshGroup().submeshes["Cube"];
+    TriangleBVH box(boxMesh, NewRC<NormalMaterial>(),//NewRC<DiffuseMaterial>(Spectrum(0.6f, 0.6f, 0.6f)),
+                               Transform::Translate({ 0.0, -2.0, 0.0 }));
+
     Scene scene;
     scene.camera = &camera;
     scene.entities = { 
         &ground,
-        &centreBall, &leftGlassSphere, &rightMetalSphere,
+        &centreBall, &leftGlassSphere, /*&rightMetalSphere, */&box,
         &sky };
 
     RenderTarget<Color3f> renderTarget(SCR_W, SCR_H);
@@ -52,7 +94,7 @@ int main()
     PathTracer integrator(10);
 
     //ParallelRenderer<Native1sppSubareaRenderer> renderer(-1);
-    ParallelRenderer<JitteredSubareaRenderer> renderer(4, 20);
+    SerialRenderer<JitteredSubareaRenderer> renderer(5);
     renderer.Render(scene, integrator, renderTarget);
 
     AGZ::Tex::TextureFile::WriteRGBToPNG("Output.png", ToSavedImage(renderTarget, 2.2f));

@@ -11,6 +11,7 @@
 #include <Atrc/Entity/GeometryTemplate/Sphere.h>
 #include <Atrc/Entity/GeometryTemplate/SmoothTriangle.h>
 
+#include <Atrc/Entity/BruteforceTriangleMesh.h>
 #include <Atrc/Entity/ColoredSky.h>
 #include <Atrc/Entity/MatGeoEntity.h>
 #include <Atrc/Entity/TriangleBVH.h>
@@ -19,6 +20,7 @@
 #include <Atrc/Material/Diffuse.h>
 #include <Atrc/Material/Glass.h>
 #include <Atrc/Material/Metal.h>
+#include <Atrc/Material/Normal.h>
 
 #include <Atrc/Renderer/ParallelRenderer.h>
 #include <Atrc/Renderer/SerialRenderer.h>

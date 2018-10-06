@@ -96,6 +96,12 @@
     <ClInclude Include="..\..\..\Source\Atrc\Entity\TriangleBVH.h">
       <Filter>Entity</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Entity\BruteforceTriangleMesh.h">
+      <Filter>Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Material\Normal.h">
+      <Filter>Material</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\Atrc\Common.cpp" />
@@ -155,6 +161,12 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Source\Atrc\Entity\TriangleBVH.cpp">
       <Filter>Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Entity\BruteforceTriangleMesh.cpp">
+      <Filter>Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Material\Normal.cpp">
+      <Filter>Material</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
