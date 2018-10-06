@@ -9,13 +9,15 @@ class PathTracer
     : ATRC_IMPLEMENTS Integrator,
       ATRC_PROPERTY AGZ::Uncopiable
 {
-    uint32_t maxDepth_;
+    uint32_t minDepth_;
+    Real stopProb_;
+    float stopCoef_;
 
     Spectrum Trace(const Scene &scene, const Ray &r, uint32_t depth) const;
 
 public:
 
-    explicit PathTracer(uint32_t maxDepth);
+    explicit PathTracer(uint32_t minDepth, Real stopProb);
 
     Spectrum GetRadiance(const Scene &scene, const Ray &r) const override;
 };

@@ -299,6 +299,13 @@ void TriangleBVH::InitBVH(const Vertex *vertices, size_t triangleCount)
     CompactBVHIntoArray(nodes_, tris_, vertices, root, triIdxMap, boundArena_);
 }
 
+void TriangleBVH::InitBound(const Vertex *vertices, size_t vertexCount)
+{
+    bound_ = AABB();
+    for(size_t i = 0; i < vertexCount; ++i)
+        bound_.Expand(local2World_.ApplyToPoint(vertices[i].pos));
+}
+
 bool TriangleBVH::HasIntersectionAux(const Ray &r, size_t nodeIdx) const
 {
     AGZ_ASSERT(nodeIdx < nodes_.size());
@@ -369,6 +376,7 @@ TriangleBVH::TriangleBVH(
     : surfaceArea_(0.0), mat_(mat), local2World_(local2World)
 {
     InitBVH(vertices, triangleCount);
+    InitBound(vertices, triangleCount * 3);
 }
 
 TriangleBVH::TriangleBVH(
@@ -389,6 +397,7 @@ TriangleBVH::TriangleBVH(
     | AGZ::Collect<std::vector<Vertex>>();
 
     InitBVH(vertices.data(), vertices.size() / 3);
+    InitBound(vertices.data(), vertices.size());
 }
 
 bool TriangleBVH::HasIntersection(const Ray &r) const
@@ -408,22 +417,7 @@ bool TriangleBVH::EvalIntersection(const Ray &r, Intersection *inct) const
 
 AABB TriangleBVH::GetBoundingBox() const
 {
-    if(nodes_.empty())
-        return AABB();
-
-    if(nodes_[0].isLeaf)
-    {
-        AABB ret = Geometry::Triangle::ToBoundingBox(
-            tris_[0].A, tris_[0].A + tris_[0].B_A, tris_[0].A + tris_[0].C_A);
-        for(size_t i = 1; i < tris_.size(); ++i)
-        {
-            ret = ret | Geometry::Triangle::ToBoundingBox(
-                tris_[i].A, tris_[i].A + tris_[i].B_A, tris_[i].A + tris_[i].C_A);
-        }
-        return ret;
-    }
-
-    return *nodes_[0].internal.bound;
+    return bound_;
 }
 
 Real TriangleBVH::SurfaceArea() const

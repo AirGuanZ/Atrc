@@ -6,8 +6,13 @@ AGZ_NS_BEG(Atrc)
 
 Spectrum PathTracer::Trace(const Scene &scene, const Ray &r, uint32_t depth) const
 {
-    if(depth > maxDepth_)
-        return SPECTRUM::BLACK;
+    float stopCoef = 1.0f;
+    if(depth > minDepth_)
+    {
+        if(Rand() > stopProb_)
+            return SPECTRUM::BLACK;
+        stopCoef = stopCoef_;
+    }
 
     Intersection inct;
     if(!FindClosestIntersection(scene, r, &inct))
@@ -16,16 +21,17 @@ Spectrum PathTracer::Trace(const Scene &scene, const Ray &r, uint32_t depth) con
     auto bxdf = inct.entity->GetBxDF(inct);
     auto bxdfSample = bxdf->Sample(-r.direction, BXDF_ALL);
     if(!bxdfSample)
-        return bxdf->AmbientRadiance(inct);
+        return stopCoef * bxdf->AmbientRadiance(inct);
 
     auto newRay = Ray(inct.pos, bxdfSample->dir, 1e-5);
-    return bxdfSample->coef * Trace(scene, newRay, depth + 1)
-         * SS(Abs(Dot(inct.nor, bxdfSample->dir)) / bxdfSample->pdf)
-         + bxdf->AmbientRadiance(inct);
+    return stopCoef * 
+        (bxdfSample->coef * Trace(scene, newRay, depth + 1)
+       * SS(Abs(Dot(inct.nor, bxdfSample->dir)) / bxdfSample->pdf)
+       + bxdf->AmbientRadiance(inct));
 }
 
-PathTracer::PathTracer(uint32_t maxDepth)
-    : maxDepth_(maxDepth)
+PathTracer::PathTracer(uint32_t minDepth, Real stopProb)
+    : minDepth_(minDepth), stopProb_(stopProb), stopCoef_(static_cast<float>(1 / stopProb))
 {
     AGZ_ASSERT(maxDepth >= 1);
 }

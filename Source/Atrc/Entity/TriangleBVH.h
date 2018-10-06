@@ -59,6 +59,8 @@ private:
 
     AGZ::SmallObjArena<AABB> boundArena_;
 
+    AABB bound_;
+
     Real surfaceArea_;
     std::vector<InternalTriangle> tris_;
     std::vector<Node> nodes_;
@@ -67,6 +69,8 @@ private:
     Transform local2World_;
     
     void InitBVH(const Vertex *vertices, size_t triangleCount);
+
+    void InitBound(const Vertex *vertices, size_t vertexCount);
 
     bool HasIntersectionAux(const Ray &r, size_t nodeIdx) const;
 

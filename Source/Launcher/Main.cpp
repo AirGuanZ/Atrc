@@ -88,7 +88,7 @@ int main()
 
     RenderTarget<Color3f> renderTarget(SCR_W, SCR_H);
 
-    PathTracer integrator(10);
+    PathTracer integrator(10, 0.1);
 
     ParallelRenderer<JitteredSubareaRenderer> renderer(4, 20);
     renderer.Render(scene, integrator, renderTarget);

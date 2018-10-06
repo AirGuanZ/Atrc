@@ -97,7 +97,7 @@ int main()
     //============= Rendering =============
 
     ParallelRenderer<JitteredSubareaRenderer> renderer(4, 1000);
-    renderer.Render(scene, PathTracer(10), renderTarget);
+    renderer.Render(scene, PathTracer(10, 0.1), renderTarget);
 
     //============= Output =============
 
