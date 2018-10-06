@@ -168,7 +168,7 @@ namespace
                 tSplitPos = splitPos;
         }
 
-        if(cost[tSplitPos] < primCount)
+        if(cost[tSplitPos] > primCount)
         {
             *nodeCount = 1;
             return FillLeaf(nodeArena.Alloc(), startIdx, primCount);
@@ -177,7 +177,7 @@ namespace
         // Split triangles and build two subtrees recursively
 
         auto midElem = std::partition(
-            &tris.triIdxMap[startIdx], &tris.triIdxMap[endIdx],
+            &tris.triIdxMap[startIdx], &tris.triIdxMap[endIdx - 1] + 1,
             [&](size_t idx)
         {
             auto n = static_cast<int>((tris.triInfo[idx].centroid - centroidBound.low)[splitAxis]
@@ -186,7 +186,7 @@ namespace
             return n <= tSplitPos;
         });
 
-        size_t splitIdx = midElem - &tris.triIdxMap[startIdx];
+        size_t splitIdx = midElem - &tris.triIdxMap[startIdx] + startIdx;
         if(splitIdx == startIdx || splitIdx == endIdx)
         {
             *nodeCount = 1;
@@ -290,7 +290,7 @@ void TriangleBVH::InitBVH(const Vertex *vertices, size_t triangleCount)
     size_t nodeCount = 0;
     MappedTriangles mappedTriangles{ vertices, triInfo, triIdxMap };
     TempNode *root = Build(
-        mappedTriangles, tNodeArena, 0, triangleCount - 1, &nodeCount);
+        mappedTriangles, tNodeArena, 0, triangleCount, &nodeCount);
 
     nodes_.clear();
     tris_.clear();
