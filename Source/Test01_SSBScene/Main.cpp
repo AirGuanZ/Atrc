@@ -3,8 +3,8 @@
 using namespace std;
 using namespace Atrc;
 
-constexpr uint32_t SCR_W = 640;
-constexpr uint32_t SCR_H = 480;
+constexpr uint32_t SCR_W = 1920;
+constexpr uint32_t SCR_H = 1080;
 
 constexpr Real SCR_ASPECT_RATIO = static_cast<Real>(SCR_W) / SCR_H;
 
@@ -59,39 +59,47 @@ f 1//6 4//6 8//6
 
 int main()
 {
+    //============= Camera =============
+
     const Vec3r eye = { -5.0, 0.0, 0.0 };
     const Vec3r dir = (Vec3r(0.0) - eye).Normalize();
     PerspectiveCamera camera(
         eye, dir, { 0.0, 0.0, 1.0 },
         Degr(90.0), SCR_ASPECT_RATIO);
 
+    //============= Scene =============
+
     ColoredSky sky({ 0.4f, 0.7f, 0.9f }, { 1.0f, 1.0f, 1.0f });
     MatGeoEntity<Sphere> ground(NewRC<DiffuseMaterial>(Spectrum(0.4f, 0.8f, 0.4f)),
-                                200.0, Transform::Translate({ 0.0, 0.0, -201.0 }));
+        200.0, Transform::Translate({ 0.0, 0.0, -201.0 }));
     MatGeoEntity<Sphere> centreBall(NewRC<DiffuseMaterial>(Spectrum(0.7f, 0.7f, 0.7f)),
-                                    1.0, TRANSFORM_IDENTITY);
+        1.0, TRANSFORM_IDENTITY);
     MatGeoEntity<Sphere> leftMetalSphere(NewRC<MetalMaterial>(Spectrum(1.0f, 0.3f, 0.3f), 0.2),
-                                         1.0, Transform::Translate({ 0.0, 2.0, 0.0 }));
+        1.0, Transform::Translate({ 0.0, 2.0, 0.0 }));
 
     AGZ::Model::WavefrontObj boxOBJ;
     AGZ::Model::WavefrontObjFile::LoadFromMemory(boxOBJContent, &boxOBJ);
     auto boxMesh = boxOBJ.ToGeometryMeshGroup().submeshes["Cube"];
     TriangleBVH box(boxMesh, NewRC<DiffuseMaterial>(Spectrum(0.3f, 0.3f, 1.0f)),
-                               Transform::Translate({ 0.0, -2.0, -0.1 }));
+        Transform::Translate({ 0.0, -2.0, -0.1 }));
 
     Scene scene;
     scene.camera = &camera;
-    scene.entities = { 
+    scene.entities = {
         &ground,
         &centreBall, &leftMetalSphere, &box,
         &sky };
 
+    //============= Render Target =============
+
     RenderTarget<Color3f> renderTarget(SCR_W, SCR_H);
 
-    PathTracer integrator(10);
+    //============= Rendering =============
 
-    ParallelRenderer<JitteredSubareaRenderer> renderer(4, 20);
-    renderer.Render(scene, integrator, renderTarget);
+    ParallelRenderer<JitteredSubareaRenderer> renderer(4, 1000);
+    renderer.Render(scene, PathTracer(10), renderTarget);
+
+    //============= Output =============
 
     AGZ::Tex::TextureFile::WriteRGBToPNG("Output.png", ToSavedImage(renderTarget, 2.2f));
 }

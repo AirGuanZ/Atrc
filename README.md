@@ -2,6 +2,6 @@
 
 ## Screenshots
 
-![SinglePathTracedDiffuseSphere](./Screenshots/Output0.png)
+![SinglePathTracedDiffuseSphere](./Diary/06_2018_10_06.png)
 
-![SinglePathTracedDiffuseSphere](./Screenshots/Output1.png)
+![SinglePathTracedDiffuseSphere](./Diary/05_2018_9_30.png)
