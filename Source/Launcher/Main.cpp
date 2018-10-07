@@ -4,8 +4,8 @@
 using namespace std;
 using namespace Atrc;
 
-constexpr uint32_t SCR_W = 640;
-constexpr uint32_t SCR_H = 480;
+constexpr uint32_t SCR_W = 1920;
+constexpr uint32_t SCR_H = 1080;
 
 constexpr Real SCR_ASPECT_RATIO = static_cast<Real>(SCR_W) / SCR_H;
 
@@ -26,34 +26,29 @@ int main()
 {
     //============= Camera =============
 
-    const Vec3r eye = { -5.0, 0.0, 0.0 };
+    const Vec3r eye = { -1.5, -5.0, 1.0 };
     const Vec3r dir = (Vec3r(0.0) - eye).Normalize();
     PerspectiveCamera camera(
         eye, dir, { 0.0, 0.0, 1.0 },
-        Degr(90.0), SCR_ASPECT_RATIO);
+        Degr(60.0), SCR_ASPECT_RATIO);
 
     //============= Scene =============
 
     ColoredSky sky({ 0.4f, 0.7f, 0.9f }, { 1.0f, 1.0f, 1.0f });
+
     MatGeoEntity<Sphere> ground(NewRC<DiffuseMaterial>(Spectrum(0.4f, 0.8f, 0.4f)),
                                 200.0, Transform::Translate({ 0.0, 0.0, -201.0 }));
-    MatGeoEntity<Sphere> centreBall(NewRC<DiffuseMaterial>(Spectrum(0.7f, 0.7f, 0.7f)),
-                                    1.0, TRANSFORM_IDENTITY);
-    MatGeoEntity<Sphere> leftMetalSphere(NewRC<MetalMaterial>(Spectrum(1.0f, 0.3f, 0.3f), 0.2),
-                                         1.0, Transform::Translate({ 0.0, 2.0, 0.0 }));
 
     AGZ::Model::WavefrontObj arbShapeObj;
-    AGZ::Model::WavefrontObjFile::LoadFromObjFile("test.obj", &arbShapeObj);
+    AGZ::Model::WavefrontObjFile::LoadFromObjFile("bun_zipper.obj", &arbShapeObj);
     auto arbShapeMesh = arbShapeObj.ToGeometryMeshGroup().submeshes["Default"];
-    MatGeoEntity<TriangleBVH> arbShape(NewRC<DiffuseMaterial>(Spectrum(0.3f, 0.3f, 1.0f)),
-                                       arbShapeMesh, Transform::Translate({ 0.0, -2.0, -0.1 }));
+    MatGeoEntity<TriangleBVH> arbShape(NewRC<MetalMaterial>(Spectrum(0.4f), 0.1),
+                                       arbShapeMesh, Transform::Translate({ 0.0, 0.0, -0.8 })
+                                                   * Transform::Scale(Vec3r(1.5e-5)));
 
     Scene scene;
     scene.camera = &camera;
-    scene.entities = {
-        &ground,
-        &centreBall, &leftMetalSphere, &arbShape,
-        &sky };
+    scene.entities = { &ground, &arbShape, &sky };
 
     //============= Render Target =============
 
@@ -61,7 +56,7 @@ int main()
 
     //============= Rendering =============
 
-    ParallelRenderer<JitteredSubareaRenderer> renderer(6, 20);
+    ParallelRenderer<JitteredSubareaRenderer> renderer(7, 20);
     PathTracer integrator(10);
 
     cout << "Start rendering..." << endl;

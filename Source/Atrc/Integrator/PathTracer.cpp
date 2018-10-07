@@ -7,7 +7,7 @@ AGZ_NS_BEG(Atrc)
 Spectrum PathTracer::Trace(const Scene &scene, const Ray &r, uint32_t depth) const
 {
     if(depth > maxDepth_)
-        return SPECTRUM::BLACK;
+        return SPECTRUM::RED;
 
     Intersection inct;
     if(!FindClosestIntersection(scene, r, &inct))

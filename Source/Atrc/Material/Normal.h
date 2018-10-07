@@ -23,7 +23,7 @@ public:
 
 class NormalMaterial
     : ATRC_IMPLEMENTS Material,
-    ATRC_PROPERTY AGZ::Uncopiable
+      ATRC_PROPERTY AGZ::Uncopiable
 {
 public:
 
