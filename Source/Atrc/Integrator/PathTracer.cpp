@@ -33,7 +33,7 @@ Spectrum PathTracer::Trace(const Scene &scene, const Ray &r, uint32_t depth) con
 PathTracer::PathTracer(uint32_t minDepth, Real stopProb)
     : minDepth_(minDepth), stopProb_(stopProb), stopCoef_(static_cast<float>(1 / stopProb))
 {
-    AGZ_ASSERT(maxDepth >= 1);
+    AGZ_ASSERT(minDepth >= 1);
 }
 
 Spectrum PathTracer::GetRadiance(const Scene &scene, const Ray &r) const

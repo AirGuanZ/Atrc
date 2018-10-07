@@ -31,12 +31,26 @@ public:
 
     struct Node
     {
+        Node(const AABB *bound, size_t offset)
+            : isLeaf(false)
+        {
+            internal.bound = bound;
+            internal.offset = offset;
+        }
+
+        Node(size_t startOffset, size_t primCount)
+            : isLeaf(true)
+        {
+            leaf.startOffset = startOffset;
+            leaf.primCount = primCount;
+        }
+
         bool isLeaf;
         union
         {
             struct
             {
-                AABB *bound;
+                const AABB *bound;
                 size_t offset;
             } internal;
 
@@ -90,7 +104,6 @@ public:
     
     bool EvalIntersection(const Ray &r, Intersection *inct) const override;
 
-    // FIXME
     AABB GetBoundingBox() const override;
 
     Real SurfaceArea() const override;

@@ -176,17 +176,24 @@ namespace
 
         // Split triangles and build two subtrees recursively
 
-        auto midElem = std::partition(
-            &tris.triIdxMap[startIdx], &tris.triIdxMap[endIdx - 1] + 1,
-            [&](size_t idx)
+        std::vector<size_t> leftPartIdx, rightPartIdx;
+        for(size_t i = startIdx; i < endIdx; ++i)
         {
-            auto n = static_cast<int>((tris.triInfo[idx].centroid - centroidBound.low)[splitAxis]
-                / centroidDelta[splitAxis] * BUCKET_COUNT);
+            auto n = static_cast<int>((tris.GetInfo(i).centroid - centroidBound.low)[splitAxis]
+                     / centroidDelta[splitAxis] * BUCKET_COUNT);
             n = Clamp(n, 0, BUCKET_COUNT - 1);
-            return n <= tSplitPos;
-        });
+            if(n <= tSplitPos)
+                leftPartIdx.push_back(tris.triIdxMap[i]);
+            else
+                rightPartIdx.push_back(tris.triIdxMap[i]);
+        }
 
-        size_t splitIdx = midElem - &tris.triIdxMap[startIdx] + startIdx;
+        size_t splitIdx = startIdx + leftPartIdx.size();
+        for(size_t i = 0; i < leftPartIdx.size(); ++i)
+            tris.triIdxMap[startIdx + i] = leftPartIdx[i];
+        for(size_t i = 0; i < rightPartIdx.size(); ++i)
+            tris.triIdxMap[splitIdx + i] = rightPartIdx[i];
+
         if(splitIdx == startIdx || splitIdx == endIdx)
         {
             *nodeCount = 1;
@@ -213,11 +220,7 @@ namespace
     {
         if(tree->isLeaf)
         {
-            TriangleBVH::Node node;
-            node.isLeaf = true;
-            node.leaf.startOffset = tris.size();
-            node.leaf.primCount = tree->leaf.primCount;
-            nodes.push_back(node);
+            nodes.emplace_back(tris.size(), tree->leaf.primCount);
 
             size_t endOffset = tree->leaf.startOffset + tree->leaf.primCount;
             for(size_t i = tree->leaf.startOffset; i < endOffset; ++i)
@@ -238,11 +241,11 @@ namespace
         }
         else
         {
-            TriangleBVH::Node node;
+            auto pBound = boundArena.Alloc();
+            TriangleBVH::Node node(pBound, 0);
+
             auto &b = tree->internal.bound;
-            node.isLeaf = false;
-            node.internal.bound = boundArena.Alloc();
-            *node.internal.bound = {
+            *pBound = {
                 { b.low.x,  b.low.y,  b.low.z },
                 { b.high.x, b.high.y, b.high.z }
             };
@@ -261,8 +264,8 @@ namespace
 }
 
 /*
-    1. 构建链式BVH
-    2. 把BVH压缩到数组中，得到nodes_
+    1. Construct BVH tree in linking-style
+    2. Conpact the tree into array 'nodes_'
 */
 void TriangleBVH::InitBVH(const Vertex *vertices, size_t triangleCount)
 {
