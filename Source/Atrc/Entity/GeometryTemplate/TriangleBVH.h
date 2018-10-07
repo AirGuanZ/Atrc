@@ -5,7 +5,6 @@
 #include <Atrc/Common.h>
 #include <Atrc/Entity/Entity.h>
 #include <Atrc/Math/Math.h>
-#include <Atrc/Material/Material.h>
 
 AGZ_NS_BEG(Atrc)
 
@@ -73,18 +72,13 @@ private:
 
     AGZ::SmallObjArena<AABB> boundArena_;
 
-    AABB bound_;
-
     Real surfaceArea_;
     std::vector<InternalTriangle> tris_;
     std::vector<Node> nodes_;
 
-    RC<Material> mat_;
     Transform local2World_;
     
     void InitBVH(const Vertex *vertices, size_t triangleCount);
-
-    void InitBound(const Vertex *vertices, size_t vertexCount);
 
     bool HasIntersectionAux(const Ray &r, size_t nodeIdx) const;
 
@@ -92,13 +86,9 @@ private:
     
 public:
 
-    TriangleBVH(
-        const Vertex *vertices, size_t triangleCount,
-        RC<Material> mat, const Transform &local2World);
+    TriangleBVH(const Vertex *vertices, size_t triangleCount, const Transform &local2World);
 
-    TriangleBVH(
-        const AGZ::Model::GeometryMesh &mesh, RC<Material> mat,
-        const Transform &local2World);
+    TriangleBVH(const AGZ::Model::GeometryMesh &mesh, const Transform &local2World);
     
     bool HasIntersection(const Ray &r) const override;
     
@@ -108,7 +98,7 @@ public:
 
     Real SurfaceArea() const override;
 
-    RC<BxDF> GetBxDF(const Intersection &inct) const override;
+    Vec2r GetMaterialParameter(const Intersection &inct) const;
 };
 
 AGZ_NS_END(Atrc)

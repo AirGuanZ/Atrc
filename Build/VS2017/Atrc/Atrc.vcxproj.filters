@@ -93,14 +93,14 @@
     <ClInclude Include="..\..\..\Source\Atrc\Material\Material.h">
       <Filter>Material</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\Atrc\Entity\TriangleBVH.h">
-      <Filter>Entity</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Source\Atrc\Entity\BruteforceTriangleMesh.h">
       <Filter>Entity</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Source\Atrc\Material\Normal.h">
       <Filter>Material</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Entity\GeometryTemplate\TriangleBVH.h">
+      <Filter>Entity\GeometryTemplate</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -159,14 +159,14 @@
     <ClCompile Include="..\..\..\Source\Atrc\Material\Ambient.cpp">
       <Filter>Material</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Source\Atrc\Entity\TriangleBVH.cpp">
-      <Filter>Entity</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Source\Atrc\Entity\BruteforceTriangleMesh.cpp">
       <Filter>Entity</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Source\Atrc\Material\Normal.cpp">
       <Filter>Material</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Entity\GeometryTemplate\TriangleBVH.cpp">
+      <Filter>Entity\GeometryTemplate</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

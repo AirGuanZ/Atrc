@@ -78,17 +78,17 @@ int main()
     MatGeoEntity<Sphere> leftMetalSphere(NewRC<MetalMaterial>(Spectrum(1.0f, 0.3f, 0.3f), 0.2),
                                          1.0, Transform::Translate({ 0.0, 2.0, 0.0 }));
 
-    AGZ::Model::WavefrontObj boxOBJ;
-    AGZ::Model::WavefrontObjFile::LoadFromMemory(boxOBJContent, &boxOBJ);
-    auto boxMesh = boxOBJ.ToGeometryMeshGroup().submeshes["Cube"];
-    TriangleBVH box(boxMesh, NewRC<DiffuseMaterial>(Spectrum(0.3f, 0.3f, 1.0f)),
-                    Transform::Translate({ 0.0, -2.0, -0.1 }));
+    AGZ::Model::WavefrontObj arbShapeObj;
+    AGZ::Model::WavefrontObjFile::LoadFromMemory(boxOBJContent, &arbShapeObj);
+    auto arbShapeMesh = arbShapeObj.ToGeometryMeshGroup().submeshes["Cube"];
+    MatGeoEntity<TriangleBVH> arbShape(NewRC<DiffuseMaterial>(Spectrum(0.3f, 0.3f, 1.0f)),
+                                       arbShapeMesh, Transform::Translate({ 0.0, -2.0, -0.1 }));
 
     Scene scene;
     scene.camera = &camera;
     scene.entities = {
         &ground,
-        &centreBall, &leftMetalSphere, &box,
+        &centreBall, &leftMetalSphere, &arbShape,
         &sky };
 
     //============= Render Target =============

@@ -9,10 +9,22 @@ AGZ_NS_BEG(Atrc)
 template<typename GeoTpl,
          std::enable_if_t<std::is_base_of_v<Entity, GeoTpl>, int> = 0>
 class MatGeoEntity
-    : ATRC_PROPERTY AGZ::Uncopiable,
-      public GeoTpl
+    : public GeoTpl
 {
     RC<Material> mat_;
+
+    template<typename U, std::enable_if_t<
+        AGZ::TypeOpr::True_v<decltype(&GeoTpl::GetMaterialParameter)>, int> = 0>
+    Vec2r GetMaterialParameter(const Intersection &inct, U) const
+    {
+        return this->GeoTpl::GetMaterialParameter(inct);
+    }
+
+    template<typename U>
+    Vec2r GetMaterialParameter(const Intersection &inct, ...) const
+    {
+        return inct.uv;
+    }
 
 public:
 
@@ -25,7 +37,7 @@ public:
 
     RC<BxDF> GetBxDF(const Intersection &inct) const override
     {
-        return mat_->GetBxDF(inct, inct.uv);
+        return mat_->GetBxDF(inct, GetMaterialParameter<int>(inct, 0));
     }
 };
 

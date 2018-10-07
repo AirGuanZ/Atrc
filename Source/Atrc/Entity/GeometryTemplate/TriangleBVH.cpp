@@ -1,4 +1,4 @@
-#include <Atrc/Entity/TriangleBVH.h>
+#include <Atrc/Entity/GeometryTemplate/TriangleBVH.h>
 
 AGZ_NS_BEG(Atrc)
 
@@ -303,13 +303,6 @@ void TriangleBVH::InitBVH(const Vertex *vertices, size_t triangleCount)
     CompactBVHIntoArray(nodes_, tris_, vertices, root, triIdxMap, boundArena_);
 }
 
-void TriangleBVH::InitBound(const Vertex *vertices, size_t vertexCount)
-{
-    bound_ = AABB();
-    for(size_t i = 0; i < vertexCount; ++i)
-        bound_.Expand(local2World_.ApplyToPoint(vertices[i].pos));
-}
-
 bool TriangleBVH::HasIntersectionAux(const Ray &r, size_t nodeIdx) const
 {
     AGZ_ASSERT(nodeIdx < nodes_.size());
@@ -374,18 +367,14 @@ bool TriangleBVH::EvalIntersectionAux(const Ray &r, size_t nodeIdx, Intersection
     return EvalIntersectionAux(r, node.internal.offset, inct);
 }
 
-TriangleBVH::TriangleBVH(
-    const Vertex *vertices, size_t triangleCount,
-    RC<Material> mat, const Transform &local2World)
-    : surfaceArea_(0.0), mat_(mat), local2World_(local2World)
+TriangleBVH::TriangleBVH(const Vertex *vertices, size_t triangleCount, const Transform &local2World)
+    : surfaceArea_(0.0), local2World_(local2World)
 {
     InitBVH(vertices, triangleCount);
-    InitBound(vertices, triangleCount * 3);
 }
 
-TriangleBVH::TriangleBVH(
-    const AGZ::Model::GeometryMesh &mesh, RC<Material> mat, const Transform &local2World)
-    : surfaceArea_(0.0), mat_(mat), local2World_(local2World)
+TriangleBVH::TriangleBVH(const AGZ::Model::GeometryMesh &mesh, const Transform &local2World)
+    : surfaceArea_(0.0), local2World_(local2World)
 {
     AGZ_ASSERT(mesh.vertices.size() % 3 == 0);
 
@@ -401,7 +390,6 @@ TriangleBVH::TriangleBVH(
     | AGZ::Collect<std::vector<Vertex>>();
 
     InitBVH(vertices.data(), vertices.size() / 3);
-    InitBound(vertices.data(), vertices.size());
 }
 
 bool TriangleBVH::HasIntersection(const Ray &r) const
@@ -421,7 +409,14 @@ bool TriangleBVH::EvalIntersection(const Ray &r, Intersection *inct) const
 
 AABB TriangleBVH::GetBoundingBox() const
 {
-    return bound_;
+    AABB ret;
+    for(auto &t : tris_)
+    {
+        ret.Expand(local2World_.ApplyToPoint(t.A));
+        ret.Expand(local2World_.ApplyToPoint(t.A + t.B_A));
+        ret.Expand(local2World_.ApplyToPoint(t.A + t.C_A));
+    }
+    return ret;
 }
 
 Real TriangleBVH::SurfaceArea() const
@@ -429,10 +424,10 @@ Real TriangleBVH::SurfaceArea() const
     return surfaceArea_;
 }
 
-RC<BxDF> TriangleBVH::GetBxDF(const Intersection &inct) const
+Vec2r TriangleBVH::GetMaterialParameter(const Intersection &inct) const
 {
     const InternalTriangle &tri = tris_[inct.flag];
-    return mat_->GetBxDF(inct, tri.tA + tri.tB_tA * inct.uv.u + tri.tC_tA * inct.uv.v);
+    return tri.tA + tri.tB_tA * inct.uv.u + tri.tC_tA * inct.uv.v;
 }
 
 AGZ_NS_END(Atrc)

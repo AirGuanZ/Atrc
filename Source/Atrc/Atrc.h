@@ -8,13 +8,13 @@
 #include <Atrc/Integrator/AmbientIntegrator.h>
 #include <Atrc/Integrator/PathTracer.h>
 
+#include <Atrc/Entity/GeometryTemplate/TriangleBVH.h>
 #include <Atrc/Entity/GeometryTemplate/Sphere.h>
 #include <Atrc/Entity/GeometryTemplate/SmoothTriangle.h>
 
 #include <Atrc/Entity/BruteforceTriangleMesh.h>
 #include <Atrc/Entity/ColoredSky.h>
 #include <Atrc/Entity/MatGeoEntity.h>
-#include <Atrc/Entity/TriangleBVH.h>
 
 #include <Atrc/Material/Ambient.h>
 #include <Atrc/Material/Diffuse.h>

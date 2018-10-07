@@ -45,8 +45,8 @@ int main()
     AGZ::Model::WavefrontObj arbShapeObj;
     AGZ::Model::WavefrontObjFile::LoadFromObjFile("test.obj", &arbShapeObj);
     auto arbShapeMesh = arbShapeObj.ToGeometryMeshGroup().submeshes["Default"];
-    TriangleBVH arbShape(arbShapeMesh, NewRC<DiffuseMaterial>(Spectrum(0.3f, 0.3f, 1.0f)),
-                         Transform::Translate({ 0.0, -2.0, -0.1 }));
+    MatGeoEntity<TriangleBVH> arbShape(NewRC<DiffuseMaterial>(Spectrum(0.3f, 0.3f, 1.0f)),
+                                       arbShapeMesh, Transform::Translate({ 0.0, -2.0, -0.1 }));
 
     Scene scene;
     scene.camera = &camera;
@@ -61,7 +61,7 @@ int main()
 
     //============= Rendering =============
 
-    ParallelRenderer<JitteredSubareaRenderer> renderer(6, 1000);
+    ParallelRenderer<JitteredSubareaRenderer> renderer(6, 20);
     PathTracer integrator(10);
 
     cout << "Start rendering..." << endl;
