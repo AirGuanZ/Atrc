@@ -32,7 +32,7 @@ Option<BxDFSample> DiffuseBxDF::Sample(const Vec3r &wi, BxDFType type) const
 }
 
 DiffuseMaterial::DiffuseMaterial(const Spectrum &color)
-    : color_(color)
+    : color_(color / PI<float>)
 {
 
 }

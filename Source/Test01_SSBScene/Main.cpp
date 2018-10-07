@@ -1,10 +1,11 @@
+#include <iostream>
 #include <Atrc/Atrc.h>
 
 using namespace std;
 using namespace Atrc;
 
-constexpr uint32_t SCR_W = 1920;
-constexpr uint32_t SCR_H = 1080;
+constexpr uint32_t SCR_W = 640;
+constexpr uint32_t SCR_H = 480;
 
 constexpr Real SCR_ASPECT_RATIO = static_cast<Real>(SCR_W) / SCR_H;
 
@@ -96,8 +97,16 @@ int main()
 
     //============= Rendering =============
 
-    ParallelRenderer<JitteredSubareaRenderer> renderer(-1, 200);
-    renderer.Render(scene, PathTracer(20), renderTarget);
+    ParallelRenderer<JitteredSubareaRenderer> renderer(-1, 1000);
+    PathTracer integrator(20);
+
+    cout << "Start rendering..." << endl;
+
+    AGZ::Timer timer;
+    renderer.Render(scene, integrator, renderTarget);
+    auto deltaTime = timer.Milliseconds() / 1000.0;
+
+    cout << "Complete rendering...Total time: " << deltaTime << "s." << endl;
 
     //============= Output =============
 

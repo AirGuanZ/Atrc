@@ -1,10 +1,11 @@
+#include <iostream>
 #include <Atrc/Atrc.h>
 
 using namespace std;
 using namespace Atrc;
 
-constexpr uint32_t SCR_W = 1920;
-constexpr uint32_t SCR_H = 1080;
+constexpr uint32_t SCR_W = 640;
+constexpr uint32_t SCR_H = 480;
 
 constexpr Real SCR_ASPECT_RATIO = static_cast<Real>(SCR_W) / SCR_H;
 
@@ -41,17 +42,17 @@ int main()
     MatGeoEntity<Sphere> leftMetalSphere(NewRC<MetalMaterial>(Spectrum(1.0f, 0.3f, 0.3f), 0.2),
                                          1.0, Transform::Translate({ 0.0, 2.0, 0.0 }));
 
-    AGZ::Model::WavefrontObj boxOBJ;
-    AGZ::Model::WavefrontObjFile::LoadFromObjFile("test.obj", &boxOBJ);
-    auto boxMesh = boxOBJ.ToGeometryMeshGroup().submeshes["Default"];
-    TriangleBVH box(boxMesh, NewRC<DiffuseMaterial>(Spectrum(0.3f, 0.3f, 1.0f)),
-                    Transform::Translate({ 0.0, -2.0, -0.1 }));
+    AGZ::Model::WavefrontObj arbShapeObj;
+    AGZ::Model::WavefrontObjFile::LoadFromObjFile("test.obj", &arbShapeObj);
+    auto arbShapeMesh = arbShapeObj.ToGeometryMeshGroup().submeshes["Default"];
+    TriangleBVH arbShape(arbShapeMesh, NewRC<DiffuseMaterial>(Spectrum(0.3f, 0.3f, 1.0f)),
+                         Transform::Translate({ 0.0, -2.0, -0.1 }));
 
     Scene scene;
     scene.camera = &camera;
     scene.entities = {
         &ground,
-        &centreBall, &leftMetalSphere, &box,
+        &centreBall, &leftMetalSphere, &arbShape,
         &sky };
 
     //============= Render Target =============
@@ -60,8 +61,16 @@ int main()
 
     //============= Rendering =============
 
-    ParallelRenderer<JitteredSubareaRenderer> renderer(7, 1000);
-    renderer.Render(scene, PathTracer(20), renderTarget);
+    ParallelRenderer<JitteredSubareaRenderer> renderer(6, 1000);
+    PathTracer integrator(10);
+
+    cout << "Start rendering..." << endl;
+
+    AGZ::Timer timer;
+    renderer.Render(scene, integrator, renderTarget);
+    auto deltaTime = timer.Milliseconds() / 1000.0;
+
+    cout << "Complete rendering...Total time: " << deltaTime << "s." << endl;
 
     //============= Output =============
 
