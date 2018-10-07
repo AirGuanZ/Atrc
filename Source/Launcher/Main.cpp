@@ -3,8 +3,8 @@
 using namespace std;
 using namespace Atrc;
 
-constexpr uint32_t SCR_W = 640;
-constexpr uint32_t SCR_H = 480;
+constexpr uint32_t SCR_W = 1920;
+constexpr uint32_t SCR_H = 1080;
 
 constexpr Real SCR_ASPECT_RATIO = static_cast<Real>(SCR_W) / SCR_H;
 
@@ -23,11 +23,15 @@ RenderTarget<Color3b> ToSavedImage(const RenderTarget<Color3f> &origin, float ga
 
 int main()
 {
+    //============= Camera =============
+
     const Vec3r eye = { -5.0, 0.0, 0.0 };
     const Vec3r dir = (Vec3r(0.0) - eye).Normalize();
     PerspectiveCamera camera(
         eye, dir, { 0.0, 0.0, 1.0 },
         Degr(90.0), SCR_ASPECT_RATIO);
+
+    //============= Scene =============
 
     ColoredSky sky({ 0.4f, 0.7f, 0.9f }, { 1.0f, 1.0f, 1.0f });
     MatGeoEntity<Sphere> ground(NewRC<DiffuseMaterial>(Spectrum(0.4f, 0.8f, 0.4f)),
@@ -41,21 +45,25 @@ int main()
     AGZ::Model::WavefrontObjFile::LoadFromObjFile("test.obj", &boxOBJ);
     auto boxMesh = boxOBJ.ToGeometryMeshGroup().submeshes["Default"];
     TriangleBVH box(boxMesh, NewRC<DiffuseMaterial>(Spectrum(0.3f, 0.3f, 1.0f)),
-                               Transform::Translate({ 0.0, -2.0, -0.1 }));
+                    Transform::Translate({ 0.0, -2.0, -0.1 }));
 
     Scene scene;
     scene.camera = &camera;
-    scene.entities = { 
+    scene.entities = {
         &ground,
         &centreBall, &leftMetalSphere, &box,
         &sky };
 
+    //============= Render Target =============
+
     RenderTarget<Color3f> renderTarget(SCR_W, SCR_H);
 
-    PathTracer integrator(10, 0.5);
+    //============= Rendering =============
 
-    ParallelRenderer<JitteredSubareaRenderer> renderer(4, 50);
-    renderer.Render(scene, integrator, renderTarget);
+    ParallelRenderer<JitteredSubareaRenderer> renderer(7, 1000);
+    renderer.Render(scene, PathTracer(20), renderTarget);
+
+    //============= Output =============
 
     AGZ::Tex::TextureFile::WriteRGBToPNG("Output.png", ToSavedImage(renderTarget, 2.2f));
 }

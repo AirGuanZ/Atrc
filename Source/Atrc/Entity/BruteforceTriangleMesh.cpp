@@ -8,7 +8,7 @@ BruteforceTriangleMesh::BruteforceTriangleMesh(
 {
     AGZ_ASSERT(mesh.vertices.size() % 3 == 0);
     tris_.reserve(mesh.vertices.size() / 3);
-    for(size_t i = 0; i < mesh.vertices.size(); i += 3)
+    for(auto i : Between<size_t>(0, mesh.vertices.size(), 3))
     {
         Triangle tri;
         tri.A     = mesh.vertices[i].pos;
@@ -39,7 +39,7 @@ bool BruteforceTriangleMesh::EvalIntersection(const Ray &r, Intersection *inct) 
 {
     bool ret = false;
     Ray _r = local2World_.ApplyInverseToRay(r);
-    for(size_t i = 0; i < tris_.size(); ++i)
+    for(auto i : Between<size_t>(0, tris_.size()))
     {
         auto &t = tris_[i];
 

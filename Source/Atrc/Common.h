@@ -87,6 +87,10 @@ inline Real Rand() { return Random::Uniform(0.0, 1.0); }
 using AGZ::Str8;
 using AGZ::WStr;
 
+// ============================= Export AGZ::Range =============================
+
+using AGZ::Between;
+
 // ============================= Spectrum =============================
 
 using SS = float;

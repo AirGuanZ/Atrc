@@ -71,17 +71,17 @@ int main()
 
     ColoredSky sky({ 0.4f, 0.7f, 0.9f }, { 1.0f, 1.0f, 1.0f });
     MatGeoEntity<Sphere> ground(NewRC<DiffuseMaterial>(Spectrum(0.4f, 0.8f, 0.4f)),
-        200.0, Transform::Translate({ 0.0, 0.0, -201.0 }));
+                                200.0, Transform::Translate({ 0.0, 0.0, -201.0 }));
     MatGeoEntity<Sphere> centreBall(NewRC<DiffuseMaterial>(Spectrum(0.7f, 0.7f, 0.7f)),
-        1.0, TRANSFORM_IDENTITY);
+                                    1.0, TRANSFORM_IDENTITY);
     MatGeoEntity<Sphere> leftMetalSphere(NewRC<MetalMaterial>(Spectrum(1.0f, 0.3f, 0.3f), 0.2),
-        1.0, Transform::Translate({ 0.0, 2.0, 0.0 }));
+                                         1.0, Transform::Translate({ 0.0, 2.0, 0.0 }));
 
     AGZ::Model::WavefrontObj boxOBJ;
     AGZ::Model::WavefrontObjFile::LoadFromMemory(boxOBJContent, &boxOBJ);
     auto boxMesh = boxOBJ.ToGeometryMeshGroup().submeshes["Cube"];
     TriangleBVH box(boxMesh, NewRC<DiffuseMaterial>(Spectrum(0.3f, 0.3f, 1.0f)),
-        Transform::Translate({ 0.0, -2.0, -0.1 }));
+                    Transform::Translate({ 0.0, -2.0, -0.1 }));
 
     Scene scene;
     scene.camera = &camera;
@@ -96,8 +96,8 @@ int main()
 
     //============= Rendering =============
 
-    ParallelRenderer<JitteredSubareaRenderer> renderer(4, 1000);
-    renderer.Render(scene, PathTracer(10, 0.1), renderTarget);
+    ParallelRenderer<JitteredSubareaRenderer> renderer(-1, 200);
+    renderer.Render(scene, PathTracer(20), renderTarget);
 
     //============= Output =============
 

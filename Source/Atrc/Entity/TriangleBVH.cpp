@@ -98,7 +98,8 @@ namespace
         // If all centriods are the same, create a leaf node
 
         AABB centroidBound = { tris.GetInfo(startIdx).centroid, tris.GetInfo(startIdx).centroid };
-        for(size_t i = startIdx + 1; i < endIdx; ++i)
+        //for(size_t i = startIdx + 1; i < endIdx; ++i)
+        for(auto i : Between(startIdx, endIdx))
             centroidBound.Expand(tris.GetInfo(i).centroid);
 
         Vec3r centroidDelta = centroidBound.high - centroidBound.low;
@@ -113,7 +114,7 @@ namespace
             tris.GetTriangle(startIdx)[0].pos,
             tris.GetTriangle(startIdx)[1].pos,
             tris.GetTriangle(startIdx)[2].pos);
-        for(size_t i = startIdx + 1; i < endIdx; ++i)
+        for(auto i : Between(startIdx + 1, endIdx))
         {
             allBound.Expand(tris.GetTriangle(i)[0].pos);
             allBound.Expand(tris.GetTriangle(i)[1].pos);
@@ -129,10 +130,10 @@ namespace
             AABB bound;
         } buckets[BUCKET_COUNT];
 
-        for(size_t i = startIdx; i < endIdx; ++i)
+        for(auto i : Between(startIdx, endIdx))
         {
-            auto n = static_cast<int>((tris.GetInfo(i).centroid - centroidBound.low)[splitAxis]
-                / centroidDelta[splitAxis] * BUCKET_COUNT);
+            auto n = static_cast<int>((tris.GetInfo(i).centroid[splitAxis] - centroidBound.low[splitAxis])
+                                    / centroidDelta[splitAxis] * BUCKET_COUNT);
             n = Clamp(n, 0, BUCKET_COUNT - 1);
 
             ++buckets[n].count;
@@ -140,7 +141,7 @@ namespace
         }
 
         Real cost[BUCKET_COUNT - 1], invAllBoundArea = 1 / allBound.SurfaceArea();
-        for(int splitPos = 0; splitPos < BUCKET_COUNT - 1; ++splitPos)
+        for(auto splitPos : Between(0, BUCKET_COUNT - 1))
         {
             AABB blow, bhigh;
             int clow = 0, chigh = 0;
@@ -162,7 +163,7 @@ namespace
         }
 
         int tSplitPos = 0;
-        for(int splitPos = 1; splitPos < BUCKET_COUNT - 1; ++splitPos)
+        for(auto splitPos : Between(1, BUCKET_COUNT - 1))
         {
             if(cost[splitPos] < cost[tSplitPos])
                 tSplitPos = splitPos;
@@ -177,9 +178,9 @@ namespace
         // Split triangles and build two subtrees recursively
 
         std::vector<size_t> leftPartIdx, rightPartIdx;
-        for(size_t i = startIdx; i < endIdx; ++i)
+        for(auto i : Between(startIdx, endIdx))
         {
-            auto n = static_cast<int>((tris.GetInfo(i).centroid - centroidBound.low)[splitAxis]
+            auto n = static_cast<int>((tris.GetInfo(i).centroid[splitAxis] - centroidBound.low[splitAxis])
                      / centroidDelta[splitAxis] * BUCKET_COUNT);
             n = Clamp(n, 0, BUCKET_COUNT - 1);
             if(n <= tSplitPos)
