@@ -4,8 +4,8 @@
 using namespace std;
 using namespace Atrc;
 
-constexpr uint32_t SCR_W = 640;
-constexpr uint32_t SCR_H = 480;
+constexpr uint32_t SCR_W = 1920;
+constexpr uint32_t SCR_H = 1080;
 
 constexpr Real SCR_ASPECT_RATIO = static_cast<Real>(SCR_W) / SCR_H;
 
