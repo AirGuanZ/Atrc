@@ -1,1 +1,7 @@
 Diary/
+*.d
+*.o
+*.a
+*.dtmp
+Build/Launcher
+Build/Test01_SSBScene

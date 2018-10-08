@@ -40,7 +40,7 @@ int main()
                                 200, Transform::Translate({ 0.0, 0.0, -200 - 1.0 }));
 
     AGZ::Model::WavefrontObj arbShapeObj;
-    AGZ::Model::WavefrontObjFile::LoadFromObjFile("../Assets/bunny.obj", &arbShapeObj);
+    AGZ::Model::WavefrontObjFile::LoadFromObjFile("./Assets/bunny.obj", &arbShapeObj);
     MatGeoEntity<TriangleBVH> arbShape(NewRC<MetalMaterial>(Spectrum(0.4f), 0.2),
                                        arbShapeObj.ToGeometryMeshGroup().submeshes["Default"],
                                        Transform::Translate({ 0.0, 0.0, -0.8 })
@@ -56,7 +56,7 @@ int main()
 
     //============= Rendering =============
 
-    ParallelRenderer<JitteredSubareaRenderer> renderer(-1, 10);
+    ParallelRenderer<JitteredSubareaRenderer> renderer(-1, 1);
     PathTracer integrator(10);
 
     cout << "Start rendering..." << endl;
@@ -69,5 +69,5 @@ int main()
 
     //============= Output =============
 
-    AGZ::Tex::TextureFile::WriteRGBToPNG("Output.png", ToSavedImage(renderTarget, 2.2f));
+    AGZ::Tex::TextureFile::WriteRGBToPNG("./Build/Output.png", ToSavedImage(renderTarget, 2.2f));
 }

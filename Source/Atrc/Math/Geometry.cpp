@@ -28,8 +28,8 @@ bool HasIntersection(const Ray &r, Real radius)
     Real t0 = (-B - delta) * inv2A;
     Real t1 = (-B + delta) * inv2A;
     
-    return r.minT <= t0 && t0 <= r.maxT ||
-           r.minT <= t1 && t1 <= r.maxT;
+    return (r.minT <= t0 && t0 <= r.maxT) ||
+           (r.minT <= t1 && t1 <= r.maxT);
 }
 
 bool EvalIntersection(const Ray &r, Real radius, Intersection *inct)

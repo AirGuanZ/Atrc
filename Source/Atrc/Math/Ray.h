@@ -24,7 +24,7 @@ public:
     Ray(const Vec3r &ori, const Vec3r &dir, Real minT = 0.0, Real maxT = RealT::Infinity())
         : origin(ori), direction(dir), minT(minT), maxT(maxT)
     {
-        AGZ_ASSERT(ApproxEq(dir.Length(), 1.0, 1e-5));
+        AGZ_ASSERT(ApproxEq(dir.LengthSquare(), 1.0, 1e-5));
     }
 
     Vec3r At(Real t) const

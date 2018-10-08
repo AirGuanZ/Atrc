@@ -110,5 +110,5 @@ int main()
 
     //============= Output =============
 
-    AGZ::Tex::TextureFile::WriteRGBToPNG("Output.png", ToSavedImage(renderTarget, 2.2f));
+    AGZ::Tex::TextureFile::WriteRGBToPNG("./Build/Output.png", ToSavedImage(renderTarget, 2.2f));
 }

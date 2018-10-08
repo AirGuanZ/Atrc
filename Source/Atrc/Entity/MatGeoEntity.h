@@ -13,9 +13,8 @@ class MatGeoEntity
 {
     RC<Material> mat_;
 
-    template<typename U, std::enable_if_t<
-        AGZ::TypeOpr::True_v<decltype(&GeoTpl::GetMaterialParameter)>, int> = 0>
-    Vec2r GetMaterialParameter(const Intersection &inct, U) const
+    template<typename U>
+    Vec2r GetMaterialParameter(const Intersection &inct, decltype(&U::GetMaterialParameter)) const
     {
         return this->GeoTpl::GetMaterialParameter(inct);
     }
@@ -37,7 +36,7 @@ public:
 
     RC<BxDF> GetBxDF(const Intersection &inct) const override
     {
-        return mat_->GetBxDF(inct, GetMaterialParameter<int>(inct, 0));
+        return mat_->GetBxDF(inct, GetMaterialParameter<GeoTpl>(inct, 0));
     }
 };
 
