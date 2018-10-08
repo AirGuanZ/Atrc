@@ -20,7 +20,7 @@ Spectrum BxDFOpr_Add::Eval(const Vec3r &wi, const Vec3r &wo) const
 
 Option<BxDFSample> BxDFOpr_Add::Sample(const Vec3r &wi, BxDFType type) const
 {
-    auto ret = Rand() < lProb_ ? lhs_ : rhs_->Sample(wi, type);
+    auto ret = (Rand() < lProb_ ? lhs_ : rhs_)->Sample(wi, type);
     if(ret)
         ret->coef *= coef_;
     return ret;
@@ -28,7 +28,8 @@ Option<BxDFSample> BxDFOpr_Add::Sample(const Vec3r &wi, BxDFType type) const
 
 Spectrum BxDFOpr_Add::AmbientRadiance(const Intersection &inct) const
 {
-    return coef_ * (Rand() < lProb_ ? lhs_ : rhs_)->AmbientRadiance(inct);
+    return coef_ * (SS(lProb_) * lhs_->AmbientRadiance(inct)
+                  + (1 - SS(lProb_)) * rhs_->AmbientRadiance(inct));
 }
 
 MatOpr_Add::MatOpr_Add(RC<Material> lhs, RC<Material> rhs, Real wL, Real wR)

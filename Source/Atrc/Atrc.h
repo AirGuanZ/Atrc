@@ -19,6 +19,7 @@
 #include <Atrc/Material/Ambient.h>
 #include <Atrc/Material/Diffuse.h>
 #include <Atrc/Material/Glass.h>
+#include <Atrc/Material/MatOpr.h>
 #include <Atrc/Material/Metal.h>
 #include <Atrc/Material/Normal.h>
 

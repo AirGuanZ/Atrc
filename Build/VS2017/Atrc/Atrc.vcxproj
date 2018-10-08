@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -39,6 +39,7 @@
     <ClInclude Include="..\..\..\Source\Atrc\Material\Material.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Material\Diffuse.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Material\Glass.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Material\MatOpr.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Material\Metal.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Material\Normal.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Math\AABB.h" />
@@ -72,6 +73,7 @@
     <ClCompile Include="..\..\..\Source\Atrc\Material\BxDF.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Material\Diffuse.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Material\Glass.cpp" />
+    <ClCompile Include="..\..\..\Source\Atrc\Material\MatOpr.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Material\Metal.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Material\Normal.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Math\CommonSampler.cpp" />
