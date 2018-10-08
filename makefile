@@ -1,6 +1,6 @@
 CPPC = clang++
 CPPC_INCLUDE_FLAGS = -I ./Source/ -I $(AGZ_UTILS_HOME)
-CPPC_FLAGS = $(CPPC_INCLUDE_FLAGS) -std=c++17 -Werror -Wall -O2
+CPPC_FLAGS = $(CPPC_INCLUDE_FLAGS) -std=c++17 -stdlib=libc++ -Werror -Wall -O2
 LD_FLAGS = -lpthread
 
 TARGETS =
@@ -32,8 +32,8 @@ $(2)$(CPP_SUFFIX) = $$(shell find ./Source/$(1)/ -name "*.cpp")
 $(2)$(O_SUFFIX) = $$(patsubst %.cpp, %.o, $$($(2)$(CPP_SUFFIX)))
 $(2)$(D_SUFFIX) = $$(patsubst %.cpp, %.d, $$($(2)$(CPP_SUFFIX)))
 
-$$($(2)) : $$($(2)$(O_SUFFIX)) $(ATRC)
-	$$(CPPC) $(LD_FLAGS) $(ATRC) $$^ -o $$@
+$$($(2)) : $$($(2)$(O_SUFFIX)) $$(ATRC)
+	$$(CPPC) $(CPPC_FLAGS) $(LD_FLAGS) $$^ -o $$@
 
 $$($(2)$(O_SUFFIX)) : %.o : %.cpp
 	$$(CPPC) $$(CPPC_FLAGS) -c $$< -o $$@
@@ -69,10 +69,15 @@ $(DPP_FILES) : %.d : %.cpp
 
 -include $(DPP_FILES)
 
-.PHONY : run
-run :
-	make $(ATRC)
-	$(ATRC)
+.PHONY : runlauncher
+runlauncher :
+	make $(LAUNCHER)
+	$(LAUNCHER)
+
+.PHONY : runtest01
+runtest01 :
+	make $(TEST01_SSBSCENE)
+	$(TEST01_SSBSCENE)
 
 .PHONY : clean
 clean :

@@ -72,7 +72,6 @@ public:
         const Scene &scene, const Integrator &integrator,
         RenderTarget<Color3f> &output) const override
     {
-        AGZ_ASSERT(workerCount_ > 0);
         AGZ_ASSERT(output.IsAvailable());
         uint32_t w = output.GetWidth();
         uint32_t h = output.GetHeight();
