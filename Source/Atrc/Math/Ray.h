@@ -12,6 +12,10 @@
 
 AGZ_NS_BEG(Atrc)
 
+struct Nonunit_t { };
+
+inline Nonunit_t NON_UNIT;
+
 class Ray
 {
 public:
@@ -25,6 +29,12 @@ public:
         : origin(ori), direction(dir), minT(minT), maxT(maxT)
     {
         AGZ_ASSERT(ApproxEq(dir.LengthSquare(), 1.0, 1e-5));
+    }
+
+    Ray(Nonunit_t, const Vec3r &ori, const Vec3r &dir, Real minT = 0.0, Real maxT = RealT::Infinity())
+        : origin(ori), direction(dir), minT(minT), maxT(maxT)
+    {
+        
     }
 
     Vec3r At(Real t) const
