@@ -4,8 +4,8 @@
 using namespace std;
 using namespace Atrc;
 
-constexpr uint32_t SCR_W = 1920;
-constexpr uint32_t SCR_H = 1080;
+constexpr uint32_t SCR_W = 640;
+constexpr uint32_t SCR_H = 480;
 
 constexpr Real SCR_ASPECT_RATIO = static_cast<Real>(SCR_W) / SCR_H;
 
@@ -40,7 +40,7 @@ int main()
                                 200, Transform::Translate({ 0.0, 0.0, -200 - 1.0 }));
 
     AGZ::Model::WavefrontObj arbShapeObj;
-    AGZ::Model::WavefrontObjFile::LoadFromObjFile("bunny.obj", &arbShapeObj);
+    AGZ::Model::WavefrontObjFile::LoadFromObjFile("../Assets/bunny.obj", &arbShapeObj);
     MatGeoEntity<TriangleBVH> arbShape(NewRC<MetalMaterial>(Spectrum(0.4f), 0.2),
                                        arbShapeObj.ToGeometryMeshGroup().submeshes["Default"],
                                        Transform::Translate({ 0.0, 0.0, -0.8 })
@@ -56,7 +56,7 @@ int main()
 
     //============= Rendering =============
 
-    ParallelRenderer<JitteredSubareaRenderer> renderer(7, 1);
+    ParallelRenderer<JitteredSubareaRenderer> renderer(-1, 10);
     PathTracer integrator(10);
 
     cout << "Start rendering..." << endl;
