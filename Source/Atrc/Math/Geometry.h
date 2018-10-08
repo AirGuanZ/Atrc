@@ -24,4 +24,6 @@ AABB ToBoundingBox(const Vec3r &A, const Vec3r &B, const Vec3r &C);
 
 Real SurfaceArea(const Vec3r &A, const Vec3r &B, const Vec3r &C);
 
+Real SurfaceArea(const Vec3r &B_A, const Vec3r &C_A);
+
 AGZ_NS_END(Atrc::Geometry::Triangle)

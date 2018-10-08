@@ -77,7 +77,7 @@ Real BruteforceTriangleMesh::SurfaceArea() const
 {
     Real ret = 0.0;
     for(auto &t : tris_)
-        ret += Geometry::Triangle::SurfaceArea(t.A, t.A + t.B_A, t.A + t.C_A);
+        ret += Geometry::Triangle::SurfaceArea(t.B_A, t.C_A);
     return ret;
 }
 

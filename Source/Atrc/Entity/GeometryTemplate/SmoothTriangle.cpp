@@ -41,4 +41,9 @@ AABB SmoothTriangle::GetBoundingBox() const
     };
 }
 
+Real SmoothTriangle::SurfaceArea() const
+{
+    return Geometry::Triangle::SurfaceArea(B_A, C_A);
+}
+
 AGZ_NS_END(Atrc)

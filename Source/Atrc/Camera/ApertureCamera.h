@@ -2,7 +2,6 @@
 
 #include <Atrc/Common.h>
 #include <Atrc/Camera/Camera.h>
-#include "PerspectiveCamera.h"
 
 AGZ_NS_BEG(Atrc)
 

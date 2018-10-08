@@ -30,7 +30,7 @@ public:
 
     template<typename...Args>
     explicit MatGeoEntity(RC<Material> mat, Args&&...args)
-        : GeoTpl(std::forward<Args>(args)...), mat_(mat)
+        : GeoTpl(std::forward<Args>(args)...), mat_(std::move(mat))
     {
         
     }

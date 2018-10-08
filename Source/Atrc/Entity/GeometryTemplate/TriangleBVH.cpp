@@ -266,7 +266,7 @@ namespace
 
 /*
     1. Construct BVH tree in linking-style
-    2. Conpact the tree into array 'nodes_'
+    2. Compact the tree into array 'nodes_'
 */
 void TriangleBVH::InitBVH(const Vertex *vertices, size_t triangleCount)
 {
