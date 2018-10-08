@@ -36,15 +36,15 @@ int main()
 
     ColoredSky sky({ 0.4f, 0.7f, 0.9f }, { 1.0f, 1.0f, 1.0f });
 
-    MatGeoEntity<Sphere> ground(NewRC<DiffuseMaterial>(Spectrum(0.4f, 0.8f, 0.4f)),
-                                200.0, Transform::Translate({ 0.0, 0.0, -201.0 }));
+    MatGeoEntity<Sphere> ground(NewRC<MetalMaterial>(Spectrum(0.4f, 0.8f, 0.4f), 0.35),
+                                200, Transform::Translate({ 0.0, 0.0, -200 - 1.0 }));
 
     AGZ::Model::WavefrontObj arbShapeObj;
-    AGZ::Model::WavefrontObjFile::LoadFromObjFile("bun_zipper.obj", &arbShapeObj);
-    auto arbShapeMesh = arbShapeObj.ToGeometryMeshGroup().submeshes["Default"];
-    MatGeoEntity<TriangleBVH> arbShape(NewRC<MetalMaterial>(Spectrum(0.4f), 0.1),
-                                       arbShapeMesh, Transform::Translate({ 0.0, 0.0, -0.8 })
-                                                   * Transform::Scale(Vec3r(1.5e-5)));
+    AGZ::Model::WavefrontObjFile::LoadFromObjFile("bunny.obj", &arbShapeObj);
+    MatGeoEntity<TriangleBVH> arbShape(NewRC<MetalMaterial>(Spectrum(0.4f), 0.2),
+                                       arbShapeObj.ToGeometryMeshGroup().submeshes["Default"],
+                                       Transform::Translate({ 0.0, 0.0, -0.8 })
+                                     * Transform::Scale(Vec3r(2.2 / 40)));
 
     Scene scene;
     scene.camera = &camera;
@@ -56,7 +56,7 @@ int main()
 
     //============= Rendering =============
 
-    ParallelRenderer<JitteredSubareaRenderer> renderer(7, 20);
+    ParallelRenderer<JitteredSubareaRenderer> renderer(7, 1000);
     PathTracer integrator(10);
 
     cout << "Start rendering..." << endl;
