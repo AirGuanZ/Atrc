@@ -1,3 +1,5 @@
+#include <queue>
+
 #include <Atrc/Entity/GeometryTemplate/TriangleBVH.h>
 
 AGZ_NS_BEG(Atrc)
@@ -6,7 +8,7 @@ namespace
 {
     using Vertex = TriangleBVH::Vertex;
 
-    constexpr size_t MAX_LEAF_SIZE = 2;
+    constexpr size_t MAX_LEAF_SIZE = 4;
 
     struct Tri
     {
@@ -82,18 +84,27 @@ namespace
         }
     };
 
-    TempNode *Build(
+    struct BuildTask
+    {
+        uint32_t startIdx, endIdx;
+        TempNode **fillNode;
+    };
+
+    TempNode *BuildSingleNode(
         MappedTriangles &tris,
         AGZ::SmallObjArena<TempNode> &nodeArena,
-        uint32_t startIdx, uint32_t endIdx, size_t *nodeCount,
-        const Transform &local2World)
+        const BuildTask &task,
+        size_t *nodeCount,
+        std::queue<BuildTask> *tasks)
     {
-        AGZ_ASSERT(startIdx < endIdx && nodeCount);
+        uint32_t startIdx = task.startIdx, endIdx = task.endIdx;
+
+        AGZ_ASSERT(startIdx < endIdx && nodeCount && tasks);
 
         uint32_t primCount = endIdx - startIdx;
-        if(primCount < MAX_LEAF_SIZE)
+        if(primCount <= MAX_LEAF_SIZE)
         {
-            *nodeCount = 1;
+            *nodeCount += 1;
             return FillLeaf(nodeArena.Alloc(), startIdx, primCount);
         }
 
@@ -108,7 +119,7 @@ namespace
         Axis splitAxis = SelectAxisWithMaxExtent(centroidDelta);
         if(centroidBound.low[splitAxis] >= centroidBound.high[splitAxis])
         {
-            *nodeCount = 1;
+            *nodeCount += 1;
             return FillLeaf(nodeArena.Alloc(), startIdx, primCount);
         }
 
@@ -135,7 +146,7 @@ namespace
         for(auto i : Between(startIdx, endIdx))
         {
             auto n = static_cast<int>((tris.GetInfo(i).centroid[splitAxis] - centroidBound.low[splitAxis])
-                                    / centroidDelta[splitAxis] * BUCKET_COUNT);
+                / centroidDelta[splitAxis] * BUCKET_COUNT);
             n = Clamp(n, 0, BUCKET_COUNT - 1);
 
             ++buckets[n].count;
@@ -173,7 +184,7 @@ namespace
 
         /*if(cost[tSplitPos] > primCount)
         {
-            *nodeCount = 1;
+            *nodeCount += 1;
             return FillLeaf(nodeArena.Alloc(), startIdx, primCount);
         }*/
 
@@ -183,7 +194,7 @@ namespace
         for(auto i : Between(startIdx, endIdx))
         {
             auto n = static_cast<int>((tris.GetInfo(i).centroid[splitAxis] - centroidBound.low[splitAxis])
-                                    / centroidDelta[splitAxis] * BUCKET_COUNT);
+                / centroidDelta[splitAxis] * BUCKET_COUNT);
             n = Clamp(n, 0, BUCKET_COUNT - 1);
             if(n <= tSplitPos)
                 leftPartIdx.push_back(tris.triIdxMap[i]);
@@ -199,17 +210,40 @@ namespace
 
         if(splitIdx == startIdx || splitIdx == endIdx)
         {
-            *nodeCount = 1;
+            *nodeCount += 1;
             return FillLeaf(nodeArena.Alloc(), startIdx, primCount);
         }
 
-        size_t leftNodeCount = 0, rightNodeCount = 0;
         TempNode *ret = nodeArena.Alloc();
         ret->isLeaf = false;
         ret->internal.bound = allBound;
-        ret->internal.left = Build(tris, nodeArena, startIdx, splitIdx, &leftNodeCount, local2World);
-        ret->internal.right = Build(tris, nodeArena, splitIdx, endIdx, &rightNodeCount, local2World);
-        *nodeCount = leftNodeCount + rightNodeCount + 1;
+
+        tasks->push({ startIdx, splitIdx, &ret->internal.left });
+        tasks->push({ splitIdx, endIdx, &ret->internal.right });
+
+        *nodeCount += 1;
+
+        return ret;
+    }
+
+    TempNode *Build(
+        MappedTriangles &tris,
+        AGZ::SmallObjArena<TempNode> &nodeArena,
+        uint32_t startIdx, uint32_t endIdx,
+        size_t *nodeCount)
+    {
+        *nodeCount = 0;
+        TempNode *ret;
+
+        std::queue<BuildTask> tasks;
+        tasks.push({ startIdx, endIdx, &ret });
+
+        while(!tasks.empty())
+        {
+            BuildTask task = tasks.front();
+            tasks.pop();
+            *task.fillNode = BuildSingleNode(tris, nodeArena, task, nodeCount, &tasks);
+        }
 
         return ret;
     }
@@ -274,8 +308,10 @@ void TriangleBVH::InitBVH(const Vertex *vertices, uint32_t triangleCount)
     std::vector<size_t> triIdxMap(triangleCount);
     for(size_t i = 0, j = 0; i < triangleCount; ++i, j += 3)
     {
-        Real sa = Geometry::Triangle::SurfaceArea(
-            vertices[j].pos, vertices[j + 1].pos, vertices[j + 2].pos);
+        Vec3r wA = local2World_.ApplyToPoint(vertices[j].pos);
+        Vec3r wB = local2World_.ApplyToPoint(vertices[j + 1].pos);
+        Vec3r wC = local2World_.ApplyToPoint(vertices[j + 2].pos);
+        Real sa = Geometry::Triangle::SurfaceArea(wA, wB, wC);
         surfaceArea_ += sa;
 
         triInfo[i].id = i;
@@ -291,7 +327,7 @@ void TriangleBVH::InitBVH(const Vertex *vertices, uint32_t triangleCount)
     size_t nodeCount = 0;
     MappedTriangles mappedTriangles{ vertices, triInfo, triIdxMap };
     TempNode *root = Build(
-        mappedTriangles, tNodeArena, 0, triangleCount, &nodeCount, local2World_);
+        mappedTriangles, tNodeArena, 0, triangleCount, &nodeCount);
 
     nodes_.clear();
     tris_.clear();
