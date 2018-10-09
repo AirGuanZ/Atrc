@@ -50,27 +50,39 @@ public:
     bool HasIntersection(const Ray &r) const
     {
         Real t0 = r.minT, t1 = r.maxT;
-        for(int i = 0; i < 3; ++i)
-        {
-            if(RealT(r.direction[i]).ApproxEq(0))
-            {
-                if(r.origin[i] < low[i] || r.origin[i] > high[i])
-                    return false;
-                continue;
-            }
 
-            Real invDir = 1 / r.direction[i];
-            Real n = invDir * (low[i] - r.origin[i]);
-            Real f = invDir * (high[i] - r.origin[i]);
-            if(n > f)
-                std::swap(n, f);
-            f *= (1 + 1e-5);
-            t0 = Max(n, t0);
-            t1 = Min(f, t1);
-            if(t0 > t1)
-                return false;
-        }
-        return true;
+        Real invDir = 1 / r.direction.x;
+        Real n = invDir * (low.x - r.origin.x);
+        Real f = invDir * (high.x - r.origin.x);
+        if(n > f)
+            std::swap(n, f);
+        f *= (1 + 1e-5);
+        t0 = Max(n, t0);
+        t1 = Min(f, t1);
+        if(t0 > t1)
+            return false;
+
+        invDir = 1 / r.direction.y;
+        n = invDir * (low.y - r.origin.y);
+        f = invDir * (high.y - r.origin.y);
+        if(n > f)
+            std::swap(n, f);
+        f *= (1 + 1e-5);
+        t0 = Max(n, t0);
+        t1 = Min(f, t1);
+        if(t0 > t1)
+            return false;
+
+        invDir = 1 / r.direction.z;
+        n = invDir * (low.z - r.origin.z);
+        f = invDir * (high.z - r.origin.z);
+        if(n > f)
+            std::swap(n, f);
+        f *= (1 + 1e-5);
+        t0 = Max(n, t0);
+        t1 = Min(f, t1);
+
+        return t0 <= t1;
     }
 };
 

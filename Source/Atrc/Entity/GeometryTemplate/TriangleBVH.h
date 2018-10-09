@@ -14,8 +14,6 @@ class TriangleBVH
 {
 public:
 
-    static constexpr size_t MAX_LEAF_SIZE = 4;
-
     struct Vertex
     {
         Vec3r pos;
@@ -30,18 +28,18 @@ public:
 
     struct Node
     {
-        Node(const AABB *bound, size_t offset)
+        Node(const AABB *bound, uint32_t offset)
             : isLeaf(false)
         {
             internal.bound = bound;
             internal.offset = offset;
         }
 
-        Node(size_t startOffset, size_t primCount)
+        Node(uint32_t startOffset, uint32_t primCount)
             : isLeaf(true)
         {
             leaf.startOffset = startOffset;
-            leaf.primCount = primCount;
+            leaf.endOffset = startOffset + primCount;
         }
 
         bool isLeaf;
@@ -50,13 +48,13 @@ public:
             struct
             {
                 const AABB *bound;
-                size_t offset;
+                uint32_t offset;
             } internal;
 
             struct
             {
-                size_t startOffset;
-                size_t primCount;
+                uint32_t startOffset;
+                uint32_t endOffset;
             } leaf;
         };
     };
@@ -78,15 +76,15 @@ private:
 
     Transform local2World_;
     
-    void InitBVH(const Vertex *vertices, size_t triangleCount);
+    void InitBVH(const Vertex *vertices, uint32_t triangleCount);
 
-    bool HasIntersectionAux(const Ray &r, size_t nodeIdx) const;
+    bool HasIntersectionAux(const Ray &r, uint32_t nodeIdx) const;
 
-    bool EvalIntersectionAux(const Ray &r, size_t nodeIdx, Intersection *inct) const;
+    bool EvalIntersectionAux(const Ray &r, uint32_t nodeIdx, Intersection *inct) const;
     
 public:
 
-    TriangleBVH(const Vertex *vertices, size_t triangleCount, const Transform &local2World);
+    TriangleBVH(const Vertex *vertices, uint32_t triangleCount, const Transform &local2World);
 
     TriangleBVH(const AGZ::Model::GeometryMesh &mesh, const Transform &local2World);
     

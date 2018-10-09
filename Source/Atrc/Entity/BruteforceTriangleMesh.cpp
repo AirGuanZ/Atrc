@@ -39,7 +39,7 @@ bool BruteforceTriangleMesh::EvalIntersection(const Ray &r, Intersection *inct) 
 {
     bool ret = false;
     Ray _r = local2World_.ApplyInverseToRay(r);
-    for(auto i : Between<size_t>(0, tris_.size()))
+    for(auto i : Between<uint32_t>(0, static_cast<uint32_t>(tris_.size())))
     {
         auto &t = tris_[i];
 

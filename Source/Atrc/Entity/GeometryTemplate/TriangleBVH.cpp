@@ -6,6 +6,8 @@ namespace
 {
     using Vertex = TriangleBVH::Vertex;
 
+    constexpr size_t MAX_LEAF_SIZE = 2;
+
     struct Tri
     {
         size_t id = 0;
@@ -27,7 +29,7 @@ namespace
             
             struct
             {
-                size_t startOffset, primCount;
+                uint32_t startOffset, primCount;
             } leaf;
         };
     };
@@ -46,7 +48,7 @@ namespace
         return delta.x < delta.z ? Z : X;
     }
 
-    TempNode *FillLeaf(TempNode *ret, size_t start, size_t n)
+    TempNode *FillLeaf(TempNode *ret, uint32_t start, uint32_t n)
     {
         ret->isLeaf = true;
         ret->leaf.startOffset = start;
@@ -83,12 +85,13 @@ namespace
     TempNode *Build(
         MappedTriangles &tris,
         AGZ::SmallObjArena<TempNode> &nodeArena,
-        size_t startIdx, size_t endIdx, size_t *nodeCount)
+        uint32_t startIdx, uint32_t endIdx, size_t *nodeCount,
+        const Transform &local2World)
     {
         AGZ_ASSERT(startIdx < endIdx && nodeCount);
 
-        size_t primCount = endIdx - startIdx;
-        if(primCount < TriangleBVH::MAX_LEAF_SIZE)
+        uint32_t primCount = endIdx - startIdx;
+        if(primCount < MAX_LEAF_SIZE)
         {
             *nodeCount = 1;
             return FillLeaf(nodeArena.Alloc(), startIdx, primCount);
@@ -98,7 +101,6 @@ namespace
         // If all centriods are the same, create a leaf node
 
         AABB centroidBound = { tris.GetInfo(startIdx).centroid, tris.GetInfo(startIdx).centroid };
-        //for(size_t i = startIdx + 1; i < endIdx; ++i)
         for(auto i : Between(startIdx, endIdx))
             centroidBound.Expand(tris.GetInfo(i).centroid);
 
@@ -169,11 +171,11 @@ namespace
                 tSplitPos = splitPos;
         }
 
-        if(cost[tSplitPos] > primCount)
+        /*if(cost[tSplitPos] > primCount)
         {
             *nodeCount = 1;
             return FillLeaf(nodeArena.Alloc(), startIdx, primCount);
-        }
+        }*/
 
         // Split triangles and build two subtrees recursively
 
@@ -181,7 +183,7 @@ namespace
         for(auto i : Between(startIdx, endIdx))
         {
             auto n = static_cast<int>((tris.GetInfo(i).centroid[splitAxis] - centroidBound.low[splitAxis])
-                     / centroidDelta[splitAxis] * BUCKET_COUNT);
+                                    / centroidDelta[splitAxis] * BUCKET_COUNT);
             n = Clamp(n, 0, BUCKET_COUNT - 1);
             if(n <= tSplitPos)
                 leftPartIdx.push_back(tris.triIdxMap[i]);
@@ -189,7 +191,7 @@ namespace
                 rightPartIdx.push_back(tris.triIdxMap[i]);
         }
 
-        size_t splitIdx = startIdx + leftPartIdx.size();
+        uint32_t splitIdx = startIdx + static_cast<uint32_t>(leftPartIdx.size());
         for(size_t i = 0; i < leftPartIdx.size(); ++i)
             tris.triIdxMap[startIdx + i] = leftPartIdx[i];
         for(size_t i = 0; i < rightPartIdx.size(); ++i)
@@ -205,8 +207,8 @@ namespace
         TempNode *ret = nodeArena.Alloc();
         ret->isLeaf = false;
         ret->internal.bound = allBound;
-        ret->internal.left = Build(tris, nodeArena, startIdx, splitIdx, &leftNodeCount);
-        ret->internal.right = Build(tris, nodeArena, splitIdx, endIdx, &rightNodeCount);
+        ret->internal.left = Build(tris, nodeArena, startIdx, splitIdx, &leftNodeCount, local2World);
+        ret->internal.right = Build(tris, nodeArena, splitIdx, endIdx, &rightNodeCount, local2World);
         *nodeCount = leftNodeCount + rightNodeCount + 1;
 
         return ret;
@@ -221,7 +223,7 @@ namespace
     {
         if(tree->isLeaf)
         {
-            nodes.emplace_back(tris.size(), tree->leaf.primCount);
+            nodes.emplace_back(static_cast<uint32_t>(tris.size()), tree->leaf.primCount);
 
             size_t endOffset = tree->leaf.startOffset + tree->leaf.primCount;
             for(size_t i = tree->leaf.startOffset; i < endOffset; ++i)
@@ -243,13 +245,8 @@ namespace
         else
         {
             auto pBound = boundArena.Alloc();
+            *pBound = tree->internal.bound;
             TriangleBVH::Node node(pBound, 0);
-
-            auto &b = tree->internal.bound;
-            *pBound = {
-                { b.low.x,  b.low.y,  b.low.z },
-                { b.high.x, b.high.y, b.high.z }
-            };
 
             size_t nodeIdx = nodes.size();
             nodes.push_back(node);
@@ -257,7 +254,7 @@ namespace
             CompactBVHIntoArray(
                 nodes, tris, vertices, tree->internal.left, triIdxMap, boundArena);
             
-            nodes[nodeIdx].internal.offset = nodes.size();
+            nodes[nodeIdx].internal.offset = static_cast<uint32_t>(nodes.size());
             CompactBVHIntoArray(
                 nodes, tris, vertices, tree->internal.right, triIdxMap, boundArena);
         }
@@ -268,7 +265,7 @@ namespace
     1. Construct BVH tree in linking-style
     2. Compact the tree into array 'nodes_'
 */
-void TriangleBVH::InitBVH(const Vertex *vertices, size_t triangleCount)
+void TriangleBVH::InitBVH(const Vertex *vertices, uint32_t triangleCount)
 {
     if(!triangleCount)
         return;
@@ -294,7 +291,7 @@ void TriangleBVH::InitBVH(const Vertex *vertices, size_t triangleCount)
     size_t nodeCount = 0;
     MappedTriangles mappedTriangles{ vertices, triInfo, triIdxMap };
     TempNode *root = Build(
-        mappedTriangles, tNodeArena, 0, triangleCount, &nodeCount);
+        mappedTriangles, tNodeArena, 0, triangleCount, &nodeCount, local2World_);
 
     nodes_.clear();
     tris_.clear();
@@ -303,13 +300,13 @@ void TriangleBVH::InitBVH(const Vertex *vertices, size_t triangleCount)
     CompactBVHIntoArray(nodes_, tris_, vertices, root, triIdxMap, boundArena_);
 }
 
-bool TriangleBVH::HasIntersectionAux(const Ray &r, size_t nodeIdx) const
+bool TriangleBVH::HasIntersectionAux(const Ray &r, uint32_t nodeIdx) const
 {
     AGZ_ASSERT(nodeIdx < nodes_.size());
     const auto &node = nodes_[nodeIdx];
     if(node.isLeaf)
     {
-        size_t endOffset = node.leaf.startOffset + node.leaf.primCount;
+        size_t endOffset = node.leaf.endOffset;
         for(size_t i = node.leaf.startOffset; i < endOffset; ++i)
         {
             const auto &tri = tris_[i];
@@ -326,31 +323,35 @@ bool TriangleBVH::HasIntersectionAux(const Ray &r, size_t nodeIdx) const
            HasIntersectionAux(r, node.internal.offset);
 }
 
-bool TriangleBVH::EvalIntersectionAux(const Ray &r, size_t nodeIdx, Intersection *inct) const
+bool TriangleBVH::EvalIntersectionAux(const Ray &r, uint32_t nodeIdx, Intersection *inct) const
 {
     AGZ_ASSERT(nodeIdx < nodes_.size());
     const auto &node = nodes_[nodeIdx];
 
     if(node.isLeaf)
     {
-        bool ret = false;
-        size_t endOffset = node.leaf.startOffset + node.leaf.primCount;
-        for(size_t i = node.leaf.startOffset; i < endOffset; ++i)
+        Intersection tInct;
+        Real bestT = RealT::Infinity();
+        uint32_t endOffset = node.leaf.endOffset;
+        for(uint32_t i = node.leaf.startOffset; i < endOffset; ++i)
         {
-            Intersection tInct;
             const auto &tri = tris_[i];
             if(Geometry::Triangle::EvalIntersection(tri.A, tri.B_A, tri.C_A, r, &tInct)
-                && (!ret || tInct.t < inct->t))
+                && tInct.t < bestT)
             {
-                ret = true;
                 *inct = tInct;
+                bestT = tInct.t;
                 inct->flag = i;
-                inct->nor = (tri.nA + inct->uv.u * tri.nB_nA + inct->uv.v * tri.nC_nA).Normalize();
             }
         }
-        if(ret)
+        if(!RealT(bestT).IsInfinity())
+        {
             inct->entity = this;
-        return ret;
+            const auto &tri = tris_[inct->flag];
+            inct->nor = (tri.nA + inct->uv.u * tri.nB_nA + inct->uv.v * tri.nC_nA).Normalize();
+            return true;
+        }
+        return false;
     }
 
     if(!node.internal.bound->HasIntersection(r))
@@ -367,7 +368,7 @@ bool TriangleBVH::EvalIntersectionAux(const Ray &r, size_t nodeIdx, Intersection
     return EvalIntersectionAux(r, node.internal.offset, inct);
 }
 
-TriangleBVH::TriangleBVH(const Vertex *vertices, size_t triangleCount, const Transform &local2World)
+TriangleBVH::TriangleBVH(const Vertex *vertices, uint32_t triangleCount, const Transform &local2World)
     : surfaceArea_(0.0), local2World_(local2World)
 {
     InitBVH(vertices, triangleCount);
@@ -389,7 +390,7 @@ TriangleBVH::TriangleBVH(const AGZ::Model::GeometryMesh &mesh, const Transform &
         })
     | AGZ::Collect<std::vector<Vertex>>();
 
-    InitBVH(vertices.data(), vertices.size() / 3);
+    InitBVH(vertices.data(), static_cast<uint32_t>(vertices.size()) / 3);
 }
 
 bool TriangleBVH::HasIntersection(const Ray &r) const

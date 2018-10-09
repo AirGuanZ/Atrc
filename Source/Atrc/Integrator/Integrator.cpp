@@ -8,9 +8,9 @@ bool Integrator::FindClosestIntersection(const Scene &scene, const Ray &r, Inter
     AGZ_ASSERT(inct);
 
     bool incted = false;
+    Intersection newInct;
     for(auto ent : scene.entities)
     {
-        Intersection newInct;
         if(ent->EvalIntersection(r, &newInct) &&
            (!incted || newInct.t < inct->t))
         {

@@ -108,23 +108,24 @@ bool EvalIntersection(
 {
     AGZ_ASSERT(inct);
 
-    Vec3r wr = -r.direction;
-    Real detD = Mat3r::FromCols(B_A, C_A, wr).Determinant();
-    if(ApproxEq(RealT(detD), RealT(0.0)))
+    Vec3r s1 = Cross(r.direction, C_A);
+    Real div = Dot(s1, B_A);
+    if(!div)
         return false;
-    Real invDetD = 1.0 / detD;
+    Real invDiv = 1 / div;
 
     Vec3r o_A = r.origin - A;
-    Real t = invDetD * Mat3r::FromCols(B_A, C_A, o_A).Determinant();
+    Real alpha = Dot(o_A, s1) * invDiv;
+    if(alpha < 0 || alpha > 1)
+        return false;
+
+    Vec3r s2 = Cross(o_A, B_A);
+    Real beta = Dot(r.direction, s2) * invDiv;
+    if(beta < 0 || alpha + beta > 1)
+        return false;
+
+    Real t = Dot(C_A, s2) * invDiv;
     if(t < r.minT || t > r.maxT)
-        return false;
-
-    Real alpha = invDetD * Mat3r::FromCols(o_A, C_A, wr).Determinant();
-    if(alpha < 0.0)
-        return false;
-
-    Real beta  = invDetD * Mat3r::FromCols(B_A, o_A, wr).Determinant();
-    if(beta < 0.0 || alpha + beta > 1.0)
         return false;
 
     inct->wr  = -r.direction;
