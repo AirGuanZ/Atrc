@@ -47,8 +47,8 @@ $$($(2)$(D_SUFFIX)) : %.d : %.cpp
 
 -include $$($(2)$(D_SUFFIX))
 
-ALL_OPP_FILES += $(2)$(O_SUFFIX)
-ALL_DPP_FILES += $(2)$(D_SUFFIX)
+ALL_OPP_FILES += $$($(2)$(O_SUFFIX))
+ALL_DPP_FILES += $$($(2)$(D_SUFFIX))
 
 TARGETS += $(1)
 
