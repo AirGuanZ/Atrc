@@ -5,26 +5,6 @@
 
 AGZ_NS_BEG(Atrc)
 
-class BxDFOpr_Add
-    : ATRC_IMPLEMENTS BxDF
-{
-    RC<BxDF> lhs_, rhs_;
-    Real lProb_;
-    SS coef_;
-
-public:
-
-    BxDFOpr_Add(RC<BxDF> lhs, RC<BxDF> rhs, Real lProb, SS coef);
-
-    BxDFType GetType() const override;
-
-    Spectrum Eval(const Vec3r &wi, const Vec3r &wo) const override;
-
-    Option<BxDFSample> Sample(const Vec3r &wi, BxDFType type) const override;
-
-    Spectrum AmbientRadiance(const Intersection &inct) const override;
-};
-
 class MatOpr_Add
     : ATRC_IMPLEMENTS Material
 {

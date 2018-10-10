@@ -105,6 +105,9 @@
     <ClInclude Include="..\..\..\Source\Atrc\Material\MatOpr.h">
       <Filter>Material</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Material\TextureMultiplier.h">
+      <Filter>Material</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\Atrc\Common.cpp" />

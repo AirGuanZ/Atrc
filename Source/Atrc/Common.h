@@ -82,6 +82,19 @@ using Degr = Deg<Real>;
 
 inline Real Rand() { return Random::Uniform(0.0, 1.0); }
 
+// ============================= Export AGZ::Tex::Texture =============================
+
+template<typename T>
+using Tex2D = AGZ::Tex::Texture2D<T>;
+
+// ============================= Texture Sampling =============================
+
+enum class Texture2DSampleType
+{
+    Nearest,
+    Linear,
+};
+
 // ============================= Export AGZ::String =============================
 
 using AGZ::Str8;

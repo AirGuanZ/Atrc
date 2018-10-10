@@ -22,70 +22,90 @@ namespace
         t = t * t;
         return t + (1 - t) * Pow(1 - cos, 5);
     }
-}
 
-GlassBxDF::GlassBxDF(
-    const Intersection &inct, const Spectrum &reflColor, const Spectrum &refrColor, Real refIdx)
-    : nor_(inct.nor), reflColor_(reflColor), refrColor_(refrColor), refIdx_(refIdx)
-{
-
-}
-
-BxDFType GlassBxDF::GetType() const
-{
-    return BXDF_REFLECTION | BXDF_TRANSMISSION | BXDF_SPECULAR;
-}
-
-Spectrum GlassBxDF::Eval(const Vec3r &wi, const Vec3r &wo) const
-{
-    return SPECTRUM::BLACK;
-}
-
-Option<BxDFSample> GlassBxDF::Sample(const Vec3r &wi, BxDFType type) const
-{
-    Real dot = Dot(wi, nor_), absDot = Abs(dot);
-    Real niDivNt, cosine = absDot;
-
-    Vec3r nor;
-    if(dot < 0)
+    class GlassBxDF
+        : ATRC_IMPLEMENTS BxDF,
+        ATRC_PROPERTY AGZ::Uncopiable
     {
-        niDivNt = refIdx_;
-        nor = -nor_;
-        cosine *= refIdx_;
-    }
-    else
+        Vec3r nor_;
+        Spectrum reflColor_, refrColor_;
+        Real refIdx_;
+
+    public:
+
+        explicit GlassBxDF(
+            const Intersection &inct, const Spectrum &reflColor, const Spectrum &refrColor, Real refIdx = 1.5);
+
+        BxDFType GetType() const override;
+
+        Spectrum Eval(const Vec3r &wi, const Vec3r &wo) const override;
+
+        Option<BxDFSample> Sample(const Vec3r &wi, BxDFType type) const override;
+    };
+
+    GlassBxDF::GlassBxDF(
+        const Intersection &inct, const Spectrum &reflColor, const Spectrum &refrColor, Real refIdx)
+        : nor_(inct.nor), reflColor_(reflColor), refrColor_(refrColor), refIdx_(refIdx)
     {
-        niDivNt = 1 / refIdx_;
-        nor = nor_;
+
     }
 
-    if(type.Contains(BXDF_TRANSMISSION | BXDF_SPECULAR))
+    BxDFType GlassBxDF::GetType() const
     {
-        if(!type.Contains(BXDF_REFLECTION) ||
-            Rand() > ChristopheSchlick(cosine, refIdx_))
+        return BXDF_REFLECTION | BXDF_TRANSMISSION | BXDF_SPECULAR;
+    }
+
+    Spectrum GlassBxDF::Eval(const Vec3r &wi, const Vec3r &wo) const
+    {
+        return SPECTRUM::BLACK;
+    }
+
+    Option<BxDFSample> GlassBxDF::Sample(const Vec3r &wi, BxDFType type) const
+    {
+        Real dot = Dot(wi, nor_), absDot = Abs(dot);
+        Real niDivNt, cosine = absDot;
+
+        Vec3r nor;
+        if(dot < 0)
         {
-            Vec3r refrDir;
-            if(Refract(wi, nor, niDivNt, &refrDir))
+            niDivNt = refIdx_;
+            nor = -nor_;
+            cosine *= refIdx_;
+        }
+        else
+        {
+            niDivNt = 1 / refIdx_;
+            nor = nor_;
+        }
+
+        if(type.Contains(BXDF_TRANSMISSION | BXDF_SPECULAR))
+        {
+            if(!type.Contains(BXDF_REFLECTION) ||
+                Rand() > ChristopheSchlick(cosine, refIdx_))
             {
-                BxDFSample ret;
-                ret.dir = refrDir.Normalize();
-                ret.coef = refrColor_;
-                ret.pdf = 1;
-                return ret;
+                Vec3r refrDir;
+                if(Refract(wi, nor, niDivNt, &refrDir))
+                {
+                    BxDFSample ret;
+                    ret.dir = refrDir.Normalize();
+                    ret.coef = refrColor_;
+                    ret.pdf = 1;
+                    return ret;
+                }
             }
         }
-    }
 
-    if(type.Contains(BXDF_REFLECTION | BXDF_SPECULAR))
-    {
-        BxDFSample ret;
-        ret.dir = 2 * absDot * nor - wi;
-        ret.coef = reflColor_;
-        ret.pdf = 1;
-        return ret;
-    }
+        if(type.Contains(BXDF_REFLECTION | BXDF_SPECULAR))
+        {
+            BxDFSample ret;
+            ret.dir = 2 * absDot * nor - wi;
+            ret.coef = reflColor_;
+            ret.pdf = 1;
+            return ret;
+        }
 
-    return None;
+        return None;
+    }
 }
 
 GlassMaterial::GlassMaterial(const Spectrum &reflColor, const Spectrum &refrColor, Real refIdx)

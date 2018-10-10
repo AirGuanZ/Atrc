@@ -2,30 +2,52 @@
 
 AGZ_NS_BEG(Atrc)
 
-AmbientBRDF::AmbientBRDF(const Spectrum &color)
-    : color_(color)
+namespace
 {
+    class AmbientBRDF
+        : ATRC_IMPLEMENTS BxDF,
+        ATRC_PROPERTY AGZ::Uncopiable
+    {
+        Spectrum color_;
 
-}
+    public:
 
-BxDFType AmbientBRDF::GetType() const
-{
-    return BXDF_NONE;
-}
+        explicit AmbientBRDF(const Spectrum &color);
 
-Spectrum AmbientBRDF::Eval(const Vec3r &wi, const Vec3r &wo) const
-{
-    return SPECTRUM::BLACK;
-}
+        BxDFType GetType() const override;
 
-Option<BxDFSample> AmbientBRDF::Sample(const Vec3r &wi, BxDFType type) const
-{
-    return None;
-}
+        Spectrum Eval(const Vec3r &wi, const Vec3r &wo) const override;
 
-Spectrum AmbientBRDF::AmbientRadiance(const Intersection &inct) const
-{
-    return color_;
+        Option<BxDFSample> Sample(const Vec3r &wi, BxDFType type) const override;
+
+        Spectrum AmbientRadiance(const Intersection &inct) const override;
+    };
+
+    AmbientBRDF::AmbientBRDF(const Spectrum &color)
+        : color_(color)
+    {
+
+    }
+
+    BxDFType AmbientBRDF::GetType() const
+    {
+        return BXDF_NONE;
+    }
+
+    Spectrum AmbientBRDF::Eval(const Vec3r &wi, const Vec3r &wo) const
+    {
+        return SPECTRUM::BLACK;
+    }
+
+    Option<BxDFSample> AmbientBRDF::Sample(const Vec3r &wi, BxDFType type) const
+    {
+        return None;
+    }
+
+    Spectrum AmbientBRDF::AmbientRadiance(const Intersection &inct) const
+    {
+        return color_;
+    }
 }
 
 AmbientMaterial::AmbientMaterial(const Spectrum &color)

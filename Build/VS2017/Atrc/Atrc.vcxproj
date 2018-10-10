@@ -42,6 +42,7 @@
     <ClInclude Include="..\..\..\Source\Atrc\Material\MatOpr.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Material\Metal.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Material\Normal.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Material\TextureMultiplier.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Math\AABB.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Math\CoordSys.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Math\Geometry.h" />

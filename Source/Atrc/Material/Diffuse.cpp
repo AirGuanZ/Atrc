@@ -2,33 +2,54 @@
 
 AGZ_NS_BEG(Atrc)
 
-DiffuseBxDF::DiffuseBxDF(const Intersection &inct, const Spectrum &color)
-    : localCoord_(CoordSys::FromZ(inct.nor)), color_(color)
+namespace
 {
-
-}
-
-BxDFType DiffuseBxDF::GetType() const
-{
-    return BXDF_REFLECTION | BXDF_DIFFUSE;
-}
-
-Spectrum DiffuseBxDF::Eval(const Vec3r &wi, const Vec3r &wo) const
-{
-    if(Dot(wi, localCoord_.ez) > 0.0 && Dot(wo, localCoord_.ez) > 0.0)
-        return color_;
-    return SPECTRUM::BLACK;
-}
-
-Option<BxDFSample> DiffuseBxDF::Sample(const Vec3r &wi, BxDFType type) const
-{
-    if(type.Contains(BXDF_REFLECTION | BXDF_DIFFUSE) &&
-        Dot(wi, localCoord_.ez) > 0.0)
+    class DiffuseBxDF
+        : ATRC_IMPLEMENTS BxDF,
+        ATRC_PROPERTY AGZ::Uncopiable
     {
-        auto [dir, pdf] = CommonSampler::ZWeighted_OnUnitHemisphere::Sample();
-        return BxDFSample{ localCoord_.C2W(dir), color_ * SS(dir.z), pdf };
+        CoordSys localCoord_;
+        Spectrum color_;
+
+    public:
+
+        explicit DiffuseBxDF(const Intersection &inct, const Spectrum &color);
+
+        BxDFType GetType() const override;
+
+        Spectrum Eval(const Vec3r &wi, const Vec3r &wo) const override;
+
+        Option<BxDFSample> Sample(const Vec3r &wi, BxDFType type) const override;
+    };
+
+    DiffuseBxDF::DiffuseBxDF(const Intersection &inct, const Spectrum &color)
+        : localCoord_(CoordSys::FromZ(inct.nor)), color_(color)
+    {
+
     }
-    return None;
+
+    BxDFType DiffuseBxDF::GetType() const
+    {
+        return BXDF_REFLECTION | BXDF_DIFFUSE;
+    }
+
+    Spectrum DiffuseBxDF::Eval(const Vec3r &wi, const Vec3r &wo) const
+    {
+        if(Dot(wi, localCoord_.ez) > 0.0 && Dot(wo, localCoord_.ez) > 0.0)
+            return color_;
+        return SPECTRUM::BLACK;
+    }
+
+    Option<BxDFSample> DiffuseBxDF::Sample(const Vec3r &wi, BxDFType type) const
+    {
+        if(type.Contains(BXDF_REFLECTION | BXDF_DIFFUSE) &&
+            Dot(wi, localCoord_.ez) > 0.0)
+        {
+            auto[dir, pdf] = CommonSampler::ZWeighted_OnUnitHemisphere::Sample();
+            return BxDFSample{ localCoord_.C2W(dir), color_ * SS(dir.z), pdf };
+        }
+        return None;
+    }
 }
 
 DiffuseMaterial::DiffuseMaterial(const Spectrum &color)
