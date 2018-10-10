@@ -4,12 +4,12 @@
 
 AGZ_NS_BEG(Atrc)
 
-template<typename M>
+template<typename M, std::enable_if_t<std::is_base_of_v<Material, M>, int> = 0>
 class TextureMultiplier
     : ATRC_IMPLEMENTS Material,
       ATRC_PROPERTY AGZ::Uncopiable
 {
-    RC<Tex2D<Color3f>> tex_;
+    const Tex2D<Color3f> &tex_;
     M m_;
 
     class TextureMultiplierBxDF
@@ -54,8 +54,8 @@ class TextureMultiplier
 public:
 
     template<typename...Args>
-    explicit TextureMultiplier(RC<Tex2D<Color3f>> tex, Args&&...args)
-        : tex_(std::move(tex)), m_(std::forward<Args>(args)...)
+    explicit TextureMultiplier(const Tex2D<Color3f> &tex, Args&&...args)
+        : tex_(tex), m_(std::forward<Args>(args)...)
     {
         
     }
@@ -63,8 +63,8 @@ public:
     RC<BxDF> GetBxDF(const Intersection &inct, const Vec2r &matParam) const override
     {
         return NewRC<TextureMultiplierBxDF>(
-            m_->GetBxDF(inct, matParam),
-            AGZ::Tex::NearestSampler::Sample(*tex_, matParam));
+            m_.GetBxDF(inct, matParam),
+            AGZ::Tex::NearestSampler::Sample(tex_, matParam));
     }
 };
 

@@ -87,17 +87,66 @@ bool Cube::EvalIntersection(const Ray &r, Intersection *inct) const
     if(bestAxis < 0)
         return false;
 
-    inct->pos = r.At(bestT);
-    inct->wr = -r.direction;
-
     auto nor = Vec3r(0.0);
     nor[bestAxis] = negAxis ? -1.0 : 1.0;
+
+    Vec3r p = r.At(bestT);
+
+    inct->pos = p;
+    inct->wr  = -r.direction;
     inct->nor = nor;
+    inct->t   = bestT;
 
-    inct->t = bestT;
+    switch(bestAxis)
+    {
+    case 0:
 
-    // TODO
-    inct->uv = Vec2r(0.0);
+        if(negAxis)
+        {
+            inct->uv.u = Clamp(0.5 - 0.5 * p.y / halfSideLen_, 0.0, 1.0);
+            inct->uv.v = Clamp(0.5 - 0.5 * p.z / halfSideLen_, 0.0, 1.0);
+        }
+        else
+        {
+            inct->uv.u = Clamp(0.5 * p.y / halfSideLen_ + 0.5, 0.0, 1.0);
+            inct->uv.v = Clamp(0.5 * p.z / halfSideLen_ + 0.5, 0.0, 1.0);
+        }
+
+        break;
+
+    case 1:
+
+        if(negAxis)
+        {
+            inct->uv.u = Clamp(0.5 * p.x / halfSideLen_ + 0.5, 0.0, 1.0);
+            inct->uv.v = Clamp(0.5 * p.z / halfSideLen_ + 0.5, 0.0, 1.0);
+        }
+        else
+        {
+            inct->uv.u = Clamp(0.5 - 0.5 * p.x / halfSideLen_, 0.0, 1.0);
+            inct->uv.v = Clamp(0.5 - 0.5 * p.z / halfSideLen_, 0.0, 1.0);
+        }
+
+        break;
+
+    case 2:
+
+        if(negAxis)
+        {
+            inct->uv.u = Clamp(0.5 - 0.5 * p.x / halfSideLen_, 0.0, 1.0);
+            inct->uv.v = Clamp(0.5 - 0.5 * p.y / halfSideLen_, 0.0, 1.0);
+        }
+        else
+        {
+            inct->uv.u = Clamp(0.5 * p.x / halfSideLen_ + 0.5, 0.0, 1.0);
+            inct->uv.v = Clamp(0.5 * p.y / halfSideLen_ + 0.5, 0.0, 1.0);
+        }
+
+        break;
+
+    default:
+        AGZ::Unreachable();
+    }
 
     inct->entity = this;
 

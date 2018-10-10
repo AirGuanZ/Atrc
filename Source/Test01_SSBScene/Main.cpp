@@ -1,5 +1,6 @@
 #include <iostream>
 #include <Atrc/Atrc.h>
+#include "Atrc/Material/TextureMultiplier.h"
 
 using namespace std;
 using namespace Atrc;
@@ -37,19 +38,28 @@ int main()
     ColoredSky sky({ 0.4f, 0.7f, 0.9f }, { 1.0f, 1.0f, 1.0f });
 
     MatGeoEntity<Transformer<Sphere>> ground(
-        NewRC<DiffuseMaterial>(Spectrum(0.4f, 0.8f, 0.4f)),
+        NewRC<DiffuseMaterial>(Spectrum(0.3f, 0.3f, 1.0f)),
         Transform::Translate({ 0.0, 0.0, -201.0 }), 200.0);
 
     MatGeoEntity<Transformer<Sphere>> centreBall(
-        NewRC<DiffuseMaterial>(Spectrum(0.7f, 0.7f, 0.7f)),
+        NewRC<DiffuseMaterial>(Spectrum(0.4f, 0.7f, 0.2f)),
         TRANSFORM_IDENTITY, 1.0);
 
     MatGeoEntity<Transformer<Sphere>> leftMetalSphere(
         NewRC<MetalMaterial>(Spectrum(1.0f, 0.3f, 0.3f), 0.2),
         Transform::Translate({ 0.0, 2.0, 0.0 }), 1.0);
 
+    auto cubeTex = Tex2D<Color3b>(
+        AGZ::Tex::TextureFile::LoadRGBFromFile(
+        "./Assets/CubeTex.png")).Map(
+            [](const Vec3<uint8_t> &vb)
+    {
+        return vb.Map([](uint8_t b) {return b / 255.0f; });
+    });
+
     MatGeoEntity<Transformer<Cube>> rightDiffuseCube(
-        NewRC<DiffuseMaterial>(Spectrum(0.3f, 0.3f, 1.0f)),
+        NewRC<TextureMultiplier<DiffuseMaterial>>(
+            cubeTex, Spectrum(0.8f)),
         Transform::Translate({ 0.0, -2.0, 0.123 })
       * Transform::Rotate({ 1.0, 1.1, 1.2 }, Degr(47)),
         0.7);
@@ -67,7 +77,7 @@ int main()
 
     //============= Rendering =============
 
-    ParallelRenderer<JitteredSubareaRenderer> renderer(-1, 1000);
+    ParallelRenderer<JitteredSubareaRenderer> renderer(-1, 2000);
     PathTracer integrator(20);
 
     cout << "Start rendering..." << endl;
@@ -80,5 +90,6 @@ int main()
 
     //============= Output =============
 
-    AGZ::Tex::TextureFile::WriteRGBToPNG("./Build/Output.png", ToSavedImage(renderTarget, 2.2f));
+    AGZ::Tex::TextureFile::WriteRGBToPNG(
+        "./Build/Output.png", ToSavedImage(renderTarget, 2.2f));
 }
