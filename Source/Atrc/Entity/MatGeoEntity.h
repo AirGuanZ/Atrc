@@ -6,8 +6,7 @@
 
 AGZ_NS_BEG(Atrc)
 
-template<typename GeoTpl,
-         std::enable_if_t<std::is_base_of_v<Entity, GeoTpl>, int> = 0>
+template<typename GeoTpl, std::enable_if_t<std::is_base_of_v<Entity, GeoTpl>, int> = 0>
 class MatGeoEntity
     : public GeoTpl
 {

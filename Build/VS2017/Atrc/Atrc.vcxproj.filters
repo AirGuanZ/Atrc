@@ -111,6 +111,9 @@
     <ClInclude Include="..\..\..\Source\Atrc\Entity\GeometryTemplate\Transformer.h">
       <Filter>Entity\GeometryTemplate</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Entity\GeometryTemplate\Cube.h">
+      <Filter>Entity\GeometryTemplate</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\Atrc\Common.cpp" />
@@ -179,6 +182,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Source\Atrc\Material\MatOpr.cpp">
       <Filter>Material</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Entity\GeometryTemplate\Cube.cpp">
+      <Filter>Entity\GeometryTemplate</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

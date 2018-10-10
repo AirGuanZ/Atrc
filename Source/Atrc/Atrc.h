@@ -8,6 +8,7 @@
 #include <Atrc/Integrator/AmbientIntegrator.h>
 #include <Atrc/Integrator/PathTracer.h>
 
+#include <Atrc/Entity/GeometryTemplate/Cube.h>
 #include <Atrc/Entity/GeometryTemplate/Sphere.h>
 #include <Atrc/Entity/GeometryTemplate/SmoothTriangle.h>
 #include <Atrc/Entity/GeometryTemplate/Transformer.h>

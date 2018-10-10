@@ -27,6 +27,7 @@
     <ClInclude Include="..\..\..\Source\Atrc\Entity\BruteforceTriangleMesh.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Entity\ColoredSky.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Entity\Entity.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Entity\GeometryTemplate\Cube.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Entity\GeometryTemplate\SmoothTriangle.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Entity\GeometryTemplate\Sphere.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Entity\GeometryTemplate\Transformer.h" />
@@ -65,6 +66,7 @@
     <ClCompile Include="..\..\..\Source\Atrc\Entity\BruteforceTriangleMesh.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Entity\ColoredSky.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Entity\Entity.cpp" />
+    <ClCompile Include="..\..\..\Source\Atrc\Entity\GeometryTemplate\Cube.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Entity\GeometryTemplate\SmoothTriangle.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Entity\GeometryTemplate\Sphere.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Entity\GeometryTemplate\TriangleBVH.cpp" />

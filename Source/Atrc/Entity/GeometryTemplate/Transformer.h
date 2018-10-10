@@ -29,7 +29,7 @@ public:
         return Ent::HasIntersection(local2World_.ApplyInverseToRay(r));
     }
 
-    bool EvalIntersection(const Ray &r, Intersection *inct) const
+    bool EvalIntersection(const Ray &r, Intersection *inct) const override
     {
         if(Ent::EvalIntersection(local2World_.ApplyInverseToRay(r), inct))
         {

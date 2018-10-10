@@ -22,42 +22,6 @@ RenderTarget<Color3b> ToSavedImage(const RenderTarget<Color3f> &origin, float ga
     });
 }
 
-WStr boxOBJContent =
-R"___(
-# Blender v2.79 (sub 0) OBJ File: ''
-# www.blender.org
-mtllib untitled.mtl
-o Cube
-v -1.000000 1.000000 -1.000000
-v 1.000000 1.000000 -1.000000
-v 1.000000 -1.000000 -1.000000
-v -1.000000 -1.000000 -1.000000
-v -0.999999 1.000000 1.000000
-v 1.000001 0.999999 1.000000
-v 1.000000 -1.000000 1.000000
-v -1.000000 -1.000000 1.000000
-vn 0.0000 0.0000 -1.0000
-vn 0.0000 0.0000 1.0000
-vn 0.0000 1.0000 -0.0000
-vn 1.0000 0.0000 -0.0000
-vn -0.0000 -1.0000 -0.0000
-vn -1.0000 0.0000 0.0000
-usemtl Material
-s off
-f 2//1 4//1 1//1
-f 8//2 6//2 5//2
-f 5//3 2//3 1//3
-f 6//4 3//4 2//4
-f 3//5 8//5 4//5
-f 1//6 8//6 5//6
-f 2//1 3//1 4//1
-f 8//2 7//2 6//2
-f 5//3 6//3 2//3
-f 6//4 7//4 3//4
-f 3//5 7//5 8//5
-f 1//6 4//6 8//6
-)___";
-
 int main()
 {
     //============= Camera =============
@@ -71,28 +35,30 @@ int main()
     //============= Scene =============
 
     ColoredSky sky({ 0.4f, 0.7f, 0.9f }, { 1.0f, 1.0f, 1.0f });
+
     MatGeoEntity<Transformer<Sphere>> ground(
         NewRC<DiffuseMaterial>(Spectrum(0.4f, 0.8f, 0.4f)),
         Transform::Translate({ 0.0, 0.0, -201.0 }), 200.0);
+
     MatGeoEntity<Transformer<Sphere>> centreBall(
         NewRC<DiffuseMaterial>(Spectrum(0.7f, 0.7f, 0.7f)),
         TRANSFORM_IDENTITY, 1.0);
+
     MatGeoEntity<Transformer<Sphere>> leftMetalSphere(
         NewRC<MetalMaterial>(Spectrum(1.0f, 0.3f, 0.3f), 0.2),
         Transform::Translate({ 0.0, 2.0, 0.0 }), 1.0);
 
-    AGZ::Model::WavefrontObj arbShapeObj;
-    AGZ::Model::WavefrontObjFile::LoadFromMemory(boxOBJContent, &arbShapeObj);
-    auto arbShapeMesh = arbShapeObj.ToGeometryMeshGroup().submeshes["Cube"];
-    MatGeoEntity<Transformer<TriangleBVH>> arbShape(
+    MatGeoEntity<Transformer<Cube>> rightDiffuseCube(
         NewRC<DiffuseMaterial>(Spectrum(0.3f, 0.3f, 1.0f)),
-        Transform::Translate({ 0.0, -2.0, -0.1 }), arbShapeMesh);
+        Transform::Translate({ 0.0, -2.0, 0.123 })
+      * Transform::Rotate({ 1.0, 1.1, 1.2 }, Degr(47)),
+        0.7);
 
     Scene scene;
     scene.camera = &camera;
     scene.entities = {
         &ground,
-        &centreBall, &leftMetalSphere, &arbShape,
+        &centreBall, &leftMetalSphere, &rightDiffuseCube,
         &sky };
 
     //============= Render Target =============
