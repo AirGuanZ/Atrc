@@ -43,7 +43,7 @@ void Run()
     AGZ::Model::WavefrontObj dragonObj;
     AGZ::Model::WavefrontObjFile::LoadFromObjFile("./Assets/dragon_vrip.obj", &dragonObj);
     MatGeoEntity<TriangleBVH> dragon(
-        NewRC<DiffuseMaterial>(Spectrum(0.4f)),
+        NewRC<MetalMaterial>(Spectrum(0.4f), 0.2),
         dragonObj.ToGeometryMeshGroup().submeshes["Default"],
         Transform::Translate({ 0.0, 0.0, -0.67 })
       * Transform::Scale(Vec3r(2.2 / 50)));
@@ -69,7 +69,7 @@ void Run()
 
     //============= Rendering =============
 
-    ParallelRenderer<JitteredSubareaRenderer> renderer(6, 100);
+    ParallelRenderer<JitteredSubareaRenderer> renderer(6, 200);
     PathTracer integrator(10);
 
     cout << "Start rendering..." << endl;

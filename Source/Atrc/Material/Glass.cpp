@@ -69,7 +69,7 @@ Option<BxDFSample> GlassBxDF::Sample(const Vec3r &wi, BxDFType type) const
             {
                 BxDFSample ret;
                 ret.dir = refrDir.Normalize();
-                ret.coef = refrColor_ / SS(absDot);
+                ret.coef = refrColor_;
                 ret.pdf = 1;
                 return ret;
             }
@@ -80,7 +80,7 @@ Option<BxDFSample> GlassBxDF::Sample(const Vec3r &wi, BxDFType type) const
     {
         BxDFSample ret;
         ret.dir = 2 * absDot * nor - wi;
-        ret.coef = reflColor_ / SS(absDot);
+        ret.coef = reflColor_;
         ret.pdf = 1;
         return ret;
     }

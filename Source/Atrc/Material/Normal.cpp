@@ -19,7 +19,7 @@ Option<BxDFSample> NormalBRDF::Sample(const Vec3r &wi, BxDFType type) const
 
 Spectrum NormalBRDF::AmbientRadiance(const Intersection &inct) const
 {
-    return 0.5f * (inct.nor.Map([](Real r) {return static_cast<float>(r); }) + Spectrum(1.0f));
+    return 0.5f * (inct.nor.Map([](Real r) { return static_cast<float>(r); }) + Spectrum(1.0f));
 }
 
 RC<BxDF> NormalMaterial::GetBxDF(const Intersection &inct, const Vec2r &matParam) const
