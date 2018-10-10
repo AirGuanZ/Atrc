@@ -4,8 +4,8 @@
 using namespace std;
 using namespace Atrc;
 
-constexpr uint32_t SCR_W = 1920;
-constexpr uint32_t SCR_H = 1080;
+constexpr uint32_t SCR_W = 640;
+constexpr uint32_t SCR_H = 480;
 
 constexpr Real SCR_ASPECT_RATIO = static_cast<Real>(SCR_W) / SCR_H;
 
@@ -36,27 +36,28 @@ void Run()
 
     ColoredSky sky({ 0.4f, 0.7f, 0.9f }, { 1.0f, 1.0f, 1.0f });
 
-    MatGeoEntity<Sphere> ground(
+    MatGeoEntity<Transformer<Sphere>> ground(
         NewRC<DiffuseMaterial>(Spectrum(0.4f, 0.8f, 0.4f)),
-        200, Transform::Translate({ 0.0, 0.0, -200 - 1.0 }));
+        Transform::Translate({ 0.0, 0.0, -200 - 1.0 }),
+        200);
 
     AGZ::Model::WavefrontObj dragonObj;
     AGZ::Model::WavefrontObjFile::LoadFromObjFile("./Assets/dragon_vrip.obj", &dragonObj);
-    MatGeoEntity<TriangleBVH> dragon(
+    MatGeoEntity<Transformer<TriangleBVH>> dragon(
         NewRC<MetalMaterial>(Spectrum(0.4f), 0.2),
-        dragonObj.ToGeometryMeshGroup().submeshes["Default"],
         Transform::Translate({ 0.0, 0.0, -0.67 })
-      * Transform::Scale(Vec3r(2.2 / 50)));
+      * Transform::Scale(Vec3r(2.2 / 50)),
+        dragonObj.ToGeometryMeshGroup().submeshes["Default"]);
     dragonObj.Clear();
 
     AGZ::Model::WavefrontObj bunnyObj;
     AGZ::Model::WavefrontObjFile::LoadFromObjFile("./Assets/bunny.obj", &bunnyObj);
-    MatGeoEntity<TriangleBVH> bunny(
+    MatGeoEntity<Transformer<TriangleBVH>> bunny(
         NewRC<MetalMaterial>(Spectrum(0.7f), 0.1),
-        bunnyObj.ToGeometryMeshGroup().submeshes["Default"],
         Transform::Translate({ 2.5, 1.0, -0.85 })
       * Transform::RotateZ(Degr(90))
-      * Transform::Scale(Vec3r(2.2 / 60)));
+      * Transform::Scale(Vec3r(2.2 / 60)),
+        bunnyObj.ToGeometryMeshGroup().submeshes["Default"]);
     bunnyObj.Clear();
 
     Scene scene;
@@ -69,7 +70,7 @@ void Run()
 
     //============= Rendering =============
 
-    ParallelRenderer<JitteredSubareaRenderer> renderer(6, 200);
+    ParallelRenderer<JitteredSubareaRenderer> renderer(6, 1);
     PathTracer integrator(10);
 
     cout << "Start rendering..." << endl;

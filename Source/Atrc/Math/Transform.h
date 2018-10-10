@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Atrc/Common.h>
+#include <Atrc/Math/AABB.h>
 #include <Atrc/Math/Ray.h>
 
 AGZ_NS_BEG(Atrc)
@@ -46,6 +47,9 @@ public:
 
     Ray ApplyToRay(const Ray &r) const;
     Ray ApplyInverseToRay(const Ray &r) const;
+
+    AABB ApplyToAABB(const AABB &aabb) const;
+    AABB ApplyInverseToAABB(const AABB &aabb) const;
 
     Intersection ApplyToIntersection(const Intersection &inct) const;
     Intersection ApplyInverseToIntersection(const Intersection &inct) const;
@@ -173,21 +177,58 @@ inline Vec3r Transform::ApplyInverseToNormal(const Vec3r &n) const
 
 inline Ray Transform::ApplyToRay(const Ray &r) const
 {
+    Vec3r newDir = ApplyToVector(r.direction);
+    Real lengthRatio = newDir.Length() / r.direction.Length();
     return Ray(
         NON_UNIT,
         ApplyToPoint(r.origin),
-        ApplyToVector(r.direction),
-        r.minT, r.maxT);
+        newDir,
+        r.minT * lengthRatio, r.maxT * lengthRatio);
 }
 
 inline Ray Transform::ApplyInverseToRay(const Ray &r) const
 {
+    Vec3r newDir = ApplyInverseToVector(r.direction);
+    Real lengthRatio = newDir.Length() / r.direction.Length();
     return Ray(
         NON_UNIT,
         ApplyInverseToPoint(r.origin),
-        ApplyInverseToVector(r.direction),
-        r.minT, r.maxT);
+        newDir,
+        r.minT * lengthRatio, r.maxT * lengthRatio);
 }
+
+inline AABB Transform::ApplyToAABB(const AABB &aabb) const
+{
+    if(aabb.low.x >= aabb.high.x || aabb.low.y >= aabb.high.y || aabb.low.z >= aabb.high.z)
+        return aabb;
+    AABB ret;
+    ret.Expand(ApplyToPoint(aabb.low));
+    ret.Expand(ApplyToPoint(Vec3r(aabb.high.x, aabb.low.y,  aabb.low.z)));
+    ret.Expand(ApplyToPoint(Vec3r(aabb.low.x,  aabb.high.y, aabb.low.z)));
+    ret.Expand(ApplyToPoint(Vec3r(aabb.low.x,  aabb.low.y,  aabb.high.z)));
+    ret.Expand(ApplyToPoint(Vec3r(aabb.high.x, aabb.high.y, aabb.low.z)));
+    ret.Expand(ApplyToPoint(Vec3r(aabb.low.x,  aabb.high.y, aabb.high.z)));
+    ret.Expand(ApplyToPoint(Vec3r(aabb.high.x, aabb.low.y,  aabb.high.z)));
+    ret.Expand(ApplyToPoint(aabb.high));
+    return ret;
+}
+
+inline AABB Transform::ApplyInverseToAABB(const AABB &aabb) const
+{
+    if(aabb.low.x >= aabb.high.x || aabb.low.y >= aabb.high.y || aabb.low.z >= aabb.high.z)
+        return aabb;
+    AABB ret;
+    ret.Expand(ApplyInverseToPoint(aabb.low));
+    ret.Expand(ApplyInverseToPoint(Vec3r(aabb.high.x, aabb.low.y,  aabb.low.z)));
+    ret.Expand(ApplyInverseToPoint(Vec3r(aabb.low.x,  aabb.high.y, aabb.low.z)));
+    ret.Expand(ApplyInverseToPoint(Vec3r(aabb.low.x,  aabb.low.y,  aabb.high.z)));
+    ret.Expand(ApplyInverseToPoint(Vec3r(aabb.high.x, aabb.high.y, aabb.low.z)));
+    ret.Expand(ApplyInverseToPoint(Vec3r(aabb.low.x,  aabb.high.y, aabb.high.z)));
+    ret.Expand(ApplyInverseToPoint(Vec3r(aabb.high.x, aabb.low.y,  aabb.high.z)));
+    ret.Expand(ApplyInverseToPoint(aabb.high));
+    return ret;
+}
+
 
 inline Intersection Transform::ApplyToIntersection(const Intersection &inct) const
 {

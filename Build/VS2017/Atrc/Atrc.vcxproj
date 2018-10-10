@@ -29,6 +29,7 @@
     <ClInclude Include="..\..\..\Source\Atrc\Entity\Entity.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Entity\GeometryTemplate\SmoothTriangle.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Entity\GeometryTemplate\Sphere.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Entity\GeometryTemplate\Transformer.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Entity\GeometryTemplate\TriangleBVH.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Entity\MatGeoEntity.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Integrator\AmbientIntegrator.h" />

@@ -12,11 +12,10 @@ class Sphere
 protected:
 
     Real radius_;
-    Transform local2World_;
 
 public:
 
-    Sphere(Real radius, const Transform &local2World);
+    explicit Sphere(Real radius);
 
     bool HasIntersection(const Ray &r) const override;
 

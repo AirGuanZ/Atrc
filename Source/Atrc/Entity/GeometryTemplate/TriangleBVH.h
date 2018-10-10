@@ -73,8 +73,6 @@ private:
     Real surfaceArea_;
     std::vector<InternalTriangle> tris_;
     std::vector<Node> nodes_;
-
-    Transform local2World_;
     
     void InitBVH(const Vertex *vertices, uint32_t triangleCount);
 
@@ -84,9 +82,9 @@ private:
     
 public:
 
-    TriangleBVH(const Vertex *vertices, uint32_t triangleCount, const Transform &local2World);
+    TriangleBVH(const Vertex *vertices, uint32_t triangleCount);
 
-    TriangleBVH(const AGZ::Model::GeometryMesh &mesh, const Transform &local2World);
+    explicit TriangleBVH(const AGZ::Model::GeometryMesh &mesh);
     
     bool HasIntersection(const Ray &r) const override;
     

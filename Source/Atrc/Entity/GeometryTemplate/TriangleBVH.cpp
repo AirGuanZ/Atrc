@@ -308,10 +308,14 @@ void TriangleBVH::InitBVH(const Vertex *vertices, uint32_t triangleCount)
     std::vector<size_t> triIdxMap(triangleCount);
     for(size_t i = 0, j = 0; i < triangleCount; ++i, j += 3)
     {
-        Vec3r wA = local2World_.ApplyToPoint(vertices[j].pos);
-        Vec3r wB = local2World_.ApplyToPoint(vertices[j + 1].pos);
-        Vec3r wC = local2World_.ApplyToPoint(vertices[j + 2].pos);
-        Real sa = Geometry::Triangle::SurfaceArea(wA, wB, wC);
+        //Vec3r wA = local2World_.ApplyToPoint(vertices[j].pos);
+        //Vec3r wB = local2World_.ApplyToPoint(vertices[j + 1].pos);
+        //Vec3r wC = local2World_.ApplyToPoint(vertices[j + 2].pos);
+        //Real sa = Geometry::Triangle::SurfaceArea(wA, wB, wC);
+        //surfaceArea_ += sa;
+        Real sa = Geometry::Triangle::SurfaceArea(
+            vertices[j].pos, vertices[j + 1].pos, vertices[j + 2].pos);
+
         surfaceArea_ += sa;
 
         triInfo[i].id = i;
@@ -404,14 +408,14 @@ bool TriangleBVH::EvalIntersectionAux(const Ray &r, uint32_t nodeIdx, Intersecti
     return EvalIntersectionAux(r, node.internal.offset, inct);
 }
 
-TriangleBVH::TriangleBVH(const Vertex *vertices, uint32_t triangleCount, const Transform &local2World)
-    : surfaceArea_(0.0), local2World_(local2World)
+TriangleBVH::TriangleBVH(const Vertex *vertices, uint32_t triangleCount)
+    : surfaceArea_(0.0)
 {
     InitBVH(vertices, triangleCount);
 }
 
-TriangleBVH::TriangleBVH(const AGZ::Model::GeometryMesh &mesh, const Transform &local2World)
-    : surfaceArea_(0.0), local2World_(local2World)
+TriangleBVH::TriangleBVH(const AGZ::Model::GeometryMesh &mesh)
+    : surfaceArea_(0.0)
 {
     AGZ_ASSERT(mesh.vertices.size() % 3 == 0);
 
@@ -433,15 +437,12 @@ bool TriangleBVH::HasIntersection(const Ray &r) const
 {
     if(nodes_.empty())
         return false;
-    return HasIntersectionAux(local2World_.ApplyInverseToRay(r), 0);
+    return HasIntersectionAux(r, 0);
 }
 
 bool TriangleBVH::EvalIntersection(const Ray &r, Intersection *inct) const
 {
-    if(nodes_.empty() || !EvalIntersectionAux(local2World_.ApplyInverseToRay(r), 0, inct))
-        return false;
-    *inct = local2World_.ApplyToIntersection(*inct);
-    return true;
+    return !nodes_.empty() && EvalIntersectionAux(r, 0, inct);
 }
 
 AABB TriangleBVH::GetBoundingBox() const
@@ -449,9 +450,9 @@ AABB TriangleBVH::GetBoundingBox() const
     AABB ret;
     for(auto &t : tris_)
     {
-        ret.Expand(local2World_.ApplyToPoint(t.A));
-        ret.Expand(local2World_.ApplyToPoint(t.A + t.B_A));
-        ret.Expand(local2World_.ApplyToPoint(t.A + t.C_A));
+        ret.Expand(t.A);
+        ret.Expand(t.A + t.B_A);
+        ret.Expand(t.A + t.C_A);
     }
     return ret;
 }
