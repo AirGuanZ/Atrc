@@ -56,9 +56,9 @@ AmbientMaterial::AmbientMaterial(const Spectrum &color)
     
 }
 
-RC<BxDF> AmbientMaterial::GetBxDF(const Intersection &inct, const Vec2r &matParam) const
+Box<BxDF> AmbientMaterial::GetBxDF(const Intersection &inct, const Vec2r &matParam) const
 {
-    return NewRC<AmbientBRDF>(color_);
+    return NewBox<AmbientBRDF>(color_);
 }
 
 AGZ_NS_END(Atrc)

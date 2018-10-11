@@ -63,9 +63,9 @@ MetalMaterial::MetalMaterial(const Spectrum &color, Real roughness)
     
 }
 
-RC<BxDF> MetalMaterial::GetBxDF(const Intersection &inct, const Vec2r &matParam) const
+Box<BxDF> MetalMaterial::GetBxDF(const Intersection &inct, const Vec2r &matParam) const
 {
-    return NewRC<MetalBxDF>(inct, color_, roughness_);
+    return NewBox<MetalBxDF>(inct, color_, roughness_);
 }
 
 AGZ_NS_END(Atrc)

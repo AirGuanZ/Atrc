@@ -1,4 +1,5 @@
 #include <Atrc/Material/Diffuse.h>
+#include <Atrc/Math/Math.h>
 
 AGZ_NS_BEG(Atrc)
 
@@ -58,9 +59,9 @@ DiffuseMaterial::DiffuseMaterial(const Spectrum &color)
 
 }
 
-RC<BxDF> DiffuseMaterial::GetBxDF(const Intersection &inct, const Vec2r &matParam) const
+Box<BxDF> DiffuseMaterial::GetBxDF(const Intersection &inct, const Vec2r &matParam) const
 {
-    return NewRC<DiffuseBxDF>(inct, color_);
+    return NewBox<DiffuseBxDF>(inct, color_);
 }
 
 AGZ_NS_END(Atrc)

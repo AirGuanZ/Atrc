@@ -63,9 +63,9 @@ MatOpr_Add::MatOpr_Add(RC<Material> lhs, RC<Material> rhs, Real wL, Real wR)
     coef_ = SS(dem);
 }
 
-RC<BxDF> MatOpr_Add::GetBxDF(const Intersection &inct, const Vec2r &matParam) const
+Box<BxDF> MatOpr_Add::GetBxDF(const Intersection &inct, const Vec2r &matParam) const
 {
-    return NewRC<BxDFOpr_Add>(
+    return NewBox<BxDFOpr_Add>(
         lhs_->GetBxDF(inct, matParam), rhs_->GetBxDF(inct, matParam), lProb_, coef_);
 }
 

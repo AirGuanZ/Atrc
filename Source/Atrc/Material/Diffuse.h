@@ -3,7 +3,6 @@
 #include <Atrc/Common.h>
 #include <Atrc/Material/BxDF.h>
 #include <Atrc/Material/Material.h>
-#include <Atrc/Math/Math.h>
 
 AGZ_NS_BEG(Atrc)
 
@@ -17,7 +16,7 @@ public:
 
     explicit DiffuseMaterial(const Spectrum &color);
 
-    RC<BxDF> GetBxDF(const Intersection &inct, const Vec2r &matParam) const override;
+    Box<BxDF> GetBxDF(const Intersection &inct, const Vec2r &matParam) const override;
 };
 
 AGZ_NS_END(Atrc)

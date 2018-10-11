@@ -23,7 +23,7 @@ public:
 
     GlassMaterial(const Spectrum &reflColor, const Spectrum &refrColor, Real refIdx = 1.5);
 
-    RC<BxDF> GetBxDF(const Intersection &inct, const Vec2r &matParam) const override;
+    Box<BxDF> GetBxDF(const Intersection &inct, const Vec2r &matParam) const override;
 };
 
 AGZ_NS_END(Atrc)

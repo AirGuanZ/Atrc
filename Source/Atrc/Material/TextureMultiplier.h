@@ -16,12 +16,12 @@ class TextureMultiplier
         : ATRC_IMPLEMENTS BxDF,
           ATRC_PROPERTY AGZ::Uncopiable
     {
-        RC<BxDF> bxdf_;
+        Box<BxDF> bxdf_;
         Spectrum coef_;
 
     public:
 
-        TextureMultiplierBxDF(RC<BxDF> bxdf, const Spectrum &coef)
+        TextureMultiplierBxDF(Box<BxDF> bxdf, const Spectrum &coef)
             : bxdf_(std::move(bxdf)), coef_(coef)
         {
             AGZ_ASSERT(bxdf_);
@@ -60,9 +60,9 @@ public:
         
     }
 
-    RC<BxDF> GetBxDF(const Intersection &inct, const Vec2r &matParam) const override
+    Box<BxDF> GetBxDF(const Intersection &inct, const Vec2r &matParam) const override
     {
-        return NewRC<TextureMultiplierBxDF>(
+        return NewBox<TextureMultiplierBxDF>(
             m_.GetBxDF(inct, matParam),
             AGZ::Tex::NearestSampler::Sample(tex_, matParam));
     }

@@ -4,7 +4,6 @@ AGZ_NS_BEG(Atrc)
 
 namespace
 {
-
     class NormalBRDF
         : ATRC_IMPLEMENTS BxDF,
         ATRC_PROPERTY AGZ::Uncopiable
@@ -41,9 +40,9 @@ namespace
     }
 }
 
-RC<BxDF> NormalMaterial::GetBxDF(const Intersection &inct, const Vec2r &matParam) const
+Box<BxDF> NormalMaterial::GetBxDF(const Intersection &inct, const Vec2r &matParam) const
 {
-    return NewRC<NormalBRDF>();
+    return NewBox<NormalBRDF>();
 }
 
 AGZ_NS_END(Atrc)

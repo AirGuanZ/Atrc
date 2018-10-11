@@ -16,7 +16,7 @@ public:
 
     MatOpr_Add(RC<Material> lhs, RC<Material> rhs, Real wL, Real wR);
 
-    RC<BxDF> GetBxDF(const Intersection &inct, const Vec2r &matParam) const override;
+    Box<BxDF> GetBxDF(const Intersection &inct, const Vec2r &matParam) const override;
 };
 
 AGZ_NS_END(Atrc)

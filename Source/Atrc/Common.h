@@ -31,6 +31,17 @@ auto NewRC(Args&&...args)
     return std::make_shared<T>(std::forward<Args>(args)...);
 }
 
+// ============================= Unique pointer =============================
+
+template<typename T>
+using Box = std::unique_ptr<T>;
+
+template<typename T, typename...Args>
+auto NewBox(Args&&...args)
+{
+    return std::make_unique<T>(std::forward<Args>(args)...);
+}
+
 // ============================= Atrc::Exception =============================
 
 class Exception : public std::runtime_error
