@@ -5,7 +5,8 @@
 
 AGZ_NS_BEG(Atrc)
 
-template<typename M, typename Sampler = AGZ::Tex::NearestSampler,std::enable_if_t<std::is_base_of_v<Material, M>, int> = 0>
+template<typename M, typename Sampler = AGZ::Tex::NearestSampler,
+         std::enable_if_t<std::is_base_of_v<Material, M>, int> = 0>
 class TextureMultiplier
     : ATRC_IMPLEMENTS Material,
       ATRC_PROPERTY AGZ::Uncopiable
@@ -64,8 +65,7 @@ public:
     Box<BxDF> GetBxDF(const Intersection &inct, const Vec2r &matParam) const override
     {
         return NewBox<TextureMultiplierBxDF>(
-            m_.GetBxDF(inct, matParam),
-            Sampler::Sample(tex_, matParam));
+            m_.GetBxDF(inct, matParam), Sampler::Sample(tex_, matParam));
     }
 };
 
