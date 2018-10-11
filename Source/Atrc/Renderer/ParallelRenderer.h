@@ -11,7 +11,7 @@
 
 AGZ_NS_BEG(Atrc)
 
-template<typename SR>
+template<typename SR, std::enable_if_t<std::is_base_of_v<SubareaRenderer, SR>, int> = 0>
 class ParallelRenderer
     : ATRC_IMPLEMENTS Renderer,
       ATRC_PROPERTY AGZ::Uncopiable
