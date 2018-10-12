@@ -57,9 +57,10 @@ int main()
         return vb.Map([](uint8_t b) {return b / 255.0f; });
     });
 
+    auto cubeMat = NewRC<TextureMultiplier<DiffuseMaterial, SamplingStrategy::Linear>>(
+                            cubeTex, Spectrum(0.8f));
     MatGeoEntity<Transformer<Cube>> rightDiffuseCube(
-        NewRC<TextureMultiplier<DiffuseMaterial>>(
-            cubeTex, Spectrum(0.8f)),
+        cubeMat,
         Transform::Translate({ 0.0, -2.0, 0.123 })
       * Transform::Rotate({ 1.0, 1.1, 1.2 }, Degr(47)),
         0.7);
@@ -77,7 +78,7 @@ int main()
 
     //============= Rendering =============
 
-    ParallelRenderer<JitteredSubareaRenderer> renderer(-1, 1000);
+    ParallelRenderer<JitteredSubareaRenderer> renderer(-1, 10);
     PathTracer integrator(20);
 
     cout << "Start rendering..." << endl;

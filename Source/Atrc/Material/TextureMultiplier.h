@@ -5,11 +5,52 @@
 
 AGZ_NS_BEG(Atrc)
 
-template<typename M, typename Sampler = AGZ::Tex::NearestSampler,
+namespace SamplingStrategy
+{
+    class Nearest
+    {
+    public:
+
+        static constexpr Texture2DSampleType GetSamplingStrategy()
+        {
+            return Texture2DSampleType::Nearest;
+        }
+    };
+
+    class Linear
+    {
+    public:
+
+        static constexpr Texture2DSampleType GetSamplingStrategy()
+        {
+            return Texture2DSampleType::Linear;
+        }
+    };
+
+    class Dynamic
+    {
+        Texture2DSampleType type_ = Texture2DSampleType::Nearest;
+
+    public:
+
+        Texture2DSampleType GetSamplingStrategy() const
+        {
+            return type_;
+        }
+
+        void SetSamplingStrategy(Texture2DSampleType type)
+        {
+            type_ = type;
+        }
+    };
+}
+
+template<typename M, typename Sampling = SamplingStrategy::Nearest,
          std::enable_if_t<std::is_base_of_v<Material, M>, int> = 0>
 class TextureMultiplier
     : ATRC_IMPLEMENTS Material,
-      ATRC_PROPERTY AGZ::Uncopiable
+      ATRC_PROPERTY AGZ::Uncopiable,
+      public Sampling
 {
     const Tex2D<Color3f> &tex_;
     M m_;
@@ -64,8 +105,17 @@ public:
 
     Box<BxDF> GetBxDF(const Intersection &inct, const Vec2r &matParam) const override
     {
-        return NewBox<TextureMultiplierBxDF>(
-            m_.GetBxDF(inct, matParam), Sampler::Sample(tex_, matParam));
+        switch(Sampling::GetSamplingStrategy())
+        {
+        case Texture2DSampleType::Nearest:
+            return NewBox<TextureMultiplierBxDF>(
+                m_.GetBxDF(inct, matParam), AGZ::Tex::NearestSampler::Sample(tex_, matParam));
+        case Texture2DSampleType::Linear:
+            return NewBox<TextureMultiplierBxDF>(
+                m_.GetBxDF(inct, matParam), AGZ::Tex::LinearSampler::Sample(tex_, matParam));
+        default:
+            AGZ::Unreachable();
+        }
     }
 };
 
