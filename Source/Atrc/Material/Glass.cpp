@@ -88,7 +88,7 @@ namespace
                 {
                     BxDFSample ret;
                     ret.dir = refrDir.Normalize();
-                    ret.coef = refrColor_;
+                    ret.coef = refrColor_ / SS(Abs(Dot(ret.dir, nor_)));
                     ret.pdf = 1;
                     return ret;
                 }
@@ -99,7 +99,7 @@ namespace
         {
             BxDFSample ret;
             ret.dir = 2 * absDot * nor - wi;
-            ret.coef = reflColor_;
+            ret.coef = reflColor_ / SS(Abs(Dot(ret.dir, nor_)));
             ret.pdf = 1;
             return ret;
         }

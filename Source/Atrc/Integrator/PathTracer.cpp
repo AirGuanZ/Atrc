@@ -20,7 +20,8 @@ Spectrum PathTracer::Trace(const Scene &scene, const Ray &r, uint32_t depth) con
 
     auto newRay = Ray(inct.pos, bxdfSample->dir, 1e-5);
     AGZ_ASSERT(ValidDir(newRay));
-    return bxdfSample->coef * Trace(scene, newRay, depth + 1) / SS(bxdfSample->pdf)
+    return bxdfSample->coef * Trace(scene, newRay, depth + 1)
+         * SS(Abs(Dot(inct.nor, bxdfSample->dir)) / bxdfSample->pdf)
          + bxdf->EmittedRadiance(inct);
 }
 
