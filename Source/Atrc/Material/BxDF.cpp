@@ -3,7 +3,7 @@
 
 AGZ_NS_BEG(Atrc)
 
-Spectrum BxDF::AmbientRadiance(const Intersection &inct) const
+Spectrum BxDF::EmittedRadiance(const Intersection &inct) const
 {
     return SPECTRUM::BLACK;
 }

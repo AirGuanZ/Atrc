@@ -16,7 +16,7 @@ namespace
 
         Option<BxDFSample> Sample(const Vec3r &wi, BxDFType type) const override;
 
-        Spectrum AmbientRadiance(const Intersection &inct) const override;
+        Spectrum EmittedRadiance(const Intersection &inct) const override;
     };
 
     BxDFType NormalBRDF::GetType() const
@@ -34,7 +34,7 @@ namespace
         return None;
     }
 
-    Spectrum NormalBRDF::AmbientRadiance(const Intersection &inct) const
+    Spectrum NormalBRDF::EmittedRadiance(const Intersection &inct) const
     {
         return 0.5f * (inct.nor.Map([](Real r) { return static_cast<float>(r); }) + Spectrum(1.0f));
     }

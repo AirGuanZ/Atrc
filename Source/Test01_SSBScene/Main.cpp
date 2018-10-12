@@ -34,8 +34,9 @@ int main()
         Degr(90.0), SCR_ASPECT_RATIO);
 
     //============= Scene =============
-
-    ColoredSky sky({ 0.4f, 0.7f, 0.9f }, { 1.0f, 1.0f, 1.0f });
+    
+    //ColoredSky sky({ 0.4f, 0.7f, 0.9f }, { 1.0f, 1.0f, 1.0f });
+    ColoredSky sky(SPECTRUM::BLACK, SPECTRUM::BLACK);
 
     MatGeoEntity<Transformer<Sphere>> ground(
         NewRC<DiffuseMaterial>(Spectrum(0.3f, 0.3f, 1.0f)),
@@ -44,6 +45,10 @@ int main()
     MatGeoEntity<Transformer<Sphere>> centreBall(
         NewRC<DiffuseMaterial>(Spectrum(0.4f, 0.7f, 0.2f)),
         TRANSFORM_IDENTITY, 1.0);
+
+    MatGeoEntity<Transformer<Sphere>> lightBall (
+        NewRC<AmbientMaterial>(Spectrum(1.0)),
+        Transform::Translate({ -1.0, 0.4, -0.9 }), 0.2);
 
     MatGeoEntity<Transformer<Sphere>> leftMetalSphere(
         NewRC<MetalMaterial>(Spectrum(1.0f, 0.3f, 0.3f), 0.2),
@@ -64,11 +69,12 @@ int main()
         Transform::Translate({ 0.0, -2.0, 0.123 })
       * Transform::Rotate({ 1.0, 1.1, 1.2 }, Degr(47)),
         0.7);
+    
 
     Scene scene;
     scene.camera = &camera;
     scene.entities = {
-        &ground,
+        &ground, &lightBall,
         &centreBall, &leftMetalSphere, &rightDiffuseCube,
         &sky };
 
@@ -78,7 +84,7 @@ int main()
 
     //============= Rendering =============
 
-    ParallelRenderer<JitteredSubareaRenderer> renderer(-1, 10);
+    ParallelRenderer<JitteredSubareaRenderer> renderer(6, 100);
     PathTracer integrator(20);
 
     cout << "Start rendering..." << endl;

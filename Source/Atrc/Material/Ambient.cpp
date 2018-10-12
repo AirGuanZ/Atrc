@@ -20,7 +20,7 @@ namespace
 
         Option<BxDFSample> Sample(const Vec3r &wi, BxDFType type) const override;
 
-        Spectrum AmbientRadiance(const Intersection &inct) const override;
+        Spectrum EmittedRadiance(const Intersection &inct) const override;
     };
 
     AmbientBRDF::AmbientBRDF(const Spectrum &color)
@@ -44,7 +44,7 @@ namespace
         return None;
     }
 
-    Spectrum AmbientBRDF::AmbientRadiance(const Intersection &inct) const
+    Spectrum AmbientBRDF::EmittedRadiance(const Intersection &inct) const
     {
         return color_;
     }

@@ -88,9 +88,9 @@ class TextureMultiplier
             return ret;
         }
     
-        Spectrum AmbientRadiance(const Intersection &inct) const override
+        Spectrum EmittedRadiance(const Intersection &inct) const override
         {
-            return coef_ * bxdf_->AmbientRadiance(inct);
+            return coef_ * bxdf_->EmittedRadiance(inct);
         }
     };
 
