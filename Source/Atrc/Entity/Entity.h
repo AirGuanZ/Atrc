@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Atrc/Common.h>
+#include <Atrc/Light/Light.h>
 #include <Atrc/Math/Math.h>
 
 AGZ_NS_BEG(Atrc)
@@ -20,6 +21,8 @@ public:
     virtual Real SurfaceArea() const = 0;
 
     virtual RC<BxDF> GetBxDF(const Intersection &inct) const = 0;
+
+    virtual const Light *AsLight() const;
 };
 
 AGZ_NS_END(Atrc)

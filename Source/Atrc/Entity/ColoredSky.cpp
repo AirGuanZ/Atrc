@@ -36,7 +36,7 @@ namespace
             return None;
         }
 
-        Spectrum EmittedRadiance(const Intersection &inct) const override
+        Spectrum AmbientRadiance(const Intersection &inct) const override
         {
             SS t = SS(0.5) * SS(inct.wr.z) + SS(0.5);
             return (SS(1) - t) * colorTop_ + t * colorBottom_;

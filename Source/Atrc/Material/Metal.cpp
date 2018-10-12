@@ -51,7 +51,7 @@ namespace
             Real cos = Dot(dir, nor_);
             if(cos <= 0.0)
                 return None;
-            return BxDFSample{ dir, color_ / cos, 1.0 };
+            return BxDFSample{ dir, color_ / SS(cos), 1.0 };
         }
         return None;
     }

@@ -8,4 +8,9 @@ bool Entity::HasIntersection(const Ray &r) const
     return EvalIntersection(r, &inct);
 }
 
+const Light *Entity::AsLight() const
+{
+    return nullptr;
+}
+
 AGZ_NS_END(Atrc)

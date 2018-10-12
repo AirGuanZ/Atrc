@@ -21,7 +21,7 @@ namespace
 
         Option<BxDFSample> Sample(const Vec3r &wi, BxDFType type) const override;
 
-        Spectrum EmittedRadiance(const Intersection &inct) const override;
+        Spectrum AmbientRadiance(const Intersection &inct) const override;
     };
 
     BxDFOpr_Add::BxDFOpr_Add(RC<BxDF> lhs, RC<BxDF> rhs, Real lProb, SS coef)
@@ -48,10 +48,10 @@ namespace
         return ret;
     }
 
-    Spectrum BxDFOpr_Add::EmittedRadiance(const Intersection &inct) const
+    Spectrum BxDFOpr_Add::AmbientRadiance(const Intersection &inct) const
     {
-        return coef_ * (SS(lProb_) * lhs_->EmittedRadiance(inct)
-            + (1 - SS(lProb_)) * rhs_->EmittedRadiance(inct));
+        return coef_ * (SS(lProb_) * lhs_->AmbientRadiance(inct)
+            + (1 - SS(lProb_)) * rhs_->AmbientRadiance(inct));
     }
 }
 

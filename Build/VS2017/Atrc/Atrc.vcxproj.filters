@@ -114,6 +114,15 @@
     <ClInclude Include="..\..\..\Source\Atrc\Entity\GeometryTemplate\Cube.h">
       <Filter>Entity\GeometryTemplate</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Integrator\PathTracerEx.h">
+      <Filter>Integrator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Light\Light.h">
+      <Filter>Light</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Light\LightManager.h">
+      <Filter>Light</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\Atrc\Common.cpp" />
@@ -186,6 +195,15 @@
     <ClCompile Include="..\..\..\Source\Atrc\Entity\GeometryTemplate\Cube.cpp">
       <Filter>Entity\GeometryTemplate</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Integrator\PathTracerEx.cpp">
+      <Filter>Integrator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Light\Light.cpp">
+      <Filter>Light</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Light\LightManager.cpp">
+      <Filter>Light</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Camera">
@@ -208,6 +226,9 @@
     </Filter>
     <Filter Include="Entity\GeometryTemplate">
       <UniqueIdentifier>{5cd37857-779e-4aea-bb9a-eb7b0b64d282}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Light">
+      <UniqueIdentifier>{426ec1d4-f4eb-47dc-af3d-4d2677959e17}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

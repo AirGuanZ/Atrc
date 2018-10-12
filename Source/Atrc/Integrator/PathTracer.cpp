@@ -16,13 +16,13 @@ Spectrum PathTracer::Trace(const Scene &scene, const Ray &r, uint32_t depth) con
     auto bxdf = inct.entity->GetBxDF(inct);
     auto bxdfSample = bxdf->Sample(-r.direction, BXDF_ALL);
     if(!bxdfSample)
-        return bxdf->EmittedRadiance(inct);
+        return bxdf->AmbientRadiance(inct);
 
     auto newRay = Ray(inct.pos, bxdfSample->dir, 1e-5);
     AGZ_ASSERT(ValidDir(newRay));
     return bxdfSample->coef * Trace(scene, newRay, depth + 1)
          * SS(Abs(Dot(inct.nor, bxdfSample->dir)) / bxdfSample->pdf)
-         + bxdf->EmittedRadiance(inct);
+         + bxdf->AmbientRadiance(inct);
 }
 
 PathTracer::PathTracer(uint32_t maxDepth)

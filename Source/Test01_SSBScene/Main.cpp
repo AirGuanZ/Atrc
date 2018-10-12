@@ -41,10 +41,10 @@ int main()
         NewRC<DiffuseMaterial>(Spectrum(0.3f, 0.3f, 1.0f)),
         Transform::Translate({ 0.0, 0.0, -201.0 }), 200.0);
 
-    MatGeoEntity<Transformer<Sphere>> centreBall(
+    MatGeoEntity<Transformer<Sphere>> centreSphere(
         NewRC<DiffuseMaterial>(Spectrum(0.4f, 0.7f, 0.2f)),
         TRANSFORM_IDENTITY, 1.0);
-
+    
     MatGeoEntity<Transformer<Sphere>> leftMetalSphere(
         NewRC<MetalMaterial>(Spectrum(1.0f, 0.3f, 0.3f), 0.2),
         Transform::Translate({ 0.0, 2.0, 0.0 }), 1.0);
@@ -69,7 +69,7 @@ int main()
     scene.camera = &camera;
     scene.entities = {
         &ground,
-        &centreBall, &leftMetalSphere, &rightDiffuseCube,
+        &centreSphere, &leftMetalSphere, &rightDiffuseCube,
         &sky };
 
     //============= Render Target =============
