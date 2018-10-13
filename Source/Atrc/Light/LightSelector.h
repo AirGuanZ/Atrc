@@ -5,27 +5,23 @@
 
 AGZ_NS_BEG(Atrc)
 
-struct LightManagerSample
+struct LightSelectorSample
 {
     const Light *light;
     Real pdf;
 };
 
-class LightManager
+class LightSelector
 {
+    std::vector<const Light*> lights_;
+
 public:
 
-    explicit LightManager(std::vector<Light*> &&lights)
-    {
-        
-    }
+    explicit LightSelector(const std::vector<const Light*> &&lights);
 
     // Sample a light source to compute direct illumination at inct
     // ret.light == nullptr means there is no available light source
-    LightManagerSample Sample(const Intersection &inct) const
-    {
-        return { nullptr, 0.0 };
-    }
+    LightSelectorSample Sample(const Intersection &inct) const;
 };
 
 AGZ_NS_END(Atrc)

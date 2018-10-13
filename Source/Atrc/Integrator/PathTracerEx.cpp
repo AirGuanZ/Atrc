@@ -1,6 +1,6 @@
 #include <Atrc/Entity/Entity.h>
 #include <Atrc/Integrator/PathTracerEx.h>
-#include <Atrc/Light/LightManager.h>
+#include <Atrc/Light/LightSelector.h>
 #include <Atrc/Material/BxDF.h>
 
 AGZ_NS_BEG(Atrc)
@@ -12,6 +12,8 @@ Spectrum PathTracerEx::L(const Ray &r, const Intersection &inct, const Scene &sc
     const Light *light = inct.entity->AsLight();
 
     auto bxdf = inct.entity->GetBxDF(inct);
+    if(!bxdf->CanScatter())
+        return bxdf->AmbientRadiance(inct);
 
     Spectrum Le = light ? light->Le(inct) : SPECTRUM::BLACK;
     Spectrum Es = E(r, inct, *bxdf, scene, depth);
@@ -44,8 +46,8 @@ Spectrum PathTracerEx::E(const Ray &r, const Intersection &inct, const BxDF &bxd
             continue;
 
         dir /= dis;
-        Ray shadowRay = Ray(lightPnt->pos, dir / dis, 1e-5, dis - 1e-5);
-        if(HasIntersection(scene, shadowRay))
+        Ray shadowRay = Ray(lightPnt->pos, dir, 1e-5, dis - 1e-5);
+        if(Dot(-dir, inct.nor) <= 0.0 || HasIntersection(scene, shadowRay))
             continue;
 
         ret += bxdf.Eval(-dir, inct.wr) * lightPnt->radiance
@@ -78,8 +80,14 @@ Spectrum PathTracerEx::S(const Ray &r, const Intersection &inct, const BxDF &bxd
         return SPECTRUM::BLACK;
     auto newBxDF = newInct.entity->GetBxDF(newInct);
 
-    Spectrum EpS = E(newRay, newInct, *newBxDF, scene, depth + 1);
-    EpS += S(newRay, newInct, *newBxDF, scene, depth + 1);
+    Spectrum EpS = SPECTRUM::BLACK;
+    if(newBxDF->CanScatter())
+    {
+        EpS += E(newRay, newInct, *newBxDF, scene, depth + 1);
+        EpS += S(newRay, newInct, *newBxDF, scene, depth + 1);
+    }
+    else
+        EpS = newBxDF->AmbientRadiance(newInct);
 
     Spectrum ret = bxdfSample->coef * EpS
                  * SS(Abs(Dot(inct.nor, bxdfSample->dir))

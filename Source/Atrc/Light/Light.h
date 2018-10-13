@@ -18,11 +18,11 @@ public:
 
     virtual ~Light() = default;
 
+    virtual void PreprocessScene(const Scene &scene);
+
     virtual Option<LightSample> SampleTo(const Intersection &inct) const = 0;
 
     virtual Spectrum Le(const Intersection &inct) const = 0;
-
-    virtual Real Weight() const;
 };
 
 AGZ_NS_END(Atrc)

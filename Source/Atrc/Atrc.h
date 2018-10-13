@@ -19,6 +19,10 @@
 #include <Atrc/Entity/ColoredSky.h>
 #include <Atrc/Entity/MatGeoEntity.h>
 
+#include <Atrc/Light/DirectionalLight.h>
+
+#include <Atrc/Light/LightSelector.h>
+
 #include <Atrc/Material/Ambient.h>
 #include <Atrc/Material/Diffuse.h>
 #include <Atrc/Material/Glass.h>

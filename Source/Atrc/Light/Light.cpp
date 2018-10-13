@@ -2,9 +2,9 @@
 
 AGZ_NS_BEG(Atrc)
 
-Real Light::Weight() const
+void Light::PreprocessScene(const Scene &scene)
 {
-    return 1.0;
+    // do nothing
 }
 
 AGZ_NS_END(Atrc)

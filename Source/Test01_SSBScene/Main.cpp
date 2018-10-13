@@ -35,7 +35,8 @@ int main()
 
     //============= Scene =============
     
-    ColoredSky sky({ 0.4f, 0.7f, 0.9f }, { 1.0f, 1.0f, 1.0f });
+    //ColoredSky sky(Spectrum(0.4f, 0.7f, 0.9f), Spectrum(1.0f, 1.0f, 1.0f));
+    ColoredSky sky(Spectrum(0.03f), Spectrum(0.03f));
 
     MatGeoEntity<Transformer<Sphere>> ground(
         NewRC<DiffuseMaterial>(Spectrum(0.3f, 0.3f, 1.0f)),
@@ -46,7 +47,7 @@ int main()
         TRANSFORM_IDENTITY, 1.0);
     
     MatGeoEntity<Transformer<Sphere>> leftMetalSphere(
-        NewRC<MetalMaterial>(Spectrum(1.0f, 0.3f, 0.3f), 0.2),
+        NewRC<DiffuseMaterial>(Spectrum(1.0f, 0.3f, 0.3f)),
         Transform::Translate({ 0.0, 2.0, 0.0 }), 1.0);
 
     auto cubeTex = Tex2D<Color3b>(
@@ -64,13 +65,20 @@ int main()
         Transform::Translate({ 0.0, -2.0, 0.123 })
       * Transform::Rotate({ 1.0, 1.1, 1.2 }, Degr(47)),
         0.7);
+
+    DirectionalLight dirLight(Spectrum(0.7f), { 4.0, -2.0, -7.0 }, Degr(5.0));
+
+    LightSelector lights({ &dirLight });
     
     Scene scene;
-    scene.camera = &camera;
+    scene.camera   = &camera;
+    scene.lightMgr = &lights;
     scene.entities = {
         &ground,
         &centreSphere, &leftMetalSphere, &rightDiffuseCube,
         &sky };
+
+    dirLight.PreprocessScene(scene);
 
     //============= Render Target =============
 
@@ -78,9 +86,8 @@ int main()
 
     //============= Rendering =============
 
-    ParallelRenderer<JitteredSubareaRenderer> renderer(6, 100);
-    //PathTracer integrator(20);
-    PathTracerEx integrator(0, 0.0, 10, 50);
+    ParallelRenderer<JitteredSubareaRenderer> renderer(6, 10);
+    PathTracerEx integrator(1, 0.0, 10, 50);
 
     cout << "Start rendering..." << endl;
 

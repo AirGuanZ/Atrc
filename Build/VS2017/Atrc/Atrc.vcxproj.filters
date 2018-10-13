@@ -120,7 +120,10 @@
     <ClInclude Include="..\..\..\Source\Atrc\Light\Light.h">
       <Filter>Light</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\Atrc\Light\LightManager.h">
+    <ClInclude Include="..\..\..\Source\Atrc\Light\LightSelector.h">
+      <Filter>Light</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Light\DirectionalLight.h">
       <Filter>Light</Filter>
     </ClInclude>
   </ItemGroup>
@@ -198,10 +201,13 @@
     <ClCompile Include="..\..\..\Source\Atrc\Integrator\PathTracerEx.cpp">
       <Filter>Integrator</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Light\LightSelector.cpp">
+      <Filter>Light</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\..\Source\Atrc\Light\Light.cpp">
       <Filter>Light</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Source\Atrc\Light\LightManager.cpp">
+    <ClCompile Include="..\..\..\Source\Atrc\Light\DirectionalLight.cpp">
       <Filter>Light</Filter>
     </ClCompile>
   </ItemGroup>

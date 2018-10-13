@@ -37,8 +37,9 @@
     <ClInclude Include="..\..\..\Source\Atrc\Integrator\Integrator.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Integrator\PathTracer.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Integrator\PathTracerEx.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Light\DirectionalLight.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Light\Light.h" />
-    <ClInclude Include="..\..\..\Source\Atrc\Light\LightManager.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Light\LightSelector.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Material\Ambient.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Material\BxDF.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Material\Material.h" />
@@ -77,8 +78,9 @@
     <ClCompile Include="..\..\..\Source\Atrc\Integrator\Integrator.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Integrator\PathTracer.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Integrator\PathTracerEx.cpp" />
+    <ClCompile Include="..\..\..\Source\Atrc\Light\DirectionalLight.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Light\Light.cpp" />
-    <ClCompile Include="..\..\..\Source\Atrc\Light\LightManager.cpp" />
+    <ClCompile Include="..\..\..\Source\Atrc\Light\LightSelector.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Material\Ambient.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Material\BxDF.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Material\Diffuse.cpp" />

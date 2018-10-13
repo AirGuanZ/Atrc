@@ -41,6 +41,11 @@ namespace
             SS t = SS(0.5) * SS(inct.wr.z) + SS(0.5);
             return (SS(1) - t) * colorTop_ + t * colorBottom_;
         }
+
+        bool CanScatter() const override
+        {
+            return false;
+        }
     };
 }
 
@@ -52,7 +57,7 @@ ColoredSky::ColoredSky(const Spectrum &top, const Spectrum &bottom)
 
 bool ColoredSky::HasIntersection(const Ray &r) const
 {
-    return true;
+    return RealT(r.maxT).IsInfinity();
 }
 
 bool ColoredSky::EvalIntersection(const Ray &r, Intersection *inct) const

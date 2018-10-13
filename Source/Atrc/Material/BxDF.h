@@ -51,6 +51,8 @@ public:
     virtual Option<BxDFSample> Sample(const Vec3r &wi, BxDFType type) const = 0;
 
     virtual Spectrum AmbientRadiance(const Intersection &inct) const;
+
+    virtual bool CanScatter() const;
 };
 
 AGZ_NS_END(Atrc)

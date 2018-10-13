@@ -8,4 +8,9 @@ Spectrum BxDF::AmbientRadiance(const Intersection &inct) const
     return SPECTRUM::BLACK;
 }
 
+bool BxDF::CanScatter() const
+{
+    return true;
+}
+
 AGZ_NS_END(Atrc)

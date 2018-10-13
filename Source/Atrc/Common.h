@@ -72,7 +72,23 @@ ATRC_INTERFACE BxDF;
 ATRC_INTERFACE Camera;
 ATRC_INTERFACE Entity;
 ATRC_INTERFACE Integrator;
+ATRC_INTERFACE Light;
+ATRC_INTERFACE Material;
 ATRC_INTERFACE Renderer;
+
+class AABB;
+class LightSelector;
+class Ray;
+class Transform;
+
+// ============================= Scene =============================
+
+struct Scene
+{
+    const Camera *camera = nullptr;
+    const LightSelector *lightMgr = nullptr;
+    std::vector<const Entity*> entities;
+};
 
 // ============================= Export AGZ::Math =============================
 
