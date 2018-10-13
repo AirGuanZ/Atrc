@@ -9,6 +9,8 @@ class PathTracerEx
     : ATRC_IMPLEMENTS Integrator,
       ATRC_PROPERTY AGZ::Uncopiable
 {
+    int lightSampleCount_;
+
     Real contProb_;
     int minDepth_;
     int maxDepth_;
@@ -19,7 +21,7 @@ class PathTracerEx
 
 public:
 
-    PathTracerEx(Real contProb, int minDepth, int maxDepth = (std::numeric_limits<int>::max)());
+    PathTracerEx(int lightSampleCount, Real contProb, int minDepth, int maxDepth = (std::numeric_limits<int>::max)());
 
     Spectrum GetRadiance(const Scene &scene, const Ray &r) const override;
 };

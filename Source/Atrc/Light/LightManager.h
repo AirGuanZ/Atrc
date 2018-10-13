@@ -15,9 +15,17 @@ class LightManager
 {
 public:
 
-    explicit LightManager(std::vector<Light*> &&lights);
+    explicit LightManager(std::vector<Light*> &&lights)
+    {
+        
+    }
 
-    LightManagerSample Sample(const Intersection &inct) const;
+    // Sample a light source to compute direct illumination at inct
+    // ret.light == nullptr means there is no available light source
+    LightManagerSample Sample(const Intersection &inct) const
+    {
+        return { nullptr, 0.0 };
+    }
 };
 
 AGZ_NS_END(Atrc)

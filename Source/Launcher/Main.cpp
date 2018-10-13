@@ -1,5 +1,6 @@
 #include <iostream>
 #include <Atrc/Atrc.h>
+#include "Atrc/Integrator/PathTracerEx.h"
 
 using namespace std;
 using namespace Atrc;
@@ -70,7 +71,7 @@ void Run()
 
     //============= Rendering =============
 
-    ParallelRenderer<JitteredSubareaRenderer> renderer(6, 1);
+    ParallelRenderer<JitteredSubareaRenderer> renderer(6, 10);
     PathTracer integrator(10);
 
     cout << "Start rendering..." << endl;

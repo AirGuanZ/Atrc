@@ -79,7 +79,8 @@ int main()
     //============= Rendering =============
 
     ParallelRenderer<JitteredSubareaRenderer> renderer(6, 100);
-    PathTracer integrator(20);
+    //PathTracer integrator(20);
+    PathTracerEx integrator(0, 0.0, 10, 50);
 
     cout << "Start rendering..." << endl;
 

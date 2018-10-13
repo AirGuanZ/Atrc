@@ -7,6 +7,7 @@ AGZ_NS_BEG(Atrc)
 struct LightSample
 {
     Vec3r pos;
+    Vec3r nor;
     Spectrum radiance;
     Real pdf;
 };

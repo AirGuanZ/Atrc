@@ -22,4 +22,14 @@ bool Integrator::FindClosestIntersection(const Scene &scene, const Ray &r, Inter
     return incted;
 }
 
+bool Integrator::HasIntersection(const Scene &scene, const Ray &r)
+{
+    for(auto ent : scene.entities)
+    {
+        if(ent->HasIntersection(r))
+            return true;
+    }
+    return false;
+}
+
 AGZ_NS_END(Atrc)
