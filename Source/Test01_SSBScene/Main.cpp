@@ -39,7 +39,7 @@ int main()
     ColoredSky sky(Spectrum(0.0f), Spectrum(0.0f));
 
     MatGeoEntity<Transformer<Sphere>> ground(
-        NewRC<DiffuseMaterial>(Spectrum(0.3f, 0.3f, 1.0f)),
+        NewRC<DiffuseMaterial>(Spectrum(1.0f, 0.3f, 0.3f)),
         Transform::Translate({ 0.0, 0.0, -201.0 }), 200.0);
 
     MatGeoEntity<Transformer<Sphere>> centreSphere(
@@ -47,7 +47,7 @@ int main()
         TRANSFORM_IDENTITY, 1.0);
     
     MatGeoEntity<Transformer<Sphere>> leftMetalSphere(
-        NewRC<DiffuseMaterial>(Spectrum(1.0f, 0.3f, 0.3f)),
+        NewRC<DiffuseMaterial>(Spectrum(0.3f, 0.3f, 1.0f)),
         Transform::Translate({ 0.0, 2.0, 0.0 }), 1.0);
 
     auto cubeTex = Tex2D<Color3b>(
@@ -58,7 +58,7 @@ int main()
         return vb.Map([](uint8_t b) {return b / 255.0f; });
     });
 
-    auto cubeMat = NewRC<TextureMultiplier<DiffuseMaterial, SamplingStrategy::Linear>>(
+    auto cubeMat = NewRC<TextureMultiplier<DiffuseMaterial, SamplingStrategy::Nearest>>(
                             cubeTex, Spectrum(0.7f));
     MatGeoEntity<Transformer<Cube>> rightDiffuseCube(
         cubeMat,
@@ -66,9 +66,9 @@ int main()
       * Transform::Rotate({ 1.0, 1.1, 1.2 }, Degr(47)),
         0.7);
 
-    DirectionalLight dirLight(Spectrum(1.0f), { 4.0, -2.0, -7.0 }, Degr(10.0));
+    DirectionalLight dirLight(Spectrum(0.008f), { 4.0, -2.0, -7.0 }, Degr(10.0));
     MatGeoEntity<GeoDiffuseLight<Transformer<Sphere>>> lightSphere(
-        NewRC<VoidMaterial>(), Spectrum(1.0f), Transform::Translate({ -1.5, 0.4, -0.65 }), 0.3);
+        NewRC<VoidMaterial>(), Spectrum(1.0f), Transform::Translate({ -1.5, 0.4, 0.5 }), 0.3);
 
     LightSelector lights({ /*&dirLight, */&lightSphere });
     
@@ -89,7 +89,8 @@ int main()
     //============= Rendering =============
 
     ParallelRenderer<JitteredSubareaRenderer> renderer(6, 1000);
-    PathTracerEx integrator(1, 0.0, 10, 50);
+    PathTracerEx integrator(1, 10);
+
     //PathTracer integrator(10);
 
     cout << "Start rendering..." << endl;

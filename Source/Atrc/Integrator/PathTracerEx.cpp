@@ -16,13 +16,13 @@ Spectrum PathTracerEx::L(const Ray &r, const Intersection &inct, const Scene &sc
     if(!bxdf->CanScatter())
         return Le + bxdf->AmbientRadiance(inct);
 
-    Spectrum Es = E(r, inct, *bxdf, scene, depth);
+    Spectrum Es = E(r, inct, *bxdf, scene);
     Spectrum Ss = S(r, inct, *bxdf, scene, depth);
 
     return Le + Es + Ss;
 }
 
-Spectrum PathTracerEx::E(const Ray &r, const Intersection &inct, const BxDF &bxdf, const Scene &scene, int depth) const
+Spectrum PathTracerEx::E(const Ray &r, const Intersection &inct, const BxDF &bxdf, const Scene &scene) const
 {
     Spectrum ret = SPECTRUM::BLACK;
     if(!scene.lightMgr || !lightSampleCount_)
@@ -63,12 +63,8 @@ Spectrum PathTracerEx::E(const Ray &r, const Intersection &inct, const BxDF &bxd
 Spectrum PathTracerEx::S(const Ray &r, const Intersection &inct, const BxDF &bxdf, const Scene &scene, int depth) const
 {
     SS RRCoef = 1.0f;
-    if(depth >= minDepth_)
-    {
-        if(depth > maxDepth_ || Rand() > contProb_)
-            return SPECTRUM::BLACK;
-        RRCoef = 1 / SS(contProb_);
-    }
+    if(depth > maxDepth_)
+        return SPECTRUM::BLACK;
 
     auto bxdfSample = bxdf.Sample(inct.wr, BXDF_ALL);
     if(!bxdfSample)
@@ -85,7 +81,7 @@ Spectrum PathTracerEx::S(const Ray &r, const Intersection &inct, const BxDF &bxd
     Spectrum EpS = SPECTRUM::BLACK;
     if(newBxDF->CanScatter())
     {
-        EpS += E(newRay, newInct, *newBxDF, scene, depth + 1);
+        EpS += E(newRay, newInct, *newBxDF, scene);
         EpS += S(newRay, newInct, *newBxDF, scene, depth + 1);
     }
     else
@@ -98,18 +94,23 @@ Spectrum PathTracerEx::S(const Ray &r, const Intersection &inct, const BxDF &bxd
     return RRCoef * ret;
 }
 
-PathTracerEx::PathTracerEx(int lightSampleCount, Real contProb, int minDepth, int maxDepth)
-    : lightSampleCount_(lightSampleCount), contProb_(contProb), minDepth_(minDepth), maxDepth_(maxDepth)
+PathTracerEx::PathTracerEx(int lightSampleCount, int maxDepth)
+    : lightSampleCount_(lightSampleCount), maxDepth_(maxDepth)
 {
-    AGZ_ASSERT(lightSampleCount >= 0 && 0.0 <= contProb && contProb <= 1.0);
-    AGZ_ASSERT(1 <= minDepth && minDepth <= maxDepth);
+    AGZ_ASSERT(lightSampleCount >= 0);
+    AGZ_ASSERT(1 <= maxDepth);
+}
+
+void PathTracerEx::SetBackground(const Spectrum &color)
+{
+    background_ = color;
 }
 
 Spectrum PathTracerEx::GetRadiance(const Scene &scene, const Ray &r) const
 {
     Intersection inct;
     if(!FindClosestIntersection(scene, r, &inct))
-        return SPECTRUM::BLACK;
+        return background_;
     return L(r, inct, scene, 1);
 }
 

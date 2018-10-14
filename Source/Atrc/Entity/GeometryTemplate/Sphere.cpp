@@ -50,7 +50,7 @@ Option<GeometrySurfaceSample> Sphere::SampleSurface() const
     }
 
     ret.pos = radius_ * ret.nor;
-    ret.pdf = 4 * PI<Real> * radius_ * radius_;
+    ret.pdf = 1 / (4 * PI<Real> * radius_ * radius_);
 
     return ret;
 }

@@ -7,11 +7,11 @@ AGZ_NS_BEG(Atrc)
 Spectrum PathTracer::Trace(const Scene &scene, const Ray &r, uint32_t depth) const
 {
     if(depth > maxDepth_)
-        return SPECTRUM::RED;
+        return SPECTRUM::BLACK;
 
     Intersection inct;
     if(!FindClosestIntersection(scene, r, &inct))
-        return SPECTRUM::BLACK;
+        return depth <= 1 ? background_ : SPECTRUM::BLACK;
 
     Spectrum ret;
     if(inct.entity->AsLight())
@@ -35,6 +35,11 @@ PathTracer::PathTracer(uint32_t maxDepth)
     : maxDepth_(maxDepth)
 {
     AGZ_ASSERT(maxDepth >= 1);
+}
+
+void PathTracer::SetBackground(const Spectrum &color)
+{
+    background_ = color;
 }
 
 Spectrum PathTracer::GetRadiance(const Scene &scene, const Ray &r) const

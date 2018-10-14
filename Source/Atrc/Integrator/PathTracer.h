@@ -11,11 +11,15 @@ class PathTracer
 {
     uint32_t maxDepth_;
 
+    Spectrum background_;
+
     Spectrum Trace(const Scene &scene, const Ray &r, uint32_t depth) const;
 
 public:
 
     explicit PathTracer(uint32_t maxDepth);
+
+    void SetBackground(const Spectrum &color);
 
     Spectrum GetRadiance(const Scene &scene, const Ray &r) const override;
 };
