@@ -13,6 +13,8 @@ class ColoredSky
 
 public:
 
+    explicit ColoredSky(const Spectrum &topAndBottom);
+
     ColoredSky(const Spectrum &top, const Spectrum &bottom);
 
     bool HasIntersection(const Ray &r) const override;

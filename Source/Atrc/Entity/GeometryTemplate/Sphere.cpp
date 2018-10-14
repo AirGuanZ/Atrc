@@ -35,4 +35,24 @@ Real Sphere::SurfaceArea() const
     return 4 * PI<Real> * radius_ * radius_;
 }
 
+Option<GeometrySurfaceSample> Sphere::SampleSurface() const
+{
+    GeometrySurfaceSample ret;
+
+    for(;;)
+    {
+        auto [sam, pdf] = CommonSampler::Uniform_InUnitSphere::Sample();
+        if(sam.LengthSquare() > 0.05)
+        {
+            ret.nor = sam.Normalize();
+            break;
+        }
+    }
+
+    ret.pos = radius_ * ret.nor;
+    ret.pdf = 4 * PI<Real> * radius_ * radius_;
+
+    return ret;
+}
+
 AGZ_NS_END(Atrc)

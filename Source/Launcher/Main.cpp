@@ -1,12 +1,11 @@
 #include <iostream>
 #include <Atrc/Atrc.h>
-#include "Atrc/Integrator/PathTracerEx.h"
 
 using namespace std;
 using namespace Atrc;
 
-constexpr uint32_t SCR_W = 640;
-constexpr uint32_t SCR_H = 480;
+constexpr uint32_t SCR_W = 1920;
+constexpr uint32_t SCR_H = 1080;
 
 constexpr Real SCR_ASPECT_RATIO = static_cast<Real>(SCR_W) / SCR_H;
 
@@ -54,8 +53,8 @@ void Run()
     AGZ::Model::WavefrontObj bunnyObj;
     AGZ::Model::WavefrontObjFile::LoadFromObjFile("./Assets/bunny.obj", &bunnyObj);
     MatGeoEntity<Transformer<TriangleBVH>> bunny(
-        NewRC<MetalMaterial>(Spectrum(0.7f), 0.1),
-        Transform::Translate({ 2.5, 1.0, -0.85 })
+        NewRC<GlassMaterial>(Spectrum(0.7f), 1.4),
+        Transform::Translate({ 2.5, 1.0, -0.7 })
       * Transform::RotateZ(Degr(90))
       * Transform::Scale(Vec3r(2.2 / 60)),
         bunnyObj.ToGeometryMeshGroup().submeshes["Default"]);
@@ -71,7 +70,7 @@ void Run()
 
     //============= Rendering =============
 
-    ParallelRenderer<JitteredSubareaRenderer> renderer(6, 10);
+    ParallelRenderer<JitteredSubareaRenderer> renderer(6, 1000);
     PathTracer integrator(10);
 
     cout << "Start rendering..." << endl;

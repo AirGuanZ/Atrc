@@ -36,7 +36,7 @@ int main()
     //============= Scene =============
     
     //ColoredSky sky(Spectrum(0.4f, 0.7f, 0.9f), Spectrum(1.0f, 1.0f, 1.0f));
-    ColoredSky sky(Spectrum(0.03f), Spectrum(0.03f));
+    ColoredSky sky(Spectrum(0.0f), Spectrum(0.0f));
 
     MatGeoEntity<Transformer<Sphere>> ground(
         NewRC<DiffuseMaterial>(Spectrum(0.3f, 0.3f, 1.0f)),
@@ -59,22 +59,24 @@ int main()
     });
 
     auto cubeMat = NewRC<TextureMultiplier<DiffuseMaterial, SamplingStrategy::Linear>>(
-                            cubeTex, Spectrum(0.8f));
+                            cubeTex, Spectrum(0.7f));
     MatGeoEntity<Transformer<Cube>> rightDiffuseCube(
         cubeMat,
         Transform::Translate({ 0.0, -2.0, 0.123 })
       * Transform::Rotate({ 1.0, 1.1, 1.2 }, Degr(47)),
         0.7);
 
-    DirectionalLight dirLight(Spectrum(0.7f), { 4.0, -2.0, -7.0 }, Degr(5.0));
+    DirectionalLight dirLight(Spectrum(1.0f), { 4.0, -2.0, -7.0 }, Degr(10.0));
+    MatGeoEntity<GeoDiffuseLight<Transformer<Sphere>>> lightSphere(
+        NewRC<VoidMaterial>(), Spectrum(1.0f), Transform::Translate({ -1.5, 0.4, -0.65 }), 0.3);
 
-    LightSelector lights({ &dirLight });
+    LightSelector lights({ /*&dirLight, */&lightSphere });
     
     Scene scene;
     scene.camera   = &camera;
     scene.lightMgr = &lights;
     scene.entities = {
-        &ground,
+        &ground, &lightSphere,
         &centreSphere, &leftMetalSphere, &rightDiffuseCube,
         &sky };
 
@@ -86,8 +88,9 @@ int main()
 
     //============= Rendering =============
 
-    ParallelRenderer<JitteredSubareaRenderer> renderer(6, 10);
+    ParallelRenderer<JitteredSubareaRenderer> renderer(6, 1000);
     PathTracerEx integrator(1, 0.0, 10, 50);
+    //PathTracer integrator(10);
 
     cout << "Start rendering..." << endl;
 

@@ -126,6 +126,12 @@
     <ClInclude Include="..\..\..\Source\Atrc\Light\DirectionalLight.h">
       <Filter>Light</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Light\GeoDiffuseLight.h">
+      <Filter>Light</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Material\VoidMaterial.h">
+      <Filter>Material</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\Atrc\Common.cpp" />
@@ -209,6 +215,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Source\Atrc\Light\DirectionalLight.cpp">
       <Filter>Light</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Material\VoidMaterial.cpp">
+      <Filter>Material</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

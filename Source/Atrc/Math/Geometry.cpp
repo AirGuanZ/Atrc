@@ -4,27 +4,26 @@ AGZ_NS_BEG(Atrc::Geometry::Sphere)
 
 namespace
 {
-    // |o + td|^2 = r^2 => t^2 + Bt + C = 0
-    // Returns (B, C)
-    std::tuple<Real, Real> Coefs(const Ray &r, Real radius)
+    // |o + td|^2 = r^2 => At^2 + Bt + C = 0
+    // returns (A, B, C)
+    std::tuple<Real, Real, Real> SphereCoefs(Real radius, const Ray &r)
     {
-        AGZ_ASSERT(ValidDir(r));
-        return {
-            2.0 * Dot(r.direction, r.origin),
-            r.origin.LengthSquare() - radius * radius
-        };
+        Real A = r.direction.LengthSquare();
+        Real B = 2.0 * Dot(r.direction, r.origin);
+        Real C = r.origin.LengthSquare() - radius * radius;
+        return { A, B, C };
     }
 }
 
 bool HasIntersection(const Ray &r, Real radius)
 {
-    auto [B, C] = Coefs(r, radius);
-    Real delta = B * B - 4.0 * C;
+    auto [A, B, C] = SphereCoefs(radius, r);
+    Real delta = B * B - 4.0 * A* C;
     if(delta < 0.0)
         return false;
     delta = Sqrt(delta);
     
-    constexpr Real inv2A = 0.5;
+    Real inv2A = 0.5 / A;
     Real t0 = (-B - delta) * inv2A;
     Real t1 = (-B + delta) * inv2A;
     
@@ -36,13 +35,13 @@ bool EvalIntersection(const Ray &r, Real radius, Intersection *inct)
 {
     AGZ_ASSERT(inct && ValidDir(r));
     
-    auto [B, C] = Coefs(r, radius);
-    Real delta = B * B - 4.0 * C;
+    auto [A, B, C] = SphereCoefs(radius, r);
+    Real delta = B * B - 4.0 * A * C;
     if(delta < 0.0)
         return false;
     delta = Sqrt(delta);
     
-    constexpr auto inv2A = 0.5;
+    Real inv2A = 0.5 / A;
     Real t0 = (-B - delta) * inv2A;
     Real t1 = (-B + delta) * inv2A;
     
@@ -71,9 +70,9 @@ bool EvalIntersection(const Ray &r, Real radius, Intersection *inct)
     Real u = 0.5 * InvPI<Real> * phi;
     Real v = InvPI<Real> * theta + 0.5;
     
-    inct->wr  = -r.direction;
+    inct->wr  = -r.direction.Normalize();
     inct->pos = pos;
-    inct->nor = inct->pos.Normalize();
+    inct->nor = inct->pos / radius;
     inct->t   = t;
     inct->uv  = Vec2r(u, v);
     
@@ -128,7 +127,7 @@ bool EvalIntersection(
     if(t < r.minT || t > r.maxT)
         return false;
 
-    inct->wr  = -r.direction;
+    inct->wr  = -r.direction.Normalize();
     inct->pos = r.At(t);
     inct->t   = t;
     inct->uv  = Vec2r(alpha, beta);

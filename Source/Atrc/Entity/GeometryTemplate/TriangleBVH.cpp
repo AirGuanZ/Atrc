@@ -308,11 +308,6 @@ void TriangleBVH::InitBVH(const Vertex *vertices, uint32_t triangleCount)
     std::vector<size_t> triIdxMap(triangleCount);
     for(size_t i = 0, j = 0; i < triangleCount; ++i, j += 3)
     {
-        //Vec3r wA = local2World_.ApplyToPoint(vertices[j].pos);
-        //Vec3r wB = local2World_.ApplyToPoint(vertices[j + 1].pos);
-        //Vec3r wC = local2World_.ApplyToPoint(vertices[j + 2].pos);
-        //Real sa = Geometry::Triangle::SurfaceArea(wA, wB, wC);
-        //surfaceArea_ += sa;
         Real sa = Geometry::Triangle::SurfaceArea(
             vertices[j].pos, vertices[j + 1].pos, vertices[j + 2].pos);
 

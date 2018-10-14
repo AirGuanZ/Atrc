@@ -49,6 +49,12 @@ namespace
     };
 }
 
+ColoredSky::ColoredSky(const Spectrum &topAndBottom)
+    : ColoredSky(topAndBottom, topAndBottom)
+{
+
+}
+
 ColoredSky::ColoredSky(const Spectrum &top, const Spectrum &bottom)
     : top_(top), bottom_(bottom)
 {

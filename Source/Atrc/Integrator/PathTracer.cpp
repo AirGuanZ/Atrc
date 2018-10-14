@@ -13,14 +13,14 @@ Spectrum PathTracer::Trace(const Scene &scene, const Ray &r, uint32_t depth) con
     if(!FindClosestIntersection(scene, r, &inct))
         return SPECTRUM::BLACK;
 
-    auto bxdf = inct.entity->GetBxDF(inct);
-    auto bxdfSample = bxdf->Sample(-r.direction, BXDF_ALL);
-    if(!bxdfSample)
-        return bxdf->AmbientRadiance(inct);
-
     Spectrum ret;
     if(inct.entity->AsLight())
         ret += inct.entity->AsLight()->Le(inct);
+
+    auto bxdf = inct.entity->GetBxDF(inct);
+    auto bxdfSample = bxdf->Sample(-r.direction, BXDF_ALL);
+    if(!bxdfSample)
+        return ret + bxdf->AmbientRadiance(inct);
 
     auto newRay = Ray(inct.pos, bxdfSample->dir, 1e-5);
     AGZ_ASSERT(ValidDir(newRay));

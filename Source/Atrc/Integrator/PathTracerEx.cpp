@@ -10,12 +10,12 @@ Spectrum PathTracerEx::L(const Ray &r, const Intersection &inct, const Scene &sc
     AGZ_ASSERT(inct.entity);
 
     const Light *light = inct.entity->AsLight();
+    Spectrum Le = light ? light->Le(inct) : SPECTRUM::BLACK;
 
     auto bxdf = inct.entity->GetBxDF(inct);
     if(!bxdf->CanScatter())
-        return bxdf->AmbientRadiance(inct);
+        return Le + bxdf->AmbientRadiance(inct);
 
-    Spectrum Le = light ? light->Le(inct) : SPECTRUM::BLACK;
     Spectrum Es = E(r, inct, *bxdf, scene, depth);
     Spectrum Ss = S(r, inct, *bxdf, scene, depth);
 
@@ -38,15 +38,17 @@ Spectrum PathTracerEx::E(const Ray &r, const Intersection &inct, const BxDF &bxd
         if(!lightPnt)
             continue;
 
-        lightPnt->pos += 1e-4 * lightPnt->nor;
-        Vec3r dir = inct.pos - lightPnt->pos;
+        lightPnt->pos += 1e-5 * lightPnt->nor;
+        Vec3r dstPos = inct.pos + 1e-5 * inct.nor;
+
+        Vec3r dir = dstPos - lightPnt->pos;
         Real dis = dir.Length();
 
         if(lightSam.light == inct.entity->AsLight() && dis <= 3e-5)
             continue;
 
         dir /= dis;
-        Ray shadowRay = Ray(lightPnt->pos, dir, 1e-5, dis - 1e-5);
+        Ray shadowRay = Ray(lightPnt->pos, dir, 0, dis);
         if(Dot(-dir, inct.nor) <= 0.0 || HasIntersection(scene, shadowRay))
             continue;
 

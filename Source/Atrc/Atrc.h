@@ -20,6 +20,7 @@
 #include <Atrc/Entity/MatGeoEntity.h>
 
 #include <Atrc/Light/DirectionalLight.h>
+#include <Atrc/Light/GeoDiffuseLight.h>
 
 #include <Atrc/Light/LightSelector.h>
 
@@ -29,6 +30,7 @@
 #include <Atrc/Material/MatOpr.h>
 #include <Atrc/Material/Metal.h>
 #include <Atrc/Material/Normal.h>
+#include <Atrc/Material/VoidMaterial.h>
 
 #include <Atrc/Renderer/ParallelRenderer.h>
 #include <Atrc/Renderer/SerialRenderer.h>

@@ -2,6 +2,7 @@
 
 #include <Atrc/Common.h>
 #include <Atrc/Entity/Entity.h>
+#include <Atrc/Light/GeoDiffuseLight.h>
 #include <Atrc/Math/Math.h>
 
 AGZ_NS_BEG(Atrc)
@@ -24,6 +25,8 @@ public:
     AABB GetBoundingBox() const override;
 
     Real SurfaceArea() const override;
+
+    Option<GeometrySurfaceSample> SampleSurface() const;
 };
 
 AGZ_NS_END(Atrc)

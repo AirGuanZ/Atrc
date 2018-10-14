@@ -38,6 +38,7 @@
     <ClInclude Include="..\..\..\Source\Atrc\Integrator\PathTracer.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Integrator\PathTracerEx.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Light\DirectionalLight.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Light\GeoDiffuseLight.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Light\Light.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Light\LightSelector.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Material\Ambient.h" />
@@ -49,6 +50,7 @@
     <ClInclude Include="..\..\..\Source\Atrc\Material\Metal.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Material\Normal.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Material\TextureMultiplier.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Material\VoidMaterial.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Math\AABB.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Math\CoordSys.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Math\Geometry.h" />
@@ -88,6 +90,7 @@
     <ClCompile Include="..\..\..\Source\Atrc\Material\MatOpr.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Material\Metal.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Material\Normal.cpp" />
+    <ClCompile Include="..\..\..\Source\Atrc\Material\VoidMaterial.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Math\CommonSampler.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Math\Geometry.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Renderer\JitteredSubareaRenderer.cpp" />

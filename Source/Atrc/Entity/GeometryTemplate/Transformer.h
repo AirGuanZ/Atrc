@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Atrc/Entity/Entity.h>
+#include <Atrc/Light/GeoDiffuseLight.h>
 #include <Atrc/Math/Math.h>
 
 AGZ_NS_BEG(Atrc)
@@ -47,6 +48,16 @@ public:
     Real SurfaceArea() const override
     {
         return areaSquareFactor_ * Ent::SurfaceArea();
+    }
+
+    Option<GeometrySurfaceSample> SampleSurface() const
+    {
+        auto ori = Ent::SampleSurface();
+        if(!ori)
+            return None;
+        ori->pos = local2World_.ApplyToPoint(ori->pos);
+        ori->nor = local2World_.ApplyToNormal(ori->nor);
+        return ori;
     }
 };
 
