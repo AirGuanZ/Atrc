@@ -16,6 +16,7 @@ AGZ_NS_BEG(Atrc::Geometry::Triangle)
 
 bool HasIntersection(const Vec3r &A, const Vec3r &B_A, const Vec3r &C_A, const Ray &r);
 
+// NOTE: this funtion won't set inct->nor
 bool EvalIntersection(
     const Vec3r &A, const Vec3r &B_A, const Vec3r &C_A,
     const Ray &r, Intersection *inct);

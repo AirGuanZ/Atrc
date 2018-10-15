@@ -2,14 +2,19 @@
 
 AGZ_NS_BEG(Atrc::CommonSampler)
 
+namespace
+{
+    thread_local Random::SharedRandomEngine_t<std::minstd_rand> RNG;
+}
+
 Uniform_InUnitSphere::Result Uniform_InUnitSphere::Sample()
 {
     for(;;)
     {
         Vec3r sample(
-            2.0 * Rand() - 1.0,
-            2.0 * Rand() - 1.0,
-            2.0 * Rand() - 1.0);
+            2.0 * Uniform(0.0, 1.0, RNG) - 1.0,
+            2.0 * Uniform(0.0, 1.0, RNG) - 1.0,
+            2.0 * Uniform(0.0, 1.0, RNG) - 1.0);
         if(sample.LengthSquare() <= 1.0)
             return { sample, 4.0 / 3.0 * PI<Real> };
     }
@@ -24,7 +29,7 @@ namespace
 {
     Vec2r Concentric_UnitDisk()
     {
-        Vec2r uOffset = 2 * Vec2r(Rand(), Rand()) - Vec2r(1.0);
+        Vec2r uOffset = 2 * Vec2r(Uniform(0.0, 1.0, RNG), Uniform(0.0, 1.0, RNG)) - Vec2r(1.0);
         if(uOffset.x == 0 && uOffset.y == 0)
             return Vec2r(0.0);
         Real theta, r;
@@ -50,19 +55,6 @@ ZWeighted_OnUnitHemisphere::Result ZWeighted_OnUnitHemisphere::Sample()
 Real ZWeighted_OnUnitHemisphere::PDF(const Vec3r &sample)
 {
     return sample.z / PI<Real>;
-}
-
-Uniform_OnHemisphere::Result Uniform_OnHemisphere::Sample()
-{
-    Real z = Rand();
-    Real r = Sqrt(Max(0.0, 1.0 - z * z));
-    Real phi = 2 * PI<Real> * Rand();
-    return { { r * Cos(phi), r * Sin(phi), z }, 0.5 / PI<Real> };
-}
-
-Real Uniform_OnHemisphere::PDF(const Vec3r &sample)
-{
-    return 0.5 / PI<Real>;
 }
 
 AGZ_NS_END(Atrc::CommonSampler)

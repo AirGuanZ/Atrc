@@ -54,8 +54,8 @@ class ParallelRenderer
                     {
                         std::lock_guard<std::mutex> lk2(*param.outMut);
                         float percent = 100.0f * param.tasks->size() / param.taskCount;
-                        printf("%sRemaining tasks: %5.2f%%  ",
-                               std::string(50, '\b').c_str(), percent);
+                        std::printf("%sRemaining tasks: %5.2f%%  ",
+                                    std::string(50, '\b').c_str(), percent);
                     }
 
                     area = param.tasks->front();
