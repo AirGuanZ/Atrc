@@ -11,7 +11,7 @@ public:
 
     virtual ~Material() = default;
 
-    virtual Box<BxDF> GetBxDF(const Intersection &inct, const Vec2r &matParam) const = 0;
+    virtual RC<BxDF> GetBxDF(const Intersection &inct, const Vec2r &matParam) const = 0;
 };
 
 AGZ_NS_END(Atrc)

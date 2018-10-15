@@ -36,11 +36,9 @@ namespace
         explicit GlassBxDF(
             const Intersection &inct, const Spectrum &reflColor, const Spectrum &refrColor, Real refIdx = 1.5);
 
-        BxDFType GetType() const override;
-
         Spectrum Eval(const Vec3r &wi, const Vec3r &wo) const override;
 
-        Option<BxDFSample> Sample(const Vec3r &wi, BxDFType type) const override;
+        Option<BxDFSample> Sample(const Vec3r &wi) const override;
     };
 
     GlassBxDF::GlassBxDF(
@@ -50,17 +48,12 @@ namespace
 
     }
 
-    BxDFType GlassBxDF::GetType() const
-    {
-        return BXDF_REFLECTION | BXDF_TRANSMISSION | BXDF_SPECULAR;
-    }
-
     Spectrum GlassBxDF::Eval(const Vec3r &wi, const Vec3r &wo) const
     {
         return SPECTRUM::BLACK;
     }
 
-    Option<BxDFSample> GlassBxDF::Sample(const Vec3r &wi, BxDFType type) const
+    Option<BxDFSample> GlassBxDF::Sample(const Vec3r &wi) const
     {
         Real dot = Dot(wi, nor_), absDot = Abs(dot);
         Real niDivNt, cosine = absDot;
@@ -78,33 +71,24 @@ namespace
             nor = nor_;
         }
 
-        if(type.Contains(BXDF_TRANSMISSION | BXDF_SPECULAR))
+        if(Rand() > ChristopheSchlick(cosine, refIdx_))
         {
-            if(!type.Contains(BXDF_REFLECTION) ||
-                Rand() > ChristopheSchlick(cosine, refIdx_))
+            Vec3r refrDir;
+            if(Refract(wi, nor, niDivNt, &refrDir))
             {
-                Vec3r refrDir;
-                if(Refract(wi, nor, niDivNt, &refrDir))
-                {
-                    BxDFSample ret;
-                    ret.dir = refrDir.Normalize();
-                    ret.coef = refrColor_ / SS(Abs(Dot(ret.dir, nor_)));
-                    ret.pdf = 1;
-                    return ret;
-                }
+                BxDFSample ret;
+                ret.dir = refrDir.Normalize();
+                ret.coef = refrColor_ / SS(Abs(Dot(ret.dir, nor_)));
+                ret.pdf = 1;
+                return ret;
             }
         }
 
-        if(type.Contains(BXDF_REFLECTION | BXDF_SPECULAR))
-        {
-            BxDFSample ret;
-            ret.dir = 2 * absDot * nor - wi;
-            ret.coef = reflColor_ / SS(Abs(Dot(ret.dir, nor_)));
-            ret.pdf = 1;
-            return ret;
-        }
-
-        return None;
+        BxDFSample ret;
+        ret.dir = 2 * absDot * nor - wi;
+        ret.coef = reflColor_ / SS(Abs(Dot(ret.dir, nor_)));
+        ret.pdf = 1;
+        return ret;
     }
 }
 
@@ -114,9 +98,9 @@ GlassMaterial::GlassMaterial(const Spectrum &reflColor, const Spectrum &refrColo
 
 }
 
-Box<BxDF> GlassMaterial::GetBxDF(const Intersection &inct, const Vec2r &matParam) const
+RC<BxDF> GlassMaterial::GetBxDF(const Intersection &inct, const Vec2r &matParam) const
 {
-    return NewBox<GlassBxDF>(inct, reflColor_, refrColor_, refIdx_);
+    return NewRC<GlassBxDF>(inct, reflColor_, refrColor_, refIdx_);
 }
 
 

@@ -132,6 +132,9 @@
     <ClInclude Include="..\..\..\Source\Atrc\Material\VoidMaterial.h">
       <Filter>Material</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Integrator\PathTracerEx2.h">
+      <Filter>Integrator</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\Atrc\Common.cpp" />
@@ -218,6 +221,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Source\Atrc\Material\VoidMaterial.cpp">
       <Filter>Material</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Integrator\PathTracerEx2.cpp">
+      <Filter>Integrator</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

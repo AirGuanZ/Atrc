@@ -17,7 +17,7 @@ public:
 
     MetalMaterial(const Spectrum &color, Real roughness);
 
-    Box<BxDF> GetBxDF(const Intersection &inct, const Vec2r &matParam) const override;
+    RC<BxDF> GetBxDF(const Intersection &inct, const Vec2r &matParam) const override;
 };
 
 AGZ_NS_END(Atrc)

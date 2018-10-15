@@ -47,7 +47,7 @@ public:
 
     Spectrum Le(const Intersection &inct) const override
     {
-        AGZ_ASSERT(dynamic_cast<GeoDiffuseLight<GeoTpl>*>(inct.entity) == this);
+        AGZ_ASSERT(dynamic_cast<const GeoDiffuseLight<GeoTpl>*>(inct.entity) == this);
         return color_;
     }
 

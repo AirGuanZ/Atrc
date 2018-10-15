@@ -1,7 +1,9 @@
 #pragma once
 
+#include <iostream>
 #include <mutex>
 #include <queue>
+#include <string>
 #include <thread>
 #include <vector>
 
@@ -18,6 +20,8 @@ class ParallelRenderer
 {
     int workerCount_;
     SR subareaRenderer_;
+
+    bool printProgress_;
     
     using Area = SubareaRenderer::Subarea;
     
@@ -30,6 +34,9 @@ class ParallelRenderer
 
         std::mutex       *mut;
         std::queue<Area> *tasks;
+
+        std::mutex *outMut = nullptr;
+        size_t taskCount   = 0;
     };
     
     static void Worker(Param param)
@@ -43,6 +50,14 @@ class ParallelRenderer
                 std::lock_guard<std::mutex> lk(*param.mut);
                 if(!param.tasks->empty())
                 {
+                    if(param.outMut)
+                    {
+                        std::lock_guard<std::mutex> lk2(*param.outMut);
+                        float percent = 100.0f * param.tasks->size() / param.taskCount;
+                        printf("%sRemaining tasks: %5.2f%%  ",
+                               std::string(50, '\b').c_str(), percent);
+                    }
+
                     area = param.tasks->front();
                     param.tasks->pop();
                     done = false;
@@ -61,11 +76,16 @@ public:
 
     template<typename...Args>
     explicit ParallelRenderer(int workerCount, Args&&...args)
-        : subareaRenderer_(std::forward<Args>(args)...)
+        : subareaRenderer_(std::forward<Args>(args)...), printProgress_(false)
     {
         if(workerCount <= 0)
             workerCount = std::thread::hardware_concurrency();
         workerCount_ = (std::max)(1, workerCount) - 1;
+    }
+
+    void SetProgressPrinting(bool print)
+    {
+        printProgress_ = print;
     }
 
     void Render(
@@ -77,18 +97,24 @@ public:
         uint32_t h = output.GetHeight();
         
         std::queue<Area> tasks;
-        uint32_t yStep = w >= 2048 ? 1 : 4096 / w;
+        uint32_t yStep = w >= 4096 ? 1 : 8192 / w;
         uint32_t y = 0;
         for(; y + yStep <= h; y += yStep)
             tasks.push({ 0, w, y, y + yStep });
         if(y < h)
             tasks.push({ 0, w, y, h });
 
-        std::mutex mut;
+        std::mutex mut, outMut;
         Param param = {
             &scene, &integrator, &output, &subareaRenderer_,
             &mut, &tasks
         };
+
+        if(printProgress_)
+        {
+            param.outMut = &outMut;
+            param.taskCount = tasks.size();
+        }
         
         std::vector<std::thread> workers;
         if(workerCount_)
@@ -99,6 +125,9 @@ public:
         
         for(auto &worker : workers)
             worker.join();
+
+        if(printProgress_)
+            std::cout << std::endl;
     }
 };
 

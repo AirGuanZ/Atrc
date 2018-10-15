@@ -17,11 +17,11 @@ namespace
 
         explicit MetalBxDF(const Intersection &inct, const Spectrum &color, Real roughness);
 
-        BxDFType GetType() const override;
-
         Spectrum Eval(const Vec3r &wi, const Vec3r &wo) const override;
 
-        Option<BxDFSample> Sample(const Vec3r &wi, BxDFType type) const override;
+        Option<BxDFSample> Sample(const Vec3r &wi) const override;
+
+        bool IsSpecular() const override;
     };
 
     MetalBxDF::MetalBxDF(const Intersection &inct, const Spectrum &color, Real roughness)
@@ -30,20 +30,14 @@ namespace
 
     }
 
-    BxDFType MetalBxDF::GetType() const
-    {
-        return BXDF_REFLECTION | BXDF_SPECULAR;
-    }
-
     Spectrum MetalBxDF::Eval(const Vec3r &wi, const Vec3r &wo) const
     {
         return SPECTRUM::BLACK;
     }
 
-    Option<BxDFSample> MetalBxDF::Sample(const Vec3r &wi, BxDFType type) const
+    Option<BxDFSample> MetalBxDF::Sample(const Vec3r &wi) const
     {
-        if(type.Contains(BXDF_REFLECTION | BXDF_SPECULAR) &&
-            Dot(wi, nor_) > 0.0)
+        if(Dot(wi, nor_) > 0.0)
         {
             Vec3r dir = 2.0 * Dot(nor_, wi) * nor_ - wi;
             if(roughness_)
@@ -55,6 +49,11 @@ namespace
         }
         return None;
     }
+
+    bool MetalBxDF::IsSpecular() const
+    {
+        return true;
+    }
 }
 
 MetalMaterial::MetalMaterial(const Spectrum &color, Real roughness)
@@ -63,9 +62,9 @@ MetalMaterial::MetalMaterial(const Spectrum &color, Real roughness)
     
 }
 
-Box<BxDF> MetalMaterial::GetBxDF(const Intersection &inct, const Vec2r &matParam) const
+RC<BxDF> MetalMaterial::GetBxDF(const Intersection &inct, const Vec2r &matParam) const
 {
-    return NewBox<MetalBxDF>(inct, color_, roughness_);
+    return NewRC<MetalBxDF>(inct, color_, roughness_);
 }
 
 AGZ_NS_END(Atrc)

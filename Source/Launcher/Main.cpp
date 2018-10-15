@@ -70,7 +70,8 @@ void Run()
 
     //============= Rendering =============
 
-    ParallelRenderer<JitteredSubareaRenderer> renderer(6, 1000);
+    ParallelRenderer<JitteredSubareaRenderer> renderer(6, 100);
+    renderer.SetProgressPrinting(true);
     PathTracer integrator(10);
 
     cout << "Start rendering..." << endl;

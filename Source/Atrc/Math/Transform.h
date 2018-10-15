@@ -178,7 +178,7 @@ inline Vec3r Transform::ApplyInverseToNormal(const Vec3r &n) const
 inline Ray Transform::ApplyToRay(const Ray &r) const
 {
     Vec3r newDir = ApplyToVector(r.direction);
-    Real lengthRatio = newDir.Length() / r.direction.Length();
+    Real lengthRatio = Sqrt(newDir.LengthSquare() / r.direction.LengthSquare());
     return Ray(
         NON_UNIT,
         ApplyToPoint(r.origin),
@@ -189,7 +189,7 @@ inline Ray Transform::ApplyToRay(const Ray &r) const
 inline Ray Transform::ApplyInverseToRay(const Ray &r) const
 {
     Vec3r newDir = ApplyInverseToVector(r.direction);
-    Real lengthRatio = newDir.Length() / r.direction.Length();
+    Real lengthRatio = Sqrt(newDir.LengthSquare() / r.direction.LengthSquare());
     return Ray(
         NON_UNIT,
         ApplyInverseToPoint(r.origin),

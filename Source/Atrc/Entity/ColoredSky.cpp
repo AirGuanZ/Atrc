@@ -21,17 +21,12 @@ namespace
 
         }
 
-        BxDFType GetType() const override
-        {
-            return BXDF_NONE;
-        }
-
         Spectrum Eval(const Vec3r &wi, const Vec3r &wo) const override
         {
             return SPECTRUM::BLACK;
         }
 
-        Option<BxDFSample> Sample(const Vec3r &wi, BxDFType type) const override
+        Option<BxDFSample> Sample(const Vec3r &wi) const override
         {
             return None;
         }

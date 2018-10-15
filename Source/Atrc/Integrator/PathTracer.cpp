@@ -18,7 +18,7 @@ Spectrum PathTracer::Trace(const Scene &scene, const Ray &r, uint32_t depth) con
         ret += inct.entity->AsLight()->Le(inct);
 
     auto bxdf = inct.entity->GetBxDF(inct);
-    auto bxdfSample = bxdf->Sample(-r.direction, BXDF_ALL);
+    auto bxdfSample = bxdf->Sample(-r.direction);
     if(!bxdfSample)
         return ret + bxdf->AmbientRadiance(inct);
 

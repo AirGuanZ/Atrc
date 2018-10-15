@@ -16,7 +16,7 @@ public:
 
     explicit AmbientMaterial(const Spectrum &color);
 
-    Box<BxDF> GetBxDF(const Intersection &inct, const Vec2r &matParam) const override;
+    RC<BxDF> GetBxDF(const Intersection &inct, const Vec2r &matParam) const override;
 };
 
 AGZ_NS_END(Atrc)

@@ -10,13 +10,12 @@ class MatOpr_Add
 {
     RC<Material> lhs_, rhs_;
     Real lProb_;
-    SS coef_;
 
 public:
 
-    MatOpr_Add(RC<Material> lhs, RC<Material> rhs, Real wL, Real wR);
+    MatOpr_Add(RC<Material> lhs, RC<Material> rhs, Real weightL);
 
-    Box<BxDF> GetBxDF(const Intersection &inct, const Vec2r &matParam) const override;
+    RC<BxDF> GetBxDF(const Intersection &inct, const Vec2r &matParam) const override;
 };
 
 AGZ_NS_END(Atrc)

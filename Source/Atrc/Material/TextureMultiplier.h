@@ -59,20 +59,15 @@ class TextureMultiplier
         : ATRC_IMPLEMENTS BxDF,
           ATRC_PROPERTY AGZ::Uncopiable
     {
-        Box<BxDF> bxdf_;
+        RC<BxDF> bxdf_;
         Spectrum coef_;
 
     public:
 
-        TextureMultiplierBxDF(Box<BxDF> bxdf, const Spectrum &coef)
+        TextureMultiplierBxDF(RC<BxDF> bxdf, const Spectrum &coef)
             : bxdf_(std::move(bxdf)), coef_(coef)
         {
             AGZ_ASSERT(bxdf_);
-        }
-
-        BxDFType GetType() const override
-        {
-            return bxdf_->GetType();
         }
 
         Spectrum Eval(const Vec3r &wi, const Vec3r &wo) const override
@@ -80,9 +75,9 @@ class TextureMultiplier
             return coef_ * bxdf_->Eval(wi, wo);
         }
 
-        Option<BxDFSample> Sample(const Vec3r &wi, BxDFType type) const override
+        Option<BxDFSample> Sample(const Vec3r &wi) const override
         {
-            auto ret = bxdf_->Sample(wi, type);
+            auto ret = bxdf_->Sample(wi);
             if(ret)
                 ret->coef *= coef_;
             return ret;
@@ -103,15 +98,15 @@ public:
         
     }
 
-    Box<BxDF> GetBxDF(const Intersection &inct, const Vec2r &matParam) const override
+    RC<BxDF> GetBxDF(const Intersection &inct, const Vec2r &matParam) const override
     {
         switch(Sampling::GetSamplingStrategy())
         {
         case Texture2DSampleType::Nearest:
-            return NewBox<TextureMultiplierBxDF>(
+            return NewRC<TextureMultiplierBxDF>(
                 m_.GetBxDF(inct, matParam), AGZ::Tex::NearestSampler::Sample(tex_, matParam));
         case Texture2DSampleType::Linear:
-            return NewBox<TextureMultiplierBxDF>(
+            return NewRC<TextureMultiplierBxDF>(
                 m_.GetBxDF(inct, matParam), AGZ::Tex::LinearSampler::Sample(tex_, matParam));
         default:
             AGZ::Unreachable();

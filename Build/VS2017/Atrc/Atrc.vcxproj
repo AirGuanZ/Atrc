@@ -37,6 +37,7 @@
     <ClInclude Include="..\..\..\Source\Atrc\Integrator\Integrator.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Integrator\PathTracer.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Integrator\PathTracerEx.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Integrator\PathTracerEx2.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Light\DirectionalLight.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Light\GeoDiffuseLight.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Light\Light.h" />
@@ -80,6 +81,7 @@
     <ClCompile Include="..\..\..\Source\Atrc\Integrator\Integrator.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Integrator\PathTracer.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Integrator\PathTracerEx.cpp" />
+    <ClCompile Include="..\..\..\Source\Atrc\Integrator\PathTracerEx2.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Light\DirectionalLight.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Light\Light.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Light\LightSelector.cpp" />

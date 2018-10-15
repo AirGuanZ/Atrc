@@ -10,26 +10,19 @@ namespace
     {
     public:
 
-        BxDFType GetType() const override;
-
         Spectrum Eval(const Vec3r &wi, const Vec3r &wo) const override;
 
-        Option<BxDFSample> Sample(const Vec3r &wi, BxDFType type) const override;
+        Option<BxDFSample> Sample(const Vec3r &wi) const override;
 
         Spectrum AmbientRadiance(const Intersection &inct) const override;
     };
-
-    BxDFType NormalBRDF::GetType() const
-    {
-        return BXDF_NONE;
-    }
 
     Spectrum NormalBRDF::Eval(const Vec3r &wi, const Vec3r &wo) const
     {
         return SPECTRUM::BLACK;
     }
 
-    Option<BxDFSample> NormalBRDF::Sample(const Vec3r &wi, BxDFType type) const
+    Option<BxDFSample> NormalBRDF::Sample(const Vec3r &wi) const
     {
         return None;
     }
@@ -40,9 +33,9 @@ namespace
     }
 }
 
-Box<BxDF> NormalMaterial::GetBxDF(const Intersection &inct, const Vec2r &matParam) const
+RC<BxDF> NormalMaterial::GetBxDF(const Intersection &inct, const Vec2r &matParam) const
 {
-    return NewBox<NormalBRDF>();
+    return NewRC<NormalBRDF>();
 }
 
 AGZ_NS_END(Atrc)

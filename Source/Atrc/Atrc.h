@@ -8,6 +8,7 @@
 #include <Atrc/Integrator/AmbientIntegrator.h>
 #include <Atrc/Integrator/PathTracer.h>
 #include <Atrc/Integrator/PathTracerEx.h>
+#include <Atrc/Integrator/PathTracerEx2.h>
 
 #include <Atrc/Entity/GeometryTemplate/Cube.h>
 #include <Atrc/Entity/GeometryTemplate/Sphere.h>
@@ -30,6 +31,7 @@
 #include <Atrc/Material/MatOpr.h>
 #include <Atrc/Material/Metal.h>
 #include <Atrc/Material/Normal.h>
+#include <Atrc/Material/TextureMultiplier.h>
 #include <Atrc/Material/VoidMaterial.h>
 
 #include <Atrc/Renderer/ParallelRenderer.h>

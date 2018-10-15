@@ -4,7 +4,7 @@
 
 AGZ_NS_BEG(Atrc)
 
-struct BxDFType
+/*struct BxDFType
 {
     uint8_t value;
 
@@ -29,7 +29,7 @@ constexpr BxDFType BXDF_GLOSSY       = BxDFType(1 << 3);
 constexpr BxDFType BXDF_SPECULAR     = BxDFType(1 << 4);
 constexpr BxDFType BXDF_ALL_REF      = BXDF_REFLECTION   | BXDF_DIFFUSE | BXDF_GLOSSY | BXDF_SPECULAR;
 constexpr BxDFType BXDF_ALL_TRANS    = BXDF_TRANSMISSION | BXDF_DIFFUSE | BXDF_GLOSSY | BXDF_SPECULAR;
-constexpr BxDFType BXDF_ALL          = BXDF_ALL_REF | BXDF_ALL_TRANS;
+constexpr BxDFType BXDF_ALL          = BXDF_ALL_REF | BXDF_ALL_TRANS;*/
 
 struct BxDFSample
 {
@@ -44,15 +44,17 @@ public:
 
     virtual ~BxDF() = default;
 
-    virtual BxDFType GetType() const = 0;
-
     virtual Spectrum Eval(const Vec3r &wi, const Vec3r &wo) const = 0;
 
-    virtual Option<BxDFSample> Sample(const Vec3r &wi, BxDFType type) const = 0;
+    virtual Option<BxDFSample> Sample(const Vec3r &wi) const = 0;
 
     virtual Spectrum AmbientRadiance(const Intersection &inct) const;
 
     virtual bool CanScatter() const;
+
+    virtual bool IsSpecular() const;
+
+    virtual const BxDF *GetLeafBxDF() const;
 };
 
 AGZ_NS_END(Atrc)
