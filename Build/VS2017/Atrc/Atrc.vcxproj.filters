@@ -132,6 +132,9 @@
     <ClInclude Include="..\..\..\Source\Atrc\Integrator\PathTracerEx2.h">
       <Filter>Integrator</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Integrator\PathTracerMIS.h">
+      <Filter>Integrator</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\Atrc\Common.cpp" />
@@ -217,6 +220,9 @@
       <Filter>Material</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Source\Atrc\Integrator\PathTracerEx2.cpp">
+      <Filter>Integrator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Integrator\PathTracerMIS.cpp">
       <Filter>Integrator</Filter>
     </ClCompile>
   </ItemGroup>

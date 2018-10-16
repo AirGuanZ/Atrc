@@ -5,17 +5,17 @@
 
 AGZ_NS_BEG(Atrc)
 
-Spectrum PathTracerEx2::L(const Ray &r, const Intersection &inct, const Scene &scene, int depth) const
+Spectrum PathTracerEx2::L(const Intersection &inct, const Scene &scene, int depth) const
 {
     AGZ_ASSERT(inct.entity);
 
     const Light *light = inct.entity->AsLight();
     Spectrum Le = light ? light->Le(inct) : SPECTRUM::BLACK;
 
-    return Le + Ls(r, inct, scene, depth);
+    return Le + Ls(inct, scene, depth);
 }
 
-Spectrum PathTracerEx2::Ls(const Ray &r, const Intersection &inct, const Scene &scene, int depth) const
+Spectrum PathTracerEx2::Ls(const Intersection &inct, const Scene &scene, int depth) const
 {
     AGZ_ASSERT(inct.entity);
 
@@ -40,14 +40,14 @@ Spectrum PathTracerEx2::Ls(const Ray &r, const Intersection &inct, const Scene &
             return bxdf->AmbientRadiance(inct);
 
         return bxdf->AmbientRadiance(inct) +
-            bxdfSample->coef * L(newRay, newInct, scene, depth + 1)
+            bxdfSample->coef * L(newInct, scene, depth + 1)
           * SS(Abs(Dot(inct.wr, inct.nor)) / bxdfSample->pdf);
     }
 
-    return E(r, inct, *bxdf, scene) + S(r, inct, *bxdf, scene, depth);
+    return E(inct, *bxdf, scene) + S(inct, *bxdf, scene, depth);
 }
 
-Spectrum PathTracerEx2::E(const Ray &r, const Intersection &inct, const BxDF &bxdf, const Scene &scene) const
+Spectrum PathTracerEx2::E(const Intersection &inct, const BxDF &bxdf, const Scene &scene) const
 {
     Spectrum ret = SPECTRUM::BLACK;
     if(!scene.lightMgr || !lightSampleCount_)
@@ -86,7 +86,7 @@ Spectrum PathTracerEx2::E(const Ray &r, const Intersection &inct, const BxDF &bx
     return ret / lightSampleCount_;
 }
 
-Spectrum PathTracerEx2::S(const Ray &r, const Intersection &inct, const BxDF &bxdf, const Scene &scene, int depth) const
+Spectrum PathTracerEx2::S(const Intersection &inct, const BxDF &bxdf, const Scene &scene, int depth) const
 {
     if(depth > maxDepth_)
         return SPECTRUM::BLACK;
@@ -102,7 +102,7 @@ Spectrum PathTracerEx2::S(const Ray &r, const Intersection &inct, const BxDF &bx
     if(!FindClosestIntersection(scene, newRay, &newInct))
         return bxdf.AmbientRadiance(inct);
 
-    Spectrum ret = bxdfSample->coef * Ls(newRay, newInct, scene, depth + 1)
+    Spectrum ret = bxdfSample->coef * Ls(newInct, scene, depth + 1)
         * SS(Abs(Dot(inct.nor, bxdfSample->dir))
             / bxdfSample->pdf)
         + bxdf.AmbientRadiance(inct);
@@ -125,7 +125,7 @@ Spectrum PathTracerEx2::GetRadiance(const Scene &scene, const Ray &r) const
     Intersection inct;
     if(!FindClosestIntersection(scene, r, &inct))
         return background_;
-    return L(r, inct, scene, 1);
+    return L(inct, scene, 1);
 }
 
 AGZ_NS_END(Atrc)

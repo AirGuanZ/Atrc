@@ -16,4 +16,9 @@ LightSelectorSample LightSelector::Sample(const Intersection &inct) const
     return { lights_[idx], 1.0 / lights_.size() };
 }
 
+Real LightSelector::PDF(const Light *light) const
+{
+    return lights_.empty() ? 0.0 : (1.0 / lights_.size());
+}
+
 AGZ_NS_END(Atrc)

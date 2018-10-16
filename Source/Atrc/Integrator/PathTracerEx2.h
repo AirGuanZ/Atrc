@@ -15,16 +15,16 @@ class PathTracerEx2
     Spectrum background_;
 
     // returns L(inct.pos -> inct.wr)
-    Spectrum L(const Ray &r, const Intersection &inct, const Scene &scene, int depth) const;
+    Spectrum L(const Intersection &inct, const Scene &scene, int depth) const;
 
     // returns Ls(inct.pos -> inct.wr)
-    Spectrum Ls(const Ray &r, const Intersection &inct, const Scene &scene, int depth) const;
+    Spectrum Ls(const Intersection &inct, const Scene &scene, int depth) const;
 
     // returns E(inct.pos -> inct.wr)
-    Spectrum E(const Ray &r, const Intersection &inct, const BxDF &bxdf, const Scene &scene) const;
+    Spectrum E(const Intersection &inct, const BxDF &bxdf, const Scene &scene) const;
 
     // returns S(inct.pos -> inct.wr)
-    Spectrum S(const Ray &r, const Intersection &inct, const BxDF &bxdf, const Scene &scene, int depth) const;
+    Spectrum S(const Intersection &inct, const BxDF &bxdf, const Scene &scene, int depth) const;
 
 public:
 

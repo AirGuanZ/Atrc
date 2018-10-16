@@ -48,11 +48,11 @@ void Render()
     ColoredSky sky(Spectrum(0.0f), Spectrum(0.0f));
 
     MatGeoEntity<Transformer<Sphere>> ground(
-        NewRC<DiffuseMaterial>(Spectrum(1.0f, 0.3f, 0.3f)),
+        NewRC<DiffuseMaterial>(Spectrum(0.4f, 0.7f, 0.9f)),
         Transform::Translate({ 0.0, 0.0, -201.0 }), 200.0);
 
     MatGeoEntity<Transformer<Sphere>> centreSphere(
-        NewRC<DiffuseMaterial>(Spectrum(0.4f, 0.7f, 0.2f)),
+        NewRC<DiffuseMaterial>(Spectrum(1.0, 0.3f, 0.3f)),
         TRANSFORM_IDENTITY, 1.0);
     
     MatGeoEntity<Transformer<Sphere>> leftSphere(
@@ -64,7 +64,7 @@ void Render()
         "./Assets/CubeTex.png")).Map(
             [](const Vec3<uint8_t> &vb)
     {
-        return vb.Map([](uint8_t b) {return b / 255.0f; });
+        return vb.Map([](uint8_t b) { return b / 255.0f; });
     });
 
     auto cubeMat = NewRC<TextureMultiplier<DiffuseMaterial, SamplingStrategy::Nearest>>(
@@ -76,7 +76,7 @@ void Render()
         0.7);
 
     MatGeoEntity<GeoDiffuseLight<Transformer<Sphere>>> lightSphere(
-        NewRC<VoidMaterial>(), Spectrum(1.0f), Transform::Translate({ -1.5, 0.4, 0.5 }), 0.3);
+        NewRC<VoidMaterial>(), Spectrum(1.0f), Transform::Translate({ -1.5, 0.4, -0.65 }), 0.3);
 
     LightSelector lights({ &lightSphere });
     
@@ -98,8 +98,9 @@ void Render()
     ParallelRenderer<JitteredSubareaRenderer> renderer(6, 200);
     renderer.SetProgressPrinting(true);
     //PathTracerEx integrator(1, 10);
-    PathTracerEx2 integrator(1, 10);
-    //PathTracer integrator(10);
+    //PathTracerEx2 integrator(1, 10);
+    //PathTracerMIS integrator(10);
+    PathTracer integrator(10);
 
     cout << "Start rendering..." << endl;
 

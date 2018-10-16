@@ -22,6 +22,8 @@ public:
     // Sample a light source to compute direct illumination at inct
     // ret.light == nullptr means there is no available light source
     LightSelectorSample Sample(const Intersection &inct) const;
+
+    Real PDF(const Light *light) const;
 };
 
 AGZ_NS_END(Atrc)

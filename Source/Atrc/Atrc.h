@@ -9,6 +9,7 @@
 #include <Atrc/Integrator/PathTracer.h>
 #include <Atrc/Integrator/PathTracerEx.h>
 #include <Atrc/Integrator/PathTracerEx2.h>
+#include <Atrc/Integrator/PathTracerMIS.h>
 
 #include <Atrc/Entity/GeometryTemplate/Cube.h>
 #include <Atrc/Entity/GeometryTemplate/Sphere.h>
