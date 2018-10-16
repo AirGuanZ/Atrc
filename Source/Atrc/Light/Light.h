@@ -22,6 +22,8 @@ public:
 
     virtual Option<LightSample> SampleTo(const Intersection &inct) const = 0;
 
+    virtual Real SampleToPDF(const Intersection &inct, const Vec3r &pos) const = 0;
+
     virtual Spectrum Le(const Intersection &inct) const = 0;
 };
 

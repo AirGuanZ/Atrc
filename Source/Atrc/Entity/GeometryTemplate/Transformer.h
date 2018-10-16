@@ -59,6 +59,11 @@ public:
         ori->nor = local2World_.ApplyToNormal(ori->nor);
         return ori;
     }
+
+    Real SurfacePDF(const Vec3r &p) const
+    {
+        return Ent::SurfacePDF(local2World_.ApplyInverseToPoint(p));
+    }
 };
 
 AGZ_NS_END(Atrc)

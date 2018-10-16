@@ -49,7 +49,8 @@ Spectrum PathTracerEx::E(const Ray &r, const Intersection &inct, const BxDF &bxd
 
         dir /= dis;
         Ray shadowRay = Ray(lightPnt->pos, dir, 0, dis);
-        if(Dot(-dir, inct.nor) <= 0.0 || HasIntersection(scene, shadowRay))
+        if(((Dot(-dir, inct.nor) <= 0.0) ^ (Dot(inct.wr, inct.nor) <= 0.0))
+          || HasIntersection(scene, shadowRay))
             continue;
 
         ret += bxdf.Eval(-dir, inct.wr) * lightPnt->radiance

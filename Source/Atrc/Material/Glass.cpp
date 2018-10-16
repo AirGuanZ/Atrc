@@ -38,6 +38,8 @@ namespace
 
         Spectrum Eval(const Vec3r &wi, const Vec3r &wo) const override;
 
+        Real PDF(const Vec3r &wo, const Vec3r &sample) const override;
+
         Option<BxDFSample> Sample(const Vec3r &wi) const override;
     };
 
@@ -53,9 +55,14 @@ namespace
         return SPECTRUM::BLACK;
     }
 
-    Option<BxDFSample> GlassBxDF::Sample(const Vec3r &wi) const
+    Real GlassBxDF::PDF(const Vec3r &wo, const Vec3r &sample) const
     {
-        Real dot = Dot(wi, nor_), absDot = Abs(dot);
+        return 0.0;
+    }
+
+    Option<BxDFSample> GlassBxDF::Sample(const Vec3r &wo) const
+    {
+        Real dot = Dot(wo, nor_), absDot = Abs(dot);
         Real niDivNt, cosine = absDot;
 
         Vec3r nor;
@@ -74,7 +81,7 @@ namespace
         if(Rand() > ChristopheSchlick(cosine, refIdx_))
         {
             Vec3r refrDir;
-            if(Refract(wi, nor, niDivNt, &refrDir))
+            if(Refract(wo, nor, niDivNt, &refrDir))
             {
                 BxDFSample ret;
                 ret.dir = refrDir.Normalize();
@@ -85,7 +92,7 @@ namespace
         }
 
         BxDFSample ret;
-        ret.dir = 2 * absDot * nor - wi;
+        ret.dir = 2 * absDot * nor - wo;
         ret.coef = reflColor_ / SS(Abs(Dot(ret.dir, nor_)));
         ret.pdf = 1;
         return ret;

@@ -12,7 +12,9 @@ namespace
 
         Spectrum Eval(const Vec3r &wi, const Vec3r &wo) const override;
 
-        Option<BxDFSample> Sample(const Vec3r &wi) const override;
+        Real PDF(const Vec3r &wo, const Vec3r &sample) const override;
+
+        Option<BxDFSample> Sample(const Vec3r &wo) const override;
 
         Spectrum AmbientRadiance(const Intersection &inct) const override;
     };
@@ -22,7 +24,12 @@ namespace
         return SPECTRUM::BLACK;
     }
 
-    Option<BxDFSample> NormalBRDF::Sample(const Vec3r &wi) const
+    Real NormalBRDF::PDF(const Vec3r &wo, const Vec3r &sample) const
+    {
+        return 0.0;
+    }
+
+    Option<BxDFSample> NormalBRDF::Sample(const Vec3r &wo) const
     {
         return None;
     }

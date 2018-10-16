@@ -19,7 +19,9 @@ namespace
 
         Spectrum Eval(const Vec3r &wi, const Vec3r &wo) const override;
 
-        Option<BxDFSample> Sample(const Vec3r &wi) const override;
+        Real PDF(const Vec3r &wo, const Vec3r &sample) const override;
+
+        Option<BxDFSample> Sample(const Vec3r &wo) const override;
 
         bool IsSpecular() const override;
     };
@@ -35,11 +37,16 @@ namespace
         return SPECTRUM::BLACK;
     }
 
-    Option<BxDFSample> MetalBxDF::Sample(const Vec3r &wi) const
+    Real MetalBxDF::PDF(const Vec3r &wo, const Vec3r &sample) const
     {
-        if(Dot(wi, nor_) > 0.0)
+        return 0.0;
+    }
+
+    Option<BxDFSample> MetalBxDF::Sample(const Vec3r &wo) const
+    {
+        if(Dot(wo, nor_) > 0.0)
         {
-            Vec3r dir = 2.0 * Dot(nor_, wi) * nor_ - wi;
+            Vec3r dir = 2.0 * Dot(nor_, wo) * nor_ - wo;
             if(roughness_)
                 dir = (dir + roughness_ * CommonSampler::Uniform_InUnitSphere::Sample().sample).Normalize();
             Real cos = Dot(dir, nor_);

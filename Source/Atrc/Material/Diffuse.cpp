@@ -18,7 +18,9 @@ namespace
 
         Spectrum Eval(const Vec3r &wi, const Vec3r &wo) const override;
 
-        Option<BxDFSample> Sample(const Vec3r &wi) const override;
+        Real PDF(const Vec3r &wo, const Vec3r &sample) const override;
+
+        Option<BxDFSample> Sample(const Vec3r &wo) const override;
     };
 
     DiffuseBxDF::DiffuseBxDF(const Intersection &inct, const Spectrum &color)
@@ -34,11 +36,16 @@ namespace
         return SPECTRUM::BLACK;
     }
 
-    Option<BxDFSample> DiffuseBxDF::Sample(const Vec3r &wi) const
+    Real DiffuseBxDF::PDF(const Vec3r &wo, const Vec3r &sample) const
     {
-        if(Dot(wi, localCoord_.ez) > 0.0)
+        return Max(CommonSampler::ZWeighted_OnUnitHemisphere::PDF(localCoord_.W2C(sample)), 0.0);
+    }
+
+    Option<BxDFSample> DiffuseBxDF::Sample(const Vec3r &wo) const
+    {
+        if(Dot(wo, localCoord_.ez) > 0.0)
         {
-            auto[dir, pdf] = CommonSampler::ZWeighted_OnUnitHemisphere::Sample();
+            auto [dir, pdf] = CommonSampler::ZWeighted_OnUnitHemisphere::Sample();
             return BxDFSample{ localCoord_.C2W(dir), color_, pdf };
         }
         return None;

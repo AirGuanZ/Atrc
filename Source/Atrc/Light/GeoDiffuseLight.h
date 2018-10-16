@@ -45,6 +45,11 @@ public:
         return ret;
     }
 
+    Real SampleToPDF(const Intersection &inct, const Vec3r &pos) const override
+    {
+        return GeoTpl::SurfacePDF(pos);
+    }
+
     Spectrum Le(const Intersection &inct) const override
     {
         AGZ_ASSERT(dynamic_cast<const GeoDiffuseLight<GeoTpl>*>(inct.entity) == this);

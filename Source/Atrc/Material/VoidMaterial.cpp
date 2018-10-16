@@ -15,7 +15,12 @@ namespace
             return SPECTRUM::BLACK;
         }
 
-        Option<BxDFSample> Sample(const Vec3r &wi) const override
+        Real PDF(const Vec3r &wo, const Vec3r &sample) const override
+        {
+            return 0.0;
+        }
+
+        Option<BxDFSample> Sample(const Vec3r &wo) const override
         {
             return None;
         }

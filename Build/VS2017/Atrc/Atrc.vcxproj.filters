@@ -102,9 +102,6 @@
     <ClInclude Include="..\..\..\Source\Atrc\Entity\GeometryTemplate\TriangleBVH.h">
       <Filter>Entity\GeometryTemplate</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\Atrc\Material\MatOpr.h">
-      <Filter>Material</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Source\Atrc\Material\TextureMultiplier.h">
       <Filter>Material</Filter>
     </ClInclude>
@@ -200,9 +197,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Source\Atrc\Entity\GeometryTemplate\TriangleBVH.cpp">
       <Filter>Entity\GeometryTemplate</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\Atrc\Material\MatOpr.cpp">
-      <Filter>Material</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Source\Atrc\Entity\GeometryTemplate\Cube.cpp">
       <Filter>Entity\GeometryTemplate</Filter>

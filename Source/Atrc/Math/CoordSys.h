@@ -24,6 +24,15 @@ public:
     {
         return ex * vec.x + ey * vec.y + ez * vec.z;
     }
+
+    Vec3r W2C(const Vec3r &vec) const
+    {
+        return {
+            Dot(ex, vec),
+            Dot(ey, vec),
+            Dot(ez, vec)
+        };
+    }
 };
 
 AGZ_NS_END(Atrc)
