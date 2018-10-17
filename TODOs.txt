@@ -1,0 +1,9 @@
+系统地做一套Common Distribution Transformer，这个做进Utils好了
+缺乏一致的处理无限光源、无实体光源、有实体光源的方法
+缺乏光源采样策略的指导性原则
+BxDF的局部坐标系各自为政
+wi和wo混乱不堪，面对非对称BSDF太烧脑
+缺乏GeometryTemplate的接口规范
+几何参数坐标和着色参数坐标的框架混乱不堪
+交点的几何信息和着色信息应该分开存储和传递，现在的Intersection简直是混沌恶
+要支持动态模糊就得引入时间参数
