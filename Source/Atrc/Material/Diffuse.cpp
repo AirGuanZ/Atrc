@@ -18,7 +18,7 @@ namespace
 
         Spectrum Eval(const Vec3r &wi, const Vec3r &wo) const override;
 
-        Real PDF(const Vec3r &wo, const Vec3r &sample) const override;
+        Real PDF(const Vec3r &wi, const Vec3r &wo) const override;
 
         Option<BxDFSample> Sample(const Vec3r &wo) const override;
     };
@@ -36,9 +36,9 @@ namespace
         return SPECTRUM::BLACK;
     }
 
-    Real DiffuseBxDF::PDF(const Vec3r &wo, const Vec3r &sample) const
+    Real DiffuseBxDF::PDF(const Vec3r &wi, const Vec3r &wo) const
     {
-        return CommonSampler::ZWeighted_OnUnitHemisphere::PDF(localCoord_.W2C(sample));
+        return CommonSampler::ZWeighted_OnUnitHemisphere::PDF(localCoord_.W2C(wi));
     }
 
     Option<BxDFSample> DiffuseBxDF::Sample(const Vec3r &wo) const

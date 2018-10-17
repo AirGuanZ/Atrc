@@ -46,7 +46,7 @@ public:
 
     virtual Spectrum Eval(const Vec3r &wi, const Vec3r &wo) const = 0;
 
-    virtual Real PDF(const Vec3r &wo, const Vec3r &sample) const = 0;
+    virtual Real PDF(const Vec3r &wi, const Vec3r &wo) const = 0;
 
     virtual Option<BxDFSample> Sample(const Vec3r &wo) const = 0;
 

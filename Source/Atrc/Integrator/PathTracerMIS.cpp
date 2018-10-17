@@ -132,7 +132,7 @@ Spectrum PathTracerMIS::E2(const Scene &scene, const Intersection &inct, const B
         return SPECTRUM::BLACK;
 
     Real lpdf = lightSample.pdf * lightPnt->pdf;
-    auto w = 1 / SS(lpdf + bxdf.PDF(inct.wr, -dir));
+    auto w = 1 / SS(lpdf + bxdf.PDF(-dir, inct.wr));
 
     auto f = bxdf.Eval(-dir, inct.wr);
     if(f == SPECTRUM::BLACK)

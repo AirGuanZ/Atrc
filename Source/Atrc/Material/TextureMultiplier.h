@@ -75,9 +75,9 @@ class TextureMultiplier
             return coef_ * bxdf_->Eval(wi, wo);
         }
 
-        Real PDF(const Vec3r &wo, const Vec3r &sample) const override
+        Real PDF(const Vec3r &wi, const Vec3r &wo) const override
         {
-            return bxdf_->PDF(wo, sample);
+            return bxdf_->PDF(wi, wo);
         }
 
         Option<BxDFSample> Sample(const Vec3r &wo) const override

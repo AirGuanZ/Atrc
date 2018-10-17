@@ -26,7 +26,7 @@ namespace
             return SPECTRUM::BLACK;
         }
 
-        Real PDF(const Vec3r &wo, const Vec3r &sample) const override
+        Real PDF(const Vec3r &wi, const Vec3r &wo) const override
         {
             return 0.0;
         }

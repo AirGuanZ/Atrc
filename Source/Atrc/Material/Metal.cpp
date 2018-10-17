@@ -21,7 +21,7 @@ namespace
 
         Spectrum Eval(const Vec3r &wi, const Vec3r &wo) const override;
 
-        Real PDF(const Vec3r &wo, const Vec3r &sample) const override;
+        Real PDF(const Vec3r &wi, const Vec3r &wo) const override;
 
         Option<BxDFSample> Sample(const Vec3r &wo) const override;
 
@@ -39,7 +39,7 @@ namespace
         return SPECTRUM::BLACK;
     }
 
-    Real MetalBxDF::PDF(const Vec3r &wo, const Vec3r &sample) const
+    Real MetalBxDF::PDF(const Vec3r &wi, const Vec3r &wo) const
     {
         return 0.0;
     }
