@@ -41,7 +41,7 @@ void Render()
     const Vec3r dir = (Vec3r(0.0) - eye).Normalize();
     PerspectiveCamera camera(
         eye, dir, { 0.0, 0.0, 1.0 },
-        Degr(90.0), SCR_ASPECT_RATIO);
+        Degr(40.0), SCR_ASPECT_RATIO);
 
     //============= Scene =============
     
@@ -56,7 +56,7 @@ void Render()
         TRANSFORM_IDENTITY, 1.0);
     
     MatGeoEntity<Transformer<Sphere>> leftSphere(
-        NewRC<MetalMaterial>(Spectrum(0.9f), 0.0),
+        NewRC<MetalMaterial>(Spectrum(0.9f), 1.2),
         Transform::Translate({ 0.0, 2.0, 0.0 }), 1.0);
 
     auto cubeTex = Tex2D<Color3b>(
@@ -95,10 +95,11 @@ void Render()
 
     //============= Rendering =============
 
-    ParallelRenderer<JitteredSubareaRenderer> renderer(6, 100);
+    //SerialRenderer<JitteredSubareaRenderer> renderer(2);
+    ParallelRenderer<JitteredSubareaRenderer> renderer(6, 800);
     renderer.SetProgressPrinting(true);
     //PathTracerEx integrator(1, 10);
-    //PathTracerEx2 integrator(1, 10);
+    //PathTracerEx2 integrator(1, 20);
     PathTracerMIS integrator(10);
     //PathTracer integrator(10);
 

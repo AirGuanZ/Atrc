@@ -38,7 +38,7 @@ namespace
 
     Real DiffuseBxDF::PDF(const Vec3r &wo, const Vec3r &sample) const
     {
-        return Max(CommonSampler::ZWeighted_OnUnitHemisphere::PDF(localCoord_.W2C(sample)), 0.0);
+        return CommonSampler::ZWeighted_OnUnitHemisphere::PDF(localCoord_.W2C(sample));
     }
 
     Option<BxDFSample> DiffuseBxDF::Sample(const Vec3r &wo) const

@@ -54,7 +54,7 @@ ZWeighted_OnUnitHemisphere::Result ZWeighted_OnUnitHemisphere::Sample()
 
 Real ZWeighted_OnUnitHemisphere::PDF(const Vec3r &sample)
 {
-    return sample.z / PI<Real>;
+    return Max(0.0, sample.z / PI<Real>);
 }
 
 AGZ_NS_END(Atrc::CommonSampler)
