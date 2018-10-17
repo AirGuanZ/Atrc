@@ -84,7 +84,7 @@ namespace
         Real t = PI<Real> / 2 - beta - phi;
         Real z = Cos(PI<Real> / 2 - t);
 
-        return color_ * SS(z / PI<Real> /*/ Dot(wi, nor_)*/);
+        return color_ * SS(z / PI<Real> / Dot(wi, nor_));
     }
 
     Real MetalBxDF::PDF(const Vec3r &wi, const Vec3r &wo) const

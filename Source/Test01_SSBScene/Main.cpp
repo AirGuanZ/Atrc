@@ -4,8 +4,8 @@
 using namespace std;
 using namespace Atrc;
 
-constexpr uint32_t SCR_W = 640;
-constexpr uint32_t SCR_H = 480;
+constexpr uint32_t SCR_W = 1920;
+constexpr uint32_t SCR_H = 1080;
 
 constexpr Real SCR_ASPECT_RATIO = static_cast<Real>(SCR_W) / SCR_H;
 
@@ -41,7 +41,7 @@ void Render()
     const Vec3r dir = (Vec3r(0.0) - eye).Normalize();
     PerspectiveCamera camera(
         eye, dir, { 0.0, 0.0, 1.0 },
-        Degr(40.0), SCR_ASPECT_RATIO);
+        Degr(60.0), SCR_ASPECT_RATIO);
 
     //============= Scene =============
     
@@ -56,7 +56,7 @@ void Render()
         TRANSFORM_IDENTITY, 1.0);
     
     MatGeoEntity<Transformer<Sphere>> leftSphere(
-        NewRC<MetalMaterial>(Spectrum(0.9f), 1.2),
+        NewRC<MetalMaterial>(Spectrum(0.9f), 99.0),
         Transform::Translate({ 0.0, 2.0, 0.0 }), 1.0);
 
     auto cubeTex = Tex2D<Color3b>(
@@ -96,12 +96,12 @@ void Render()
     //============= Rendering =============
 
     //SerialRenderer<JitteredSubareaRenderer> renderer(2);
-    ParallelRenderer<JitteredSubareaRenderer> renderer(6, 800);
+    ParallelRenderer<JitteredSubareaRenderer> renderer(6, 50);
     renderer.SetProgressPrinting(true);
     //PathTracerEx integrator(1, 10);
     //PathTracerEx2 integrator(1, 20);
-    PathTracerMIS integrator(10);
-    //PathTracer integrator(10);
+    //PathTracerMIS integrator(10);
+    PathTracer integrator(10);
 
     cout << "Start rendering..." << endl;
 
