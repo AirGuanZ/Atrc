@@ -95,9 +95,12 @@ Spectrum PathTracerMIS::E1(const Scene &scene, const Intersection &inct, const B
     if(!light)
         return SPECTRUM::BLACK;
 
-    auto w = 1 / SS(bxdfSample->pdf + scene.lightMgr->PDF(light) * light->SampleToPDF(inct, newInct.pos));
+    auto le = light->Le(newInct);
+    if(le == SPECTRUM::BLACK)
+        return SPECTRUM::BLACK;
 
-    return w * bxdfSample->coef * light->Le(newInct) * SS(Abs(Dot(inct.nor, bxdfSample->dir)));
+    auto w = 1 / SS(bxdfSample->pdf + scene.lightMgr->PDF(light) * light->SampleToPDF(inct, newInct.pos));
+    return w * bxdfSample->coef * le * SS(Abs(Dot(inct.nor, bxdfSample->dir)));
 }
 
 Spectrum PathTracerMIS::E2(const Scene &scene, const Intersection &inct, const BxDF &bxdf) const
@@ -131,7 +134,11 @@ Spectrum PathTracerMIS::E2(const Scene &scene, const Intersection &inct, const B
     Real lpdf = lightSample.pdf * lightPnt->pdf;
     auto w = 1 / SS(lpdf + bxdf.PDF(inct.wr, -dir));
 
-    return bxdf.Eval(-dir, inct.wr) * lightPnt->radiance
+    auto f = bxdf.Eval(-dir, inct.wr);
+    if(f == SPECTRUM::BLACK)
+        return SPECTRUM::BLACK;
+
+    return f * lightPnt->radiance
         * SS(w * Abs(Dot(lightPnt->nor, dir) * Dot(inct.nor, -dir))
             / (dis * dis));
 }

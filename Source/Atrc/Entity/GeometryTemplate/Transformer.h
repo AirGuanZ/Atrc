@@ -50,9 +50,9 @@ public:
         return areaSquareFactor_ * Ent::SurfaceArea();
     }
 
-    Option<GeometrySurfaceSample> SampleSurface() const
+    Option<GeometrySurfaceSample> SampleSurfaceTo(const Vec3r &dst) const
     {
-        auto ori = Ent::SampleSurface();
+        auto ori = Ent::SampleSurfaceTo(local2World_.ApplyInverseToPoint(dst));
         if(!ori)
             return None;
         ori->pos = local2World_.ApplyToPoint(ori->pos);
@@ -60,9 +60,10 @@ public:
         return ori;
     }
 
-    Real SurfacePDF(const Vec3r &p) const
+    Real SampleSurfaceToPDF(const Vec3r &dst, const Vec3r &p) const
     {
-        return Ent::SurfacePDF(local2World_.ApplyInverseToPoint(p));
+        return Ent::SampleSurfaceToPDF(
+            local2World_.ApplyInverseToPoint(dst), local2World_.ApplyInverseToPoint(p));
     }
 };
 

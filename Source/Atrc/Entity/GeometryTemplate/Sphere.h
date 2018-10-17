@@ -26,9 +26,9 @@ public:
 
     Real SurfaceArea() const override;
 
-    Option<GeometrySurfaceSample> SampleSurface() const;
+    Option<GeometrySurfaceSample> SampleSurfaceTo(const Vec3r &dst) const;
 
-    Real SurfacePDF(const Vec3r &p) const;
+    Real SampleSurfaceToPDF(const Vec3r &dst, const Vec3r &p) const;
 };
 
 AGZ_NS_END(Atrc)

@@ -4,8 +4,8 @@
 using namespace std;
 using namespace Atrc;
 
-constexpr uint32_t SCR_W = 1920;
-constexpr uint32_t SCR_H = 1080;
+constexpr uint32_t SCR_W = 640;
+constexpr uint32_t SCR_H = 480;
 
 constexpr Real SCR_ASPECT_RATIO = static_cast<Real>(SCR_W) / SCR_H;
 
@@ -44,7 +44,7 @@ void Run()
     AGZ::Model::WavefrontObj dragonObj;
     AGZ::Model::WavefrontObjFile::LoadFromObjFile("./Assets/dragon_vrip.obj", &dragonObj);
     MatGeoEntity<Transformer<TriangleBVH>> dragon(
-        NewRC<MetalMaterial>(Spectrum(0.4f), 0.2),
+        NewRC<DiffuseMaterial>(Spectrum(0.4f)),
         Transform::Translate({ 0.0, 0.0, -0.67 })
       * Transform::Scale(Vec3r(2.2 / 50)),
         dragonObj.ToGeometryMeshGroup().submeshes["Default"]);
@@ -53,16 +53,22 @@ void Run()
     AGZ::Model::WavefrontObj bunnyObj;
     AGZ::Model::WavefrontObjFile::LoadFromObjFile("./Assets/bunny.obj", &bunnyObj);
     MatGeoEntity<Transformer<TriangleBVH>> bunny(
-        NewRC<GlassMaterial>(Spectrum(0.7f), 1.4),
+        NewRC<DiffuseMaterial>(Spectrum(0.7f)),
         Transform::Translate({ 2.5, 1.0, -0.7 })
       * Transform::RotateZ(Degr(90))
       * Transform::Scale(Vec3r(2.2 / 60)),
         bunnyObj.ToGeometryMeshGroup().submeshes["Default"]);
     bunnyObj.Clear();
 
+    MatGeoEntity<GeoDiffuseLight<Transformer<Sphere>>> lightSphere(
+        NewRC<VoidMaterial>(), Spectrum(1.0f), Transform::Translate({ -1.5, 0.4, -0.65 }), 0.3);
+
+    LightSelector lights({ &lightSphere });
+
     Scene scene;
+    scene.lightMgr = &lights;
     scene.camera = &camera;
-    scene.entities = { &ground, &dragon, &bunny, &sky };
+    scene.entities = { &ground, &dragon, &bunny, &lightSphere, /*&sky*/ };
 
     //============= Render Target =============
 
@@ -70,9 +76,10 @@ void Run()
 
     //============= Rendering =============
 
-    ParallelRenderer<JitteredSubareaRenderer> renderer(6, 100);
+    ParallelRenderer<JitteredSubareaRenderer> renderer(6, 40);
     renderer.SetProgressPrinting(true);
     PathTracer integrator(10);
+    //PathTracerEx2 integrator(1, 10);
 
     cout << "Start rendering..." << endl;
 

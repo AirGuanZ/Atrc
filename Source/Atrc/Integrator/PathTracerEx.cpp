@@ -53,7 +53,11 @@ Spectrum PathTracerEx::E(const Ray &r, const Intersection &inct, const BxDF &bxd
           || HasIntersection(scene, shadowRay))
             continue;
 
-        ret += bxdf.Eval(-dir, inct.wr) * lightPnt->radiance
+        auto f = bxdf.Eval(-dir, inct.wr);
+        if(f == SPECTRUM::BLACK)
+            return SPECTRUM::BLACK;
+
+        ret += f * lightPnt->radiance
              * SS(Abs(Dot(lightPnt->nor, dir) * Dot(inct.nor, -dir))
                 / (dis * dis * lightSam.pdf * lightPnt->pdf));
     }

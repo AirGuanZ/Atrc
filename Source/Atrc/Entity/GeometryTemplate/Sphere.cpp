@@ -35,7 +35,7 @@ Real Sphere::SurfaceArea() const
     return 4 * PI<Real> * radius_ * radius_;
 }
 
-Option<GeometrySurfaceSample> Sphere::SampleSurface() const
+Option<GeometrySurfaceSample> Sphere::SampleSurfaceTo(const Vec3r &dst) const
 {
     GeometrySurfaceSample ret;
 
@@ -55,7 +55,7 @@ Option<GeometrySurfaceSample> Sphere::SampleSurface() const
     return ret;
 }
 
-Real Sphere::SurfacePDF(const Vec3r &p) const
+Real Sphere::SampleSurfaceToPDF(const Vec3r &dst, const Vec3r &p) const
 {
     return 1 / (4 * PI<Real>) / (radius_ * radius_);
 }

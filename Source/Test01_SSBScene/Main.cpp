@@ -95,12 +95,12 @@ void Render()
 
     //============= Rendering =============
 
-    ParallelRenderer<JitteredSubareaRenderer> renderer(6, 200);
+    ParallelRenderer<JitteredSubareaRenderer> renderer(6, 100);
     renderer.SetProgressPrinting(true);
     //PathTracerEx integrator(1, 10);
     //PathTracerEx2 integrator(1, 10);
-    //PathTracerMIS integrator(10);
-    PathTracer integrator(10);
+    PathTracerMIS integrator(10);
+    //PathTracer integrator(10);
 
     cout << "Start rendering..." << endl;
 

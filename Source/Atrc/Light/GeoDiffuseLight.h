@@ -13,7 +13,7 @@ struct GeometrySurfaceSample
 };
 
 template<typename GeoTpl, std::enable_if_t<std::is_base_of_v<Entity, GeoTpl>, int> = 0,
-                          typename = AGZ::TypeOpr::Void_t<decltype(&GeoTpl::SampleSurface)>>
+                          typename = AGZ::TypeOpr::Void_t<decltype(&GeoTpl::SampleSurfaceTo)>>
 class GeoDiffuseLight
     : ATRC_IMPLEMENTS Light,
       ATRC_PROPERTY AGZ::Uncopiable,
@@ -32,7 +32,7 @@ public:
 
     Option<LightSample> SampleTo(const Intersection &inct) const override
     {
-        auto geoSam = GeoTpl::SampleSurface();
+        auto geoSam = GeoTpl::SampleSurfaceTo(inct.pos);
         if(!geoSam)
             return None;
 
@@ -47,7 +47,7 @@ public:
 
     Real SampleToPDF(const Intersection &inct, const Vec3r &pos) const override
     {
-        return GeoTpl::SurfacePDF(pos);
+        return GeoTpl::SampleSurfaceToPDF(inct.pos, pos);
     }
 
     Spectrum Le(const Intersection &inct) const override
