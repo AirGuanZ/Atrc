@@ -10,11 +10,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Launcher", "Launcher\Launch
 		{ED1F930B-E133-4017-9CD8-9DD9AF8666EF} = {ED1F930B-E133-4017-9CD8-9DD9AF8666EF}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Test01_SSBScene", "Test01_SSBScene\Test01_SSBScene.vcxproj", "{2E1E713C-0BC1-470C-B865-FFC996ABD744}"
-	ProjectSection(ProjectDependencies) = postProject
-		{ED1F930B-E133-4017-9CD8-9DD9AF8666EF} = {ED1F930B-E133-4017-9CD8-9DD9AF8666EF}
-	EndProjectSection
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -39,14 +34,6 @@ Global
 		{38D51DF7-78E0-44FC-AA08-68AF473BEEDC}.Release|x64.Build.0 = Release|x64
 		{38D51DF7-78E0-44FC-AA08-68AF473BEEDC}.Release|x86.ActiveCfg = Release|Win32
 		{38D51DF7-78E0-44FC-AA08-68AF473BEEDC}.Release|x86.Build.0 = Release|Win32
-		{2E1E713C-0BC1-470C-B865-FFC996ABD744}.Debug|x64.ActiveCfg = Debug|x64
-		{2E1E713C-0BC1-470C-B865-FFC996ABD744}.Debug|x64.Build.0 = Debug|x64
-		{2E1E713C-0BC1-470C-B865-FFC996ABD744}.Debug|x86.ActiveCfg = Debug|Win32
-		{2E1E713C-0BC1-470C-B865-FFC996ABD744}.Debug|x86.Build.0 = Debug|Win32
-		{2E1E713C-0BC1-470C-B865-FFC996ABD744}.Release|x64.ActiveCfg = Release|x64
-		{2E1E713C-0BC1-470C-B865-FFC996ABD744}.Release|x64.Build.0 = Release|x64
-		{2E1E713C-0BC1-470C-B865-FFC996ABD744}.Release|x86.ActiveCfg = Release|Win32
-		{2E1E713C-0BC1-470C-B865-FFC996ABD744}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
