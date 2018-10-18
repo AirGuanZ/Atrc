@@ -1,9 +1,19 @@
 系统地做一套Common Distribution Transformer，这个做进Utils好了
+    扩充Utils。这个没有技术难度
 缺乏一致的处理无限光源、无实体光源、有实体光源的方法
+    把光源分为delta光源和非delta光源，统一采用MIS，对delta分布单独处理
+    单独写好一个计算direct illumination的integrator，免得四处开弓容易出错
 缺乏光源采样策略的指导性原则
+    保持接口一致，内部采样策略各自实现
 BxDF的局部坐标系各自为政
+    统一在基类中处理好
 wi和wo混乱不堪，面对非对称BSDF太烧脑
+    规范接口和参数命名
 缺乏GeometryTemplate的接口规范
-几何参数坐标和着色参数坐标的框架混乱不堪
+    搞个shape基类，不要靠模板嵌套了
+几何参数坐标和着色参数坐标的框架不明朗
+    参见下一条
 交点的几何信息和着色信息应该分开存储和传递，现在的Intersection简直是混沌恶
+    搞个RayShapeInteraction，里面分geometry和shading两个区域
 要支持动态模糊就得引入时间参数
+    这个先不忙
