@@ -4,6 +4,7 @@
 
 #include <Atrc/Core/AABB.h>
 #include <Atrc/Core/Ray.h>
+#include <Atrc/Core/SurfacePoint.h>
 
 AGZ_NS_BEG(Atrc)
 
@@ -12,18 +13,30 @@ class Transform
     Mat4 mat_;
     Mat4 inv_;
 
-public:
+    Real scaleFactor_;
+    Real invScaleFac_;
 
     explicit Transform(const Mat4 &mat)
-        : mat_(mat), inv_(mat.Inverse())
+        : mat_(mat), inv_(mat.Inverse()),
+        scaleFactor_(mat.ApplyToVector(Vec3::UNIT_X()).LengthSquare())
     {
-        
+        invScaleFac_ = 1.0 / scaleFactor_;
     }
 
     Transform(const Mat4 &mat, const Mat4 &inv)
-        : mat_(mat), inv_(inv)
+        : mat_(mat), inv_(inv),
+        scaleFactor_(mat.ApplyToVector(Vec3::UNIT_X()).LengthSquare())
     {
-        
+        invScaleFac_ = 1.0 / scaleFactor_;
+    }
+
+public:
+
+    Transform()
+        : mat_(Mat4::IDENTITY()), inv_(Mat4::IDENTITY()),
+          scaleFactor_(1.0), invScaleFac_(1.0)
+    {
+
     }
 
     static Transform Translate(const Vec3 &offset)
@@ -56,17 +69,15 @@ public:
         return Transform(Mat4::RotateZ(angle), Mat4::RotateZ(-angle));
     }
 
-    static Transform Scale(const Vec3 &scale)
+    static Transform Scale(Real factor)
     {
-        AGZ_ASSERT(scale.x > 0.0 && scale.y > 0.0 && scale.z > 0.0);
-        return Transform(Mat4::Scale(scale),
-                         Mat4::Scale(scale.Map([](Real v) { return 1.0 / v; })));
+        Real invFac = 1.0 / factor;
+        return Transform(Mat4::Scale({ factor, factor, factor }),
+                         Mat4::Scale({ invFac, invFac, invFac }));
     }
 
-    static Transform Scale(Real x, Real y, Real z)
-    {
-        return Scale({ x, y, z });
-    }
+    Real ScaleFactor() const { return scaleFactor_; }
+    Real InverseScaleFactor() const { return invScaleFac_; }
 
     Vec3 ApplyToPoint(const Vec3 &pnt) const
     {
@@ -90,12 +101,12 @@ public:
 
     Vec3 ApplyToNormal(const Vec3 &nor) const
     {
-        return inv_.ApplyInverseToNormal(nor);
+        return inv_.ApplyInverseToNormal(nor).Normalize();
     }
 
     Vec3 ApplyInverseToNormal(const Vec3 &nor) const
     {
-        return mat_.ApplyInverseToNormal(nor);
+        return mat_.ApplyInverseToNormal(nor).Normalize();
     }
 
     Ray ApplyToRay(const Ray &r) const
@@ -144,6 +155,24 @@ public:
            .Expand(ApplyInverseToPoint(Vec3(aabb.high.x, aabb.low.y,  aabb.high.z)))
            .Expand(ApplyInverseToPoint(aabb.high));
         return ret;
+    }
+
+    LocalCoordSystem ApplyToCoordSystem(const LocalCoordSystem &sys) const
+    {
+        return {
+            ApplyToVector(sys.ex).Normalize(),
+            ApplyToVector(sys.ey).Normalize(),
+            ApplyToVector(sys.ez).Normalize()
+        };
+    }
+
+    LocalCoordSystem ApplyInverseToCoordSystem(const LocalCoordSystem &sys) const
+    {
+        return {
+            ApplyInverseToVector(sys.ex).Normalize(),
+            ApplyInverseToVector(sys.ey).Normalize(),
+            ApplyInverseToVector(sys.ez).Normalize()
+        };
     }
 };
 

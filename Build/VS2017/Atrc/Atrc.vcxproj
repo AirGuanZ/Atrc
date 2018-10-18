@@ -27,18 +27,22 @@
     <ClInclude Include="..\..\..\Source\Atrc\Core\Core.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Core\Entity.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Core\Geometry.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Core\Integrator.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Core\Light.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Core\Material.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Core\Ray.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Core\Renderer.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Core\Scene.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Core\SurfacePoint.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Core\Transform.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Geometry\Sphere.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\Atrc\Core\Entity.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Core\Geometry.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Core\Material.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Core\Scene.cpp" />
+    <ClCompile Include="..\..\..\Source\Atrc\Geometry\Sphere.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

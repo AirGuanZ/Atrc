@@ -17,3 +17,5 @@ wi和wo混乱不堪，面对非对称BSDF太烧脑
     搞个RayShapeInteraction，里面分geometry和shading两个区域
 要支持动态模糊就得引入时间参数
     这个先不忙
+
+规定：world space中wi、wo和r.dir均为单位向量，随手assert检查

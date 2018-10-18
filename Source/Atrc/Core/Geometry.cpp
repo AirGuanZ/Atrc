@@ -8,7 +8,7 @@ bool Geometry::HasIntersection(const Ray &r) const
     return FindIntersection(r, &sp);
 }
 
-AABB Geometry::GlobalBound() const
+AABB Geometry::WorldBound() const
 {
     return local2World_.ApplyToAABB(LocalBound());
 }

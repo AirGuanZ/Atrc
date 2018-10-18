@@ -63,10 +63,21 @@ inline Real Cos(const Vec3 &L, const Vec3 &R) { return Dot(L, R) / (L.Length() *
 
 using AGZ::Math::Abs;
 using AGZ::Math::ApproxEq;
-using AGZ::Math::Cross;
-using AGZ::Math::Dot;
+using AGZ::Math::Clamp;
 using AGZ::Math::Max;
 using AGZ::Math::Min;
+using AGZ::Math::Sqrt;
+
+using AGZ::Math::Cross;
+using AGZ::Math::Dot;
+
+using AGZ::Math::Arcsin;
+using AGZ::Math::Arctan2;
+
+constexpr Real PI = AGZ::Math::PI<Real>;
+constexpr Real InvPI = AGZ::Math::InvPI<Real>;
+
+using AGZ::UNINITIALIZED;
 
 // ============================= Spectrum =============================
 
@@ -87,12 +98,16 @@ class Camera;
 class Entity;
 class Geometry;
 class Light;
+class Integrator;
 class Material;
 class Ray;
+class Renderer;
 class Scene;
 class Transform;
 
 struct SurfacePoint;
 struct ShadingPoint;
+
+using RenderTarget = AGZ::Tex::Texture2D<Spectrum>;
 
 AGZ_NS_END(Atrc)

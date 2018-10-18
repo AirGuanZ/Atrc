@@ -2,6 +2,7 @@
 
 #include <Atrc/Core/AABB.h>
 #include <Atrc/Core/BSDF.h>
+#include <Atrc/Core/Camera.h>
 #include <Atrc/Core/Entity.h>
 #include <Atrc/Core/Geometry.h>
 #include <Atrc/Core/Light.h>

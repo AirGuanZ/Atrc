@@ -17,6 +17,8 @@ struct GeometrySampleResult
 
 class Geometry
 {
+protected:
+
     Transform local2World_;
 
 public:
@@ -31,16 +33,23 @@ public:
 
     virtual bool HasIntersection(const Ray &r) const;
 
+    // 填充：t，pos，wo，geoUV，usrUV，geoLocal（，flag0）
     virtual bool FindIntersection(const Ray &r, SurfacePoint *sp) const = 0;
 
+    // 在World意义上的表面积
     virtual Real SurfaceArea() const = 0;
 
+    // 局部bound
     virtual AABB LocalBound() const = 0;
 
-    virtual AABB GlobalBound() const;
+    // 世界bound
+    virtual AABB WorldBound() const;
 
+    // 在表面面积上采样
+    // 填充sp：pos，geoUV，usrUV，geoLocal（，flag0）
     virtual GeometrySampleResult Sample() const = 0;
 
+    // 给定采样结果，返回其概率密度
     virtual Real SamplePDF(const SurfacePoint &sp) const = 0;
 };
 
