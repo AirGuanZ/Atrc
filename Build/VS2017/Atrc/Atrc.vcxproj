@@ -62,6 +62,7 @@
     <ClCompile Include="..\..\..\Source\Atrc\Material\BlackMaterial.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Material\PureDiffuse.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Renderer\JitteredSubareaRenderer.cpp" />
+    <ClInclude Include="..\..\..\Source\Atrc\Renderer\ParallelRenderer.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

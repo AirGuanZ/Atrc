@@ -150,5 +150,8 @@
     <ClCompile Include="..\..\..\Source\Atrc\Core\Common.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Renderer\ParallelRenderer.h">
+      <Filter>Renderer</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

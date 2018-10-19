@@ -64,6 +64,8 @@ inline Real Rand() { return AGZ::Math::Random::Uniform(0.0, 1.0); }
 
 inline Real Cos(const Vec3 &L, const Vec3 &R) { return Dot(L, R) / (L.Length() * R.Length()); }
 
+inline bool IsNormalized(const Vec3 &v) { return AGZ::Math::ApproxEq(v.LengthSquare(), 1.0, 1e-5); }
+
 using AGZ::Math::Abs;
 using AGZ::Math::ApproxEq;
 using AGZ::Math::Clamp;

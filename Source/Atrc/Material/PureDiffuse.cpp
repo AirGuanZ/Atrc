@@ -18,6 +18,9 @@ namespace
 
         Spectrum Eval(const Vec3 &wi, const Vec3 &wo) const override
         {
+            AGZ_ASSERT(IsNormalized(wi));
+            AGZ_ASSERT(IsNormalized(wo));
+
             if(shadingLocal_.World2Local(wi).z > 0.0 && shadingLocal_.World2Local(wo).z > 0.0)
                 return color_;
             return SPECTRUM::BLACK;
@@ -25,6 +28,8 @@ namespace
 
         Option<BSDFSampleWiResult> SampleWi(const Vec3 &wo, BxDFType type) const override
         {
+            AGZ_ASSERT(IsNormalized(wo));
+
             if(!(BXDF_DIFFUSE & type))
                 return None;
 
@@ -47,6 +52,9 @@ namespace
 
         Real SampleWiPDF(const Vec3 &wi, const Vec3 &wo, BxDFType type) const override
         {
+            AGZ_ASSERT(IsNormalized(wi));
+            AGZ_ASSERT(IsNormalized(wo));
+
             if(!(BXDF_DIFFUSE & type))
                 return 0.0;
 

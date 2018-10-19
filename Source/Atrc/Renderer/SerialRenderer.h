@@ -2,23 +2,19 @@
 
 #include <iostream>
 #include <Atrc/Core/Core.h>
-#include <Atrc/Renderer/SubareaRenderer.h>
 
 AGZ_NS_BEG(Atrc)
 
-template<typename SR, std::enable_if_t<std::is_base_of_v<SubareaRenderer, SR>, int> = 0>
-    class SerialRenderer : public Renderer
+class SerialRenderer : public Renderer
 {
-    SR subareaRenderer_;
     bool printProgress_;
 
 public:
 
-    template<typename...Args>
-    explicit SerialRenderer(Args&&...args)
-        : subareaRenderer_(std::forward<Args>(args)...), printProgress_(false)
+    SerialRenderer()
+        : printProgress_(false)
     {
-
+        
     }
 
     void SetProgressPrinting(bool print)
@@ -26,10 +22,9 @@ public:
         printProgress_ = print;
     }
 
-    void Render(
-        const Scene &scene, const Integrator &integrator, RenderTarget &rt) const override
+    void Render(const SubareaRenderer &subareaRenderer, const Scene &scene, const Integrator &integrator, RenderTarget &rt) const override
     {
-        AGZ_ASSERT(output.IsAvailable());
+        AGZ_ASSERT(rt.IsAvailable());
 
         uint32_t w = rt.GetWidth();
         uint32_t h = rt.GetHeight();
@@ -38,13 +33,11 @@ public:
 
         for(; y + yStep <= h; y += yStep)
         {
-            subareaRenderer_.Render(
-                scene, integrator, rt,
-                { 0, w, y, y + yStep });
+            subareaRenderer.Render(scene, integrator, rt, { 0, w, y, y + yStep });
 
             if(printProgress_)
             {
-                float percent = 100.0f * (y + 1) / h;
+                float percent = 100.0f * (y + yStep) / h;
                 std::printf("%sProgress: %5.2f%%  ",
                     std::string(50, '\b').c_str(), percent);
             }
@@ -52,9 +45,7 @@ public:
 
         if(y < h)
         {
-            subareaRenderer_.Render(
-                scene, integrator, rt,
-                { 0, w, y, h });
+            subareaRenderer.Render(scene, integrator, rt, { 0, w, y, h });
             std::printf("%sProgress: %5.2f%%  ",
                 std::string(50, '\b').c_str(), 100.0f);
         }

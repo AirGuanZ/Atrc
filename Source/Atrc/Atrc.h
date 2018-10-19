@@ -16,4 +16,5 @@
 
 #include <Atrc/Renderer/JitteredSubareaRenderer.h>
 
+#include <Atrc/Renderer/ParallelRenderer.h>
 #include <Atrc/Renderer/SerialRenderer.h>

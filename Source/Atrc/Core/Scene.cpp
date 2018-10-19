@@ -10,6 +10,7 @@ const Camera* Scene::GetCamera() const
 
 bool Scene::HasIntersection(const Ray &r) const
 {
+    AGZ_ASSERT(r.IsNormalized());
     for(auto ent : entities_)
     {
         if(ent->HasIntersection(r))

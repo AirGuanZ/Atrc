@@ -37,12 +37,12 @@ int main()
     //============= Camera =============
 
     const Vec3 eye = { -5.0, 0.0, 0.0 };
-    const Vec3 dir = (Vec3(0.0) - eye).Normalize();
+    const Vec3 dir = Vec3(0.0) - eye;
     PerspectiveCamera camera(eye, dir, { 0.0, 0.0, 1.0 }, Deg(60.0), SCR_ASPECT_RATIO);
 
     //============= Scene =============
 
-    Sphere sph(Transform::Translate(0.0, 0.0, -201.0), -200.0);
+    Sphere sph(Transform::Translate(0.0, 0.0, -201.0), 200.0);
     GeometryEntity ground(&sph, &STATIC_BLACK_MATERIAL);
 
     Sphere sph2(Transform(), 1.0);
@@ -56,17 +56,21 @@ int main()
 
     RenderTarget renderTarget(SCR_W, SCR_H);
 
-    //============= Rendering =============
+    //============= Renderer & Integrator =============
 
-    SerialRenderer<JitteredSubareaRenderer> renderer(100);
+    JitteredSubareaRenderer subareaRenderer(100);
+
+    ParallelRenderer renderer;
     renderer.SetProgressPrinting(true);
 
     PureColorIntegrator integrator(SPECTRUM::WHITE, SPECTRUM::BLACK);
 
+    //============= Rendering =============
+
     cout << "Start rendering..." << endl;
 
     AGZ::Timer timer;
-    renderer.Render(scene, integrator, renderTarget);
+    renderer.Render(subareaRenderer, scene, integrator, renderTarget);
     auto deltaTime = timer.Milliseconds() / 1000.0;
 
     cout << "Complete rendering...Total time: " << deltaTime << "s." << endl;
