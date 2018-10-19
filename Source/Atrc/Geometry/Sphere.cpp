@@ -112,4 +112,23 @@ AABB Sphere::LocalBound() const
     return { Vec3(-radius_), Vec3(radius_) };
 }
 
+GeometrySampleResult Sphere::Sample() const
+{
+    Real u = Rand(), v = Rand();
+    auto [sam, pdf] = AGZ::Math::DistributionTransform
+                      ::UniformOnUnitSphere<Real>::Transform({ u, v });
+
+    GeometrySampleResult ret;
+    ret.pos = local2World_.ApplyToPoint(radius_ * sam);
+    ret.nor = ret.pos.Normalize();
+    ret.pdf = pdf * local2World_.InverseScaleFactor() * local2World_.InverseScaleFactor();
+    return ret;
+}
+
+Real Sphere::SamplePDF(const Vec3 &, const Vec3 &) const
+{
+    Real r = radius_ * local2World_.ScaleFactor();
+    return 1 / (4 * PI * r * r);
+}
+
 AGZ_NS_END(Atrc)

@@ -11,7 +11,8 @@ AGZ_NS_BEG(Atrc)
 
 struct GeometrySampleResult
 {
-    SurfacePoint sp;
+    Vec3 pos;
+    Vec3 nor;
     Real pdf = 0.0;
 };
 
@@ -46,11 +47,10 @@ public:
     virtual AABB WorldBound() const;
 
     // 在表面面积上采样
-    // 填充sp：pos，geoUV，usrUV，geoLocal（，flag0）
     virtual GeometrySampleResult Sample() const = 0;
 
     // 给定采样结果，返回其概率密度
-    virtual Real SamplePDF(const SurfacePoint &sp) const = 0;
+    virtual Real SamplePDF(const Vec3 &pos, const Vec3 &nor) const = 0;
 };
 
 AGZ_NS_END(Atrc)

@@ -28,10 +28,10 @@ struct BSDFSampleWiResult
     BxDFType type = BXDF_NONE;
 };
 
-using BxDFSampleWiResult = BSDFSampleWiResult;
-
 class BSDF
 {
+protected:
+
     LocalCoordSystem shadingLocal_;
     Vec3 geometryNormal_;
 
@@ -47,24 +47,9 @@ public:
 
     virtual Spectrum Eval(const Vec3 &wi, const Vec3 &wo) const = 0;
 
-    virtual BSDFSampleWiResult SampleWi(const Vec3 &wo, BxDFType type) const = 0;
+    virtual Option<BSDFSampleWiResult> SampleWi(const Vec3 &wo, BxDFType type) const = 0;
 
-    virtual Real SampleWiPDF(const Vec3 &wo, const Vec3 &wi, BxDFType type) const = 0;
-};
-
-class BxDF
-{
-public:
-
-    virtual ~BxDF() = default;
-
-    virtual BxDFType GetType() const = 0;
-
-    virtual Spectrum Eval(const Vec3 &wi, const Vec3 &wo) const = 0;
-
-    virtual BxDFSampleWiResult SampleWi(const Vec3 &wo) const = 0;
-
-    virtual Real SampleWiPDF(const Vec3 &wo, const Vec3 &wi) const = 0;
+    virtual Real SampleWiPDF(const Vec3 &wi, const Vec3 &wo, BxDFType type) const = 0;
 };
 
 AGZ_NS_END(Atrc)

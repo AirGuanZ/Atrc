@@ -26,7 +26,7 @@ public:
 
     GeometrySampleResult Sample() const override;
 
-    Real SamplePDF(const SurfacePoint &sp) const override;
+    Real SamplePDF(const Vec3 &pos, const Vec3 &nor) const override;
 };
 
 AGZ_NS_END(Atrc)
