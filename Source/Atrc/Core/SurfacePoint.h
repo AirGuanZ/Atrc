@@ -49,9 +49,6 @@ struct SurfacePoint
     // 几何局部坐标系，其中ez就是表面法线
     LocalCoordSystem geoLocal;
 
-    // 着色局部坐标系，大部分时候与geoLocal一样，受bump mapping等技术的影响
-    Option<LocalCoordSystem> shdLocal;
-
     // 相交实体
     const Entity *entity = nullptr;
     
@@ -61,6 +58,9 @@ struct SurfacePoint
 
 struct ShadingPoint
 {
+    // 着色局部坐标系，大部分时候与geoLocal一样，受bump mapping等技术的影响
+    LocalCoordSystem shdLocal;
+
     RC<BSDF> bsdf;
 };
 

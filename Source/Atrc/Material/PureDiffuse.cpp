@@ -10,8 +10,8 @@ namespace
 
     public:
 
-        explicit PureDiffuseBSDF(const SurfacePoint &sp, const Spectrum &color)
-            : BSDF(sp.shdLocal.value(), sp.geoLocal.ez), color_(color)
+        explicit PureDiffuseBSDF(const LocalCoordSystem &shdLocal, const Vec3 &geoNor, const Spectrum &color)
+            : BSDF(shdLocal, geoNor), color_(color)
         {
             
         }
@@ -77,7 +77,8 @@ PureDiffuse::PureDiffuse(const Spectrum &albedo)
 void PureDiffuse::Shade(const SurfacePoint &sp, ShadingPoint *dst) const
 {
     AGZ_ASSERT(dst);
-    dst->bsdf = MakeRC<PureDiffuseBSDF>(sp, color_);
+    dst->shdLocal = sp.geoLocal;
+    dst->bsdf = MakeRC<PureDiffuseBSDF>(dst->shdLocal, sp.geoLocal.ez, color_);
 }
 
 AGZ_NS_END(Atrc)

@@ -39,7 +39,8 @@ namespace
 void BlackMaterial::Shade(const SurfacePoint &sp, ShadingPoint *dst) const
 {
     AGZ_ASSERT(dst);
-    dst->bsdf = MakeRC<BlackBSDF>(*sp.shdLocal, sp.geoLocal.ez);
+    dst->shdLocal = sp.geoLocal;
+    dst->bsdf = MakeRC<BlackBSDF>(dst->shdLocal, sp.geoLocal.ez);
 }
 
 AGZ_NS_END(Atrc)

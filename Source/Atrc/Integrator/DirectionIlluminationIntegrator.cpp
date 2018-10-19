@@ -30,11 +30,8 @@ Spectrum DirectIlluminationIntegrator::GetRadiance(const Scene &scene, const Ray
 
     // 取得表面材质
 
-    auto mat = inct.entity->GetMaterial(inct);
-    mat->ComputeShadingLocal(&inct);
-    
     ShadingPoint shdPnt;
-    mat->Shade(inct, &shdPnt);
+    inct.entity->GetMaterial(inct)->Shade(inct, &shdPnt);
 
     // 物体自发光
 
