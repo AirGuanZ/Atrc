@@ -8,6 +8,22 @@ const Camera* Scene::GetCamera() const
     return camera;
 }
 
+const std::vector<const Light*> &Scene::GetLights() const
+{
+    return lights_;
+}
+
+SceneLightSampleResult Scene::SampleLight() const
+{
+    if(lights_.empty())
+        return { nullptr, 0.0 };
+
+    return {
+        lights_[AGZ::Math::Random::Uniform<size_t>(0, lights_.size() - 1)],
+        1.0 / lights_.size()
+    };
+}
+
 bool Scene::HasIntersection(const Ray &r) const
 {
     AGZ_ASSERT(r.IsNormalized());

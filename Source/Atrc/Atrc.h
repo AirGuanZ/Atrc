@@ -12,6 +12,7 @@
 
 #include <Atrc/Light/GeometricDiffuseLight.h>
 
+#include <Atrc/Integrator/DirectIlluminationIntegrator.h>
 #include <Atrc/Integrator/PureColorIntegrator.h>
 
 #include <Atrc/Renderer/JitteredSubareaRenderer.h>

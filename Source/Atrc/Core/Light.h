@@ -35,7 +35,7 @@ public:
     // 仅针对有实体的光源，设某r与实体交于sp，求这一点沿-r.dir的radiance
     virtual Spectrum AreaLe(const SurfacePoint &sp) const = 0;
 
-    // 没有实体，凭空产生的那些le，比如environment map
+    // 没有实体，沿-r.dir方向凭空产生的那些le，比如skylight等
     virtual Spectrum Le(const Ray &r) const = 0;
 
     // 用来在多个光源间进行选择

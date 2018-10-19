@@ -9,6 +9,12 @@
 
 AGZ_NS_BEG(Atrc)
 
+struct SceneLightSampleResult
+{
+    const Light *light;
+    Real pdf;
+};
+
 class Scene
 {
 public:
@@ -18,6 +24,10 @@ public:
     const Camera *camera;
 
     const Camera *GetCamera() const;
+
+    const std::vector<const Light*> &GetLights() const;
+
+    SceneLightSampleResult SampleLight() const;
 
     bool HasIntersection(const Ray &r) const;
 
