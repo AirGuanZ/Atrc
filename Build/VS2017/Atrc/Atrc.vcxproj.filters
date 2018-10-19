@@ -7,6 +7,12 @@
     <Filter Include="Geometry">
       <UniqueIdentifier>{c4c298d0-2f34-4287-a568-d15632166fe0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Material">
+      <UniqueIdentifier>{6860a200-355f-495d-9ef8-3fbaac9c29f7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Entity">
+      <UniqueIdentifier>{c644ba10-9bc8-42aa-8095-24a35273fd40}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Source\Atrc\Atrc.h" />
@@ -58,6 +64,12 @@
     <ClInclude Include="..\..\..\Source\Atrc\Geometry\Sphere.h">
       <Filter>Geometry</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Material\PureDiffuse.h">
+      <Filter>Material</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Entity\GeometricEntity.h">
+      <Filter>Entity</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\Atrc\Core\Geometry.cpp">
@@ -74,6 +86,12 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Source\Atrc\Geometry\Sphere.cpp">
       <Filter>Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Material\PureDiffuse.cpp">
+      <Filter>Material</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Entity\GeometricEntity.cpp">
+      <Filter>Entity</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
