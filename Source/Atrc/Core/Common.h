@@ -57,6 +57,9 @@ using Mat4 = AGZ::Math::Mat4<Real>;
 using Rad = AGZ::Math::Rad<Real>;
 using Deg = AGZ::Math::Deg<Real>;
 
+using AGZ::Math::Color3f;
+using AGZ::Math::Color3b;
+
 inline Real Rand() { return AGZ::Math::Random::Uniform(0.0, 1.0); }
 
 inline Real Cos(const Vec3 &L, const Vec3 &R) { return Dot(L, R) / (L.Length() * R.Length()); }
@@ -66,6 +69,7 @@ using AGZ::Math::ApproxEq;
 using AGZ::Math::Clamp;
 using AGZ::Math::Max;
 using AGZ::Math::Min;
+using AGZ::Math::Pow;
 using AGZ::Math::Sqrt;
 
 using AGZ::Math::Cross;
@@ -86,7 +90,7 @@ using AGZ::UNINITIALIZED;
 
 // ============================= Spectrum =============================
 
-using Spectrum = AGZ::Math::Color3f;
+using Spectrum = Color3f;
 
 namespace SPECTRUM = AGZ::Math::COLOR;
 

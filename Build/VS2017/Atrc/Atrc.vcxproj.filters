@@ -147,5 +147,8 @@
     <ClCompile Include="..\..\..\Source\Atrc\Camera\PerspectiveCamera.cpp">
       <Filter>Camera</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Core\Common.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

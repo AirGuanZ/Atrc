@@ -49,6 +49,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\Atrc\Camera\PerspectiveCamera.cpp" />
+    <ClCompile Include="..\..\..\Source\Atrc\Core\Common.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Core\Entity.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Core\Geometry.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Core\Light.cpp" />
