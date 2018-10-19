@@ -37,15 +37,20 @@
     <ClInclude Include="..\..\..\Source\Atrc\Core\Transform.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Entity\GeometricEntity.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Geometry\Sphere.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Light\GeometricDiffuseLight.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Material\PureDiffuse.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Material\BlackMaterial.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\Atrc\Core\Entity.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Core\Geometry.cpp" />
+    <ClCompile Include="..\..\..\Source\Atrc\Core\Light.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Core\Material.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Core\Scene.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Entity\GeometricEntity.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Geometry\Sphere.cpp" />
+    <ClCompile Include="..\..\..\Source\Atrc\Light\GeometricDiffuseLight.cpp" />
+    <ClCompile Include="..\..\..\Source\Atrc\Material\BlackMaterial.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Material\PureDiffuse.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

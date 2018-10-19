@@ -50,7 +50,11 @@ public:
     virtual GeometrySampleResult Sample() const = 0;
 
     // 给定采样结果，返回其概率密度
-    virtual Real SamplePDF(const Vec3 &pos, const Vec3 &nor) const = 0;
+    virtual Real SamplePDF(const Vec3 &pos) const = 0;
+
+    virtual GeometrySampleResult Sample(const Vec3 &dst) const;
+
+    virtual Real SamplePDF(const Vec3 &pos, const Vec3 &dst) const;
 };
 
 AGZ_NS_END(Atrc)

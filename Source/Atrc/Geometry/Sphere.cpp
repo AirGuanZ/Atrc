@@ -125,7 +125,7 @@ GeometrySampleResult Sphere::Sample() const
     return ret;
 }
 
-Real Sphere::SamplePDF(const Vec3 &, const Vec3 &) const
+Real Sphere::SamplePDF(const Vec3 &) const
 {
     Real r = radius_ * local2World_.ScaleFactor();
     return 1 / (4 * PI * r * r);

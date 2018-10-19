@@ -13,4 +13,14 @@ AABB Geometry::WorldBound() const
     return local2World_.ApplyToAABB(LocalBound());
 }
 
+GeometrySampleResult Geometry::Sample(const Vec3 &dst) const
+{
+    return Sample();
+}
+
+Real Geometry::SamplePDF(const Vec3 &pos, const Vec3 &dst) const
+{
+    return SamplePDF(pos);
+}
+
 AGZ_NS_END(Atrc)

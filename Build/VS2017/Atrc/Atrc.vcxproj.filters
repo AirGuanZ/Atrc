@@ -13,6 +13,9 @@
     <Filter Include="Entity">
       <UniqueIdentifier>{c644ba10-9bc8-42aa-8095-24a35273fd40}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Light">
+      <UniqueIdentifier>{d5158d51-105b-4931-8bab-53cc51219f98}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Source\Atrc\Atrc.h" />
@@ -70,6 +73,12 @@
     <ClInclude Include="..\..\..\Source\Atrc\Entity\GeometricEntity.h">
       <Filter>Entity</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Light\GeometricDiffuseLight.h">
+      <Filter>Light</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Material\BlackMaterial.h">
+      <Filter>Material</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\Atrc\Core\Geometry.cpp">
@@ -92,6 +101,15 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Source\Atrc\Entity\GeometricEntity.cpp">
       <Filter>Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Light\GeometricDiffuseLight.cpp">
+      <Filter>Light</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Core\Light.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Material\BlackMaterial.cpp">
+      <Filter>Material</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
