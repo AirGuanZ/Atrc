@@ -36,6 +36,7 @@
     <ClInclude Include="..\..\..\Source\Atrc\Core\SurfacePoint.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Core\Transform.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Entity\GeometricEntity.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Entity\GeometricLightEntity.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Geometry\Sphere.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Light\GeometricDiffuseLight.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Material\PureDiffuse.h" />

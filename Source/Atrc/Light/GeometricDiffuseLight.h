@@ -1,14 +1,11 @@
 #pragma once
 
-#include <Atrc/Core/Common.h>
-#include <Atrc/Core/Geometry.h>
-#include <Atrc/Core/Light.h>
+#include <Atrc/Core/Core.h>
 
 AGZ_NS_BEG(Atrc)
 
-class GeometricDiffuseLight : public Light
+class GeometricDiffuseLight : public GeometricLight
 {
-    const Geometry *geometry_;
     Spectrum radiance_;
 
 public:

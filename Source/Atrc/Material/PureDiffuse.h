@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Atrc/Core/Material.h>
+#include <Atrc/Core/Core.h>
 
 AGZ_NS_BEG(Atrc)
 

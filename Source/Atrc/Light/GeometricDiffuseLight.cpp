@@ -3,7 +3,7 @@
 AGZ_NS_BEG(Atrc)
 
 GeometricDiffuseLight::GeometricDiffuseLight(const Geometry *geometry, const Spectrum &radiance)
-    : geometry_(geometry), radiance_(radiance)
+    : GeometricLight(geometry), radiance_(radiance)
 {
     AGZ_ASSERT(geometry);
 }

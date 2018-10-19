@@ -1,4 +1,3 @@
-#include <Atrc/Core/BSDF.h>
 #include <Atrc/Material/PureDiffuse.h>
 
 AGZ_NS_BEG(Atrc)

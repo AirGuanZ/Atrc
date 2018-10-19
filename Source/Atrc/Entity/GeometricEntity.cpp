@@ -35,7 +35,7 @@ const Material *GeometryEntity::GetMaterial(const SurfacePoint &sp) const
     return material_;
 }
 
-const Light *GeometryEntity::AsAreaLight() const
+const Light *GeometryEntity::AsLight() const
 {
     return nullptr;
 }

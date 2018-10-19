@@ -42,4 +42,24 @@ public:
     virtual Spectrum Power() const = 0;
 };
 
+class GeometricLight : public Light
+{
+protected:
+
+    const Geometry *geometry_;
+
+public:
+
+    GeometricLight(const Geometry *geometry)
+        : geometry_(geometry)
+    {
+        AGZ_ASSERT(geometry);
+    }
+
+    const Geometry *GetGeometry() const
+    {
+        return geometry_;
+    }
+};
+
 AGZ_NS_END(Atrc)

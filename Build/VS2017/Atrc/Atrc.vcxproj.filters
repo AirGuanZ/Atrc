@@ -79,6 +79,9 @@
     <ClInclude Include="..\..\..\Source\Atrc\Material\BlackMaterial.h">
       <Filter>Material</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Entity\GeometricLightEntity.h">
+      <Filter>Entity</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\Atrc\Core\Geometry.cpp">

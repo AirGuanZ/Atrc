@@ -1,7 +1,6 @@
 #pragma once
 
-#include <Atrc/Core/Common.h>
-#include <Atrc/Core/Material.h>
+#include <Atrc/Core/Core.h>
 
 AGZ_NS_BEG(Atrc)
 
@@ -11,5 +10,7 @@ public:
 
     void Shade(const SurfacePoint &sp, ShadingPoint *dst) const override;
 };
+
+inline const BlackMaterial STATIC_BLACK_MATERIAL;
 
 AGZ_NS_END(Atrc)

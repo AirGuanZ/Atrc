@@ -24,7 +24,7 @@ public:
 
     virtual const Material *GetMaterial(const SurfacePoint &sp) const = 0;
 
-    virtual const Light *AsAreaLight() const = 0;
+    virtual const Light *AsLight() const = 0;
 };
 
 AGZ_NS_END(Atrc)

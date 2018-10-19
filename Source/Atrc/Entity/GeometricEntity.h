@@ -1,8 +1,6 @@
 #pragma once
 
-#include <Atrc/Core/Common.h>
-#include <Atrc/Core/Entity.h>
-#include <Atrc/Core/Geometry.h>
+#include <Atrc/Core/Core.h>
 
 AGZ_NS_BEG(Atrc)
 
@@ -23,7 +21,7 @@ public:
 
     const Material *GetMaterial(const SurfacePoint &sp) const override;
 
-    const Light *AsAreaLight() const override;
+    const Light *AsLight() const override;
 };
 
 AGZ_NS_END(Atrc)
