@@ -22,7 +22,7 @@ Spectrum DirectIlluminationIntegrator::GetRadiance(const Scene &scene, const Ray
     SurfacePoint inct;
     if(!scene.FindCloestIntersection(r, &inct))
     {
-        // 那些没有实体的光源
+        // 处理没有实体的光源
         for(auto light : scene.GetLights())
             ret += light->Le(r);
         return ret;
@@ -36,7 +36,7 @@ Spectrum DirectIlluminationIntegrator::GetRadiance(const Scene &scene, const Ray
     ShadingPoint shdPnt;
     mat->Shade(inct, &shdPnt);
 
-    // 自发光
+    // 物体自发光
 
     auto selfLight = inct.entity->AsLight();
     if(selfLight)
