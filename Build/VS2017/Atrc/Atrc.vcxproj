@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Source\Atrc\Atrc.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Camera\PerspectiveCamera.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Core\AABB.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Core\BSDF.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Core\Camera.h" />
@@ -38,11 +39,16 @@
     <ClInclude Include="..\..\..\Source\Atrc\Entity\GeometricEntity.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Entity\GeometricLightEntity.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Geometry\Sphere.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Integrator\PureColorIntegrator.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Light\GeometricDiffuseLight.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Material\PureDiffuse.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Material\BlackMaterial.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Renderer\JitteredSubareaRenderer.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Renderer\SerialRenderer.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Renderer\SubareaRenderer.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\Source\Atrc\Camera\PerspectiveCamera.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Core\Entity.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Core\Geometry.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Core\Light.cpp" />
@@ -50,9 +56,11 @@
     <ClCompile Include="..\..\..\Source\Atrc\Core\Scene.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Entity\GeometricEntity.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Geometry\Sphere.cpp" />
+    <ClCompile Include="..\..\..\Source\Atrc\Integrator\PureColorIntegrator.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Light\GeometricDiffuseLight.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Material\BlackMaterial.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Material\PureDiffuse.cpp" />
+    <ClCompile Include="..\..\..\Source\Atrc\Renderer\JitteredSubareaRenderer.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

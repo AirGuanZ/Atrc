@@ -46,14 +46,16 @@ public:
     // 世界bound
     virtual AABB WorldBound() const;
 
-    // 在表面面积上采样
+    // 在表面上采样
     virtual GeometrySampleResult Sample() const = 0;
 
     // 给定采样结果，返回其概率密度
     virtual Real SamplePDF(const Vec3 &pos) const = 0;
 
+    // 以dst为“目标点”在表面上进行采样
     virtual GeometrySampleResult Sample(const Vec3 &dst) const;
 
+    // 上一个函数的pdf
     virtual Real SamplePDF(const Vec3 &pos, const Vec3 &dst) const;
 };
 

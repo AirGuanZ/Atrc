@@ -16,6 +16,15 @@
     <Filter Include="Light">
       <UniqueIdentifier>{d5158d51-105b-4931-8bab-53cc51219f98}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Renderer">
+      <UniqueIdentifier>{1c19e29f-cb60-41a7-97c0-599c11e1fe53}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Integrator">
+      <UniqueIdentifier>{9234bb83-6ce8-47f6-8e2a-28e53bb4d31d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Camera">
+      <UniqueIdentifier>{44bcb54b-d304-4880-9ee5-d62c26d896ea}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Source\Atrc\Atrc.h" />
@@ -82,6 +91,21 @@
     <ClInclude Include="..\..\..\Source\Atrc\Entity\GeometricLightEntity.h">
       <Filter>Entity</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Renderer\SerialRenderer.h">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Renderer\JitteredSubareaRenderer.h">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Renderer\SubareaRenderer.h">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Integrator\PureColorIntegrator.h">
+      <Filter>Integrator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Camera\PerspectiveCamera.h">
+      <Filter>Camera</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\Atrc\Core\Geometry.cpp">
@@ -113,6 +137,15 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Source\Atrc\Material\BlackMaterial.cpp">
       <Filter>Material</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Renderer\JitteredSubareaRenderer.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Integrator\PureColorIntegrator.cpp">
+      <Filter>Integrator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Camera\PerspectiveCamera.cpp">
+      <Filter>Camera</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

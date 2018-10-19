@@ -20,7 +20,7 @@ struct LocalCoordSystem
 
     static LocalCoordSystem FromEz(const Vec3 &ez)
     {
-        Vec3 ex(AGZ::UNINITIALIZED);
+        Vec3 ex;
         if(ApproxEq(Abs(Dot(ez, Vec3::UNIT_X())), 1.0, 0.1))
             ex = Cross(ez, Vec3::UNIT_Y()).Normalize();
         else

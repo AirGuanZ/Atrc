@@ -47,8 +47,10 @@ public:
 
     virtual Spectrum Eval(const Vec3 &wi, const Vec3 &wo) const = 0;
 
+    // 给定wo，对wi进行type类型的采样
     virtual Option<BSDFSampleWiResult> SampleWi(const Vec3 &wo, BxDFType type) const = 0;
 
+    // 给定某wi，假设这时SampleWi的采样结果，返回pdf
     virtual Real SampleWiPDF(const Vec3 &wi, const Vec3 &wo, BxDFType type) const = 0;
 };
 

@@ -12,7 +12,7 @@ public:
 
     virtual ~Renderer() = default;
 
-    virtual void Render(const Integrator &integrator, const Scene &scene, RenderTarget &rt) const = 0;
+    virtual void Render(const Scene &scene, const Integrator &integrator, RenderTarget &rt) const = 0;
 };
 
 AGZ_NS_END(Atrc)

@@ -71,7 +71,12 @@ using AGZ::Math::Sqrt;
 using AGZ::Math::Cross;
 using AGZ::Math::Dot;
 
+using AGZ::Math::Sin;
+using AGZ::Math::Cos;
+using AGZ::Math::Tan;
+
 using AGZ::Math::Arcsin;
+using AGZ::Math::Arccos;
 using AGZ::Math::Arctan2;
 
 constexpr Real PI = AGZ::Math::PI<Real>;

@@ -24,6 +24,7 @@ public:
 
     virtual const Material *GetMaterial(const SurfacePoint &sp) const = 0;
 
+    // 少数Entity自身可作为光源，否则返回nullptr
     virtual const Light *AsLight() const = 0;
 };
 

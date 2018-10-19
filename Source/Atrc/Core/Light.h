@@ -50,7 +50,7 @@ protected:
 
 public:
 
-    GeometricLight(const Geometry *geometry)
+    explicit GeometricLight(const Geometry *geometry)
         : geometry_(geometry)
     {
         AGZ_ASSERT(geometry);
