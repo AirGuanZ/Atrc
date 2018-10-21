@@ -106,9 +106,11 @@
     <ClInclude Include="..\..\..\Source\Atrc\Camera\PerspectiveCamera.h">
       <Filter>Camera</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\Atrc\Renderer\ParallelRenderer.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Integrator\PathTracer.h">
       <Filter>Integrator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Renderer\ParallelRenderer.h">
+      <Filter>Renderer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

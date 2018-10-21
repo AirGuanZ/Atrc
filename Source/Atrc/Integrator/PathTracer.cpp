@@ -44,7 +44,9 @@ Spectrum PathTracer::Ls(const Scene &scene, const SurfacePoint &sp, int depth) c
 
     ShadingPoint shd;
     sp.entity->GetMaterial(sp)->Shade(sp, &shd);
-    return E(scene, sp, shd) + S(scene, sp, shd, depth);
+    auto e = E(scene, sp, shd);
+    auto s = S(scene, sp, shd, depth);
+    return e + s;
 }
 
 Spectrum PathTracer::E(const Scene &scene, const SurfacePoint &sp, const ShadingPoint &shd) const

@@ -67,9 +67,9 @@ int main()
 
     //============= Renderer & Integrator =============
 
-    JitteredSubareaRenderer subareaRenderer(100);
+    JitteredSubareaRenderer subareaRenderer(1000);
 
-    ParallelRenderer renderer;
+    ParallelRenderer renderer(6);
     //SerialRenderer renderer;
     renderer.SetProgressPrinting(true);
 
@@ -88,5 +88,5 @@ int main()
 
     //============= Output =============
 
-    AGZ::Tex::TextureFile::WriteRGBToPNG("./Build/Output.png", ToSavedImage(renderTarget, 2.2f));
+    AGZ::Tex::TextureFile::WriteRGBToPNG("./Build/Output.png", ToSavedImage(renderTarget, 1 / 2.2f));
 }
