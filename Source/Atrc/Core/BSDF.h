@@ -33,12 +33,12 @@ class BSDF
 protected:
 
     LocalCoordSystem shadingLocal_;
-    Vec3 geometryNormal_;
+    LocalCoordSystem geometryLocal_;
 
 public:
 
-    BSDF(const LocalCoordSystem &shadingLocal, const Vec3 &geometryNormal)
-        : shadingLocal_(shadingLocal), geometryNormal_(geometryNormal)
+    BSDF(const LocalCoordSystem &shadingLocal, const LocalCoordSystem &geometryLocal)
+        : shadingLocal_(shadingLocal), geometryLocal_(geometryLocal)
     {
         
     }

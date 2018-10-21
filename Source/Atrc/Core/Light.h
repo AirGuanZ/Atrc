@@ -7,8 +7,8 @@ AGZ_NS_BEG(Atrc)
 struct LightSampleToResult
 {
     Vec3 pos;
-    Vec3 nor;
-    Spectrum le;
+    Vec3 wi;
+    Spectrum radiance;
     Real pdf = 0.0;
 };
 
@@ -18,11 +18,12 @@ public:
 
     virtual ~Light() = default;
 
-    // 在光源上采样一个点照向sp
+    // 在光源上采样一个点照向sp，原则上包含了AreaLe和Le两部分
     virtual LightSampleToResult SampleTo(const SurfacePoint &sp) const = 0;
 
     // 给定光源上的采样结果，求pdf
-    virtual Real SampleToPDF(const Vec3 &pos, const Vec3 &dst) const = 0;
+    // posOnLight指出pos是否在光源实体上
+    virtual Real SampleToPDF(const Vec3 &pos, const Vec3 &dst, bool posOnLight = true) const = 0;
 
     // 位置采样是否使用delta分布
     virtual bool IsDeltaPosition() const = 0;

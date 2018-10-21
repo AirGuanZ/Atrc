@@ -12,16 +12,23 @@ LightSampleToResult GeometricDiffuseLight::SampleTo(const SurfacePoint &sp) cons
 {
     LightSampleToResult ret;
     GeometrySampleResult sam = geometry_->Sample();
+
     ret.pos = sam.pos;
-    ret.nor = sam.nor;
+    ret.wi = (sam.pos - sp.pos).Normalize();
     ret.pdf = sam.pdf;
-    ret.le = radiance_;
+
+    auto cos = Dot(sam.nor, -ret.wi);
+    if(cos <= 0.0)
+        ret.radiance = SPECTRUM::BLACK;
+    else
+        ret.radiance = radiance_ * cos / (sam.pos - sp.pos).LengthSquare();
+
     return ret;
 }
 
-Real GeometricDiffuseLight::SampleToPDF(const Vec3 &pos, const Vec3 &dst) const
+Real GeometricDiffuseLight::SampleToPDF(const Vec3 &pos, const Vec3 &dst, bool posOnLight) const
 {
-    return geometry_->SamplePDF(pos);
+    return posOnLight ? geometry_->SamplePDF(pos) : 0.0;
 }
 
 bool GeometricDiffuseLight::IsDeltaPosition() const

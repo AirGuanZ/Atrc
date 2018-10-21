@@ -14,7 +14,7 @@ public:
 
     LightSampleToResult SampleTo(const SurfacePoint &sp) const override;
 
-    Real SampleToPDF(const Vec3 &pos, const Vec3 &dst) const override;
+    Real SampleToPDF(const Vec3 &pos, const Vec3 &dst, bool posOnLight) const override;
 
     bool IsDeltaPosition() const override;
 

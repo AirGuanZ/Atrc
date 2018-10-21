@@ -24,6 +24,12 @@ SceneLightSampleResult Scene::SampleLight() const
     };
 }
 
+Real Scene::SampleLightPDF(const Light *light) const
+{
+    AGZ_ASSERT(light && lights_.size());
+    return 1.0 / lights_.size();
+}
+
 bool Scene::HasIntersection(const Ray &r) const
 {
     AGZ_ASSERT(r.IsNormalized());

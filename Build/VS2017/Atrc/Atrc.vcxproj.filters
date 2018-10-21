@@ -106,7 +106,8 @@
     <ClInclude Include="..\..\..\Source\Atrc\Camera\PerspectiveCamera.h">
       <Filter>Camera</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\Atrc\Integrator\DirectIlluminationIntegrator.h">
+    <ClInclude Include="..\..\..\Source\Atrc\Renderer\ParallelRenderer.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Integrator\PathTracer.h">
       <Filter>Integrator</Filter>
     </ClInclude>
   </ItemGroup>
@@ -115,9 +116,6 @@
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Source\Atrc\Core\Entity.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\Atrc\Core\Material.cpp">
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Source\Atrc\Core\Scene.cpp">
@@ -153,10 +151,7 @@
     <ClCompile Include="..\..\..\Source\Atrc\Core\Common.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Source\Atrc\Renderer\ParallelRenderer.h">
-      <Filter>Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\Atrc\Integrator\DirectionIlluminationIntegrator.cpp">
+    <ClCompile Include="..\..\..\Source\Atrc\Integrator\PathTracer.cpp">
       <Filter>Integrator</Filter>
     </ClCompile>
   </ItemGroup>

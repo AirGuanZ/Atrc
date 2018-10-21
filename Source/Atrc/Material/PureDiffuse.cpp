@@ -10,8 +10,8 @@ namespace
 
     public:
 
-        explicit PureDiffuseBSDF(const LocalCoordSystem &shdLocal, const Vec3 &geoNor, const Spectrum &color)
-            : BSDF(shdLocal, geoNor), color_(color)
+        explicit PureDiffuseBSDF(const LocalCoordSystem &shdLocal, const LocalCoordSystem &geoLocal, const Spectrum &color)
+            : BSDF(shdLocal, geoLocal), color_(color)
         {
             
         }
@@ -47,6 +47,8 @@ namespace
             ret.coef = color_;
             ret.type = BXDF_DIFFUSE;
 
+            AGZ_ASSERT(ApproxEq(ret.pdf, SampleWiPDF(ret.wi, wo, type), 1e-5));
+
             return ret;
         }
 
@@ -78,7 +80,7 @@ void PureDiffuse::Shade(const SurfacePoint &sp, ShadingPoint *dst) const
 {
     AGZ_ASSERT(dst);
     dst->shdLocal = sp.geoLocal;
-    dst->bsdf = MakeRC<PureDiffuseBSDF>(dst->shdLocal, sp.geoLocal.ez, color_);
+    dst->bsdf = MakeRC<PureDiffuseBSDF>(dst->shdLocal, sp.geoLocal, color_);
 }
 
 AGZ_NS_END(Atrc)

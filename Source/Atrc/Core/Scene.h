@@ -29,6 +29,8 @@ public:
 
     SceneLightSampleResult SampleLight() const;
 
+    Real SampleLightPDF(const Light *light) const;
+
     bool HasIntersection(const Ray &r) const;
 
     bool FindCloestIntersection(const Ray &r, SurfacePoint *sp) const;

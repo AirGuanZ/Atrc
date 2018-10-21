@@ -121,7 +121,12 @@ GeometrySampleResult Sphere::Sample() const
     GeometrySampleResult ret;
     ret.pos = local2World_.ApplyToPoint(radius_ * sam);
     ret.nor = ret.pos.Normalize();
-    ret.pdf = pdf * local2World_.InverseScaleFactor() * local2World_.InverseScaleFactor();
+
+    Real r = radius_ * local2World_.ScaleFactor();
+    ret.pdf = pdf / (r * r);
+
+    AGZ_ASSERT(ApproxEq(ret.pdf, SamplePDF(ret.pos), 1e-5));
+
     return ret;
 }
 

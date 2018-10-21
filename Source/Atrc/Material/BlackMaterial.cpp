@@ -8,8 +8,8 @@ namespace
     {
     public:
 
-        BlackBSDF(const LocalCoordSystem &shadingLocal, const Vec3 &geometryNormal)
-            : BSDF(shadingLocal, geometryNormal)
+        BlackBSDF(const LocalCoordSystem &shadingLocal, const LocalCoordSystem &geoLocal)
+            : BSDF(shadingLocal, geoLocal)
         {
             
         }
@@ -40,7 +40,7 @@ void BlackMaterial::Shade(const SurfacePoint &sp, ShadingPoint *dst) const
 {
     AGZ_ASSERT(dst);
     dst->shdLocal = sp.geoLocal;
-    dst->bsdf = MakeRC<BlackBSDF>(dst->shdLocal, sp.geoLocal.ez);
+    dst->bsdf = MakeRC<BlackBSDF>(dst->shdLocal, sp.geoLocal);
 }
 
 AGZ_NS_END(Atrc)

@@ -12,7 +12,7 @@ class GeometricLightEntity : public Entity
 
     AGZ_FORCEINLINE const Geometry *Geo() const
     {
-        return light_->GetGeometry();
+        return light_.GetGeometry();
     }
 
 public:
@@ -39,7 +39,7 @@ public:
 
     AABB WorldBound() const override
     {
-        return light_->GetGeometry()->WorldBound();
+        return Geo()->WorldBound();
     }
 
     const Material *GetMaterial(const SurfacePoint &sp) const override
