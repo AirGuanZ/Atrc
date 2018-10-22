@@ -8,7 +8,7 @@
 #include <Atrc/Geometry/Sphere.h>
 
 #include <Atrc/Material/BlackMaterial.h>
-#include <Atrc/Material/PureDiffuse.h>
+#include <Atrc/Material/DiffuseMaterial.h>
 
 #include <Atrc/Light/GeometricDiffuseLight.h>
 

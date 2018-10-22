@@ -113,7 +113,7 @@ Spectrum PathTracer::E2(const Scene &scene, const SurfacePoint &sp, const Shadin
     if(!lightSample.radiance)
         return Spectrum();
 
-    Spectrum f = shd.bsdf->Eval(lightSample.wi, sp.wo);
+    Spectrum f = shd.bsdf->Eval(lightSample.wi, sp.wo, BXDF_ALL);
     if(!f)
         return Spectrum();
 

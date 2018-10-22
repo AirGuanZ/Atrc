@@ -4,14 +4,13 @@
 
 AGZ_NS_BEG(Atrc)
 
-class BxDFScaler : public BxDF
+class DiffuseBxDF : public BxDF
 {
-    Spectrum scale_;
-    RC<BxDF> bxdf_;
+    Spectrum color_;
 
 public:
 
-    BxDFScaler(BxDFType type, const Spectrum &scale, RC<BxDF> bxdf);
+    explicit DiffuseBxDF(const Spectrum &color);
 
     Spectrum Eval(const Vec3 &wi, const Vec3 &wo) const override;
 

@@ -30,8 +30,8 @@ AGZ::Tex::Texture2D<Color3b> ToSavedImage(const RenderTarget &origin, float gamm
 
 int main()
 {
-    constexpr uint32_t SCR_W = 1920;
-    constexpr uint32_t SCR_H = 1080;
+    constexpr uint32_t SCR_W = 640;
+    constexpr uint32_t SCR_H = 480;
     constexpr Real SCR_ASPECT_RATIO = static_cast<Real>(SCR_W) / SCR_H;
 
     //============= Camera =============
@@ -43,7 +43,7 @@ int main()
     //============= Scene =============
 
     Sphere sph(Transform::Translate(0.0, 0.0, -101.0), 100.0);
-    PureDiffuse groundMat(Spectrum(0.4f, 0.7f, 0.9f));
+    DiffuseMaterial groundMat(Spectrum(0.5f));
     GeometryEntity ground(&sph, &groundMat);
 
     Sphere sph2(Transform::Translate(0.0, 0.0, 1.0), 1.0);

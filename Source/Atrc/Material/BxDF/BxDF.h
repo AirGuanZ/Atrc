@@ -19,16 +19,13 @@ public:
     template<typename T>
     explicit BxDF(T type) : type_(BxDFType(type)) { }
 
-    bool MatchType(BxDFType type) const;
+    bool MatchType(BxDFType type) const { return (type_ & type) == type_; }
 
     virtual Spectrum Eval(const Vec3 &wi, const Vec3 &wo) const = 0;
 
-    virtual Option<BxDFSampleWiResult> SampleWi(const Vec3 &wo, BxDFType type) const = 0;
-};
+    virtual Option<BxDFSampleWiResult> SampleWi(const Vec3 &wo) const = 0;
 
-inline bool BxDF::MatchType(BxDFType type) const
-{
-    return (type_ & type) == type_;
-}
+    virtual Real SampleWiPDF(const Vec3 &wi, const Vec3 &wo) const = 0;
+};
 
 AGZ_NS_END(Atrc)

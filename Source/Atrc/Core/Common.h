@@ -25,6 +25,12 @@ using RC = std::shared_ptr<T>;
 template<typename T, typename...Args>
 auto MakeRC(Args&&...args) { return std::make_shared<T>(std::forward<Args>(args)...); }
 
+template<typename T>
+using Box = std::unique_ptr<T>;
+
+template<typename T, typename...Args>
+auto MakeBox(Args&&...args) { return std::make_unique<T>(std::forward<Args>(args)...); }
+
 // ============================= Atrc::Exception =============================
 
 class Exception : public std::runtime_error

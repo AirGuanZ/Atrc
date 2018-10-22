@@ -14,7 +14,7 @@ namespace
             
         }
 
-        Spectrum Eval(const Vec3 &wi, const Vec3 &wo) const override
+        Spectrum Eval(const Vec3 &wi, const Vec3 &wo, BxDFType type) const override
         {
             AGZ_ASSERT(IsNormalized(wi));
             AGZ_ASSERT(IsNormalized(wo));

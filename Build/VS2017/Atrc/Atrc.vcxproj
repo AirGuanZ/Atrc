@@ -42,11 +42,17 @@
     <ClInclude Include="..\..\..\Source\Atrc\Integrator\PathTracer.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Integrator\PureColorIntegrator.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Light\GeometricDiffuseLight.h" />
-    <ClInclude Include="..\..\..\Source\Atrc\Material\PureDiffuse.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Material\BxDFAggregate.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Material\BxDF\BxDF.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Material\BxDF\BxDFScaler.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Material\BxDF\DiffuseBxDF.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Material\BxDF\PerfectSpecularReflection.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Material\BxDF\PerfectSpecularTransmission.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Material\DiffuseMaterial.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Material\Fresnel.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Material\BlackMaterial.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Renderer\JitteredSubareaRenderer.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Renderer\SerialRenderer.h" />
-    <ClInclude Include="Fresnel.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\Atrc\Camera\PerspectiveCamera.cpp" />
@@ -61,7 +67,13 @@
     <ClCompile Include="..\..\..\Source\Atrc\Integrator\PureColorIntegrator.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Light\GeometricDiffuseLight.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Material\BlackMaterial.cpp" />
-    <ClCompile Include="..\..\..\Source\Atrc\Material\PureDiffuse.cpp" />
+    <ClCompile Include="..\..\..\Source\Atrc\Material\BxDFAggregate.cpp" />
+    <ClCompile Include="..\..\..\Source\Atrc\Material\BxDF\BxDFScaler.cpp" />
+    <ClCompile Include="..\..\..\Source\Atrc\Material\BxDF\DiffuseBxDF.cpp" />
+    <ClCompile Include="..\..\..\Source\Atrc\Material\BxDF\PerfectSpecularReflection.cpp" />
+    <ClCompile Include="..\..\..\Source\Atrc\Material\BxDF\PerfectSpecularTransmission.cpp" />
+    <ClCompile Include="..\..\..\Source\Atrc\Material\DiffuseMaterial.cpp" />
+    <ClCompile Include="..\..\..\Source\Atrc\Material\Fresnel.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Renderer\JitteredSubareaRenderer.cpp" />
     <ClInclude Include="..\..\..\Source\Atrc\Renderer\ParallelRenderer.h" />
   </ItemGroup>

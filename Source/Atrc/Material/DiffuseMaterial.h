@@ -4,13 +4,13 @@
 
 AGZ_NS_BEG(Atrc)
 
-class PureDiffuse : public Material
+class DiffuseMaterial : public Material
 {
     Spectrum color_;
 
 public:
 
-    explicit PureDiffuse(const Spectrum &albedo);
+    explicit DiffuseMaterial(const Spectrum &albedo);
 
     void Shade(const SurfacePoint &sp, ShadingPoint *dst) const override;
 };

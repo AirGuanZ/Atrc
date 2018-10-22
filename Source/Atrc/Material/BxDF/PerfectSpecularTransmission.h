@@ -1,17 +1,18 @@
 #pragma once
 
 #include <Atrc/Material/BxDF/BxDF.h>
+#include <Atrc/Material/Fresnel.h>
 
 AGZ_NS_BEG(Atrc)
 
-class BxDFScaler : public BxDF
+class PerfectSpecularTransmission : public BxDF
 {
-    Spectrum scale_;
-    RC<BxDF> bxdf_;
+    Spectrum rc_;
+    RC<Fresnel> fresnel_;
 
 public:
 
-    BxDFScaler(BxDFType type, const Spectrum &scale, RC<BxDF> bxdf);
+    PerfectSpecularTransmission(const Spectrum &rc, RC<Fresnel> fresnel);
 
     Spectrum Eval(const Vec3 &wi, const Vec3 &wo) const override;
 

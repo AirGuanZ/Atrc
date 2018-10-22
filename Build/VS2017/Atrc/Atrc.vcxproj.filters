@@ -25,6 +25,9 @@
     <Filter Include="Camera">
       <UniqueIdentifier>{44bcb54b-d304-4880-9ee5-d62c26d896ea}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Material\BxDF">
+      <UniqueIdentifier>{bad1ef04-0e87-4f28-9c90-48b725d20539}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Source\Atrc\Atrc.h" />
@@ -76,9 +79,6 @@
     <ClInclude Include="..\..\..\Source\Atrc\Geometry\Sphere.h">
       <Filter>Geometry</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\Atrc\Material\PureDiffuse.h">
-      <Filter>Material</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Source\Atrc\Entity\GeometricEntity.h">
       <Filter>Entity</Filter>
     </ClInclude>
@@ -109,8 +109,29 @@
     <ClInclude Include="..\..\..\Source\Atrc\Renderer\ParallelRenderer.h">
       <Filter>Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="Fresnel.h">
+    <ClInclude Include="..\..\..\Source\Atrc\Material\Fresnel.h">
       <Filter>Material</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Material\BxDFAggregate.h">
+      <Filter>Material</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Material\BxDF\BxDFScaler.h">
+      <Filter>Material\BxDF</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Material\BxDF\BxDF.h">
+      <Filter>Material\BxDF</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Material\BxDF\PerfectSpecularReflection.h">
+      <Filter>Material\BxDF</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Material\BxDF\DiffuseBxDF.h">
+      <Filter>Material\BxDF</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Material\DiffuseMaterial.h">
+      <Filter>Material</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Material\BxDF\PerfectSpecularTransmission.h">
+      <Filter>Material\BxDF</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -125,9 +146,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Source\Atrc\Geometry\Sphere.cpp">
       <Filter>Geometry</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\Atrc\Material\PureDiffuse.cpp">
-      <Filter>Material</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Source\Atrc\Entity\GeometricEntity.cpp">
       <Filter>Entity</Filter>
@@ -155,6 +173,27 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Source\Atrc\Integrator\PathTracer.cpp">
       <Filter>Integrator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Material\Fresnel.cpp">
+      <Filter>Material</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Material\BxDF\BxDFScaler.cpp">
+      <Filter>Material\BxDF</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Material\BxDFAggregate.cpp">
+      <Filter>Material</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Material\BxDF\DiffuseBxDF.cpp">
+      <Filter>Material\BxDF</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Material\DiffuseMaterial.cpp">
+      <Filter>Material</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Material\BxDF\PerfectSpecularReflection.cpp">
+      <Filter>Material\BxDF</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Material\BxDF\PerfectSpecularTransmission.cpp">
+      <Filter>Material\BxDF</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
