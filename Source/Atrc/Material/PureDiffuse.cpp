@@ -30,7 +30,7 @@ namespace
         {
             AGZ_ASSERT(IsNormalized(wo));
 
-            if((type & (BXDF_DIFFUSE | BXDF_REFLECTION)) != (BXDF_DIFFUSE | BXDF_REFLECTION))
+            if(!Match(BXDF_DIFFUSE | BXDF_REFLECTION, type))
                 return None;
 
             Vec3 localWo = shadingLocal_.World2Local(wo);
@@ -57,7 +57,7 @@ namespace
             AGZ_ASSERT(IsNormalized(wi));
             AGZ_ASSERT(IsNormalized(wo));
 
-            if(!(BXDF_DIFFUSE & type))
+            if(!Match(BXDF_DIFFUSE | BXDF_REFLECTION, type))
                 return 0.0;
 
             Vec3 localWi = shadingLocal_.World2Local(wi);

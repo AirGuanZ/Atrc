@@ -20,6 +20,12 @@ enum BxDFType
                BXDF_REFLECTION | BXDF_TRANSMISSION
 };
 
+template<typename T>
+bool Match(T myType, BxDFType dstType)
+{
+    return (BxDFType(myType) & dstType) == myType;
+}
+
 struct BSDFSampleWiResult
 {
     Vec3 wi;
