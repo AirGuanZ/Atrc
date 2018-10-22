@@ -2,7 +2,7 @@
 
 AGZ_NS_BEG(Atrc)
 
-float FresnelDielectric(float etaI, float etaT, float cosThetaI)
+float ComputeFresnelDielectric(float etaI, float etaT, float cosThetaI)
 {
     AGZ_ASSERT(cosThetaI >= 0.0f);
 
@@ -21,7 +21,7 @@ float FresnelDielectric(float etaI, float etaT, float cosThetaI)
     return 0.5f * (para * para + perp * perp);
 }
 
-Spectrum FresnelConductor(const Spectrum &etaI, const Spectrum &etaT, const Spectrum &k, float cosThetaI)
+Spectrum ComputeFresnelConductor(const Spectrum &etaI, const Spectrum &etaT, const Spectrum &k, float cosThetaI)
 {
     Spectrum eta = etaT / etaI;
     Spectrum etaK = k / etaI;
@@ -43,6 +43,28 @@ Spectrum FresnelConductor(const Spectrum &etaI, const Spectrum &etaT, const Spec
     Spectrum rp = rs * (t3 - t4) / (t3 + t4);
 
     return 0.5f * (rp + rs);
+}
+
+FresnelDielectric::FresnelDielectric(float etaI, float etaT)
+    : etaI(etaI), etaT(etaT)
+{
+    
+}
+
+Spectrum FresnelDielectric::Eval(float cosThetaI) const
+{
+    return Spectrum(ComputeFresnelDielectric(etaI, etaT, cosThetaI));
+}
+
+FresnelConductor::FresnelConductor(const Spectrum &etaI, const Spectrum &etaT, const Spectrum &k)
+    : etaI(etaI), etaT(etaT), k(k)
+{
+    
+}
+
+Spectrum FresnelConductor::Eval(float cosThetaI) const
+{
+    return ComputeFresnelConductor(etaI, etaT, k, cosThetaI);
 }
 
 AGZ_NS_END(Atrc)

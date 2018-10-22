@@ -16,7 +16,8 @@ public:
 
     virtual ~BxDF() = default;
 
-    explicit BxDF(BxDFType type);
+    template<typename T>
+    explicit BxDF(T type) : type_(BxDFType(type)) { }
 
     bool MatchType(BxDFType type) const;
 
@@ -24,12 +25,6 @@ public:
 
     virtual Option<BxDFSampleWiResult> SampleWi(const Vec3 &wo, BxDFType type) const = 0;
 };
-
-inline BxDF::BxDF(BxDFType type)
-    : type_(type)
-{
-
-}
 
 inline bool BxDF::MatchType(BxDFType type) const
 {
