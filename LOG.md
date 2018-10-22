@@ -41,4 +41,4 @@ wi和wo混乱不堪，面对非对称BSDF太烧脑
 
 ## 2018.10.22
 
-刚开始写材质系统，离能用还有十万八千里呢。
+刚开始写材质系统，完成了BxDFAggregate，DiffuseBRDF和PerfectSpecularReflection

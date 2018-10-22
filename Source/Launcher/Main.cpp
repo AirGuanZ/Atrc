@@ -66,7 +66,7 @@ int main()
 
     //============= Renderer & Integrator =============
 
-    JitteredSubareaRenderer subareaRenderer(100);
+    JitteredSubareaRenderer subareaRenderer(5000);
 
     ParallelRenderer renderer(6);
     //SerialRenderer renderer;

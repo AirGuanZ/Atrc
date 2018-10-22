@@ -45,7 +45,7 @@
     <ClInclude Include="..\..\..\Source\Atrc\Material\BxDFAggregate.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Material\BxDF\BxDF.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Material\BxDF\BxDFScaler.h" />
-    <ClInclude Include="..\..\..\Source\Atrc\Material\BxDF\DiffuseBxDF.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Material\BxDF\DiffuseBRDF.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Material\BxDF\PerfectSpecularReflection.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Material\BxDF\PerfectSpecularTransmission.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Material\DiffuseMaterial.h" />
@@ -69,7 +69,7 @@
     <ClCompile Include="..\..\..\Source\Atrc\Material\BlackMaterial.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Material\BxDFAggregate.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Material\BxDF\BxDFScaler.cpp" />
-    <ClCompile Include="..\..\..\Source\Atrc\Material\BxDF\DiffuseBxDF.cpp" />
+    <ClCompile Include="..\..\..\Source\Atrc\Material\BxDF\DiffuseBRDF.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Material\BxDF\PerfectSpecularReflection.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Material\BxDF\PerfectSpecularTransmission.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Material\DiffuseMaterial.cpp" />

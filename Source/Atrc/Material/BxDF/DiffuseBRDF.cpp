@@ -1,21 +1,21 @@
-#include <Atrc/Material/BxDF/DiffuseBxDF.h>
+#include <Atrc/Material/BxDF/DiffuseBRDF.h>
 
 AGZ_NS_BEG(Atrc)
 
-DiffuseBxDF::DiffuseBxDF(const Spectrum &color)
+DiffuseBRDF::DiffuseBRDF(const Spectrum &color)
     : BxDF(BXDF_DIFFUSE | BXDF_REFLECTION), color_(color)
 {
 
 }
 
-Spectrum DiffuseBxDF::Eval(const Vec3 &wi, const Vec3 &wo) const
+Spectrum DiffuseBRDF::Eval(const Vec3 &wi, const Vec3 &wo) const
 {
     if(wi.z <= 0.0 || wo.z <= 0.0)
         return Spectrum();
     return color_;
 }
 
-Option<BxDFSampleWiResult> DiffuseBxDF::SampleWi(const Vec3 &wo) const
+Option<BxDFSampleWiResult> DiffuseBRDF::SampleWi(const Vec3 &wo) const
 {
     AGZ_ASSERT(IsNormalized(wo));
 
@@ -36,7 +36,7 @@ Option<BxDFSampleWiResult> DiffuseBxDF::SampleWi(const Vec3 &wo) const
     return ret;
 }
 
-Real DiffuseBxDF::SampleWiPDF(const Vec3 &wi, const Vec3 &wo) const
+Real DiffuseBRDF::SampleWiPDF(const Vec3 &wi, const Vec3 &wo) const
 {
     AGZ_ASSERT(IsNormalized(wi));
     AGZ_ASSERT(IsNormalized(wo));

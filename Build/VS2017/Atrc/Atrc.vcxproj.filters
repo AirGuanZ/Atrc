@@ -124,13 +124,13 @@
     <ClInclude Include="..\..\..\Source\Atrc\Material\BxDF\PerfectSpecularReflection.h">
       <Filter>Material\BxDF</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\Atrc\Material\BxDF\DiffuseBxDF.h">
-      <Filter>Material\BxDF</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Source\Atrc\Material\DiffuseMaterial.h">
       <Filter>Material</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Source\Atrc\Material\BxDF\PerfectSpecularTransmission.h">
+      <Filter>Material\BxDF</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Material\BxDF\DiffuseBRDF.h">
       <Filter>Material\BxDF</Filter>
     </ClInclude>
   </ItemGroup>
@@ -183,9 +183,6 @@
     <ClCompile Include="..\..\..\Source\Atrc\Material\BxDFAggregate.cpp">
       <Filter>Material</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Source\Atrc\Material\BxDF\DiffuseBxDF.cpp">
-      <Filter>Material\BxDF</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Source\Atrc\Material\DiffuseMaterial.cpp">
       <Filter>Material</Filter>
     </ClCompile>
@@ -193,6 +190,9 @@
       <Filter>Material\BxDF</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Source\Atrc\Material\BxDF\PerfectSpecularTransmission.cpp">
+      <Filter>Material\BxDF</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Material\BxDF\DiffuseBRDF.cpp">
       <Filter>Material\BxDF</Filter>
     </ClCompile>
   </ItemGroup>
