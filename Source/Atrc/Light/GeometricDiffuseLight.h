@@ -12,9 +12,9 @@ public:
 
     GeometricDiffuseLight(const Geometry *geometry, const Spectrum &radiance);
 
-    LightSampleToResult SampleTo(const SurfacePoint &sp) const override;
+    LightSampleToResult SampleLi(const SurfacePoint &sp) const override;
 
-    Real SampleToPDF(const Vec3 &pos, const Vec3 &dst, bool posOnLight) const override;
+    Real SampleLiPDF(const Vec3 &pos, const Vec3 &dst, bool posOnLight) const override;
 
     bool IsDeltaPosition() const override;
 
@@ -24,7 +24,7 @@ public:
 
     Spectrum AreaLe(const SurfacePoint &sp) const override;
 
-    Spectrum Le(const Ray &r) const override;
+    Spectrum NonareaLe(const Ray &r) const override;
 
     Spectrum Power() const override;
 };

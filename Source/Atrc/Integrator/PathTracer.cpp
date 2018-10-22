@@ -20,7 +20,7 @@ Spectrum PathTracer::GetRadiance(const Scene &scene, const Ray &r) const
     {
         Spectrum ret;
         for(auto light : scene.GetLights())
-            ret += light->Le(r);
+            ret += light->NonareaLe(r);
         return ret;
     }
     return L(scene, sp, 1);
@@ -51,6 +51,10 @@ Spectrum PathTracer::Ls(const Scene &scene, const SurfacePoint &sp, int depth) c
 
 Spectrum PathTracer::E(const Scene &scene, const SurfacePoint &sp, const ShadingPoint &shd) const
 {
+    /*constexpr Real PROB_E1 = 0.5;
+    constexpr Real PROB_E2 = 1 - PROB_E1;
+    return Rand() < PROB_E1 ? float(1 / PROB_E1) * E1(scene, sp, shd)
+                            : float(1 / PROB_E2) * E2(scene, sp, shd);*/
     return E1(scene, sp, shd) + E2(scene, sp, shd);
 }
 
@@ -68,13 +72,13 @@ Spectrum PathTracer::E1(const Scene &scene, const SurfacePoint &sp, const Shadin
         if(!light)
             return Spectrum();
 
-        if(bsdfSample->type == BXDF_SPECULAR)
+        if(bsdfSample->type & BXDF_SPECULAR)
         {
             return bsdfSample->coef * Abs(Dot(shd.shdLocal.ez, bsdfSample->wi))
                  * light->AreaLe(newInct) / bsdfSample->pdf;
         }
 
-        Real lpdf = scene.SampleLightPDF(light) * light->SampleToPDF(newInct.pos, sp.pos);
+        Real lpdf = scene.SampleLightPDF(light) * light->SampleLiPDF(newInct.pos, sp.pos);
         return bsdfSample->coef * Abs(Dot(shd.shdLocal.ez, bsdfSample->wi))
              * light->AreaLe(newInct) / (bsdfSample->pdf + lpdf);
     }
@@ -85,16 +89,16 @@ Spectrum PathTracer::E1(const Scene &scene, const SurfacePoint &sp, const Shadin
     if(!light || light->IsDelta())
         return Spectrum();
 
-    auto le = light->Le(newRay);
+    auto le = light->NonareaLe(newRay);
     if(!le)
         return Spectrum();
 
     // Specular BSDF的coef和pdf都是delta
-    if(bsdfSample->type == BXDF_SPECULAR)
+    if(bsdfSample->type & BXDF_SPECULAR)
         return bsdfSample->coef * Abs(Dot(shd.shdLocal.ez, bsdfSample->wi))
         * le / bsdfSample->pdf;
 
-    lpdf *= light->SampleToPDF(Vec3(), sp.pos, false);
+    lpdf *= light->SampleLiPDF(Vec3(), sp.pos, false);
     return bsdfSample->coef * Abs(Dot(shd.shdLocal.ez, bsdfSample->wi))
          * le / (bsdfSample->pdf + lpdf);
 }
@@ -105,7 +109,7 @@ Spectrum PathTracer::E2(const Scene &scene, const SurfacePoint &sp, const Shadin
     if(!light)
         return Spectrum();
 
-    auto lightSample = light->SampleTo(sp);
+    auto lightSample = light->SampleLi(sp);
     if(!lightSample.radiance)
         return Spectrum();
 

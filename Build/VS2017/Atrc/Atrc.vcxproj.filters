@@ -97,9 +97,6 @@
     <ClInclude Include="..\..\..\Source\Atrc\Renderer\JitteredSubareaRenderer.h">
       <Filter>Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\Atrc\Renderer\SubareaRenderer.h">
-      <Filter>Renderer</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Source\Atrc\Integrator\PureColorIntegrator.h">
       <Filter>Integrator</Filter>
     </ClInclude>
@@ -111,6 +108,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Source\Atrc\Renderer\ParallelRenderer.h">
       <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Fresnel.h">
+      <Filter>Material</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

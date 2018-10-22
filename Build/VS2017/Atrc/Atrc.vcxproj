@@ -46,7 +46,7 @@
     <ClInclude Include="..\..\..\Source\Atrc\Material\BlackMaterial.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Renderer\JitteredSubareaRenderer.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Renderer\SerialRenderer.h" />
-    <ClInclude Include="..\..\..\Source\Atrc\Renderer\SubareaRenderer.h" />
+    <ClInclude Include="Fresnel.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\Atrc\Camera\PerspectiveCamera.cpp" />

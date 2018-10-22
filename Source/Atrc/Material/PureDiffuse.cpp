@@ -30,7 +30,7 @@ namespace
         {
             AGZ_ASSERT(IsNormalized(wo));
 
-            if(!(BXDF_DIFFUSE & type))
+            if((type & (BXDF_DIFFUSE | BXDF_REFLECTION)) != (BXDF_DIFFUSE | BXDF_REFLECTION))
                 return None;
 
             Vec3 localWo = shadingLocal_.World2Local(wo);
@@ -45,7 +45,7 @@ namespace
             ret.wi   = shadingLocal_.Local2World(sam);
             ret.pdf  = pdf;
             ret.coef = color_;
-            ret.type = BXDF_DIFFUSE;
+            ret.type = BxDFType(BXDF_DIFFUSE | BXDF_REFLECTION);
 
             AGZ_ASSERT(ApproxEq(ret.pdf, SampleWiPDF(ret.wi, wo, type), 1e-5));
 

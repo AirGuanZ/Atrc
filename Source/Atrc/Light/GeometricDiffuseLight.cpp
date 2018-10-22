@@ -8,7 +8,7 @@ GeometricDiffuseLight::GeometricDiffuseLight(const Geometry *geometry, const Spe
     AGZ_ASSERT(geometry);
 }
 
-LightSampleToResult GeometricDiffuseLight::SampleTo(const SurfacePoint &sp) const
+LightSampleToResult GeometricDiffuseLight::SampleLi(const SurfacePoint &sp) const
 {
     LightSampleToResult ret;
     GeometrySampleResult sam = geometry_->Sample();
@@ -26,7 +26,7 @@ LightSampleToResult GeometricDiffuseLight::SampleTo(const SurfacePoint &sp) cons
     return ret;
 }
 
-Real GeometricDiffuseLight::SampleToPDF(const Vec3 &pos, const Vec3 &dst, bool posOnLight) const
+Real GeometricDiffuseLight::SampleLiPDF(const Vec3 &pos, const Vec3 &dst, bool posOnLight) const
 {
     return posOnLight ? geometry_->SamplePDF(pos) : 0.0;
 }
@@ -51,7 +51,7 @@ Spectrum GeometricDiffuseLight::AreaLe(const SurfacePoint &sp) const
     return radiance_;
 }
 
-Spectrum GeometricDiffuseLight::Le(const Ray &r) const
+Spectrum GeometricDiffuseLight::NonareaLe(const Ray &r) const
 {
     return SPECTRUM::BLACK;
 }

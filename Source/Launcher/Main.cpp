@@ -30,25 +30,24 @@ AGZ::Tex::Texture2D<Color3b> ToSavedImage(const RenderTarget &origin, float gamm
 
 int main()
 {
-    constexpr uint32_t SCR_W = 640;
-    constexpr uint32_t SCR_H = 480;
+    constexpr uint32_t SCR_W = 1920;
+    constexpr uint32_t SCR_H = 1080;
     constexpr Real SCR_ASPECT_RATIO = static_cast<Real>(SCR_W) / SCR_H;
 
     //============= Camera =============
 
     const Vec3 eye = { -5.0, 0.0, 0.0 };
     const Vec3 dir = Vec3(0.0) - eye;
-    PerspectiveCamera camera(eye, dir, { 0.0, 0.0, 1.0 }, Deg(75.0f), SCR_ASPECT_RATIO);
+    PerspectiveCamera camera(eye, dir, { 0.0, 0.0, 1.0 }, Deg(90.0f), SCR_ASPECT_RATIO);
 
     //============= Scene =============
 
     Sphere sph(Transform::Translate(0.0, 0.0, -101.0), 100.0);
-    PureDiffuse groundMat(Spectrum(0.9f));
+    PureDiffuse groundMat(Spectrum(0.4f, 0.7f, 0.9f));
     GeometryEntity ground(&sph, &groundMat);
 
-    Sphere sph2(Transform::Translate(0.0, 0.0, 0.0), 1.0);
-    //GeometryEntity sphere(&sph2, &STATIC_BLACK_MATERIAL);
-    GeometricLightEntity<GeometricDiffuseLight> sphere(&sph2, Spectrum(5.0f));
+    Sphere sph2(Transform::Translate(0.0, 0.0, 1.0), 1.0);
+    GeometricLightEntity<GeometricDiffuseLight> sphere(&sph2, Spectrum(3.0f));
 
     Scene scene;
     scene.camera = &camera;
@@ -67,7 +66,7 @@ int main()
 
     //============= Renderer & Integrator =============
 
-    JitteredSubareaRenderer subareaRenderer(1000);
+    JitteredSubareaRenderer subareaRenderer(100);
 
     ParallelRenderer renderer(6);
     //SerialRenderer renderer;

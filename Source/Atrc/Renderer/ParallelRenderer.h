@@ -28,9 +28,9 @@ class ParallelRenderer : public Renderer
         std::mutex              *mut   = nullptr;
         std::queue<SubareaRect> *tasks = nullptr;
 
-        std::mutex *outMut                = nullptr;
-        size_t taskCount                  = 0;
-        std::atomic<size_t> finishedCount = 0;
+        std::mutex *outMut   = nullptr;
+        size_t taskCount     = 0;
+        size_t finishedCount = 0;
     };
 
     static void Worker(Param &param)
@@ -59,7 +59,8 @@ class ParallelRenderer : public Renderer
             {
                 std::lock_guard<std::mutex> lk2(*param.outMut);
                 float percent = 100.0f * (++param.finishedCount) / param.taskCount;
-                std::printf("%sProgress: %5.2f%%  ", std::string(50, '\b').c_str(), percent);
+                std::printf("\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b"
+                            "Progress: %5.2f%%  ", percent);
             }
         }
     }

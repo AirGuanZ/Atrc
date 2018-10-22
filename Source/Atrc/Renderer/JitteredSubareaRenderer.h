@@ -1,7 +1,6 @@
 #pragma once
 
 #include <Atrc/Core/Core.h>
-#include <Atrc/Renderer/SubareaRenderer.h>
 
 AGZ_NS_BEG(Atrc)
 
