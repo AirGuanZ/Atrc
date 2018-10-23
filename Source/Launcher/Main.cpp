@@ -46,19 +46,30 @@ int main()
     DiffuseMaterial groundMat(Spectrum(0.5f));
     GeometryEntity ground(&sph, &groundMat);
 
-    Sphere sph2(Transform::Translate(0.0, 0.0, 1.0), 1.0);
-    GeometricLightEntity<GeometricDiffuseLight> sphere(&sph2, Spectrum(3.0f));
+    Sphere sph2(Transform::Translate(0.0, 0.0, 0.0), 0.4);
+    //GeometricLightEntity<GeometricDiffuseLight> medSph(&sph2, Spectrum(5.0f));
+    DiffuseMaterial medMat(Spectrum(0.5f));
+    GeometryEntity medSph(&sph2, &medMat);
+
+    Sphere sph3(Transform::Translate(0.0, 2.0, 0.0), 1.0);
+    DiffuseMaterial leftMat(Spectrum(0.9f, 0.7f, 0.4f));
+    GeometryEntity leftSph(&sph3, &leftMat);
+
+    DirectionalLight dirLight({ 4.0, -3.0, -5.0 }, Spectrum(0.6f));
 
     Scene scene;
-    scene.camera = &camera;
-    scene.entities_ = { &ground, &sphere };
+    scene.camera    = &camera;
+    scene.lights_   = { &dirLight };
+    scene.entities_ = { &ground, &medSph, &leftSph };
 
-    for(auto ent : scene.entities_)
+    for(auto ent : scene.GetEntities())
     {
         auto L = ent->AsLight();
         if(L)
             scene.lights_.push_back(L);
     }
+
+    dirLight.PreprocessScene(scene);
 
     //============= Render Target =============
 
@@ -66,7 +77,7 @@ int main()
 
     //============= Renderer & Integrator =============
 
-    JitteredSubareaRenderer subareaRenderer(5000);
+    JitteredSubareaRenderer subareaRenderer(1000);
 
     ParallelRenderer renderer(6);
     //SerialRenderer renderer;

@@ -8,11 +8,11 @@ AGZ_NS_BEG(Atrc)
 class PerfectSpecularTransmission : public BxDF
 {
     Spectrum rc_;
-    RC<Fresnel> fresnel_;
+    RC<const Fresnel> fresnel_;
 
 public:
 
-    PerfectSpecularTransmission(const Spectrum &rc, RC<Fresnel> fresnel);
+    PerfectSpecularTransmission(const Spectrum &rc, RC<const Fresnel> fresnel);
 
     Spectrum Eval(const Vec3 &wi, const Vec3 &wo) const override;
 

@@ -17,6 +17,8 @@ struct SceneLightSampleResult
 
 class Scene
 {
+    mutable Option<AABB> worldBound_;
+
 public:
 
     std::vector<const Entity*> entities_;
@@ -26,6 +28,10 @@ public:
     const Camera *GetCamera() const;
 
     const std::vector<const Light*> &GetLights() const;
+
+    const std::vector<const Entity*> &GetEntities() const;
+
+    const AABB &GetWorldBound() const;
 
     SceneLightSampleResult SampleLight() const;
 

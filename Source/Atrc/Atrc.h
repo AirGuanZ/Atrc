@@ -10,6 +10,7 @@
 #include <Atrc/Material/BlackMaterial.h>
 #include <Atrc/Material/DiffuseMaterial.h>
 
+#include <Atrc/Light/DirectionalLight.h>
 #include <Atrc/Light/GeometricDiffuseLight.h>
 
 #include <Atrc/Integrator/PathTracer.h>

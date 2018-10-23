@@ -18,6 +18,10 @@ public:
 
     virtual ~Light() = default;
 
+    // 预处理场景以获得必要的信息，比如有向光获取场景大小以进行采样等
+    // 缺省啥也不做
+    virtual void PreprocessScene(const Scene &scene);
+
     // 在光源上采样一个点照向sp，原则上包含了AreaLe和NonareaLe两部分
     virtual LightSampleToResult SampleLi(const SurfacePoint &sp) const = 0;
 

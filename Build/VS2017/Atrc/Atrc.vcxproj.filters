@@ -133,6 +133,9 @@
     <ClInclude Include="..\..\..\Source\Atrc\Material\BxDF\DiffuseBRDF.h">
       <Filter>Material\BxDF</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Light\DirectionalLight.h">
+      <Filter>Light</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\Atrc\Core\Geometry.cpp">
@@ -194,6 +197,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Source\Atrc\Material\BxDF\DiffuseBRDF.cpp">
       <Filter>Material\BxDF</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Light\DirectionalLight.cpp">
+      <Filter>Light</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

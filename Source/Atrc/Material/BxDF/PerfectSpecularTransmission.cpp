@@ -2,7 +2,7 @@
 
 AGZ_NS_BEG(Atrc)
 
-PerfectSpecularTransmission::PerfectSpecularTransmission(const Spectrum &rc, RC<Fresnel> fresnel)
+PerfectSpecularTransmission::PerfectSpecularTransmission(const Spectrum &rc, RC<const Fresnel> fresnel)
     : BxDF(BXDF_SPECULAR | BXDF_TRANSMISSION), rc_(rc), fresnel_(std::move(fresnel))
 {
     AGZ_ASSERT(fresnel_);

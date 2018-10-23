@@ -41,6 +41,7 @@
     <ClInclude Include="..\..\..\Source\Atrc\Geometry\Sphere.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Integrator\PathTracer.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Integrator\PureColorIntegrator.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Light\DirectionalLight.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Light\GeometricDiffuseLight.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Material\BxDFAggregate.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Material\BxDF\BxDF.h" />
@@ -65,6 +66,7 @@
     <ClCompile Include="..\..\..\Source\Atrc\Geometry\Sphere.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Integrator\PathTracer.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Integrator\PureColorIntegrator.cpp" />
+    <ClCompile Include="..\..\..\Source\Atrc\Light\DirectionalLight.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Light\GeometricDiffuseLight.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Material\BlackMaterial.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Material\BxDFAggregate.cpp" />

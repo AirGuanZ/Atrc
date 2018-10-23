@@ -26,6 +26,8 @@ public:
 
     // 少数Entity自身可作为光源，否则返回nullptr
     virtual const Light *AsLight() const = 0;
+
+    virtual Light *AsLight() = 0;
 };
 
 AGZ_NS_END(Atrc)

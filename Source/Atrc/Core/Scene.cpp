@@ -13,6 +13,23 @@ const std::vector<const Light*> &Scene::GetLights() const
     return lights_;
 }
 
+const std::vector<const Entity*> &Scene::GetEntities() const
+{
+    return entities_;
+}
+
+const AABB &Scene::GetWorldBound() const
+{
+    if(!worldBound_)
+    {
+        AABB wb;
+        for(auto ent : GetEntities())
+            wb = wb | ent->WorldBound();
+        worldBound_ = wb;
+    }
+    return *worldBound_;
+}
+
 SceneLightSampleResult Scene::SampleLight() const
 {
     if(lights_.empty())

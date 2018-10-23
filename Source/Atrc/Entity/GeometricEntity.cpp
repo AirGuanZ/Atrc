@@ -40,4 +40,9 @@ const Light *GeometryEntity::AsLight() const
     return nullptr;
 }
 
+Light* GeometryEntity::AsLight()
+{
+    return nullptr;
+}
+
 AGZ_NS_END(Atrc)

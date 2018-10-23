@@ -51,6 +51,11 @@ public:
     {
         return &light_;
     }
+
+    Light* AsLight() override
+    {
+        return &light_;
+    }
 };
 
 AGZ_NS_END(Atrc)

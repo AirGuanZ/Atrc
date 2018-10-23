@@ -22,6 +22,8 @@ public:
     const Material *GetMaterial(const SurfacePoint &sp) const override;
 
     const Light *AsLight() const override;
+
+    Light *AsLight() override;
 };
 
 AGZ_NS_END(Atrc)
