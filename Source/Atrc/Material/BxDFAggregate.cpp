@@ -32,7 +32,7 @@ Option<BSDFSampleWiResult> BxDFAggregate::SampleWi(const Vec3 &wo, BxDFType type
 {
     // 有多少type对得上的bxdf
 
-    int nMatched = 0;
+    size_t nMatched = 0;
     for(size_t i = 0; i < bxdfCnt_; ++i)
         nMatched += bxdfs_[i]->MatchType(type);
     if(!nMatched)

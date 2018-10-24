@@ -1,14 +1,14 @@
-#include <Atrc/Light/GeometricDiffuseLight.h>
+#include <Atrc/Light/GeometricDiffuseLightImpl.h>
 
 AGZ_NS_BEG(Atrc)
 
-GeometricDiffuseLight::GeometricDiffuseLight(const Geometry *geometry, const Spectrum &radiance)
+GeometricDiffuseLightImpl::GeometricDiffuseLightImpl(const Geometry *geometry, const Spectrum &radiance)
     : GeometricLight(geometry), radiance_(radiance)
 {
     AGZ_ASSERT(geometry);
 }
 
-LightSampleToResult GeometricDiffuseLight::SampleLi(const SurfacePoint &sp) const
+LightSampleToResult GeometricDiffuseLightImpl::SampleLi(const SurfacePoint &sp) const
 {
     LightSampleToResult ret;
     GeometrySampleResult sam = geometry_->Sample();
@@ -26,37 +26,37 @@ LightSampleToResult GeometricDiffuseLight::SampleLi(const SurfacePoint &sp) cons
     return ret;
 }
 
-Real GeometricDiffuseLight::SampleLiPDF(const Vec3 &pos, const Vec3 &dst, bool posOnLight) const
+Real GeometricDiffuseLightImpl::SampleLiPDF(const Vec3 &pos, const SurfacePoint &dst, bool posOnLight) const
 {
     return posOnLight ? geometry_->SamplePDF(pos) : 0.0;
 }
 
-bool GeometricDiffuseLight::IsDeltaPosition() const
+bool GeometricDiffuseLightImpl::IsDeltaPosition() const
 {
     return false;
 }
 
-bool GeometricDiffuseLight::IsDeltaDirection() const
+bool GeometricDiffuseLightImpl::IsDeltaDirection() const
 {
     return false;
 }
 
-bool GeometricDiffuseLight::IsDelta() const
+bool GeometricDiffuseLightImpl::IsDelta() const
 {
     return false;
 }
 
-Spectrum GeometricDiffuseLight::AreaLe(const SurfacePoint &sp) const
+Spectrum GeometricDiffuseLightImpl::AreaLe(const SurfacePoint &sp) const
 {
     return radiance_;
 }
 
-Spectrum GeometricDiffuseLight::NonareaLe(const Ray &r) const
+Spectrum GeometricDiffuseLightImpl::NonareaLe(const Ray &r) const
 {
     return SPECTRUM::BLACK;
 }
 
-Spectrum GeometricDiffuseLight::Power() const
+Spectrum GeometricDiffuseLightImpl::Power() const
 {
     return AGZ::Math::PI<float> * float(geometry_->SurfaceArea()) * radiance_;
 }

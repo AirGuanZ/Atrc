@@ -82,9 +82,6 @@
     <ClInclude Include="..\..\..\Source\Atrc\Entity\GeometricEntity.h">
       <Filter>Entity</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\Atrc\Light\GeometricDiffuseLight.h">
-      <Filter>Light</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Source\Atrc\Material\BlackMaterial.h">
       <Filter>Material</Filter>
     </ClInclude>
@@ -136,6 +133,18 @@
     <ClInclude Include="..\..\..\Source\Atrc\Light\DirectionalLight.h">
       <Filter>Light</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Material\IdealMirror.h">
+      <Filter>Material</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Material\FresnelSpecular.h">
+      <Filter>Material</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Light\SkyLight.h">
+      <Filter>Light</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Light\GeometricDiffuseLightImpl.h">
+      <Filter>Light</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\Atrc\Core\Geometry.cpp">
@@ -152,9 +161,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Source\Atrc\Entity\GeometricEntity.cpp">
       <Filter>Entity</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\Atrc\Light\GeometricDiffuseLight.cpp">
-      <Filter>Light</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Source\Atrc\Core\Light.cpp">
       <Filter>Core</Filter>
@@ -199,6 +205,18 @@
       <Filter>Material\BxDF</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Source\Atrc\Light\DirectionalLight.cpp">
+      <Filter>Light</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Material\IdealMirror.cpp">
+      <Filter>Material</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Material\FresnelSpecular.cpp">
+      <Filter>Material</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Light\GeometricDiffuseLightImpl.cpp">
+      <Filter>Light</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Light\SkyLight.cpp">
       <Filter>Light</Filter>
     </ClCompile>
   </ItemGroup>

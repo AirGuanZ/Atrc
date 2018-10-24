@@ -19,6 +19,8 @@ public:
     template<typename T>
     explicit BxDF(T type) : type_(BxDFType(type)) { }
 
+    BxDFType GetType() const { return type_; }
+
     bool MatchType(BxDFType type) const { return (type_ & type) == type_; }
 
     virtual Spectrum Eval(const Vec3 &wi, const Vec3 &wo) const = 0;

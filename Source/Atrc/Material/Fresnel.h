@@ -29,7 +29,11 @@ public:
 
     FresnelDielectric(float etaI, float etaT);
 
-    Spectrum Eval(float cosThetaI) const;
+    Spectrum Eval(float cosThetaI) const override;
+
+    float GetEtaI() const { return etaI; }
+
+    float GetEtaT() const { return etaT; }
 };
 
 class FresnelConductor : public Fresnel
@@ -40,7 +44,7 @@ public:
 
     FresnelConductor(const Spectrum &etaI, const Spectrum &etaT, const Spectrum &k);
 
-    Spectrum Eval(float cosThetaI) const;
+    Spectrum Eval(float cosThetaI) const override;
 };
 
 AGZ_NS_END(Atrc)

@@ -9,9 +9,12 @@
 
 #include <Atrc/Material/BlackMaterial.h>
 #include <Atrc/Material/DiffuseMaterial.h>
+#include <Atrc/Material/FresnelSpecular.h>
+#include <Atrc/Material/IdealMirror.h>
 
 #include <Atrc/Light/DirectionalLight.h>
-#include <Atrc/Light/GeometricDiffuseLight.h>
+#include <Atrc/Light/GeometricDiffuseLightImpl.h>
+#include <Atrc/Light/SkyLight.h>
 
 #include <Atrc/Integrator/PathTracer.h>
 #include <Atrc/Integrator/PureColorIntegrator.h>

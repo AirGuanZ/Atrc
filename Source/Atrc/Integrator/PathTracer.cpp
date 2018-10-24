@@ -78,7 +78,7 @@ Spectrum PathTracer::E1(const Scene &scene, const SurfacePoint &sp, const Shadin
                  * light->AreaLe(newInct) / bsdfSample->pdf;
         }
 
-        Real lpdf = scene.SampleLightPDF(light) * light->SampleLiPDF(newInct.pos, sp.pos);
+        Real lpdf = scene.SampleLightPDF(light) * light->SampleLiPDF(newInct.pos, sp);
         return bsdfSample->coef * Abs(Dot(shd.shdLocal.ez, bsdfSample->wi))
              * light->AreaLe(newInct) / (bsdfSample->pdf + lpdf);
     }
@@ -98,7 +98,7 @@ Spectrum PathTracer::E1(const Scene &scene, const SurfacePoint &sp, const Shadin
         return bsdfSample->coef * Abs(Dot(shd.shdLocal.ez, bsdfSample->wi))
         * le / bsdfSample->pdf;
 
-    lpdf *= light->SampleLiPDF(Vec3(), sp.pos, false);
+    lpdf *= light->SampleLiPDF(sp.pos + bsdfSample->wi, sp, false);
     return bsdfSample->coef * Abs(Dot(shd.shdLocal.ez, bsdfSample->wi))
          * le / (bsdfSample->pdf + lpdf);
 }
@@ -122,15 +122,16 @@ Spectrum PathTracer::E2(const Scene &scene, const SurfacePoint &sp, const Shadin
     if(scene.HasIntersection(shadowRay))
         return Spectrum();
 
+    lpdf *= lightSample.pdf;
+
     // Delta lightµÄpdfÊÇdelta
     if(light->IsDelta())
     {
         return f * Abs(Dot(sp.geoLocal.ez, lightSample.wi))
-             * lightSample.radiance / lightSample.pdf;
+             * lightSample.radiance / lpdf;
     }
 
     Real bpdf = shd.bsdf->SampleWiPDF(lightSample.wi, sp.wo, BxDFType(BXDF_ALL & ~BXDF_SPECULAR));
-    lpdf *= lightSample.pdf;
     return f * Abs(Dot(sp.geoLocal.ez, lightSample.wi))
          * lightSample.radiance / (bpdf + lpdf);
 }

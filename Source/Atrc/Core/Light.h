@@ -27,7 +27,7 @@ public:
 
     // 给定光源上的采样结果，求pdf
     // posOnLight指出pos是否在光源实体上，前者对应AreaLe，后者对应NonareaLe
-    virtual Real SampleLiPDF(const Vec3 &pos, const Vec3 &dst, bool posOnLight = true) const = 0;
+    virtual Real SampleLiPDF(const Vec3 &pos, const SurfacePoint &dst, bool posOnLight = true) const = 0;
 
     // 位置采样是否使用delta分布
     virtual bool IsDeltaPosition() const = 0;

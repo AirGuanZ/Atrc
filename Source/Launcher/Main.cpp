@@ -9,6 +9,7 @@ using namespace std;
 // See https://knarkowicz.wordpress.com/2016/01/06/aces-filmic-tone-mapping-curve/
 float ACESFilm(float x)
 {
+    return x;
     constexpr float a = 2.51f;
     constexpr float b = 0.03f;
     constexpr float c = 2.43f;
@@ -37,30 +38,33 @@ int main()
     //============= Camera =============
 
     const Vec3 eye = { -5.0, 0.0, 0.0 };
-    const Vec3 dir = Vec3(0.0) - eye;
-    PerspectiveCamera camera(eye, dir, { 0.0, 0.0, 1.0 }, Deg(90.0f), SCR_ASPECT_RATIO);
+    const Vec3 dir = Vec3(0.0, 0.5, 0.0) - eye;
+    PerspectiveCamera camera(eye, dir, { 0.0, 0.0, 1.0 }, Deg(90.0), SCR_ASPECT_RATIO);
 
     //============= Scene =============
 
-    Sphere sph(Transform::Translate(0.0, 0.0, -101.0), 100.0);
-    DiffuseMaterial groundMat(Spectrum(0.5f));
+    Sphere sph(Transform::Translate(0.0, 0.0, -201.0), 200.0);
+    DiffuseMaterial groundMat(Spectrum(0.4f, 0.8f, 0.4f));
     GeometryEntity ground(&sph, &groundMat);
 
     Sphere sph2(Transform::Translate(0.0, 0.0, 0.0), 0.4);
-    //GeometricLightEntity<GeometricDiffuseLight> medSph(&sph2, Spectrum(5.0f));
-    DiffuseMaterial medMat(Spectrum(0.5f));
+    DiffuseMaterial medMat(Spectrum(0.4f));
     GeometryEntity medSph(&sph2, &medMat);
 
     Sphere sph3(Transform::Translate(0.0, 2.0, 0.0), 1.0);
-    DiffuseMaterial leftMat(Spectrum(0.9f, 0.7f, 0.4f));
+    DiffuseMaterial leftMat(Spectrum(0.8f)/*, MakeRC<FresnelDielectric>(1.0f, 0.01f)*/);
     GeometryEntity leftSph(&sph3, &leftMat);
 
-    DirectionalLight dirLight({ 4.0, -3.0, -5.0 }, Spectrum(0.6f));
+    Sphere sph4(Transform::Translate(0.0, 0.5, 0.7), 0.25);
+    GeometricDiffuseLight upLight(&sph4, Spectrum(25.0f));
+
+    //DirectionalLight dirLight({ 4.0, -3.0, -5.0 }, Spectrum(0.35f));
+    SkyLight sky(Spectrum(0.4f, 0.7f, 0.9f), Spectrum(1.0f));
 
     Scene scene;
     scene.camera    = &camera;
-    scene.lights_   = { &dirLight };
-    scene.entities_ = { &ground, &medSph, &leftSph };
+    scene.lights_   = { &sky };
+    scene.entities_ = { &ground, &medSph, &leftSph,/* &upLight*/ };
 
     for(auto ent : scene.GetEntities())
     {
@@ -69,7 +73,9 @@ int main()
             scene.lights_.push_back(L);
     }
 
-    dirLight.PreprocessScene(scene);
+    //dirLight.PreprocessScene(scene);
+    sky.PreprocessScene(scene);
+    //upLight.AsLight()->PreprocessScene(scene);
 
     //============= Render Target =============
 
@@ -77,7 +83,7 @@ int main()
 
     //============= Renderer & Integrator =============
 
-    JitteredSubareaRenderer subareaRenderer(1000);
+    JitteredSubareaRenderer subareaRenderer(100);
 
     ParallelRenderer renderer(6);
     //SerialRenderer renderer;

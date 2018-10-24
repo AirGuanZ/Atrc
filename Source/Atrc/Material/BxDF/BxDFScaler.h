@@ -11,7 +11,7 @@ class BxDFScaler : public BxDF
 
 public:
 
-    BxDFScaler(BxDFType type, const Spectrum &scale, RC<BxDF> bxdf);
+    BxDFScaler(const Spectrum &scale, RC<BxDF> bxdf);
 
     Spectrum Eval(const Vec3 &wi, const Vec3 &wo) const override;
 

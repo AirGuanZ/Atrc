@@ -24,10 +24,10 @@ Option<BxDFSampleWiResult> PerfectSpecularReflection::SampleWi(const Vec3 &wo) c
         return None;
 
     BxDFSampleWiResult ret;
-    ret.wi = 2 * wo.z * Vec3::UNIT_Z() - wo;
+    ret.wi   = 2 * wo.z * Vec3::UNIT_Z() - wo;
     ret.coef = rc_ * fresnel_->Eval(float(wo.z)) / float(ret.wi.z);
-    ret.pdf = 1.0;
-    ret.type = BxDFType(BXDF_SPECULAR | BXDF_REFLECTION);
+    ret.pdf  = 1.0;
+    ret.type = type_;
 
     return ret;
 }

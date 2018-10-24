@@ -4,17 +4,25 @@
 
 AGZ_NS_BEG(Atrc)
 
-class GeometricDiffuseLight : public GeometricLight
+class SkyLight : public Light
 {
-    Spectrum radiance_;
+    Spectrum top_;
+    Spectrum bottom_;
+
+    Vec3 worldCentre_;
+    Real worldRadius_;
 
 public:
 
-    GeometricDiffuseLight(const Geometry *geometry, const Spectrum &radiance);
+    explicit SkyLight(const Spectrum &topAndBottom);
+
+    SkyLight(const Spectrum &top, const Spectrum &bottom);
+
+    void PreprocessScene(const Scene &scene) override;
 
     LightSampleToResult SampleLi(const SurfacePoint &sp) const override;
 
-    Real SampleLiPDF(const Vec3 &pos, const Vec3 &dst, bool posOnLight) const override;
+    Real SampleLiPDF(const Vec3 &pos, const SurfacePoint &dst, bool posOnLight) const override;
 
     bool IsDeltaPosition() const override;
 
