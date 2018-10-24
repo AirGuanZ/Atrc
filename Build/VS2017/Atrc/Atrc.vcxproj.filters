@@ -145,6 +145,9 @@
     <ClInclude Include="..\..\..\Source\Atrc\Light\GeometricDiffuseLightImpl.h">
       <Filter>Light</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Material\BxDF\PerfectSpecular.h">
+      <Filter>Material\BxDF</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\Atrc\Core\Geometry.cpp">
@@ -218,6 +221,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Source\Atrc\Light\SkyLight.cpp">
       <Filter>Light</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Material\BxDF\PerfectSpecular.cpp">
+      <Filter>Material\BxDF</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

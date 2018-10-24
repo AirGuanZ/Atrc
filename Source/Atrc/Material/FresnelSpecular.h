@@ -12,6 +12,8 @@ class FresnelSpecular : public Material
 
 public:
 
+    FresnelSpecular(const Spectrum &rc, RC<const FresnelDielectric> fresnel);
+
     void Shade(const SurfacePoint &sp, ShadingPoint *dst) const override;
 };
 

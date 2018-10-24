@@ -15,17 +15,13 @@ Spectrum PerfectSpecularReflection::Eval(const Vec3 &wi, const Vec3 &wo) const
 
 Option<BxDFSampleWiResult> PerfectSpecularReflection::SampleWi(const Vec3 &wo) const
 {
-    if(wo.z <= 0.0)
-        return None;
-
     AGZ_ASSERT(IsNormalized(wo));
 
-    if(wo.z <= 0.0)
-        return None;
+    Vec3 nor = wo.z > 0.0 ? Vec3::UNIT_Z() : -Vec3::UNIT_Z();
 
     BxDFSampleWiResult ret;
-    ret.wi   = 2 * wo.z * Vec3::UNIT_Z() - wo;
-    ret.coef = rc_ * fresnel_->Eval(float(wo.z)) / float(ret.wi.z);
+    ret.wi   = 2 * Abs(wo.z) * nor - wo;
+    ret.coef = rc_ * fresnel_->Eval(float(ret.wi.z)) / Abs(float(ret.wi.z));
     ret.pdf  = 1.0;
     ret.type = type_;
 

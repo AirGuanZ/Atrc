@@ -61,6 +61,7 @@ Option<BSDFSampleWiResult> BxDFAggregate::SampleWi(const Vec3 &wo, BxDFType type
     // 如果这是个specular，那么coef和pdf都附带了delta，此时把别的bxdf算进来没有意义
     if(ret->type & BXDF_SPECULAR || nMatched <= 1)
     {
+        ret->pdf /= nMatched;
         ret->wi = shadingLocal_.Local2World(ret->wi);
         return ret;
     }

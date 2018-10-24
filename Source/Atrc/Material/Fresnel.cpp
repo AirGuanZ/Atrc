@@ -4,7 +4,11 @@ AGZ_NS_BEG(Atrc)
 
 float ComputeFresnelDielectric(float etaI, float etaT, float cosThetaI)
 {
-    AGZ_ASSERT(cosThetaI >= 0.0f);
+    if(cosThetaI < 0.0)
+    {
+        std::swap(etaI, etaT);
+        cosThetaI = -cosThetaI;
+    }
 
     // 求解Snell方程
     float sinThetaI = Sqrt(Max(0.0f, 1 - cosThetaI * cosThetaI));

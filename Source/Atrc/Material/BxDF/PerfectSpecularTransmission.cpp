@@ -43,12 +43,12 @@ Option<BxDFSampleWiResult> PerfectSpecularTransmission::SampleWi(const Vec3 &wo)
     if(!wi)
         return None;
 
-    auto Fr = fresnel_->Eval(Abs(float(wi->z)));
+    auto Fr = fresnel_->Eval(float(wi->z));
 
     BxDFSampleWiResult ret;
     ret.wi   = wi->Normalize();
     ret.pdf  = 1.0;
-    ret.coef = rc_ * (Spectrum(1.0f) - Fr) / (eta * eta);
+    ret.coef = eta * eta * rc_ * (Spectrum(1.0f) - Fr) / Abs(ret.wi.z);
     ret.type = type_;
 
     return ret;
