@@ -148,6 +148,9 @@
     <ClInclude Include="..\..\..\Source\Atrc\Material\BxDF\PerfectSpecular.h">
       <Filter>Material\BxDF</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Geometry\TriangleBVH.h">
+      <Filter>Geometry</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\Atrc\Core\Geometry.cpp">
@@ -224,6 +227,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Source\Atrc\Material\BxDF\PerfectSpecular.cpp">
       <Filter>Material\BxDF</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Geometry\TriangleBVH.cpp">
+      <Filter>Geometry</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
