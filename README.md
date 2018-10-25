@@ -10,4 +10,4 @@
 
 ![SS2](./Gallery/06_2018_10_09.png)
 
-![SS3](./Gallery/01_2018_10_4.png)
+![SS3](./Gallery/23_2018_10_23_IdealMirror.png)
