@@ -157,6 +157,9 @@
     <ClInclude Include="..\..\..\Source\Atrc\Material\MicrofacetDistribution\MicrofacetDistribution.h">
       <Filter>Material\MicrofacetDistribution</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Material\TextureScaler.h">
+      <Filter>Material</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\Atrc\Core\Geometry.cpp">

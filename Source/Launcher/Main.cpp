@@ -19,7 +19,7 @@ float ACESFilm(float x)
     return x;
 }
 
-Tex::Texture2D<Color3b> ToSavedImage(const RenderTarget &origin, float gamma)
+Texture2D<Color3b> ToSavedImage(const RenderTarget &origin, float gamma)
 {
     return origin.Map([=](const Color3f &color)
     {
@@ -110,5 +110,5 @@ int main()
 
     //============= Output =============
 
-    Tex::TextureFile::WriteRGBToPNG("./Build/Output.png", ToSavedImage(renderTarget, 1 / 2.2f));
+    TextureFile::WriteRGBToPNG("./Build/Output.png", ToSavedImage(renderTarget, 1 / 2.2f));
 }

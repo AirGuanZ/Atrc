@@ -127,6 +127,6 @@ class Transform;
 struct SurfacePoint;
 struct ShadingPoint;
 
-using RenderTarget = AGZ::Tex::Texture2D<Spectrum>;
+using RenderTarget = AGZ::Texture2D<Spectrum>;
 
 AGZ_NS_END(Atrc)
