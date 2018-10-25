@@ -3,6 +3,7 @@
 #include <Atrc/Atrc.h>
 #include <Utils.h>
 
+using namespace AGZ;
 using namespace Atrc;
 using namespace std;
 
@@ -58,12 +59,20 @@ int main()
     Sphere sph4(Transform::Translate(0.0, 0.5, 0.7), 0.25);
     GeometricDiffuseLight upLight(&sph4, Spectrum(25.0f));
 
+    Model::WavefrontObj dragonObj;
+    Model::WavefrontObjFile::LoadFromObjFile("./Assets/dragon_vrip.obj", &dragonObj);
+    auto dragonBVHCore = MakeRC<TriangleBVHCore>(dragonObj.ToGeometryMeshGroup().submeshes["Default"]);
+    dragonObj.Clear();
+    TriangleBVH dragonBVH(Transform::Translate(-1.5, -2.8, -0.6) * Transform::RotateZ(Deg(-90.0)) * Transform::Scale(2.2 / 40), dragonBVHCore);
+    IdealMirror dragonMat(Spectrum(0.6f), MakeRC<FresnelDielectric>(1.0f, 0.01f));
+    GeometricEntity dragon(&dragonBVH, &dragonMat);
+
     SkyLight sky(Spectrum(0.4f, 0.7f, 0.9f), Spectrum(1.0f));
 
     Scene scene;
     scene.camera    = &camera;
     scene.lights_   = { &sky };
-    scene.entities_ = { &ground, &medSph, &leftSph };
+    scene.entities_ = { &ground, &medSph, &leftSph, &dragon };
 
     for(auto ent : scene.GetEntities())
     {
@@ -80,12 +89,13 @@ int main()
 
     //============= Renderer & Integrator =============
 
-    JitteredSubareaRenderer subareaRenderer(100);
+    JitteredSubareaRenderer subareaRenderer(200);
 
     ParallelRenderer renderer(6);
     //SerialRenderer renderer;
     renderer.SetProgressPrinting(true);
 
+    //PureColorIntegrator integrator(SPECTRUM::BLACK, SPECTRUM::WHITE);
     PathTracer integrator(10);
 
     //============= Rendering =============

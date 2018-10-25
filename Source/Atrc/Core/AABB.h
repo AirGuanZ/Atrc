@@ -31,7 +31,7 @@ public:
         for(int i = 0; i < 3; ++i)
         {
             low[i] = Min(low[i], p[i]);
-            high[i] = Max(low[i], p[i]);
+            high[i] = Max(high[i], p[i]);
         }
         return *this;
     }

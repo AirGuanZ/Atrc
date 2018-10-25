@@ -56,8 +56,6 @@ Option<BxDFSampleWiResult> PerfectSpecular::SampleWi(const Vec3 &wo) const
     if(!wi)
         return None;
 
-    AGZ_ASSERT(ApproxEq(fwdFr, fresnel_->Eval(float(wi->z)), 1e-5));
-
     BxDFSampleWiResult ret;
     ret.wi   = wi->Normalize();
     ret.pdf  = 1.0;

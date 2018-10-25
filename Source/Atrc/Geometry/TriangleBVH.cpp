@@ -40,7 +40,7 @@ namespace
         const Vec3 &A, const Vec3 &B_A, const Vec3 &C_A,
         const Ray &r, SurfacePoint *sp)
     {
-        AGZ_ASSERT(inct);
+        AGZ_ASSERT(sp);
 
         Vec3 s1 = Cross(r.dir, C_A);
         Real div = Dot(s1, B_A);
@@ -75,6 +75,36 @@ TriangleBVHCore::TriangleBVHCore(const Vertex *vertices, uint32_t triangleCount)
     : areaPrefixSum_(triangleCount)
 {
     InitBVH(vertices, triangleCount);
+
+    AGZ_ASSERT(!triangles_.empty());
+
+    areaPrefixSum_[0] = TriangleSurfaceArea(triangles_[0].B_A, triangles_[0].C_A);
+    for(uint32_t i = 1; i < triangles_.size(); ++i)
+    {
+        areaPrefixSum_[i] = areaPrefixSum_[i - 1] +
+            TriangleSurfaceArea(triangles_[i].B_A, triangles_[i].C_A);
+    }
+}
+
+TriangleBVHCore::TriangleBVHCore(const AGZ::Model::GeometryMesh &mesh)
+{
+    AGZ_ASSERT(mesh.vertices.size() % 3 == 0);
+
+    auto vertices = mesh.vertices
+    | AGZ::Map([](const AGZ::Model::GeometryMesh::Vertex &v)
+        {
+            Vertex ret;
+            ret.pos = v.pos;
+            ret.uv  = v.tex.uv();
+            ret.nor = v.nor;
+            return ret;
+        })
+    | AGZ::Collect<std::vector<Vertex>>();
+
+    auto triangleCount = static_cast<uint32_t>(mesh.vertices.size() / 3);
+    areaPrefixSum_.resize(triangleCount);
+
+    InitBVH(vertices.data(), triangleCount);
 
     AGZ_ASSERT(!triangles_.empty());
 
@@ -235,7 +265,7 @@ namespace
     struct MappedTriangles
     {
         const TriangleBVHCore::Vertex *vertices;
-        const std::vector<TriangleInfo> triInfo;
+        const std::vector<TriangleInfo> &triInfo;
         std::vector<uint32_t> &triIdxMap;
 
         MappedTriangles(
@@ -265,7 +295,7 @@ namespace
         TempNode **fillNode;
     };
 
-    constexpr uint32_t MAX_LEAF_SIZE = 4;
+    constexpr uint32_t MAX_LEAF_SIZE = 12;
 
     TempNode *BuildSingleNode(
         MappedTriangles &tris, AGZ::SmallObjArena<TempNode> &nodeArena,
@@ -367,11 +397,6 @@ namespace
             return FillLeaf(nodeArena.Alloc(), start, end);
         }
 
-        for(uint32_t i = 0; i < left.size(); ++i)
-            tris.triIdxMap[start + i] = left[i];
-        for(uint32_t i = 0; i < right.size(); ++i)
-            tris.triIdxMap[splitIdx + i] = right[i];
-
         AABB allBound;
         for(auto i = start; i < end; ++i)
         {
@@ -380,6 +405,11 @@ namespace
             allBound.Expand(tri[1].pos);
             allBound.Expand(tri[2].pos);
         }
+
+        for(uint32_t i = 0; i < left.size(); ++i)
+            tris.triIdxMap[start + i] = left[i];
+        for(uint32_t i = 0; i < right.size(); ++i)
+            tris.triIdxMap[splitIdx + i] = right[i];
 
         TempNode *ret = nodeArena.Alloc();
         ret->isLeaf = false;
@@ -413,68 +443,56 @@ namespace
         return ret;
     }
 
-    struct CompactTask
-    {
-        const TempNode *tree = nullptr;
-        uint32_t *rightChild = nullptr;
-    };
-
     void CompactBVHIntoArray(
         std::vector<TriangleBVHCore::Node> &nodes,
         std::vector<TriangleBVHCore::InternalTriangle> &tris,
         const TriangleBVHCore::Vertex *vertices,
-        const TempNode *root, const std::vector<uint32_t> &triIdxMap,
+        const TempNode *tree, const std::vector<uint32_t> &triIdxMap,
         AGZ::SmallObjArena<AABB> &boundArena)
     {
-        std::queue<CompactTask> taskQueue;
-        taskQueue.push({ root, nullptr });
-
-        while(!taskQueue.empty())
+        if(tree->isLeaf)
         {
-            auto task = taskQueue.front();
-            taskQueue.pop();
+            TriangleBVHCore::Node node;
+            node.isLeaf = true;
+            node.leaf.start = static_cast<uint32_t>(tris.size());
+            node.leaf.end = node.leaf.start + tree->leaf.end - tree->leaf.start;
+            nodes.push_back(node);
 
-            if(task.tree->isLeaf)
+            for(uint32_t i = tree->leaf.start; i < tree->leaf.end; ++i)
             {
-                TriangleBVHCore::Node node;
-                node.isLeaf     = true;
-                node.leaf.start = static_cast<uint32_t>(tris.size());
-                node.leaf.end   = task.tree->leaf.end - task.tree->leaf.start;
-                nodes.push_back(node);
-
-                for(size_t i = task.tree->leaf.start; i < task.tree->leaf.end; ++i)
-                {
-                    auto *tri = &vertices[3 * triIdxMap[i]];
-                    TriangleBVHCore::InternalTriangle intTri;
-                    intTri.A     = tri[0].pos;
-                    intTri.B_A   = tri[1].pos - tri[0].pos;
-                    intTri.C_A   = tri[2].pos - tri[0].pos;
-                    intTri.nA    = tri[0].nor;
-                    intTri.nB_nA = tri[1].nor - tri[0].nor;
-                    intTri.nC_nA = tri[2].nor - tri[0].nor;
-                    intTri.tA    = tri[0].uv;
-                    intTri.tB_tA = tri[1].uv - tri[0].uv;
-                    intTri.tC_tA = tri[2].uv - tri[0].uv;
-                    tris.push_back(intTri);
-                }
+                auto *tri = &vertices[3 * triIdxMap[i]];
+                TriangleBVHCore::InternalTriangle intTri;
+                intTri.A     = tri[0].pos;
+                intTri.B_A   = tri[1].pos - tri[0].pos;
+                intTri.C_A   = tri[2].pos - tri[0].pos;
+                intTri.nA    = tri[0].nor;
+                intTri.nB_nA = tri[1].nor - tri[0].nor;
+                intTri.nC_nA = tri[2].nor - tri[0].nor;
+                intTri.tA    = tri[0].uv;
+                intTri.tB_tA = tri[1].uv - tri[0].uv;
+                intTri.tC_tA = tri[2].uv - tri[0].uv;
+                tris.push_back(intTri);
             }
-            else
-            {
-                auto pBound = boundArena.Alloc();
-                *pBound = task.tree->internal.bound;
+        }
+        else
+        {
+            auto pBound = boundArena.Alloc();
+            *pBound = tree->internal.bound;
 
-                TriangleBVHCore::Node node;
-                node.isLeaf              = false;
-                node.internal.bound      = pBound;
-                node.internal.rightChild = 0;
-                nodes.push_back(node);
+            TriangleBVHCore::Node node;
+            node.isLeaf = false;
+            node.internal.bound = pBound;
+            node.internal.rightChild = 0;
 
-                taskQueue.push({ task.tree->internal.left, &node.internal.rightChild });
-                taskQueue.push({ task.tree->internal.right, nullptr });
-            }
+            size_t nodeIdx = nodes.size();
+            nodes.push_back(node);
 
-            if(task.rightChild)
-                *task.rightChild = static_cast<uint32_t>(nodes.size());
+            CompactBVHIntoArray(
+                nodes, tris, vertices, tree->internal.left, triIdxMap, boundArena);
+
+            nodes[nodeIdx].internal.rightChild = static_cast<uint32_t>(nodes.size());
+            CompactBVHIntoArray(
+                nodes, tris, vertices, tree->internal.right, triIdxMap, boundArena);
         }
     }
 }

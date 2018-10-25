@@ -45,6 +45,8 @@ public:
 
     TriangleBVHCore(const Vertex *vertices, uint32_t triangleCount);
 
+    explicit TriangleBVHCore(const AGZ::Model::GeometryMesh &mesh);
+
     bool HasIntersection(const Ray &r) const;
 
     bool FindIntersection(const Ray &r, SurfacePoint *sp) const;

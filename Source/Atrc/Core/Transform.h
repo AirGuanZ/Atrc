@@ -18,14 +18,14 @@ class Transform
 
     explicit Transform(const Mat4 &mat)
         : mat_(mat), inv_(mat.Inverse()),
-        scaleFactor_(mat.ApplyToVector(Vec3::UNIT_X()).LengthSquare())
+          scaleFactor_(mat.ApplyToVector(Vec3::UNIT_X()).LengthSquare())
     {
         invScaleFac_ = 1.0 / scaleFactor_;
     }
 
     Transform(const Mat4 &mat, const Mat4 &inv)
         : mat_(mat), inv_(inv),
-        scaleFactor_(mat.ApplyToVector(Vec3::UNIT_X()).LengthSquare())
+          scaleFactor_(mat.ApplyToVector(Vec3::UNIT_X()).LengthSquare())
     {
         invScaleFac_ = 1.0 / scaleFactor_;
     }
@@ -78,6 +78,11 @@ public:
 
     Real ScaleFactor() const { return scaleFactor_; }
     Real InverseScaleFactor() const { return invScaleFac_; }
+
+    Transform operator*(const Transform &rhs) const
+    {
+        return Transform(mat_ * rhs.mat_, rhs.inv_ * inv_);
+    }
 
     Vec3 ApplyToPoint(const Vec3 &pnt) const
     {
