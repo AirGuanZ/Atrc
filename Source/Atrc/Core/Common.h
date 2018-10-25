@@ -46,6 +46,8 @@ public:
         explicit NAME(const std::string &err) : Exception(err) { } \
     }
 
+DEFINE_ATRC_EXCEPTION(ArgumentException);
+
 #undef DEFINE_ATRC_EXCEPTION
 
 // ============================= Atrc::Math =============================

@@ -2,19 +2,19 @@
 
 AGZ_NS_BEG(Atrc)
 
-GeometryEntity::GeometryEntity(const Geometry *geometry, const Material *material)
+GeometricEntity::GeometricEntity(const Geometry *geometry, const Material *material)
     : geometry_(geometry), material_(material)
 {
     AGZ_ASSERT(geometry && material);
 }
 
-bool GeometryEntity::HasIntersection(const Ray &r) const
+bool GeometricEntity::HasIntersection(const Ray &r) const
 {
     AGZ_ASSERT(geometry_);
     return geometry_->HasIntersection(r);
 }
 
-bool GeometryEntity::FindIntersection(const Ray &r, SurfacePoint *sp) const
+bool GeometricEntity::FindIntersection(const Ray &r, SurfacePoint *sp) const
 {
     AGZ_ASSERT(geometry_ && sp);
     if(!geometry_->FindIntersection(r, sp))
@@ -23,24 +23,24 @@ bool GeometryEntity::FindIntersection(const Ray &r, SurfacePoint *sp) const
     return true;
 }
 
-AABB GeometryEntity::WorldBound() const
+AABB GeometricEntity::WorldBound() const
 {
     AGZ_ASSERT(geometry_);
     return geometry_->WorldBound();
 }
 
-const Material *GeometryEntity::GetMaterial(const SurfacePoint &sp) const
+const Material *GeometricEntity::GetMaterial(const SurfacePoint &sp) const
 {
     AGZ_ASSERT(material_ && sp.entity == this);
     return material_;
 }
 
-const Light *GeometryEntity::AsLight() const
+const Light *GeometricEntity::AsLight() const
 {
     return nullptr;
 }
 
-Light* GeometryEntity::AsLight()
+Light* GeometricEntity::AsLight()
 {
     return nullptr;
 }

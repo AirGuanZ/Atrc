@@ -45,15 +45,15 @@ int main()
 
     Sphere sph(Transform::Translate(0.0, 0.0, -201.0), 200.0);
     DiffuseMaterial groundMat(Spectrum(0.4f, 0.8f, 0.4f));
-    GeometryEntity ground(&sph, &groundMat);
+    GeometricEntity ground(&sph, &groundMat);
 
     Sphere sph2(Transform::Translate(0.0, 0.0, 0.0), 1.0);
     DiffuseMaterial medMat(Spectrum(0.7f));
-    GeometryEntity medSph(&sph2, &medMat);
+    GeometricEntity medSph(&sph2, &medMat);
 
     Sphere sph3(Transform::Translate(0.0, 2.0, 0.0), 1.0);
     FresnelSpecular leftMat(Spectrum(0.8f), MakeRC<FresnelDielectric>(1.0f, 1.5f));
-    GeometryEntity leftSph(&sph3, &leftMat);
+    GeometricEntity leftSph(&sph3, &leftMat);
 
     Sphere sph4(Transform::Translate(0.0, 0.5, 0.7), 0.25);
     GeometricDiffuseLight upLight(&sph4, Spectrum(25.0f));

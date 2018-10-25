@@ -1,7 +1,6 @@
 #pragma once
 
 #include <Atrc/Core/Core.h>
-#include "Atrc/Entity/GeometricLightEntity.h"
 
 AGZ_NS_BEG(Atrc)
 
@@ -29,7 +28,5 @@ public:
 
     Spectrum Power() const override;
 };
-
-using GeometricDiffuseLight = GeometricLightEntity<GeometricDiffuseLightImpl>;
 
 AGZ_NS_END(Atrc)

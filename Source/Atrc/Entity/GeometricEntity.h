@@ -4,14 +4,14 @@
 
 AGZ_NS_BEG(Atrc)
 
-class GeometryEntity : public Entity
+class GeometricEntity : public Entity
 {
     const Geometry *geometry_;
     const Material *material_;
 
 public:
 
-    GeometryEntity(const Geometry *geometry, const Material *material);
+    GeometricEntity(const Geometry *geometry, const Material *material);
 
     bool HasIntersection(const Ray &r) const override;
 

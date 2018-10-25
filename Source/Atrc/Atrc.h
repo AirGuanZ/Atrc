@@ -6,6 +6,7 @@
 #include <Atrc/Entity/GeometricLightEntity.h>
 
 #include <Atrc/Geometry/Sphere.h>
+#include <Atrc/Geometry/TriangleBVH.h>
 
 #include <Atrc/Material/BlackMaterial.h>
 #include <Atrc/Material/DiffuseMaterial.h>
@@ -23,3 +24,9 @@
 
 #include <Atrc/Renderer/ParallelRenderer.h>
 #include <Atrc/Renderer/SerialRenderer.h>
+
+AGZ_NS_BEG(Atrc)
+
+using GeometricDiffuseLight = GeometricLightEntity<GeometricDiffuseLightImpl>;
+
+AGZ_NS_END(Atrc)

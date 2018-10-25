@@ -40,18 +40,22 @@ public:
         Vec3 A, B_A, C_A;
         Vec3 nA, nB_nA, nC_nA;
         Vec2 tA, tB_tA, tC_tA;
-        Real surfaceArea;
+        Real surfaceArea = 0.0;
     };
 
     TriangleBVHCore(const Vertex *vertices, uint32_t triangleCount);
 
     bool HasIntersection(const Ray &r) const;
 
-    bool EvalIntersection(const Ray &r, SurfacePoint *sp) const;
+    bool FindIntersection(const Ray &r, SurfacePoint *sp) const;
 
     AABB LocalBound() const;
 
     Real SurfaceArea() const;
+
+    GeometrySampleResult Sample() const;
+
+    const std::vector<InternalTriangle> &GetAllTriangles() const;
 
 private:
 
@@ -69,9 +73,15 @@ private:
 
 class TriangleBVH : public Geometry
 {
+    RC<TriangleBVHCore> core_;
+    AABB worldBound_;
+    Real surfaceArea_;
+
 public:
 
-    bool HasIntersection(const Ray &r) const;
+    TriangleBVH(const Transform &local2World, RC<TriangleBVHCore> bvhCore);
+
+    bool HasIntersection(const Ray &r) const override;
 
     bool FindIntersection(const Ray &r, SurfacePoint *sp) const override;
 
@@ -79,13 +89,15 @@ public:
 
     AABB LocalBound() const override;
 
+    AABB WorldBound() const override;
+
     GeometrySampleResult Sample() const override;
 
     Real SamplePDF(const Vec3 &pos) const override;
 
-    GeometrySampleResult Sample(const Vec3 &dst) const;
+    GeometrySampleResult Sample(const Vec3 &dst) const override;
 
-    Real SamplePDF(const Vec3 &pos, const Vec3 &dst) const;
+    Real SamplePDF(const Vec3 &pos, const Vec3 &dst) const override;
 };
 
 AGZ_NS_END(Atrc)
