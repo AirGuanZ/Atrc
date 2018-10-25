@@ -2,11 +2,11 @@
 
 AGZ_NS_BEG(Atrc)
 
-BxDFScaler::BxDFScaler(const Spectrum &scale, RC<BxDF> bxdf)
+BxDFScaler::BxDFScaler(const Spectrum &scale, BxDF *bxdf)
     : BxDF(bxdf->GetType()), scale_(scale)
 {
     AGZ_ASSERT(bxdf);
-    bxdf_ = std::move(bxdf);
+    bxdf_ = bxdf;
 }
 
 Spectrum BxDFScaler::Eval(const Vec3 &wi, const Vec3 &wo) const

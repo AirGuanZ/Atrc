@@ -10,6 +10,8 @@ JitteredSubareaRenderer::JitteredSubareaRenderer(uint32_t spp)
 
 void JitteredSubareaRenderer::Render(const Scene &scene, const Integrator &integrator, RenderTarget &rt, const SubareaRect & area) const
 {
+    AGZ::ObjArena<> arena;
+
     auto pw = rt.GetWidth(), ph = rt.GetHeight();
     Real xBaseCoef = 2.0 / pw, yBaseCoef = 2.0 / ph;
     auto cam = scene.GetCamera();
@@ -26,9 +28,12 @@ void JitteredSubareaRenderer::Render(const Scene &scene, const Integrator &integ
                 Real xOffset = xBaseCoef * Rand();
                 Real yOffset = -yBaseCoef * Rand();
                 pixel += integrator.GetRadiance(
-                    scene, cam->GetRay({ xBase + xOffset, yBase + yOffset }));
+                    scene, cam->GetRay({ xBase + xOffset, yBase + yOffset }), arena);
             }
             rt(px, py) = pixel / spp_;
+
+            if(arena.GetUsedBytes() > 16 * 1024 * 1024)
+                arena.Clear();
         }
     }
 }

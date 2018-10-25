@@ -12,16 +12,14 @@ FresnelSpecular::FresnelSpecular(const Spectrum &rc, RC<const FresnelDielectric>
     AGZ_ASSERT(fresnel_);
 }
 
-void FresnelSpecular::Shade(const SurfacePoint &sp, ShadingPoint *dst) const
+void FresnelSpecular::Shade(const SurfacePoint &sp, ShadingPoint *dst, AGZ::ObjArena<> &arena) const
 {
     AGZ_ASSERT(dst);
 
-    auto bsdf = MakeRC<BxDFAggregate>(sp.geoLocal, sp.geoLocal);
-    //bsdf->AddBxDF(MakeRC<PerfectSpecularReflection>(rc_, fresnel_));
-    //bsdf->AddBxDF(MakeRC<PerfectSpecularTransmission>(rc_, fresnel_));
-    bsdf->AddBxDF(MakeRC<PerfectSpecular>(rc_, fresnel_));
+    auto bsdf = arena.Create<BxDFAggregate>(sp.geoLocal, sp.geoLocal);
+    bsdf->AddBxDF(arena.Create<PerfectSpecular>(rc_, fresnel_.get()));
 
-    dst->bsdf = std::move(bsdf);
+    dst->bsdf = bsdf;
     dst->shdLocal = sp.geoLocal;
 }
 

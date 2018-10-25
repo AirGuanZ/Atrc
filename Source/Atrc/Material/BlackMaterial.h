@@ -8,7 +8,7 @@ class BlackMaterial : public Material
 {
 public:
 
-    void Shade(const SurfacePoint &sp, ShadingPoint *dst) const override;
+    void Shade(const SurfacePoint &sp, ShadingPoint *dst, AGZ::ObjArena<> &arena) const override;
 };
 
 inline const BlackMaterial STATIC_BLACK_MATERIAL;

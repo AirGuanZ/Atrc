@@ -8,10 +8,10 @@ BxDFAggregate::BxDFAggregate(const LocalCoordSystem &shdLocal, const LocalCoordS
 
 }
 
-void BxDFAggregate::AddBxDF(RC<BxDF> bxdf)
+void BxDFAggregate::AddBxDF(BxDF *bxdf)
 {
     AGZ_ASSERT(bxdfCnt_ < MAX_BXDF_CNT);
-    bxdfs_[bxdfCnt_++] = std::move(bxdf);
+    bxdfs_[bxdfCnt_++] = bxdf;
 }
 
 Spectrum BxDFAggregate::Eval(const Vec3 &wi, const Vec3 &wo, BxDFType type) const
@@ -46,7 +46,7 @@ Option<BSDFSampleWiResult> BxDFAggregate::SampleWi(const Vec3 &wo, BxDFType type
     {
         if(bxdfs_[i]->MatchType(type) && j++ == dstIdx)
         {
-            bxdf = bxdfs_[i].get();
+            bxdf = bxdfs_[i];
             break;
         }
     }
@@ -69,7 +69,7 @@ Option<BSDFSampleWiResult> BxDFAggregate::SampleWi(const Vec3 &wo, BxDFType type
     // 综合考虑所有类型对得上的bxdf的意见
     for(size_t i = 0; i < bxdfCnt_; ++i)
     {
-        if(bxdfs_[i]->MatchType(type) && bxdfs_[i].get() != bxdf)
+        if(bxdfs_[i]->MatchType(type) && bxdfs_[i] != bxdf)
         {
             ret->pdf += bxdfs_[i]->SampleWiPDF(ret->wi, lwo);
             ret->coef += bxdfs_[i]->Eval(ret->wi, lwo);

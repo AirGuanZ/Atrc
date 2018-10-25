@@ -11,7 +11,7 @@ public:
 
     virtual ~Material() = default;
 
-    virtual void Shade(const SurfacePoint &sp, ShadingPoint *dst) const = 0;
+    virtual void Shade(const SurfacePoint &sp, ShadingPoint *dst, AGZ::ObjArena<> &arena) const = 0;
 };
 
 AGZ_NS_END(Atrc)

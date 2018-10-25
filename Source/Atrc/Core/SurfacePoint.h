@@ -61,7 +61,7 @@ struct ShadingPoint
     // 着色局部坐标系，大部分时候与geoLocal一样，受bump mapping等技术的影响
     LocalCoordSystem shdLocal;
 
-    RC<BSDF> bsdf;
+    BSDF *bsdf;
 };
 
 AGZ_NS_END(Atrc)

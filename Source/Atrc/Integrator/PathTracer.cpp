@@ -13,7 +13,7 @@ void PathTracer::SetBackground(const Spectrum &background)
     background_ = background;
 }
 
-Spectrum PathTracer::GetRadiance(const Scene &scene, const Ray &r) const
+Spectrum PathTracer::GetRadiance(const Scene &scene, const Ray &r, AGZ::ObjArena<> &arena) const
 {
     SurfacePoint sp;
     if(!scene.FindCloestIntersection(r, &sp))
@@ -23,10 +23,10 @@ Spectrum PathTracer::GetRadiance(const Scene &scene, const Ray &r) const
             ret += light->NonareaLe(r);
         return ret;
     }
-    return L(scene, sp, 1);
+    return L(scene, sp, 1, arena);
 }
 
-Spectrum PathTracer::L(const Scene &scene, const SurfacePoint &sp, int depth) const
+Spectrum PathTracer::L(const Scene &scene, const SurfacePoint &sp, int depth, AGZ::ObjArena<> &arena) const
 {
     if(depth > maxDepth_)
         return Spectrum();
@@ -34,18 +34,18 @@ Spectrum PathTracer::L(const Scene &scene, const SurfacePoint &sp, int depth) co
     auto light = sp.entity->AsLight();
     Spectrum le = light ? light->AreaLe(sp) : Spectrum();
 
-    return le + Ls(scene, sp, depth);
+    return le + Ls(scene, sp, depth, arena);
 }
 
-Spectrum PathTracer::Ls(const Scene &scene, const SurfacePoint &sp, int depth) const
+Spectrum PathTracer::Ls(const Scene &scene, const SurfacePoint &sp, int depth, AGZ::ObjArena<> &arena) const
 {
     if(depth > maxDepth_)
         return Spectrum();
 
     ShadingPoint shd;
-    sp.entity->GetMaterial(sp)->Shade(sp, &shd);
+    sp.entity->GetMaterial(sp)->Shade(sp, &shd, arena);
     auto e = E(scene, sp, shd);
-    auto s = S(scene, sp, shd, depth);
+    auto s = S(scene, sp, shd, depth, arena);
     return e + s;
 }
 
@@ -136,7 +136,7 @@ Spectrum PathTracer::E2(const Scene &scene, const SurfacePoint &sp, const Shadin
          * lightSample.radiance / (bpdf + lpdf);
 }
 
-Spectrum PathTracer::S(const Scene &scene, const SurfacePoint &sp, const ShadingPoint &shd, int depth) const
+Spectrum PathTracer::S(const Scene &scene, const SurfacePoint &sp, const ShadingPoint &shd, int depth, AGZ::ObjArena<> &arena) const
 {
     auto bsdfSample = shd.bsdf->SampleWi(sp.wo, BXDF_ALL);
     if(!bsdfSample || !bsdfSample->coef)
@@ -148,7 +148,7 @@ Spectrum PathTracer::S(const Scene &scene, const SurfacePoint &sp, const Shading
         return Spectrum();
 
     return bsdfSample->coef * Abs(Dot(shd.shdLocal.ez, bsdfSample->wi))
-         * Ls(scene, newInct, depth + 1) / bsdfSample->pdf;
+         * Ls(scene, newInct, depth + 1, arena) / bsdfSample->pdf;
 }
 
 AGZ_NS_END(Atrc)

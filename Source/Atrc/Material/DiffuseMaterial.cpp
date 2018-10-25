@@ -10,15 +10,15 @@ DiffuseMaterial::DiffuseMaterial(const Spectrum &albedo)
 
 }
 
-void DiffuseMaterial::Shade(const SurfacePoint &sp, ShadingPoint *dst) const
+void DiffuseMaterial::Shade(const SurfacePoint &sp, ShadingPoint *dst, AGZ::ObjArena<> &arena) const
 {
     AGZ_ASSERT(dst);
 
-    auto bsdf = MakeRC<BxDFAggregate>(sp.geoLocal, sp.geoLocal);
-    bsdf->AddBxDF(MakeRC<DiffuseBRDF>(color_));
+    auto bsdf = arena.Create<BxDFAggregate>(sp.geoLocal, sp.geoLocal);
+    bsdf->AddBxDF(arena.Create<DiffuseBRDF>(color_));
 
     dst->shdLocal = sp.geoLocal;
-    dst->bsdf = std::move(bsdf);
+    dst->bsdf = bsdf;
 }
 
 AGZ_NS_END(Atrc)

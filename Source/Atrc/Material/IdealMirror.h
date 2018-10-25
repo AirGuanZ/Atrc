@@ -14,7 +14,7 @@ public:
 
     IdealMirror(const Spectrum &rc, RC<const Fresnel> fresnel);
 
-    void Shade(const SurfacePoint &sp, ShadingPoint *dst) const override;
+    void Shade(const SurfacePoint &sp, ShadingPoint *dst, AGZ::ObjArena<> &arena) const override;
 };
 
 AGZ_NS_END(Atrc)

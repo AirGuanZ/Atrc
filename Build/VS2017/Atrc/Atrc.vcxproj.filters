@@ -28,6 +28,9 @@
     <Filter Include="Material\BxDF">
       <UniqueIdentifier>{bad1ef04-0e87-4f28-9c90-48b725d20539}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Material\MicrofacetDistribution">
+      <UniqueIdentifier>{f729a02e-6b7c-4733-a890-da5b06703d56}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Source\Atrc\Atrc.h" />
@@ -150,6 +153,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Source\Atrc\Geometry\TriangleBVH.h">
       <Filter>Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Material\MicrofacetDistribution\MicrofacetDistribution.h">
+      <Filter>Material\MicrofacetDistribution</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

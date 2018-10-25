@@ -2,8 +2,8 @@
 
 AGZ_NS_BEG(Atrc)
 
-PerfectSpecularReflection::PerfectSpecularReflection(const Spectrum &rc, RC<const Fresnel> fresnel)
-    : BxDF(BXDF_SPECULAR | BXDF_REFLECTION), rc_(rc), fresnel_(std::move(fresnel))
+PerfectSpecularReflection::PerfectSpecularReflection(const Spectrum &rc, const Fresnel *fresnel)
+    : BxDF(BXDF_SPECULAR | BXDF_REFLECTION), rc_(rc), fresnel_(fresnel)
 {
     AGZ_ASSERT(fresnel_);
 }

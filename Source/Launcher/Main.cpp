@@ -19,7 +19,7 @@ float ACESFilm(float x)
     return x;
 }
 
-AGZ::Tex::Texture2D<Color3b> ToSavedImage(const RenderTarget &origin, float gamma)
+Tex::Texture2D<Color3b> ToSavedImage(const RenderTarget &origin, float gamma)
 {
     return origin.Map([=](const Color3f &color)
     {
@@ -89,7 +89,7 @@ int main()
 
     //============= Renderer & Integrator =============
 
-    JitteredSubareaRenderer subareaRenderer(200);
+    JitteredSubareaRenderer subareaRenderer(10);
 
     ParallelRenderer renderer(6);
     //SerialRenderer renderer;
@@ -102,7 +102,7 @@ int main()
 
     cout << "Start rendering..." << endl;
 
-    AGZ::Timer timer;
+    Timer timer;
     renderer.Render(subareaRenderer, scene, integrator, renderTarget);
     auto deltaTime = timer.Milliseconds() / 1000.0;
 
@@ -110,5 +110,5 @@ int main()
 
     //============= Output =============
 
-    AGZ::Tex::TextureFile::WriteRGBToPNG("./Build/Output.png", ToSavedImage(renderTarget, 1 / 2.2f));
+    Tex::TextureFile::WriteRGBToPNG("./Build/Output.png", ToSavedImage(renderTarget, 1 / 2.2f));
 }

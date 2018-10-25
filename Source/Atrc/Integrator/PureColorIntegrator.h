@@ -13,7 +13,7 @@ public:
 
     PureColorIntegrator(const Spectrum &background, const Spectrum &entity);
 
-    Spectrum GetRadiance(const Scene &scene, const Ray &r) const override;
+    Spectrum GetRadiance(const Scene &scene, const Ray &r, AGZ::ObjArena<> &arena) const override;
 };
 
 AGZ_NS_END(Atrc)

@@ -36,11 +36,12 @@ namespace
     };
 }
 
-void BlackMaterial::Shade(const SurfacePoint &sp, ShadingPoint *dst) const
+void BlackMaterial::Shade(const SurfacePoint &sp, ShadingPoint *dst, AGZ::ObjArena<> &arena) const
 {
     AGZ_ASSERT(dst);
     dst->shdLocal = sp.geoLocal;
-    dst->bsdf = MakeRC<BlackBSDF>(dst->shdLocal, sp.geoLocal);
+
+    dst->bsdf = arena.Create<BlackBSDF>(dst->shdLocal, sp.geoLocal);
 }
 
 AGZ_NS_END(Atrc)
