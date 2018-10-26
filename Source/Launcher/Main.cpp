@@ -40,7 +40,7 @@ int main()
 
     const Vec3 eye = { -5.0, 0.0, 0.0 };
     const Vec3 dir = Vec3(0.0, 0.0, 0.0) - eye;
-    PerspectiveCamera camera(eye, dir, { 0.0, 0.0, 1.0 }, Deg(90.0), SCR_ASPECT_RATIO);
+    PerspectiveCamera camera(eye, dir, { 0.0, 0.0, 1.0 }, Deg(60.0), SCR_ASPECT_RATIO);
 
     //============= Scene =============
 
@@ -53,11 +53,8 @@ int main()
     GeometricEntity medSph(&sph2, &medMat);
 
     Sphere sph3(Transform::Translate(0.0, 2.0, 0.0), 1.0);
-    FresnelSpecular leftMat(Spectrum(0.8f), MakeRC<FresnelDielectric>(1.0f, 1.5f));
+    FresnelSpecular leftMat(Spectrum(0.8f), MakeRC<FresnelDielectric>(1.0f, 1.4f));
     GeometricEntity leftSph(&sph3, &leftMat);
-
-    Sphere sph4(Transform::Translate(0.0, 0.5, 0.7), 0.25);
-    GeometricDiffuseLight upLight(&sph4, Spectrum(25.0f));
 
     Model::WavefrontObj dragonObj;
     Model::WavefrontObjFile::LoadFromObjFile("./Assets/dragon_vrip.obj", &dragonObj);
@@ -67,12 +64,21 @@ int main()
     IdealMirror dragonMat(Spectrum(0.6f), MakeRC<FresnelDielectric>(1.0f, 0.01f));
     GeometricEntity dragon(&dragonBVH, &dragonMat);
 
+    /*Texture2D<Spectrum> cubeTex = Texture2D<Spectrum>(
+        TextureFile::LoadRGBFromFile("./Assets/CubeTex.png").Map(
+        [](const Color3b &c) { return c.Map([](uint8_t b) { return b / 255.0f; }); }));
+
+    Cube cube(Transform::Translate(0.0, -2.0, 0.123) * Transform::Rotate({ 1.0, 1.1, 1.2 }, Deg(47)), 1.4);
+    DiffuseMaterial cubeDiffuse(Spectrum(0.2f, 0.4f, 0.8f));
+    TextureScaler<Atrc::LinearSampler> cubeMat(&cubeTex, &cubeDiffuse);
+    GeometricEntity rightCube(&cube, &cubeMat);*/
+
     SkyLight sky(Spectrum(0.4f, 0.7f, 0.9f), Spectrum(1.0f));
 
     Scene scene;
     scene.camera    = &camera;
     scene.lights_   = { &sky };
-    scene.entities_ = { &ground, &medSph, &leftSph, &dragon };
+    scene.entities_ = { &medSph, &leftSph, &dragon, &ground, };
 
     for(auto ent : scene.GetEntities())
     {
@@ -89,7 +95,7 @@ int main()
 
     //============= Renderer & Integrator =============
 
-    JitteredSubareaRenderer subareaRenderer(10);
+    JitteredSubareaRenderer subareaRenderer(200);
 
     ParallelRenderer renderer(6);
     //SerialRenderer renderer;

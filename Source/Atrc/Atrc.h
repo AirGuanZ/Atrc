@@ -5,6 +5,7 @@
 #include <Atrc/Entity/GeometricEntity.h>
 #include <Atrc/Entity/GeometricLightEntity.h>
 
+#include <Atrc/Geometry/Cube.h>
 #include <Atrc/Geometry/Sphere.h>
 #include <Atrc/Geometry/TriangleBVH.h>
 

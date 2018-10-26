@@ -187,8 +187,7 @@ bool TriangleBVHCore::FindIntersection(const Ray &r, SurfacePoint *sp) const
 
     const auto &tri = triangles_[sp->flag0];
     sp->usrUV = tri.tA + sp->geoUV.u * tri.tB_tA + sp->geoUV.v * tri.tC_tA;
-    sp->geoLocal = LocalCoordSystem::FromEz(
-        (tri.nA + sp->geoUV.u * tri.nB_nA + sp->geoUV.v * tri.nC_nA).Normalize());
+    sp->geoLocal = LocalCoordSystem::FromEz(tri.nor);
     return true;
 }
 
@@ -465,9 +464,7 @@ namespace
                 intTri.A     = tri[0].pos;
                 intTri.B_A   = tri[1].pos - tri[0].pos;
                 intTri.C_A   = tri[2].pos - tri[0].pos;
-                intTri.nA    = tri[0].nor;
-                intTri.nB_nA = tri[1].nor - tri[0].nor;
-                intTri.nC_nA = tri[2].nor - tri[0].nor;
+                intTri.nor   = tri[0].nor;
                 intTri.tA    = tri[0].uv;
                 intTri.tB_tA = tri[1].uv - tri[0].uv;
                 intTri.tC_tA = tri[2].uv - tri[0].uv;
@@ -549,7 +546,7 @@ GeometrySampleResult TriangleBVHCore::Sample() const
 
     GeometrySampleResult ret;
     ret.pos = tri.A + uv.u * tri.B_A + uv.v * tri.C_A;
-    ret.nor = (tri.nA + uv.u * tri.nB_nA + uv.v * tri.nC_nA).Normalize();
+    ret.nor = tri.nor;
     ret.pdf = 1.0 / SurfaceArea();
 
     return ret;

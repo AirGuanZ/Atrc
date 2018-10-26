@@ -58,6 +58,9 @@ public:
 
     // 给定某wi，假设这时SampleWi的采样结果，返回pdf
     virtual Real SampleWiPDF(const Vec3 &wi, const Vec3 &wo, BxDFType type) const = 0;
+
+    const LocalCoordSystem &GetShadingLocal() const { return shadingLocal_; }
+    const LocalCoordSystem &GetGeometryLocal() const { return geometryLocal_; }
 };
 
 AGZ_NS_END(Atrc)

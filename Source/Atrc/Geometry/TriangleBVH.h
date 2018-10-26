@@ -38,7 +38,7 @@ public:
     struct InternalTriangle
     {
         Vec3 A, B_A, C_A;
-        Vec3 nA, nB_nA, nC_nA;
+        Vec3 nor;
         Vec2 tA, tB_tA, tC_tA;
         Real surfaceArea = 0.0;
     };

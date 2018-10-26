@@ -38,6 +38,7 @@
     <ClInclude Include="..\..\..\Source\Atrc\Core\Transform.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Entity\GeometricEntity.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Entity\GeometricLightEntity.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Geometry\Cube.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Geometry\Sphere.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Geometry\TriangleBVH.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Integrator\PathTracer.h" />
@@ -57,7 +58,6 @@
     <ClInclude Include="..\..\..\Source\Atrc\Material\BlackMaterial.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Material\FresnelSpecular.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Material\IdealMirror.h" />
-    <ClInclude Include="..\..\..\Source\Atrc\Material\MicrofacetDistribution\MicrofacetDistribution.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Material\TextureScaler.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Renderer\JitteredSubareaRenderer.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Renderer\SerialRenderer.h" />
@@ -70,6 +70,7 @@
     <ClCompile Include="..\..\..\Source\Atrc\Core\Light.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Core\Scene.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Entity\GeometricEntity.cpp" />
+    <ClCompile Include="..\..\..\Source\Atrc\Geometry\Cube.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Geometry\Sphere.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Geometry\TriangleBVH.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Integrator\PathTracer.cpp" />

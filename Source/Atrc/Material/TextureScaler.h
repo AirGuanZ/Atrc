@@ -1,8 +1,6 @@
 #pragma once
 
 #include <Atrc/Core/Core.h>
-#include <Atrc/Material/BxDF/BxDFScaler.h>
-#include <Atrc/Material/BxDFAggregate.h>
 
 AGZ_NS_BEG(Atrc)
 
@@ -58,8 +56,8 @@ protected:
 template<typename SampleStrategy = NearestSampler>
 class TextureScaler : public Material, public SampleStrategy
 {
-    RC<AGZ::Texture2D<Spectrum>> tex_;
-    RC<Material> mat_;
+    const AGZ::Texture2D<Spectrum> *tex_;
+    const Material *mat_;
 
     class BSDFScaler : public BSDF
     {
@@ -99,10 +97,10 @@ class TextureScaler : public Material, public SampleStrategy
 
 public:
 
-    TextureScaler(RC<AGZ::Texture2D<Spectrum>> &tex, RC<Material> mat)
-        : tex_(std::move(tex)), mat_(std::move(mat))
+    TextureScaler(const AGZ::Texture2D<Spectrum> *tex, const Material *mat)
+        : tex_(tex), mat_(mat)
     {
-        
+        AGZ_ASSERT(tex && mat);
     }
 
     void Shade(const SurfacePoint &sp, ShadingPoint *dst, AGZ::ObjArena<> &arena) const override
@@ -110,7 +108,8 @@ public:
         mat_->Shade(sp, dst, arena);
 
         Spectrum scale = SampleStrategy::SampleTexture(*tex_, sp.usrUV);
-        dst->bsdf = arena.Create<BSDFScaler>(scale, dst->bsdf);
+        dst->bsdf = arena.Create<BSDFScaler>(
+            dst->bsdf->GetShadingLocal(), dst->bsdf->GetGeometryLocal(), scale, dst->bsdf);
     }
 };
 
