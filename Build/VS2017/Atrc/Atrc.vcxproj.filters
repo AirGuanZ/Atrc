@@ -28,7 +28,7 @@
     <Filter Include="Material\BxDF">
       <UniqueIdentifier>{bad1ef04-0e87-4f28-9c90-48b725d20539}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Material\MicrofacetDistribution">
+    <Filter Include="Material\BxDF\TorranceSparrow">
       <UniqueIdentifier>{5a7d997d-e0a2-462b-bd7d-335517bec2fd}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -160,8 +160,17 @@
     <ClInclude Include="..\..\..\Source\Atrc\Geometry\Cube.h">
       <Filter>Geometry</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\Atrc\Material\MicrofacetDistribution\MicrofacetDistribution.h">
-      <Filter>Material\MicrofacetDistribution</Filter>
+    <ClInclude Include="..\..\..\Source\Atrc\Material\BxDF\TorranceSparrow.h">
+      <Filter>Material\BxDF</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Material\BxDF\TorranceSparrow\BlinnPhongDistribution.h">
+      <Filter>Material\BxDF\TorranceSparrow</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Material\Plastic.h">
+      <Filter>Material</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Material\Metal.h">
+      <Filter>Material</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -245,6 +254,18 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Source\Atrc\Geometry\Cube.cpp">
       <Filter>Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Material\BxDF\TorranceSparrow\BlinnPhongDistribution.cpp">
+      <Filter>Material\BxDF\TorranceSparrow</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Material\BxDF\TorranceSparrow.cpp">
+      <Filter>Material\BxDF</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Material\Plastic.cpp">
+      <Filter>Material</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Material\Metal.cpp">
+      <Filter>Material</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

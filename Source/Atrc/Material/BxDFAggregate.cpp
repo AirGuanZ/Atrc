@@ -8,7 +8,7 @@ BxDFAggregate::BxDFAggregate(const LocalCoordSystem &shdLocal, const LocalCoordS
 
 }
 
-void BxDFAggregate::AddBxDF(BxDF *bxdf)
+void BxDFAggregate::AddBxDF(const BxDF *bxdf)
 {
     AGZ_ASSERT(bxdfCnt_ < MAX_BXDF_CNT);
     bxdfs_[bxdfCnt_++] = bxdf;

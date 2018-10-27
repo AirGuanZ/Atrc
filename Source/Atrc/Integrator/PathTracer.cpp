@@ -119,7 +119,9 @@ Spectrum PathTracer::E2(const Scene &scene, const SurfacePoint &sp, const Shadin
 
     // Shadow ray≤‚ ‘
     Ray shadowRay(sp.pos, lightSample.wi, 1e-5, (lightSample.pos - sp.pos).Length() - 1e-5);
-    if(scene.HasIntersection(shadowRay))
+    if(scene.HasIntersection(shadowRay) ||
+        ((Dot(sp.wo,          sp.geoLocal.ez) <= 0.0) ^
+         (Dot(lightSample.wi, sp.geoLocal.ez) <= 0.0)))
         return Spectrum();
 
     lpdf *= lightSample.pdf;

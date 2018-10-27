@@ -11,14 +11,14 @@ class BxDFAggregate : public BSDF
 {
     static constexpr size_t MAX_BXDF_CNT = 8;
 
-    BxDF *bxdfs_[MAX_BXDF_CNT];
+    const BxDF *bxdfs_[MAX_BXDF_CNT];
     size_t bxdfCnt_;
 
 public:
 
     BxDFAggregate(const LocalCoordSystem &shdLocal, const LocalCoordSystem &geoLocal);
 
-    void AddBxDF(BxDF *bxdf);
+    void AddBxDF(const BxDF *bxdf);
 
     Spectrum Eval(const Vec3 &wi, const Vec3 &wo, BxDFType type) const override;
 

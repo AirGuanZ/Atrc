@@ -38,9 +38,9 @@ int main()
 
     //============= Camera =============
 
-    const Vec3 eye = { -5.0, 0.0, 0.0 };
-    const Vec3 dir = Vec3(0.0, 0.0, 0.0) - eye;
-    PerspectiveCamera camera(eye, dir, { 0.0, 0.0, 1.0 }, Deg(60.0), SCR_ASPECT_RATIO);
+    const Vec3 eye = { -7.0, 0.0, 0.0 };
+    const Vec3 dir = Vec3(0.0, -0.3, 0.0) - eye;
+    PerspectiveCamera camera(eye, dir, { 0.0, 0.0, 1.0 }, Deg(40.0), SCR_ASPECT_RATIO);
 
     //============= Scene =============
 
@@ -49,25 +49,27 @@ int main()
     GeometricEntity ground(&sph, &groundMat);
 
     Sphere sph2(Transform::Translate(0.0, 0.0, 0.0), 1.0);
-    DiffuseMaterial medMat(Spectrum(0.7f));
-    GeometricEntity medSph(&sph2, &medMat);
+    Plastic medPlastic(Spectrum(0.2f), Spectrum(0.08f), 0.04);
+    GeometricEntity medSph(&sph2, &medPlastic);
 
-    Sphere sph3(Transform::Translate(0.0, 2.0, 0.0), 1.0);
-    SchlickApproximation leftMatFresnel(1.0f, 1.4f);
-    FresnelSpecular leftMat(Spectrum(0.8f), &leftMatFresnel);
+    Sphere sph3(Transform::Translate(0.0, 2.0, -0.3), 0.7);
+    DiffuseMaterial leftMat(Spectrum(0.5f));
     GeometricEntity leftSph(&sph3, &leftMat);
 
     /*Model::WavefrontObj dragonObj;
     Model::WavefrontObjFile::LoadFromObjFile("./Assets/dragon_vrip.obj", &dragonObj);
     auto dragonBVHCore = MakeRC<TriangleBVHCore>(dragonObj.ToGeometryMeshGroup().submeshes["Default"]);
     dragonObj.Clear();
-    TriangleBVH dragonBVH(Transform::Translate(-1.5, -2.8, -0.6) * Transform::RotateZ(Deg(-90.0)) * Transform::Scale(2.2 / 40), dragonBVHCore);
-    IdealMirror dragonMat(Spectrum(0.6f), MakeRC<FresnelDielectric>(1.0f, 0.01f));
+    TriangleBVH dragonBVH(Transform::Translate(-1.5, 0.5, -0.6) * Transform::RotateZ(Deg(-90.0)) * Transform::Scale(2.2 / 40), dragonBVHCore);
+    //FresnelDielectric dragonFresnel(1.0f, 0.01f);
+    //IdealMirror dragonMat(Spectrum(0.6f), &dragonFresnel);
+    //Plastic dragonMat(Spectrum(0.4f), Spectrum(0.4f), 1.0);
+    Metal dragonMat(Spectrum(191, 173, 111) / 255.0f, Spectrum(0.1f), Spectrum(0.05f), 0.04);
     GeometricEntity dragon(&dragonBVH, &dragonMat);*/
 
     Texture2D<Spectrum> cubeTex = Texture2D<Spectrum>(
-        TextureFile::LoadRGBFromFile("./Assets/CubeTex.png").Map(
-        [](const Color3b &c) { return c.Map([](uint8_t b) { return b / 255.0f; }); }));
+    TextureFile::LoadRGBFromFile("./Assets/CubeTex.png").Map(
+    [](const Color3b &c) { return c.Map([](uint8_t b) { return b / 255.0f; }); }));
 
     Cube cube(Transform::Translate(0.0, -2.0, 0.123) * Transform::Rotate({ 1.0, 1.1, 1.2 }, Deg(47)), 1.4);
     DiffuseMaterial cubeDiffuse(Spectrum(0.2f, 0.4f, 0.8f));
@@ -75,11 +77,13 @@ int main()
     GeometricEntity rightCube(&cube, &cubeMat);
 
     SkyLight sky(Spectrum(0.4f, 0.7f, 0.9f), Spectrum(1.0f));
+    Sphere sph4(Transform::Translate(2.0, 1.0, 1.8), 0.4);
+    GeometricDiffuseLight sphLight(&sph4, Spectrum(8.0f));
 
     Scene scene;
     scene.camera    = &camera;
-    scene.lights_   = { &sky };
-    scene.entities_ = { &medSph, &leftSph, &rightCube, &ground, };
+    scene.lights_   = { /*&sky*/ };
+    scene.entities_ = { &rightCube, &leftSph, &medSph, &ground, &sphLight };
 
     for(auto ent : scene.GetEntities())
     {
@@ -89,6 +93,7 @@ int main()
     }
 
     sky.PreprocessScene(scene);
+    sphLight.AsLight()->PreprocessScene(scene);
 
     //============= Render Target =============
 
@@ -96,7 +101,7 @@ int main()
 
     //============= Renderer & Integrator =============
 
-    JitteredSubareaRenderer subareaRenderer(1000);
+    JitteredSubareaRenderer subareaRenderer(200);
 
     ParallelRenderer renderer(6);
     //SerialRenderer renderer;

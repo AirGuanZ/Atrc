@@ -32,14 +32,14 @@ Option<BxDFSampleWiResult> PerfectSpecular::SampleWi(const Vec3 &wo) const
 {
     Vec3 nor = wo.z > 0.0 ? Vec3::UNIT_Z() : -Vec3::UNIT_Z();
 
-    // 先假设是反射，算fresnel量，根据概率选反射还是折射
+    // 先算fresnel量，根据概率选反射还是折射
     auto Fr = fresnel_->Eval(float(wo.z));
     if(Rand() < Fr.r)
     {
         BxDFSampleWiResult ret;
-        ret.wi   = 2 * Abs(wo.z) * nor - wo;
-        ret.coef = rc_ / Abs(float(ret.wi.z));
-        ret.pdf  = 1.0;
+        ret.wi   = /*2 * Abs(wo.z) * nor - wo*/Vec3(-wo.xy(), wo.z);
+        ret.coef = rc_ * Fr / Abs(float(ret.wi.z));
+        ret.pdf  = Fr.r;
         ret.type = BxDFType(BXDF_SPECULAR | BXDF_REFLECTION);
         return ret;
     }
@@ -53,14 +53,12 @@ Option<BxDFSampleWiResult> PerfectSpecular::SampleWi(const Vec3 &wo) const
 
     float eta = etaI / etaT;
     auto wi = GetRefractDirection(wo, nor, eta);
-    if(!wi)
-        return None;
 
     BxDFSampleWiResult ret;
     ret.wi   = wi->Normalize();
-    ret.pdf  = 1.0;
+    ret.pdf  = 1.0 - Fr.r;
     ret.coef = eta * eta * rc_ * (Spectrum(1.0f) - Fr)
-             / (Abs(ret.wi.z) * (1.0f - Fr.r));
+             / Abs(ret.wi.z);
     ret.type = BxDFType(BXDF_SPECULAR | BXDF_TRANSMISSION);
 
     return ret;

@@ -53,12 +53,15 @@
     <ClInclude Include="..\..\..\Source\Atrc\Material\BxDF\PerfectSpecular.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Material\BxDF\PerfectSpecularReflection.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Material\BxDF\PerfectSpecularTransmission.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Material\BxDF\TorranceSparrow.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Material\BxDF\TorranceSparrow\BlinnPhongDistribution.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Material\DiffuseMaterial.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Material\Fresnel.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Material\BlackMaterial.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Material\FresnelSpecular.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Material\IdealMirror.h" />
-    <ClInclude Include="..\..\..\Source\Atrc\Material\MicrofacetDistribution\MicrofacetDistribution.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Material\Metal.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Material\Plastic.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Material\TextureScaler.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Renderer\JitteredSubareaRenderer.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Renderer\SerialRenderer.h" />
@@ -86,10 +89,14 @@
     <ClCompile Include="..\..\..\Source\Atrc\Material\BxDF\PerfectSpecular.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Material\BxDF\PerfectSpecularReflection.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Material\BxDF\PerfectSpecularTransmission.cpp" />
+    <ClCompile Include="..\..\..\Source\Atrc\Material\BxDF\TorranceSparrow.cpp" />
+    <ClCompile Include="..\..\..\Source\Atrc\Material\BxDF\TorranceSparrow\BlinnPhongDistribution.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Material\DiffuseMaterial.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Material\Fresnel.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Material\FresnelSpecular.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Material\IdealMirror.cpp" />
+    <ClCompile Include="..\..\..\Source\Atrc\Material\Metal.cpp" />
+    <ClCompile Include="..\..\..\Source\Atrc\Material\Plastic.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Renderer\JitteredSubareaRenderer.cpp" />
     <ClInclude Include="..\..\..\Source\Atrc\Renderer\ParallelRenderer.h" />
   </ItemGroup>

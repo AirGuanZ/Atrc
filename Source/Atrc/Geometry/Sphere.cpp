@@ -120,7 +120,7 @@ GeometrySampleResult Sphere::Sample() const
 
     GeometrySampleResult ret;
     ret.pos = local2World_.ApplyToPoint(radius_ * sam);
-    ret.nor = ret.pos.Normalize();
+    ret.nor = local2World_.ApplyInverseToNormal(sam);
 
     Real r = radius_ * local2World_.ScaleFactor();
     ret.pdf = pdf / (r * r);

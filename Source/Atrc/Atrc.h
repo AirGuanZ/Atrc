@@ -13,6 +13,8 @@
 #include <Atrc/Material/DiffuseMaterial.h>
 #include <Atrc/Material/FresnelSpecular.h>
 #include <Atrc/Material/IdealMirror.h>
+#include <Atrc/Material/Metal.h>
+#include <Atrc/Material/Plastic.h>
 #include <Atrc/Material/TextureScaler.h>
 
 #include <Atrc/Light/DirectionalLight.h>
