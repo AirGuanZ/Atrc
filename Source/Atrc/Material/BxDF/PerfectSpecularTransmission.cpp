@@ -17,7 +17,7 @@ namespace
     }
 }
 
-PerfectSpecularTransmission::PerfectSpecularTransmission(const Spectrum &rc, const FresnelDielectric *fresnel)
+PerfectSpecularTransmission::PerfectSpecularTransmission(const Spectrum &rc, const Dielectric *fresnel)
     : BxDF(BXDF_SPECULAR | BXDF_TRANSMISSION), rc_(rc), fresnel_(fresnel)
 {
     AGZ_ASSERT(fresnel_);

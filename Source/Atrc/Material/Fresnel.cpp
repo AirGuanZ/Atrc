@@ -49,8 +49,34 @@ Spectrum ComputeFresnelConductor(const Spectrum &etaI, const Spectrum &etaT, con
     return 0.5f * (rp + rs);
 }
 
+float ComputeSchlickApproximation(float etaI, float etaT, float cosThetaI)
+{
+    if(cosThetaI < 0.0)
+    {
+        std::swap(etaI, etaT);
+        cosThetaI = -cosThetaI;
+    }
+
+    float R0 = (etaI - etaT) / (etaI + etaT);
+    float t = 1 - cosThetaI;
+    float t2 = t * t;
+    R0 *= R0;
+    return R0 + (1 - R0) * (t2 * t2 * t);
+}
+
+FresnelConductor::FresnelConductor(const Spectrum &etaI, const Spectrum &etaT, const Spectrum &k)
+    : etaI(etaI), etaT(etaT), k(k)
+{
+
+}
+
+Spectrum FresnelConductor::Eval(float cosThetaI) const
+{
+    return ComputeFresnelConductor(etaI, etaT, k, cosThetaI);
+}
+
 FresnelDielectric::FresnelDielectric(float etaI, float etaT)
-    : etaI(etaI), etaT(etaT)
+    : Dielectric(etaI, etaT)
 {
     
 }
@@ -60,15 +86,15 @@ Spectrum FresnelDielectric::Eval(float cosThetaI) const
     return Spectrum(ComputeFresnelDielectric(etaI, etaT, cosThetaI));
 }
 
-FresnelConductor::FresnelConductor(const Spectrum &etaI, const Spectrum &etaT, const Spectrum &k)
-    : etaI(etaI), etaT(etaT), k(k)
+SchlickApproximation::SchlickApproximation(float etaI, float etaT)
+    : Dielectric(etaI, etaT)
 {
     
 }
 
-Spectrum FresnelConductor::Eval(float cosThetaI) const
+Spectrum SchlickApproximation::Eval(float cosThetaI) const
 {
-    return ComputeFresnelConductor(etaI, etaT, k, cosThetaI);
+    return Spectrum(ComputeSchlickApproximation(etaI, etaT, cosThetaI));
 }
 
 AGZ_NS_END(Atrc)

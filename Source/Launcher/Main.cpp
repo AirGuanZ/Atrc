@@ -32,8 +32,8 @@ Texture2D<Color3b> ToSavedImage(const RenderTarget &origin, float gamma)
 
 int main()
 {
-    constexpr uint32_t SCR_W = 1200;
-    constexpr uint32_t SCR_H = 675;
+    constexpr uint32_t SCR_W = 640;
+    constexpr uint32_t SCR_H = 480;
     constexpr Real SCR_ASPECT_RATIO = static_cast<Real>(SCR_W) / SCR_H;
 
     //============= Camera =============
@@ -53,32 +53,33 @@ int main()
     GeometricEntity medSph(&sph2, &medMat);
 
     Sphere sph3(Transform::Translate(0.0, 2.0, 0.0), 1.0);
-    FresnelSpecular leftMat(Spectrum(0.8f), MakeRC<FresnelDielectric>(1.0f, 1.4f));
+    SchlickApproximation leftMatFresnel(1.0f, 1.4f);
+    FresnelSpecular leftMat(Spectrum(0.8f), &leftMatFresnel);
     GeometricEntity leftSph(&sph3, &leftMat);
 
-    Model::WavefrontObj dragonObj;
+    /*Model::WavefrontObj dragonObj;
     Model::WavefrontObjFile::LoadFromObjFile("./Assets/dragon_vrip.obj", &dragonObj);
     auto dragonBVHCore = MakeRC<TriangleBVHCore>(dragonObj.ToGeometryMeshGroup().submeshes["Default"]);
     dragonObj.Clear();
     TriangleBVH dragonBVH(Transform::Translate(-1.5, -2.8, -0.6) * Transform::RotateZ(Deg(-90.0)) * Transform::Scale(2.2 / 40), dragonBVHCore);
     IdealMirror dragonMat(Spectrum(0.6f), MakeRC<FresnelDielectric>(1.0f, 0.01f));
-    GeometricEntity dragon(&dragonBVH, &dragonMat);
+    GeometricEntity dragon(&dragonBVH, &dragonMat);*/
 
-    /*Texture2D<Spectrum> cubeTex = Texture2D<Spectrum>(
+    Texture2D<Spectrum> cubeTex = Texture2D<Spectrum>(
         TextureFile::LoadRGBFromFile("./Assets/CubeTex.png").Map(
         [](const Color3b &c) { return c.Map([](uint8_t b) { return b / 255.0f; }); }));
 
     Cube cube(Transform::Translate(0.0, -2.0, 0.123) * Transform::Rotate({ 1.0, 1.1, 1.2 }, Deg(47)), 1.4);
     DiffuseMaterial cubeDiffuse(Spectrum(0.2f, 0.4f, 0.8f));
     TextureScaler<Atrc::LinearSampler> cubeMat(&cubeTex, &cubeDiffuse);
-    GeometricEntity rightCube(&cube, &cubeMat);*/
+    GeometricEntity rightCube(&cube, &cubeMat);
 
     SkyLight sky(Spectrum(0.4f, 0.7f, 0.9f), Spectrum(1.0f));
 
     Scene scene;
     scene.camera    = &camera;
     scene.lights_   = { &sky };
-    scene.entities_ = { &medSph, &leftSph, &dragon, &ground, };
+    scene.entities_ = { &medSph, &leftSph, &rightCube, &ground, };
 
     for(auto ent : scene.GetEntities())
     {
@@ -95,7 +96,7 @@ int main()
 
     //============= Renderer & Integrator =============
 
-    JitteredSubareaRenderer subareaRenderer(200);
+    JitteredSubareaRenderer subareaRenderer(1000);
 
     ParallelRenderer renderer(6);
     //SerialRenderer renderer;

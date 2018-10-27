@@ -8,11 +8,11 @@ AGZ_NS_BEG(Atrc)
 class IdealMirror : public Material
 {
     Spectrum rc_;
-    RC<const Fresnel> fresnel_;
+    const Fresnel *fresnel_;
 
 public:
 
-    IdealMirror(const Spectrum &rc, RC<const Fresnel> fresnel);
+    IdealMirror(const Spectrum &rc, const Fresnel *fresnel);
 
     void Shade(const SurfacePoint &sp, ShadingPoint *dst, AGZ::ObjArena<> &arena) const override;
 };

@@ -12,6 +12,9 @@ float ComputeFresnelDielectric(float etaI, float etaT, float cosThetaT);
 // 导体Fresnel反射比
 Spectrum ComputeFresnelConductor(const Spectrum &etaI, const Spectrum &etaT, const Spectrum &k, float cosThetaI);
 
+// Schlick公式
+float ComputeSchlickApproximation(float etaI, float etaT, float cosThetaI);
+
 class Fresnel
 {
 public:
@@ -21,21 +24,6 @@ public:
     virtual Spectrum Eval(float cosThetaI) const = 0;
 };
 
-class FresnelDielectric : public Fresnel
-{
-    float etaI, etaT;
-
-public:
-
-    FresnelDielectric(float etaI, float etaT);
-
-    Spectrum Eval(float cosThetaI) const override;
-
-    float GetEtaI() const { return etaI; }
-
-    float GetEtaT() const { return etaT; }
-};
-
 class FresnelConductor : public Fresnel
 {
     Spectrum etaI, etaT, k;
@@ -43,6 +31,39 @@ class FresnelConductor : public Fresnel
 public:
 
     FresnelConductor(const Spectrum &etaI, const Spectrum &etaT, const Spectrum &k);
+
+    Spectrum Eval(float cosThetaI) const override;
+};
+
+class Dielectric : public Fresnel
+{
+protected:
+
+    float etaI, etaT;
+
+public:
+
+    Dielectric(float etaI, float etaT) : etaI(etaI), etaT(etaT) { }
+
+    float GetEtaI() const { return etaI; }
+
+    float GetEtaT() const { return etaT; }
+};
+
+class FresnelDielectric : public Dielectric
+{
+public:
+
+    FresnelDielectric(float etaI, float etaT);
+
+    Spectrum Eval(float cosThetaI) const override;
+};
+
+class SchlickApproximation : public Dielectric
+{
+public:
+
+    SchlickApproximation(float etaI, float etaT);
 
     Spectrum Eval(float cosThetaI) const override;
 };

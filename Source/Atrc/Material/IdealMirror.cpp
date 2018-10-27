@@ -4,8 +4,8 @@
 
 AGZ_NS_BEG(Atrc)
 
-IdealMirror::IdealMirror(const Spectrum &rc, RC<const Fresnel> fresnel)
-    : rc_(rc), fresnel_(std::move(fresnel))
+IdealMirror::IdealMirror(const Spectrum &rc, const Fresnel *fresnel)
+    : rc_(rc), fresnel_(fresnel)
 {
 
 }
@@ -15,7 +15,7 @@ void IdealMirror::Shade(const SurfacePoint &sp, ShadingPoint *dst, AGZ::ObjArena
     AGZ_ASSERT(dst);
 
     auto bsdf = arena.Create<BxDFAggregate>(sp.geoLocal, sp.geoLocal);
-    bsdf->AddBxDF(arena.Create<PerfectSpecularReflection>(rc_, fresnel_.get()));
+    bsdf->AddBxDF(arena.Create<PerfectSpecularReflection>(rc_, fresnel_));
 
     dst->shdLocal = sp.geoLocal;
     dst->bsdf = bsdf;
