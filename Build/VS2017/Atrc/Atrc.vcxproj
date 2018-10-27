@@ -58,6 +58,7 @@
     <ClInclude Include="..\..\..\Source\Atrc\Material\BlackMaterial.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Material\FresnelSpecular.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Material\IdealMirror.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Material\MicrofacetDistribution\MicrofacetDistribution.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Material\TextureScaler.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Renderer\JitteredSubareaRenderer.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Renderer\SerialRenderer.h" />

@@ -77,6 +77,7 @@ inline bool IsNormalized(const Vec3 &v) { return AGZ::Math::ApproxEq(v.LengthSqu
 using AGZ::Math::Abs;
 using AGZ::Math::ApproxEq;
 using AGZ::Math::Clamp;
+using AGZ::Math::Exp;
 using AGZ::Math::Max;
 using AGZ::Math::Min;
 using AGZ::Math::Pow;
@@ -97,6 +98,15 @@ constexpr Real PI = AGZ::Math::PI<Real>;
 constexpr Real InvPI = AGZ::Math::InvPI<Real>;
 
 using AGZ::UNINITIALIZED;
+
+// ============================= 一些针对BSDF空间的辅助函数 =============================
+
+inline Real CosTheta(const Vec3 &w) { return w.z; }
+inline Real Cos2Theta(const Vec3 &w) { return w.z * w.z; }
+inline Real Sin2Theta(const Vec3 &w) { return Max(0.0, 1.0 - Cos2Theta(w)); }
+inline Real SinTheta(const Vec3 &w) { return Sqrt(Sin2Theta(w)); }
+inline Real CosPhi(const Vec3 &w) { Real s = SinTheta(w); return !s ? 1.0 : Clamp(w.x / s, -1.0, 1.0); }
+inline Real SinPhi(const Vec3 &w) { Real s = SinTheta(w); return !s ? 0.0 : Clamp(w.y / s, -1.0, 1.0); }
 
 // ============================= Spectrum =============================
 
