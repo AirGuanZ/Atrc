@@ -294,7 +294,7 @@ namespace
         TempNode **fillNode;
     };
 
-    constexpr uint32_t MAX_LEAF_SIZE = 12;
+    constexpr uint32_t MAX_LEAF_SIZE = 6;
 
     TempNode *BuildSingleNode(
         MappedTriangles &tris, AGZ::SmallObjArena<TempNode> &nodeArena,
@@ -348,6 +348,16 @@ namespace
             buckets[iBucket].bound.Expand(tri.centroid);
         }
 
+        AABB allBound;
+        for(auto i = start; i < end; ++i)
+        {
+            auto tri = tris.GetTriangleVertices(i);
+            allBound.Expand(tri[0].pos);
+            allBound.Expand(tri[1].pos);
+            allBound.Expand(tri[2].pos);
+        }
+        Real invAllBoundArea = 1 / allBound.SurfaceArea();
+
         Real cost[BUCKET_COUNT - 1];
         for(int splitPos = 0; splitPos < BUCKET_COUNT - 1; ++splitPos)
         {
@@ -366,7 +376,7 @@ namespace
                 bhigh = bhigh | buckets[i].bound;
             }
 
-            cost[splitPos] = clow * blow.SurfaceArea() + chigh * bhigh.SurfaceArea();
+            cost[splitPos] = 0.125 + invAllBoundArea * (clow * blow.SurfaceArea() + chigh * bhigh.SurfaceArea());
         }
 
         int splitPos = 0;
@@ -394,15 +404,6 @@ namespace
         {
             *nodeCount += 1;
             return FillLeaf(nodeArena.Alloc(), start, end);
-        }
-
-        AABB allBound;
-        for(auto i = start; i < end; ++i)
-        {
-            auto tri = tris.GetTriangleVertices(i);
-            allBound.Expand(tri[0].pos);
-            allBound.Expand(tri[1].pos);
-            allBound.Expand(tri[2].pos);
         }
 
         for(uint32_t i = 0; i < left.size(); ++i)

@@ -32,8 +32,8 @@ Texture2D<Color3b> ToSavedImage(const RenderTarget &origin, float gamma)
 
 int main()
 {
-    constexpr uint32_t SCR_W = 640;
-    constexpr uint32_t SCR_H = 480;
+    constexpr uint32_t SCR_W = 1200;
+    constexpr uint32_t SCR_H = 675;
     constexpr Real SCR_ASPECT_RATIO = static_cast<Real>(SCR_W) / SCR_H;
 
     //============= Camera =============
@@ -48,12 +48,18 @@ int main()
     DiffuseMaterial groundMat(Spectrum(0.4f, 0.8f, 0.4f));
     GeometricEntity ground(&sph, &groundMat);
 
+    Model::WavefrontObj medObj;
+    Model::WavefrontObjFile::LoadFromObjFile("./Assets/test.obj", &medObj);
+    auto medBVHCore = MakeRC<TriangleBVHCore>(medObj.ToGeometryMeshGroup().submeshes["Default"]);
+    medObj.Clear();
+    TriangleBVH medBVH(Transform::Translate(0.0, 0.25, -1.0) * Transform::RotateZ(Deg(-90)) * Transform::Scale(1.0 / 10000), medBVHCore);
+
     Sphere sph2(Transform::Translate(0.0, 0.0, 0.0), 1.0);
-    Plastic medPlastic(Spectrum(0.2f), Spectrum(0.1f), 0.02);
-    GeometricEntity medSph(&sph2, &medPlastic);
+    Metal medMat(Spectrum(0.9f, 0.4f, 0.2f), Spectrum(0.01f), Spectrum(0.1f), 0.02);
+    GeometricEntity medSph(&medBVH, &medMat);
 
     Sphere sph3(Transform::Translate(0.0, 2.0, -0.3), 0.7);
-    Metal leftMat(Spectrum(0.5f), Spectrum(0.1f), Spectrum(0.1f), 0.007);
+    Metal leftMat(Spectrum(0.5f), Spectrum(0.1f), Spectrum(0.1f), 0.003);
     GeometricEntity leftSph(&sph3, &leftMat);
 
     /*Model::WavefrontObj dragonObj;
@@ -82,7 +88,7 @@ int main()
     Model::WavefrontObjFile::LoadFromObjFile("./Assets/ring.obj", &ringObj);
     auto ringBVHCore = MakeRC<TriangleBVHCore>(ringObj.ToGeometryMeshGroup().submeshes["Default"]);
     ringObj.Clear();
-    TriangleBVH ringBVH(Transform::Translate(-2.0, 1.0, -0.2) * Transform::RotateY(Deg(-40.0)) * Transform::RotateX(Deg(80.0)) * Transform::Scale(1 / 4.0), ringBVHCore);
+    TriangleBVH ringBVH(Transform::Translate(-2.0, 1.0, -0.7) * Transform::RotateZ(Deg(90)) * Transform::Scale(1.0 / 6.0), ringBVHCore);
 
     //Sphere sph4(Transform::Translate(2.0, 1.0, 1.8), 0.4);
     Cube cubeL(Transform::Translate(2.0, 1.0, 1.8) * Transform::Rotate({ 1.0, 1.1, 1.2 }, Deg(47)), 0.7);
@@ -90,8 +96,8 @@ int main()
 
     Scene scene;
     scene.camera    = &camera;
-    scene.lights_   = { /*&sky*/ };
-    scene.entities_ = { &rightCube, &leftSph, &medSph, &ground, &sphLight };
+    scene.lights_   = { &sky };
+    scene.entities_ = { &rightCube, &leftSph, &medSph, &ground, /*&sphLight*/ };
 
     for(auto ent : scene.GetEntities())
     {
@@ -109,7 +115,7 @@ int main()
 
     //============= Renderer & Integrator =============
 
-    JitteredSubareaRenderer subareaRenderer(1000);
+    JitteredSubareaRenderer subareaRenderer(100);
 
     ParallelRenderer renderer(6);
     //SerialRenderer renderer;
