@@ -28,7 +28,7 @@ LightSampleToResult GeometricDiffuseLightImpl::SampleLi(const SurfacePoint &sp) 
 
 Real GeometricDiffuseLightImpl::SampleLiPDF(const Vec3 &pos, const SurfacePoint &dst, bool posOnLight) const
 {
-    return posOnLight ? geometry_->SamplePDF(pos) : 0.0;
+    return posOnLight ? geometry_->SamplePDF(pos, dst.pos) : 0.0;
 }
 
 bool GeometricDiffuseLightImpl::IsDeltaPosition() const

@@ -608,9 +608,12 @@ AABB TriangleBVH::WorldBound() const
 
 GeometrySampleResult TriangleBVH::Sample() const
 {
-    auto ret = core_->Sample();
-    ret.pdf = 1.0 / surfaceArea_;
-    return ret;
+    auto trt = core_->Sample();
+    return {
+        local2World_.ApplyToPoint(trt.pos),
+        local2World_.ApplyToNormal(trt.nor),
+        1 / surfaceArea_
+    };
 }
 
 Real TriangleBVH::SamplePDF(const Vec3 &pos) const

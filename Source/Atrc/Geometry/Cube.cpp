@@ -7,7 +7,7 @@ Cube::Cube(const Transform &local2World, Real sideLen)
 {
     AGZ_ASSERT(halfSideLen_ > 0.0);
     Real fac = local2World.ScaleFactor();
-    surfaceArea_ = 6.0 * 4.0 * (fac * fac) * (halfSideLen_ * halfSideLen_);;
+    surfaceArea_ = 6.0 * (fac * fac) * (sideLen * sideLen);
 }
 
 bool Cube::HasIntersection(const Ray &r) const
@@ -182,9 +182,9 @@ GeometrySampleResult Cube::Sample() const
 {
     int s = AGZ::Math::Random::Uniform(0, 5);
     int axis = s % 3;
-    bool neg = axis >= 3;
+    bool neg = s >= 3;
 
-    Vec3 nor(0.0), pos(0.0);
+    Vec3 nor(0.0), pos;
 
     nor[axis] = neg ? -1.0 : 1.0;
 

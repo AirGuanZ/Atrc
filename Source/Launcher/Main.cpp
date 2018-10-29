@@ -49,11 +49,11 @@ int main()
     GeometricEntity ground(&sph, &groundMat);
 
     Sphere sph2(Transform::Translate(0.0, 0.0, 0.0), 1.0);
-    Plastic medPlastic(Spectrum(0.2f), Spectrum(0.08f), 0.04);
+    Plastic medPlastic(Spectrum(0.2f), Spectrum(0.1f), 0.02);
     GeometricEntity medSph(&sph2, &medPlastic);
 
     Sphere sph3(Transform::Translate(0.0, 2.0, -0.3), 0.7);
-    DiffuseMaterial leftMat(Spectrum(0.5f));
+    Metal leftMat(Spectrum(0.5f), Spectrum(0.1f), Spectrum(0.1f), 0.007);
     GeometricEntity leftSph(&sph3, &leftMat);
 
     /*Model::WavefrontObj dragonObj;
@@ -77,8 +77,16 @@ int main()
     GeometricEntity rightCube(&cube, &cubeMat);
 
     SkyLight sky(Spectrum(0.4f, 0.7f, 0.9f), Spectrum(1.0f));
-    Sphere sph4(Transform::Translate(2.0, 1.0, 1.8), 0.4);
-    GeometricDiffuseLight sphLight(&sph4, Spectrum(8.0f));
+
+    Model::WavefrontObj ringObj;
+    Model::WavefrontObjFile::LoadFromObjFile("./Assets/ring.obj", &ringObj);
+    auto ringBVHCore = MakeRC<TriangleBVHCore>(ringObj.ToGeometryMeshGroup().submeshes["Default"]);
+    ringObj.Clear();
+    TriangleBVH ringBVH(Transform::Translate(-2.0, 1.0, -0.2) * Transform::RotateY(Deg(-40.0)) * Transform::RotateX(Deg(80.0)) * Transform::Scale(1 / 4.0), ringBVHCore);
+
+    //Sphere sph4(Transform::Translate(2.0, 1.0, 1.8), 0.4);
+    Cube cubeL(Transform::Translate(2.0, 1.0, 1.8) * Transform::Rotate({ 1.0, 1.1, 1.2 }, Deg(47)), 0.7);
+    GeometricDiffuseLight sphLight(&ringBVH, Spectrum(8.0f));
 
     Scene scene;
     scene.camera    = &camera;
@@ -101,7 +109,7 @@ int main()
 
     //============= Renderer & Integrator =============
 
-    JitteredSubareaRenderer subareaRenderer(200);
+    JitteredSubareaRenderer subareaRenderer(1000);
 
     ParallelRenderer renderer(6);
     //SerialRenderer renderer;
