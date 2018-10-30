@@ -23,6 +23,8 @@
 #include <Atrc/Light/GeometricDiffuseLightImpl.h>
 #include <Atrc/Light/SkyLight.h>
 
+#include <Atrc/Manager/MaterialManager.h>
+
 #include <Atrc/Integrator/PathTracer.h>
 #include <Atrc/Integrator/PureColorIntegrator.h>
 
