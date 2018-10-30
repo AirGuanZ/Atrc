@@ -42,3 +42,7 @@ wi和wo混乱不堪，面对非对称BSDF太烧脑
 ## 2018.10.22
 
 刚开始写材质系统，完成了BxDFAggregate，DiffuseBRDF和PerfectSpecularReflection
+
+## 2018.10.30
+
+居然好几天忘了写日志。这几天主要完成了Cube类型的Geometry Object，三角形网格的BVH树，OBJ文件解析以及Torrance-Sparrow反射模型，添加了塑料、金属之类的材质。哦对，还支持了纹理，包括nearest和bilinear采样，Mipmap就先不管了。
