@@ -98,7 +98,7 @@ public:
         workerCount_ = (std::max)(1, workerCount) - 1;
     }
 
-    void SetProgressPrinting(bool print)
+    void EnableProgressPrinting(bool print)
     {
         printProgress_ = print;
     }

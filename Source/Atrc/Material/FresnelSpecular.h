@@ -12,8 +12,6 @@ class FresnelSpecular : public Material
 
 public:
 
-    Material *Clone(const SceneParamGroup &group, AGZ::ObjArena<> &arena) const override;
-
     FresnelSpecular(const Spectrum &rc, const Dielectric *fresnel);
 
     void Shade(const SurfacePoint &sp, ShadingPoint *dst, AGZ::ObjArena<> &arena) const override;

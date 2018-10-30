@@ -12,11 +12,6 @@ FresnelSpecular::FresnelSpecular(const Spectrum &rc, const Dielectric *fresnel)
     AGZ_ASSERT(fresnel_);
 }
 
-Material *FresnelSpecular::Clone(const SceneParamGroup &group, AGZ::ObjArena<> &arena) const
-{
-    return arena.Create<FresnelSpecular>(rc_, fresnel_);
-}
-
 void FresnelSpecular::Shade(const SurfacePoint &sp, ShadingPoint *dst, AGZ::ObjArena<> &arena) const
 {
     AGZ_ASSERT(dst);

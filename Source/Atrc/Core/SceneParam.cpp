@@ -1,4 +1,5 @@
 #include <Atrc/Core/SceneParam.h>
+#include <Atrc/Utility/ParamParser.h>
 
 AGZ_NS_BEG(Atrc)
 
@@ -39,6 +40,26 @@ const SceneParamGroup &SceneParamGroup::GetGroup(const Str8 &k) const
     if(!it->second.second.has_value())
         throw SceneParamException_KeyNotFound(("Key with wrong type: " + k).ToStdString());
     return *it->second.second;
+}
+
+float SceneParamGroup::GetFloat(const Str8 &k) const
+{
+    return ParamParser::ParseFloat(GetValue(k));
+}
+
+Real SceneParamGroup::GetReal(const Str8 &k) const
+{
+    return ParamParser::ParseReal(GetValue(k));
+}
+
+Spectrum SceneParamGroup::GetSpectrum(const Str8 &k) const
+{
+    return ParamParser::ParseRGB(GetValue(k));
+}
+
+Vec3 SceneParamGroup::GetVec3(const Str8 &k) const
+{
+    return ParamParser::ParseVec3(GetValue(k));
 }
 
 AGZ_NS_END(Atrc)

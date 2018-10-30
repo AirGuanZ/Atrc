@@ -11,5 +11,6 @@
 #include <Atrc/Core/Ray.h>
 #include <Atrc/Core/Renderer.h>
 #include <Atrc/Core/Scene.h>
+#include <Atrc/Core/SceneParam.h>
 #include <Atrc/Core/SurfacePoint.h>
 #include <Atrc/Core/Transform.h>

@@ -17,7 +17,7 @@ public:
         
     }
 
-    void SetProgressPrinting(bool print)
+    void EnableProgressPrinting(bool print)
     {
         printProgress_ = print;
     }

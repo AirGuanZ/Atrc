@@ -2,6 +2,30 @@
 
 AGZ_NS_BEG(Atrc)
 
+float ParamParser::ParseFloat(const StrView8 &s)
+{
+    try
+    {
+        return s.Parse<float>();
+    }
+    catch(...)
+    {
+        throw ParamParser_SyntaxError("Syntax error in float number");
+    }
+}
+
+Real ParamParser::ParseReal(const StrView8 &s)
+{
+    try
+    {
+        return s.Parse<Real>();
+    }
+    catch(...)
+    {
+        throw ParamParser_SyntaxError("Syntax error in real number");
+    }
+}
+
 Spectrum ParamParser::ParseRGB3f(const StrView8 &s)
 {
     static thread_local AGZ::Regex8 reg(R"___(\(\s*&@{!,}+&\s*,\s*&@{!,}+&\s*,\s*&@{!,}+&\s*\))___");

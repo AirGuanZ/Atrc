@@ -68,4 +68,11 @@ public:
     Spectrum Eval(float cosThetaI) const override;
 };
 
+FresnelConductor     *CreateFresnelConductor    (const SceneParamGroup &params, AGZ::ObjArena<> &arena);
+FresnelDielectric    *CreateFresnelDielectric   (const SceneParamGroup &params, AGZ::ObjArena<> &arena);
+SchlickApproximation *CreateSchlickApproximation(const SceneParamGroup &params, AGZ::ObjArena<> &arena);
+
+Fresnel    *CreateFresnel(const SceneParamGroup &params, AGZ::ObjArena<> &arena);
+Dielectric *CreateDielectric(const SceneParamGroup &params, AGZ::ObjArena<> &arena);
+
 AGZ_NS_END(Atrc)

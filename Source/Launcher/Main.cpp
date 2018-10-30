@@ -124,11 +124,11 @@ int main()
 
     //============= Renderer & Integrator =============
 
-    JitteredSubareaRenderer subareaRenderer(1);
+    JitteredSubareaRenderer subareaRenderer(100);
 
     ParallelRenderer renderer(6);
     //SerialRenderer renderer;
-    renderer.SetProgressPrinting(true);
+    renderer.EnableProgressPrinting(true);
 
     //PureColorIntegrator integrator(SPECTRUM::BLACK, SPECTRUM::WHITE);
     PathTracer integrator(10);

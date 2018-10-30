@@ -11,12 +11,6 @@ DiffuseMaterial::DiffuseMaterial(const Spectrum &albedo)
 
 }
 
-Material *DiffuseMaterial::Clone(const SceneParamGroup &group, AGZ::ObjArena<> &arena) const
-{
-    auto albedo = ParamParser::ParseRGB(group.GetValue("Albedo"));
-    return arena.Create<DiffuseMaterial>(albedo);
-}
-
 void DiffuseMaterial::Shade(const SurfacePoint &sp, ShadingPoint *dst, AGZ::ObjArena<> &arena) const
 {
     AGZ_ASSERT(dst);

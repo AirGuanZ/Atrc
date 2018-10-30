@@ -26,6 +26,14 @@ public:
     const Str8 &GetValue(const Str8 &k) const;
 
     const SceneParamGroup &GetGroup(const Str8 &k) const;
+
+    float GetFloat(const Str8 &k) const;
+
+    Real GetReal(const Str8 &k) const;
+
+    Spectrum GetSpectrum(const Str8 &k) const;
+
+    Vec3 GetVec3(const Str8 &k) const;
 };
 
 AGZ_NS_END(Atrc)

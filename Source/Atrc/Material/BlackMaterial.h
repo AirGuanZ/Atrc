@@ -8,8 +8,6 @@ class BlackMaterial : public Material
 {
 public:
 
-    Material *Clone(const SceneParamGroup &group, AGZ::ObjArena<> &arena) const override;
-
     void Shade(const SurfacePoint &sp, ShadingPoint *dst, AGZ::ObjArena<> &arena) const override;
 };
 

@@ -1,4 +1,5 @@
 #include <Atrc/Material/Fresnel.h>
+#include <Atrc/Utility/ParamParser.h>
 
 AGZ_NS_BEG(Atrc)
 
@@ -95,6 +96,50 @@ SchlickApproximation::SchlickApproximation(float etaI, float etaT)
 Spectrum SchlickApproximation::Eval(float cosThetaI) const
 {
     return Spectrum(ComputeSchlickApproximation(etaI, etaT, cosThetaI));
+}
+
+FresnelConductor *CreateFresnelConductor(const SceneParamGroup &params, AGZ::ObjArena<> &arena)
+{
+    Spectrum etaI = params.GetSpectrum("etaI");
+    Spectrum etaT = params.GetSpectrum("etaT");
+    Spectrum k    = params.GetSpectrum("k");
+    return arena.Create<FresnelConductor>(etaI, etaT, k);
+}
+
+FresnelDielectric *CreateFresnelDielectric(const SceneParamGroup &params, AGZ::ObjArena<> &arena)
+{
+    float etaI = params.GetFloat("etaI");
+    float etaT = params.GetFloat("etaT");
+    return arena.Create<FresnelDielectric>(etaI, etaT);
+}
+
+SchlickApproximation *CreateSchlickApproximation(const SceneParamGroup &params, AGZ::ObjArena<> &arena)
+{
+    float etaI = params.GetFloat("etaI");
+    float etaT = params.GetFloat("etaT");
+    return arena.Create<SchlickApproximation>(etaI, etaT);
+}
+
+Fresnel *CreateFresnel(const SceneParamGroup &params, AGZ::ObjArena<> &arena)
+{
+    auto &s = params.GetValue("Fresnel");
+    if(s == "FresnelConductor")
+        return CreateFresnelConductor(params.GetGroup(s), arena);
+    if(s == "FresnelDielectric")
+        return CreateFresnelDielectric(params.GetGroup(s), arena);
+    if(s == "SchlickApproximation")
+        return CreateSchlickApproximation(params.GetGroup(s), arena);
+    throw ArgumentException(("Unknown Fresnel type: " + s).ToStdString());
+}
+
+Dielectric *CreateDielectric(const SceneParamGroup &params, AGZ::ObjArena<> &arena)
+{
+    auto &s = params.GetValue("Dielectric");
+    if(s == "FresnelDielectric")
+        return CreateFresnelDielectric(params.GetGroup(s), arena);
+    if(s == "SchlickApproximation")
+        return CreateSchlickApproximation(params.GetGroup(s), arena);
+    throw ArgumentException(("Unknown Dielectric type: " + s).ToStdString());
 }
 
 AGZ_NS_END(Atrc)

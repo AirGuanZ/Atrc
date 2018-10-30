@@ -10,6 +10,10 @@ class ParamParser
 {
 public:
 
+    static float ParseFloat(const StrView8 &s);
+
+    static Real ParseReal(const StrView8 &s);
+
     // "(0.6, 0.8, 0.1)" => Spectrum(0.6f, 0.8f, 0.1f)
     static Spectrum ParseRGB3f(const StrView8 &s);
 
