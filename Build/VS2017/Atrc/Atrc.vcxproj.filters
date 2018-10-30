@@ -34,6 +34,12 @@
     <Filter Include="Accelarator">
       <UniqueIdentifier>{05c93d2d-c916-4044-9cee-e0fd2ddd1fe3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Manager">
+      <UniqueIdentifier>{59736344-4834-49c2-b4ad-6b0aed353dbc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utility">
+      <UniqueIdentifier>{2ef414f3-3594-49ef-a4e7-16aafa293abc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Source\Atrc\Atrc.h" />
@@ -181,6 +187,15 @@
     <ClInclude Include="..\..\..\Source\Atrc\Material\UncallableMaterial.h">
       <Filter>Material</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Manager\MaterialManager.h">
+      <Filter>Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Utility\ParamParser.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Core\SceneParam.h">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\Atrc\Core\Geometry.cpp">
@@ -278,6 +293,15 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Source\Atrc\Accelarator\BVH.cpp">
       <Filter>Accelarator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Core\Material.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Core\SceneParam.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Utility\ParamParser.cpp">
+      <Filter>Utility</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

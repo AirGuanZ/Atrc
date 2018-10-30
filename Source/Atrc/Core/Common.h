@@ -47,9 +47,8 @@ public:
     }
 
 DEFINE_ATRC_EXCEPTION(ArgumentException);
+DEFINE_ATRC_EXCEPTION(UnimplementedMethod);
 DEFINE_ATRC_EXCEPTION(UnreachableException);
-
-#undef DEFINE_ATRC_EXCEPTION
 
 // ============================= Atrc::Math =============================
 
@@ -99,6 +98,11 @@ constexpr Real PI = AGZ::Math::PI<Real>;
 constexpr Real InvPI = AGZ::Math::InvPI<Real>;
 
 using AGZ::UNINITIALIZED;
+
+// ============================= Atrc::String =============================
+
+using AGZ::Str8;
+using AGZ::StrView8;
 
 // ============================= 一些针对BSDF空间的辅助函数 =============================
 

@@ -31,6 +31,8 @@
 #include <Atrc/Renderer/ParallelRenderer.h>
 #include <Atrc/Renderer/SerialRenderer.h>
 
+#include <Atrc/Utility/ParamParser.h>
+
 AGZ_NS_BEG(Atrc)
 
 using GeometricDiffuseLight = GeometricLightEntity<GeometricDiffuseLightImpl>;

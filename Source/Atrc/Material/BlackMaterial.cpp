@@ -36,6 +36,11 @@ namespace
     };
 }
 
+Material *BlackMaterial::Clone(const SceneParamGroup &group, AGZ::ObjArena<> &arena) const
+{
+    return arena.Create<BlackMaterial>();
+}
+
 void BlackMaterial::Shade(const SurfacePoint &sp, ShadingPoint *dst, AGZ::ObjArena<> &arena) const
 {
     AGZ_ASSERT(dst);

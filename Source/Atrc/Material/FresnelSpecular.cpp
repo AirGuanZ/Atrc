@@ -7,9 +7,14 @@
 AGZ_NS_BEG(Atrc)
 
 FresnelSpecular::FresnelSpecular(const Spectrum &rc, const Dielectric *fresnel)
-    : rc_(rc), fresnel_(std::move(fresnel))
+    : rc_(rc), fresnel_(fresnel)
 {
     AGZ_ASSERT(fresnel_);
+}
+
+Material *FresnelSpecular::Clone(const SceneParamGroup &group, AGZ::ObjArena<> &arena) const
+{
+    return arena.Create<FresnelSpecular>(rc_, fresnel_);
 }
 
 void FresnelSpecular::Shade(const SurfacePoint &sp, ShadingPoint *dst, AGZ::ObjArena<> &arena) const

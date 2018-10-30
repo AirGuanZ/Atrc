@@ -35,6 +35,7 @@
     <ClInclude Include="..\..\..\Source\Atrc\Core\Ray.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Core\Renderer.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Core\Scene.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Core\SceneParam.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Core\SurfacePoint.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Core\Transform.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Entity\GeometricEntity.h" />
@@ -47,6 +48,7 @@
     <ClInclude Include="..\..\..\Source\Atrc\Light\DirectionalLight.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Light\GeometricDiffuseLightImpl.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Light\SkyLight.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Manager\MaterialManager.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Material\BxDFAggregate.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Material\BxDF\BxDF.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Material\BxDF\BxDFScaler.h" />
@@ -67,6 +69,7 @@
     <ClInclude Include="..\..\..\Source\Atrc\Material\UncallableMaterial.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Renderer\JitteredSubareaRenderer.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Renderer\SerialRenderer.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Utility\ParamParser.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\Atrc\Accelarator\BVH.cpp" />
@@ -75,7 +78,9 @@
     <ClCompile Include="..\..\..\Source\Atrc\Core\Entity.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Core\Geometry.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Core\Light.cpp" />
+    <ClCompile Include="..\..\..\Source\Atrc\Core\Material.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Core\Scene.cpp" />
+    <ClCompile Include="..\..\..\Source\Atrc\Core\SceneParam.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Entity\GeometricEntity.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Geometry\Cube.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Geometry\Sphere.cpp" />
@@ -101,6 +106,7 @@
     <ClCompile Include="..\..\..\Source\Atrc\Material\Metal.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Material\Plastic.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Renderer\JitteredSubareaRenderer.cpp" />
+    <ClCompile Include="..\..\..\Source\Atrc\Utility\ParamParser.cpp" />
     <ClInclude Include="..\..\..\Source\Atrc\Renderer\ParallelRenderer.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
