@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\Source\Atrc\Accelarator\BVH.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Atrc.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Camera\PerspectiveCamera.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Core\AABB.h" />
@@ -63,10 +64,12 @@
     <ClInclude Include="..\..\..\Source\Atrc\Material\Metal.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Material\Plastic.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Material\TextureScaler.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Material\UncallableMaterial.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Renderer\JitteredSubareaRenderer.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Renderer\SerialRenderer.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\Source\Atrc\Accelarator\BVH.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Camera\PerspectiveCamera.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Core\Common.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Core\Entity.cpp" />

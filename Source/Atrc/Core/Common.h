@@ -47,6 +47,7 @@ public:
     }
 
 DEFINE_ATRC_EXCEPTION(ArgumentException);
+DEFINE_ATRC_EXCEPTION(UnreachableException);
 
 #undef DEFINE_ATRC_EXCEPTION
 

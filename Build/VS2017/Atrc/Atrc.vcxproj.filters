@@ -31,6 +31,9 @@
     <Filter Include="Material\BxDF\TorranceSparrow">
       <UniqueIdentifier>{5a7d997d-e0a2-462b-bd7d-335517bec2fd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Accelarator">
+      <UniqueIdentifier>{05c93d2d-c916-4044-9cee-e0fd2ddd1fe3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Source\Atrc\Atrc.h" />
@@ -172,6 +175,12 @@
     <ClInclude Include="..\..\..\Source\Atrc\Material\Metal.h">
       <Filter>Material</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Accelarator\BVH.h">
+      <Filter>Accelarator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Material\UncallableMaterial.h">
+      <Filter>Material</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\Atrc\Core\Geometry.cpp">
@@ -266,6 +275,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Source\Atrc\Material\Metal.cpp">
       <Filter>Material</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Accelarator\BVH.cpp">
+      <Filter>Accelarator</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

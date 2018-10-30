@@ -3,6 +3,10 @@
 #include <Atrc/Atrc.h>
 #include <Utils.h>
 
+#if defined(_MSC_VER) && defined(_DEBUG)
+#include <crtdbg.h>
+#endif
+
 using namespace AGZ;
 using namespace Atrc;
 using namespace std;
@@ -32,6 +36,11 @@ Texture2D<Color3b> ToSavedImage(const RenderTarget &origin, float gamma)
 
 int main()
 {
+#if defined(_WIN32) && defined(_DEBUG)
+    _CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG)
+                 | _CRTDBG_LEAK_CHECK_DF);
+#endif
+
     constexpr uint32_t SCR_W = 1200;
     constexpr uint32_t SCR_H = 675;
     constexpr Real SCR_ASPECT_RATIO = static_cast<Real>(SCR_W) / SCR_H;
@@ -115,7 +124,7 @@ int main()
 
     //============= Renderer & Integrator =============
 
-    JitteredSubareaRenderer subareaRenderer(100);
+    JitteredSubareaRenderer subareaRenderer(1);
 
     ParallelRenderer renderer(6);
     //SerialRenderer renderer;

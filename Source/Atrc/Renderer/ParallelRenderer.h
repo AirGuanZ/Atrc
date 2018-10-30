@@ -35,33 +35,56 @@ class ParallelRenderer : public Renderer
 
     static void Worker(Param &param)
     {
-        for(;;)
+        try
         {
-            bool done = true;
-            SubareaRect area = { 0, 0, 0, 0 };
-
+            for(;;)
             {
-                std::lock_guard<std::mutex> lk(*param.mut);
-                if(!param.tasks->empty())
+                bool done = true;
+                SubareaRect area = { 0, 0, 0, 0 };
+
                 {
-                    area = param.tasks->front();
-                    param.tasks->pop();
-                    done = false;
+                    std::lock_guard<std::mutex> lk(*param.mut);
+                    if(!param.tasks->empty())
+                    {
+                        area = param.tasks->front();
+                        param.tasks->pop();
+                        done = false;
+                    }
+                }
+
+                if(done)
+                    break;
+
+                param.subareaRenderer->Render(
+                    *param.scene, *param.integrator, *param.output, area);
+                if(param.outMut)
+                {
+                    std::lock_guard<std::mutex> lk2(*param.outMut);
+                    float percent = 100.0f * (++param.finishedCount) / param.taskCount;
+                    std::printf("\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b"
+                                "Progress: %5.2f%%  ", percent);
                 }
             }
-
-            if(done)
-                break;
-
-            param.subareaRenderer->Render(
-                *param.scene, *param.integrator, *param.output, area);
+        }
+        catch(const std::exception &err)
+        {
             if(param.outMut)
             {
-                std::lock_guard<std::mutex> lk2(*param.outMut);
-                float percent = 100.0f * (++param.finishedCount) / param.taskCount;
+                std::lock_guard<std::mutex> lk(*param.outMut);
                 std::printf("\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b"
-                            "Progress: %5.2f%%  ", percent);
+                            "Exception in subrendering thread: %s\n", err.what());
             }
+            std::terminate();
+        }
+        catch(...)
+        {
+            if(param.outMut)
+            {
+                std::lock_guard<std::mutex> lk(*param.outMut);
+                std::printf("\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b"
+                            "Unknown exception in subrendering thread\n");
+            }
+            std::terminate();
         }
     }
 
@@ -115,6 +138,9 @@ public:
 
         for(auto &worker : workers)
             worker.join();
+
+        if(!tasks.empty())
+            printf("Some error occurred...\n");
 
         if(printProgress_)
             std::cout << std::endl;

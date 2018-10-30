@@ -1,7 +1,8 @@
 #pragma once
 
-#include <Atrc/Camera/PerspectiveCamera.h>
+#include <Atrc/Accelarator/BVH.h>
 
+#include <Atrc/Camera/PerspectiveCamera.h>
 #include <Atrc/Entity/GeometricEntity.h>
 #include <Atrc/Entity/GeometricLightEntity.h>
 
@@ -16,6 +17,7 @@
 #include <Atrc/Material/Metal.h>
 #include <Atrc/Material/Plastic.h>
 #include <Atrc/Material/TextureScaler.h>
+#include <Atrc/Material/UncallableMaterial.h>
 
 #include <Atrc/Light/DirectionalLight.h>
 #include <Atrc/Light/GeometricDiffuseLightImpl.h>
