@@ -50,8 +50,6 @@ private:
 
     std::vector<const Entity*> entities_;
     std::vector<Node> nodes_;
-
-    AABB worldBound_;
 };
 
 AGZ_NS_END(Atrc)

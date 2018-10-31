@@ -103,17 +103,21 @@ int main()
     Cube cubeL(Transform::Translate(2.0, 1.0, 1.8) * Transform::Rotate({ 1.0, 1.1, 1.2 }, Deg(47)), 0.7);
     GeometricDiffuseLight sphLight(&ringBVH, Spectrum(8.0f));
 
+    std::vector<const Entity*> entities = { &rightCube, &leftSph, &medSph, &ground, /*&sphLight*/ };
+
     Scene scene;
     scene.camera    = &camera;
     scene.lights_   = { &sky };
-    scene.entities_ = { &rightCube, &leftSph, &medSph, &ground, /*&sphLight*/ };
 
-    for(auto ent : scene.GetEntities())
+    for(auto ent : entities)
     {
         auto L = ent->AsLight();
         if(L)
             scene.lights_.push_back(L);
     }
+
+    BVH bvh(entities);
+    scene.entities_ =  { &bvh };
 
     sky.PreprocessScene(scene);
     sphLight.AsLight()->PreprocessScene(scene);

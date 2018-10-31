@@ -35,14 +35,4 @@ const Material *GeometricEntity::GetMaterial(const SurfacePoint &sp) const
     return material_;
 }
 
-const Light *GeometricEntity::AsLight() const
-{
-    return nullptr;
-}
-
-Light* GeometricEntity::AsLight()
-{
-    return nullptr;
-}
-
 AGZ_NS_END(Atrc)
