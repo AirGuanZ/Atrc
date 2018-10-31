@@ -271,7 +271,7 @@ namespace
 
         MappedTriangles(
             const TriangleBVHCore::Vertex *vertices, const std::vector<TriangleInfo> &triInfo,
-            std::vector<size_t> &triIdxMap)
+            std::vector<uint32_t> &triIdxMap)
             : vertices(vertices), triInfo(triInfo), triIdxMap(triIdxMap)
         {
 
