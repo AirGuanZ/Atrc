@@ -124,7 +124,7 @@ int main()
 
     //============= Renderer & Integrator =============
 
-    JitteredSubareaRenderer subareaRenderer(100);
+    JitteredSubareaRenderer subareaRenderer(10);
 
     ParallelRenderer renderer(6);
     //SerialRenderer renderer;

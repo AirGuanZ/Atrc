@@ -226,7 +226,6 @@ namespace
 
     struct TempNode
     {
-        TempNode() { }
         bool isLeaf;
         union
         {
@@ -404,7 +403,7 @@ namespace
         if(splitIdx == start || splitIdx == end)
         {
             *nodeCount += 1;
-            return FillLeaf(nodeArena.Create<TempNode>(), start, end);
+            return FillLeaf(nodeArena.Alloc(), start, end);
         }
 
         for(uint32_t i = 0; i < left.size(); ++i)
@@ -412,7 +411,7 @@ namespace
         for(uint32_t i = 0; i < right.size(); ++i)
             tris.triIdxMap[splitIdx + i] = right[i];
 
-        TempNode *ret = nodeArena.Create<TempNode>();
+        TempNode *ret = nodeArena.Alloc();
         ret->isLeaf = false;
         ret->internal.bound = allBound;
 
@@ -424,7 +423,7 @@ namespace
     }
 
     TempNode *BuildBVH(
-        MappedTriangles &tris, AGZ::ObjArena<> &nodeArena,
+        MappedTriangles &tris, AGZ::SmallObjArena<TempNode> &nodeArena,
         uint32_t start, uint32_t end, size_t *nodeCount)
     {
         *nodeCount = 0;
@@ -449,7 +448,7 @@ namespace
         std::vector<TriangleBVHCore::InternalTriangle> &tris,
         const TriangleBVHCore::Vertex *vertices,
         const TempNode *tree, const std::vector<uint32_t> &triIdxMap,
-        AGZ::ObjArena<> &boundArena)
+        AGZ::SmallObjArena<AABB> &boundArena)
     {
         if(tree->isLeaf)
         {
@@ -475,7 +474,7 @@ namespace
         }
         else
         {
-            auto pBound = boundArena.Create<AABB>();
+            auto pBound = boundArena.Alloc();
             *pBound = tree->internal.bound;
 
             TriangleBVHCore::Node node;
@@ -516,7 +515,7 @@ void TriangleBVHCore::InitBVH(const Vertex *vertices, uint32_t triangleCount)
         triIdxMap[i] = i;
     }
 
-    AGZ::ObjArena<> nodeArena;
+    AGZ::SmallObjArena<TempNode> nodeArena;
     size_t nodeCount = 0;
     MappedTriangles tris(vertices, triInfo, triIdxMap);
 

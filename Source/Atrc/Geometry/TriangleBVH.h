@@ -64,7 +64,7 @@ private:
     void InitBVH(const Vertex *vertices, uint32_t triangleCount);
 
     // 申请Bound用的arena
-    AGZ::SmallObjArena<AABB> boundArena_;
+    AGZ::ObjArena<> boundArena_;
 
     // triangles_中面积的前缀和，用来二分查找以进行全体三角形上的面积均匀采样
     std::vector<Real> areaPrefixSum_;

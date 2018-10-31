@@ -46,7 +46,7 @@ private:
     // Ìî³äentities_ºÍnodes_
     void InitBVH(const ConstEntityPtr *entities, uint32_t nEntity);
 
-    AGZ::SmallObjArena<AABB> boundArena_;
+    AGZ::ObjArena<> boundArena_;
 
     std::vector<const Entity*> entities_;
     std::vector<Node> nodes_;
