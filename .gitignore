@@ -5,3 +5,5 @@ Diary/
 *.dtmp
 Build/Launcher
 Build/Test01_SSBScene
+
+*.TMP

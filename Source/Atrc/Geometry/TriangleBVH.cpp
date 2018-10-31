@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <queue>
+#include <stack>
 #include <vector>
 
 #include <Atrc/Geometry/TriangleBVH.h>
@@ -444,7 +445,7 @@ namespace
         return ret;
     }
 
-    void CompactBVHIntoArray(
+    /*void CompactBVHIntoArray(
         std::vector<TriangleBVHCore::Node> &nodes,
         std::vector<TriangleBVHCore::InternalTriangle> &tris,
         const TriangleBVHCore::Vertex *vertices,
@@ -492,6 +493,72 @@ namespace
             nodes[nodeIdx].internal.rightChild = static_cast<uint32_t>(nodes.size());
             CompactBVHIntoArray(
                 nodes, tris, vertices, tree->internal.right, triIdxMap, boundArena);
+        }
+    }*/
+
+    struct CompactTask
+    {
+        const TempNode *tree;
+        uint32_t *fillNodeIdx;
+    };
+
+    void CompactBVHIntoArray(
+        std::vector<TriangleBVHCore::Node> &nodes,
+        std::vector<TriangleBVHCore::InternalTriangle> &tris,
+        const TriangleBVHCore::Vertex *vertices,
+        const TempNode *root, const std::vector<uint32_t> &triIdxMap,
+        AGZ::ObjArena<> &boundArena)
+    {
+        std::stack<CompactTask> tasks;
+        tasks.push({ root, nullptr });
+
+        while(!tasks.empty())
+        {
+            auto task = tasks.top();
+            tasks.pop();
+            auto tree = task.tree;
+
+            if(task.fillNodeIdx)
+                *task.fillNodeIdx = static_cast<uint32_t>(nodes.size());
+
+            if(tree->isLeaf)
+            {
+                TriangleBVHCore::Node node;
+                node.isLeaf = true;
+                node.leaf.start = static_cast<uint32_t>(tris.size());
+                node.leaf.end = node.leaf.start + tree->leaf.end - tree->leaf.start;
+                nodes.push_back(node);
+
+                for(uint32_t i = tree->leaf.start; i < tree->leaf.end; ++i)
+                {
+                    auto *tri = &vertices[3 * triIdxMap[i]];
+                    TriangleBVHCore::InternalTriangle intTri;
+                    intTri.A = tri[0].pos;
+                    intTri.B_A = tri[1].pos - tri[0].pos;
+                    intTri.C_A = tri[2].pos - tri[0].pos;
+                    intTri.nor = tri[0].nor;
+                    intTri.tA = tri[0].uv;
+                    intTri.tB_tA = tri[1].uv - tri[0].uv;
+                    intTri.tC_tA = tri[2].uv - tri[0].uv;
+                    tris.push_back(intTri);
+                }
+            }
+            else
+            {
+                auto pBound = boundArena.Create<AABB>();
+                *pBound = tree->internal.bound;
+
+                TriangleBVHCore::Node node;
+                node.isLeaf = false;
+                node.internal.bound = pBound;
+                node.internal.rightChild = 0;
+
+                size_t nodeIdx = nodes.size();
+                nodes.push_back(node);
+
+                tasks.push({ tree->internal.right, &nodes[nodeIdx].internal.rightChild });
+                tasks.push({ tree->internal.left, nullptr });
+            }
         }
     }
 }
