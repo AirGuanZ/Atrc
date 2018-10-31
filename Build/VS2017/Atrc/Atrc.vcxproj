@@ -35,7 +35,6 @@
     <ClInclude Include="..\..\..\Source\Atrc\Core\Ray.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Core\Renderer.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Core\Scene.h" />
-    <ClInclude Include="..\..\..\Source\Atrc\Core\SceneParam.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Core\SurfacePoint.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Core\Transform.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Entity\GeometricEntity.h" />
@@ -49,6 +48,7 @@
     <ClInclude Include="..\..\..\Source\Atrc\Light\GeometricDiffuseLightImpl.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Light\SkyLight.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Manager\MaterialManager.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Manager\SceneParam.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Material\BxDFAggregate.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Material\BxDF\BxDF.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Material\BxDF\BxDFScaler.h" />
@@ -80,7 +80,6 @@
     <ClCompile Include="..\..\..\Source\Atrc\Core\Light.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Core\Material.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Core\Scene.cpp" />
-    <ClCompile Include="..\..\..\Source\Atrc\Core\SceneParam.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Entity\GeometricEntity.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Geometry\Cube.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Geometry\Sphere.cpp" />
@@ -91,6 +90,7 @@
     <ClCompile Include="..\..\..\Source\Atrc\Light\GeometricDiffuseLightImpl.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Light\SkyLight.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Manager\MaterialManager.cpp" />
+    <ClCompile Include="..\..\..\Source\Atrc\Manager\SceneParam.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Material\BlackMaterial.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Material\BxDFAggregate.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Material\BxDF\BxDFScaler.cpp" />

@@ -1,4 +1,4 @@
-#include <Atrc/Core/SceneParam.h>
+#include <Atrc/Manager/SceneParam.h>
 #include <Atrc/Utility/ParamParser.h>
 
 AGZ_NS_BEG(Atrc)

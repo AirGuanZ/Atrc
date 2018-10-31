@@ -2,7 +2,7 @@
 
 #include <map>
 
-#include <Atrc/Core/Common.h>
+#include <Atrc/Core/Core.h>
 
 AGZ_NS_BEG(Atrc)
 

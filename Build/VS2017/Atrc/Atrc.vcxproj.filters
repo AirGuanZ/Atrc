@@ -193,8 +193,8 @@
     <ClInclude Include="..\..\..\Source\Atrc\Utility\ParamParser.h">
       <Filter>Utility</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\Atrc\Core\SceneParam.h">
-      <Filter>Core</Filter>
+    <ClInclude Include="..\..\..\Source\Atrc\Manager\SceneParam.h">
+      <Filter>Manager</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -297,13 +297,13 @@
     <ClCompile Include="..\..\..\Source\Atrc\Core\Material.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Source\Atrc\Core\SceneParam.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Source\Atrc\Utility\ParamParser.cpp">
       <Filter>Utility</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Source\Atrc\Manager\MaterialManager.cpp">
+      <Filter>Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Manager\SceneParam.cpp">
       <Filter>Manager</Filter>
     </ClCompile>
   </ItemGroup>

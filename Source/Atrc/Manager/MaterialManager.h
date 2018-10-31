@@ -1,6 +1,8 @@
 #pragma once
 
 #include <Atrc/Core/Core.h>
+#include <Atrc/Manager/SceneParam.h>
+#include <Atrc/Material/Fresnel.h>
 
 AGZ_NS_BEG(Atrc)
 
@@ -23,6 +25,13 @@ public:
 
     Material *Create(const Str8 &name, const SceneParamGroup &params, AGZ::ObjArena<> &arena);
 };
+
+FresnelConductor     *CreateFresnelConductor(const SceneParamGroup &params, AGZ::ObjArena<> &arena);
+FresnelDielectric    *CreateFresnelDielectric(const SceneParamGroup &params, AGZ::ObjArena<> &arena);
+SchlickApproximation *CreateSchlickApproximation(const SceneParamGroup &params, AGZ::ObjArena<> &arena);
+
+Fresnel    *CreateFresnel(const SceneParamGroup &params, AGZ::ObjArena<> &arena);
+Dielectric *CreateDielectric(const SceneParamGroup &params, AGZ::ObjArena<> &arena);
 
 #define DEFINE_MATERIAL_CREATOR(NAME) \
     class NAME : public MaterialCreator \

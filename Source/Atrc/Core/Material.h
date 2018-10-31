@@ -1,7 +1,6 @@
 #pragma once
 
 #include <Atrc/Core/Common.h>
-#include <Atrc/Core/SceneParam.h>
 #include <Atrc/Core/SurfacePoint.h>
 
 AGZ_NS_BEG(Atrc)
