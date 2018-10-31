@@ -196,6 +196,9 @@
     <ClInclude Include="..\..\..\Source\Atrc\Manager\SceneParam.h">
       <Filter>Manager</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Core\Medium.h">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\Atrc\Core\Geometry.cpp">

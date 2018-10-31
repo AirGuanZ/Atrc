@@ -8,7 +8,7 @@ class BVH : public Entity
 {
 public:
 
-    struct Node
+    /*struct Node
     {
         bool isLeaf;
         union
@@ -25,7 +25,20 @@ public:
                 uint32_t end;
             } leaf;
         };
+    };*/
+
+    struct Internal
+    {
+        AABB bound;
+        uint32_t rightChild;
     };
+
+    struct Leaf
+    {
+        uint32_t start, end;
+    };
+
+    using Node = AGZ::TypeOpr::Variant<Internal, Leaf>;
 
     using ConstEntityPtr = const Entity*;
 
@@ -45,8 +58,6 @@ private:
 
     // Ìî³äentities_ºÍnodes_
     void InitBVH(const ConstEntityPtr *entities, uint32_t nEntity);
-
-    AGZ::ObjArena<> boundArena_;
 
     std::vector<const Entity*> entities_;
     std::vector<Node> nodes_;

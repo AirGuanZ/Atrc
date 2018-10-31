@@ -36,19 +36,28 @@ bool BVH::HasIntersection(const Ray &r) const
         tasks.pop();
         const Node &node = nodes_[taskNodeIdx];
 
-        if(node.isLeaf)
+        auto trt = AGZ::TypeOpr::MatchVar(node,
+            [&](const Leaf &leaf)
         {
-            for(uint32_t i = node.leaf.start; i < node.leaf.end; ++i)
+            for(uint32_t i = leaf.start; i < leaf.end; ++i)
             {
                 if(entities_[i]->HasIntersection(r))
                     return true;
             }
-        }
-        else if(node.internal.bound->HasIntersection(r))
+            return false;
+        },
+            [&](const Internal &internal)
         {
-            tasks.push(taskNodeIdx + 1);
-            tasks.push(node.internal.rightChild);
-        }
+            if(internal.bound.HasIntersection(r))
+            {
+                tasks.push(taskNodeIdx + 1);
+                tasks.push(internal.rightChild);
+            }
+            return false;
+        });
+
+        if(trt)
+            return true;
     }
 
     return false;
@@ -67,10 +76,11 @@ bool BVH::FindIntersection(const Ray &r, SurfacePoint *sp) const
         tasks.pop();
         const Node &node = nodes_[taskNodeIdx];
 
-        if(node.isLeaf)
+        AGZ::TypeOpr::MatchVar(node,
+            [&](const Leaf &leaf)
         {
             SurfacePoint tSp;
-            for(uint32_t i = node.leaf.start; i < node.leaf.end; ++i)
+            for(uint32_t i = leaf.start; i < leaf.end; ++i)
             {
                 const auto &ent = entities_[i];
                 if(ent->FindIntersection(r, &tSp) && (!ret || tSp.t < sp->t))
@@ -79,12 +89,15 @@ bool BVH::FindIntersection(const Ray &r, SurfacePoint *sp) const
                     *sp = tSp;
                 }
             }
-        }
-        else if(node.internal.bound->HasIntersection(r))
+        },
+            [&](const Internal &internal)
         {
-            tasks.push(taskNodeIdx + 1);
-            tasks.push(node.internal.rightChild);
-        }
+            if(internal.bound.HasIntersection(r))
+            {
+                tasks.push(taskNodeIdx + 1);
+                tasks.push(internal.rightChild);
+            }
+        });
     }
 
     return ret;
@@ -94,15 +107,18 @@ AABB BVH::WorldBound() const
 {
     AGZ_ASSERT(!nodes_.empty());
 
-    if(nodes_[0].isLeaf)
+    return AGZ::TypeOpr::MatchVar(nodes_[0],
+        [&](const Leaf &leaf)
     {
         AABB ret;
-        for(uint32_t i = nodes_[0].leaf.start; i < nodes_[0].leaf.end; ++i)
+        for(uint32_t i = leaf.start; i < leaf.end; ++i)
             ret = ret | entities_[i]->WorldBound();
         return ret;
-    }
-
-    return *nodes_[0].internal.bound;
+    },
+        [&](const Internal &internal)
+    {
+        return internal.bound;
+    });
 }
 
 const Material *BVH::GetMaterial(const SurfacePoint &sp) const
@@ -119,24 +135,20 @@ namespace
         Vec3 centroid;
     };
 
-    struct TNode
+    struct TLeaf;
+    struct TInternal;
+
+    using TNode = AGZ::TypeOpr::Variant<TLeaf, TInternal>;
+
+    struct TLeaf
     {
-        TNode() { }
+        uint32_t start, end;
+    };
 
-        bool isLeaf;
-        union
-        {
-            struct
-            {
-                TNode *left, *right;
-                AABB bound;
-            } internal;
-
-            struct
-            {
-                uint32_t start, end;
-            } leaf;
-        };
+    struct TInternal
+    {
+        TNode *left, *right;
+        AABB bound;
     };
 
     using Axis = uint8_t;
@@ -152,9 +164,7 @@ namespace
 
     TNode *FillLeaf(TNode *ret, uint32_t start, uint32_t end)
     {
-        ret->isLeaf = true;
-        ret->leaf.start = start;
-        ret->leaf.end = end;
+        *ret = TLeaf{ start, end };
         return ret;
     }
 
@@ -280,11 +290,12 @@ namespace
             ents[splitIdx + i] = right[i];
 
         auto *ret = nodeArena.Create<TNode>();
-        ret->isLeaf = false;
-        ret->internal.bound = allBound;
+        *ret = TInternal{ nullptr, nullptr, allBound };
 
-        taskQueue->push({ start, splitIdx, &ret->internal.left });
-        taskQueue->push({ splitIdx, end, &ret->internal.right });
+        auto &internal = std::get<TInternal>(*ret);
+
+        taskQueue->push({ start, splitIdx, &internal.left });
+        taskQueue->push({ splitIdx, end, &internal.right });
 
         *nodeCount += 1;
         return ret;
@@ -321,8 +332,7 @@ namespace
         std::vector<BVH::Node> &nodes,
         const std::vector<EntityInfo> &entInfo,
         std::vector<const Entity*> &ents,
-        const TNode *root,
-        AGZ::ObjArena<> &boundArena)
+        const TNode *root)
     {
         std::stack<CompactTask> tasks;
         tasks.push({ root, nullptr });
@@ -336,33 +346,31 @@ namespace
             if(task.fillNodeIdx)
                 *task.fillNodeIdx = static_cast<uint32_t>(nodes.size());
 
-            if(tree->isLeaf)
+            AGZ::TypeOpr::MatchVar(*tree,
+                [&](const TLeaf &leaf)
             {
-                BVH::Node node;
-                node.isLeaf = true;
-                node.leaf.start = static_cast<uint32_t>(ents.size());
-                node.leaf.end = node.leaf.start + tree->leaf.end - tree->leaf.start;
-                nodes.push_back(node);
+                BVH::Leaf nleaf =
+                {
+                    static_cast<uint32_t>(ents.size()),
+                    leaf.start + leaf.end - leaf.start
+                };
+                nodes.emplace_back(nleaf);
 
-                for(uint32_t i = tree->leaf.start; i < tree->leaf.end; ++i)
+                for(uint32_t i = leaf.start; i < leaf.end; ++i)
                     ents.push_back(entInfo[i].entity);
-            }
-            else
+            },
+                [&](const TInternal &internal)
             {
-                auto pBound = boundArena.Create<AABB>();
-                *pBound = tree->internal.bound;
+                BVH::Internal nInternal =
+                {
+                    internal.bound,
+                    0
+                };
+                nodes.emplace_back(nInternal);
 
-                BVH::Node node;
-                node.isLeaf = false;
-                node.internal.bound = pBound;
-                node.internal.rightChild = 0;
-
-                size_t nodeIdx = nodes.size();
-                nodes.push_back(node);
-
-                tasks.push({ tree->internal.right, &nodes[nodeIdx].internal.rightChild });
-                tasks.push({ tree->internal.left, nullptr });
-            }
+                tasks.push({ internal.right, &std::get<BVH::Internal>(nodes.back()).rightChild });
+                tasks.push({ internal.left, nullptr });
+            });
         }
     }
 }
@@ -387,7 +395,7 @@ void BVH::InitBVH(const ConstEntityPtr *entities, uint32_t nEntity)
     nodes_.reserve(nodeCount);
     entities_.reserve(nEntity);
 
-    CompactBVHIntoArray(nodes_, entInfo, entities_, root, boundArena_);
+    CompactBVHIntoArray(nodes_, entInfo, entities_, root);
 }
 
 AGZ_NS_END(Atrc)

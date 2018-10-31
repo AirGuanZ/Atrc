@@ -8,6 +8,7 @@
 #include <Atrc/Core/Integrator.h>
 #include <Atrc/Core/Light.h>
 #include <Atrc/Core/Material.h>
+#include <Atrc/Core/Medium.h>
 #include <Atrc/Core/Ray.h>
 #include <Atrc/Core/Renderer.h>
 #include <Atrc/Core/Scene.h>
