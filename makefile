@@ -28,6 +28,11 @@ $(2) = ./Build/$(1)
 .PHONY : $(1)
 $(1) : $$($(2))
 
+.PHONY : run$(1)
+run$(1) :
+	make $(1)
+	$$($(2))
+
 $(2)$(CPP_SUFFIX) = $$(shell find ./Source/$(1)/ -name "*.cpp")
 $(2)$(O_SUFFIX) = $$(patsubst %.cpp, %.o, $$($(2)$(CPP_SUFFIX)))
 $(2)$(D_SUFFIX) = $$(patsubst %.cpp, %.d, $$($(2)$(CPP_SUFFIX)))
@@ -52,15 +57,7 @@ ALL_DPP_FILES += $$($(2)$(D_SUFFIX))
 
 TARGETS += $(1)
 
-.PHONY : run$(1)
-run$(1) :
-    make $(2)
-    $(2)
-
 endef
-
-$(eval $(call add_target,Launcher,LAUNCHER))
-$(eval $(call add_target,Test01_SSBScene,TEST01_SSBScene))
 
 $(OPP_FILES) : %.o : %.cpp
 	$(CPPC) $(CPPC_FLAGS) -c $< -o $@
@@ -73,6 +70,8 @@ $(DPP_FILES) : %.d : %.cpp
 	rm -f $@.$$$$.dtmp
 
 -include $(DPP_FILES)
+
+$(eval $(call add_target,Launcher,LAUNCHER))
 
 .PHONY : clean
 clean :
