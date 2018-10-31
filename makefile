@@ -52,6 +52,11 @@ ALL_DPP_FILES += $$($(2)$(D_SUFFIX))
 
 TARGETS += $(1)
 
+.PHONY : run$(1)
+run$(1) :
+    make $(2)
+    $(2)
+
 endef
 
 $(eval $(call add_target,Launcher,LAUNCHER))
@@ -68,16 +73,6 @@ $(DPP_FILES) : %.d : %.cpp
 	rm -f $@.$$$$.dtmp
 
 -include $(DPP_FILES)
-
-.PHONY : runlauncher
-runlauncher :
-	make $(LAUNCHER)
-	$(LAUNCHER)
-
-.PHONY : runtest01
-runtest01 :
-	make $(TEST01_SSBSCENE)
-	$(TEST01_SSBSCENE)
 
 .PHONY : clean
 clean :
