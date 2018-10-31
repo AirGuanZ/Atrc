@@ -8,25 +8,6 @@ class BVH : public Entity
 {
 public:
 
-    /*struct Node
-    {
-        bool isLeaf;
-        union
-        {
-            struct
-            {
-                const AABB *bound;
-                uint32_t rightChild;
-            } internal;
-
-            struct
-            {
-                uint32_t start;
-                uint32_t end;
-            } leaf;
-        };
-    };*/
-
     struct Internal
     {
         AABB bound;
