@@ -46,3 +46,11 @@ wi和wo混乱不堪，面对非对称BSDF太烧脑
 ## 2018.10.30
 
 居然好几天忘了写日志。这几天主要完成了Cube类型的Geometry Object，三角形网格的BVH树，OBJ文件解析以及Torrance-Sparrow反射模型，添加了塑料、金属之类的材质。哦对，还支持了纹理，包括nearest和bilinear采样，Mipmap就先不管了。
+
+## 2018.10.31
+
+今天完成了Global BVH和Utils中的Config组件。下一步目标是写介质，想想牛奶玉石还有丁达尔效应就让人开心。
+
+先稍微整理一下思路。任何光线的传播过程都要把介质考虑进来，因为必须跟踪任何light-carrying ray所处的介质。任何可以产生ray的东西都要指定它产生的ray所处的介质是什么，ray和表面发生intersection的时候也要做介质切换。目前，应该是要让entity指定in和out两种介质，scene指定虚空中的介质。Camera不指定介质，因为camera出来的ray的介质要么由首个交点指定，要么是虚空介质。
+
+传播过程也有两类：light-surface传播，以及surface-surface传播，这两个过程都由integrator完成。
