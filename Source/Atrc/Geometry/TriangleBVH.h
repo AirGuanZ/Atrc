@@ -16,23 +16,20 @@ public:
         Vec2 uv;
     };
 
-    struct Node
-    {
-        bool isLeaf;
-        union
-        {
-            struct
-            {
-                const AABB *bound;
-                uint32_t rightChild;
-            } internal;
+    struct Leaf;
+    struct Internal;
 
-            struct
-            {
-                uint32_t start;
-                uint32_t end;
-            } leaf;
-        };
+    using Node = AGZ::TypeOpr::Variant<Leaf, Internal>;
+
+    struct Leaf
+    {
+        uint32_t start, end;
+    };
+
+    struct Internal
+    {
+        AABB bound;
+        uint32_t rightChild;
     };
 
     struct InternalTriangle
@@ -62,9 +59,6 @@ public:
 private:
 
     void InitBVH(const Vertex *vertices, uint32_t triangleCount);
-
-    // 申请Bound用的arena
-    AGZ::ObjArena<> boundArena_;
 
     // triangles_中面积的前缀和，用来二分查找以进行全体三角形上的面积均匀采样
     std::vector<Real> areaPrefixSum_;

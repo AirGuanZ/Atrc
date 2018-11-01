@@ -129,20 +129,29 @@ bool TriangleBVHCore::HasIntersection(const Ray &r) const
         tasks.pop();
         const Node &node = nodes_[taskNodeIdx];
 
-        if(node.isLeaf)
+        bool inct = AGZ::TypeOpr::MatchVar(node,
+            [&](const Leaf &leaf)
         {
-            for(uint32_t i = node.leaf.start; i < node.leaf.end; ++i)
+            for(uint32_t i = leaf.start; i < leaf.end; ++i)
             {
                 const auto &tri = triangles_[i];
                 if(HasIntersectionWithTriangle(tri.A, tri.B_A, tri.C_A, r))
                     return true;
             }
-        }
-        else if(node.internal.bound->HasIntersection(r))
+            return false;
+        },
+            [&](const Internal &internal)
         {
-            tasks.push(taskNodeIdx + 1);
-            tasks.push(node.internal.rightChild);
-        }
+            if(internal.bound.HasIntersection(r))
+            {
+                tasks.push(taskNodeIdx + 1);
+                tasks.push(internal.rightChild);
+            }
+            return false;
+        });
+
+        if(inct)
+            return true;
     }
 
     return false;
@@ -161,10 +170,11 @@ bool TriangleBVHCore::FindIntersection(const Ray &r, SurfacePoint *sp) const
         tasks.pop();
         const Node &node = nodes_[taskNodeIdx];
 
-        if(node.isLeaf)
+        AGZ::TypeOpr::MatchVar(node,
+            [&](const Leaf &leaf)
         {
             SurfacePoint tSp;
-            for(uint32_t i = node.leaf.start; i < node.leaf.end; ++i)
+            for(uint32_t i = leaf.start; i < leaf.end; ++i)
             {
                 const auto &tri = triangles_[i];
                 if(EvalIntersectionWithTriangle(
@@ -175,12 +185,15 @@ bool TriangleBVHCore::FindIntersection(const Ray &r, SurfacePoint *sp) const
                     sp->flag0 = i;
                 }
             }
-        }
-        else if(node.internal.bound->HasIntersection(r))
+        },
+            [&](const Internal &internal)
         {
-            tasks.push(taskNodeIdx + 1);
-            tasks.push(node.internal.rightChild);
-        }
+            if(internal.bound.HasIntersection(r))
+            {
+                tasks.push(taskNodeIdx + 1);
+                tasks.push(internal.rightChild);
+            }
+        });
     }
 
     if(!ret)
@@ -196,19 +209,22 @@ AABB TriangleBVHCore::LocalBound() const
 {
     AGZ_ASSERT(!nodes_.empty());
 
-    if(nodes_[0].isLeaf)
+    return AGZ::TypeOpr::MatchVar(nodes_[0],
+        [&](const Leaf &leaf)
     {
         AABB ret;
         for(auto &tri : triangles_)
         {
             ret.Expand(tri.A)
-               .Expand(tri.A + tri.B_A)
-               .Expand(tri.A + tri.C_A);
+                .Expand(tri.A + tri.B_A)
+                .Expand(tri.A + tri.C_A);
         }
         return ret;
-    }
-
-    return *nodes_[0].internal.bound;
+    },
+        [&](const Internal &internal)
+    {
+        return internal.bound;
+    });
 }
 
 Real TriangleBVHCore::SurfaceArea() const
@@ -501,8 +517,7 @@ namespace
         std::vector<TriangleBVHCore::Node> &nodes,
         std::vector<TriangleBVHCore::InternalTriangle> &tris,
         const TriangleBVHCore::Vertex *vertices,
-        const TNode *root, const std::vector<uint32_t> &triIdxMap,
-        AGZ::ObjArena<> &boundArena)
+        const TNode *root, const std::vector<uint32_t> &triIdxMap)
     {
         std::stack<CompactTask> tasks;
         tasks.push({ root, nullptr });
@@ -519,21 +534,19 @@ namespace
             AGZ::TypeOpr::MatchVar(*tree,
                 [&](const TLeaf &leaf)
             {
-                TriangleBVHCore::Node node;
-                node.isLeaf = true;
-                node.leaf.start = static_cast<uint32_t>(tris.size());
-                node.leaf.end = node.leaf.start + leaf.end - leaf.start;
-                nodes.push_back(node);
+                auto start = static_cast<uint32_t>(tris.size());
+                auto end = start + leaf.end - leaf.start;
+                nodes.emplace_back(TriangleBVHCore::Leaf{ start, end });
 
                 for(uint32_t i = leaf.start; i < leaf.end; ++i)
                 {
                     auto *tri = &vertices[3 * triIdxMap[i]];
                     TriangleBVHCore::InternalTriangle intTri;
-                    intTri.A = tri[0].pos;
-                    intTri.B_A = tri[1].pos - tri[0].pos;
-                    intTri.C_A = tri[2].pos - tri[0].pos;
-                    intTri.nor = tri[0].nor;
-                    intTri.tA = tri[0].uv;
+                    intTri.A     = tri[0].pos;
+                    intTri.B_A   = tri[1].pos - tri[0].pos;
+                    intTri.C_A   = tri[2].pos - tri[0].pos;
+                    intTri.nor   = tri[0].nor;
+                    intTri.tA    = tri[0].uv;
                     intTri.tB_tA = tri[1].uv - tri[0].uv;
                     intTri.tC_tA = tri[2].uv - tri[0].uv;
                     tris.push_back(intTri);
@@ -541,18 +554,9 @@ namespace
             },
                 [&](const TInternal &internal)
             {
-                auto pBound = boundArena.Create<AABB>();
-                *pBound = internal.bound;
+                nodes.emplace_back(TriangleBVHCore::Internal{ internal.bound, 0 });
 
-                TriangleBVHCore::Node node;
-                node.isLeaf = false;
-                node.internal.bound = pBound;
-                node.internal.rightChild = 0;
-
-                size_t nodeIdx = nodes.size();
-                nodes.push_back(node);
-
-                tasks.push({ internal.right, &nodes[nodeIdx].internal.rightChild });
+                tasks.push({ internal.right, &std::get<TriangleBVHCore::Internal>(nodes.back()).rightChild });
                 tasks.push({ internal.left, nullptr });
             });
         }
@@ -590,7 +594,7 @@ void TriangleBVHCore::InitBVH(const Vertex *vertices, uint32_t triangleCount)
     nodes_.reserve(nodeCount);
     triangles_.reserve(triangleCount);
 
-    CompactBVHIntoArray(nodes_, triangles_, vertices, root, triIdxMap, boundArena_);
+    CompactBVHIntoArray(nodes_, triangles_, vertices, root, triIdxMap);
 }
 
 GeometrySampleResult TriangleBVHCore::Sample() const
