@@ -225,23 +225,20 @@ namespace
         Vec3 centroid;
     };
 
-    struct TempNode
-    {
-        TempNode() { }
-        bool isLeaf;
-        union
-        {
-            struct
-            {
-                TempNode *left, *right;
-                AABB bound;
-            } internal;
+    struct TLeaf;
+    struct TInternal;
 
-            struct
-            {
-                uint32_t start, end;
-            } leaf;
-        };
+    using TNode = AGZ::TypeOpr::Variant<TLeaf, TInternal>;
+
+    struct TLeaf
+    {
+        uint32_t start, end;
+    };
+
+    struct TInternal
+    {
+        TNode *left, *right;
+        AABB bound;
     };
 
     using Axis = uint8_t;
@@ -255,11 +252,9 @@ namespace
         return delta.x < delta.z ? Z : X;
     }
 
-    TempNode *FillLeaf(TempNode *ret, uint32_t start, uint32_t end)
+    TNode *FillLeaf(TNode *ret, uint32_t start, uint32_t end)
     {
-        ret->isLeaf     = true;
-        ret->leaf.start = start;
-        ret->leaf.end   = end;
+        *ret = TLeaf{ start, end };
         return ret;
     }
 
@@ -293,12 +288,12 @@ namespace
     struct BuildTask
     {
         uint32_t start, end;
-        TempNode **fillNode;
+        TNode **fillNode;
     };
 
     constexpr uint32_t MAX_LEAF_SIZE = 6;
 
-    TempNode *BuildSingleNode(
+    TNode *BuildSingleNode(
         MappedTriangles &tris, AGZ::ObjArena<> &nodeArena,
         const BuildTask &task, size_t *nodeCount, std::queue<BuildTask> *taskQueue)
     {
@@ -309,7 +304,7 @@ namespace
         if(N <= MAX_LEAF_SIZE)
         {
             *nodeCount += 1;
-            return FillLeaf(nodeArena.Create<TempNode>(), start, end);
+            return FillLeaf(nodeArena.Create<TNode>(), start, end);
         }
 
         // 选择划分轴
@@ -324,7 +319,7 @@ namespace
         if(centroidDelta[splitAxis] <= 0.0)
         {
             *nodeCount += 1;
-            return FillLeaf(nodeArena.Create<TempNode>(), start, end);
+            return FillLeaf(nodeArena.Create<TNode>(), start, end);
         }
 
         // 把所有三角形划分到一堆buckets中，然后从buckets间隙中选择一个最佳划分点
@@ -405,7 +400,7 @@ namespace
         if(splitIdx == start || splitIdx == end)
         {
             *nodeCount += 1;
-            return FillLeaf(nodeArena.Create<TempNode>(), start, end);
+            return FillLeaf(nodeArena.Create<TNode>(), start, end);
         }
 
         for(uint32_t i = 0; i < left.size(); ++i)
@@ -413,23 +408,23 @@ namespace
         for(uint32_t i = 0; i < right.size(); ++i)
             tris.triIdxMap[splitIdx + i] = right[i];
 
-        TempNode *ret = nodeArena.Create<TempNode>();
-        ret->isLeaf = false;
-        ret->internal.bound = allBound;
+        TNode *ret = nodeArena.Create<TNode>();
+        *ret = TInternal{ nullptr, nullptr, allBound };
+        auto &internal = std::get<TInternal>(*ret);
 
-        taskQueue->push({ start, splitIdx, &ret->internal.left });
-        taskQueue->push({ splitIdx, end, &ret->internal.right });
+        taskQueue->push({ start, splitIdx, &internal.left });
+        taskQueue->push({ splitIdx, end, &internal.right });
 
         *nodeCount += 1;
         return ret;
     }
 
-    TempNode *BuildBVH(
+    TNode *BuildBVH(
         MappedTriangles &tris, AGZ::ObjArena<> &nodeArena,
         uint32_t start, uint32_t end, size_t *nodeCount)
     {
         *nodeCount = 0;
-        TempNode *ret = nullptr;
+        TNode *ret = nullptr;
 
         std::queue<BuildTask> taskQueue;
         taskQueue.push({ start, end, &ret });
@@ -498,7 +493,7 @@ namespace
 
     struct CompactTask
     {
-        const TempNode *tree;
+        const TNode *tree;
         uint32_t *fillNodeIdx;
     };
 
@@ -506,7 +501,7 @@ namespace
         std::vector<TriangleBVHCore::Node> &nodes,
         std::vector<TriangleBVHCore::InternalTriangle> &tris,
         const TriangleBVHCore::Vertex *vertices,
-        const TempNode *root, const std::vector<uint32_t> &triIdxMap,
+        const TNode *root, const std::vector<uint32_t> &triIdxMap,
         AGZ::ObjArena<> &boundArena)
     {
         std::stack<CompactTask> tasks;
@@ -521,15 +516,16 @@ namespace
             if(task.fillNodeIdx)
                 *task.fillNodeIdx = static_cast<uint32_t>(nodes.size());
 
-            if(tree->isLeaf)
+            AGZ::TypeOpr::MatchVar(*tree,
+                [&](const TLeaf &leaf)
             {
                 TriangleBVHCore::Node node;
                 node.isLeaf = true;
                 node.leaf.start = static_cast<uint32_t>(tris.size());
-                node.leaf.end = node.leaf.start + tree->leaf.end - tree->leaf.start;
+                node.leaf.end = node.leaf.start + leaf.end - leaf.start;
                 nodes.push_back(node);
 
-                for(uint32_t i = tree->leaf.start; i < tree->leaf.end; ++i)
+                for(uint32_t i = leaf.start; i < leaf.end; ++i)
                 {
                     auto *tri = &vertices[3 * triIdxMap[i]];
                     TriangleBVHCore::InternalTriangle intTri;
@@ -542,11 +538,11 @@ namespace
                     intTri.tC_tA = tri[2].uv - tri[0].uv;
                     tris.push_back(intTri);
                 }
-            }
-            else
+            },
+                [&](const TInternal &internal)
             {
                 auto pBound = boundArena.Create<AABB>();
-                *pBound = tree->internal.bound;
+                *pBound = internal.bound;
 
                 TriangleBVHCore::Node node;
                 node.isLeaf = false;
@@ -556,9 +552,9 @@ namespace
                 size_t nodeIdx = nodes.size();
                 nodes.push_back(node);
 
-                tasks.push({ tree->internal.right, &nodes[nodeIdx].internal.rightChild });
-                tasks.push({ tree->internal.left, nullptr });
-            }
+                tasks.push({ internal.right, &nodes[nodeIdx].internal.rightChild });
+                tasks.push({ internal.left, nullptr });
+            });
         }
     }
 }
@@ -587,7 +583,7 @@ void TriangleBVHCore::InitBVH(const Vertex *vertices, uint32_t triangleCount)
     size_t nodeCount = 0;
     MappedTriangles tris(vertices, triInfo, triIdxMap);
 
-    TempNode *root = BuildBVH(tris, nodeArena, 0, triangleCount, &nodeCount);
+    TNode *root = BuildBVH(tris, nodeArena, 0, triangleCount, &nodeCount);
 
     nodes_.clear();
     triangles_.clear();
