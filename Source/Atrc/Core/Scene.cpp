@@ -33,18 +33,18 @@ const AABB &Scene::GetWorldBound() const
 SceneLightSampleResult Scene::SampleLight() const
 {
     if(lights_.empty())
-        return { nullptr, 0.0 };
+        return { nullptr, Real(0) };
 
     return {
         lights_[AGZ::Math::Random::Uniform<size_t>(0, lights_.size() - 1)],
-        1.0 / lights_.size()
+        Real(1) / lights_.size()
     };
 }
 
 Real Scene::SampleLightPDF(const Light *light) const
 {
     AGZ_ASSERT(light && lights_.size());
-    return 1.0 / lights_.size();
+    return Real(1) / lights_.size();
 }
 
 bool Scene::HasIntersection(const Ray &r) const

@@ -11,7 +11,7 @@ namespace
 {
     Real TriangleSurfaceArea(const Vec3 &B_A, const Vec3 &C_A)
     {
-        return 0.5 * Cross(B_A, C_A).Length();
+        return Real(0.5) * Cross(B_A, C_A).Length();
     }
 
     bool HasIntersectionWithTriangle(const Vec3 &A, const Vec3 &B_A, const Vec3 &C_A, const Ray &r)
@@ -93,10 +93,11 @@ TriangleBVHCore::TriangleBVHCore(const AGZ::Model::GeometryMesh &mesh)
     auto vertices = mesh.vertices
     | AGZ::Map([](const AGZ::Model::GeometryMesh::Vertex &v)
         {
+			using AGZ::TypeOpr::StaticCaster;
             Vertex ret;
-            ret.pos = v.pos;
-            ret.uv  = v.tex.uv();
-            ret.nor = v.nor;
+            ret.pos = v.pos.Map(StaticCaster<Real, double>);
+            ret.uv  = v.tex.uv().Map(StaticCaster<Real, double>);
+            ret.nor = v.nor.Map(StaticCaster<Real, double>);
             return ret;
         })
     | AGZ::Collect<std::vector<Vertex>>();
@@ -318,7 +319,7 @@ namespace
         TNode **fillNode;
     };
 
-    constexpr uint32_t MAX_LEAF_SIZE = 6;
+    constexpr uint32_t MAX_LEAF_SIZE = 4;
 
     TNode *BuildSingleNode(
         MappedTriangles &tris, AGZ::ObjArena<> &nodeArena,
@@ -400,7 +401,7 @@ namespace
                 bhigh = bhigh | buckets[i].bound;
             }
 
-            cost[splitPos] = 0.125 + invAllBoundArea * (clow * blow.SurfaceArea() + chigh * bhigh.SurfaceArea());
+            cost[splitPos] = Real(0.125) + invAllBoundArea * (clow * blow.SurfaceArea() + chigh * bhigh.SurfaceArea());
         }
 
         int splitPos = 0;
@@ -538,7 +539,7 @@ void TriangleBVHCore::InitBVH(const Vertex *vertices, uint32_t triangleCount)
         Real sa = TriangleSurfaceArea(vtx[1].pos - vtx[0].pos, vtx[2].pos - vtx[0].pos);
 
         triInfo[i].surfaceArea = sa;
-        triInfo[i].centroid = 1.0 / 3 * (vtx[0].pos + vtx[1].pos + vtx[2].pos);
+        triInfo[i].centroid = Real(1) / 3 * (vtx[0].pos + vtx[1].pos + vtx[2].pos);
 
         triIdxMap[i] = i;
     }
@@ -562,7 +563,7 @@ GeometrySampleResult TriangleBVHCore::Sample() const
     // 在[0, surfaceArea]间生成一个随机数，然后在triangles_面积前缀和中用二分查找选一个三角形
     // 并在三角形上均匀采样
 
-    Real u = AGZ::Math::Random::Uniform(0.0, SurfaceArea());
+    Real u = AGZ::Math::Random::Uniform(Real(0.0), SurfaceArea());
     auto upper = std::lower_bound(areaPrefixSum_.begin(), areaPrefixSum_.end(), u);
 
     size_t triIdx = upper == areaPrefixSum_.end() ? (areaPrefixSum_.size() - 1)
@@ -576,7 +577,7 @@ GeometrySampleResult TriangleBVHCore::Sample() const
     GeometrySampleResult ret;
     ret.pos = tri.A + uv.u * tri.B_A + uv.v * tri.C_A;
     ret.nor = tri.nor;
-    ret.pdf = 1.0 / SurfaceArea();
+    ret.pdf = 1 / SurfaceArea();
 
     return ret;
 }
@@ -647,7 +648,7 @@ GeometrySampleResult TriangleBVH::Sample() const
 
 Real TriangleBVH::SamplePDF(const Vec3 &pos) const
 {
-    return 1.0 / surfaceArea_;
+    return 1 / surfaceArea_;
 }
 
 GeometrySampleResult TriangleBVH::Sample(const Vec3 &dst) const

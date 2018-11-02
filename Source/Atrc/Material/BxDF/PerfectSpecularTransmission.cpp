@@ -8,9 +8,9 @@ namespace
     Option<Vec3> GetRefractDirection(const Vec3 &wo, const Vec3 &nor, float eta)
     {
         Real cosThetaI = Abs(wo.z);
-        Real sinThetaI2 = Max(0.0, 1 - cosThetaI * cosThetaI);
+        Real sinThetaI2 = Max(Real(0), 1 - cosThetaI * cosThetaI);
         Real sinThetaT2 = eta * eta * sinThetaI2;
-        if(sinThetaT2 >= 1.0)
+        if(sinThetaT2 >= 1)
             return None;
         Real cosThetaT = Sqrt(1 - sinThetaT2);
         return (eta * cosThetaI - cosThetaT) * nor - eta * wo;
@@ -32,9 +32,9 @@ Option<BxDFSampleWiResult> PerfectSpecularTransmission::SampleWi(const Vec3 &wo)
 {
     // 折射对应的时透明物体，故wo可能是从内部往外部，应区别对待
 
-    float etaI = wo.z > 0.0 ? fresnel_->GetEtaI() : fresnel_->GetEtaT();
-    float etaT = wo.z > 0.0 ? fresnel_->GetEtaT() : fresnel_->GetEtaI();
-    Vec3 nor = wo.z > 0.0 ? Vec3::UNIT_Z() : -Vec3::UNIT_Z();
+    float etaI = wo.z > 0 ? fresnel_->GetEtaI() : fresnel_->GetEtaT();
+    float etaT = wo.z > 0 ? fresnel_->GetEtaT() : fresnel_->GetEtaI();
+    Vec3 nor = wo.z > 0 ? Vec3::UNIT_Z() : -Vec3::UNIT_Z();
 
     // 折射方向
 
@@ -47,7 +47,7 @@ Option<BxDFSampleWiResult> PerfectSpecularTransmission::SampleWi(const Vec3 &wo)
 
     BxDFSampleWiResult ret;
     ret.wi   = wi->Normalize();
-    ret.pdf  = 1.0;
+    ret.pdf  = 1;
     ret.coef = eta * eta * rc_ * (Spectrum(1.0f) - Fr) / Abs(ret.wi.z);
     ret.type = type_;
 
@@ -56,7 +56,7 @@ Option<BxDFSampleWiResult> PerfectSpecularTransmission::SampleWi(const Vec3 &wo)
 
 Real PerfectSpecularTransmission::SampleWiPDF(const Vec3 &wi, const Vec3 &wo) const
 {
-    return 0.0;
+    return 0;
 }
 
 AGZ_NS_END(Atrc)

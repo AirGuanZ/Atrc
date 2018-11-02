@@ -12,7 +12,7 @@ PerspectiveCamera::PerspectiveCamera(const Vec3 &eye, const Vec3 &_dir, const Ve
     Vec3 scrXDir = Cross(dir, up).Normalize();
     Vec3 scrYDir = Cross(scrXDir, dir);
 
-    Real scrYSize = Tan(0.5 * FOVy);
+    Real scrYSize = Tan(Real(0.5) * FOVy);
     Real scrXSize = scrYSize * aspectRatio;
 
     scrX_ = scrXSize * scrXDir;

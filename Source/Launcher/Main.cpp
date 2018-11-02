@@ -47,7 +47,7 @@ int main()
 
     //============= Camera =============
 
-    const Vec3 eye = { -7.0, 0.0, 0.0 };
+    const Vec3 eye = Vec3(-7.0, 0.0, 0.0);
     const Vec3 dir = Vec3(0.0, -0.3, 0.0) - eye;
     PerspectiveCamera camera(eye, dir, { 0.0, 0.0, 1.0 }, Deg(40.0), SCR_ASPECT_RATIO);
 

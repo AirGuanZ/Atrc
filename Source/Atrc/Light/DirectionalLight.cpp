@@ -15,14 +15,14 @@ void DirectionalLight::PreprocessScene(const Scene &scene)
     auto &wb = scene.GetWorldBound();
     if(wb.IsEmpty())
     {
-        worldRadius_ = 1.0;
+        worldRadius_ = 1;
         return;
     }
 
-    worldCentre_ = 0.5 * (wb.high - wb.low);
+    worldCentre_ = Real(0.5) * (wb.high - wb.low);
 
     auto hd = wb.high - worldCentre_;
-    worldRadius_ = 1.01 * hd.Length();
+    worldRadius_ = Real(1.01) * hd.Length();
 }
 
 LightSampleToResult DirectionalLight::SampleLi(const SurfacePoint &sp) const
@@ -33,7 +33,7 @@ LightSampleToResult DirectionalLight::SampleLi(const SurfacePoint &sp) const
     ret.pos      = sp.pos - 2 * worldRadius_ * dir_;
     ret.wi       = -dir_;
     ret.radiance = radiance_;
-    ret.pdf      = 1.0;
+    ret.pdf      = 1;
 
     return ret;
 }

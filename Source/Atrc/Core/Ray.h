@@ -29,7 +29,7 @@ public:
 
     bool IsNormalized() const
     {
-        return ApproxEq(dir.Length(), 1.0, 1e-5);
+        return ApproxEq(dir.Length(), Real(1), Real(1e-5));
     }
 };
 

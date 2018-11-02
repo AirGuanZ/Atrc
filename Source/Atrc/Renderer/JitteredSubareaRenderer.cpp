@@ -13,14 +13,14 @@ void JitteredSubareaRenderer::Render(const Scene &scene, const Integrator &integ
     AGZ::ObjArena<> arena;
 
     auto pw = rt.GetWidth(), ph = rt.GetHeight();
-    Real xBaseCoef = 2.0 / pw, yBaseCoef = 2.0 / ph;
+    Real xBaseCoef = Real(2) / pw, yBaseCoef = Real(2) / ph;
     auto cam = scene.GetCamera();
     for(uint32_t py = area.yBegin; py < area.yEnd; ++py)
     {
-        Real yBase = 1.0 - 2.0 * py / ph;
+        Real yBase = 1 - Real(2) * py / ph;
         for(uint32_t px = area.xBegin; px < area.xEnd; ++px)
         {
-            Real xBase = 2.0 * px / pw - 1.0;
+            Real xBase = Real(2) * px / pw - 1;
 
             Spectrum pixel = SPECTRUM::BLACK;
             for(uint32_t i = 0; i < spp_; ++i)

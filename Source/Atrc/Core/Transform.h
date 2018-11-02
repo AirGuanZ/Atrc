@@ -20,21 +20,21 @@ class Transform
         : mat_(mat), inv_(mat.Inverse()),
           scaleFactor_(mat.ApplyToVector(Vec3::UNIT_X()).LengthSquare())
     {
-        invScaleFac_ = 1.0 / scaleFactor_;
+        invScaleFac_ = 1 / scaleFactor_;
     }
 
     Transform(const Mat4 &mat, const Mat4 &inv)
         : mat_(mat), inv_(inv),
           scaleFactor_(mat.ApplyToVector(Vec3::UNIT_X()).LengthSquare())
     {
-        invScaleFac_ = 1.0 / scaleFactor_;
+        invScaleFac_ = 1 / scaleFactor_;
     }
 
 public:
 
     Transform()
         : mat_(Mat4::IDENTITY()), inv_(Mat4::IDENTITY()),
-          scaleFactor_(1.0), invScaleFac_(1.0)
+          scaleFactor_(1), invScaleFac_(1)
     {
 
     }
@@ -71,7 +71,7 @@ public:
 
     static Transform Scale(Real factor)
     {
-        Real invFac = 1.0 / factor;
+        Real invFac = 1 / factor;
         return Transform(Mat4::Scale({ factor, factor, factor }),
                          Mat4::Scale({ invFac, invFac, invFac }));
     }

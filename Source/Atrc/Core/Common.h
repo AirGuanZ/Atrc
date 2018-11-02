@@ -68,11 +68,11 @@ using Deg = AGZ::Math::Deg<Real>;
 using AGZ::Math::Color3f;
 using AGZ::Math::Color3b;
 
-inline Real Rand() { return AGZ::Math::Random::Uniform(0.0, 1.0); }
+inline Real Rand() { return AGZ::Math::Random::Uniform(Real(0), Real(1)); }
 
 inline Real Cos(const Vec3 &L, const Vec3 &R) { return Dot(L, R) / (L.Length() * R.Length()); }
 
-inline bool IsNormalized(const Vec3 &v) { return AGZ::Math::ApproxEq(v.LengthSquare(), 1.0, 1e-5); }
+inline bool IsNormalized(const Vec3 &v) { return AGZ::Math::ApproxEq(v.LengthSquare(), Real(1), Real(1e-5)); }
 
 using AGZ::Math::Abs;
 using AGZ::Math::ApproxEq;
@@ -108,10 +108,10 @@ using AGZ::StrView8;
 
 inline Real CosTheta(const Vec3 &w) { return w.z; }
 inline Real Cos2Theta(const Vec3 &w) { return w.z * w.z; }
-inline Real Sin2Theta(const Vec3 &w) { return Max(0.0, 1.0 - Cos2Theta(w)); }
+inline Real Sin2Theta(const Vec3 &w) { return Max(Real(0), 1 - Cos2Theta(w)); }
 inline Real SinTheta(const Vec3 &w) { return Sqrt(Sin2Theta(w)); }
-inline Real CosPhi(const Vec3 &w) { Real s = SinTheta(w); return !s ? 1.0 : Clamp(w.x / s, -1.0, 1.0); }
-inline Real SinPhi(const Vec3 &w) { Real s = SinTheta(w); return !s ? 0.0 : Clamp(w.y / s, -1.0, 1.0); }
+inline Real CosPhi(const Vec3 &w) { Real s = SinTheta(w); return !s ? Real(1) : Clamp(w.x / s, Real(-1), Real(1)); }
+inline Real SinPhi(const Vec3 &w) { Real s = SinTheta(w); return !s ? Real(0) : Clamp(w.y / s, Real(-1), Real(1)); }
 
 // ============================= Spectrum =============================
 

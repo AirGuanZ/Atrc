@@ -9,7 +9,7 @@ namespace
     std::tuple<Real, Real, Real> ABC(Real radius, const Ray &r)
     {
         Real A = r.dir.LengthSquare();
-        Real B = 2.0 * Dot(r.dir, r.ori);
+        Real B = 2 * Dot(r.dir, r.ori);
         Real C = r.ori.LengthSquare() - radius * radius;
         return { A, B, C };
     }
@@ -20,12 +20,12 @@ bool Sphere::HasIntersection(const Ray &_r) const
     Ray r = local2World_.ApplyInverseToRay(_r);
 
     auto [A, B, C] = ABC(radius_, r);
-    Real delta = B * B - 4.0 * A * C;
-    if(delta < 0.0)
+    Real delta = B * B - 4 * A * C;
+    if(delta < 0)
         return false;
     delta = Sqrt(delta);
 
-    Real inv2A = 0.5 / A;
+    Real inv2A = Real(0.5) / A;
     Real t0 = (-B - delta) * inv2A;
     Real t1 = (-B + delta) * inv2A;
 
@@ -39,16 +39,16 @@ bool Sphere::FindIntersection(const Ray &_r, SurfacePoint *sp) const
     // 联立r和sphere方程解出两个t，选更近的那个
 
     auto [A, B, C] = ABC(radius_, r);
-    Real delta = B * B - 4.0 * A * C;
-    if(delta < 0.0)
+    Real delta = B * B - 4 * A * C;
+    if(delta < 0)
         return false;
     delta = Sqrt(delta);
 
-    Real inv2A = 0.5 / A;
+    Real inv2A = Real(0.5) / A;
     Real t0 = (-B - delta) * inv2A;
     Real t1 = (-B + delta) * inv2A;
 
-    AGZ_ASSERT(A > 0.0);
+    AGZ_ASSERT(A > 0);
     if(r.maxT < t0 || t1 < r.minT)
         return false;
     bool notT0 = t0 < r.minT;
@@ -60,26 +60,26 @@ bool Sphere::FindIntersection(const Ray &_r, SurfacePoint *sp) const
 
     Vec3 pos = r.At(t);
 
-    Real phi = (!pos.x && !pos.y) ? 0.0 : Arctan2(pos.y, pos.x);
-    if(phi < 0.0)
-        phi += 2.0 * PI;
+    Real phi = (!pos.x && !pos.y) ? Real(0) : Arctan2(pos.y, pos.x);
+    if(phi < 0)
+        phi += 2 * PI;
 
-    Real sinTheta = Clamp(pos.z / radius_, -1.0, 1.0);
+    Real sinTheta = Clamp(pos.z / radius_, -Real(1), Real(1));
     Real theta = Arcsin(sinTheta);
 
-    Vec2 geoUV(0.5 * InvPI * phi, InvPI * theta + 0.5);
+    Vec2 geoUV(Real(0.5) * InvPI * phi, InvPI * theta + Real(0.5));
 
     // 计算local coordinate system
 
     Vec3 nor = pos;
     Vec3 ex, ey;
-    if(ApproxEq(nor.z, 1.0, 1e-5))
+    if(ApproxEq(nor.z, Real(1), Real(1e-5)))
     {
         nor = Vec3::UNIT_Z();
         ex = Vec3::UNIT_X();
         ey = Vec3::UNIT_Y();
     }
-    else if(ApproxEq(nor.z, -1.0, 1e-5))
+    else if(ApproxEq(nor.z, Real(-1), Real(1e-5)))
     {
         nor = -Vec3::UNIT_Z();
         ex = Vec3::UNIT_Y();
@@ -104,7 +104,7 @@ bool Sphere::FindIntersection(const Ray &_r, SurfacePoint *sp) const
 Real Sphere::SurfaceArea() const
 {
     Real sR = local2World_.ScaleFactor() * radius_;
-    return 4.0 * PI * sR * sR;
+    return 4 * PI * sR * sR;
 }
 
 AABB Sphere::LocalBound() const

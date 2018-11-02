@@ -254,7 +254,7 @@ namespace
                 bhigh = bhigh | buckets[i].bound;
             }
 
-            cost[splitPos] = 0.125 + invAllBoundArea * (clow * blow.SurfaceArea() + chigh * bhigh.SurfaceArea());
+            cost[splitPos] = Real(0.125) + invAllBoundArea * (clow * blow.SurfaceArea() + chigh * bhigh.SurfaceArea());
         }
 
         int splitPos = 0;
@@ -390,7 +390,7 @@ void BVH::InitBVH(const ConstEntityPtr *entities, uint32_t nEntity)
     {
         entInfo[i].entity = entities[i];
         entInfo[i].bound = entities[i]->WorldBound();
-        entInfo[i].centroid = 0.5 * (entInfo[i].bound.high + entInfo[i].bound.low);
+        entInfo[i].centroid = Real(0.5) * (entInfo[i].bound.high + entInfo[i].bound.low);
     }
 
     AGZ::ObjArena<> nodeArena;

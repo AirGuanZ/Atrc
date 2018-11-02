@@ -21,14 +21,14 @@ void SkyLight::PreprocessScene(const Scene &scene)
     auto &wb = scene.GetWorldBound();
     if(wb.IsEmpty())
     {
-        worldRadius_ = 1.0;
+        worldRadius_ = 1;
         return;
     }
 
-    worldCentre_ = 0.5 * (wb.high - wb.low);
+    worldCentre_ = Real(0.5) * (wb.high - wb.low);
 
     auto hd = wb.high - worldCentre_;
-    worldRadius_ = 1.01 * hd.Length();
+    worldRadius_ = Real(1.01) * hd.Length();
 }
 
 LightSampleToResult SkyLight::SampleLi(const SurfacePoint &sp) const
@@ -42,7 +42,7 @@ LightSampleToResult SkyLight::SampleLi(const SurfacePoint &sp) const
     float topWeight = 0.5f * float(sam.z) + 0.5f;
 
     LightSampleToResult ret;
-    ret.pos      = sp.pos + 2.0 * sam * worldRadius_;
+    ret.pos      = sp.pos + 2 * sam * worldRadius_;
     ret.wi       = sam;
     ret.radiance = topWeight * top_ + (1 - topWeight) * bottom_;
     ret.pdf      = pdf;

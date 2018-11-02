@@ -8,9 +8,9 @@ namespace
     Option<Vec3> GetRefractDirection(const Vec3 &wo, const Vec3 &nor, float eta)
     {
         Real cosThetaI = Abs(wo.z);
-        Real sinThetaI2 = Max(0.0, 1 - cosThetaI * cosThetaI);
+        Real sinThetaI2 = Max(Real(0), 1 - cosThetaI * cosThetaI);
         Real sinThetaT2 = eta * eta * sinThetaI2;
-        if(sinThetaT2 >= 1.0)
+        if(sinThetaT2 >= 1)
             return None;
         Real cosThetaT = Sqrt(1 - sinThetaT2);
         return (eta * cosThetaI - cosThetaT) * nor - eta * wo;
@@ -30,7 +30,7 @@ Spectrum PerfectSpecular::Eval(const Vec3 &wi, const Vec3 &wo) const
 
 Option<BxDFSampleWiResult> PerfectSpecular::SampleWi(const Vec3 &wo) const
 {
-    Vec3 nor = wo.z > 0.0 ? Vec3::UNIT_Z() : -Vec3::UNIT_Z();
+    Vec3 nor = wo.z > 0 ? Vec3::UNIT_Z() : -Vec3::UNIT_Z();
 
     // 先算fresnel量，根据概率选反射还是折射
     auto Fr = fresnel_->Eval(float(wo.z));
@@ -56,7 +56,7 @@ Option<BxDFSampleWiResult> PerfectSpecular::SampleWi(const Vec3 &wo) const
 
     BxDFSampleWiResult ret;
     ret.wi   = wi->Normalize();
-    ret.pdf  = 1.0 - Fr.r;
+    ret.pdf  = 1 - Fr.r;
     ret.coef = eta * eta * rc_ * (Spectrum(1.0f) - Fr)
              / Abs(ret.wi.z);
     ret.type = BxDFType(BXDF_SPECULAR | BXDF_TRANSMISSION);
@@ -66,7 +66,7 @@ Option<BxDFSampleWiResult> PerfectSpecular::SampleWi(const Vec3 &wo) const
 
 Real PerfectSpecular::SampleWiPDF(const Vec3 &wi, const Vec3 &wo) const
 {
-    return 0.0;
+    return 0;
 }
 
 AGZ_NS_END(Atrc)

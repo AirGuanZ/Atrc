@@ -3,11 +3,11 @@
 AGZ_NS_BEG(Atrc)
 
 Cube::Cube(const Transform &local2World, Real sideLen)
-    : Geometry(local2World), halfSideLen_(0.5 * sideLen)
+    : Geometry(local2World), halfSideLen_(Real(0.5) * sideLen)
 {
-    AGZ_ASSERT(halfSideLen_ > 0.0);
+    AGZ_ASSERT(halfSideLen_ > 0);
     Real fac = local2World.ScaleFactor();
-    surfaceArea_ = 6.0 * (fac * fac) * (sideLen * sideLen);
+    surfaceArea_ = 6 * (fac * fac) * (sideLen * sideLen);
 }
 
 bool Cube::HasIntersection(const Ray &r) const
@@ -98,7 +98,7 @@ bool Cube::FindIntersection(const Ray &_r, SurfacePoint *sp) const
         return false;
 
     auto nor = Vec3(0.0);
-    nor[bestAxis] = negAxis ? -1.0 : 1.0;
+    nor[bestAxis] = negAxis ? -Real(1) : Real(1);
 
     Vec3 pos = r.At(bestT), ex;
 
@@ -108,14 +108,14 @@ bool Cube::FindIntersection(const Ray &_r, SurfacePoint *sp) const
 
         if(negAxis)
         {
-            sp->geoUV.u = Clamp(0.5 - 0.5 * pos.y / halfSideLen_, 0.0, 1.0);
-            sp->geoUV.v = Clamp(0.5 - 0.5 * pos.z / halfSideLen_, 0.0, 1.0);
+            sp->geoUV.u = Clamp(Real(0.5) - Real(0.5) * pos.y / halfSideLen_, Real(0), Real(1));
+            sp->geoUV.v = Clamp(Real(0.5) - Real(0.5) * pos.z / halfSideLen_, Real(0), Real(1));
             ex = -Vec3::UNIT_Y();
         }
         else
         {
-            sp->geoUV.u = Clamp(0.5 * pos.y / halfSideLen_ + 0.5, 0.0, 1.0);
-            sp->geoUV.v = Clamp(0.5 * pos.z / halfSideLen_ + 0.5, 0.0, 1.0);
+            sp->geoUV.u = Clamp(Real(0.5) * pos.y / halfSideLen_ + Real(0.5), Real(0), Real(1));
+            sp->geoUV.v = Clamp(Real(0.5) * pos.z / halfSideLen_ + Real(0.5), Real(0), Real(1));
             ex = Vec3::UNIT_Y();
         }
 
@@ -125,14 +125,14 @@ bool Cube::FindIntersection(const Ray &_r, SurfacePoint *sp) const
 
         if(negAxis)
         {
-            sp->geoUV.u = Clamp(0.5 * pos.x / halfSideLen_ + 0.5, 0.0, 1.0);
-            sp->geoUV.v = Clamp(0.5 * pos.z / halfSideLen_ + 0.5, 0.0, 1.0);
+            sp->geoUV.u = Clamp(Real(0.5) * pos.x / halfSideLen_ + Real(0.5), Real(0), Real(1.0));
+            sp->geoUV.v = Clamp(Real(0.5) * pos.z / halfSideLen_ + Real(0.5), Real(0), Real(1.0));
             ex = Vec3::UNIT_X();
         }
         else
         {
-            sp->geoUV.u = Clamp(0.5 - 0.5 * pos.x / halfSideLen_, 0.0, 1.0);
-            sp->geoUV.v = Clamp(0.5 - 0.5 * pos.z / halfSideLen_, 0.0, 1.0);
+            sp->geoUV.u = Clamp(Real(0.5) - Real(0.5) * pos.x / halfSideLen_, Real(0), Real(1));
+            sp->geoUV.v = Clamp(Real(0.5) - Real(0.5) * pos.z / halfSideLen_, Real(0), Real(1));
             ex = -Vec3::UNIT_X();
         }
 
@@ -142,14 +142,14 @@ bool Cube::FindIntersection(const Ray &_r, SurfacePoint *sp) const
 
         if(negAxis)
         {
-            sp->geoUV.u = Clamp(0.5 - 0.5 * pos.x / halfSideLen_, 0.0, 1.0);
-            sp->geoUV.v = Clamp(0.5 - 0.5 * pos.y / halfSideLen_, 0.0, 1.0);
+            sp->geoUV.u = Clamp(Real(0.5) - Real(0.5) * pos.x / halfSideLen_, Real(0), Real(1));
+            sp->geoUV.v = Clamp(Real(0.5) - Real(0.5) * pos.y / halfSideLen_, Real(0), Real(1));
             ex = -Vec3::UNIT_X();
         }
         else
         {
-            sp->geoUV.u = Clamp(0.5 * pos.x / halfSideLen_ + 0.5, 0.0, 1.0);
-            sp->geoUV.v = Clamp(0.5 * pos.y / halfSideLen_ + 0.5, 0.0, 1.0);
+            sp->geoUV.u = Clamp(Real(0.5) * pos.x / halfSideLen_ + Real(0.5), Real(0), Real(1));
+            sp->geoUV.v = Clamp(Real(0.5) * pos.y / halfSideLen_ + Real(0.5), Real(0), Real(1));
             ex = Vec3::UNIT_X();
         }
 
@@ -186,7 +186,7 @@ GeometrySampleResult Cube::Sample() const
 
     Vec3 nor(0.0), pos;
 
-    nor[axis] = neg ? -1.0 : 1.0;
+    nor[axis] = neg ? -Real(1) : Real(1);
 
     pos[axis] = neg ? -halfSideLen_ : halfSideLen_;
     pos[(axis + 1) % 3] = AGZ::Math::Random::Uniform(-halfSideLen_, halfSideLen_);

@@ -15,21 +15,21 @@ float BlinnPhongDistribution::Eval(const Vec3 &H) const
 
 Option<MDSampleResult> BlinnPhongDistribution::SampleWi(const Vec3 &wo) const
 {
-    if(wo.z <= 0.0)
+    if(wo.z <= 0)
         return None;
 
     Real u1 = Rand(), u2 = Rand();
     Real cosTheta = Pow(u1, 1 / (e_ + 1));
-    Real sinTheta = Sqrt(Max(0.0, 1 - cosTheta * cosTheta));
+    Real sinTheta = Sqrt(Max(Real(0), 1 - cosTheta * cosTheta));
     Real phi = 2 * PI * u2;
 
     Vec3 H = { sinTheta * Cos(phi), sinTheta * Sin(phi), cosTheta };
-    if(H.z <= 0.0)
+    if(H.z <= 0)
         return None;
 
     MDSampleResult ret;
     ret.wi = 2 * Dot(wo, H) * H - wo;
-    if(ret.wi.z <= 0.0)
+    if(ret.wi.z <= 0)
         return None;
     AGZ_ASSERT(IsNormalized(ret.wi));
 

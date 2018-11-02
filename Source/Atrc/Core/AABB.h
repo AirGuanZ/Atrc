@@ -21,9 +21,9 @@ public:
     Real SurfaceArea() const
     {
         Vec3 delta = high - low;
-        if(delta.x <= 0.0 || delta.y <= 0.0 || delta.z <= 0.0)
-            return 0.0;
-        return 2.0 * (delta.x * delta.y + delta.y * delta.z + delta.z * delta.x);
+        if(delta.x <= 0 || delta.y <= 0 || delta.z <= 0)
+            return 0;
+        return 2 * (delta.x * delta.y + delta.y * delta.z + delta.z * delta.x);
     }
 
     AABB &Expand(const Vec3 &p)
@@ -98,7 +98,7 @@ public:
         Real f = invDir * (high.x - r.ori.x);
         if(n > f)
             std::swap(n, f);
-        f *= (1 + 1e-5);
+        f *= Real(1 + 1e-5);
         t0 = Max(n, t0);
         t1 = Min(f, t1);
         if(t0 > t1)
@@ -109,7 +109,7 @@ public:
         f = invDir * (high.y - r.ori.y);
         if(n > f)
             std::swap(n, f);
-        f *= (1 + 1e-5);
+        f *= Real(1 + 1e-5);
         t0 = Max(n, t0);
         t1 = Min(f, t1);
         if(t0 > t1)
@@ -120,7 +120,7 @@ public:
         f = invDir * (high.z - r.ori.z);
         if(n > f)
             std::swap(n, f);
-        f *= (1 + 1e-5);
+        f *= Real(1 + 1e-5);
         t0 = Max(n, t0);
         t1 = Min(f, t1);
 
