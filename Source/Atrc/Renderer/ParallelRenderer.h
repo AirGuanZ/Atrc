@@ -11,7 +11,6 @@
 
 AGZ_NS_BEG(Atrc)
 
-
 class ParallelRenderer : public Renderer
 {
     int workerCount_;
@@ -61,8 +60,7 @@ class ParallelRenderer : public Renderer
                 {
                     std::lock_guard<std::mutex> lk2(*param.outMut);
                     float percent = 100.0f * (++param.finishedCount) / param.taskCount;
-                    std::printf("\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b"
-                                "Progress: %5.2f%%  ", percent);
+					std::cout << "Progress: " << percent << "%" << std::endl;
                 }
             }
         }
@@ -71,8 +69,7 @@ class ParallelRenderer : public Renderer
             if(param.outMut)
             {
                 std::lock_guard<std::mutex> lk(*param.outMut);
-                std::printf("\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b"
-                            "Exception in subrendering thread: %s\n", err.what());
+				std::cout << "Exception in subrendering thread: " << err.what() << std::endl;
             }
             std::terminate();
         }
@@ -81,8 +78,7 @@ class ParallelRenderer : public Renderer
             if(param.outMut)
             {
                 std::lock_guard<std::mutex> lk(*param.outMut);
-                std::printf("\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b"
-                            "Unknown exception in subrendering thread\n");
+				std::cout << "Unknown exception in subrendering thread" << std::endl;
             }
             std::terminate();
         }
@@ -140,7 +136,7 @@ public:
             worker.join();
 
         if(!tasks.empty())
-            printf("Some error occurred...\n");
+            std::cout << "Some error occurred..." << std::endl;
 
         if(printProgress_)
             std::cout << std::endl;

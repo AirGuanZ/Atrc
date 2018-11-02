@@ -24,16 +24,21 @@ BVH::BVH(const ConstEntityPtr *entities, size_t nEntity)
     AGZ_ASSERT(!nodes_.empty() && !entities_.empty());
 }
 
+constexpr int TVL_TASK_STACK_SIZE = 128;
+
 bool BVH::HasIntersection(const Ray &r) const
 {
     AGZ_ASSERT(!nodes_.empty());
 
-    std::queue<uint32_t> tasks;
-    tasks.push(0);
-    while(!tasks.empty())
+	Vec3 invDir = Vec3(1) / r.dir;
+
+	static thread_local uint32_t tasks[TVL_TASK_STACK_SIZE];
+	int taskTop = 0;
+	tasks[taskTop++] = 0;
+
+    while(taskTop)
     {
-        uint32_t taskNodeIdx = tasks.front();
-        tasks.pop();
+        uint32_t taskNodeIdx = tasks[--taskTop];
         const Node &node = nodes_[taskNodeIdx];
 
         auto trt = AGZ::TypeOpr::MatchVar(node,
@@ -48,10 +53,10 @@ bool BVH::HasIntersection(const Ray &r) const
         },
             [&](const Internal &internal)
         {
-            if(internal.bound.HasIntersection(r))
+            if(internal.bound.HasIntersection(r, invDir))
             {
-                tasks.push(taskNodeIdx + 1);
-                tasks.push(internal.rightChild);
+                tasks[taskTop++] = taskNodeIdx + 1;
+                tasks[taskTop++] = internal.rightChild;
             }
             return false;
         });
@@ -67,13 +72,17 @@ bool BVH::FindIntersection(const Ray &r, SurfacePoint *sp) const
 {
     AGZ_ASSERT(!nodes_.empty());
 
-    bool ret = false;
-    std::queue<uint32_t> tasks;
-    tasks.push(0);
-    while(!tasks.empty())
+	Vec3 invDir = Vec3(1) / r.dir;
+
+	sp->t = RealT::Infinity();
+
+	static thread_local uint32_t tasks[TVL_TASK_STACK_SIZE];
+	int taskTop = 0;
+	tasks[taskTop++] = 0;
+
+    while(taskTop)
     {
-        uint32_t taskNodeIdx = tasks.front();
-        tasks.pop();
+		uint32_t taskNodeIdx = tasks[--taskTop];
         const Node &node = nodes_[taskNodeIdx];
 
         AGZ::TypeOpr::MatchVar(node,
@@ -83,24 +92,21 @@ bool BVH::FindIntersection(const Ray &r, SurfacePoint *sp) const
             for(uint32_t i = leaf.start; i < leaf.end; ++i)
             {
                 const auto &ent = entities_[i];
-                if(ent->FindIntersection(r, &tSp) && (!ret || tSp.t < sp->t))
-                {
-                    ret = true;
+                if(ent->FindIntersection(r, &tSp) && tSp.t < sp->t)
                     *sp = tSp;
-                }
             }
         },
             [&](const Internal &internal)
         {
-            if(internal.bound.HasIntersection(r))
+            if(internal.bound.HasIntersection(r, invDir))
             {
-                tasks.push(taskNodeIdx + 1);
-                tasks.push(internal.rightChild);
+				tasks[taskTop++] = taskNodeIdx + 1;
+				tasks[taskTop++] = internal.rightChild;
             }
         });
     }
 
-    return ret;
+    return !RealT(sp->t).IsInfinity();
 }
 
 AABB BVH::WorldBound() const

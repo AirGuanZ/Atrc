@@ -51,21 +51,20 @@ namespace
 
         Vec3 o_A = r.ori - A;
         Real alpha = Dot(o_A, s1) * invDiv;
-        if(alpha < 0 || alpha > 1)
-            return false;
+		if(alpha < 0)
+			return false;
 
         Vec3 s2 = Cross(o_A, B_A);
         Real beta = Dot(r.dir, s2) * invDiv;
-        if(beta < 0 || alpha + beta > 1)
-            return false;
+		if(beta < 0 || alpha + beta > 1)
+			return false;
 
         Real t = Dot(C_A, s2) * invDiv;
-        if(!r.Between(t))
-            return false;
+
+		if(!r.Between(t))
+			return false;
 
         sp->t     = t;
-        sp->pos   = r.At(t);
-        sp->wo    = -r.dir.Normalize();
         sp->geoUV = Vec2(alpha, beta);
 
         return true;
@@ -117,16 +116,21 @@ TriangleBVHCore::TriangleBVHCore(const AGZ::Model::GeometryMesh &mesh)
     }
 }
 
+constexpr int TVL_TASK_STACK_SIZE = 128;
+
 bool TriangleBVHCore::HasIntersection(const Ray &r) const
 {
     AGZ_ASSERT(!nodes_.empty());
 
-    std::queue<uint32_t> tasks;
-    tasks.push(0);
-    while(!tasks.empty())
+	Vec3 invDir = Vec3(1) / r.dir;
+
+	static thread_local uint32_t tasks[TVL_TASK_STACK_SIZE];
+	int taskTop = 0;
+	tasks[taskTop++] = 0;
+
+    while(taskTop)
     {
-        uint32_t taskNodeIdx = tasks.front();
-        tasks.pop();
+		uint32_t taskNodeIdx = tasks[--taskTop];
         const Node &node = nodes_[taskNodeIdx];
 
         bool inct = AGZ::TypeOpr::MatchVar(node,
@@ -142,10 +146,10 @@ bool TriangleBVHCore::HasIntersection(const Ray &r) const
         },
             [&](const Internal &internal)
         {
-            if(internal.bound.HasIntersection(r))
+            if(internal.bound.HasIntersection(r, invDir))
             {
-                tasks.push(taskNodeIdx + 1);
-                tasks.push(internal.rightChild);
+				tasks[taskTop++] = taskNodeIdx + 1;
+				tasks[taskTop++] = internal.rightChild;
             }
             return false;
         });
@@ -161,13 +165,17 @@ bool TriangleBVHCore::FindIntersection(const Ray &r, SurfacePoint *sp) const
 {
     AGZ_ASSERT(!nodes_.empty());
 
-    bool ret = false;
-    std::queue<uint32_t> tasks;
-    tasks.push(0);
-    while(!tasks.empty())
+	Vec3 invDir = Vec3(1) / r.dir;
+
+	sp->t = RealT::Infinity();
+
+	static thread_local uint32_t tasks[TVL_TASK_STACK_SIZE];
+	uint32_t taskTop = 0;
+	tasks[taskTop++] = 0;
+
+    while(taskTop)
     {
-        uint32_t taskNodeIdx = tasks.front();
-        tasks.pop();
+		uint32_t taskNodeIdx = tasks[--taskTop];
         const Node &node = nodes_[taskNodeIdx];
 
         AGZ::TypeOpr::MatchVar(node,
@@ -178,9 +186,8 @@ bool TriangleBVHCore::FindIntersection(const Ray &r, SurfacePoint *sp) const
             {
                 const auto &tri = triangles_[i];
                 if(EvalIntersectionWithTriangle(
-                    tri.A, tri.B_A, tri.C_A, r, &tSp) && (!ret || tSp.t < sp->t))
+                    tri.A, tri.B_A, tri.C_A, r, &tSp) && tSp.t <= sp->t)
                 {
-                    ret = true;
                     *sp = tSp;
                     sp->flag0 = i;
                 }
@@ -188,20 +195,24 @@ bool TriangleBVHCore::FindIntersection(const Ray &r, SurfacePoint *sp) const
         },
             [&](const Internal &internal)
         {
-            if(internal.bound.HasIntersection(r))
+            if(internal.bound.HasIntersection(r, invDir))
             {
-                tasks.push(taskNodeIdx + 1);
-                tasks.push(internal.rightChild);
+				tasks[taskTop++] = taskNodeIdx + 1;
+				tasks[taskTop++] = internal.rightChild;
             }
         });
     }
 
-    if(!ret)
-        return false;
+	if(RealT(sp->t).IsInfinity())
+		return false;
+
+	sp->pos = r.At(sp->t);
+	sp->wo  = -r.dir.Normalize();
 
     const auto &tri = triangles_[sp->flag0];
     sp->usrUV = tri.tA + sp->geoUV.u * tri.tB_tA + sp->geoUV.v * tri.tC_tA;
     sp->geoLocal = LocalCoordSystem::FromEz(tri.nor);
+
     return true;
 }
 
