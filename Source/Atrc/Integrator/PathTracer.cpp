@@ -51,10 +51,6 @@ Spectrum PathTracer::Ls(const Scene &scene, const SurfacePoint &sp, int depth, A
 
 Spectrum PathTracer::E(const Scene &scene, const SurfacePoint &sp, const ShadingPoint &shd) const
 {
-    /*constexpr Real PROB_E1 = 0.5;
-    constexpr Real PROB_E2 = 1 - PROB_E1;
-    return Rand() < PROB_E1 ? float(1 / PROB_E1) * E1(scene, sp, shd)
-                            : float(1 / PROB_E2) * E2(scene, sp, shd);*/
     return E1(scene, sp, shd) + E2(scene, sp, shd);
 }
 
