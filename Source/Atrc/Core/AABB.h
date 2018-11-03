@@ -36,40 +36,49 @@ public:
         return *this;
     }
 
-	/*bool HasIntersection(const Ray &r, const Vec3 &invDir) const
+	template<bool SwapX, bool SwapY, bool SwapZ>
+	bool HasIntersection(const Ray &r, const Vec3 &invDir) const
 	{
-		Real t0 = r.minT, t1 = r.maxT;
+		Real t0, t1;
 
-		Real n = invDir.x * (low.x - r.ori.x);
-		Real f = invDir.x * (high.x - r.ori.x);
-		if(n > f)
-			std::swap(n, f);
-		f *= (1 + 1e-5);
-		t0 = Max(n, t0);
-		t1 = Min(f, t1);
-		if(t0 > t1)
-			return false;
+		Vec3 n = invDir * (low - r.ori);
+		Vec3 f = invDir * (high - r.ori);
 
-		n = invDir.y * (low.y - r.ori.y);
-		f = invDir.y * (high.y - r.ori.y);
-		if(n > f)
-			std::swap(n, f);
-		f *= (1 + 1e-5);
-		t0 = Max(n, t0);
-		t1 = Min(f, t1);
-		if(t0 > t1)
-			return false;
+		if constexpr(SwapX)
+		{
+			t0 = Max(r.minT, f.x);
+			t1 = Min(r.maxT, n.x);
+		}
+		else
+		{
+			t0 = Max(r.minT, n.x);
+			t1 = Min(r.maxT, f.x);
+		}
 
-		n = invDir.z * (low.z - r.ori.z);
-		f = invDir.z * (high.z - r.ori.z);
-		if(n > f)
-			std::swap(n, f);
-		f *= (1 + 1e-5);
-		t0 = Max(n, t0);
-		t1 = Min(f, t1);
+		if constexpr(SwapY)
+		{
+			t0 = Max(t0, f.y);
+			t1 = Min(t1, n.y);
+		}
+		else
+		{
+			t0 = Max(t0, n.y);
+			t1 = Min(t1, f.y);
+		}
+
+		if constexpr(SwapZ)
+		{
+			t0 = Max(t0, f.z);
+			t1 = Min(t1, n.z);
+		}
+		else
+		{
+			t0 = Max(t0, n.z);
+			t1 = Min(t1, f.z);
+		}
 
 		return t0 <= t1;
-	}*/
+	}
 
 	bool HasIntersection(const Ray &r, const Vec3 &invDir) const
 	{
@@ -85,6 +94,20 @@ public:
 		t1 = Min(t1, Max(n.x, f.x));
 		t1 = Min(t1, Max(n.y, f.y));
 		t1 = Min(t1, Max(n.z, f.z));
+
+		return t0 <= t1;
+	}
+
+	bool HasIntersection(AGZ::Math::D64x4 invDir, AGZ::Math::D64x4 ori, Real minT, Real maxT) const
+	{
+		using namespace AGZ::Math;
+
+		D64x4 n = invDir * (D64x4(Vec4(low, 0.0)) - ori);
+		D64x4 f = invDir * (D64x4(Vec4(high, 0.0)) - ori);
+		D64x4 a = Min(n, f), b = Max(n, f);
+
+		Real t0 = Max(minT, Max(a.x, Max(a.y, a.z)));
+		Real t1 = Min(maxT, Min(b.x, Min(b.y, b.z)));
 
 		return t0 <= t1;
 	}

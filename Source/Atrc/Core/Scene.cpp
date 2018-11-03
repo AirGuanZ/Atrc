@@ -60,17 +60,14 @@ bool Scene::HasIntersection(const Ray &r) const
 
 bool Scene::FindCloestIntersection(const Ray &r, SurfacePoint *sp) const
 {
-    bool ret = false;
+	sp->t = RealT::Infinity();
     for(auto ent : entities_)
     {
         SurfacePoint newSp;
-        if(ent->FindIntersection(r, &newSp) && (!ret || newSp.t < sp->t))
-        {
-            ret = true;
+        if(ent->FindIntersection(r, &newSp) && newSp.t < sp->t)
             *sp = newSp;
-        }
     }
-    return ret;
+    return !RealT(sp->t).IsInfinity();
 }
 
 AGZ_NS_END(Atrc)

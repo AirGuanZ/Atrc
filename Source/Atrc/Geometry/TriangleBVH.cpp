@@ -174,6 +174,8 @@ bool TriangleBVHCore::FindIntersection(const Ray &r, SurfacePoint *sp) const
 	uint32_t taskTop = 0;
 	tasks[taskTop++] = 0;
 
+	Ray tr = r;
+
     while(taskTop)
     {
 		uint32_t taskNodeIdx = tasks[--taskTop];
@@ -186,9 +188,9 @@ bool TriangleBVHCore::FindIntersection(const Ray &r, SurfacePoint *sp) const
             for(uint32_t i = leaf.start; i < leaf.end; ++i)
             {
                 const auto &tri = triangles_[i];
-                if(EvalIntersectionWithTriangle(
-                    tri.A, tri.B_A, tri.C_A, r, &tSp) && tSp.t <= sp->t)
+                if(EvalIntersectionWithTriangle(tri.A, tri.B_A, tri.C_A, tr, &tSp))
                 {
+					tr.maxT = tSp.t;
                     *sp = tSp;
                     sp->flag0 = i;
                 }
@@ -196,7 +198,7 @@ bool TriangleBVHCore::FindIntersection(const Ray &r, SurfacePoint *sp) const
         },
             [&](const Internal &internal)
         {
-            if(internal.bound.HasIntersection(r, invDir))
+            if(internal.bound.HasIntersection(tr, invDir))
             {
 				tasks[taskTop++] = taskNodeIdx + 1;
 				tasks[taskTop++] = internal.rightChild;
@@ -319,7 +321,7 @@ namespace
         TNode **fillNode;
     };
 
-    constexpr uint32_t MAX_LEAF_SIZE = 4;
+    constexpr uint32_t MAX_LEAF_SIZE = 6;
 
     TNode *BuildSingleNode(
         MappedTriangles &tris, AGZ::ObjArena<> &nodeArena,
