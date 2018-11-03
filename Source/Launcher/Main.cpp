@@ -36,7 +36,7 @@ Texture2D<Color3b> ToSavedImage(const RenderTarget &origin, float gamma)
 
 int main()
 {
-#if defined(_WIN32) && defined(_DEBUG)
+#if defined(_MSC_VER) && defined(_DEBUG)
     _CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG)
                  | _CRTDBG_LEAK_CHECK_DF);
 #endif
@@ -72,10 +72,10 @@ int main()
     GeometricEntity leftSph(&sph3, &leftMat);
 
     Model::WavefrontObj dragonObj;
-    Model::WavefrontObjFile::LoadFromObjFile("./Assets/airguanz.obj", &dragonObj);
+    Model::WavefrontObjFile::LoadFromObjFile("./Assets/bun_zipper.obj", &dragonObj);
     auto dragonBVHCore = MakeRC<TriangleBVHCore>(dragonObj.ToGeometryMeshGroup().submeshes["Default"]);
     dragonObj.Clear();
-    TriangleBVH dragonBVH(Transform::Translate(0.0, -0.4, -1.0) * Transform::RotateZ(Deg(-90)) * Transform::Scale(2.2 / 20), dragonBVHCore);
+    TriangleBVH dragonBVH(Transform::Translate(0.0, -0.4, -0.8) * Transform::RotateZ(Deg(-90)) * Transform::Scale(2.2 / 50), dragonBVHCore);
     Metal dragonMat(Spectrum(0.9f, 0.4f, 0.2f), Spectrum(0.1f), Spectrum(0.05f), 0.04);
     GeometricEntity dragon(&dragonBVH, &dragonMat);
 
@@ -88,8 +88,8 @@ int main()
     TextureScaler<Atrc::LinearSampler> cubeMat(&cubeTex, &cubeDiffuse);
     GeometricEntity rightCube(&cube, &cubeMat);
 
-    //SkyLight sky(Spectrum(0.4f, 0.7f, 0.9f), Spectrum(1.0f));
-	SkyLight sky(Spectrum(0.01f, 0.0f, 0.0f), Spectrum(0.01f, 0.0f, 0.0f));
+    SkyLight sky(Spectrum(0.4f, 0.7f, 0.9f), Spectrum(1.0f));
+	//SkyLight sky(Spectrum(0.01f, 0.0f, 0.0f), Spectrum(0.01f, 0.0f, 0.0f));
 
     Model::WavefrontObj ringObj;
     Model::WavefrontObjFile::LoadFromObjFile("./Assets/ring.obj", &ringObj);
@@ -97,11 +97,11 @@ int main()
     ringObj.Clear();
     TriangleBVH ringBVH(Transform::Translate(0.0, 0.78, -0.37) * Transform::RotateZ(Deg(90)) * Transform::Scale(1.0 / 20.0), ringBVHCore);
 
-    //Sphere sph4(Transform::Translate(2.0, 1.0, 1.8), 0.4);
+    Sphere sph4(Transform::Translate(0.0, 0.78, -0.4), 0.05);
     Cube cubeL(Transform::Translate(2.0, 1.0, 1.8) * Transform::Rotate({ 1.0, 1.1, 1.2 }, Deg(47)), 0.7);
-    GeometricDiffuseLight sphLight(&ringBVH, Spectrum(11.0f));
+    GeometricDiffuseLight sphLight(&sph4, Spectrum(13.0f));
 
-    std::vector<const Entity*> entities = { /*&rightCube, &leftSph,*/ &dragon, /*&medModel,*/ &ground, &sphLight };
+    std::vector<const Entity*> entities = { /*&rightCube, &leftSph,*/ &dragon, /*&medModel,*/ &ground, /*&sphLight*/ };
 
     Scene scene;
     scene.camera    = &camera;
@@ -126,7 +126,7 @@ int main()
 
     //============= Renderer & Integrator =============
 
-    JitteredSubareaRenderer subareaRenderer(100);
+    JitteredSubareaRenderer subareaRenderer(1);
 
     ParallelRenderer renderer(6);
     //SerialRenderer renderer;

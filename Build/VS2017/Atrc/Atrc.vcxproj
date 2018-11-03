@@ -79,7 +79,6 @@
     <ClCompile Include="..\..\..\Source\Atrc\Core\Entity.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Core\Geometry.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Core\Light.cpp" />
-    <ClCompile Include="..\..\..\Source\Atrc\Core\Material.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Core\Scene.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Entity\GeometricEntity.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Geometry\Cube.cpp" />

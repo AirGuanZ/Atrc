@@ -297,9 +297,6 @@
     <ClCompile Include="..\..\..\Source\Atrc\Accelarator\BVH.cpp">
       <Filter>Accelarator</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Source\Atrc\Core\Material.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Source\Atrc\Utility\ParamParser.cpp">
       <Filter>Utility</Filter>
     </ClCompile>
