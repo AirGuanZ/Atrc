@@ -55,6 +55,8 @@ DEFINE_ATRC_EXCEPTION(UnreachableException);
 using Real = double;
 using RealT = AGZ::Math::FP<Real>;
 
+constexpr Real EPS = Real(1e-6);
+
 using Vec2 = AGZ::Math::Vec2<Real>;
 using Vec3 = AGZ::Math::Vec3<Real>;
 using Vec4 = AGZ::Math::Vec4<Real>;
@@ -72,7 +74,7 @@ inline Real Rand() { return AGZ::Math::Random::Uniform(Real(0), Real(1)); }
 
 inline Real Cos(const Vec3 &L, const Vec3 &R) { return Dot(L, R) / (L.Length() * R.Length()); }
 
-inline bool IsNormalized(const Vec3 &v) { return AGZ::Math::ApproxEq(v.LengthSquare(), Real(1), Real(1e-5)); }
+inline bool IsNormalized(const Vec3 &v) { return AGZ::Math::ApproxEq(v.LengthSquare(), Real(1), EPS); }
 
 using AGZ::Math::Abs;
 using AGZ::Math::ApproxEq;

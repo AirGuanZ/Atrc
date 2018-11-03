@@ -337,6 +337,15 @@ namespace
             return FillLeaf(nodeArena.Create<TNode>(), start, end);
         }
 
+		AABB allBound;
+		for(auto i = start; i < end; ++i)
+		{
+			auto tri = tris.GetTriangleVertices(i);
+			allBound.Expand(tri[0].pos);
+			allBound.Expand(tri[1].pos);
+			allBound.Expand(tri[2].pos);
+		}
+
         // 选择划分轴
         // 若所有centroid都在同一个位置，则创建一个叶节点
 
@@ -354,7 +363,7 @@ namespace
 
         // 把所有三角形划分到一堆buckets中，然后从buckets间隙中选择一个最佳划分点
 
-        constexpr int BUCKET_COUNT = 12;
+        /*constexpr int BUCKET_COUNT = 12;
 
         struct Bucket
         {
@@ -373,15 +382,6 @@ namespace
 
             ++buckets[iBucket].count;
             buckets[iBucket].bound.Expand(tri.centroid);
-        }
-
-        AABB allBound;
-        for(auto i = start; i < end; ++i)
-        {
-            auto tri = tris.GetTriangleVertices(i);
-            allBound.Expand(tri[0].pos);
-            allBound.Expand(tri[1].pos);
-            allBound.Expand(tri[2].pos);
         }
         Real invAllBoundArea = 1 / allBound.SurfaceArea();
 
@@ -436,7 +436,13 @@ namespace
         for(uint32_t i = 0; i < left.size(); ++i)
             tris.triIdxMap[start + i] = left[i];
         for(uint32_t i = 0; i < right.size(); ++i)
-            tris.triIdxMap[splitIdx + i] = right[i];
+            tris.triIdxMap[splitIdx + i] = right[i];*/
+
+		std::sort(&tris.triIdxMap[start], &tris.triIdxMap[end], [&](uint32_t L, uint32_t R)
+        {
+	        return tris.triInfo[L].centroid[splitAxis] < tris.triInfo[R].centroid[splitAxis];
+        });
+		uint32_t splitIdx = (start + end) / 2;
 
         auto *ret = nodeArena.Create<TNode>();
         *ret = TInternal{ nullptr, nullptr, allBound };

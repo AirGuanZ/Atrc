@@ -73,13 +73,13 @@ bool Sphere::FindIntersection(const Ray &_r, SurfacePoint *sp) const
 
     Vec3 nor = pos;
     Vec3 ex, ey;
-    if(ApproxEq(nor.z, Real(1), Real(1e-5)))
+    if(ApproxEq(nor.z, Real(1), EPS))
     {
         nor = Vec3::UNIT_Z();
         ex = Vec3::UNIT_X();
         ey = Vec3::UNIT_Y();
     }
-    else if(ApproxEq(nor.z, Real(-1), Real(1e-5)))
+    else if(ApproxEq(nor.z, Real(-1), EPS))
     {
         nor = -Vec3::UNIT_Z();
         ex = Vec3::UNIT_Y();
@@ -125,7 +125,7 @@ GeometrySampleResult Sphere::Sample() const
     Real r = radius_ * local2World_.ScaleFactor();
     ret.pdf = pdf / (r * r);
 
-    AGZ_ASSERT(ApproxEq(ret.pdf, SamplePDF(ret.pos), 1e-5));
+    AGZ_ASSERT(ApproxEq(ret.pdf, SamplePDF(ret.pos), EPS));
 
     return ret;
 }

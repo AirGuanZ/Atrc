@@ -32,7 +32,6 @@
     <ClInclude Include="..\..\..\Source\Atrc\Core\Integrator.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Core\Light.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Core\Material.h" />
-    <ClInclude Include="..\..\..\Source\Atrc\Core\Medium.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Core\Ray.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Core\Renderer.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Core\Scene.h" />

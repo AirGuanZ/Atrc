@@ -61,7 +61,7 @@ Spectrum PathTracer::E1(const Scene &scene, const SurfacePoint &sp, const Shadin
         return Spectrum();
 
     SurfacePoint newInct;
-    Ray newRay(sp.pos, bsdfSample->wi, Real(1e-5));
+    Ray newRay(sp.pos, bsdfSample->wi, EPS);
     if(scene.FindCloestIntersection(newRay, &newInct))
     {
         auto light = newInct.entity->AsLight();
@@ -114,7 +114,7 @@ Spectrum PathTracer::E2(const Scene &scene, const SurfacePoint &sp, const Shadin
         return Spectrum();
 
     // Shadow ray≤‚ ‘
-    Ray shadowRay(sp.pos, lightSample.wi, Real(1e-5), (lightSample.pos - sp.pos).Length() - Real(1e-5));
+    Ray shadowRay(sp.pos, lightSample.wi, EPS, (lightSample.pos - sp.pos).Length() - EPS);
     if(scene.HasIntersection(shadowRay) ||
         ((Dot(sp.wo,          sp.geoLocal.ez) <= 0.0) ^
          (Dot(lightSample.wi, sp.geoLocal.ez) <= 0.0)))
@@ -141,7 +141,7 @@ Spectrum PathTracer::S(const Scene &scene, const SurfacePoint &sp, const Shading
         return Spectrum();
 
     SurfacePoint newInct;
-    Ray newRay(sp.pos, bsdfSample->wi, Real(1e-5));
+    Ray newRay(sp.pos, bsdfSample->wi, EPS);
     if(!scene.FindCloestIntersection(newRay, &newInct))
         return Spectrum();
 

@@ -98,20 +98,6 @@ public:
 		return t0 <= t1;
 	}
 
-	bool HasIntersection(AGZ::Math::D64x4 invDir, AGZ::Math::D64x4 ori, Real minT, Real maxT) const
-	{
-		using namespace AGZ::Math;
-
-		D64x4 n = invDir * (D64x4(Vec4(low, 0.0)) - ori);
-		D64x4 f = invDir * (D64x4(Vec4(high, 0.0)) - ori);
-		D64x4 a = Min(n, f), b = Max(n, f);
-
-		Real t0 = Max(minT, Max(a.x, Max(a.y, a.z)));
-		Real t1 = Min(maxT, Min(b.x, Min(b.y, b.z)));
-
-		return t0 <= t1;
-	}
-
     bool HasIntersection(const Ray &r) const
     {
         Real t0 = r.minT, t1 = r.maxT;
@@ -121,7 +107,7 @@ public:
         Real f = invDir * (high.x - r.ori.x);
         if(n > f)
             std::swap(n, f);
-        f *= Real(1 + 1e-5);
+        f *= 1 + EPS;
         t0 = Max(n, t0);
         t1 = Min(f, t1);
         if(t0 > t1)
@@ -132,7 +118,7 @@ public:
         f = invDir * (high.y - r.ori.y);
         if(n > f)
             std::swap(n, f);
-        f *= Real(1 + 1e-5);
+        f *= 1 + EPS;
         t0 = Max(n, t0);
         t1 = Min(f, t1);
         if(t0 > t1)
@@ -143,7 +129,7 @@ public:
         f = invDir * (high.z - r.ori.z);
         if(n > f)
             std::swap(n, f);
-        f *= Real(1 + 1e-5);
+        f *= 1 + EPS;
         t0 = Max(n, t0);
         t1 = Min(f, t1);
 

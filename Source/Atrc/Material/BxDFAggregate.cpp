@@ -95,7 +95,7 @@ Real BxDFAggregate::SampleWiPDF(const Vec3 &wi, const Vec3 &wo, BxDFType type) c
         }
     }
 
-    return nMatched ? ret / nMatched : 0.0;
+    return nMatched ? ret / nMatched : Real(0);
 }
 
 AGZ_NS_END(Atrc)

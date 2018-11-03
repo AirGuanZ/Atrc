@@ -57,7 +57,7 @@ int main()
     DiffuseMaterial groundMat(Spectrum(0.4f, 0.8f, 0.4f));
     GeometricEntity ground(&sph, &groundMat);
 
-    Model::WavefrontObj medObj;
+    /*Model::WavefrontObj medObj;
     Model::WavefrontObjFile::LoadFromObjFile("./Assets/test.obj", &medObj);
     auto medBVHCore = MakeRC<TriangleBVHCore>(medObj.ToGeometryMeshGroup().submeshes["Default"]);
     medObj.Clear();
@@ -65,17 +65,17 @@ int main()
 
     Sphere sph2(Transform::Translate(0.0, 0.0, 0.0), 1.0);
     Metal medMat(Spectrum(0.9f, 0.4f, 0.2f), Spectrum(0.01f), Spectrum(0.1f), 0.01);
-    GeometricEntity medModel(&medBVH, &medMat);
+    GeometricEntity medModel(&medBVH, &medMat);*/
 
     Sphere sph3(Transform::Translate(0.0, 2.0, -0.3), 0.7);
     Metal leftMat(Spectrum(0.5f), Spectrum(0.1f), Spectrum(0.1f), 0.003);
     GeometricEntity leftSph(&sph3, &leftMat);
 
     Model::WavefrontObj dragonObj;
-    Model::WavefrontObjFile::LoadFromObjFile("./Assets/bun_zipper.obj", &dragonObj);
+    Model::WavefrontObjFile::LoadFromObjFile("./Assets/Statue_Bressant_1M_Poly.obj", &dragonObj);
     auto dragonBVHCore = MakeRC<TriangleBVHCore>(dragonObj.ToGeometryMeshGroup().submeshes["Default"]);
     dragonObj.Clear();
-    TriangleBVH dragonBVH(Transform::Translate(0.0, -0.4, -0.8) * Transform::RotateZ(Deg(-90)) * Transform::Scale(2.2 / 50), dragonBVHCore);
+    TriangleBVH dragonBVH(Transform::Translate(0.0, 0.3, -0.95) * Transform::RotateZ(Deg(-90)) * Transform::Scale(2.2 / 400), dragonBVHCore);
     Metal dragonMat(Spectrum(0.9f, 0.4f, 0.2f), Spectrum(0.1f), Spectrum(0.05f), 0.04);
     GeometricEntity dragon(&dragonBVH, &dragonMat);
 
@@ -101,7 +101,7 @@ int main()
     Cube cubeL(Transform::Translate(2.0, 1.0, 1.8) * Transform::Rotate({ 1.0, 1.1, 1.2 }, Deg(47)), 0.7);
     GeometricDiffuseLight sphLight(&sph4, Spectrum(13.0f));
 
-    std::vector<const Entity*> entities = { /*&rightCube, &leftSph,*/ &dragon, /*&medModel,*/ &ground, /*&sphLight*/ };
+    std::vector<const Entity*> entities = { &rightCube, &leftSph, &dragon, /*&medModel,*/ &ground, /*&sphLight*/ };
 
     Scene scene;
     scene.camera    = &camera;
