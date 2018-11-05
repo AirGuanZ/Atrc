@@ -136,10 +136,15 @@ class Geometry;
 class Light;
 class Integrator;
 class Material;
+class Medium;
+class PhaseFunction;
 class Ray;
 class Renderer;
 class Scene;
 class Transform;
+
+struct MediumPoint;
+struct MediumShadingPoint;
 
 struct SurfacePoint;
 struct ShadingPoint;

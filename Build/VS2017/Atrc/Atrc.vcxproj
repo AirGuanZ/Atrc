@@ -32,6 +32,7 @@
     <ClInclude Include="..\..\..\Source\Atrc\Core\Integrator.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Core\Light.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Core\Material.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Core\Medium.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Core\Ray.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Core\Renderer.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Core\Scene.h" />
@@ -67,6 +68,7 @@
     <ClInclude Include="..\..\..\Source\Atrc\Material\Plastic.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Material\TextureScaler.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Material\UncallableMaterial.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Medium\HenyeyGreenstein.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Renderer\JitteredSubareaRenderer.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Renderer\SerialRenderer.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Utility\ParamParser.h" />
@@ -105,6 +107,7 @@
     <ClCompile Include="..\..\..\Source\Atrc\Material\IdealMirror.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Material\Metal.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Material\Plastic.cpp" />
+    <ClCompile Include="..\..\..\Source\Atrc\Medium\HenyeyGreenstein.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Renderer\JitteredSubareaRenderer.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Utility\ParamParser.cpp" />
     <ClInclude Include="..\..\..\Source\Atrc\Renderer\ParallelRenderer.h" />
