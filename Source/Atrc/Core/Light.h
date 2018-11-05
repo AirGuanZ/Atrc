@@ -10,7 +10,6 @@ struct LightSampleToResult
     Vec3 wi;
     Spectrum radiance;
     Real pdf = 0.0;
-	bool ignoreGlobalMedium = false;
 };
 
 class Light
@@ -41,7 +40,7 @@ public:
     // 仅针对有实体的光源，设某r与实体交于sp，求这一点沿-r.dir的radiance
     virtual Spectrum AreaLe(const SurfacePoint &sp) const = 0;
 
-	virtual bool NonareaLeIgnoreGlobalMedium() const;
+	virtual bool IgnoreFirstMedium() const;
 
     // 没有实体，沿-r.dir方向凭空产生的那些le，比如skylight等
     virtual Spectrum NonareaLe(const Ray &r) const = 0;

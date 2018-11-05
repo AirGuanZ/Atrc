@@ -64,6 +64,11 @@ Spectrum DirectionalLight::AreaLe(const SurfacePoint &sp) const
     return Spectrum();
 }
 
+bool DirectionalLight::IgnoreFirstMedium() const
+{
+	return true;
+}
+
 Spectrum DirectionalLight::NonareaLe(const Ray &r) const
 {
     return Spectrum();

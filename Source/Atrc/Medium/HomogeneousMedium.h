@@ -15,12 +15,15 @@ class HomogeneousMedium : public Medium
 	// 衰减（ = sigmaA_ + sigmaS_）
 	Spectrum sigmaT_;
 
+	// 自发光
+	Spectrum le_;
+
 	// 不对称系数
 	Real g_;
 
 public:
 
-	HomogeneousMedium(const Spectrum &sigmaA, const Spectrum &sigmaS, Real g);
+	HomogeneousMedium(const Spectrum &sigmaA, const Spectrum &sigmaS, const Spectrum &le, Real g);
 
 	Spectrum Tr(const Vec3 &a, const Vec3 &b) const override;
 

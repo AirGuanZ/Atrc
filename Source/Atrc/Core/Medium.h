@@ -30,6 +30,8 @@ struct MediumPoint
 struct MediumShadingPoint
 {
 	const PhaseFunction *ph = nullptr;
+	Spectrum le;
+	Spectrum sigmaS;
 };
 
 struct MediumSampleLsResult
@@ -57,6 +59,11 @@ struct MediumInterface
 {
 	const Medium *in  = nullptr;
 	const Medium *out = nullptr;
+
+	const Medium *GetMedium(const Vec3 &norOut, const Vec3 &w) const
+	{
+		return Dot(norOut, w) > 0 ? out : in;
+	}
 };
 
 AGZ_NS_END(Atrc)

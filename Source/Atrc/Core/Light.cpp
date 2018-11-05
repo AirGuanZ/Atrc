@@ -12,7 +12,7 @@ bool Light::IsDelta() const
     return IsDeltaPosition() || IsDeltaDirection();
 }
 
-bool Light::NonareaLeIgnoreGlobalMedium() const
+bool Light::IgnoreFirstMedium() const
 {
 	return false;
 }

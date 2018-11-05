@@ -3,8 +3,8 @@
 
 AGZ_NS_BEG(Atrc)
 
-HomogeneousMedium::HomogeneousMedium(const Spectrum &sigmaA, const Spectrum &sigmaS, Real g)
-	: sigmaA_(sigmaA), sigmaS_(sigmaS), sigmaT_(sigmaA + sigmaS), g_(g)
+HomogeneousMedium::HomogeneousMedium(const Spectrum &sigmaA, const Spectrum &sigmaS, const Spectrum &le, Real g)
+	: sigmaA_(sigmaA), sigmaS_(sigmaS), sigmaT_(sigmaA + sigmaS), le_(le), g_(g)
 {
 
 }
@@ -49,6 +49,8 @@ void HomogeneousMedium::Shade(const MediumPoint &medPnt, MediumShadingPoint *shd
 {
 	AGZ_ASSERT(shdPnt && IsNormalized(medPnt.wo));
 	shdPnt->ph = arena.Create<HenyeyGreenstein>(medPnt.wo, g_);
+	shdPnt->le = le_;
+	shdPnt->sigmaS = sigmaS_;
 }
 
 AGZ_NS_END(Atrc)

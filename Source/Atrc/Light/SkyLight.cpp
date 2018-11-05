@@ -79,6 +79,11 @@ Spectrum SkyLight::AreaLe(const SurfacePoint &sp) const
     return Spectrum();
 }
 
+bool SkyLight::IgnoreFirstMedium() const
+{
+	return true;
+}
+
 Spectrum SkyLight::NonareaLe(const Ray &r) const
 {
     float topWeight = 0.5f * float(r.dir.z) + 0.5f;
