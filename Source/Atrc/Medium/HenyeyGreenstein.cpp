@@ -25,8 +25,11 @@ PhaseFunctionSampleWiResult HenyeyGreenstein::SampleWi() const
 
 	Real phi = 2 * PI * v;
 
+	auto dem = float(1 + g * g + 2 * g * cosTheta);
+	ret.coef = float(1 / (4 * PI) * (1 - g * g) / (dem * Sqrt(dem)));
 	ret.wi = LocalCoordSystem::FromEz(-wo).Local2World(
 		{ sinTheta * Cos(phi), sinTheta * Sin(phi), cosTheta });
+
 	return ret;
 }
 

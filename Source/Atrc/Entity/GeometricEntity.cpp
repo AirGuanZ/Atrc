@@ -2,8 +2,8 @@
 
 AGZ_NS_BEG(Atrc)
 
-GeometricEntity::GeometricEntity(const Geometry *geometry, const Material *material)
-    : geometry_(geometry), material_(material)
+GeometricEntity::GeometricEntity(const Geometry *geometry, const Material *material, MediumInterface mediumInterface)
+    : geometry_(geometry), material_(material), mediumInterface_(mediumInterface)
 {
     AGZ_ASSERT(geometry && material);
 }
@@ -20,6 +20,7 @@ bool GeometricEntity::FindIntersection(const Ray &r, SurfacePoint *sp) const
     if(!geometry_->FindIntersection(r, sp))
         return false;
     sp->entity = this;
+	sp->mediumInterface = MediumInterface();
     return true;
 }
 

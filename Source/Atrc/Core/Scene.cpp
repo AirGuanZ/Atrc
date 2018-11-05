@@ -8,6 +8,11 @@ const Camera* Scene::GetCamera() const
     return camera;
 }
 
+const Medium* Scene::GetGlobalMedium() const
+{
+	return globalMedium;
+}
+
 const std::vector<const Light*> &Scene::GetLights() const
 {
     return lights_;

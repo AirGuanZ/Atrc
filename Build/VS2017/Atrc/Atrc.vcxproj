@@ -45,6 +45,7 @@
     <ClInclude Include="..\..\..\Source\Atrc\Geometry\TriangleBVH.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Integrator\PathTracer.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Integrator\PureColorIntegrator.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Integrator\VolumetricPathTracer.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Light\DirectionalLight.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Light\GeometricDiffuseLightImpl.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Light\SkyLight.h" />
@@ -87,6 +88,7 @@
     <ClCompile Include="..\..\..\Source\Atrc\Geometry\TriangleBVH.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Integrator\PathTracer.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Integrator\PureColorIntegrator.cpp" />
+    <ClCompile Include="..\..\..\Source\Atrc\Integrator\VolumetricPathTracer.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Light\DirectionalLight.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Light\GeometricDiffuseLightImpl.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Light\SkyLight.cpp" />
@@ -108,6 +110,8 @@
     <ClCompile Include="..\..\..\Source\Atrc\Material\Metal.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Material\Plastic.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Medium\HenyeyGreenstein.cpp" />
+    <ClInclude Include="..\..\..\Source\Atrc\Medium\HomogeneousMedium.h" />
+    <ClCompile Include="..\..\..\Source\Atrc\Medium\HomogeneousMedium.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Renderer\JitteredSubareaRenderer.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Utility\ParamParser.cpp" />
     <ClInclude Include="..\..\..\Source\Atrc\Renderer\ParallelRenderer.h" />

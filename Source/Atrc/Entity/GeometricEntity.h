@@ -9,9 +9,11 @@ class GeometricEntity : public Entity
     const Geometry *geometry_;
     const Material *material_;
 
+	MediumInterface mediumInterface_;
+
 public:
 
-    GeometricEntity(const Geometry *geometry, const Material *material);
+    GeometricEntity(const Geometry *geometry, const Material *material, MediumInterface mediumInterface = MediumInterface());
 
     bool HasIntersection(const Ray &r) const override;
 

@@ -205,6 +205,9 @@
     <ClInclude Include="..\..\..\Source\Atrc\Medium\HenyeyGreenstein.h">
       <Filter>Medium</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Integrator\VolumetricPathTracer.h">
+      <Filter>Integrator</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\Atrc\Core\Geometry.cpp">
@@ -314,6 +317,15 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Source\Atrc\Medium\HenyeyGreenstein.cpp">
       <Filter>Medium</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Medium\HomogeneousMedium.h">
+      <Filter>Medium</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Medium\HomogeneousMedium.cpp">
+      <Filter>Medium</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Integrator\VolumetricPathTracer.cpp">
+      <Filter>Integrator</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -25,6 +25,8 @@
 
 #include <Atrc/Manager/MaterialManager.h>
 
+#include <Atrc/Medium/HomogeneousMedium.h>
+
 #include <Atrc/Integrator/PathTracer.h>
 #include <Atrc/Integrator/PureColorIntegrator.h>
 

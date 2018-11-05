@@ -34,6 +34,7 @@ public:
         if(!Geo()->FindIntersection(r, sp))
             return false;
         sp->entity = this;
+		sp->mediumInterface = MediumInterface();
         return true;
     }
 

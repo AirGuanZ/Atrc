@@ -11,8 +11,10 @@ public:
     Vec3 ori, dir;
     Real minT, maxT;
 
-    Ray(const Vec3 &ori, const Vec3 &dir, Real minT = 0.0, Real maxT = RealT::Max())
-        : ori(ori), dir(dir), minT(minT), maxT(maxT)
+	const Medium *medium;
+
+    Ray(const Vec3 &ori, const Vec3 &dir, Real minT = 0.0, Real maxT = RealT::Max(), const Medium *medium = nullptr)
+        : ori(ori), dir(dir), minT(minT), maxT(maxT), medium(medium)
     {
         
     }

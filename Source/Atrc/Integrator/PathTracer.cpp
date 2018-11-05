@@ -2,15 +2,10 @@
 
 AGZ_NS_BEG(Atrc)
 
-PathTracer::PathTracer(int maxDepth, const Spectrum &background)
-    : maxDepth_(maxDepth), background_(background)
+PathTracer::PathTracer(int maxDepth)
+    : maxDepth_(maxDepth)
 {
     AGZ_ASSERT(maxDepth >= 1);
-}
-
-void PathTracer::SetBackground(const Spectrum &background)
-{
-    background_ = background;
 }
 
 Spectrum PathTracer::GetRadiance(const Scene &scene, const Ray &r, AGZ::ObjArena<> &arena) const

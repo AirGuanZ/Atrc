@@ -17,6 +17,8 @@ auto Some(T &&v) { return std::make_optional<T>(std::forward<T>(v)); }
 
 constexpr std::nullopt_t None = std::nullopt;
 
+using AGZ::Either;
+
 // ============================= RefCounted Object =============================
 
 template<typename T>
@@ -80,6 +82,7 @@ using AGZ::Math::Abs;
 using AGZ::Math::ApproxEq;
 using AGZ::Math::Clamp;
 using AGZ::Math::Exp;
+using AGZ::Math::Log_e;
 using AGZ::Math::Max;
 using AGZ::Math::Min;
 using AGZ::Math::Pow;
@@ -120,6 +123,8 @@ inline Real SinPhi(const Vec3 &w) { Real s = SinTheta(w); return !s ? Real(0) : 
 using Spectrum = Color3f;
 
 namespace SPECTRUM = AGZ::Math::COLOR;
+
+constexpr int SPECTRUM_CHANNEL_COUNT = 3;
 
 inline bool operator!(const Spectrum &s)
 {

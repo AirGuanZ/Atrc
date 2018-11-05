@@ -8,9 +8,7 @@ class PathTracer : public Integrator
 {
 public:
 
-    explicit PathTracer(int maxDepth, const Spectrum &background = Spectrum());
-
-    void SetBackground(const Spectrum &background);
+    explicit PathTracer(int maxDepth);
 
     Spectrum GetRadiance(const Scene &scene, const Ray &r, AGZ::ObjArena<> &arena) const override;
 
