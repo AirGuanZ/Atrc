@@ -32,6 +32,9 @@ private:
 	// D2(x \leftarrow Phi)对应r = x + t\Phi
 	Spectrum D2_left(const Scene &scene, const Ray &r, int depth, AGZ::ObjArena<> &arena) const;
 
+	// 已知r出去后碰到了sp，求上面的D2_left结果
+	Spectrum D2_left(const Scene &scene, const Ray &r, const SurfacePoint &sp, int depth, AGZ::ObjArena<> &arena) const;
+
 	Spectrum L_left(const Scene &scene, const Ray &r, int depth, AGZ::ObjArena<> &arena) const;
 
 	int maxDepth_;

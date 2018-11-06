@@ -41,8 +41,8 @@ int main()
                  | _CRTDBG_LEAK_CHECK_DF);
 #endif
 
-    constexpr uint32_t SCR_W = 1200;
-    constexpr uint32_t SCR_H = 675;
+    constexpr uint32_t SCR_W = 640;
+    constexpr uint32_t SCR_H = 480;
     constexpr Real SCR_ASPECT_RATIO = static_cast<Real>(SCR_W) / SCR_H;
 
     //============= Camera =============
@@ -54,20 +54,23 @@ int main()
     //============= Scene =============
 
     Sphere sph(Transform::Translate(0.0, 0.0, -201.0), 200.0);
-    DiffuseMaterial groundMat(Spectrum(0.4f, 0.8f, 0.4f));
-    GeometricEntity ground(&sph, &groundMat);
+    DiffuseMaterial groundMat(Spectrum(0.5f));
+	GeometricEntity ground(&sph, &groundMat);
+
+	Sphere sph3(Transform::Translate(0.0, 2.0, -0.3), 0.7);
+	Metal leftMat(Spectrum(0.5f), Spectrum(0.1f), Spectrum(0.1f), 0.003);
+	GeometricEntity leftSph(&sph3, &leftMat);
 
 	Model::WavefrontObj cenObj;
-	Model::WavefrontObjFile::LoadFromObjFile("./Assets/test.obj", &cenObj);
+	Model::WavefrontObjFile::LoadFromObjFile("./Assets/dragon_vrip.obj", &cenObj);
 	auto cenBVHCore = MakeRC<TriangleBVHCore>(cenObj.ToGeometryMeshGroup().submeshes["Default"]);
 	cenObj.Clear();
-	TriangleBVH cenBVH(Transform::Translate(0.0, 0.15, -1.0) * Transform::RotateZ(Deg(-90)) * Transform::Scale(2.2 / 15000), cenBVHCore);
-	Metal cenMat(Spectrum(0.9f, 0.4f, 0.2f), Spectrum(0.1f), Spectrum(0.05f), 0.04);
-	GeometricEntity cenModel(&cenBVH, &cenMat);
-
-    Sphere sph3(Transform::Translate(0.0, 2.0, -0.3), 0.7);
-    Metal leftMat(Spectrum(0.5f), Spectrum(0.1f), Spectrum(0.1f), 0.003);
-    GeometricEntity leftSph(&sph3, &leftMat);
+	TriangleBVH cenBVH(Transform::Translate(0.0, 0.19, -1.0) * Transform::RotateZ(Deg(-90)) * Transform::Scale(2.2 / 60), cenBVHCore);
+	//Metal cenMat(Spectrum(0.9f, 0.4f, 0.2f), Spectrum(0.1f), Spectrum(0.05f), 0.04);
+	FresnelDielectric cenFresnel(1.0f, 1.6f);
+	FresnelSpecular cenMat(Spectrum(66.0f, 171.0f, 145.0f) / 255.0f, &cenFresnel);
+	HomogeneousMedium cenInside(Spectrum(7.0f), Spectrum(0.4f), Spectrum(), 0.7);
+	GeometricEntity cenModel(&cenBVH, &cenMat, { &cenInside, nullptr });
 
     Texture2D<Spectrum> cubeTex = Texture2D<Spectrum>(
     TextureFile::LoadRGBFromFile("./Assets/CubeTex.png").Map(
@@ -81,7 +84,7 @@ int main()
     SkyLight sky(Spectrum(0.4f, 0.7f, 0.9f), Spectrum(1.0f));
 
     Sphere sph4(Transform::Translate(0.0, 0.78, -0.4), 0.05);
-    GeometricDiffuseLight sphLight(&sph4, Spectrum(13.0f));
+	GeometricDiffuseLight sphLight({ nullptr, nullptr }, &sph4, Spectrum(13.0f));
 
     std::vector<const Entity*> entities = { &rightCube, &leftSph, &cenModel, &ground, /*&sphLight*/ };
 
@@ -108,14 +111,15 @@ int main()
 
     //============= Renderer & Integrator =============
 
-    JitteredSubareaRenderer subareaRenderer(10);
+    JitteredSubareaRenderer subareaRenderer(1000);
 
     ParallelRenderer renderer(6);
     //SerialRenderer renderer;
     renderer.EnableProgressPrinting(true);
 
     //PureColorIntegrator integrator(SPECTRUM::BLACK, SPECTRUM::WHITE);
-    PathTracer integrator(10);
+    //PathTracer integrator(10);
+	VolumetricPathTracer integrator(10);
 
     //============= Rendering =============
 

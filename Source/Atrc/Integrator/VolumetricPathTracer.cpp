@@ -164,17 +164,96 @@ Spectrum VolumetricPathTracer::Ls_right(const Scene &scene, const MediumPoint &m
 }
 
 // 若r发射出去有交点，则按https://airguanz.github.io/2018/10/28/LTE-with-participating-medium.html
-// 中的公式来；否则采样自发光，再加上non-area光源的发光
+// 中的公式来；否则只需采样介质
 Spectrum VolumetricPathTracer::D2_left(const Scene &scene, const Ray &r, int depth, AGZ::ObjArena<> &arena) const
 {
-	// TODO
-	return Spectrum(maxDepth_);
+	SurfacePoint sp;
+	if(!scene.FindCloestIntersection(r, &sp))
+	{
+		auto med = scene.GetGlobalMedium();
+		if(!med)
+			return Spectrum();
+
+		auto tmedSample = med->SampleLs(r);
+		if(tmedSample.IsRight())
+			return Spectrum();
+
+		auto &medSample = tmedSample.GetLeft();
+		AGZ_ASSERT(ApproxEq(medSample.medPnt.wo, -r.dir, EPS));
+
+		auto tr = medSample.medPnt.medium->Tr(medSample.medPnt.pos, r.ori);
+		auto ls = Ls_right(scene, medSample.medPnt, depth, arena);
+
+		return (ls * tr) / medSample.pdf;
+	}
+
+	return D2_left(scene, r, sp, depth, arena);
+}
+
+Spectrum VolumetricPathTracer::D2_left(const Scene &scene, const Ray &r, const SurfacePoint &sp, int depth, AGZ::ObjArena<> &arena) const
+{
+	if(depth > maxDepth_)
+		return Spectrum();
+
+	auto med = sp.mediumInterface.GetMedium(sp.geoLocal.ez, sp.wo);
+	if(!med)
+		return L2_right(scene, sp, depth, arena);
+
+	// 采样介质，采样得到的话就算介质，采样不到就算交点
+
+	Ray medSampleRay = r;
+	medSampleRay.maxT = sp.t - EPS;
+	auto tmedSample = med->SampleLs(medSampleRay);
+
+	if(tmedSample.IsRight())
+	{
+		auto xL2 = L2_right(scene, sp, depth, arena);
+		auto xL2Tr = med->Tr(sp.pos, r.ori);
+		return xL2 * (xL2Tr / tmedSample.GetRight());
+	}
+
+	auto &medSample = tmedSample.GetLeft();
+	auto pLs = Ls_right(scene, medSample.medPnt, depth, arena);
+	auto pLsTr = med->Tr(medSample.medPnt.pos, r.ori);
+
+	return pLs * (pLsTr / medSample.pdf);
 }
 
 Spectrum VolumetricPathTracer::L_left(const Scene &scene, const Ray &r, int depth, AGZ::ObjArena<> &arena) const
 {
-	// TODO
-	return Spectrum(maxDepth_);
+	if(depth > maxDepth_)
+		return Spectrum();
+
+	SurfacePoint sp;
+	if(!scene.FindCloestIntersection(r, &sp))
+	{
+		// 累加nonarea光源
+		// 这些光源要么ignore first medium不受tr影响，要么直接被无限大距离的tr干掉了
+
+		auto med = scene.GetGlobalMedium();
+		auto le = Spectrum();
+
+		for(auto light : scene.GetLights())
+		{
+			if(!med || light->IgnoreFirstMedium())
+				le += light->NonareaLe(r);
+		}
+
+		return le;
+	}
+
+	auto ret = Spectrum();
+	auto med = sp.mediumInterface.GetMedium(sp.geoLocal.ez, sp.wo);
+
+	auto light = sp.entity->AsLight();
+	if(light)
+	{
+		auto le = light->AreaLe(sp);
+		ret += med ? med->Tr(sp.pos, r.ori) * le : le;
+	}
+
+	ret += D2_left(scene, r, sp, depth, arena);
+	return ret;
 }
 
 AGZ_NS_END(Atrc)

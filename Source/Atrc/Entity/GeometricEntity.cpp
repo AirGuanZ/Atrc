@@ -20,7 +20,7 @@ bool GeometricEntity::FindIntersection(const Ray &r, SurfacePoint *sp) const
     if(!geometry_->FindIntersection(r, sp))
         return false;
     sp->entity = this;
-	sp->mediumInterface = MediumInterface();
+	sp->mediumInterface = mediumInterface_;
     return true;
 }
 

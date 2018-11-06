@@ -29,6 +29,7 @@
 
 #include <Atrc/Integrator/PathTracer.h>
 #include <Atrc/Integrator/PureColorIntegrator.h>
+#include <Atrc/Integrator/VolumetricPathTracer.h>
 
 #include <Atrc/Renderer/JitteredSubareaRenderer.h>
 

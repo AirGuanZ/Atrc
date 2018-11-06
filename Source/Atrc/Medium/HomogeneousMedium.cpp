@@ -18,19 +18,24 @@ Either<MediumSampleLsResult, Real> HomogeneousMedium::SampleLs(const Ray &r) con
 {
 	AGZ_ASSERT(r.IsNormalized() && r.minT <= r.maxT);
 
+	if(!sigmaS_ && !le_)
+		return 1.0;
+
 	Real tMax = r.maxT - r.minT;
 
 	int sampleChannel = AGZ::Math::Random::Uniform(0, SPECTRUM_CHANNEL_COUNT - 1);
-	Real st = -Log_e(1 - Rand()) / sigmaT_[sampleChannel];
-	bool sampleMedium = st <= tMax;
+	Real st = -Log_e(Rand()) / sigmaT_[sampleChannel];
+	bool sampleMedium = st < tMax;
 
-	auto Tr = (-sigmaT_ * Min(st, RealT::Max().Value())).Map(Exp<Real>);
+	auto Tr = (-sigmaT_ * Min(st, tMax)).Map(Exp<Real>);
 	auto density = sampleMedium ? (sigmaT_.Map(AGZ::TypeOpr::StaticCaster<Real, float>) * Tr) : Tr;
 
 	Real pdf = 0.0;
 	for(int i = 0; i < SPECTRUM_CHANNEL_COUNT; ++i)
 		pdf += density[i];
 	pdf *= Real(1) / SPECTRUM_CHANNEL_COUNT;
+
+	pdf = Max(pdf, Real(1e-4));
 
 	if(!sampleMedium)
 		return pdf;
@@ -40,7 +45,7 @@ Either<MediumSampleLsResult, Real> HomogeneousMedium::SampleLs(const Ray &r) con
 	ret.medPnt.pos    = r.At(st + r.minT);
 	ret.medPnt.wo     = -r.dir;
 	ret.medPnt.medium = this;
-	ret.pdf = pdf;
+	ret.pdf		      = pdf;
 
 	return ret;
 }
