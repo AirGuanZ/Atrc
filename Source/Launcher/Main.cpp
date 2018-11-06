@@ -69,7 +69,7 @@ int main()
 	//Metal cenMat(Spectrum(0.9f, 0.4f, 0.2f), Spectrum(0.1f), Spectrum(0.05f), 0.04);
 	FresnelDielectric cenFresnel(1.0f, 1.6f);
 	FresnelSpecular cenMat(Spectrum(66.0f, 171.0f, 145.0f) / 255.0f, &cenFresnel);
-	HomogeneousMedium cenInside(Spectrum(7.0f), Spectrum(0.4f), Spectrum(), 0.7);
+	HomogeneousMedium cenInside(Spectrum(2.0f), Spectrum(0.7f), Spectrum(), 0.7);
 	GeometricEntity cenModel(&cenBVH, &cenMat, { &cenInside, nullptr });
 
     Texture2D<Spectrum> cubeTex = Texture2D<Spectrum>(
@@ -83,14 +83,14 @@ int main()
 
     SkyLight sky(Spectrum(0.4f, 0.7f, 0.9f), Spectrum(1.0f));
 
-    Sphere sph4(Transform::Translate(0.0, 0.78, -0.4), 0.05);
-	GeometricDiffuseLight sphLight({ nullptr, nullptr }, &sph4, Spectrum(13.0f));
+    Sphere sph4(Transform::Translate(-1.0, 0.7, 1.8), 0.4);
+	GeometricDiffuseLight sphLight({ nullptr, nullptr }, &sph4, Spectrum(8.0f));
 
-    std::vector<const Entity*> entities = { &rightCube, &leftSph, &cenModel, &ground, /*&sphLight*/ };
+    std::vector<const Entity*> entities = { &rightCube, &leftSph, &cenModel, &ground, &sphLight };
 
     Scene scene;
     scene.camera    = &camera;
-    scene.lights_   = { &sky };
+    scene.lights_   = { /*&sky*/ };
 
     for(auto ent : entities)
     {
