@@ -70,7 +70,6 @@
     <ClInclude Include="..\..\..\Source\Atrc\Medium\HenyeyGreenstein.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Renderer\JitteredSubareaRenderer.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Renderer\SerialRenderer.h" />
-    <ClInclude Include="..\..\..\Source\Atrc\Utility\ParamParser.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\Atrc\Accelarator\BVH.cpp" />
@@ -109,7 +108,6 @@
     <ClInclude Include="..\..\..\Source\Atrc\Medium\HomogeneousMedium.h" />
     <ClCompile Include="..\..\..\Source\Atrc\Medium\HomogeneousMedium.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Renderer\JitteredSubareaRenderer.cpp" />
-    <ClCompile Include="..\..\..\Source\Atrc\Utility\ParamParser.cpp" />
     <ClInclude Include="..\..\..\Source\Atrc\Renderer\ParallelRenderer.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

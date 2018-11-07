@@ -2,15 +2,37 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\Launcher\Main.cpp" />
+    <ClCompile Include="..\..\..\Source\Launcher\MaterialManager\Creator\FresnelCreator.cpp">
+      <Filter>MaterialManager\Creator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Launcher\ParamParser\ParamParser.cpp">
+      <Filter>ParamParser</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="MaterialManager">
       <UniqueIdentifier>{844f8132-df48-479b-976a-14f71df0b6f5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="MaterialManager\Creator">
+      <UniqueIdentifier>{6be427e9-e73c-4307-9ab7-61b599d2377d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ParamParser">
+      <UniqueIdentifier>{17d23527-e081-47a8-b433-142e4348d5b2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Source\Launcher\MaterialManager\MaterialManager.h">
       <Filter>MaterialManager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Launcher\MaterialManager\Creator\MaterialCreator.h">
+      <Filter>MaterialManager\Creator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Launcher\MaterialManager\Creator\FresnelCreator.h">
+      <Filter>MaterialManager\Creator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Launcher\Common.h" />
+    <ClInclude Include="..\..\..\Source\Launcher\ParamParser\ParamParser.h">
+      <Filter>ParamParser</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

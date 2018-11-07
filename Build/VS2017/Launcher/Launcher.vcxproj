@@ -20,9 +20,15 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\Launcher\Main.cpp" />
+    <ClCompile Include="..\..\..\Source\Launcher\MaterialManager\Creator\FresnelCreator.cpp" />
+    <ClCompile Include="..\..\..\Source\Launcher\ParamParser\ParamParser.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\Source\Launcher\Common.h" />
+    <ClInclude Include="..\..\..\Source\Launcher\MaterialManager\Creator\FresnelCreator.h" />
+    <ClInclude Include="..\..\..\Source\Launcher\MaterialManager\Creator\MaterialCreator.h" />
     <ClInclude Include="..\..\..\Source\Launcher\MaterialManager\MaterialManager.h" />
+    <ClInclude Include="..\..\..\Source\Launcher\ParamParser\ParamParser.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
