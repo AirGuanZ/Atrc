@@ -11,7 +11,5 @@ class TextureManager : public AGZ::Singleton<TextureManager>
 
 public:
 
-	bool Load(const Str8 &filename);
-
-	const AGZ::Texture2D<Atrc::Spectrum> *operator[](const Str8 &path) const;
+    const AGZ::Texture2D<Atrc::Spectrum> *Load(const Str8 &filename);
 };

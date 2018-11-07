@@ -101,8 +101,28 @@ Transform ParamParser::ParseTransform(const ConfigNode &node)
 		{
 			ret = ret * Transform::RotateZ(ExtractAngle(t));
 		}
-		else
-			throw ParamParsingError("ParamParser: unknown transform form");
+        else if(head == "Rotate")
+        {
+            if(t.Size() != 1 + 3 + 2)
+                throw ParamParsingError("ParamParser: unknown transform form");
+
+            auto axis = Vec3(
+                t[1].AsValue().Parse<Real>(),
+                t[2].AsValue().Parse<Real>(),
+                t[3].AsValue().Parse<Real>());
+
+            Rad rad;
+            if(t[4].AsValue() == "Rad")
+                rad = Rad(t[5].AsValue().Parse<Real>());
+            else if(t[4].AsValue() == "Deg")
+                rad = Deg(t[5].AsValue().Parse<Real>());
+            else
+                throw ParamParsingError("ParamParser: unknown angle form");
+
+            ret = ret * Transform::Rotate(axis, rad);
+        }
+        else
+            throw ParamParsingError("ParamParser: unknown transform form");
 	}
 
 	return ret;

@@ -1,8 +1,11 @@
 # 每像素采样数
 spp = 100;
 
-# 最大追踪深度
-maxDepth = 10;
+# 积分器
+integrator = {
+    type = PathTracer;
+    maxDepth = 10;
+};
 
 # 输出图像
 output = {
@@ -19,7 +22,8 @@ camera = {
 };
 
 # 实体列表
-entities = ({
+entities = (
+{   # ground
     type = GeometricEntity;
     geometry = {
         type      = Sphere;
@@ -30,16 +34,54 @@ entities = ({
         type   = DiffuseMaterial;
         albedo = (0.5);
     };
-}, {
+},
+{   # left sphere
     type = GeometricEntity;
     geometry = {
         type      = Sphere;
-        radius    = 1;
-        transform = ();
+        radius    = 0.7;
+        transform = ((Translate, 0, 2, -0.3));
     };
     material = {
-        type = DiffuseMaterial;
-        albedo = (0.7);
+        type      = Metal;
+        rc        = (0.5);
+        etaI      = (1);
+        etaT      = (0.1);
+        k         = (0.1);
+        roughness = 0.003;
+    };
+},
+{   # centre model
+    type = GeometricEntity;
+    geometry = {
+        type = TriangleBVH;
+        path = "./Assets/dragon_vrip.obj";
+        transform = ((Translate, 0.0, 0.17, -1.0), (RotateZ, Deg, 90), (Scale, 0.036));
+    };
+    material = {
+        type      = Metal;
+        rc        = (0.9, 0.4, 0.2);
+        etaI      = (1);
+        etaT      = (0.1);
+        k         = (0.1);
+        roughness = 0.001;
+    };
+},
+{   # right cube
+    type = GeometricEntity;
+    geometry = {
+        type = Cube;
+        sidelen = 1.4;
+        transform = ((Translate, 0, -2, 0.123), (Rotate, 1.0, 1.1, 1.2, Deg, 47));
+    };
+    material = {
+        type = TextureScaler;
+        sampler = Linear;
+        filename = "./Assets/CubeTex.png";
+        internal = {
+            type = DiffuseMaterial;
+            albedo = (0.2, 0.4, 0.8);
+        };
     };
 });
 

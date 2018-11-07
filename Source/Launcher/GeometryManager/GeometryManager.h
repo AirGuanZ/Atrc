@@ -18,7 +18,7 @@ public:
 
 // sidelen = Real
 // transform = Transform
-class CubeCreator : public GeometryCreator, public AGZ::Singleton<SphereCreator>
+class CubeCreator : public GeometryCreator, public AGZ::Singleton<CubeCreator>
 {
 public:
 
@@ -29,7 +29,7 @@ public:
 
 // path = ...
 // transform = Transform
-class TriangleBVHCreator : public GeometryCreator, public AGZ::Singleton<SphereCreator>
+class TriangleBVHCreator : public GeometryCreator, public AGZ::Singleton<TriangleBVHCreator>
 {
 	mutable std::unordered_map<Str8, const Atrc::TriangleBVHCore*> path2Core_;
 

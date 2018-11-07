@@ -21,9 +21,11 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\Launcher\EntityManager\EntityCreator.cpp" />
     <ClCompile Include="..\..\..\Source\Launcher\GeometryManager\GeometryManager.cpp" />
+    <ClCompile Include="..\..\..\Source\Launcher\IntegratorManager\IntegratorManager.cpp" />
     <ClCompile Include="..\..\..\Source\Launcher\LightManager\LightManager.cpp" />
     <ClCompile Include="..\..\..\Source\Launcher\Main.cpp" />
     <ClCompile Include="..\..\..\Source\Launcher\MaterialManager\MaterialManager.cpp" />
+    <ClCompile Include="..\..\..\Source\Launcher\MediumManager\MediumManager.cpp" />
     <ClCompile Include="..\..\..\Source\Launcher\ParamParser\ParamParser.cpp" />
     <ClCompile Include="..\..\..\Source\Launcher\SceneManager\SceneManager.cpp" />
     <ClCompile Include="..\..\..\Source\Launcher\TextureManager\TextureManager.cpp" />
@@ -32,8 +34,10 @@
     <ClInclude Include="..\..\..\Source\Launcher\Common.h" />
     <ClInclude Include="..\..\..\Source\Launcher\EntityManager\EntityCreator.h" />
     <ClInclude Include="..\..\..\Source\Launcher\GeometryManager\GeometryManager.h" />
+    <ClInclude Include="..\..\..\Source\Launcher\IntegratorManager\IntegratorManager.h" />
     <ClInclude Include="..\..\..\Source\Launcher\LightManager\LightManager.h" />
     <ClInclude Include="..\..\..\Source\Launcher\MaterialManager\MaterialManager.h" />
+    <ClInclude Include="..\..\..\Source\Launcher\MediumManager\MediumManager.h" />
     <ClInclude Include="..\..\..\Source\Launcher\ParamParser\ParamParser.h" />
     <ClInclude Include="..\..\..\Source\Launcher\SceneManager\SceneManager.h" />
     <ClInclude Include="..\..\..\Source\Launcher\TextureManager\TextureManager.h" />

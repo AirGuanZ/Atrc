@@ -5,8 +5,8 @@
 
 Atrc::Entity *GeometricEntityCreator::Create(const ConfigGroup &params, ObjArena<> &arena) const
 {
-	auto geometry = GeometryManager::GetInstance().Create(params["geometry"].AsGroup());
-	auto material = MaterialManager::GetInstance().Create(params["material"].AsGroup());
+	auto geometry = GeometryManager::GetInstance().Create(params["geometry"].AsGroup(), arena);
+	auto material = MaterialManager::GetInstance().Create(params["material"].AsGroup(), arena);
 
 	return arena.Create<Atrc::GeometricEntity>(
 		geometry, material, Atrc::MediumInterface{ nullptr, nullptr });
@@ -14,7 +14,7 @@ Atrc::Entity *GeometricEntityCreator::Create(const ConfigGroup &params, ObjArena
 
 Atrc::Entity *GeometricDiffuseLightCreator::Create(const ConfigGroup &params, ObjArena<> &arena) const
 {
-	auto geometry = GeometryManager::GetInstance().Create(params["geometry"].AsGroup());
+	auto geometry = GeometryManager::GetInstance().Create(params["geometry"].AsGroup(), arena);
 	auto radiance = ParamParser::ParseSpectrum(params["radiance"]);
 
 	return arena.Create<Atrc::GeometricDiffuseLight>(

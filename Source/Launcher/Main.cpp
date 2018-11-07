@@ -37,8 +37,68 @@ Texture2D<Color3b> ToSavedImage(const RenderTarget &origin, float gamma)
 #include "EntityManager/EntityCreator.h"
 #include "GeometryManager/GeometryManager.h"
 #include "LightManager/LightManager.h"
+#include "IntegratorManager/IntegratorManager.h"
 #include "MaterialManager/MaterialManager.h"
+#include "MediumManager/MediumManager.h"
 #include "SceneManager/SceneManager.h"
+
+void InitializeObjectManagers()
+{
+    EntityCreator *ENTITY_CREATORS[] =
+    {
+        GeometricEntityCreator      ::GetInstancePtr(),
+        GeometricDiffuseLightCreator::GetInstancePtr(),
+    };
+    for(auto c : ENTITY_CREATORS)
+        EntityManager::GetInstance().AddCreator(c);
+
+    GeometryCreator *GEOMETRY_CREATORS[] =
+    {
+        CubeCreator       ::GetInstancePtr(),
+        SphereCreator     ::GetInstancePtr(),
+        TriangleBVHCreator::GetInstancePtr(),
+    };
+    for(auto c : GEOMETRY_CREATORS)
+        GeometryManager::GetInstance().AddCreator(c);
+
+    LightCreator *LIGHT_CREATORS[] =
+    {
+        DirectionalLightCreator::GetInstancePtr(),
+        SkyLightCreator::GetInstancePtr(),
+    };
+    for(auto c : LIGHT_CREATORS)
+        LightManager::GetInstance().AddCreator(c);
+
+    IntegratorCreator *INTEGRATOR_CREATORS[] =
+    {
+        PathTracerCreator::GetInstancePtr(),
+        PureColorIntegratorCreator::GetInstancePtr(),
+        VolumetricPathTracerCreator::GetInstancePtr(),
+    };
+    for(auto c : INTEGRATOR_CREATORS)
+        IntegratorManager::GetInstance().AddCreator(c);
+
+    MaterialCreator *MATERIAL_CREATORS[] =
+    {
+        BlackMaterialCreator     ::GetInstancePtr(),
+        DiffuseMaterialCreator   ::GetInstancePtr(),
+        FresnelSpecularCreator   ::GetInstancePtr(),
+        IdealMirrorCreator       ::GetInstancePtr(),
+        MetalCreator             ::GetInstancePtr(),
+        PlasticCreator           ::GetInstancePtr(),
+        TextureScalerCreator     ::GetInstancePtr(),
+        UncallableMaterialCreator::GetInstancePtr(),
+    };
+    for(auto c : MATERIAL_CREATORS)
+        MaterialManager::GetInstance().AddCreator(c);
+
+    MediumCreator *MEDIUM_CREATORS[] =
+    {
+        HomongeneousMediumCreator::GetInstancePtr(),
+    };
+    for(auto c : MEDIUM_CREATORS)
+        MediumManager::GetInstance().AddCreator(c);
+}
 
 int main()
 {
@@ -47,14 +107,7 @@ int main()
 				 | _CRTDBG_LEAK_CHECK_DF);
 #endif
 
-	EntityManager::GetInstance().AddCreator(GeometricEntityCreator::GetInstancePtr());
-	EntityManager::GetInstance().AddCreator(GeometricDiffuseLightCreator::GetInstancePtr());
-
-	GeometryManager::GetInstance().AddCreator(SphereCreator::GetInstancePtr());
-
-	MaterialManager::GetInstance().AddCreator(DiffuseMaterialCreator::GetInstancePtr());
-
-	LightManager::GetInstance().AddCreator(SkyLightCreator::GetInstancePtr());
+    InitializeObjectManagers();
 
 	Config config;
 	if(!config.LoadFromFile("./Build/scene.txt"))
@@ -62,6 +115,8 @@ int main()
 		cout << "Failed to load scene configuration..." << endl;
 		return -1;
 	}
+
+    ObjArena<> arena;
 
 	auto &sceneMgr = SceneManager::GetInstance();
 	sceneMgr.Initialize(config.Root());
@@ -72,7 +127,6 @@ int main()
 	auto height = conf["output.height"].AsValue().Parse<uint32_t>();
 
 	auto spp = conf["spp"].AsValue().Parse<uint32_t>();
-	auto maxDepth = conf["maxDepth"].AsValue().Parse<uint32_t>();
 
 	//============= Render Target =============
 
@@ -86,16 +140,14 @@ int main()
 	//SerialRenderer renderer;
 	renderer.EnableProgressPrinting(true);
 
-	//PureColorIntegrator integrator(SPECTRUM::BLACK, SPECTRUM::WHITE);
-	//PathTracer integrator(10);
-	VolumetricPathTracer integrator(maxDepth);
+    auto integrator = IntegratorManager::GetInstance().Create(conf["integrator"].AsGroup(), arena);
 
 	//============= Rendering =============
 
 	cout << "Start rendering..." << endl;
 
 	Timer timer;
-	renderer.Render(subareaRenderer, sceneMgr.GetScene(), integrator, renderTarget);
+	renderer.Render(subareaRenderer, sceneMgr.GetScene(), *integrator, renderTarget);
 	auto deltaTime = timer.Milliseconds() / 1000.0;
 
 	cout << "Complete rendering...Total time: " << deltaTime << "s." << endl;

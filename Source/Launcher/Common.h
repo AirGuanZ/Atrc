@@ -40,14 +40,13 @@ public:
 		name2Creator_[creator->GetName()] = creator;
 	}
 
-	T *Create(const ConfigGroup &params) const
+	T *Create(const ConfigGroup &params, ObjArena<> &arena) const
 	{
 		auto it = name2Creator_.find(params["type"].AsValue());
-		return it != name2Creator_.end() ? it->second->Create(params, arena_) : nullptr;
+		return it != name2Creator_.end() ? it->second->Create(params, arena) : nullptr;
 	}
 
 private:
 
 	std::unordered_map<Str8, const Creator*> name2Creator_;
-	mutable ObjArena<> arena_;
 };

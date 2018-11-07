@@ -47,7 +47,7 @@ void SceneManager::Initialize(const ConfigGroup &params)
 	for(size_t i = 0; i < entArr.Size(); ++i)
 	{
 		auto ent = EntityManager::GetInstance().Create(
-			entArr[i].AsGroup());
+			entArr[i].AsGroup(), arena_);
 		if(!ent)
 			throw std::runtime_error("SceneManager: unknown entity type");
 		entities.push_back(ent);
@@ -61,7 +61,7 @@ void SceneManager::Initialize(const ConfigGroup &params)
 	for(size_t i = 0; i < lgtArr.Size(); ++i)
 	{
 		auto light = LightManager::GetInstance().Create(
-			lgtArr[i].AsGroup());
+			lgtArr[i].AsGroup(), arena_);
 		if(!light)
 			throw std::runtime_error("SceneManager: unknown light type");
 		lights.push_back(light);

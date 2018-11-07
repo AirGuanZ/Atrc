@@ -23,6 +23,12 @@
     <ClCompile Include="..\..\..\Source\Launcher\SceneManager\SceneManager.cpp">
       <Filter>SceneManager</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Source\Launcher\IntegratorManager\IntegratorManager.cpp">
+      <Filter>IntegratorManager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Launcher\MediumManager\MediumManager.cpp">
+      <Filter>MediumManager</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="MaterialManager">
@@ -45,6 +51,12 @@
     </Filter>
     <Filter Include="SceneManager">
       <UniqueIdentifier>{d0237d5d-94c1-45c3-a658-9610ce801f8c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="IntegratorManager">
+      <UniqueIdentifier>{e4def4ba-9edd-4250-a731-fed1e2db537e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MediumManager">
+      <UniqueIdentifier>{abf1f2a6-dcb5-4c39-a29c-4cb9ebfe929e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -69,6 +81,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Source\Launcher\SceneManager\SceneManager.h">
       <Filter>SceneManager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Launcher\IntegratorManager\IntegratorManager.h">
+      <Filter>IntegratorManager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Launcher\MediumManager\MediumManager.h">
+      <Filter>MediumManager</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

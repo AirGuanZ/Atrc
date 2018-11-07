@@ -1,9 +1,10 @@
 #include "TextureManager.h"
 
-bool TextureManager::Load(const Str8 &filename)
+const AGZ::Texture2D<Atrc::Spectrum> *TextureManager::Load(const Str8 &filename)
 {
-	if(path2Tex_.find(filename) != path2Tex_.end())
-		return true;
+    auto it = path2Tex_.find(filename);
+    if(it != path2Tex_.end())
+        return it->second;
 
 	try
 	{
@@ -12,17 +13,10 @@ bool TextureManager::Load(const Str8 &filename)
 			AGZ::TextureFile::LoadRGBFromFile(filename.ToStdWString()).Map(
 				[](const auto &c) { return c.Map([](uint8_t b) { return b / 255.0f; }); }));
 		path2Tex_[filename] = tex;
+        return tex;
 	}
 	catch(...)
 	{
-		return false;
+        return nullptr;
 	}
-
-	return true;
-}
-
-const AGZ::Texture2D<Atrc::Spectrum> *TextureManager::operator[](const Str8 &path) const
-{
-	auto it = path2Tex_.find(path);
-	return it != path2Tex_.end() ? it->second : nullptr;
 }

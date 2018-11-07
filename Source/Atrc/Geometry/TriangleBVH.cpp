@@ -438,7 +438,7 @@ namespace
         for(uint32_t i = 0; i < right.size(); ++i)
             tris.triIdxMap[splitIdx + i] = right[i];*/
 
-		std::sort(&tris.triIdxMap[start], &tris.triIdxMap[end], [&](uint32_t L, uint32_t R)
+		std::sort(&tris.triIdxMap[0] + start, &tris.triIdxMap[0] + end, [&](uint32_t L, uint32_t R)
         {
 	        return tris.triInfo[L].centroid[splitAxis] < tris.triInfo[R].centroid[splitAxis];
         });
