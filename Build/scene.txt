@@ -1,13 +1,13 @@
-# Ã¿ÏñËØ²ÉÑùÊı
+# æ¯åƒç´ é‡‡æ ·æ•°
 spp = 1;
 
-# »ı·ÖÆ÷
+# ç§¯åˆ†å™¨
 integrator = { type = PathTracer; maxDepth = 10; };
 
-# Êä³öÍ¼Ïñ
+# è¾“å‡ºå›¾åƒ
 output = { width  = 640; height = 480; };
 
-# ÉãÏñ»ú
+# æ‘„åƒæœº
 camera = {
     eye  = (-7, 0, 0);
     dst  = (0, 0, 0);
@@ -15,7 +15,7 @@ camera = {
     FOVy = (Deg, 40);
 };
 
-# ÊµÌåÁĞ±í
+# å®ä½“åˆ—è¡¨
 entities = (
 {   # ground
     type = GeometricEntity;
@@ -79,7 +79,7 @@ entities = (
     };
 });
 
-# ¹âÔ´ÁĞ±í
+# å…‰æºåˆ—è¡¨
 lights = ({
     type   = SkyLight;
     top    = (0.4, 0.7, 0.9);
