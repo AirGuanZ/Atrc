@@ -12,3 +12,6 @@ using AGZ::ConfigGroup;
 using AGZ::ConfigNode;
 
 using AGZ::Str8;
+
+class MaterialCreator;
+class MaterialManager;

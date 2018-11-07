@@ -1,7 +1,7 @@
 #include "../../ParamParser/ParamParser.h"
 #include "FresnelCreator.h"
 
-Option<FresnelType> FresnelCreator::Name2Type(const Str8 &name)
+FresnelType FresnelCreator::Name2Type(const Str8 &name)
 {
 	if(name == "FresnelConductor")
 		return FresnelType::FresnelConductor;
@@ -9,7 +9,7 @@ Option<FresnelType> FresnelCreator::Name2Type(const Str8 &name)
 		return FresnelType::FresnelDielectric;
 	if(name == "SchlickApproximation")
 		return FresnelType::SchlickApproximation;
-	return None;
+	throw std::invalid_argument("FresnelCreator: unknown fresnel type");
 }
 
 const Atrc::Fresnel *FresnelCreator::CreateFresnel(const FresnelType &type, const ConfigGroup &params, ObjArena<>& arena)

@@ -15,7 +15,7 @@ class Metal : public Material
 
 public:
 
-    Metal(const Spectrum &rc, const Spectrum &eta, const Spectrum &k, Real roughness);
+    Metal(const Spectrum &rc, const Spectrum &etaI, const Spectrum &etaT, const Spectrum &k, Real roughness);
 
     void Shade(const SurfacePoint &sp, ShadingPoint *dst, AGZ::ObjArena<> &arena) const override;
 };

@@ -5,8 +5,8 @@
 
 AGZ_NS_BEG(Atrc)
 
-Metal::Metal(const Spectrum &rc, const Spectrum &eta, const Spectrum &k, Real roughness)
-    : fresnel_(Spectrum(1.0f), eta, k), md_(1 / roughness), torranceSparrow_(rc, &md_, &fresnel_)
+Metal::Metal(const Spectrum &rc, const Spectrum &etaI, const Spectrum &etaT, const Spectrum &k, Real roughness)
+    : fresnel_(etaI, etaT, k), md_(1 / roughness), torranceSparrow_(rc, &md_, &fresnel_)
 {
 
 }

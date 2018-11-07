@@ -1,5 +1,4 @@
 #include <Atrc/Material/Fresnel.h>
-#include <Atrc/Utility/ParamParser.h>
 
 AGZ_NS_BEG(Atrc)
 

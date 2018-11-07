@@ -2,9 +2,15 @@
 
 #include <unordered_map>
 
-#include "Creator/MaterialCreator.h"
+#include "../Common.h"
+#include "MaterialCreator.h"
 
-class MatrialManager
+// MaterialDefinition:
+// {
+//		type = ...(material name)
+//		...params
+// }
+class MaterialManager : public AGZ::Singleton<MaterialManager>
 {
 	ObjArena<> arena_;
 	std::unordered_map<Str8, const MaterialCreator*> name2Creator_;
@@ -19,9 +25,9 @@ public:
 		name2Creator_[name] = creator;
 	}
 
-	const Atrc::Material *Create(const Str8 &name, const ConfigGroup &params)
+	const Atrc::Material *Create(const ConfigGroup &params)
 	{
-		auto it = name2Creator_.find(name);
+		auto it = name2Creator_.find(params["type"].AsValue());
 		return it != name2Creator_.end() ? it->second->Create(params, arena_) : nullptr;
 	}
 };

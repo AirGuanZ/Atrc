@@ -58,7 +58,7 @@ int main()
 	GeometricEntity ground(&sph, &groundMat);
 
 	Sphere sph3(Transform::Translate(0.0, 2.0, -0.3), 0.7);
-	Metal leftMat(Spectrum(0.5f), Spectrum(0.1f), Spectrum(0.1f), 0.003);
+	Metal leftMat(Spectrum(0.5f), Spectrum(1.0f), Spectrum(0.1f), Spectrum(0.1f), 0.003);
 	GeometricEntity leftSph(&sph3, &leftMat);
 
 	Model::WavefrontObj cenObj;
