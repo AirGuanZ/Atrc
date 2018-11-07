@@ -34,6 +34,8 @@ void SceneManager::Initialize(const ConfigGroup &params)
 	if(IsAvailable())
 		throw std::runtime_error("Scene: reinitialized");
 
+    // 摄像机
+
 	auto outputWidth  = params["output.width"].AsValue().Parse<uint32_t>();
 	auto outputHeight = params["output.height"].AsValue().Parse<uint32_t>();
 	auto aspectRatio = Atrc::Real(outputWidth) / outputHeight;
@@ -42,6 +44,8 @@ void SceneManager::Initialize(const ConfigGroup &params)
 
 	std::vector<Atrc::Entity*> entities;
 	std::vector<Atrc::Light*> lights;
+
+    // 创建实体
 
 	auto &entArr = params["entities"].AsArray();
 	for(size_t i = 0; i < entArr.Size(); ++i)
@@ -56,6 +60,8 @@ void SceneManager::Initialize(const ConfigGroup &params)
 		if(light)
 			lights.push_back(light);
 	}
+
+    // 创建光源
 
 	auto &lgtArr = params["lights"].AsArray();
 	for(size_t i = 0; i < lgtArr.Size(); ++i)

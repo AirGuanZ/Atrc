@@ -1,17 +1,11 @@
 # 每像素采样数
-spp = 100;
+spp = 1;
 
 # 积分器
-integrator = {
-    type = PathTracer;
-    maxDepth = 10;
-};
+integrator = { type = PathTracer; maxDepth = 10; };
 
 # 输出图像
-output = {
-    width  = 640;
-    height = 480;
-};
+output = { width  = 640; height = 480; };
 
 # 摄像机
 camera = {
