@@ -107,6 +107,8 @@ int main()
 				 | _CRTDBG_LEAK_CHECK_DF);
 #endif
 
+    std::locale::global(std::locale(""));
+
     InitializeObjectManagers();
 
 	Config config;

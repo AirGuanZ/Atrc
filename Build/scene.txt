@@ -1,13 +1,16 @@
-# 每像素采样数
+# Samples per pixel
 spp = 1;
 
-# 积分器
+# Integrator
 integrator = { type = PathTracer; maxDepth = 10; };
 
-# 输出图像
-output = { width  = 640; height = 480; };
+# Image properties
+output = {
+    width = 640;
+    height = 480;
+};
 
-# 摄像机
+# Camera
 camera = {
     eye  = (-7, 0, 0);
     dst  = (0, 0, 0);
@@ -15,7 +18,7 @@ camera = {
     FOVy = (Deg, 40);
 };
 
-# 实体列表
+# Entity list
 entities = (
 {   # ground
     type = GeometricEntity;
@@ -79,7 +82,7 @@ entities = (
     };
 });
 
-# 光源列表
+# Light list
 lights = ({
     type   = SkyLight;
     top    = (0.4, 0.7, 0.9);
