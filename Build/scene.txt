@@ -1,0 +1,51 @@
+# 每像素采样数
+spp = 100;
+
+# 最大追踪深度
+maxDepth = 10;
+
+# 输出图像
+output = {
+    width  = 640;
+    height = 480;
+};
+
+# 摄像机
+camera = {
+    eye  = (-7, 0, 0);
+    dst  = (0, 0, 0);
+    up   = (0, 0, 1);
+    FOVy = (Deg, 40);
+};
+
+# 实体列表
+entities = ({
+    type = GeometricEntity;
+    geometry = {
+        type      = Sphere;
+        radius    = 200;
+        transform = ((Translate, 0, 0, -201));
+    };
+    material = {
+        type   = DiffuseMaterial;
+        albedo = (0.5);
+    };
+}, {
+    type = GeometricEntity;
+    geometry = {
+        type      = Sphere;
+        radius    = 1;
+        transform = ();
+    };
+    material = {
+        type = DiffuseMaterial;
+        albedo = (0.7);
+    };
+});
+
+# 光源列表
+lights = ({
+    type   = SkyLight;
+    top    = (0.4, 0.7, 0.9);
+    bottom = (1.0);
+});

@@ -20,6 +20,9 @@
     <ClCompile Include="..\..\..\Source\Launcher\LightManager\LightManager.cpp">
       <Filter>LightManager</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Source\Launcher\SceneManager\SceneManager.cpp">
+      <Filter>SceneManager</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="MaterialManager">
@@ -31,9 +34,6 @@
     <Filter Include="TextureManager">
       <UniqueIdentifier>{16dbb393-7002-4a1d-bc4c-f6a35dbe7c91}</UniqueIdentifier>
     </Filter>
-    <Filter Include="SceneManager">
-      <UniqueIdentifier>{8e167fdb-ebc2-4fe1-afb2-c6056b206a1d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="EntityManager">
       <UniqueIdentifier>{3e8c1f24-677f-464e-870e-94216688cf52}</UniqueIdentifier>
     </Filter>
@@ -43,6 +43,9 @@
     <Filter Include="GeometryManager">
       <UniqueIdentifier>{53e0494e-a17f-46ba-9268-bf2a0f782289}</UniqueIdentifier>
     </Filter>
+    <Filter Include="SceneManager">
+      <UniqueIdentifier>{d0237d5d-94c1-45c3-a658-9610ce801f8c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Source\Launcher\Common.h" />
@@ -51,9 +54,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Source\Launcher\TextureManager\TextureManager.h">
       <Filter>TextureManager</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Source\Launcher\SceneManager\SceneManager.h">
-      <Filter>SceneManager</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Source\Launcher\EntityManager\EntityCreator.h">
       <Filter>EntityManager</Filter>
@@ -66,6 +66,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Source\Launcher\LightManager\LightManager.h">
       <Filter>LightManager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Launcher\SceneManager\SceneManager.h">
+      <Filter>SceneManager</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

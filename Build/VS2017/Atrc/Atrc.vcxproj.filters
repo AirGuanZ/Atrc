@@ -193,7 +193,9 @@
     <ClInclude Include="..\..\..\Source\Atrc\Integrator\VolumetricPathTracer.h">
       <Filter>Integrator</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\Atrc\Medium\HomogeneousMedium.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Medium\HomogeneousMedium.h">
+      <Filter>Medium</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\Atrc\Core\Geometry.cpp">

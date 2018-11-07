@@ -34,7 +34,78 @@ Texture2D<Color3b> ToSavedImage(const RenderTarget &origin, float gamma)
     });
 }
 
+#include "EntityManager/EntityCreator.h"
+#include "GeometryManager/GeometryManager.h"
+#include "LightManager/LightManager.h"
+#include "MaterialManager/MaterialManager.h"
+#include "SceneManager/SceneManager.h"
+
 int main()
+{
+#if defined(_MSC_VER) && defined(_DEBUG)
+	_CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG)
+				 | _CRTDBG_LEAK_CHECK_DF);
+#endif
+
+	EntityManager::GetInstance().AddCreator(GeometricEntityCreator::GetInstancePtr());
+	EntityManager::GetInstance().AddCreator(GeometricDiffuseLightCreator::GetInstancePtr());
+
+	GeometryManager::GetInstance().AddCreator(SphereCreator::GetInstancePtr());
+
+	MaterialManager::GetInstance().AddCreator(DiffuseMaterialCreator::GetInstancePtr());
+
+	LightManager::GetInstance().AddCreator(SkyLightCreator::GetInstancePtr());
+
+	Config config;
+	if(!config.LoadFromFile("./Build/scene.txt"))
+	{
+		cout << "Failed to load scene configuration..." << endl;
+		return -1;
+	}
+
+	auto &sceneMgr = SceneManager::GetInstance();
+	sceneMgr.Initialize(config.Root());
+
+	auto &conf = config.Root();
+
+	auto width  = conf["output.width"].AsValue().Parse<uint32_t>();
+	auto height = conf["output.height"].AsValue().Parse<uint32_t>();
+
+	auto spp = conf["spp"].AsValue().Parse<uint32_t>();
+	auto maxDepth = conf["maxDepth"].AsValue().Parse<uint32_t>();
+
+	//============= Render Target =============
+
+	RenderTarget renderTarget(width, height);
+
+	//============= Renderer & Integrator =============
+
+	JitteredSubareaRenderer subareaRenderer(spp);
+
+	ParallelRenderer renderer(6);
+	//SerialRenderer renderer;
+	renderer.EnableProgressPrinting(true);
+
+	//PureColorIntegrator integrator(SPECTRUM::BLACK, SPECTRUM::WHITE);
+	//PathTracer integrator(10);
+	VolumetricPathTracer integrator(maxDepth);
+
+	//============= Rendering =============
+
+	cout << "Start rendering..." << endl;
+
+	Timer timer;
+	renderer.Render(subareaRenderer, sceneMgr.GetScene(), integrator, renderTarget);
+	auto deltaTime = timer.Milliseconds() / 1000.0;
+
+	cout << "Complete rendering...Total time: " << deltaTime << "s." << endl;
+
+	//============= Output =============
+
+	TextureFile::WriteRGBToPNG("./Build/Output.png", ToSavedImage(renderTarget, 1 / 2.2f));
+}
+
+int main0()
 {
 #if defined(_MSC_VER) && defined(_DEBUG)
     _CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG)
@@ -134,4 +205,6 @@ int main()
     //============= Output =============
 
     TextureFile::WriteRGBToPNG("./Build/Output.png", ToSavedImage(renderTarget, 1 / 2.2f));
+
+	return 0;
 }
