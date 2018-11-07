@@ -119,12 +119,22 @@ int main()
 
     ObjArena<> arena;
 
-    auto width  = conf["output.width"].AsValue().Parse<uint32_t>();
-    auto height = conf["output.height"].AsValue().Parse<uint32_t>();
-    auto spp    = conf["spp"].AsValue().Parse<uint32_t>();
+    uint32_t width, height, spp;
+    auto &sceneMgr = SceneManager::GetInstance();
 
-	auto &sceneMgr = SceneManager::GetInstance();
-	sceneMgr.Initialize(config.Root());
+    try
+    {
+        width  = conf["output.width"].AsValue().Parse<uint32_t>();
+        height = conf["output.height"].AsValue().Parse<uint32_t>();
+        spp    = conf["spp"].AsValue().Parse<uint32_t>();
+
+        sceneMgr.Initialize(config.Root());
+    }
+    catch(const std::exception &err)
+    {
+        cout << "Failed to initialize scene. " << err.what() << endl;
+        return -1;
+    }
 
 	//============= Render Target =============
 
