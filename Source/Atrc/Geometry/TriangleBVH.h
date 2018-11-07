@@ -69,13 +69,13 @@ private:
 
 class TriangleBVH : public Geometry
 {
-    RC<TriangleBVHCore> core_;
+    const TriangleBVHCore *core_;
     AABB worldBound_;
     Real surfaceArea_;
 
 public:
 
-    TriangleBVH(const Transform &local2World, RC<TriangleBVHCore> bvhCore);
+    TriangleBVH(const Transform &local2World, const TriangleBVHCore *bvhCore);
 
     bool HasIntersection(const Ray &r) const override;
 

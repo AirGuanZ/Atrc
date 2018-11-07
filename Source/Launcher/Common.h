@@ -1,5 +1,7 @@
 #pragma once
 
+#include <unordered_map>
+
 #include <Atrc/Atrc.h>
 
 using AGZ::Option;
@@ -13,5 +15,39 @@ using AGZ::ConfigNode;
 
 using AGZ::Str8;
 
-class MaterialCreator;
-class MaterialManager;
+template<typename T>
+class ObjectCreator
+{
+public:
+
+	virtual ~ObjectCreator() = default;
+
+	virtual Str8 GetName() const = 0;
+
+	virtual T *Create(const ConfigGroup &params, ObjArena<> &arena) const = 0;
+};
+
+template<typename T>
+class ObjectManager : public AGZ::Singleton<ObjectManager<T>>
+{
+public:
+
+	using Creator = ObjectCreator<T>;
+
+	void AddCreator(const Creator *creator)
+	{
+		AGZ_ASSERT(creator);
+		name2Creator_[creator->GetName()] = creator;
+	}
+
+	T *Create(const ConfigGroup &params) const
+	{
+		auto it = name2Creator_.find(params["type"].AsValue());
+		return it != name2Creator_.end() ? it->second->Create(params, arena_) : nullptr;
+	}
+
+private:
+
+	std::unordered_map<Str8, const Creator*> name2Creator_;
+	mutable ObjArena<> arena_;
+};

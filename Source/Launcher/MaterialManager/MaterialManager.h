@@ -1,33 +1,89 @@
 #pragma once
 
-#include <unordered_map>
-
 #include "../Common.h"
-#include "MaterialCreator.h"
 
-// MaterialDefinition:
-// {
-//		type = ...(material name)
-//		...params
-// }
-class MaterialManager : public AGZ::Singleton<MaterialManager>
+using MaterialCreator = ObjectCreator<Atrc::Material>;
+using MaterialManager = ObjectManager<Atrc::Material>;
+
+//================================= Fresnel Creator =================================
+
+enum class FresnelType
 {
-	ObjArena<> arena_;
-	std::unordered_map<Str8, const MaterialCreator*> name2Creator_;
+	FresnelConductor,	 // "FresnelConductor"
+	FresnelDielectric,   // "FresnelDielectric"
+	SchlickApproximation // "SchlickApproximation"
+};
 
+class FresnelCreator
+{
 public:
 
-	template<typename T, typename...Args>
-	void AddCreator(const Str8 &name, Args&&...args)
-	{
-		AGZ_ASSERT(!name.Empty());
-		auto creator = arena_.Create<T>(std::forward<Args>(args)...);
-		name2Creator_[name] = creator;
+	static FresnelType Name2Type(const Str8 &name);
+
+	static const Atrc::Fresnel *CreateFresnel(const FresnelType &type, const ConfigGroup &params, ObjArena<> &arena);
+
+	static const Atrc::Dielectric *CreateDielectric(const FresnelType &type, const ConfigGroup &params, ObjArena<> &arena);
+
+	// etaI = Spectrum;
+	// etaT = Spectrum;
+	// k	= Spectrum;
+	static const Atrc::FresnelConductor *CreateFresnelConductor(const ConfigGroup &params, ObjArena<> &arena);
+
+	// etaI = float
+	// etaT = float
+	static const Atrc::FresnelDielectric *CreateFresnelDielectric(const ConfigGroup &params, ObjArena<> &arena);
+
+	// etaI = float
+	// etaT = float
+	static const Atrc::SchlickApproximation *CreateSchlickApproximation(const ConfigGroup &params, ObjArena<> &arena);
+};
+
+#define SIMPLE_MATERIAL_CREATOR(MAT_NAME) \
+	class MAT_NAME##Creator : public MaterialCreator, public AGZ::Singleton<MAT_NAME##Creator> \
+	{ \
+	public: \
+		Str8 GetName() const override { return #MAT_NAME; } \
+		Atrc::Material *Create(const ConfigGroup &params, ObjArena<> &arena) const override; \
 	}
 
-	const Atrc::Material *Create(const ConfigGroup &params)
-	{
-		auto it = name2Creator_.find(params["type"].AsValue());
-		return it != name2Creator_.end() ? it->second->Create(params, arena_) : nullptr;
-	}
-};
+// No param
+SIMPLE_MATERIAL_CREATOR(BlackMaterial);
+
+// albedo = Spectrum
+SIMPLE_MATERIAL_CREATOR(DiffuseMaterial);
+
+// rc = Spectrum
+// fresnel = {
+//		type = DielectricType
+//		...fresnel params
+// }
+SIMPLE_MATERIAL_CREATOR(FresnelSpecular);
+
+// rc = Spectrum
+// fresnel = {
+//		type = FresnelType
+//		...fresnel params
+// }
+SIMPLE_MATERIAL_CREATOR(IdealMirror);
+
+// rc        = Spectrum
+// etaI      = Spectrum
+// etaT      = Spectrum
+// k         = Spectrum
+// roughness = Real
+SIMPLE_MATERIAL_CREATOR(Metal);
+
+// kd = Spectrum
+// ks = Spectrum
+// roughness = Real
+SIMPLE_MATERIAL_CREATOR(Plastic);
+
+// sampler = Linear/Nearest
+// texture = "filename"
+// internal = MaterialDefinition
+SIMPLE_MATERIAL_CREATOR(TextureScaler);
+
+// No param
+SIMPLE_MATERIAL_CREATOR(UncallableMaterial);
+
+#undef SIMPLE_MATERIAL_CREATOR

@@ -1,6 +1,5 @@
 #include "../ParamParser/ParamParser.h"
 #include "../TextureManager/TextureManager.h"
-#include "MaterialCreator.h"
 #include "MaterialManager.h"
 
 FresnelType FresnelCreator::Name2Type(const Str8 &name)
@@ -11,7 +10,7 @@ FresnelType FresnelCreator::Name2Type(const Str8 &name)
 		return FresnelType::FresnelDielectric;
 	if(name == "SchlickApproximation")
 		return FresnelType::SchlickApproximation;
-	throw std::invalid_argument("FresnelCreator: unknown fresnel type");
+	throw std::runtime_error("FresnelCreator: unknown fresnel type");
 }
 
 const Atrc::Fresnel *FresnelCreator::CreateFresnel(const FresnelType &type, const ConfigGroup &params, ObjArena<>& arena)
@@ -30,7 +29,7 @@ const Atrc::Dielectric *FresnelCreator::CreateDielectric(const FresnelType &type
 	case FresnelType::SchlickApproximation:
 		return CreateSchlickApproximation(params, arena);
 	default:
-		std::terminate();
+		throw std::runtime_error("FresnelCreator: unknown dielectric type");
 	}
 }
 
@@ -56,18 +55,18 @@ const Atrc::SchlickApproximation *FresnelCreator::CreateSchlickApproximation(con
 	return arena.Create<Atrc::SchlickApproximation>(etaI, etaT);
 }
 
-const Atrc::Material *BlackMaterialCreator::Create(const ConfigGroup &params, ObjArena<> &arena) const
+Atrc::Material *BlackMaterialCreator::Create(const ConfigGroup &params, ObjArena<> &arena) const
 {
 	return &Atrc::STATIC_BLACK_MATERIAL;
 }
 
-const Atrc::Material *DiffuseMaterialCreator::Create(const ConfigGroup &params, ObjArena<> &arena) const
+Atrc::Material *DiffuseMaterialCreator::Create(const ConfigGroup &params, ObjArena<> &arena) const
 {
 	auto albedo = ParamParser::ParseSpectrum(params["albedo"]);
 	return arena.Create<Atrc::DiffuseMaterial>(albedo);
 }
 
-const Atrc::Material *FresnelSpecularCreator::Create(const ConfigGroup &params, ObjArena<> &arena) const
+Atrc::Material *FresnelSpecularCreator::Create(const ConfigGroup &params, ObjArena<> &arena) const
 {
 	auto rc = ParamParser::ParseSpectrum(params["rc"]);
 
@@ -78,7 +77,7 @@ const Atrc::Material *FresnelSpecularCreator::Create(const ConfigGroup &params, 
 	return arena.Create<Atrc::FresnelSpecular>(rc, fresnel);
 }
 
-const Atrc::Material *IdealMirrorCreator::Create(const ConfigGroup &params, ObjArena<> &arena) const
+Atrc::Material *IdealMirrorCreator::Create(const ConfigGroup &params, ObjArena<> &arena) const
 {
 	auto rc = ParamParser::ParseSpectrum(params["rc"]);
 
@@ -89,7 +88,7 @@ const Atrc::Material *IdealMirrorCreator::Create(const ConfigGroup &params, ObjA
 	return arena.Create<Atrc::IdealMirror>(rc, fresnel);
 }
 
-const class Atrc::Material* MetalCreator::Create(const ConfigGroup& params, ObjArena<>& arena) const
+Atrc::Material* MetalCreator::Create(const ConfigGroup& params, ObjArena<>& arena) const
 {
 	auto rc   = ParamParser::ParseSpectrum(params["rc"]);
 	auto etaI = ParamParser::ParseSpectrum(params["etaI"]);
@@ -100,7 +99,7 @@ const class Atrc::Material* MetalCreator::Create(const ConfigGroup& params, ObjA
 	return arena.Create<Atrc::Metal>(rc, etaI, etaT, k, roughness);
 }
 
-const Atrc::Material *PlasticCreator::Create(const ConfigGroup &params, ObjArena<> &arena) const
+Atrc::Material *PlasticCreator::Create(const ConfigGroup &params, ObjArena<> &arena) const
 {
 	auto kd = ParamParser::ParseSpectrum(params["kd"]);
 	auto ks = ParamParser::ParseSpectrum(params["ks"]);
@@ -109,14 +108,14 @@ const Atrc::Material *PlasticCreator::Create(const ConfigGroup &params, ObjArena
 	return arena.Create<Atrc::Plastic>(kd, ks, roughness);
 }
 
-const class Atrc::Material *TextureScalerCreator::Create(const ConfigGroup &params, ObjArena<> &arena) const
+Atrc::Material *TextureScalerCreator::Create(const ConfigGroup &params, ObjArena<> &arena) const
 {
 	auto sampler = params["sampler"].AsValue();
 
 	auto texPath = params["filename"].AsValue();
 	auto tex = TextureManager::GetInstance()[texPath];
 	if(!tex)
-		throw std::invalid_argument(("Invalid texture path: " + texPath).ToStdString());
+		throw std::runtime_error(("Invalid texture path: " + texPath).ToStdString());
 
 	auto &internalParam = params["internal"].AsGroup();
 	auto internal = MaterialManager::GetInstance().Create(internalParam);
@@ -126,10 +125,10 @@ const class Atrc::Material *TextureScalerCreator::Create(const ConfigGroup &para
 	if(sampler == "Nearest")
 		return arena.Create<Atrc::TextureScaler<Atrc::NearestSampler>>(tex, internal);
 
-	throw std::invalid_argument(("Unknown texture sampler: " + sampler).ToStdString());
+	throw std::runtime_error(("Unknown texture sampler: " + sampler).ToStdString());
 }
 
-const Atrc::Material *UncallableMaterialCreator::Create(const ConfigGroup &params, ObjArena<> &arena) const
+Atrc::Material *UncallableMaterialCreator::Create(const ConfigGroup &params, ObjArena<> &arena) const
 {
 	return &Atrc::STATIC_UNCALLABLE_MATERIAL;
 }

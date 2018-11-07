@@ -5,11 +5,20 @@
     <ClCompile Include="..\..\..\Source\Launcher\ParamParser\ParamParser.cpp">
       <Filter>ParamParser</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Source\Launcher\MaterialManager\MaterialCreator.cpp">
-      <Filter>MaterialManager</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Source\Launcher\TextureManager\TextureManager.cpp">
       <Filter>TextureManager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Launcher\EntityManager\EntityCreator.cpp">
+      <Filter>EntityManager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Launcher\MaterialManager\MaterialManager.cpp">
+      <Filter>MaterialManager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Launcher\GeometryManager\GeometryManager.cpp">
+      <Filter>GeometryManager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Launcher\LightManager\LightManager.cpp">
+      <Filter>LightManager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -22,20 +31,41 @@
     <Filter Include="TextureManager">
       <UniqueIdentifier>{16dbb393-7002-4a1d-bc4c-f6a35dbe7c91}</UniqueIdentifier>
     </Filter>
+    <Filter Include="SceneManager">
+      <UniqueIdentifier>{8e167fdb-ebc2-4fe1-afb2-c6056b206a1d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EntityManager">
+      <UniqueIdentifier>{3e8c1f24-677f-464e-870e-94216688cf52}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LightManager">
+      <UniqueIdentifier>{fa56e79d-7b19-42ef-80c5-c517ef125d7f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GeometryManager">
+      <UniqueIdentifier>{53e0494e-a17f-46ba-9268-bf2a0f782289}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\Source\Launcher\MaterialManager\MaterialManager.h">
-      <Filter>MaterialManager</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Source\Launcher\Common.h" />
     <ClInclude Include="..\..\..\Source\Launcher\ParamParser\ParamParser.h">
       <Filter>ParamParser</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\Launcher\MaterialManager\MaterialCreator.h">
-      <Filter>MaterialManager</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Source\Launcher\TextureManager\TextureManager.h">
       <Filter>TextureManager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Launcher\SceneManager\SceneManager.h">
+      <Filter>SceneManager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Launcher\EntityManager\EntityCreator.h">
+      <Filter>EntityManager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Launcher\MaterialManager\MaterialManager.h">
+      <Filter>MaterialManager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Launcher\GeometryManager\GeometryManager.h">
+      <Filter>GeometryManager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Launcher\LightManager\LightManager.h">
+      <Filter>LightManager</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

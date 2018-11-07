@@ -11,6 +11,6 @@ public:
     void Shade(const SurfacePoint &sp, ShadingPoint *dst, AGZ::ObjArena<> &arena) const override;
 };
 
-inline const BlackMaterial STATIC_BLACK_MATERIAL;
+inline BlackMaterial STATIC_BLACK_MATERIAL;
 
 AGZ_NS_END(Atrc)

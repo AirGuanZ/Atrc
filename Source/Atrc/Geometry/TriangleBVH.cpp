@@ -595,8 +595,8 @@ const std::vector<TriangleBVHCore::InternalTriangle> &TriangleBVHCore::GetAllTri
     return triangles_;
 }
 
-TriangleBVH::TriangleBVH(const Transform &local2World, RC<TriangleBVHCore> bvhCore)
-    : Geometry(local2World), core_(std::move(bvhCore)), surfaceArea_(0.0)
+TriangleBVH::TriangleBVH(const Transform &local2World, const TriangleBVHCore *bvhCore)
+    : Geometry(local2World), core_(bvhCore), surfaceArea_(0.0)
 {
     AGZ_ASSERT(core_);
     for(auto &tri : core_->GetAllTriangles())

@@ -63,9 +63,9 @@ int main()
 
 	Model::WavefrontObj cenObj;
 	Model::WavefrontObjFile::LoadFromObjFile("./Assets/bun_zipper.obj", &cenObj);
-	auto cenBVHCore = MakeRC<TriangleBVHCore>(cenObj.ToGeometryMeshGroup().submeshes["Default"]);
+	TriangleBVHCore cenBVHCore(cenObj.ToGeometryMeshGroup().submeshes["Default"]);
 	cenObj.Clear();
-	TriangleBVH cenBVH(Transform::Translate(0.0, 0.0, -0.85) * Transform::RotateZ(Deg(-90)) * Transform::Scale(2.2 / 60), cenBVHCore);
+	TriangleBVH cenBVH(Transform::Translate(0.0, 0.0, -0.85) * Transform::RotateZ(Deg(-90)) * Transform::Scale(2.2 / 60), &cenBVHCore);
 	//Metal cenMat(Spectrum(0.9f, 0.4f, 0.2f), Spectrum(0.1f), Spectrum(0.05f), 0.04);
 	FresnelDielectric cenFresnel(1.0f, 2.2f);
 	FresnelSpecular cenMat(Spectrum(0.8f), &cenFresnel);

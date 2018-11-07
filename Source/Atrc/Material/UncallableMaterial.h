@@ -14,6 +14,6 @@ public:
     }
 };
 
-const inline UncallableMaterial STATIC_UNCALLABLE_MATERIAL;
+inline UncallableMaterial STATIC_UNCALLABLE_MATERIAL;
 
 AGZ_NS_END(Atrc)
