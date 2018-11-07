@@ -1,7 +1,6 @@
 #include <Atrc/Material/BxDF/DiffuseBRDF.h>
 #include <Atrc/Material/BxDFAggregate.h>
 #include <Atrc/Material/DiffuseMaterial.h>
-#include <Atrc/Utility/ParamParser.h>
 
 AGZ_NS_BEG(Atrc)
 

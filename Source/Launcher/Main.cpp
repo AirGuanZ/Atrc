@@ -62,14 +62,14 @@ int main()
 	GeometricEntity leftSph(&sph3, &leftMat);
 
 	Model::WavefrontObj cenObj;
-	Model::WavefrontObjFile::LoadFromObjFile("./Assets/dragon_vrip.obj", &cenObj);
+	Model::WavefrontObjFile::LoadFromObjFile("./Assets/bun_zipper.obj", &cenObj);
 	auto cenBVHCore = MakeRC<TriangleBVHCore>(cenObj.ToGeometryMeshGroup().submeshes["Default"]);
 	cenObj.Clear();
-	TriangleBVH cenBVH(Transform::Translate(0.0, 0.19, -1.0) * Transform::RotateZ(Deg(-90)) * Transform::Scale(2.2 / 60), cenBVHCore);
+	TriangleBVH cenBVH(Transform::Translate(0.0, 0.0, -0.85) * Transform::RotateZ(Deg(-90)) * Transform::Scale(2.2 / 60), cenBVHCore);
 	//Metal cenMat(Spectrum(0.9f, 0.4f, 0.2f), Spectrum(0.1f), Spectrum(0.05f), 0.04);
-	FresnelDielectric cenFresnel(1.0f, 1.6f);
-	FresnelSpecular cenMat(Spectrum(66.0f, 171.0f, 145.0f) / 255.0f, &cenFresnel);
-	HomogeneousMedium cenInside(Spectrum(2.0f), Spectrum(0.7f), Spectrum(), 0.7);
+	FresnelDielectric cenFresnel(1.0f, 2.2f);
+	FresnelSpecular cenMat(Spectrum(0.8f), &cenFresnel);
+	HomogeneousMedium cenInside(Spectrum(1.0f), Spectrum(0.2f), Spectrum(), 0.8);
 	GeometricEntity cenModel(&cenBVH, &cenMat, { &cenInside, nullptr });
 
     Texture2D<Spectrum> cubeTex = Texture2D<Spectrum>(
@@ -86,11 +86,11 @@ int main()
     Sphere sph4(Transform::Translate(-1.0, 0.7, 1.8), 0.4);
 	GeometricDiffuseLight sphLight({ nullptr, nullptr }, &sph4, Spectrum(8.0f));
 
-    std::vector<const Entity*> entities = { &rightCube, &leftSph, &cenModel, &ground, &sphLight };
+    std::vector<const Entity*> entities = { &rightCube, &leftSph, &cenModel, &ground, /*&sphLight*/ };
 
     Scene scene;
     scene.camera    = &camera;
-    scene.lights_   = { /*&sky*/ };
+    scene.lights_   = { &sky };
 
     for(auto ent : entities)
     {
@@ -111,7 +111,7 @@ int main()
 
     //============= Renderer & Integrator =============
 
-    JitteredSubareaRenderer subareaRenderer(1000);
+    JitteredSubareaRenderer subareaRenderer(10);
 
     ParallelRenderer renderer(6);
     //SerialRenderer renderer;

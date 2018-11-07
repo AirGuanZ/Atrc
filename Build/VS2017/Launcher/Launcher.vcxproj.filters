@@ -3,4 +3,14 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\Launcher\Main.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <Filter Include="MaterialManager">
+      <UniqueIdentifier>{844f8132-df48-479b-976a-14f71df0b6f5}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\Source\Launcher\MaterialManager\MaterialManager.h">
+      <Filter>MaterialManager</Filter>
+    </ClInclude>
+  </ItemGroup>
 </Project>

@@ -23,8 +23,6 @@
 #include <Atrc/Light/GeometricDiffuseLightImpl.h>
 #include <Atrc/Light/SkyLight.h>
 
-#include <Atrc/Manager/MaterialManager.h>
-
 #include <Atrc/Medium/HomogeneousMedium.h>
 
 #include <Atrc/Integrator/PathTracer.h>
@@ -35,8 +33,6 @@
 
 #include <Atrc/Renderer/ParallelRenderer.h>
 #include <Atrc/Renderer/SerialRenderer.h>
-
-#include <Atrc/Utility/ParamParser.h>
 
 AGZ_NS_BEG(Atrc)
 

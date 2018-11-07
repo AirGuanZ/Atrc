@@ -21,6 +21,9 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\Launcher\Main.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\Source\Launcher\MaterialManager\MaterialManager.h" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{38D51DF7-78E0-44FC-AA08-68AF473BEEDC}</ProjectGuid>

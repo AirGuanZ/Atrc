@@ -9,15 +9,11 @@ AGZ_NS_BEG(Atrc)
 
 // ============================= Option =============================
 
-template<typename T>
-using Option = std::optional<T>;
-
-template<typename T>
-auto Some(T &&v) { return std::make_optional<T>(std::forward<T>(v)); }
-
-constexpr std::nullopt_t None = std::nullopt;
-
 using AGZ::Either;
+
+using AGZ::Option;
+using AGZ::Some;
+using AGZ::None;
 
 // ============================= RefCounted Object =============================
 
