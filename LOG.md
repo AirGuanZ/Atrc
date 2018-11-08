@@ -90,3 +90,5 @@ VolumetricPathTracer done！开心！刚做出来的时候噪点多得可怕，�
 ## 2018.11.8
 
 I wrote this record at 04:12 on my ubuntu VM. Fuck `std::wifstream`!
+
+现在切回Windows了，吐槽一下，我跑一个小场景，编译器优化全往运行速度上开，MSVC用六个线程，耗时0.5-0.7秒；clang++在只占四个硬件线程的虚拟机上跑，只需要0.3秒……这效率我有点看不懂，明天再测试一波。

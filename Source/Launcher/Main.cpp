@@ -164,5 +164,12 @@ int main()
 
 	//============= Output =============
 
-	TextureFile::WriteRGBToPNG("./Build/Output.png", ToSavedImage(renderTarget, 1 / 2.2f));
+    try
+    {
+        TextureFile::WriteRGBToPNG("./Build/Output.png", ToSavedImage(renderTarget, 1 / 2.2f));
+    }
+    catch(const FileException &err)
+    {
+        cout << "Error in saving rendered image. " << err.what() << endl;
+    }
 }
