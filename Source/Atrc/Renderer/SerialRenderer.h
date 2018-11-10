@@ -7,20 +7,7 @@ AGZ_NS_BEG(Atrc)
 
 class SerialRenderer : public Renderer
 {
-    bool printProgress_;
-
 public:
-
-    SerialRenderer()
-        : printProgress_(false)
-    {
-        
-    }
-
-    void EnableProgressPrinting(bool print)
-    {
-        printProgress_ = print;
-    }
 
     void Render(const SubareaRenderer &subareaRenderer, const Scene &scene, const Integrator &integrator, RenderTarget &rt) const override
     {
@@ -36,12 +23,9 @@ public:
             {
                 subareaRenderer.Render(scene, integrator, rt, { 0, w, y, y + yStep });
 
-                if(printProgress_)
-                {
-                    float percent = 100.0f * (y + yStep) / h;
-                    std::printf("%sProgress: %5.2f%%  ",
-                                std::string(50, '\b').c_str(), percent);
-                }
+                float percent = 100.0f * (y + yStep) / h;
+                std::printf("%sProgress: %5.2f%%  ",
+                             std::string(50, '\b').c_str(), percent);
             }
 
             if(y < h)
@@ -65,9 +49,8 @@ public:
             printf("Some error occurred...\n");
             std::terminate();
         }
-
-        if(printProgress_)
-            std::cout << std::endl;
+        
+        std::cout << std::endl;
     }
 };
 

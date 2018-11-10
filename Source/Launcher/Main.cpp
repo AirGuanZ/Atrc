@@ -1,7 +1,14 @@
 #include <iostream>
-
 #include <Atrc/Atrc.h>
-#include <Utils.h>
+
+#include "EntityManager/EntityCreator.h"
+#include "GeometryManager/GeometryManager.h"
+#include "LightManager/LightManager.h"
+#include "IntegratorManager/IntegratorManager.h"
+#include "MaterialManager/MaterialManager.h"
+#include "MediumManager/MediumManager.h"
+#include "RendererManager/RendererManager.h"
+#include "SceneManager/SceneManager.h"
 
 #if defined(_MSC_VER) && defined(_DEBUG)
 #include <crtdbg.h>
@@ -33,14 +40,6 @@ Texture2D<Color3b> ToSavedImage(const RenderTarget &origin, float gamma)
         });
     });
 }
-
-#include "EntityManager/EntityCreator.h"
-#include "GeometryManager/GeometryManager.h"
-#include "LightManager/LightManager.h"
-#include "IntegratorManager/IntegratorManager.h"
-#include "MaterialManager/MaterialManager.h"
-#include "MediumManager/MediumManager.h"
-#include "SceneManager/SceneManager.h"
 
 void InitializeObjectManagers()
 {
@@ -98,6 +97,14 @@ void InitializeObjectManagers()
     };
     for(auto c : MEDIUM_CREATORS)
         MediumManager::GetInstance().AddCreator(c);
+
+    RendererCreator *RENDERER_CREATORS[] =
+    {
+        ParallelRendererCreator::GetInstancePtr(),
+        SerialRendererCreator  ::GetInstancePtr(),
+    };
+    for(auto c : RENDERER_CREATORS)
+        RendererManager::GetInstance().AddCreator(c);
 }
 
 int main()
@@ -146,10 +153,7 @@ int main()
 
 	JitteredSubareaRenderer subareaRenderer(spp);
 
-	ParallelRenderer renderer(6);
-	//SerialRenderer renderer;
-	renderer.EnableProgressPrinting(true);
-
+    auto renderer   = RendererManager::GetInstance().Create(conf["renderer"].AsGroup(), arena);
     auto integrator = IntegratorManager::GetInstance().Create(conf["integrator"].AsGroup(), arena);
 
 	//============= Rendering =============
@@ -157,7 +161,7 @@ int main()
 	cout << "Start rendering..." << endl;
 
 	Timer timer;
-	renderer.Render(subareaRenderer, sceneMgr.GetScene(), *integrator, renderTarget);
+	renderer->Render(subareaRenderer, sceneMgr.GetScene(), *integrator, renderTarget);
 	auto deltaTime = timer.Milliseconds() / 1000.0;
 
 	cout << "Complete rendering...Total time: " << deltaTime << "s." << endl;

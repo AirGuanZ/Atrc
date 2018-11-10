@@ -1,8 +1,11 @@
 # Samples per pixel
-spp = 1;
+spp = 100;
 
 # Integrator
 integrator = { type = PathTracer; maxDepth = 10; };
+
+# Renderer
+renderer = { type = ParallelRenderer; workerCount = 6; };
 
 # Image properties
 output = {

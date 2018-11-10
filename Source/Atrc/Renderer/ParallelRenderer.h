@@ -15,8 +15,6 @@ class ParallelRenderer : public Renderer
 {
     int workerCount_;
 
-    bool printProgress_;
-
     struct Param
     {
         const Scene           *scene           = nullptr;
@@ -87,16 +85,10 @@ class ParallelRenderer : public Renderer
 public:
 
     explicit ParallelRenderer(int workerCount = -1)
-        : printProgress_(false)
     {
         if(workerCount <= 0)
             workerCount = std::thread::hardware_concurrency();
         workerCount_ = (std::max)(1, workerCount) - 1;
-    }
-
-    void EnableProgressPrinting(bool print)
-    {
-        printProgress_ = print;
     }
 
     void Render(const SubareaRenderer &subareaRenderer, const Scene &scene, const Integrator &integrator, RenderTarget &output) const override
@@ -119,11 +111,8 @@ public:
             &mut, &tasks
         };
 
-        if(printProgress_)
-        {
-            param.outMut = &outMut;
-            param.taskCount = tasks.size();
-        }
+        param.outMut = &outMut;
+        param.taskCount = tasks.size();
 
         std::vector<std::thread> workers;
         if(workerCount_)
@@ -138,8 +127,7 @@ public:
         if(!tasks.empty())
             std::cout << "Some error occurred..." << std::endl;
 
-        if(printProgress_)
-            std::cout << std::endl;
+        std::cout << std::endl;
     }
 };
 

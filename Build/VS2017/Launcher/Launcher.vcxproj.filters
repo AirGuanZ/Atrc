@@ -29,6 +29,9 @@
     <ClCompile Include="..\..\..\Source\Launcher\MediumManager\MediumManager.cpp">
       <Filter>MediumManager</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Source\Launcher\RendererManager\RendererManager.cpp">
+      <Filter>RendererManager</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="MaterialManager">
@@ -57,6 +60,9 @@
     </Filter>
     <Filter Include="MediumManager">
       <UniqueIdentifier>{abf1f2a6-dcb5-4c39-a29c-4cb9ebfe929e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="RendererManager">
+      <UniqueIdentifier>{60c66569-d163-467f-b2ad-94d4b0b52189}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -87,6 +93,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Source\Launcher\MediumManager\MediumManager.h">
       <Filter>MediumManager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Launcher\RendererManager\RendererManager.h">
+      <Filter>RendererManager</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
