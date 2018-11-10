@@ -64,6 +64,9 @@
     <Filter Include="RendererManager">
       <UniqueIdentifier>{60c66569-d163-467f-b2ad-94d4b0b52189}</UniqueIdentifier>
     </Filter>
+    <Filter Include="PublicDefinitionManager">
+      <UniqueIdentifier>{f4c42a5c-3939-42b2-af96-2664258a8182}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Source\Launcher\Common.h" />
@@ -96,6 +99,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Source\Launcher\RendererManager\RendererManager.h">
       <Filter>RendererManager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Launcher\PublicDefinitionManager\PublicDefinitionManager.h">
+      <Filter>PublicDefinitionManager</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

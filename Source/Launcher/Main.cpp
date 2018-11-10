@@ -1,13 +1,7 @@
 #include <iostream>
 #include <Atrc/Atrc.h>
 
-#include "EntityManager/EntityCreator.h"
-#include "GeometryManager/GeometryManager.h"
-#include "LightManager/LightManager.h"
-#include "IntegratorManager/IntegratorManager.h"
-#include "MaterialManager/MaterialManager.h"
-#include "MediumManager/MediumManager.h"
-#include "RendererManager/RendererManager.h"
+#include "PublicDefinitionManager/PublicDefinitionManager.h"
 #include "SceneManager/SceneManager.h"
 
 #if defined(_MSC_VER) && defined(_DEBUG)

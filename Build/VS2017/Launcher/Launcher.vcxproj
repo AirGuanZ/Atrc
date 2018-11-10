@@ -40,6 +40,7 @@
     <ClInclude Include="..\..\..\Source\Launcher\MaterialManager\MaterialManager.h" />
     <ClInclude Include="..\..\..\Source\Launcher\MediumManager\MediumManager.h" />
     <ClInclude Include="..\..\..\Source\Launcher\ParamParser\ParamParser.h" />
+    <ClInclude Include="..\..\..\Source\Launcher\PublicDefinitionManager\PublicDefinitionManager.h" />
     <ClInclude Include="..\..\..\Source\Launcher\RendererManager\RendererManager.h" />
     <ClInclude Include="..\..\..\Source\Launcher\SceneManager\SceneManager.h" />
     <ClInclude Include="..\..\..\Source\Launcher\TextureManager\TextureManager.h" />

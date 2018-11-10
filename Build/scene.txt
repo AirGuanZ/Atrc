@@ -5,13 +5,10 @@ integrator = { type = PathTracer; maxDepth = 10; };
 renderer = { type = ParallelRenderer; workerCount = 6; };
 
 # SubareaRenderer
-subareaRenderer = { type = JitteredSubareaRenderer; spp = 10; };
+subareaRenderer = { type = JitteredSubareaRenderer; spp = 1; };
 
 # Image properties
-output = {
-    width = 640;
-    height = 480;
-};
+output = { width = 1920; height = 1080; };
 
 # Camera
 camera = {
