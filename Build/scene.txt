@@ -1,11 +1,11 @@
-# Samples per pixel
-spp = 100;
-
 # Integrator
 integrator = { type = PathTracer; maxDepth = 10; };
 
 # Renderer
 renderer = { type = ParallelRenderer; workerCount = 6; };
+
+# SubareaRenderer
+subareaRenderer = { type = JitteredSubareaRenderer; spp = 10; };
 
 # Image properties
 output = {

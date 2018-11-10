@@ -24,3 +24,16 @@ public:
 
     Atrc::Renderer *Create(const ConfigGroup &params, ObjArena<> &arena) const override;
 };
+
+using SubareaRendererCreator = ObjectCreator<Atrc::SubareaRenderer>;
+using SubareaRendererManager = ObjectManager<Atrc::SubareaRenderer>;
+
+// spp = uint32_t
+class JitteredSubareaRendererCreator : public SubareaRendererCreator, public AGZ::Singleton<JitteredSubareaRendererCreator>
+{
+public:
+
+    Str8 GetName() const override { return "JitteredSubareaRenderer"; }
+
+    Atrc::SubareaRenderer *Create(const ConfigGroup &params, ObjArena<> &arena) const override;
+};

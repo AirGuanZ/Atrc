@@ -105,6 +105,13 @@ void InitializeObjectManagers()
     };
     for(auto c : RENDERER_CREATORS)
         RendererManager::GetInstance().AddCreator(c);
+
+    SubareaRendererCreator *SUBAREARENDERER_CREATORS[] =
+    {
+        JitteredSubareaRendererCreator::GetInstancePtr(),
+    };
+    for(auto c : SUBAREARENDERER_CREATORS)
+        SubareaRendererManager::GetInstance().AddCreator(c);
 }
 
 int main()
@@ -128,14 +135,13 @@ int main()
 
     ObjArena<> arena;
 
-    uint32_t width, height, spp;
+    uint32_t width, height;
     auto &sceneMgr = SceneManager::GetInstance();
 
     try
     {
         width  = conf["output.width"].AsValue().Parse<uint32_t>();
         height = conf["output.height"].AsValue().Parse<uint32_t>();
-        spp    = conf["spp"].AsValue().Parse<uint32_t>();
 
         sceneMgr.Initialize(config.Root());
     }
@@ -151,17 +157,16 @@ int main()
 
 	//============= Renderer & Integrator =============
 
-	JitteredSubareaRenderer subareaRenderer(spp);
-
-    auto renderer   = RendererManager::GetInstance().Create(conf["renderer"].AsGroup(), arena);
-    auto integrator = IntegratorManager::GetInstance().Create(conf["integrator"].AsGroup(), arena);
+    auto renderer        = RendererManager::GetInstance().Create(conf["renderer"].AsGroup(), arena);
+    auto subareaRenderer = SubareaRendererManager::GetInstance().Create(conf["subareaRenderer"].AsGroup(), arena);
+    auto integrator      = IntegratorManager::GetInstance().Create(conf["integrator"].AsGroup(), arena);
 
 	//============= Rendering =============
 
 	cout << "Start rendering..." << endl;
 
 	Timer timer;
-	renderer->Render(subareaRenderer, sceneMgr.GetScene(), *integrator, renderTarget);
+	renderer->Render(*subareaRenderer, sceneMgr.GetScene(), *integrator, renderTarget);
 	auto deltaTime = timer.Milliseconds() / 1000.0;
 
 	cout << "Complete rendering...Total time: " << deltaTime << "s." << endl;
