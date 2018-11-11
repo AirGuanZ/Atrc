@@ -117,8 +117,7 @@ Atrc::Material *TextureScalerCreator::Create(const ConfigGroup &params, ObjArena
 	if(!tex)
 		throw std::runtime_error(("Invalid texture path: " + texPath).ToStdString());
 
-	auto &internalParam = params["internal"].AsGroup();
-	auto internal = MaterialManager::GetInstance().Create(internalParam, arena);
+    auto internal = GetSceneObject<Atrc::Material>(params["internal"], arena);
 
 	if(sampler == "Linear")
 		return arena.Create<Atrc::TextureScaler<Atrc::LinearSampler>>(tex, internal);

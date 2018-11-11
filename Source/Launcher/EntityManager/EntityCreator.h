@@ -7,7 +7,10 @@ using EntityManager = ObjectManager<Atrc::Entity>;
 
 // geometry = GeometryDefinition
 // material = MaterialDefinition
-// TODO: medium
+// mediumInterface = {
+//      in  = Medium;
+//      out = Medium;
+// }
 class GeometricEntityCreator : public EntityCreator, public AGZ::Singleton<GeometricEntityCreator>
 {
 public:
@@ -19,7 +22,10 @@ public:
 
 // geometry = GeometryDefinition
 // radiance = Spectrum
-// TODO: medium
+// mediumInterface = {
+//      in  = Medium;
+//      out = Medium;
+// }
 class GeometricDiffuseLightCreator : public EntityCreator, public AGZ::Singleton<GeometricDiffuseLightCreator>
 {
 public:

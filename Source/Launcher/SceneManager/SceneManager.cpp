@@ -1,6 +1,5 @@
-#include "../EntityManager/EntityCreator.h"
-#include "../LightManager/LightManager.h"
 #include "../ParamParser/ParamParser.h"
+#include "../PublicDefinitionManager/PublicDefinitionManager.h"
 #include "SceneManager.h"
 
 namespace
@@ -27,6 +26,14 @@ namespace
 		return arena.Create<Atrc::PerspectiveCamera>(
 			eye, dir, up, rad, aspectRatio);
 	}
+
+    template<typename T>
+    void InitializePublicDefinition(const Str8 &fieldName, const ConfigGroup &root, ObjArena<> &arena)
+	{
+        auto grp = root.Find(fieldName);
+        if(grp)
+            PublicDefinitionManager<T>::GetInstance().Initialize(grp->AsGroup(), arena);
+	}
 }
 
 void SceneManager::Initialize(const ConfigGroup &params)
@@ -44,6 +51,17 @@ void SceneManager::Initialize(const ConfigGroup &params)
 
 	std::vector<Atrc::Entity*> entities;
 	std::vector<Atrc::Light*> lights;
+
+    // 预定义元素
+
+    InitializePublicDefinition<Atrc::Geometry>("pub_geometry", params, arena_);
+    InitializePublicDefinition<Atrc::Light>   ("pub_light",    params, arena_);
+    InitializePublicDefinition<Atrc::Material>("pub_material", params, arena_);
+    InitializePublicDefinition<Atrc::Medium>  ("pub_medium",   params, arena_);
+    InitializePublicDefinition<Atrc::Entity>  ("pub_entity",   params, arena_);
+
+    InitializePublicDefinition<Atrc::Integrator>("pub_integrator", params, arena_);
+    InitializePublicDefinition<Atrc::Renderer>  ("pub_renderer",   params, arena_);
 
     // 创建实体
 

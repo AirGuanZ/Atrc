@@ -18,6 +18,18 @@ camera = {
     FOVy = (Deg, 40);
 };
 
+# Public Materials
+pub_material = {
+    centre_metal = {
+        type      = Metal;
+        rc        = (0.9, 0.4, 0.2);
+        etaI      = (1);
+        etaT      = (0.1);
+        k         = (0.1);
+        roughness = 0.001;
+    };
+};
+
 # Entity list
 entities = (
 {   # ground
@@ -55,14 +67,7 @@ entities = (
         path = "./Assets/dragon_vrip.obj";
         transform = ((Translate, 0.0, 0.17, -1.0), (RotateZ, Deg, 90), (Scale, 0.036));
     };
-    material = {
-        type      = Metal;
-        rc        = (0.9, 0.4, 0.2);
-        etaI      = (1);
-        etaT      = (0.1);
-        k         = (0.1);
-        roughness = 0.001;
-    };
+    material = $centre_metal;
 },
 {   # right cube
     type = GeometricEntity;
