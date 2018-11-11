@@ -70,10 +70,6 @@ public:
 template<typename T>
 T *ObjectManager<T>::Create(const ConfigGroup &params, ObjArena<> &arena) const
 {
-    auto &name = params["type"].AsValue();
-    if(name == "Predefined")
-        return PublicDefinitionManager<T>::GetInstance().Get(params["name"].AsValue());
-
     auto it = name2Creator_.find(params["type"].AsValue());
     if(it == name2Creator_.end())
         return nullptr;
