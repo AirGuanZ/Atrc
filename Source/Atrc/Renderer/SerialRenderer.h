@@ -15,7 +15,7 @@ public:
 
         uint32_t w = rt.GetWidth();
         uint32_t h = rt.GetHeight();
-        uint32_t yStep = w >= 1024 ? 1 : 2048 / w;
+        uint32_t yStep = w >= 256 ? 1 : 512 / w;
         uint32_t y = 0;
         try
         {

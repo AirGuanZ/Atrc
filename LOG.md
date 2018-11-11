@@ -91,10 +91,16 @@ VolumetricPathTracer done！开心！刚做出来的时候噪点多得可怕，�
 
 I wrote this record at 04:12 on my ubuntu VM. Fuck `std::wifstream`!
 
-现在切回Windows了，吐槽一下，我跑一个小场景，编译器优化全往运行速度上开，MSVC用六个线程，耗时0.5-0.7秒；clang++在只占四个硬件线程的虚拟机上跑，只需要0.3秒……这效率我有点看不懂，明天再测试一波。
+现在切回Windows了，吐槽一下，我跑一个小场景，编译器优化全往运行速度上开，MSVC用六个线程，耗时5-7秒；clang++在只占四个硬件线程的虚拟机上跑，只需要3秒……这效率我有点看不懂，明天再测试一波。
 
 ## 2018.11.10
 
 昨天一天都在车上，没空写代码；今天把RendererManager和SubareaRendererManager补全了，现在就差Independent Scene Object Definition了，有了这个就能用脚本描述Scene中包括Participating Medium在内的一切元素。
 
 为personal homepage添加了一个atrc-gallery页面。
+
+## 2018.11.11
+
+如计划所述，允许在脚本中引用之前定义的场景元素，目前已经可以用脚本描述任何可以渲染的情景了，立刻画了个琥珀材质的雕塑，想拿来当头像又觉得太丑 Orz
+
+接下来做什么还没完全想好，先画个丁达尔效应吧，然后做BSSRDF或者BDPT。

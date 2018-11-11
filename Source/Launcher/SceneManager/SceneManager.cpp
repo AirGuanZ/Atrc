@@ -13,7 +13,7 @@ namespace
 		auto up = ParamParser::ParseVec3(params["up"]);
 
 		Atrc::Rad rad;
-		auto &angle = params["FOVy"].AsArray();
+		auto &angle = params["FOVz"].AsArray();
 		if(angle.Size() != 2)
 			throw std::runtime_error("Scene: invalid angle form for FOVy");
 		if(angle[0].AsValue() == "Rad")

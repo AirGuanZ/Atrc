@@ -98,7 +98,7 @@ public:
         uint32_t h = output.GetHeight();
 
         std::queue<SubareaRect> tasks;
-        uint32_t yStep = w >= 1024 ? 1 : 2048 / w;
+        uint32_t yStep = w >= 256 ? 1 : 512 / w;
         uint32_t y = 0;
         for(; y + yStep <= h; y += yStep)
             tasks.push({ 0, w, y, y + yStep });
