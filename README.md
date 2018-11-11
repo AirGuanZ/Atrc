@@ -32,7 +32,7 @@ entities = (
     type = GeometricEntity;
     # 几何模型
     geometry = {
-        type = TriangleBVH;	# 构建为BVH树
+        type = TriangleBVH; # 构建为BVH树
         path = "./Assets/Statue_Bressant_1M_Poly.obj";
         # 绕Z轴旋转-90度，然后向下平移0.95个单位
         transform = ((Translate, 0, 0, -0.95), (RotateZ, Deg, -90));
@@ -43,8 +43,8 @@ entities = (
         rc        = (0.9, 0.4, 0.2);   # 颜色
         fresnel = {
             type = FresnelDielectric;
-            etaI = 1.0;				   # 外部折射率
-            etaT = 1.6;				   # 内部折射率
+            etaI = 1.0;                # 外部折射率
+            etaT = 1.6;                # 内部折射率
         };
     };
     # 内外介质
