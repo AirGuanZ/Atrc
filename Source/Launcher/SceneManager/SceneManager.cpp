@@ -15,13 +15,13 @@ namespace
 		Atrc::Rad rad;
 		auto &angle = params["FOVz"].AsArray();
 		if(angle.Size() != 2)
-			throw std::runtime_error("Scene: invalid angle form for FOVy");
+			throw SceneInitializationException("Scene: invalid angle form for FOVy");
 		if(angle[0].AsValue() == "Rad")
 			rad = Atrc::Rad(angle[1].AsValue().Parse<Atrc::Real>());
 		else if(angle[0].AsValue() == "Deg")
 			rad = Atrc::Deg(angle[1].AsValue().Parse<Atrc::Real>());
 		else
-			throw std::runtime_error("Scene: invalid angle form for FOVy");
+			throw SceneInitializationException("Scene: invalid angle form for FOVy");
 
 		return arena.Create<Atrc::PerspectiveCamera>(
 			eye, dir, up, rad, aspectRatio);
@@ -39,7 +39,7 @@ namespace
 void SceneManager::Initialize(const ConfigGroup &params)
 {
 	if(IsAvailable())
-		throw std::runtime_error("Scene: reinitialized");
+		throw SceneInitializationException("Scene: reinitialized");
 
     // ÉãÏñ»ú
 
@@ -70,7 +70,7 @@ void SceneManager::Initialize(const ConfigGroup &params)
 	{
 		auto ent = EntityManager::GetInstance().GetSceneObject(entArr[i], arena_);
 		if(!ent)
-			throw std::runtime_error("SceneManager: unknown entity type");
+			throw SceneInitializationException("SceneManager: unknown entity type");
 		entities.push_back(ent);
 		
 		auto light = ent->AsLight();
@@ -85,7 +85,7 @@ void SceneManager::Initialize(const ConfigGroup &params)
 	{
 		auto light = LightManager::GetInstance().GetSceneObject(lgtArr[i], arena_);
 		if(!light)
-			throw std::runtime_error("SceneManager: unknown light type");
+			throw SceneInitializationException("SceneManager: unknown light type");
 		lights.push_back(light);
 	}
 
@@ -108,6 +108,6 @@ bool SceneManager::IsAvailable() const
 const Atrc::Scene &SceneManager::GetScene() const
 {
 	if(!IsAvailable())
-		throw std::runtime_error("Scene: uninitialized");
+		throw SceneInitializationException("Scene: uninitialized");
 	return scene_;
 }

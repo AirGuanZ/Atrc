@@ -31,8 +31,8 @@ Atrc::Geometry *TriangleBVHCreator::Create(const ConfigGroup &params, ObjArena<>
 		if(!AGZ::Model::WavefrontObjFile::LoadFromObjFile(
 			path.ToStdWString(), &objs))
 		{
-			throw std::runtime_error(
-				("Failed to load obj model from " + path).ToStdString());
+			throw SceneInitializationException(
+                "Failed to load obj model from " + path);
 		}
 
 		auto newCore = arena.Create<Atrc::TriangleBVHCore>(

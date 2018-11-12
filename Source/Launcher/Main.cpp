@@ -128,51 +128,45 @@ int main()
     auto &conf = config.Root();
 
     ObjArena<> arena;
-
-    uint32_t width, height;
     auto &sceneMgr = SceneManager::GetInstance();
 
     try
     {
-        width  = conf["output.width"].AsValue().Parse<uint32_t>();
-        height = conf["output.height"].AsValue().Parse<uint32_t>();
+        auto width  = conf["output.width"] .AsValue().Parse<uint32_t>();
+        auto height = conf["output.height"].AsValue().Parse<uint32_t>();
 
         sceneMgr.Initialize(config.Root());
+
+        //============= Render Target =============
+
+        RenderTarget renderTarget(width, height);
+
+        //============= Renderer & Integrator =============
+
+        auto renderer        = RendererManager       ::GetInstance().GetSceneObject(conf["renderer"],        arena);
+        auto subareaRenderer = SubareaRendererManager::GetInstance().GetSceneObject(conf["subareaRenderer"], arena);
+        auto integrator      = IntegratorManager     ::GetInstance().GetSceneObject(conf["integrator"],      arena);
+
+        //============= Rendering =============
+
+        cout << "Start rendering..." << endl;
+
+        Timer timer;
+        renderer->Render(*subareaRenderer, sceneMgr.GetScene(), *integrator, renderTarget);
+        auto deltaTime = timer.Milliseconds() / 1000.0;
+
+        cout << "Complete rendering...Total time: " << deltaTime << "s." << endl;
+
+        //============= Output =============
+
+        TextureFile::WriteRGBToPNG("./Build/Output.png", ToSavedImage(renderTarget, 1 / 2.2f));
     }
     catch(const std::exception &err)
     {
-        cout << "Failed to initialize scene. " << err.what() << endl;
-        return -1;
+        cout << err.what() << endl;
     }
-
-	//============= Render Target =============
-
-	RenderTarget renderTarget(width, height);
-
-	//============= Renderer & Integrator =============
-
-    auto renderer        = RendererManager::GetInstance().GetSceneObject(conf["renderer"], arena);
-    auto subareaRenderer = SubareaRendererManager::GetInstance().GetSceneObject(conf["subareaRenderer"], arena);
-    auto integrator      = IntegratorManager::GetInstance().GetSceneObject(conf["integrator"], arena);
-
-	//============= Rendering =============
-
-	cout << "Start rendering..." << endl;
-
-	Timer timer;
-	renderer->Render(*subareaRenderer, sceneMgr.GetScene(), *integrator, renderTarget);
-	auto deltaTime = timer.Milliseconds() / 1000.0;
-
-	cout << "Complete rendering...Total time: " << deltaTime << "s." << endl;
-
-	//============= Output =============
-
-    try
+    catch(...)
     {
-        TextureFile::WriteRGBToPNG("./Build/Output.png", ToSavedImage(renderTarget, 1 / 2.2f));
-    }
-    catch(const FileException &err)
-    {
-        cout << "Error in saving rendered image. " << err.what() << endl;
+        cout << "Unknown error occurred..." << endl;
     }
 }

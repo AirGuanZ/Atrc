@@ -10,7 +10,7 @@ FresnelType FresnelCreator::Name2Type(const Str8 &name)
 		return FresnelType::FresnelDielectric;
 	if(name == "SchlickApproximation")
 		return FresnelType::SchlickApproximation;
-	throw std::runtime_error("FresnelCreator: unknown fresnel type");
+	throw SceneInitializationException("FresnelCreator: unknown fresnel type");
 }
 
 const Atrc::Fresnel *FresnelCreator::CreateFresnel(const FresnelType &type, const ConfigGroup &params, ObjArena<>& arena)
@@ -29,7 +29,7 @@ const Atrc::Dielectric *FresnelCreator::CreateDielectric(const FresnelType &type
 	case FresnelType::SchlickApproximation:
 		return CreateSchlickApproximation(params, arena);
 	default:
-		throw std::runtime_error("FresnelCreator: unknown dielectric type");
+		throw SceneInitializationException("FresnelCreator: unknown dielectric type");
 	}
 }
 
@@ -115,7 +115,7 @@ Atrc::Material *TextureScalerCreator::Create(const ConfigGroup &params, ObjArena
 	auto texPath = params["path"].AsValue();
 	auto tex = TextureManager::GetInstance().Load(texPath);
 	if(!tex)
-		throw std::runtime_error(("Invalid texture path: " + texPath).ToStdString());
+		throw SceneInitializationException("Invalid texture path: " + texPath);
 
     auto internal = GetSceneObject<Atrc::Material>(params["internal"], arena);
 
@@ -124,7 +124,7 @@ Atrc::Material *TextureScalerCreator::Create(const ConfigGroup &params, ObjArena
 	if(sampler == "Nearest")
 		return arena.Create<Atrc::TextureScaler<Atrc::NearestSampler>>(tex, internal);
 
-	throw std::runtime_error(("Unknown texture sampler: " + sampler).ToStdString());
+	throw SceneInitializationException("Unknown texture sampler: " + sampler);
 }
 
 Atrc::Material *UncallableMaterialCreator::Create(const ConfigGroup &params, ObjArena<> &arena) const

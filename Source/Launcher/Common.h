@@ -15,6 +15,17 @@ using AGZ::ConfigNode;
 
 using AGZ::Str8;
 
+class SceneInitializationException : public std::runtime_error
+{
+public:
+
+    explicit SceneInitializationException(const Str8 &msg)
+        : runtime_error(msg.ToStdString())
+    {
+        
+    }
+};
+
 template<typename T>
 class ObjectCreator
 {

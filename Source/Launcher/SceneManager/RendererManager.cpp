@@ -15,6 +15,6 @@ Atrc::SubareaRenderer *JitteredSubareaRendererCreator::Create(const ConfigGroup 
 {
     auto spp = params["spp"].AsValue().Parse<uint32_t>();
     if(spp < 1)
-        throw std::runtime_error("JitteredSubareaRendererCreator: invalid spp");
+        throw SceneInitializationException("JitteredSubareaRendererCreator: invalid spp");
     return arena.Create<Atrc::JitteredSubareaRenderer>(spp);
 }

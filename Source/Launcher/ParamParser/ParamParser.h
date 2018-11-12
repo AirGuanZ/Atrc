@@ -2,12 +2,12 @@
 
 #include "../Common.h"
 
-class ParamParsingError : public std::runtime_error
+class ParamParsingError : public SceneInitializationException
 {
 public:
 
-	explicit ParamParsingError(const std::string &str)
-		: std::runtime_error(str.c_str())
+	explicit ParamParsingError(const Str8 &str)
+		: SceneInitializationException(str)
 	{
 		
 	}
