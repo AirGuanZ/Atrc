@@ -1,5 +1,5 @@
 #include "../ParamParser/ParamParser.h"
-#include "../PublicDefinitionManager/PublicDefinitionManager.h"
+#include "PublicDefinitionManager.h"
 #include "SceneManager.h"
 
 namespace

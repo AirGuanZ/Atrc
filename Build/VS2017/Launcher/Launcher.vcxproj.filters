@@ -5,67 +5,40 @@
     <ClCompile Include="..\..\..\Source\Launcher\ParamParser\ParamParser.cpp">
       <Filter>ParamParser</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Source\Launcher\TextureManager\TextureManager.cpp">
-      <Filter>TextureManager</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\Launcher\EntityManager\EntityCreator.cpp">
-      <Filter>EntityManager</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\Launcher\MaterialManager\MaterialManager.cpp">
-      <Filter>MaterialManager</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\Launcher\GeometryManager\GeometryManager.cpp">
-      <Filter>GeometryManager</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\Launcher\LightManager\LightManager.cpp">
-      <Filter>LightManager</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Source\Launcher\SceneManager\SceneManager.cpp">
       <Filter>SceneManager</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Source\Launcher\IntegratorManager\IntegratorManager.cpp">
-      <Filter>IntegratorManager</Filter>
+    <ClCompile Include="..\..\..\Source\Launcher\SceneManager\EntityCreator.cpp">
+      <Filter>SceneManager</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Source\Launcher\MediumManager\MediumManager.cpp">
-      <Filter>MediumManager</Filter>
+    <ClCompile Include="..\..\..\Source\Launcher\SceneManager\GeometryManager.cpp">
+      <Filter>SceneManager</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Source\Launcher\RendererManager\RendererManager.cpp">
-      <Filter>RendererManager</Filter>
+    <ClCompile Include="..\..\..\Source\Launcher\SceneManager\IntegratorManager.cpp">
+      <Filter>SceneManager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Launcher\SceneManager\LightManager.cpp">
+      <Filter>SceneManager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Launcher\SceneManager\MaterialManager.cpp">
+      <Filter>SceneManager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Launcher\SceneManager\MediumManager.cpp">
+      <Filter>SceneManager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Launcher\SceneManager\RendererManager.cpp">
+      <Filter>SceneManager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Launcher\SceneManager\TextureManager.cpp">
+      <Filter>SceneManager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Filter Include="MaterialManager">
-      <UniqueIdentifier>{844f8132-df48-479b-976a-14f71df0b6f5}</UniqueIdentifier>
-    </Filter>
     <Filter Include="ParamParser">
       <UniqueIdentifier>{17d23527-e081-47a8-b433-142e4348d5b2}</UniqueIdentifier>
     </Filter>
-    <Filter Include="TextureManager">
-      <UniqueIdentifier>{16dbb393-7002-4a1d-bc4c-f6a35dbe7c91}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="EntityManager">
-      <UniqueIdentifier>{3e8c1f24-677f-464e-870e-94216688cf52}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="LightManager">
-      <UniqueIdentifier>{fa56e79d-7b19-42ef-80c5-c517ef125d7f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="GeometryManager">
-      <UniqueIdentifier>{53e0494e-a17f-46ba-9268-bf2a0f782289}</UniqueIdentifier>
-    </Filter>
     <Filter Include="SceneManager">
       <UniqueIdentifier>{d0237d5d-94c1-45c3-a658-9610ce801f8c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="IntegratorManager">
-      <UniqueIdentifier>{e4def4ba-9edd-4250-a731-fed1e2db537e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="MediumManager">
-      <UniqueIdentifier>{abf1f2a6-dcb5-4c39-a29c-4cb9ebfe929e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="RendererManager">
-      <UniqueIdentifier>{60c66569-d163-467f-b2ad-94d4b0b52189}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="PublicDefinitionManager">
-      <UniqueIdentifier>{f4c42a5c-3939-42b2-af96-2664258a8182}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -73,35 +46,35 @@
     <ClInclude Include="..\..\..\Source\Launcher\ParamParser\ParamParser.h">
       <Filter>ParamParser</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\Launcher\TextureManager\TextureManager.h">
-      <Filter>TextureManager</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Source\Launcher\EntityManager\EntityCreator.h">
-      <Filter>EntityManager</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Source\Launcher\MaterialManager\MaterialManager.h">
-      <Filter>MaterialManager</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Source\Launcher\GeometryManager\GeometryManager.h">
-      <Filter>GeometryManager</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Source\Launcher\LightManager\LightManager.h">
-      <Filter>LightManager</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Source\Launcher\SceneManager\SceneManager.h">
       <Filter>SceneManager</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\Launcher\IntegratorManager\IntegratorManager.h">
-      <Filter>IntegratorManager</Filter>
+    <ClInclude Include="..\..\..\Source\Launcher\SceneManager\EntityCreator.h">
+      <Filter>SceneManager</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\Launcher\MediumManager\MediumManager.h">
-      <Filter>MediumManager</Filter>
+    <ClInclude Include="..\..\..\Source\Launcher\SceneManager\GeometryManager.h">
+      <Filter>SceneManager</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\Launcher\RendererManager\RendererManager.h">
-      <Filter>RendererManager</Filter>
+    <ClInclude Include="..\..\..\Source\Launcher\SceneManager\IntegratorManager.h">
+      <Filter>SceneManager</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\Launcher\PublicDefinitionManager\PublicDefinitionManager.h">
-      <Filter>PublicDefinitionManager</Filter>
+    <ClInclude Include="..\..\..\Source\Launcher\SceneManager\LightManager.h">
+      <Filter>SceneManager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Launcher\SceneManager\MaterialManager.h">
+      <Filter>SceneManager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Launcher\SceneManager\MediumManager.h">
+      <Filter>SceneManager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Launcher\SceneManager\PublicDefinitionManager.h">
+      <Filter>SceneManager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Launcher\SceneManager\RendererManager.h">
+      <Filter>SceneManager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Launcher\SceneManager\TextureManager.h">
+      <Filter>SceneManager</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

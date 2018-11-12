@@ -1,6 +1,6 @@
 #include "../ParamParser/ParamParser.h"
-#include "../TextureManager/TextureManager.h"
 #include "MaterialManager.h"
+#include "TextureManager.h"
 
 FresnelType FresnelCreator::Name2Type(const Str8 &name)
 {
@@ -112,7 +112,7 @@ Atrc::Material *TextureScalerCreator::Create(const ConfigGroup &params, ObjArena
 {
 	auto sampler = params["sampler"].AsValue();
 
-	auto texPath = params["filename"].AsValue();
+	auto texPath = params["path"].AsValue();
 	auto tex = TextureManager::GetInstance().Load(texPath);
 	if(!tex)
 		throw std::runtime_error(("Invalid texture path: " + texPath).ToStdString());

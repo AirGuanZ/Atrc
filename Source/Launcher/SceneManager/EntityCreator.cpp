@@ -1,5 +1,3 @@
-#include "../GeometryManager/GeometryManager.h"
-#include "../MaterialManager/MaterialManager.h"
 #include "../ParamParser/ParamParser.h"
 #include "EntityCreator.h"
 

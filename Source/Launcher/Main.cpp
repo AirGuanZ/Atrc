@@ -1,7 +1,7 @@
 #include <iostream>
 #include <Atrc/Atrc.h>
 
-#include "PublicDefinitionManager/PublicDefinitionManager.h"
+#include "SceneManager/PublicDefinitionManager.h"
 #include "SceneManager/SceneManager.h"
 
 #if defined(_MSC_VER) && defined(_DEBUG)
