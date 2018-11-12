@@ -57,15 +57,15 @@ void InitializeObjectManagers()
     LightCreator *LIGHT_CREATORS[] =
     {
         DirectionalLightCreator::GetInstancePtr(),
-        SkyLightCreator::GetInstancePtr(),
+        SkyLightCreator        ::GetInstancePtr(),
     };
     for(auto c : LIGHT_CREATORS)
         LightManager::GetInstance().AddCreator(c);
 
     IntegratorCreator *INTEGRATOR_CREATORS[] =
     {
-        PathTracerCreator::GetInstancePtr(),
-        PureColorIntegratorCreator::GetInstancePtr(),
+        PathTracerCreator          ::GetInstancePtr(),
+        PureColorIntegratorCreator ::GetInstancePtr(),
         VolumetricPathTracerCreator::GetInstancePtr(),
     };
     for(auto c : INTEGRATOR_CREATORS)

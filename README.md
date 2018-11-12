@@ -69,7 +69,7 @@ entities = (
     material = {
         # 在其他材质上乘上一个由二维纹理描述的因子
         type = TextureScaler;
-        sampler = Linear;                  # 双线性采样
+        sampler = Linear;              # 双线性采样
         path = "./Assets/CubeTex.png"; # 纹理路径
         internal = {
             type = DiffuseMaterial;   # “其他材质”为理想漫反射材质
