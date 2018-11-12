@@ -1,5 +1,5 @@
 #include "../ParamParser/ParamParser.h"
-#include "PublicDefinitionManager.h"
+#include "ObjectManager.h"
 #include "SceneManager.h"
 
 namespace
@@ -32,7 +32,7 @@ namespace
 	{
         auto grp = root.Find(fieldName);
         if(grp)
-            PublicDefinitionManager<T>::GetInstance().Initialize(grp->AsGroup(), arena);
+            ObjectManager<T>::GetInstance().InitializePublicDefinitions(grp->AsGroup(), arena);
 	}
 }
 
@@ -68,8 +68,7 @@ void SceneManager::Initialize(const ConfigGroup &params)
 	auto &entArr = params["entities"].AsArray();
 	for(size_t i = 0; i < entArr.Size(); ++i)
 	{
-		auto ent = EntityManager::GetInstance().Create(
-			entArr[i].AsGroup(), arena_);
+		auto ent = EntityManager::GetInstance().GetSceneObject(entArr[i], arena_);
 		if(!ent)
 			throw std::runtime_error("SceneManager: unknown entity type");
 		entities.push_back(ent);
@@ -84,8 +83,7 @@ void SceneManager::Initialize(const ConfigGroup &params)
 	auto &lgtArr = params["lights"].AsArray();
 	for(size_t i = 0; i < lgtArr.Size(); ++i)
 	{
-		auto light = LightManager::GetInstance().Create(
-			lgtArr[i].AsGroup(), arena_);
+		auto light = LightManager::GetInstance().GetSceneObject(lgtArr[i], arena_);
 		if(!light)
 			throw std::runtime_error("SceneManager: unknown light type");
 		lights.push_back(light);

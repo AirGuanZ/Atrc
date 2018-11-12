@@ -40,7 +40,7 @@
     <ClInclude Include="..\..\..\Source\Launcher\SceneManager\LightManager.h" />
     <ClInclude Include="..\..\..\Source\Launcher\SceneManager\MaterialManager.h" />
     <ClInclude Include="..\..\..\Source\Launcher\SceneManager\MediumManager.h" />
-    <ClInclude Include="..\..\..\Source\Launcher\SceneManager\PublicDefinitionManager.h" />
+    <ClInclude Include="..\..\..\Source\Launcher\SceneManager\ObjectManager.h" />
     <ClInclude Include="..\..\..\Source\Launcher\SceneManager\RendererManager.h" />
     <ClInclude Include="..\..\..\Source\Launcher\SceneManager\SceneManager.h" />
     <ClInclude Include="..\..\..\Source\Launcher\SceneManager\TextureManager.h" />

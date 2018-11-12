@@ -1,7 +1,7 @@
 #include <iostream>
 #include <Atrc/Atrc.h>
 
-#include "SceneManager/PublicDefinitionManager.h"
+#include "SceneManager/ObjectManager.h"
 #include "SceneManager/SceneManager.h"
 
 #if defined(_MSC_VER) && defined(_DEBUG)
@@ -151,9 +151,9 @@ int main()
 
 	//============= Renderer & Integrator =============
 
-    auto renderer        = RendererManager::GetInstance().Create(conf["renderer"].AsGroup(), arena);
-    auto subareaRenderer = SubareaRendererManager::GetInstance().Create(conf["subareaRenderer"].AsGroup(), arena);
-    auto integrator      = IntegratorManager::GetInstance().Create(conf["integrator"].AsGroup(), arena);
+    auto renderer        = RendererManager::GetInstance().GetSceneObject(conf["renderer"], arena);
+    auto subareaRenderer = SubareaRendererManager::GetInstance().GetSceneObject(conf["subareaRenderer"], arena);
+    auto integrator      = IntegratorManager::GetInstance().GetSceneObject(conf["integrator"], arena);
 
 	//============= Rendering =============
 
