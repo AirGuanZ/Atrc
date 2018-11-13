@@ -167,6 +167,6 @@ int main()
     }
     catch(...)
     {
-        cout << "Unknown error occurred..." << endl;
+        cout << "An unknown error occurred..." << endl;
     }
 }
