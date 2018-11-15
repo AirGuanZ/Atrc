@@ -2,6 +2,18 @@
 
 #include "../Common.h"
 
+using ProgressReporterCreator = ObjectCreator<Atrc::ProgressReporter>;
+using ProgressReporterManager = ObjectManager<Atrc::ProgressReporter>;
+
+class DefaultProgressReporterCreator : public ProgressReporterCreator, public AGZ::Singleton<DefaultProgressReporterCreator>
+{
+public:
+
+    Str8 GetName() const override { return "Default"; }
+
+    Atrc::ProgressReporter *Create(const ConfigGroup &params, ObjArena<> &arena) const override;
+};
+
 using RendererCreator = ObjectCreator<Atrc::Renderer>;
 using RendererManager = ObjectManager<Atrc::Renderer>;
 

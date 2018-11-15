@@ -60,8 +60,9 @@ void SceneManager::Initialize(const ConfigGroup &params)
     InitializePublicDefinition<Atrc::Medium>  ("pub_medium",   params, arena_);
     InitializePublicDefinition<Atrc::Entity>  ("pub_entity",   params, arena_);
 
-    InitializePublicDefinition<Atrc::Integrator>("pub_integrator", params, arena_);
-    InitializePublicDefinition<Atrc::Renderer>  ("pub_renderer",   params, arena_);
+    InitializePublicDefinition<Atrc::Integrator>      ("pub_integrator", params, arena_);
+    InitializePublicDefinition<Atrc::Renderer>        ("pub_renderer",   params, arena_);
+    InitializePublicDefinition<Atrc::ProgressReporter>("pub_reporter", params, arena_);
 
     // 创建实体
 

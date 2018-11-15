@@ -8,3 +8,4 @@ Build/Test01_SSBScene
 
 *.TMP
 .vscode/
+/*.exe

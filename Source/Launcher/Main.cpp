@@ -92,6 +92,13 @@ void InitializeObjectManagers()
     for(auto c : MEDIUM_CREATORS)
         MediumManager::GetInstance().AddCreator(c);
 
+    ProgressReporterCreator *REPORTER_CREATORS[] =
+    {
+        DefaultProgressReporterCreator::GetInstancePtr(),
+    };
+    for(auto c : REPORTER_CREATORS)
+        ProgressReporterManager::GetInstance().AddCreator(c);
+
     RendererCreator *RENDERER_CREATORS[] =
     {
         ParallelRendererCreator::GetInstancePtr(),
@@ -143,16 +150,17 @@ int main()
 
         //============= Renderer & Integrator =============
 
-        auto renderer        = RendererManager       ::GetInstance().GetSceneObject(conf["renderer"],        arena);
-        auto subareaRenderer = SubareaRendererManager::GetInstance().GetSceneObject(conf["subareaRenderer"], arena);
-        auto integrator      = IntegratorManager     ::GetInstance().GetSceneObject(conf["integrator"],      arena);
+        auto renderer        = RendererManager        ::GetInstance().GetSceneObject(conf["renderer"],        arena);
+        auto subareaRenderer = SubareaRendererManager ::GetInstance().GetSceneObject(conf["subareaRenderer"], arena);
+        auto integrator      = IntegratorManager      ::GetInstance().GetSceneObject(conf["integrator"],      arena);
+        auto reporter        = ProgressReporterManager::GetInstance().GetSceneObject(conf["reporter"],        arena);
 
         //============= Rendering =============
 
         cout << "Start rendering..." << endl;
 
         Timer timer;
-        renderer->Render(*subareaRenderer, sceneMgr.GetScene(), *integrator, renderTarget);
+        renderer->Render(*subareaRenderer, sceneMgr.GetScene(), *integrator, &renderTarget, reporter);
         auto deltaTime = timer.Milliseconds() / 1000.0;
 
         cout << "Complete rendering...Total time: " << deltaTime << "s." << endl;

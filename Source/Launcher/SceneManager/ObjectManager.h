@@ -9,3 +9,4 @@
 #include "MaterialManager.h"
 #include "MediumManager.h"
 #include "RendererManager.h"
+#include "TextureManager.h"

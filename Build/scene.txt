@@ -5,10 +5,13 @@ integrator = { type = VolumetricPathTracer; maxDepth = 10; };
 renderer = { type = ParallelRenderer; workerCount = 6; };
 
 # SubareaRenderer
-subareaRenderer = { type = JitteredSubareaRenderer; spp = 1; };
+subareaRenderer = { type = JitteredSubareaRenderer; spp = 4000; };
 
 # Image properties
 output = { width = 640; height = 480; };
+
+# Progress reporter
+reporter = { type = Default; };
 
 # Camera
 camera = {
@@ -20,34 +23,34 @@ camera = {
 
 # Entity list
 entities = (
-{   # ground
-    type = GeometricEntity;
-    geometry = {
-        type      = Sphere;
-        radius    = 200;
-        transform = ((Translate, 0, 0, -201));
-    };
-    material = {
-        type   = DiffuseMaterial;
-        albedo = (0.5);
-    };
-},
-#{   # left sphere
+#{   # ground
 #    type = GeometricEntity;
 #    geometry = {
 #        type      = Sphere;
-#        radius    = 0.7;
-#        transform = ((Translate, 0, 2, -0.3));
+#        radius    = 200;
+#        transform = ((Translate, 0, 0, -201));
 #    };
 #    material = {
-#        type      = Metal;
-#        rc        = (0.5);
-#        etaI      = (1);
-#        etaT      = (0.1);
-#        k         = (0.1);
-#        roughness = 0.003;
+#        type   = DiffuseMaterial;
+#        albedo = (0.5);
 #    };
 #},
+{   # left sphere
+    type = GeometricEntity;
+    geometry = {
+        type      = Sphere;
+        radius    = 0.7;
+        transform = ((Translate, 0, 2, -0.3));
+    };
+    material = {
+        type      = Metal;
+        rc        = (0.5);
+        etaI      = (1);
+        etaT      = (0.1);
+        k         = (0.1);
+        roughness = 0.003;
+    };
+},
 {   # centre model
     type = GeometricEntity;
     geometry = {
@@ -73,23 +76,23 @@ entities = (
             g = 0.6;
         };
     };
-},
-{   # right cube
-    type = GeometricEntity;
-    geometry = {
-        type = Cube;
-        sidelen = 1.4;
-        transform = ((Translate, 0, -2, 0.123), (Rotate, 1.0, 1.1, 1.2, Deg, 47));
-    };
-    material = {
-        type = TextureScaler;
-        sampler = Linear;
-        path = "./Assets/CubeTex.png";
-        internal = {
-            type = DiffuseMaterial;
-            albedo = (0.2, 0.4, 0.8);
-        };
-    };
+#},
+#{   # right cube
+#    type = GeometricEntity;
+#    geometry = {
+#        type = Cube;
+#        sidelen = 1.4;
+#        transform = ((Translate, 0, -2, 0.123), (Rotate, 1.0, 1.1, 1.2, Deg, 47));
+#    };
+#    material = {
+#        type = TextureScaler;
+#        sampler = Linear;
+#        path = "./Assets/CubeTex.png";
+#        internal = {
+#            type = DiffuseMaterial;
+#            albedo = (0.2, 0.4, 0.8);
+#        };
+#    };
 });
 
 # Light list

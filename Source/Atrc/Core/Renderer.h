@@ -21,13 +21,26 @@ public:
     virtual void Render(const Scene &scene, const Integrator &integrator, RenderTarget &rt, const SubareaRect &area) const = 0;
 };
 
+class ProgressReporter
+{
+public:
+
+    virtual ~ProgressReporter() = default;
+
+    virtual void Report(Real percent) = 0;
+
+    virtual void Message(const Str8 &msg) = 0;
+};
+
 class Renderer
 {
 public:
 
     virtual ~Renderer() = default;
 
-    virtual void Render(const SubareaRenderer &subareaRenderer, const Scene &scene, const Integrator &integrator, RenderTarget &rt) const = 0;
+    virtual void Render(
+        const SubareaRenderer &subareaRenderer, const Scene &scene, const Integrator &integrator,
+        RenderTarget *rt, ProgressReporter *reporter) const = 0;
 };
 
 AGZ_NS_END(Atrc)

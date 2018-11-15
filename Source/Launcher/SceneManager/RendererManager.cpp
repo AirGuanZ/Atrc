@@ -1,5 +1,10 @@
 #include "RendererManager.h"
 
+Atrc::ProgressReporter *DefaultProgressReporterCreator::Create(const ConfigGroup &params, ObjArena<> &arena) const
+{
+    return arena.Create<Atrc::DefaultProgressReporter>();
+}
+
 Atrc::Renderer *ParallelRendererCreator::Create(const ConfigGroup &params, ObjArena<> &arena) const
 {
     auto workerCount = params["workerCount"].AsValue().Parse<int32_t>();

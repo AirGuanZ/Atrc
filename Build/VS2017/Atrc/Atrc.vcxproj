@@ -68,6 +68,7 @@
     <ClInclude Include="..\..\..\Source\Atrc\Material\TextureScaler.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Material\UncallableMaterial.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Medium\HenyeyGreenstein.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Renderer\DefaultProgressReporter.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Renderer\JitteredSubareaRenderer.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Renderer\SerialRenderer.h" />
   </ItemGroup>
@@ -105,6 +106,7 @@
     <ClCompile Include="..\..\..\Source\Atrc\Material\Metal.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Material\Plastic.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Medium\HenyeyGreenstein.cpp" />
+    <ClCompile Include="..\..\..\Source\Atrc\Renderer\ParallelRenderer.cpp" />
     <ClInclude Include="..\..\..\Source\Atrc\Medium\HomogeneousMedium.h" />
     <ClCompile Include="..\..\..\Source\Atrc\Medium\HomogeneousMedium.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Renderer\JitteredSubareaRenderer.cpp" />
