@@ -91,3 +91,5 @@ lights = ({
 见[Gallery](https://airguanz.github.io/indep_pages/atrc-gallery.html)。
 
 ![SS0](./Gallery/show-time.png)
+
+![SS1](./Gallery/show-time-2.png)
