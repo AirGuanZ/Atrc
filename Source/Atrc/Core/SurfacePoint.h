@@ -56,7 +56,7 @@ struct SurfacePoint
     // 含义由实体自行定义，比如用作triangle bvh中的face id等
     uint32_t flag0       = 0;
 
-	MediumInterface mediumInterface;
+    MediumInterface mediumInterface;
 };
 
 struct ShadingPoint

@@ -11,9 +11,9 @@ class DirectionalLightCreator : public LightCreator, public AGZ::Singleton<Direc
 {
 public:
 
-	Str8 GetName() const override { return "DirectionalLight"; }
+    Str8 GetName() const override { return "DirectionalLight"; }
 
-	Atrc::Light *Create(const ConfigGroup &params, ObjArena<> &arena) const override;
+    Atrc::Light *Create(const ConfigGroup &params, ObjArena<> &arena) const override;
 };
 
 // top    = Spectrum
@@ -22,7 +22,7 @@ class SkyLightCreator : public LightCreator, public AGZ::Singleton<SkyLightCreat
 {
 public:
 
-	Str8 GetName() const override { return "SkyLight"; }
+    Str8 GetName() const override { return "SkyLight"; }
 
-	Atrc::Light *Create(const ConfigGroup &params, ObjArena<> &arena) const override;
+    Atrc::Light *Create(const ConfigGroup &params, ObjArena<> &arena) const override;
 };

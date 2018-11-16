@@ -6,8 +6,8 @@
 
 class TextureManager : public AGZ::Singleton<TextureManager>
 {
-	ObjArena<> arena_;
-	std::unordered_map<Str8, const AGZ::Texture2D<Atrc::Spectrum>*> path2Tex_;
+    ObjArena<> arena_;
+    std::unordered_map<Str8, const AGZ::Texture2D<Atrc::Spectrum>*> path2Tex_;
 
 public:
 

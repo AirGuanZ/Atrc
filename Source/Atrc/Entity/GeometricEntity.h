@@ -9,7 +9,7 @@ class GeometricEntity : public Entity
     const Geometry *geometry_;
     const Material *material_;
 
-	MediumInterface mediumInterface_;
+    MediumInterface mediumInterface_;
 
 public:
 

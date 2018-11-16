@@ -32,7 +32,7 @@ public:
 
     Spectrum AreaLe(const SurfacePoint &sp) const override;
 
-	bool IgnoreFirstMedium() const override;
+    bool IgnoreFirstMedium() const override;
 
     Spectrum NonareaLe(const Ray &r) const override;
 

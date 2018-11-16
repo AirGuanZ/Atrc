@@ -10,7 +10,7 @@ const Camera* Scene::GetCamera() const
 
 const Medium* Scene::GetGlobalMedium() const
 {
-	return globalMedium;
+    return globalMedium;
 }
 
 const std::vector<const Light*> &Scene::GetLights() const
@@ -65,7 +65,7 @@ bool Scene::HasIntersection(const Ray &r) const
 
 bool Scene::FindCloestIntersection(const Ray &r, SurfacePoint *sp) const
 {
-	sp->t = RealT::Infinity();
+    sp->t = RealT::Infinity();
     for(auto ent : entities_)
     {
         SurfacePoint newSp;

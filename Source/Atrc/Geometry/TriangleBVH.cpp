@@ -51,18 +51,18 @@ namespace
 
         Vec3 o_A = r.ori - A;
         Real alpha = Dot(o_A, s1) * invDiv;
-		if(alpha < 0)
-			return false;
+        if(alpha < 0)
+            return false;
 
         Vec3 s2 = Cross(o_A, B_A);
         Real beta = Dot(r.dir, s2) * invDiv;
-		if(beta < 0 || alpha + beta > 1)
-			return false;
+        if(beta < 0 || alpha + beta > 1)
+            return false;
 
         Real t = Dot(C_A, s2) * invDiv;
 
-		if(!r.Between(t))
-			return false;
+        if(!r.Between(t))
+            return false;
 
         sp->t     = t;
         sp->geoUV = Vec2(alpha, beta);
@@ -93,7 +93,7 @@ TriangleBVHCore::TriangleBVHCore(const AGZ::Model::GeometryMesh &mesh)
     auto vertices = mesh.vertices
     | AGZ::Map([](const AGZ::Model::GeometryMesh::Vertex &v)
         {
-			using AGZ::TypeOpr::StaticCaster;
+            using AGZ::TypeOpr::StaticCaster;
             Vertex ret;
             ret.pos = v.pos.Map(StaticCaster<Real, double>);
             ret.uv  = v.tex.uv().Map(StaticCaster<Real, double>);
@@ -123,15 +123,15 @@ bool TriangleBVHCore::HasIntersection(const Ray &r) const
 {
     AGZ_ASSERT(!nodes_.empty());
 
-	Vec3 invDir = Vec3(1) / r.dir;
+    Vec3 invDir = Vec3(1) / r.dir;
 
-	static thread_local uint32_t tasks[TVL_TASK_STACK_SIZE];
-	int taskTop = 0;
-	tasks[taskTop++] = 0;
+    static thread_local uint32_t tasks[TVL_TASK_STACK_SIZE];
+    int taskTop = 0;
+    tasks[taskTop++] = 0;
 
     while(taskTop)
     {
-		uint32_t taskNodeIdx = tasks[--taskTop];
+        uint32_t taskNodeIdx = tasks[--taskTop];
         const Node &node = nodes_[taskNodeIdx];
 
         bool inct = AGZ::TypeOpr::MatchVar(node,
@@ -149,8 +149,8 @@ bool TriangleBVHCore::HasIntersection(const Ray &r) const
         {
             if(internal.bound.HasIntersection(r, invDir))
             {
-				tasks[taskTop++] = taskNodeIdx + 1;
-				tasks[taskTop++] = internal.rightChild;
+                tasks[taskTop++] = taskNodeIdx + 1;
+                tasks[taskTop++] = internal.rightChild;
             }
             return false;
         });
@@ -166,19 +166,19 @@ bool TriangleBVHCore::FindIntersection(const Ray &r, SurfacePoint *sp) const
 {
     AGZ_ASSERT(!nodes_.empty());
 
-	Vec3 invDir = Vec3(1) / r.dir;
+    Vec3 invDir = Vec3(1) / r.dir;
 
-	sp->t = RealT::Infinity();
+    sp->t = RealT::Infinity();
 
-	static thread_local uint32_t tasks[TVL_TASK_STACK_SIZE];
-	uint32_t taskTop = 0;
-	tasks[taskTop++] = 0;
+    static thread_local uint32_t tasks[TVL_TASK_STACK_SIZE];
+    uint32_t taskTop = 0;
+    tasks[taskTop++] = 0;
 
-	Ray tr = r;
+    Ray tr = r;
 
     while(taskTop)
     {
-		uint32_t taskNodeIdx = tasks[--taskTop];
+        uint32_t taskNodeIdx = tasks[--taskTop];
         const Node &node = nodes_[taskNodeIdx];
 
         AGZ::TypeOpr::MatchVar(node,
@@ -190,7 +190,7 @@ bool TriangleBVHCore::FindIntersection(const Ray &r, SurfacePoint *sp) const
                 const auto &tri = triangles_[i];
                 if(EvalIntersectionWithTriangle(tri.A, tri.B_A, tri.C_A, tr, &tSp))
                 {
-					tr.maxT = tSp.t;
+                    tr.maxT = tSp.t;
                     *sp = tSp;
                     sp->flag0 = i;
                 }
@@ -200,17 +200,17 @@ bool TriangleBVHCore::FindIntersection(const Ray &r, SurfacePoint *sp) const
         {
             if(internal.bound.HasIntersection(tr, invDir))
             {
-				tasks[taskTop++] = taskNodeIdx + 1;
-				tasks[taskTop++] = internal.rightChild;
+                tasks[taskTop++] = taskNodeIdx + 1;
+                tasks[taskTop++] = internal.rightChild;
             }
         });
     }
 
-	if(RealT(sp->t).IsInfinity())
-		return false;
+    if(RealT(sp->t).IsInfinity())
+        return false;
 
-	sp->pos = r.At(sp->t);
-	sp->wo  = -r.dir.Normalize();
+    sp->pos = r.At(sp->t);
+    sp->wo  = -r.dir.Normalize();
 
     const auto &tri = triangles_[sp->flag0];
     sp->usrUV = tri.tA + sp->geoUV.u * tri.tB_tA + sp->geoUV.v * tri.tC_tA;
@@ -337,14 +337,14 @@ namespace
             return FillLeaf(nodeArena.Create<TNode>(), start, end);
         }
 
-		AABB allBound;
-		for(auto i = start; i < end; ++i)
-		{
-			auto tri = tris.GetTriangleVertices(i);
-			allBound.Expand(tri[0].pos);
-			allBound.Expand(tri[1].pos);
-			allBound.Expand(tri[2].pos);
-		}
+        AABB allBound;
+        for(auto i = start; i < end; ++i)
+        {
+            auto tri = tris.GetTriangleVertices(i);
+            allBound.Expand(tri[0].pos);
+            allBound.Expand(tri[1].pos);
+            allBound.Expand(tri[2].pos);
+        }
 
         // 选择划分轴
         // 若所有centroid都在同一个位置，则创建一个叶节点
@@ -438,11 +438,11 @@ namespace
         for(uint32_t i = 0; i < right.size(); ++i)
             tris.triIdxMap[splitIdx + i] = right[i];*/
 
-		std::sort(&tris.triIdxMap[0] + start, &tris.triIdxMap[0] + end, [&](uint32_t L, uint32_t R)
+        std::sort(&tris.triIdxMap[0] + start, &tris.triIdxMap[0] + end, [&](uint32_t L, uint32_t R)
         {
-	        return tris.triInfo[L].centroid[splitAxis] < tris.triInfo[R].centroid[splitAxis];
+            return tris.triInfo[L].centroid[splitAxis] < tris.triInfo[R].centroid[splitAxis];
         });
-		uint32_t splitIdx = (start + end) / 2;
+        uint32_t splitIdx = (start + end) / 2;
 
         auto *ret = nodeArena.Create<TNode>();
         *ret = TInternal{ nullptr, nullptr, allBound };

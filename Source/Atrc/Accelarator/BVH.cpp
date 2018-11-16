@@ -30,11 +30,11 @@ bool BVH::HasIntersection(const Ray &r) const
 {
     AGZ_ASSERT(!nodes_.empty());
 
-	Vec3 invDir = Vec3(1) / r.dir;
+    Vec3 invDir = Vec3(1) / r.dir;
 
-	static thread_local uint32_t tasks[TVL_TASK_STACK_SIZE];
-	int taskTop = 0;
-	tasks[taskTop++] = 0;
+    static thread_local uint32_t tasks[TVL_TASK_STACK_SIZE];
+    int taskTop = 0;
+    tasks[taskTop++] = 0;
 
     while(taskTop)
     {
@@ -72,17 +72,17 @@ bool BVH::FindIntersection(const Ray &r, SurfacePoint *sp) const
 {
     AGZ_ASSERT(!nodes_.empty());
 
-	Vec3 invDir = Vec3(1) / r.dir;
+    Vec3 invDir = Vec3(1) / r.dir;
 
-	sp->t = RealT::Infinity();
+    sp->t = RealT::Infinity();
 
-	static thread_local uint32_t tasks[TVL_TASK_STACK_SIZE];
-	int taskTop = 0;
-	tasks[taskTop++] = 0;
+    static thread_local uint32_t tasks[TVL_TASK_STACK_SIZE];
+    int taskTop = 0;
+    tasks[taskTop++] = 0;
 
     while(taskTop)
     {
-		uint32_t taskNodeIdx = tasks[--taskTop];
+        uint32_t taskNodeIdx = tasks[--taskTop];
         const Node &node = nodes_[taskNodeIdx];
 
         AGZ::TypeOpr::MatchVar(node,
@@ -100,8 +100,8 @@ bool BVH::FindIntersection(const Ray &r, SurfacePoint *sp) const
         {
             if(internal.bound.HasIntersection(r, invDir))
             {
-				tasks[taskTop++] = taskNodeIdx + 1;
-				tasks[taskTop++] = internal.rightChild;
+                tasks[taskTop++] = taskNodeIdx + 1;
+                tasks[taskTop++] = internal.rightChild;
             }
         });
     }

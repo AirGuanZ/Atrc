@@ -9,42 +9,42 @@ using MaterialManager = ObjectManager<Atrc::Material>;
 
 enum class FresnelType
 {
-	FresnelConductor,	 // "FresnelConductor"
-	FresnelDielectric,   // "FresnelDielectric"
-	SchlickApproximation // "SchlickApproximation"
+    FresnelConductor,     // "FresnelConductor"
+    FresnelDielectric,   // "FresnelDielectric"
+    SchlickApproximation // "SchlickApproximation"
 };
 
 class FresnelCreator
 {
 public:
 
-	static FresnelType Name2Type(const Str8 &name);
+    static FresnelType Name2Type(const Str8 &name);
 
-	static const Atrc::Fresnel *CreateFresnel(const FresnelType &type, const ConfigGroup &params, ObjArena<> &arena);
+    static const Atrc::Fresnel *CreateFresnel(const FresnelType &type, const ConfigGroup &params, ObjArena<> &arena);
 
-	static const Atrc::Dielectric *CreateDielectric(const FresnelType &type, const ConfigGroup &params, ObjArena<> &arena);
+    static const Atrc::Dielectric *CreateDielectric(const FresnelType &type, const ConfigGroup &params, ObjArena<> &arena);
 
-	// etaI = Spectrum;
-	// etaT = Spectrum;
-	// k	= Spectrum;
-	static const Atrc::FresnelConductor *CreateFresnelConductor(const ConfigGroup &params, ObjArena<> &arena);
+    // etaI = Spectrum;
+    // etaT = Spectrum;
+    // k    = Spectrum;
+    static const Atrc::FresnelConductor *CreateFresnelConductor(const ConfigGroup &params, ObjArena<> &arena);
 
-	// etaI = float
-	// etaT = float
-	static const Atrc::FresnelDielectric *CreateFresnelDielectric(const ConfigGroup &params, ObjArena<> &arena);
+    // etaI = float
+    // etaT = float
+    static const Atrc::FresnelDielectric *CreateFresnelDielectric(const ConfigGroup &params, ObjArena<> &arena);
 
-	// etaI = float
-	// etaT = float
-	static const Atrc::SchlickApproximation *CreateSchlickApproximation(const ConfigGroup &params, ObjArena<> &arena);
+    // etaI = float
+    // etaT = float
+    static const Atrc::SchlickApproximation *CreateSchlickApproximation(const ConfigGroup &params, ObjArena<> &arena);
 };
 
 #define SIMPLE_MATERIAL_CREATOR(MAT_NAME) \
-	class MAT_NAME##Creator : public MaterialCreator, public AGZ::Singleton<MAT_NAME##Creator> \
-	{ \
-	public: \
-		Str8 GetName() const override { return #MAT_NAME; } \
-		Atrc::Material *Create(const ConfigGroup &params, ObjArena<> &arena) const override; \
-	}
+    class MAT_NAME##Creator : public MaterialCreator, public AGZ::Singleton<MAT_NAME##Creator> \
+    { \
+    public: \
+        Str8 GetName() const override { return #MAT_NAME; } \
+        Atrc::Material *Create(const ConfigGroup &params, ObjArena<> &arena) const override; \
+    }
 
 // No param
 SIMPLE_MATERIAL_CREATOR(BlackMaterial);
@@ -54,15 +54,15 @@ SIMPLE_MATERIAL_CREATOR(DiffuseMaterial);
 
 // rc = Spectrum
 // fresnel = {
-//		type = DielectricType
-//		...fresnel params
+//        type = DielectricType
+//        ...fresnel params
 // }
 SIMPLE_MATERIAL_CREATOR(FresnelSpecular);
 
 // rc = Spectrum
 // fresnel = {
-//		type = FresnelType
-//		...fresnel params
+//        type = FresnelType
+//        ...fresnel params
 // }
 SIMPLE_MATERIAL_CREATOR(IdealMirror);
 

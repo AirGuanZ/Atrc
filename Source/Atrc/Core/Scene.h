@@ -25,11 +25,11 @@ public:
     std::vector<const Entity*> entities_;
     std::vector<const Light*> lights_;
     const Camera *camera = nullptr;
-	const Medium *globalMedium = nullptr;
+    const Medium *globalMedium = nullptr;
 
     const Camera *GetCamera() const;
 
-	const Medium *GetGlobalMedium() const;
+    const Medium *GetGlobalMedium() const;
 
     const std::vector<const Light*> &GetLights() const;
 

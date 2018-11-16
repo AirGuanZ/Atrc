@@ -81,7 +81,7 @@ Spectrum SkyLight::AreaLe(const SurfacePoint &sp) const
 
 bool SkyLight::IgnoreFirstMedium() const
 {
-	return true;
+    return true;
 }
 
 Spectrum SkyLight::NonareaLe(const Ray &r) const

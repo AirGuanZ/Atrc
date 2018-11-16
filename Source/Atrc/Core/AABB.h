@@ -36,67 +36,67 @@ public:
         return *this;
     }
 
-	template<bool SwapX, bool SwapY, bool SwapZ>
-	bool HasIntersection(const Ray &r, const Vec3 &invDir) const
-	{
-		Real t0, t1;
+    template<bool SwapX, bool SwapY, bool SwapZ>
+    bool HasIntersection(const Ray &r, const Vec3 &invDir) const
+    {
+        Real t0, t1;
 
-		Vec3 n = invDir * (low - r.ori);
-		Vec3 f = invDir * (high - r.ori);
+        Vec3 n = invDir * (low - r.ori);
+        Vec3 f = invDir * (high - r.ori);
 
-		if constexpr(SwapX)
-		{
-			t0 = Max(r.minT, f.x);
-			t1 = Min(r.maxT, n.x);
-		}
-		else
-		{
-			t0 = Max(r.minT, n.x);
-			t1 = Min(r.maxT, f.x);
-		}
+        if constexpr(SwapX)
+        {
+            t0 = Max(r.minT, f.x);
+            t1 = Min(r.maxT, n.x);
+        }
+        else
+        {
+            t0 = Max(r.minT, n.x);
+            t1 = Min(r.maxT, f.x);
+        }
 
-		if constexpr(SwapY)
-		{
-			t0 = Max(t0, f.y);
-			t1 = Min(t1, n.y);
-		}
-		else
-		{
-			t0 = Max(t0, n.y);
-			t1 = Min(t1, f.y);
-		}
+        if constexpr(SwapY)
+        {
+            t0 = Max(t0, f.y);
+            t1 = Min(t1, n.y);
+        }
+        else
+        {
+            t0 = Max(t0, n.y);
+            t1 = Min(t1, f.y);
+        }
 
-		if constexpr(SwapZ)
-		{
-			t0 = Max(t0, f.z);
-			t1 = Min(t1, n.z);
-		}
-		else
-		{
-			t0 = Max(t0, n.z);
-			t1 = Min(t1, f.z);
-		}
+        if constexpr(SwapZ)
+        {
+            t0 = Max(t0, f.z);
+            t1 = Min(t1, n.z);
+        }
+        else
+        {
+            t0 = Max(t0, n.z);
+            t1 = Min(t1, f.z);
+        }
 
-		return t0 <= t1;
-	}
+        return t0 <= t1;
+    }
 
-	bool HasIntersection(const Ray &r, const Vec3 &invDir) const
-	{
-		Real t0 = r.minT, t1 = r.maxT;
+    bool HasIntersection(const Ray &r, const Vec3 &invDir) const
+    {
+        Real t0 = r.minT, t1 = r.maxT;
 
-		using namespace AGZ::Math;
+        using namespace AGZ::Math;
 
-		Vec3 n = invDir * (low - r.ori);
-		Vec3 f = invDir * (high - r.ori);
-		t0 = Max(t0, Min(n.x, f.x));
-		t0 = Max(t0, Min(n.y, f.y));
-		t0 = Max(t0, Min(n.z, f.z));
-		t1 = Min(t1, Max(n.x, f.x));
-		t1 = Min(t1, Max(n.y, f.y));
-		t1 = Min(t1, Max(n.z, f.z));
+        Vec3 n = invDir * (low - r.ori);
+        Vec3 f = invDir * (high - r.ori);
+        t0 = Max(t0, Min(n.x, f.x));
+        t0 = Max(t0, Min(n.y, f.y));
+        t0 = Max(t0, Min(n.z, f.z));
+        t1 = Min(t1, Max(n.x, f.x));
+        t1 = Min(t1, Max(n.y, f.y));
+        t1 = Min(t1, Max(n.z, f.z));
 
-		return t0 <= t1;
-	}
+        return t0 <= t1;
+    }
 
     bool HasIntersection(const Ray &r) const
     {

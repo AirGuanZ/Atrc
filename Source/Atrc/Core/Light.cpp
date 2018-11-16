@@ -14,7 +14,7 @@ bool Light::IsDelta() const
 
 bool Light::IgnoreFirstMedium() const
 {
-	return false;
+    return false;
 }
 
 AGZ_NS_END(Atrc)

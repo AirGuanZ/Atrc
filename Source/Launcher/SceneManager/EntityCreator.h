@@ -15,9 +15,9 @@ class GeometricEntityCreator : public EntityCreator, public AGZ::Singleton<Geome
 {
 public:
 
-	Str8 GetName() const override { return "GeometricEntity"; }
+    Str8 GetName() const override { return "GeometricEntity"; }
 
-	Atrc::Entity *Create(const ConfigGroup &params, ObjArena<> &arena) const override;
+    Atrc::Entity *Create(const ConfigGroup &params, ObjArena<> &arena) const override;
 };
 
 // geometry = GeometryDefinition
@@ -30,7 +30,7 @@ class GeometricDiffuseLightCreator : public EntityCreator, public AGZ::Singleton
 {
 public:
 
-	Str8 GetName() const override { return "GeometricDiffuseLight"; }
+    Str8 GetName() const override { return "GeometricDiffuseLight"; }
 
-	Atrc::Entity *Create(const ConfigGroup &params, ObjArena<> &arena) const override;
+    Atrc::Entity *Create(const ConfigGroup &params, ObjArena<> &arena) const override;
 };

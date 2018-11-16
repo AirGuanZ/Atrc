@@ -42,7 +42,7 @@ Spectrum ParamParser::ParseSpectrum(const ConfigNode &node)
         throw SceneInitializationException(err.what());
     }
 
-	throw ParamParsingError("ParamParser: unknown spectrum form");
+    throw ParamParsingError("ParamParser: unknown spectrum form");
 }
 
 Vec3 ParamParser::ParseVec3(const ConfigNode &node)

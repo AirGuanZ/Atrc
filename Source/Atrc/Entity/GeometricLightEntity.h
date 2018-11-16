@@ -9,7 +9,7 @@ template<typename L, std::enable_if_t<std::is_base_of_v<GeometricLight, L>, int>
 class GeometricLightEntity : public Entity
 {
     L light_;
-	MediumInterface mediumInterface_;
+    MediumInterface mediumInterface_;
 
     AGZ_FORCEINLINE const Geometry *Geo() const
     {
@@ -35,7 +35,7 @@ public:
         if(!Geo()->FindIntersection(r, sp))
             return false;
         sp->entity = this;
-		sp->mediumInterface = mediumInterface_;
+        sp->mediumInterface = mediumInterface_;
         return true;
     }
 

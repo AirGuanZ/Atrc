@@ -118,20 +118,20 @@ void InitializeObjectManagers()
 int main()
 {
 #if defined(_MSC_VER) && defined(_DEBUG)
-	_CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG)
-				 | _CRTDBG_LEAK_CHECK_DF);
+    _CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG)
+                 | _CRTDBG_LEAK_CHECK_DF);
 #endif
 
     std::locale::global(std::locale(""));
 
     InitializeObjectManagers();
 
-	Config config;
-	if(!config.LoadFromFile("./Build/scene.txt"))
-	{
-		cout << "Failed to load scene configuration..." << endl;
-		return -1;
-	}
+    Config config;
+    if(!config.LoadFromFile("./Build/scene.txt"))
+    {
+        cout << "Failed to load scene configuration..." << endl;
+        return -1;
+    }
     auto &conf = config.Root();
 
     ObjArena<> arena;
@@ -159,7 +159,7 @@ int main()
 
         cout << "Start rendering..." << endl;
 
-        Timer timer;
+        Clock timer;
         renderer->Render(*subareaRenderer, sceneMgr.GetScene(), *integrator, &renderTarget, reporter);
         auto deltaTime = timer.Milliseconds() / 1000.0;
 
