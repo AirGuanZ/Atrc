@@ -48,7 +48,7 @@ Option<BxDFSampleWiResult> PerfectSpecularTransmission::SampleWi(const Vec3 &wo)
     BxDFSampleWiResult ret;
     ret.wi   = wi->Normalize();
     ret.pdf  = 1;
-    ret.coef = /*eta * eta **/ rc_ * (Spectrum(1.0f) - Fr) / Abs(ret.wi.z);
+    ret.coef = eta * eta * rc_ * (Spectrum(1.0f) - Fr) / Abs(ret.wi.z);
     ret.type = type_;
 
     return ret;
