@@ -32,6 +32,9 @@
     <ClCompile Include="..\..\..\Source\Launcher\SceneManager\TextureManager.cpp">
       <Filter>SceneManager</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Source\Launcher\SceneManager\PostProcessorManager.cpp">
+      <Filter>SceneManager</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="ParamParser">
@@ -73,7 +76,7 @@
     <ClInclude Include="..\..\..\Source\Launcher\SceneManager\TextureManager.h">
       <Filter>SceneManager</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\Launcher\SceneManager\ObjectManager.h">
+    <ClInclude Include="..\..\..\Source\Launcher\SceneManager\PostProcessorManager.h">
       <Filter>SceneManager</Filter>
     </ClInclude>
   </ItemGroup>

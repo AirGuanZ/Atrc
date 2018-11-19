@@ -1,7 +1,15 @@
 #include <iostream>
 #include <Atrc/Atrc.h>
 
-#include "SceneManager/ObjectManager.h"
+#include "SceneManager/EntityCreator.h"
+#include "SceneManager/GeometryManager.h"
+#include "SceneManager/IntegratorManager.h"
+#include "SceneManager/LightManager.h"
+#include "SceneManager/MaterialManager.h"
+#include "SceneManager/MediumManager.h"
+#include "SceneManager/PostProcessorManager.h"
+#include "SceneManager/RendererManager.h"
+
 #include "SceneManager/SceneManager.h"
 
 #if defined(_MSC_VER) && defined(_DEBUG)
@@ -12,24 +20,13 @@ using namespace AGZ;
 using namespace Atrc;
 using namespace std;
 
-// See https://knarkowicz.wordpress.com/2016/01/06/aces-filmic-tone-mapping-curve/
-float ACESFilm(float x)
-{
-    constexpr float a = 2.51f;
-    constexpr float b = 0.03f;
-    constexpr float c = 2.43f;
-    constexpr float d = 0.59f;
-    constexpr float e = 0.14f;
-    return Clamp((x * (a * x + b)) / (x * (c * x + d) + e), 0.0f, 1.0f);
-}
-
 Texture2D<Color3b> ToSavedImage(const RenderTarget &origin, float gamma)
 {
     return origin.Map([=](const Color3f &color)
     {
         return color.Map([=](float x)
         {
-            return static_cast<uint8_t>(Clamp(Pow(ACESFilm(x), gamma), 0.0f, 1.0f) * 255);
+            return static_cast<uint8_t>(Clamp(x, 0.0f, 1.0f) * 255);
         });
     });
 }
@@ -92,6 +89,14 @@ void InitializeObjectManagers()
     for(auto c : MEDIUM_CREATORS)
         MediumManager::GetInstance().AddCreator(c);
 
+    PostProcessorStageCreator *POSTPROCESSOR_STAGE_CREATORS[] =
+    {
+        ACESFilmCreator      ::GetInstancePtr(),
+        GammaCorrectorCreator::GetInstancePtr(),
+    };
+    for(auto c : POSTPROCESSOR_STAGE_CREATORS)
+        PostProcessorStageManager::GetInstance().AddCreator(c);
+
     ProgressReporterCreator *REPORTER_CREATORS[] =
     {
         DefaultProgressReporterCreator::GetInstancePtr(),
@@ -139,8 +144,9 @@ int main()
 
     try
     {
-        auto width  = conf["output.width"] .AsValue().Parse<uint32_t>();
-        auto height = conf["output.height"].AsValue().Parse<uint32_t>();
+        auto filename = conf["output.filename"].AsValue();;
+        auto width    = conf["output.width"] .AsValue().Parse<uint32_t>();
+        auto height   = conf["output.height"].AsValue().Parse<uint32_t>();
 
         sceneMgr.Initialize(config.Root());
 
@@ -155,6 +161,16 @@ int main()
         auto integrator      = IntegratorManager      ::GetInstance().GetSceneObject(conf["integrator"],      arena);
         auto reporter        = ProgressReporterManager::GetInstance().GetSceneObject(conf["reporter"],        arena);
 
+        //============= Post processor =============
+
+        PostProcessor postProcessor;
+        if(auto pps = conf.Find("postProcessors"))
+        {
+            auto &arrPP = pps->AsArray();
+            for(size_t i = 0; i < arrPP.Size(); ++i)
+                postProcessor.AddStage(PostProcessorStageManager::GetInstance().GetSceneObject(arrPP[i], arena));
+        }
+
         //============= Rendering =============
 
         cout << "Start rendering..." << endl;
@@ -167,7 +183,9 @@ int main()
 
         //============= Output =============
 
-        TextureFile::WriteRGBToPNG("./Build/Output.png", ToSavedImage(renderTarget, 1 / 2.2f));
+        postProcessor.Process(renderTarget);
+
+        TextureFile::WriteRGBToPNG(filename.ToStdWString(), ToSavedImage(renderTarget, 1 / 2.2f));
     }
     catch(const std::exception &err)
     {

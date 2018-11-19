@@ -27,6 +27,7 @@
     <ClCompile Include="..\..\..\Source\Launcher\SceneManager\LightManager.cpp" />
     <ClCompile Include="..\..\..\Source\Launcher\SceneManager\MaterialManager.cpp" />
     <ClCompile Include="..\..\..\Source\Launcher\SceneManager\MediumManager.cpp" />
+    <ClCompile Include="..\..\..\Source\Launcher\SceneManager\PostProcessorManager.cpp" />
     <ClCompile Include="..\..\..\Source\Launcher\SceneManager\RendererManager.cpp" />
     <ClCompile Include="..\..\..\Source\Launcher\SceneManager\SceneManager.cpp" />
     <ClCompile Include="..\..\..\Source\Launcher\SceneManager\TextureManager.cpp" />
@@ -40,7 +41,7 @@
     <ClInclude Include="..\..\..\Source\Launcher\SceneManager\LightManager.h" />
     <ClInclude Include="..\..\..\Source\Launcher\SceneManager\MaterialManager.h" />
     <ClInclude Include="..\..\..\Source\Launcher\SceneManager\MediumManager.h" />
-    <ClInclude Include="..\..\..\Source\Launcher\SceneManager\ObjectManager.h" />
+    <ClInclude Include="..\..\..\Source\Launcher\SceneManager\PostProcessorManager.h" />
     <ClInclude Include="..\..\..\Source\Launcher\SceneManager\RendererManager.h" />
     <ClInclude Include="..\..\..\Source\Launcher\SceneManager\SceneManager.h" />
     <ClInclude Include="..\..\..\Source\Launcher\SceneManager\TextureManager.h" />

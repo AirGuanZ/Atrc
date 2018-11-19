@@ -1,5 +1,6 @@
 #include "../ParamParser/ParamParser.h"
-#include "ObjectManager.h"
+#include "EntityCreator.h"
+#include "LightManager.h"
 #include "SceneManager.h"
 
 namespace

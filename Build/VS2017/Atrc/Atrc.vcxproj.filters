@@ -37,6 +37,9 @@
     <Filter Include="Medium">
       <UniqueIdentifier>{14156538-7bc8-4337-abfa-d5b667fdb70c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="PostProcessor">
+      <UniqueIdentifier>{d9ee0966-d6df-4939-bcf9-614a3355751c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Source\Atrc\Atrc.h" />
@@ -202,6 +205,15 @@
     <ClInclude Include="..\..\..\Source\Atrc\Integrator\AmbientOcclusion.h">
       <Filter>Integrator</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Core\PostProcessor.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\PostProcessor\GammaCorrector.h">
+      <Filter>PostProcessor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\PostProcessor\ACESFilm.h">
+      <Filter>PostProcessor</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\Atrc\Core\Geometry.cpp">
@@ -314,6 +326,15 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Source\Atrc\Integrator\AmbientOcclusionIntegrator.cpp">
       <Filter>Integrator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Core\PostProcessor.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\PostProcessor\GammaCorrector.cpp">
+      <Filter>PostProcessor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\PostProcessor\ACESFilm.cpp">
+      <Filter>PostProcessor</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

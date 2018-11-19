@@ -1,20 +1,20 @@
 # Integrator
-#integrator = { type = VolumetricPathTracer; maxDepth = 10; };
-integrator = {
-    type = AmbientOcclusionIntegrator;
-    maxOccuT = 0.15;
-    background = (0.0);
-    object = (0.2);
-};
+integrator = { type = VolumetricPathTracer; maxDepth = 10; };
+#integrator = {
+#    type = AmbientOcclusionIntegrator;
+#    maxOccuT = 0.15;
+#    background = (0.0);
+#    object = (0.2);
+#};
 
 # Renderer
 renderer = { type = ParallelRenderer; workerCount = 6; };
 
 # SubareaRenderer
-subareaRenderer = { type = JitteredSubareaRenderer; spp = 100; };
+subareaRenderer = { type = JitteredSubareaRenderer; spp = 10; };
 
 # Image properties
-output = { width = 600; height = 900; };
+output = { filename = "./Build/Output.png"; width = 640; height = 480; };
 
 # Progress reporter
 reporter = { type = Default; };
@@ -24,7 +24,7 @@ camera = {
     eye  = (-7, 0, 0);
     dst  = (0, 0, 0);
     up   = (0, 0, 1);
-    FOVz = (Deg, 28);
+    FOVz = (Deg, 40);
 };
 
 # Entity list
@@ -50,22 +50,22 @@ entities = (
         albedo = (0.07);
     };
 },
-#{   # left sphere
-#    type = GeometricEntity;
-#    geometry = {
-#        type      = Sphere;
-#        radius    = 0.7;
-#        transform = ((Translate, 0, 2, -0.3));
-#    };
-#    material = {
-#        type      = Metal;
-#        rc        = (0.5);
-#        etaI      = (1);
-#        etaT      = (0.1);
-#        k         = (0.1);
-#        roughness = 0.003;
-#    };
-#},
+{   # left sphere
+    type = GeometricEntity;
+    geometry = {
+        type      = Sphere;
+        radius    = 0.7;
+        transform = ((Translate, 0, 2, -0.3));
+    };
+    material = {
+        type      = Metal;
+        rc        = (0.5);
+        etaI      = (1);
+        etaT      = (0.1);
+        k         = (0.1);
+        roughness = 0.003;
+    };
+},
 {   # centre model
     type = GeometricEntity;
     geometry = {
@@ -112,9 +112,14 @@ entities = (
 
 # Light list
 lights = (
-#{
-#    type   = SkyLight;
-#    top    = (0.4, 0.7, 0.9);
-#    bottom = (1.0);
-#}
+{
+    type   = SkyLight;
+    top    = (0.4, 0.7, 0.9);
+    bottom = (1.0);
+}
+);
+
+postProcessors = (
+{ type = GammaCorrection; gamma = 0.4545; },
+{ type = ACESFilm; }
 );

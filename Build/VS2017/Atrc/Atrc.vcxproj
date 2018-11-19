@@ -33,6 +33,7 @@
     <ClInclude Include="..\..\..\Source\Atrc\Core\Light.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Core\Material.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Core\Medium.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Core\PostProcessor.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Core\Ray.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Core\Renderer.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Core\Scene.h" />
@@ -69,6 +70,8 @@
     <ClInclude Include="..\..\..\Source\Atrc\Material\TextureScaler.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Material\UncallableMaterial.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Medium\HenyeyGreenstein.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\PostProcessor\ACESFilm.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\PostProcessor\GammaCorrector.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Renderer\DefaultProgressReporter.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Renderer\JitteredSubareaRenderer.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Renderer\SerialRenderer.h" />
@@ -80,6 +83,7 @@
     <ClCompile Include="..\..\..\Source\Atrc\Core\Entity.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Core\Geometry.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Core\Light.cpp" />
+    <ClCompile Include="..\..\..\Source\Atrc\Core\PostProcessor.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Core\Scene.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Entity\GeometricEntity.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Geometry\Cube.cpp" />
@@ -108,6 +112,8 @@
     <ClCompile Include="..\..\..\Source\Atrc\Material\Metal.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Material\Plastic.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Medium\HenyeyGreenstein.cpp" />
+    <ClCompile Include="..\..\..\Source\Atrc\PostProcessor\ACESFilm.cpp" />
+    <ClCompile Include="..\..\..\Source\Atrc\PostProcessor\GammaCorrector.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Renderer\ParallelRenderer.cpp" />
     <ClInclude Include="..\..\..\Source\Atrc\Medium\HomogeneousMedium.h" />
     <ClCompile Include="..\..\..\Source\Atrc\Medium\HomogeneousMedium.cpp" />
