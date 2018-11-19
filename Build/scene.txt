@@ -120,6 +120,6 @@ lights = (
 );
 
 postProcessors = (
-{ type = GammaCorrection; gamma = 0.4545; },
-{ type = ACESFilm; }
+{ type = ACESFilm; },
+{ type = GammaCorrection; gamma = 0.4545; }
 );
