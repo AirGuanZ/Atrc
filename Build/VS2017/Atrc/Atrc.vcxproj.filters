@@ -199,6 +199,9 @@
     <ClInclude Include="..\..\..\Source\Atrc\Renderer\DefaultProgressReporter.h">
       <Filter>Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Integrator\AmbientOcclusion.h">
+      <Filter>Integrator</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\Atrc\Core\Geometry.cpp">
@@ -308,6 +311,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Source\Atrc\Renderer\ParallelRenderer.cpp">
       <Filter>Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Integrator\AmbientOcclusionIntegrator.cpp">
+      <Filter>Integrator</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

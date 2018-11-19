@@ -35,3 +35,15 @@ public:
 
     Atrc::Integrator *Create(const ConfigGroup &params, ObjArena<> &arena) const override;
 };
+
+// maxOccuT = Real
+// background = Spectrum
+// object = Spectrum
+class AmbientOcclusionIntegratorCreator : public IntegratorCreator, public AGZ::Singleton<AmbientOcclusionIntegratorCreator>
+{
+public:
+
+    Str8 GetName() const override { return "AmbientOcclusionIntegrator"; }
+
+    Atrc::Integrator *Create(const ConfigGroup &params, ObjArena<> &arena) const override;
+};

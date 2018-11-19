@@ -19,3 +19,11 @@ Atrc::Integrator *VolumetricPathTracerCreator::Create(const ConfigGroup &params,
     auto maxDepth = params["maxDepth"].AsValue().Parse<uint32_t>();
     return arena.Create<Atrc::VolumetricPathTracer>(maxDepth);
 }
+
+Atrc::Integrator *AmbientOcclusionIntegratorCreator::Create(const ConfigGroup &params, ObjArena<> &arena) const
+{
+    auto maxOccuT = params["maxOccuT"].AsValue().Parse<Atrc::Real>();
+    auto background = ParamParser::ParseSpectrum(params["background"]);
+    auto object = ParamParser::ParseSpectrum(params["object"]);
+    return arena.Create<Atrc::AmbientOcclusionIntegrator>(maxOccuT, background, object);
+}

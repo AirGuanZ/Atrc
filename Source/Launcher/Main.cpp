@@ -15,13 +15,12 @@ using namespace std;
 // See https://knarkowicz.wordpress.com/2016/01/06/aces-filmic-tone-mapping-curve/
 float ACESFilm(float x)
 {
-    /*constexpr float a = 2.51f;
+    constexpr float a = 2.51f;
     constexpr float b = 0.03f;
     constexpr float c = 2.43f;
     constexpr float d = 0.59f;
     constexpr float e = 0.14f;
-    return Clamp((x * (a * x + b)) / (x * (c * x + d) + e), 0.0f, 1.0f);*/
-    return x;
+    return Clamp((x * (a * x + b)) / (x * (c * x + d) + e), 0.0f, 1.0f);
 }
 
 Texture2D<Color3b> ToSavedImage(const RenderTarget &origin, float gamma)
@@ -64,9 +63,10 @@ void InitializeObjectManagers()
 
     IntegratorCreator *INTEGRATOR_CREATORS[] =
     {
-        PathTracerCreator          ::GetInstancePtr(),
-        PureColorIntegratorCreator ::GetInstancePtr(),
-        VolumetricPathTracerCreator::GetInstancePtr(),
+        AmbientOcclusionIntegratorCreator::GetInstancePtr(),
+        PathTracerCreator                ::GetInstancePtr(),
+        PureColorIntegratorCreator       ::GetInstancePtr(),
+        VolumetricPathTracerCreator      ::GetInstancePtr(),
     };
     for(auto c : INTEGRATOR_CREATORS)
         IntegratorManager::GetInstance().AddCreator(c);

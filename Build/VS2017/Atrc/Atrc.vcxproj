@@ -43,6 +43,7 @@
     <ClInclude Include="..\..\..\Source\Atrc\Geometry\Cube.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Geometry\Sphere.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Geometry\TriangleBVH.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Integrator\AmbientOcclusion.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Integrator\PathTracer.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Integrator\PureColorIntegrator.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Integrator\VolumetricPathTracer.h" />
@@ -84,6 +85,7 @@
     <ClCompile Include="..\..\..\Source\Atrc\Geometry\Cube.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Geometry\Sphere.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Geometry\TriangleBVH.cpp" />
+    <ClCompile Include="..\..\..\Source\Atrc\Integrator\AmbientOcclusionIntegrator.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Integrator\PathTracer.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Integrator\PureColorIntegrator.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Integrator\VolumetricPathTracer.cpp" />

@@ -25,6 +25,7 @@
 
 #include <Atrc/Medium/HomogeneousMedium.h>
 
+#include <Atrc/Integrator/AmbientOcclusion.h>
 #include <Atrc/Integrator/PathTracer.h>
 #include <Atrc/Integrator/PureColorIntegrator.h>
 #include <Atrc/Integrator/VolumetricPathTracer.h>
