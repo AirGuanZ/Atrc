@@ -14,7 +14,7 @@ void ACESFilm::Process(RenderTarget &img) const
             constexpr float c = 2.43f;
             constexpr float d = 0.59f;
             constexpr float e = 0.14f;
-            return Clamp((x * (a * x + b)) / (x * (c * x + d) + e), 0.0f, 1.0f);
+            return (x * (a * x + b)) / (x * (c * x + d) + e);
         });
     });
 }

@@ -184,7 +184,6 @@ int main()
         //============= Output =============
 
         postProcessor.Process(renderTarget);
-
         TextureFile::WriteRGBToPNG(filename.ToStdWString(), ToSavedImage(renderTarget));
     }
     catch(const std::exception &err)
