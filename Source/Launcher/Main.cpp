@@ -20,7 +20,7 @@ using namespace AGZ;
 using namespace Atrc;
 using namespace std;
 
-Texture2D<Color3b> ToSavedImage(const RenderTarget &origin, float gamma)
+Texture2D<Color3b> ToSavedImage(const RenderTarget &origin)
 {
     return origin.Map([=](const Color3f &color)
     {
@@ -185,7 +185,7 @@ int main()
 
         postProcessor.Process(renderTarget);
 
-        TextureFile::WriteRGBToPNG(filename.ToStdWString(), ToSavedImage(renderTarget, 1 / 2.2f));
+        TextureFile::WriteRGBToPNG(filename.ToStdWString(), ToSavedImage(renderTarget));
     }
     catch(const std::exception &err)
     {
