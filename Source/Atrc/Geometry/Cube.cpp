@@ -125,8 +125,8 @@ bool Cube::FindIntersection(const Ray &_r, SurfacePoint *sp) const
 
         if(negAxis)
         {
-            sp->geoUV.u = Clamp(Real(0.5) * pos.x / halfSideLen_ + Real(0.5), Real(0), Real(1.0));
-            sp->geoUV.v = Clamp(Real(0.5) * pos.z / halfSideLen_ + Real(0.5), Real(0), Real(1.0));
+            sp->geoUV.u = Clamp(Real(0.5) * pos.x / halfSideLen_ + Real(0.5), Real(0), Real(1));
+            sp->geoUV.v = Clamp(Real(0.5) * pos.z / halfSideLen_ + Real(0.5), Real(0), Real(1));
             ex = Vec3::UNIT_X();
         }
         else
