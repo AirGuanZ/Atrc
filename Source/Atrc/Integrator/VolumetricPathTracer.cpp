@@ -69,7 +69,7 @@ Spectrum VolumetricPathTracer::E1_right(const Scene &scene, const SurfacePoint &
     if(!light || light->IsDelta())
         return Spectrum();
 
-    // NonareaLight¿ÉÒÔÑ¡ÔñºöÂÔÈ«¾Ö½éÖÊ£¬·ñÔòÖ±½Ó¹Òµô
+    // NonareaLightå¯ä»¥é€‰æ‹©å¿½ç•¥å…¨å±€ä»‹è´¨ï¼Œå¦åˆ™ç›´æ¥æŒ‚æ‰
     if(!light->IgnoreFirstMedium() && newRay.medium)
         return Spectrum();
 
@@ -151,7 +151,7 @@ Spectrum VolumetricPathTracer::Ls_right(const Scene &scene, const MediumPoint &m
     MediumShadingPoint medShd;
     mp.medium->Shade(mp, &medShd, arena);
 
-    // ¶ÔÏàº¯Êı²ÉÑù
+    // å¯¹ç›¸å‡½æ•°é‡‡æ ·
 
     auto phSample = medShd.ph->SampleWi();
     if(!phSample.coef)
@@ -163,8 +163,8 @@ Spectrum VolumetricPathTracer::Ls_right(const Scene &scene, const MediumPoint &m
     return medShd.le + medShd.sigmaS * phSample.coef * lph;
 }
 
-// Èôr·¢Éä³öÈ¥ÓĞ½»µã£¬Ôò°´https://airguanz.github.io/2018/10/28/LTE-with-participating-medium.html
-// ÖĞµÄ¹«Ê½À´£»·ñÔòÖ»Ğè²ÉÑù½éÖÊ
+// è‹¥rå‘å°„å‡ºå»æœ‰äº¤ç‚¹ï¼Œåˆ™æŒ‰https://airguanz.github.io/2018/10/28/LTE-with-participating-medium.html
+// ä¸­çš„å…¬å¼æ¥ï¼›å¦åˆ™åªéœ€é‡‡æ ·ä»‹è´¨
 Spectrum VolumetricPathTracer::D2_left(const Scene &scene, const Ray &r, int depth, AGZ::ObjArena<> &arena) const
 {
     SurfacePoint sp;
@@ -199,10 +199,10 @@ Spectrum VolumetricPathTracer::D2_left(const Scene &scene, const Ray &r, const S
     if(!med)
         return L2_right(scene, sp, depth, arena);
 
-    // ²ÉÑù½éÖÊ£¬²ÉÑùµÃµ½µÄ»°¾ÍËã½éÖÊ£¬²ÉÑù²»µ½¾ÍËã½»µã
+    // é‡‡æ ·ä»‹è´¨ï¼Œé‡‡æ ·å¾—åˆ°çš„è¯å°±ç®—ä»‹è´¨ï¼Œé‡‡æ ·ä¸åˆ°å°±ç®—äº¤ç‚¹
 
     Ray medSampleRay = r;
-    medSampleRay.maxT = sp.t - EPS;
+    medSampleRay.maxT = AGZ::Math::Max(sp.t - EPS, medSampleRay.minT);
     auto tmedSample = med->SampleLs(medSampleRay);
 
     if(tmedSample.IsRight())
@@ -227,8 +227,8 @@ Spectrum VolumetricPathTracer::L_left(const Scene &scene, const Ray &r, int dept
     SurfacePoint sp;
     if(!scene.FindCloestIntersection(r, &sp))
     {
-        // ÀÛ¼Ónonarea¹âÔ´
-        // ÕâĞ©¹âÔ´ÒªÃ´ignore first medium²»ÊÜtrÓ°Ïì£¬ÒªÃ´Ö±½Ó±»ÎŞÏŞ´ó¾àÀëµÄtr¸ÉµôÁË
+        // ç´¯åŠ nonareaå…‰æº
+        // è¿™äº›å…‰æºè¦ä¹ˆignore first mediumä¸å—trå½±å“ï¼Œè¦ä¹ˆç›´æ¥è¢«æ— é™å¤§è·ç¦»çš„trå¹²æ‰äº†
 
         auto med = scene.GetGlobalMedium();
         auto le = Spectrum();

@@ -16,7 +16,8 @@ Spectrum HomogeneousMedium::Tr(const Vec3 &a, const Vec3 &b) const
 
 Either<MediumSampleLsResult, Real> HomogeneousMedium::SampleLs(const Ray &r) const
 {
-    AGZ_ASSERT(r.IsNormalized() && r.minT <= r.maxT);
+    AGZ_ASSERT(r.IsNormalized());
+    AGZ_ASSERT(r.minT <= r.maxT);
 
     if(!sigmaS_ && !le_)
         return 1.0;

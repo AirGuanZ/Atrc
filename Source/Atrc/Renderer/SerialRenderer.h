@@ -13,7 +13,7 @@ public:
         const SubareaRenderer &subareaRenderer, const Scene &scene, const Integrator &integrator,
         RenderTarget *rt, ProgressReporter *reporter) const override
     {
-        AGZ_ASSERT(rt.IsAvailable());
+        AGZ_ASSERT(rt->IsAvailable());
 
         uint32_t w = rt->GetWidth();
         uint32_t h = rt->GetHeight();
