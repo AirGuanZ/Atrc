@@ -1,14 +1,14 @@
 # Integrator
-integrator = { type = VolumetricPathTracer; maxDepth = 10; };
+integrator = { type = VolumetricPathTracer; maxDepth = 50; };
 
 # Renderer
-renderer = { type = ParallelRenderer; workerCount = 6; };
+renderer = { type = ParallelRenderer; workerCount = 12; };
 
 # SubareaRenderer
-subareaRenderer = { type = JitteredSubareaRenderer; spp = 100; };
+subareaRenderer = { type = JitteredSubareaRenderer; spp = 1; };
 
 # Image properties
-output = { filename = "./Build/Output.png"; width = 640; height = 480; };
+output = { filename = "./Build/Output.png"; width = 600; height = 900; };
 
 # Progress reporter
 reporter = { type = Default; };
@@ -18,39 +18,39 @@ camera = {
     eye  = (-7, 0, 0);
     dst  = (0, 0, 0);
     up   = (0, 0, 1);
-    FOVz = (Deg, 40);
+    FOVz = (Deg, 28);
 };
 
 # Entity list
 entities = (
-{   # ground
-    type = GeometricEntity;
-    geometry = {
-        type      = Sphere;
-        radius    = 200;
-        transform = ((Translate, 0, 0, -201));
-    };
-    material = {
-        type   = DiffuseMaterial;
-        albedo = (0.07);
-    };
-},
-{   # left sphere
-    type = GeometricEntity;
-    geometry = {
-        type      = Sphere;
-        radius    = 0.7;
-        transform = ((Translate, 0, 2, -0.3));
-    };
-    material = {
-        type      = Metal;
-        rc        = (0.5);
-        etaI      = (1);
-        etaT      = (0.1);
-        k         = (0.1);
-        roughness = 0.003;
-    };
-},
+#{   # ground
+#    type = GeometricEntity;
+#    geometry = {
+#        type      = Sphere;
+#        radius    = 200;
+#        transform = ((Translate, 0, 0, -201));
+#    };
+#    material = {
+#        type   = DiffuseMaterial;
+#        albedo = (0.07);
+#    };
+#},
+#{   # left sphere
+#    type = GeometricEntity;
+#    geometry = {
+#        type      = Sphere;
+#        radius    = 0.7;
+#        transform = ((Translate, 0, 2, -0.3));
+#    };
+#    material = {
+#        type      = Metal;
+#        rc        = (0.5);
+#        etaI      = (1);
+#        etaT      = (0.1);
+#        k         = (0.1);
+#        roughness = 0.003;
+#    };
+#},
 {   # centre model
     type = GeometricEntity;
     geometry = {
@@ -76,24 +76,25 @@ entities = (
             g = 0.3;
         };
     };
-},
-{   # right cube
-    type = GeometricEntity;
-    geometry = {
-        type = Cube;
-        sidelen = 1.4;
-        transform = ((Translate, 0, -2, 0.123), (Rotate, 1.0, 1.1, 1.2, Deg, 47));
-    };
-    material = {
-        type = TextureScaler;
-        sampler = Linear;
-        path = "./Assets/CubeTex.png";
-        internal = {
-            type = DiffuseMaterial;
-            albedo = (0.2, 0.4, 0.8);
-        };
-    };
-});
+#},
+#{   # right cube
+#    type = GeometricEntity;
+#    geometry = {
+#        type = Cube;
+#        sidelen = 1.4;
+#        transform = ((Translate, 0, -2, 0.123), (Rotate, 1.0, 1.1, 1.2, Deg, 47));
+#    };
+#    material = {
+#        type = TextureScaler;
+#        sampler = Linear;
+#        path = "./Assets/CubeTex.png";
+#        internal = {
+#            type = DiffuseMaterial;
+#            albedo = (0.2, 0.4, 0.8);
+#        };
+#    };
+}
+);
 
 # Light list
 lights = (

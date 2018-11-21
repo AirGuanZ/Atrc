@@ -55,7 +55,7 @@ void ParallelRenderer::Render(
     const SubareaRenderer &subareaRenderer, const Scene &scene, const Integrator &integrator,
     RenderTarget *output, ProgressReporter *reporter) const
 {
-    AGZ_ASSERT(output.IsAvailable());
+    AGZ_ASSERT(output->IsAvailable());
     uint32_t w = output->GetWidth();
     uint32_t h = output->GetHeight();
 
