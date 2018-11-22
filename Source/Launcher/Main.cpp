@@ -121,7 +121,64 @@ void InitializeObjectManagers()
         SubareaRendererManager::GetInstance().AddCreator(c);
 }
 
-int main()
+Option<Str8> ParseParam(int argc, char *argv[])
+{
+    AGZ_ASSERT(argv);
+    if(argc == 1)
+        return "./Build/scene.txt";
+    if(argc == 2)
+        return argv[1];
+    return None;
+}
+
+int Run(const Str8 &sceneDescFilename)
+{
+    Config config;
+    if(!config.LoadFromFile(sceneDescFilename))
+    {
+        cout << "Failed to load scene configuration..." << endl;
+        return -1;
+    }
+    auto &conf = config.Root();
+
+    ObjArena<> arena;
+    auto &sceneMgr = SceneManager::GetInstance();
+
+    auto filename = conf["output.filename"].AsValue();;
+    auto width    = conf["output.width"].AsValue().Parse<uint32_t>();
+    auto height   = conf["output.height"].AsValue().Parse<uint32_t>();
+
+    sceneMgr.Initialize(config.Root());
+    RenderTarget renderTarget(width, height);
+
+    auto renderer        = RendererManager        ::GetInstance().GetSceneObject(conf["renderer"],        arena);
+    auto subareaRenderer = SubareaRendererManager ::GetInstance().GetSceneObject(conf["subareaRenderer"], arena);
+    auto integrator      = IntegratorManager      ::GetInstance().GetSceneObject(conf["integrator"],      arena);
+    auto reporter        = ProgressReporterManager::GetInstance().GetSceneObject(conf["reporter"],        arena);
+
+    PostProcessor postProcessor;
+    if(auto pps = conf.Find("postProcessors"))
+    {
+        auto &arrPP = pps->AsArray();
+        for(size_t i = 0; i < arrPP.Size(); ++i)
+            postProcessor.AddStage(PostProcessorStageManager::GetInstance().GetSceneObject(arrPP[i], arena));
+    }
+
+    cout << "Start rendering..." << endl;
+
+    Clock timer;
+    renderer->Render(*subareaRenderer, sceneMgr.GetScene(), *integrator, &renderTarget, reporter);
+    auto deltaTime = timer.Milliseconds() / 1000.0;
+
+    cout << "Complete rendering...Total time: " << deltaTime << "s." << endl;
+
+    postProcessor.Process(renderTarget);
+    TextureFile::WriteRGBToPNG(filename.ToStdWString(), ToSavedImage(renderTarget));
+
+    return 0;
+}
+
+int main(int argc, char *argv[])
 {
 #if defined(_MSC_VER) && defined(_DEBUG)
     _CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG)
@@ -132,60 +189,18 @@ int main()
 
     InitializeObjectManagers();
 
-    Config config;
-    if(!config.LoadFromFile("./Build/scene.txt"))
+    auto sceneDescFilename = ParseParam(argc, argv);
+    if(!sceneDescFilename)
     {
-        cout << "Failed to load scene configuration..." << endl;
+        cout << "Usage:" << endl;
+        cout << "    atrc [scene_desc]" << endl;
+        cout << "    './Build/scene.txt' is used when [scene_desc] unspecified" << endl;
         return -1;
     }
-    auto &conf = config.Root();
-
-    ObjArena<> arena;
-    auto &sceneMgr = SceneManager::GetInstance();
 
     try
     {
-        auto filename = conf["output.filename"].AsValue();;
-        auto width    = conf["output.width"] .AsValue().Parse<uint32_t>();
-        auto height   = conf["output.height"].AsValue().Parse<uint32_t>();
-
-        sceneMgr.Initialize(config.Root());
-
-        //============= Render Target =============
-
-        RenderTarget renderTarget(width, height);
-
-        //============= Renderer & Integrator =============
-
-        auto renderer        = RendererManager        ::GetInstance().GetSceneObject(conf["renderer"],        arena);
-        auto subareaRenderer = SubareaRendererManager ::GetInstance().GetSceneObject(conf["subareaRenderer"], arena);
-        auto integrator      = IntegratorManager      ::GetInstance().GetSceneObject(conf["integrator"],      arena);
-        auto reporter        = ProgressReporterManager::GetInstance().GetSceneObject(conf["reporter"],        arena);
-
-        //============= Post processor =============
-
-        PostProcessor postProcessor;
-        if(auto pps = conf.Find("postProcessors"))
-        {
-            auto &arrPP = pps->AsArray();
-            for(size_t i = 0; i < arrPP.Size(); ++i)
-                postProcessor.AddStage(PostProcessorStageManager::GetInstance().GetSceneObject(arrPP[i], arena));
-        }
-
-        //============= Rendering =============
-
-        cout << "Start rendering..." << endl;
-
-        Clock timer;
-        renderer->Render(*subareaRenderer, sceneMgr.GetScene(), *integrator, &renderTarget, reporter);
-        auto deltaTime = timer.Milliseconds() / 1000.0;
-
-        cout << "Complete rendering...Total time: " << deltaTime << "s." << endl;
-
-        //============= Output =============
-
-        postProcessor.Process(renderTarget);
-        TextureFile::WriteRGBToPNG(filename.ToStdWString(), ToSavedImage(renderTarget));
+        return Run(*sceneDescFilename);
     }
     catch(const std::exception &err)
     {

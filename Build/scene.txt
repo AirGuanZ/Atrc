@@ -2,13 +2,13 @@
 integrator = { type = PathTracer; maxDepth = 50; };
 
 # Renderer
-renderer = { type = ParallelRenderer; workerCount = 11; };
+renderer = { type = ParallelRenderer; workerCount = 6; };
 
 # SubareaRenderer
 subareaRenderer = { type = JitteredSubareaRenderer; spp = 10; };
 
 # Image properties
-output = { filename = "./Build/Output.png"; width = 1920; height = 1080; };
+output = { filename = "./Build/Output.png"; width = 960; height = 540; };
 
 # Progress reporter
 reporter = { type = Default; };
@@ -113,12 +113,12 @@ lights = (
 #}
 {
     type = CubeEnvironmentLight;
-    posX = "./Assets/Morning/morning_ft.png";
-    posY = "./Assets/Morning/morning_lf.png";
-    posZ = "./Assets/Morning/morning_up.png";
-    negX = "./Assets/Morning/morning_bk.png";
-    negY = "./Assets/Morning/morning_rt.png";
-    negZ = "./Assets/Morning/morning_dn.png";
+    posX = "./Assets/RedSky/front.jpg";
+    posY = "./Assets/RedSky/left.jpg";
+    posZ = "./Assets/RedSky/up.jpg";
+    negX = "./Assets/RedSky/back.jpg";
+    negY = "./Assets/RedSky/right.jpg";
+    negZ = "./Assets/RedSky/down.jpg";
 }
 );
 
