@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <Atrc/Core/Core.h>
 
@@ -37,7 +37,7 @@ public:
 
 private:
 
-    // Ìî³äentities_ºÍnodes_
+    // å¡«å……entities_å’Œnodes_
     void InitBVH(const ConstEntityPtr *entities, uint32_t nEntity);
 
     std::vector<const Entity*> entities_;

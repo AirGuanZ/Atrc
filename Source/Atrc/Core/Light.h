@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <Atrc/Core/Common.h>
 
@@ -18,34 +18,34 @@ public:
 
     virtual ~Light() = default;
 
-    // Ô¤´¦Àí³¡¾°ÒÔ»ñµÃ±ØÒªµÄĞÅÏ¢£¬±ÈÈçÓĞÏò¹â»ñÈ¡³¡¾°´óĞ¡ÒÔ½øĞĞ²ÉÑùµÈ
-    // È±Ê¡É¶Ò²²»×ö
+    // é¢„å¤„ç†åœºæ™¯ä»¥è·å¾—å¿…è¦çš„ä¿¡æ¯ï¼Œæ¯”å¦‚æœ‰å‘å…‰è·å–åœºæ™¯å¤§å°ä»¥è¿›è¡Œé‡‡æ ·ç­‰
+    // ç¼ºçœå•¥ä¹Ÿä¸åš
     virtual void PreprocessScene(const Scene &scene);
 
-    // ÔÚ¹âÔ´ÉÏ²ÉÑùÒ»¸öµãÕÕÏòsp£¬Ô­ÔòÉÏ°üº¬ÁËAreaLeºÍNonareaLeÁ½²¿·Ö
+    // åœ¨å…‰æºä¸Šé‡‡æ ·ä¸€ä¸ªç‚¹ç…§å‘spï¼ŒåŸåˆ™ä¸ŠåŒ…å«äº†AreaLeå’ŒNonareaLeä¸¤éƒ¨åˆ†
     virtual LightSampleToResult SampleLi(const SurfacePoint &sp) const = 0;
 
-    // ¸ø¶¨¹âÔ´ÉÏµÄ²ÉÑù½á¹û£¬Çópdf
-    // posOnLightÖ¸³öposÊÇ·ñÔÚ¹âÔ´ÊµÌåÉÏ£¬Ç°Õß¶ÔÓ¦AreaLe£¬ºóÕß¶ÔÓ¦NonareaLe
+    // ç»™å®šå…‰æºä¸Šçš„é‡‡æ ·ç»“æœï¼Œæ±‚pdf
+    // posOnLightæŒ‡å‡ºposæ˜¯å¦åœ¨å…‰æºå®ä½“ä¸Šï¼Œå‰è€…å¯¹åº”AreaLeï¼Œåè€…å¯¹åº”NonareaLe
     virtual Real SampleLiPDF(const Vec3 &pos, const SurfacePoint &dst, bool posOnLight = true) const = 0;
 
-    // Î»ÖÃ²ÉÑùÊÇ·ñÊ¹ÓÃdelta·Ö²¼
+    // ä½ç½®é‡‡æ ·æ˜¯å¦ä½¿ç”¨deltaåˆ†å¸ƒ
     virtual bool IsDeltaPosition() const = 0;
 
-    // ÊÇ·ñÊÇdelta·½ÏòµÄ¹âÔ´£¬±ÈÈçÀíÏëÓĞÏò¹â
+    // æ˜¯å¦æ˜¯deltaæ–¹å‘çš„å…‰æºï¼Œæ¯”å¦‚ç†æƒ³æœ‰å‘å…‰
     virtual bool IsDeltaDirection() const = 0;
 
     virtual bool IsDelta() const;
 
-    // ½öÕë¶ÔÓĞÊµÌåµÄ¹âÔ´£¬ÉèÄ³rÓëÊµÌå½»ÓÚsp£¬ÇóÕâÒ»µãÑØ-r.dirµÄradiance
+    // ä»…é’ˆå¯¹æœ‰å®ä½“çš„å…‰æºï¼Œè®¾æŸrä¸å®ä½“äº¤äºspï¼Œæ±‚è¿™ä¸€ç‚¹æ²¿-r.dirçš„radiance
     virtual Spectrum AreaLe(const SurfacePoint &sp) const = 0;
 
     virtual bool IgnoreFirstMedium() const;
 
-    // Ã»ÓĞÊµÌå£¬ÑØ-r.dir·½ÏòÆ¾¿Õ²úÉúµÄÄÇĞ©le£¬±ÈÈçskylightµÈ
+    // æ²¡æœ‰å®ä½“ï¼Œæ²¿-r.diræ–¹å‘å‡­ç©ºäº§ç”Ÿçš„é‚£äº›leï¼Œæ¯”å¦‚skylightç­‰
     virtual Spectrum NonareaLe(const Ray &r) const = 0;
 
-    // ÓÃÀ´ÔÚ¶à¸ö¹âÔ´¼ä½øĞĞÑ¡Ôñ
+    // ç”¨æ¥åœ¨å¤šä¸ªå…‰æºé—´è¿›è¡Œé€‰æ‹©
     virtual Spectrum Power() const = 0;
 };
 

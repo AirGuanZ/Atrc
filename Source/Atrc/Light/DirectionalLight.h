@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <Atrc/Core/Core.h>
 
@@ -18,30 +18,30 @@ public:
 
     void PreprocessScene(const Scene &scene) override;
 
-    // ÔÚ¹âÔ´ÉÏ²ÉÑùÒ»¸öµãÕÕÏòsp£¬Ô­ÔòÉÏ°üº¬ÁËAreaLeºÍNonareaLeÁ½²¿·Ö
+    // åœ¨å…‰æºä¸Šé‡‡æ ·ä¸€ä¸ªç‚¹ç…§å‘spï¼ŒåŸåˆ™ä¸ŠåŒ…å«äº†AreaLeå’ŒNonareaLeä¸¤éƒ¨åˆ†
     LightSampleToResult SampleLi(const SurfacePoint &sp) const override;
 
-    // ¸ø¶¨¹âÔ´ÉÏµÄ²ÉÑù½á¹û£¬Çópdf
-    // posOnLightÖ¸³öposÊÇ·ñÔÚ¹âÔ´ÊµÌåÉÏ£¬Ç°Õß¶ÔÓ¦AreaLe£¬ºóÕß¶ÔÓ¦NonareaLe
+    // ç»™å®šå…‰æºä¸Šçš„é‡‡æ ·ç»“æœï¼Œæ±‚pdf
+    // posOnLightæŒ‡å‡ºposæ˜¯å¦åœ¨å…‰æºå®ä½“ä¸Šï¼Œå‰è€…å¯¹åº”AreaLeï¼Œåè€…å¯¹åº”NonareaLe
     Real SampleLiPDF(const Vec3 &pos, const SurfacePoint &dst, bool posOnLight) const override;
 
-    // Î»ÖÃ²ÉÑùÊÇ·ñÊ¹ÓÃdelta·Ö²¼
+    // ä½ç½®é‡‡æ ·æ˜¯å¦ä½¿ç”¨deltaåˆ†å¸ƒ
     bool IsDeltaPosition() const override;
 
-    // ÊÇ·ñÊÇdelta·½ÏòµÄ¹âÔ´£¬±ÈÈçÀíÏëÓĞÏò¹â
+    // æ˜¯å¦æ˜¯deltaæ–¹å‘çš„å…‰æºï¼Œæ¯”å¦‚ç†æƒ³æœ‰å‘å…‰
     bool IsDeltaDirection() const override;
 
     bool IsDelta() const override;
 
-    // ½öÕë¶ÔÓĞÊµÌåµÄ¹âÔ´£¬ÉèÄ³rÓëÊµÌå½»ÓÚsp£¬ÇóÕâÒ»µãÑØ-r.dirµÄradiance
+    // ä»…é’ˆå¯¹æœ‰å®ä½“çš„å…‰æºï¼Œè®¾æŸrä¸å®ä½“äº¤äºspï¼Œæ±‚è¿™ä¸€ç‚¹æ²¿-r.dirçš„radiance
     Spectrum AreaLe(const SurfacePoint &sp) const override;
 
     bool IgnoreFirstMedium() const override;
 
-    // Ã»ÓĞÊµÌå£¬ÑØ-r.dir·½ÏòÆ¾¿Õ²úÉúµÄÄÇĞ©le£¬±ÈÈçskylightµÈ
+    // æ²¡æœ‰å®ä½“ï¼Œæ²¿-r.diræ–¹å‘å‡­ç©ºäº§ç”Ÿçš„é‚£äº›leï¼Œæ¯”å¦‚skylightç­‰
     Spectrum NonareaLe(const Ray &r) const override;
 
-    // ÓÃÀ´ÔÚ¶à¸ö¹âÔ´¼ä½øĞĞÑ¡Ôñ
+    // ç”¨æ¥åœ¨å¤šä¸ªå…‰æºé—´è¿›è¡Œé€‰æ‹©
     Spectrum Power() const override;
 };
 

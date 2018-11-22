@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <Atrc/Core/Common.h>
 #include <Atrc/Core/Ray.h>
@@ -12,7 +12,7 @@ public:
 
     virtual ~Integrator() = default;
 
-    // ¼ÆËãÑØ-r.dir·½Ïò»÷ÖĞr.oriµÄradiance
+    // è®¡ç®—æ²¿-r.diræ–¹å‘å‡»ä¸­r.oriçš„radiance
     virtual Spectrum GetRadiance(const Scene &scene, const Ray &r, AGZ::ObjArena<> &arena) const = 0;
 };
 

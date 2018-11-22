@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <Atrc/Core/Common.h>
 
@@ -34,28 +34,28 @@ public:
 
     virtual bool HasIntersection(const Ray &r) const;
 
-    // Ìî³ä£ºt£¬pos£¬wo£¬geoUV£¬usrUV£¬geoLocal£¨£¬flag0£©
+    // å¡«å……ï¼štï¼Œposï¼Œwoï¼ŒgeoUVï¼ŒusrUVï¼ŒgeoLocalï¼ˆï¼Œflag0ï¼‰
     virtual bool FindIntersection(const Ray &r, SurfacePoint *sp) const = 0;
 
-    // ÔÚWorldÒâÒåÉÏµÄ±íÃæ»ı
+    // åœ¨Worldæ„ä¹‰ä¸Šçš„è¡¨é¢ç§¯
     virtual Real SurfaceArea() const = 0;
 
-    // ¾Ö²¿bound
+    // å±€éƒ¨bound
     virtual AABB LocalBound() const = 0;
 
-    // ÊÀ½çbound
+    // ä¸–ç•Œbound
     virtual AABB WorldBound() const;
 
-    // ÔÚ±íÃæÉÏ²ÉÑù
+    // åœ¨è¡¨é¢ä¸Šé‡‡æ ·
     virtual GeometrySampleResult Sample() const = 0;
 
-    // ¸ø¶¨²ÉÑù½á¹û£¬·µ»ØÆä¸ÅÂÊÃÜ¶È
+    // ç»™å®šé‡‡æ ·ç»“æœï¼Œè¿”å›å…¶æ¦‚ç‡å¯†åº¦
     virtual Real SamplePDF(const Vec3 &pos) const = 0;
 
-    // ÒÔdstÎª¡°Ä¿±êµã¡±ÔÚ±íÃæÉÏ½øĞĞ²ÉÑù
+    // ä»¥dstä¸ºâ€œç›®æ ‡ç‚¹â€åœ¨è¡¨é¢ä¸Šè¿›è¡Œé‡‡æ ·
     virtual GeometrySampleResult Sample(const Vec3 &dst) const;
 
-    // ÉÏÒ»¸öº¯ÊıµÄpdf
+    // ä¸Šä¸€ä¸ªå‡½æ•°çš„pdf
     virtual Real SamplePDF(const Vec3 &pos, const Vec3 &dst) const;
 };
 

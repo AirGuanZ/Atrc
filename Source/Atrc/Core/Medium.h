@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <Atrc/Core/Common.h>
 
@@ -48,8 +48,8 @@ public:
 
     virtual Spectrum Tr(const Vec3 &a, const Vec3 &b) const = 0;
 
-    // ÔÚrÉÏ³É¹¦²ÉÑùÊ±ÎªL£¬²ÉÑùÊ§°ÜÊ±½ö·µ»Ø¸ÅÂÊÃÜ¶È
-    // r.dirÎª-wo
+    // åœ¨rä¸ŠæˆåŠŸé‡‡æ ·æ—¶ä¸ºLï¼Œé‡‡æ ·å¤±è´¥æ—¶ä»…è¿”å›æ¦‚ç‡å¯†åº¦
+    // r.dirä¸º-wo
     virtual Either<MediumSampleLsResult, Real> SampleLs(const Ray &r) const = 0;
 
     virtual void Shade(const MediumPoint &medPnt, MediumShadingPoint *shdPnt, AGZ::ObjArena<> &arena) const = 0;

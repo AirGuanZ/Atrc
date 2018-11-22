@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <memory>
 #include <optional>
@@ -105,7 +105,7 @@ using AGZ::UNINITIALIZED;
 using AGZ::Str8;
 using AGZ::StrView8;
 
-// ============================= Ò»Ð©Õë¶ÔBSDF¿Õ¼äµÄ¸¨Öúº¯Êý =============================
+// ============================= ä¸€äº›é’ˆå¯¹BSDFç©ºé—´çš„è¾…åŠ©å‡½æ•° =============================
 
 inline Real CosTheta(const Vec3 &w) { return w.z; }
 inline Real Cos2Theta(const Vec3 &w) { return w.z * w.z; }

@@ -1,4 +1,4 @@
-#pragma once
+Ôªø#pragma once
 
 #include <Atrc/Core/Common.h>
 #include <Atrc/Core/Ray.h>
@@ -12,7 +12,7 @@ public:
     Vec3 low  = Vec3(RealT::Max());
     Vec3 high = Vec3(RealT::Min());
 
-    // »Ù(high - low)µƒ»Œ“‚“ª∏ˆŒ¨∂»<=0£¨‘Ú ”Œ™Entity
+    // Ëã•(high - low)ÁöÑ‰ªªÊÑè‰∏Ä‰∏™Áª¥Â∫¶<=0ÔºåÂàôËßÜ‰∏∫Entity
     bool IsEmpty() const
     {
         return low.x >= high.x || low.y >= high.y || low.z >= high.z;

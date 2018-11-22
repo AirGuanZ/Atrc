@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <Atrc/Core/Common.h>
 
@@ -24,7 +24,7 @@ public:
 
     virtual const Material *GetMaterial(const SurfacePoint &sp) const = 0;
 
-    // ÉÙÊıEntity×ÔÉí¿É×÷Îª¹âÔ´£¬·ñÔò·µ»Ønullptr
+    // å°‘æ•°Entityè‡ªèº«å¯ä½œä¸ºå…‰æºï¼Œå¦åˆ™è¿”å›nullptr
     virtual const Light *AsLight() const;
 
     virtual Light *AsLight();

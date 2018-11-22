@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <Atrc/Core/Common.h>
 #include <Atrc/Core/SurfacePoint.h>
@@ -53,10 +53,10 @@ public:
 
     virtual Spectrum Eval(const Vec3 &wi, const Vec3 &wo, BxDFType type) const = 0;
 
-    // ¸ø¶¨wo£¬¶Ôwi½øĞĞtypeÀàĞÍµÄ²ÉÑù
+    // ç»™å®šwoï¼Œå¯¹wiè¿›è¡Œtypeç±»å‹çš„é‡‡æ ·
     virtual Option<BSDFSampleWiResult> SampleWi(const Vec3 &wo, BxDFType type) const = 0;
 
-    // ¸ø¶¨Ä³wi£¬¼ÙÉèÕâÊ±SampleWiµÄ²ÉÑù½á¹û£¬·µ»Øpdf
+    // ç»™å®šæŸwiï¼Œå‡è®¾è¿™æ—¶SampleWiçš„é‡‡æ ·ç»“æœï¼Œè¿”å›pdf
     virtual Real SampleWiPDF(const Vec3 &wi, const Vec3 &wo, BxDFType type) const = 0;
 
     const LocalCoordSystem &GetShadingLocal() const { return shadingLocal_; }

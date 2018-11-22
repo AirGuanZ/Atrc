@@ -1,10 +1,10 @@
-#pragma once
+ï»¿#pragma once
 
 #include <Atrc/Core/Core.h>
 
 AGZ_NS_BEG(Atrc)
 
-// TriangleBVH¿ÉÄÜÓĞ´óÁ¿µÄÊı¾İ£¬°ÑÊı¾İ´æ´¢·Ö³öÀ´±ãÓÚ×öinstancing
+// TriangleBVHå¯èƒ½æœ‰å¤§é‡çš„æ•°æ®ï¼ŒæŠŠæ•°æ®å­˜å‚¨åˆ†å‡ºæ¥ä¾¿äºåšinstancing
 class TriangleBVHCore
 {
 public:
@@ -60,7 +60,7 @@ private:
 
     void InitBVH(const Vertex *vertices, uint32_t triangleCount);
 
-    // triangles_ÖĞÃæ»ıµÄÇ°×ººÍ£¬ÓÃÀ´¶ş·Ö²éÕÒÒÔ½øĞĞÈ«ÌåÈı½ÇĞÎÉÏµÄÃæ»ı¾ùÔÈ²ÉÑù
+    // triangles_ä¸­é¢ç§¯çš„å‰ç¼€å’Œï¼Œç”¨æ¥äºŒåˆ†æŸ¥æ‰¾ä»¥è¿›è¡Œå…¨ä½“ä¸‰è§’å½¢ä¸Šçš„é¢ç§¯å‡åŒ€é‡‡æ ·
     std::vector<Real> areaPrefixSum_;
 
     std::vector<InternalTriangle> triangles_;

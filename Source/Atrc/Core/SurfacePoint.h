@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <Atrc/Core/Common.h>
 #include <Atrc/Core/Medium.h>
@@ -32,28 +32,28 @@ struct LocalCoordSystem
 
 struct SurfacePoint
 {
-    // �ཻ���ߵ�tֵ
+    // 相交射线的t值
     Real t = 0.0;
 
-    // ����λ��
+    // 表面位置
     Vec3 pos;
 
-    // �ཻ���ߵķ�����
+    // 相交射线的反方向
     Vec3 wo;
 
-    // ����uv���꣬���ཻ������Ĺ������ʾ���
+    // 几何uv坐标，由相交几何体的固有性质决定
     Vec2 geoUV;
 
-    // �û��Զ���uv���꣬��������ӳ���
+    // 用户自定义uv坐标，用于纹理映射等
     Vec2 usrUV;
 
-    // ���ξֲ�����ϵ������ez���Ǳ��淨��
+    // 几何局部坐标系，其中ez就是表面法线
     LocalCoordSystem geoLocal;
 
-    // �ཻʵ��
+    // 相交实体
     const Entity *entity = nullptr;
     
-    // ������ʵ�����ж��壬��������triangle bvh�е�face id��
+    // 含义由实体自行定义，比如用作triangle bvh中的face id等
     uint32_t flag0       = 0;
 
     MediumInterface mediumInterface;
@@ -61,7 +61,7 @@ struct SurfacePoint
 
 struct ShadingPoint
 {
-    // ��ɫ�ֲ�����ϵ���󲿷�ʱ����geoLocalһ������bump mapping�ȼ�����Ӱ��
+    // 着色局部坐标系，大部分时候与geoLocal一样，受bump mapping等技术的影响
     LocalCoordSystem shdLocal;
 
     BSDF *bsdf;
