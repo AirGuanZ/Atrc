@@ -16,6 +16,7 @@
 #include <Atrc/Integrator/PureColorIntegrator.h>
 #include <Atrc/Integrator/VolumetricPathTracer.h>
 
+#include <Atrc/Light/CubeEnvironmentLight.h>
 #include <Atrc/Light/DirectionalLight.h>
 #include <Atrc/Light/GeometricDiffuseLightImpl.h>
 #include <Atrc/Light/SkyLight.h>

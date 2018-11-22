@@ -52,8 +52,9 @@ void InitializeObjectManagers()
 
     LightCreator *LIGHT_CREATORS[] =
     {
-        DirectionalLightCreator::GetInstancePtr(),
-        SkyLightCreator        ::GetInstancePtr(),
+        CubeEnvironmentLightCreator::GetInstancePtr(),
+        DirectionalLightCreator    ::GetInstancePtr(),
+        SkyLightCreator            ::GetInstancePtr(),
     };
     for(auto c : LIGHT_CREATORS)
         LightManager::GetInstance().AddCreator(c);

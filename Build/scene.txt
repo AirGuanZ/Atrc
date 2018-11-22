@@ -2,55 +2,55 @@
 integrator = { type = VolumetricPathTracer; maxDepth = 50; };
 
 # Renderer
-renderer = { type = ParallelRenderer; workerCount = 10; };
+renderer = { type = ParallelRenderer; workerCount = 11; };
 
 # SubareaRenderer
-subareaRenderer = { type = JitteredSubareaRenderer; spp = 1; };
+subareaRenderer = { type = JitteredSubareaRenderer; spp = 1000; };
 
 # Image properties
-output = { filename = "./Build/Output.png"; width = 600; height = 900; };
+output = { filename = "./Build/Output.png"; width = 1920; height = 1080; };
 
 # Progress reporter
 reporter = { type = Default; };
 
 # Camera
 camera = {
-    eye  = (-7, 0, 0);
+    eye  = (-7, 0, 1);
     dst  = (0, 0, 0);
     up   = (0, 0, 1);
-    FOVz = (Deg, 28);
+    FOVz = (Deg, 70);
 };
 
 # Entity list
 entities = (
-#{   # ground
-#    type = GeometricEntity;
-#    geometry = {
-#        type      = Sphere;
-#        radius    = 200;
-#        transform = ((Translate, 0, 0, -201));
-#    };
-#    material = {
-#        type   = DiffuseMaterial;
-#        albedo = (0.07);
-#    };
-#},
-#{   # left sphere
-#    type = GeometricEntity;
-#    geometry = {
-#        type      = Sphere;
-#        radius    = 0.7;
-#        transform = ((Translate, 0, 2, -0.3));
-#    };
-#    material = {
-#        type      = Metal;
-#        rc        = (0.5);
-#        etaI      = (1);
-#        etaT      = (0.1);
-#        k         = (0.1);
-#        roughness = 0.003;
-#    };
-#},
+{   # ground
+    type = GeometricEntity;
+    geometry = {
+        type      = Sphere;
+        radius    = 200;
+        transform = ((Translate, 0, 0, -201));
+    };
+    material = {
+        type   = DiffuseMaterial;
+        albedo = (0.5);
+    };
+},
+{   # left sphere
+    type = GeometricEntity;
+    geometry = {
+        type      = Sphere;
+        radius    = 0.7;
+        transform = ((Translate, 0, 2, -0.3));
+    };
+    material = {
+        type      = Metal;
+        rc        = (0.5);
+        etaI      = (1);
+        etaT      = (0.1);
+        k         = (0.1);
+        roughness = 0.003;
+    };
+},
 {   # centre model
     type = GeometricEntity;
     geometry = {
@@ -59,53 +59,70 @@ entities = (
         transform = ((Translate, 0.0, 0.02, -1.1), (RotateZ, Deg, -90), (Scale, 0.0050));
     };
     material = {
-        type      = FresnelSpecular;
-        rc        = (0.9, 0.4, 0.2);
-        fresnel = {
-            type = FresnelDielectric;
-            etaI = 1.0;
-            etaT = 1.6;
-        };
+        type = Metal;
+        rc = (0.9, 0.4, 0.2);
+        etaI = 1;
+        etaT = 0.1;
+        k = 0.2;
+        roughness = 0.02;
     };
-    mediumInterface = {
-        in = {
-            type = Homogeneous;
-            sigmaA = (7.0);
-            sigmaS = (0.3);
-            le = (0.0);
-            g = 0.3;
-        };
-    };
-#},
-#{   # right cube
-#    type = GeometricEntity;
-#    geometry = {
-#        type = Cube;
-#        sidelen = 1.4;
-#        transform = ((Translate, 0, -2, 0.123), (Rotate, 1.0, 1.1, 1.2, Deg, 47));
-#    };
 #    material = {
-#        type = TextureScaler;
-#        sampler = Linear;
-#        path = "./Assets/CubeTex.png";
-#        internal = {
-#            type = DiffuseMaterial;
-#            albedo = (0.2, 0.4, 0.8);
+#        type      = FresnelSpecular;
+#        rc        = (0.9, 0.4, 0.2);
+#        fresnel = {
+#            type = FresnelDielectric;
+#            etaI = 1.0;
+#            etaT = 1.6;
 #        };
 #    };
+#    mediumInterface = {
+#        in = {
+#            type = Homogeneous;
+#            sigmaA = (7.0);
+#            sigmaS = (0.3);
+#            le = (0.0);
+#            g = 0.3;
+#        };
+#    };
+},
+{   # right cube
+    type = GeometricEntity;
+    geometry = {
+        type = Cube;
+        sidelen = 1.4;
+        transform = ((Translate, 0, -2, 0.123), (Rotate, 1.0, 1.1, 1.2, Deg, 47));
+    };
+    material = {
+        type = TextureScaler;
+        sampler = Linear;
+        path = "./Assets/CubeTex.png";
+        internal = {
+            type = DiffuseMaterial;
+            albedo = (0.2, 0.4, 0.8);
+        };
+    };
 }
 );
 
 # Light list
 lights = (
+#{
+#    type   = SkyLight;
+#    top    = (0.4, 0.7, 0.9);
+#    bottom = (1.0);
+#}
 {
-    type   = SkyLight;
-    top    = (0.4, 0.7, 0.9);
-    bottom = (1.0);
+    type = CubeEnvironmentLight;
+    posX = "./Assets/Morning/morning_ft.png";
+    posY = "./Assets/Morning/morning_lf.png";
+    posZ = "./Assets/Morning/morning_up.png";
+    negX = "./Assets/Morning/morning_bk.png";
+    negY = "./Assets/Morning/morning_rt.png";
+    negZ = "./Assets/Morning/morning_dn.png";
 }
 );
 
 postProcessors = (
-{ type = ACESFilm; },
-{ type = GammaCorrection; gamma = 0.4545; }
+#{ type = ACESFilm; },
+#{ type = GammaCorrection; gamma = 0.4545; }
 );

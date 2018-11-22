@@ -1,4 +1,4 @@
-#include <Atrc/Geometry/Sphere.h>
+ï»¿#include <Atrc/Geometry/Sphere.h>
 
 AGZ_NS_BEG(Atrc)
 
@@ -36,7 +36,7 @@ bool Sphere::FindIntersection(const Ray &_r, SurfacePoint *sp) const
 {
     Ray r = local2World_.ApplyInverseToRay(_r);
 
-    // ÁªÁ¢rºÍsphere·½³Ì½â³öÁ½¸öt£¬Ñ¡¸ü½üµÄÄÇ¸ö
+    // è”ç«‹rå’Œsphereæ–¹ç¨‹è§£å‡ºä¸¤ä¸ªtï¼Œé€‰æ›´è¿‘çš„é‚£ä¸ª
 
     auto [A, B, C] = ABC(radius_, r);
     Real delta = B * B - 4 * A * C;
@@ -56,7 +56,7 @@ bool Sphere::FindIntersection(const Ray &_r, SurfacePoint *sp) const
         return false;
     Real t = notT0 ? t1 : t0;
 
-    // ¼ÆËãuv×ø±ê
+    // è®¡ç®—uvåæ ‡
 
     Vec3 pos = r.At(t);
 
@@ -69,7 +69,7 @@ bool Sphere::FindIntersection(const Ray &_r, SurfacePoint *sp) const
 
     Vec2 geoUV(Real(0.5) * InvPI * phi, InvPI * theta + Real(0.5));
 
-    // ¼ÆËãlocal coordinate system
+    // è®¡ç®—local coordinate system
 
     Vec3 nor = pos;
     Vec3 ex, ey;

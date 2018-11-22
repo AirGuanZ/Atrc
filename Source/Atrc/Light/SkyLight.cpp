@@ -9,7 +9,7 @@ SkyLight::SkyLight(const Spectrum &topAndBottom)
 }
 
 SkyLight::SkyLight(const Spectrum &top, const Spectrum &bottom)
-    : top_(top), bottom_(bottom), worldRadius_(0.0)
+    : top_(top), bottom_(bottom), worldRadius_(0)
 {
 
 }

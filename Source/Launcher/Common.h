@@ -47,23 +47,23 @@ public:
 
     using Creator = ObjectCreator<T>;
 
-    // 初始化全局公有元素，可在其他定义中被引用
+    // 锟斤拷始锟斤拷全锟街癸拷锟斤拷元锟截ｏ拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟叫憋拷锟斤拷锟斤拷
     void InitializePublicDefinitions(const ConfigGroup &contents, ObjArena<> &arena)
     {
         for(auto it : contents.GetChildren())
             definitions_[it.first] = ObjectManager<T>::GetInstance().Create(it.second->AsGroup(), arena);
     }
 
-    // 注册一个新的ObjectCreator
+    // 注锟斤拷一锟斤拷锟铰碉拷ObjectCreator
     void AddCreator(const Creator *creator)
     {
         AGZ_ASSERT(creator);
         name2Creator_[creator->GetName()] = creator;
     }
 
-    // 给定rightItem，取得一个场景object
-    // 若node是$name形式的value，表示引用了一个公有定义
-    // 否则。node应该是group，包含了要创建的元素类型及参数
+    // 锟斤拷锟斤拷rightItem锟斤拷取锟斤拷一锟斤拷锟斤拷锟斤拷object
+    // 锟斤拷node锟斤拷$name锟斤拷式锟斤拷value锟斤拷锟斤拷示锟斤拷锟斤拷锟斤拷一锟斤拷锟斤拷锟叫讹拷锟斤拷
+    // 锟斤拷锟斤拷node应锟斤拷锟斤拷group锟斤拷锟斤拷锟斤拷锟斤拷要锟斤拷锟斤拷锟斤拷元锟斤拷锟斤拷锟酵硷拷锟斤拷锟斤拷
     T *GetSceneObject(const ConfigNode &node, ObjArena<> &arena)
     {
         if(node.IsValue())

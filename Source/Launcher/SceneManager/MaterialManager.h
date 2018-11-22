@@ -9,7 +9,7 @@ using MaterialManager = ObjectManager<Atrc::Material>;
 
 enum class FresnelType
 {
-    FresnelConductor,     // "FresnelConductor"
+    FresnelConductor,    // "FresnelConductor"
     FresnelDielectric,   // "FresnelDielectric"
     SchlickApproximation // "SchlickApproximation"
 };
