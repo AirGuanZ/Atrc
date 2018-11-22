@@ -5,17 +5,17 @@ integrator = { type = PathTracer; maxDepth = 50; };
 renderer = { type = ParallelRenderer; workerCount = 6; };
 
 # SubareaRenderer
-subareaRenderer = { type = JitteredSubareaRenderer; spp = 10; };
+subareaRenderer = { type = JitteredSubareaRenderer; spp = 1; };
 
 # Image properties
-output = { filename = "./Build/Output.png"; width = 960; height = 540; };
+output = { filename = "./Build/Output.png"; width = 1920; height = 1080; };
 
 # Progress reporter
 reporter = { type = Default; };
 
 # Camera
 camera = {
-    eye  = (-7, 0, 1);
+    eye  = (-7, 0, 0.5);
     dst  = (0, 0, 0);
     up   = (0, 0, 1);
     FOVz = (Deg, 70);
@@ -113,12 +113,12 @@ lights = (
 #}
 {
     type = CubeEnvironmentLight;
-    posX = "./Assets/RedSky/front.jpg";
-    posY = "./Assets/RedSky/left.jpg";
-    posZ = "./Assets/RedSky/up.jpg";
-    negX = "./Assets/RedSky/back.jpg";
-    negY = "./Assets/RedSky/right.jpg";
-    negZ = "./Assets/RedSky/down.jpg";
+    posX = "./Assets/PineForest/front.jpg";
+    posY = "./Assets/PineForest/left.jpg";
+    posZ = "./Assets/PineForest/up.jpg";
+    negX = "./Assets/PineForest/back.jpg";
+    negY = "./Assets/PineForest/right.jpg";
+    negZ = "./Assets/PineForest/down.jpg";
 }
 );
 
