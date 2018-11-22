@@ -1,4 +1,4 @@
-#include <Atrc/Integrator/AmbientOcclusion.h>
+#include <Atrc/Integrator/AmbientOcclusionIntegrator.h>
 
 AGZ_NS_BEG(Atrc)
 
@@ -8,7 +8,7 @@ AmbientOcclusionIntegrator::AmbientOcclusionIntegrator(Real maxOccuT, const Spec
     AGZ_ASSERT(maxOccuT > 0.0);
 }
 
-Spectrum AmbientOcclusionIntegrator::GetRadiance(const Scene &scene, const Ray &r, AGZ::ObjArena<> &arena) const
+Spectrum AmbientOcclusionIntegrator::GetRadiance(const Scene &scene, const Ray &r, [[maybe_unused]] AGZ::ObjArena<> &arena) const
 {
     SurfacePoint sp;
     if(!scene.FindCloestIntersection(r, &sp))

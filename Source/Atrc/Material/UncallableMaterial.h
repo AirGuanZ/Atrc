@@ -8,7 +8,7 @@ class UncallableMaterial : public Material
 {
 public:
 
-    void Shade(const SurfacePoint &sp, ShadingPoint *dst, AGZ::ObjArena<> &arena) const override
+    void Shade([[maybe_unused]] const SurfacePoint &sp, [[maybe_unused]] ShadingPoint *dst, [[maybe_unused]] AGZ::ObjArena<> &arena) const override
     {
         throw UnreachableException("UncallableMaterial");
     }

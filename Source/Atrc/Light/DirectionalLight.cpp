@@ -38,7 +38,7 @@ LightSampleToResult DirectionalLight::SampleLi(const SurfacePoint &sp) const
     return ret;
 }
 
-Real DirectionalLight::SampleLiPDF(const Vec3 &pos, const SurfacePoint &dst, bool posOnLight) const
+Real DirectionalLight::SampleLiPDF([[maybe_unused]] const Vec3 &pos, [[maybe_unused]] const SurfacePoint &dst, bool posOnLight) const
 {
     AGZ_ASSERT(!posOnLight);
     return 0.0;
@@ -59,7 +59,7 @@ bool DirectionalLight::IsDelta() const
     return true;
 }
 
-Spectrum DirectionalLight::AreaLe(const SurfacePoint &sp) const
+Spectrum DirectionalLight::AreaLe([[maybe_unused]] const SurfacePoint &sp) const
 {
     return Spectrum();
 }
@@ -69,7 +69,7 @@ bool DirectionalLight::IgnoreFirstMedium() const
     return true;
 }
 
-Spectrum DirectionalLight::NonareaLe(const Ray &r) const
+Spectrum DirectionalLight::NonareaLe([[maybe_unused]] const Ray &r) const
 {
     return Spectrum();
 }

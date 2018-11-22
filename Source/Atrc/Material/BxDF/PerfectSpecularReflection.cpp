@@ -8,7 +8,7 @@ PerfectSpecularReflection::PerfectSpecularReflection(const Spectrum &rc, const F
     AGZ_ASSERT(fresnel_);
 }
 
-Spectrum PerfectSpecularReflection::Eval(const Vec3 &wi, const Vec3 &wo) const
+Spectrum PerfectSpecularReflection::Eval([[maybe_unused]] const Vec3 &wi, [[maybe_unused]] const Vec3 &wo) const
 {
     return Spectrum();
 }
@@ -28,7 +28,7 @@ Option<BxDFSampleWiResult> PerfectSpecularReflection::SampleWi(const Vec3 &wo) c
     return ret;
 }
 
-Real PerfectSpecularReflection::SampleWiPDF(const Vec3 &wi, const Vec3 &wo) const
+Real PerfectSpecularReflection::SampleWiPDF([[maybe_unused]] const Vec3 &wi, [[maybe_unused]] const Vec3 &wo) const
 {
     return 0.0;
 }

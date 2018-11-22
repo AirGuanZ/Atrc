@@ -55,7 +55,7 @@ const Atrc::SchlickApproximation *FresnelCreator::CreateSchlickApproximation(con
     return arena.Create<Atrc::SchlickApproximation>(etaI, etaT);
 }
 
-Atrc::Material *BlackMaterialCreator::Create(const ConfigGroup &params, ObjArena<> &arena) const
+Atrc::Material *BlackMaterialCreator::Create([[maybe_unused]] const ConfigGroup &params, [[maybe_unused]] ObjArena<> &arena) const
 {
     return &Atrc::STATIC_BLACK_MATERIAL;
 }
@@ -127,7 +127,7 @@ Atrc::Material *TextureScalerCreator::Create(const ConfigGroup &params, ObjArena
     throw SceneInitializationException("Unknown texture sampler: " + sampler);
 }
 
-Atrc::Material *UncallableMaterialCreator::Create(const ConfigGroup &params, ObjArena<> &arena) const
+Atrc::Material *UncallableMaterialCreator::Create([[maybe_unused]] const ConfigGroup &params, [[maybe_unused]] ObjArena<> &arena) const
 {
     return &Atrc::STATIC_UNCALLABLE_MATERIAL;
 }

@@ -15,24 +15,24 @@ public:
 
 private:
 
-    // MediumÓÉsp×Ô´ø
+    // Mediumï¿½ï¿½spï¿½Ô´ï¿½
     Spectrum L_right(const Scene &scene, const SurfacePoint &sp, int depth, AGZ::ObjArena<> &arena) const;
 
     Spectrum L2_right(const Scene &scene, const SurfacePoint &sp, int depth, AGZ::ObjArena<> &arena) const;
 
-    Spectrum E1_right(const Scene &scene, const SurfacePoint &sp, const ShadingPoint &shd, int depth, AGZ::ObjArena<> &arena) const;
+    Spectrum E1_right(const Scene &scene, const SurfacePoint &sp, const ShadingPoint &shd) const;
 
-    Spectrum E2_right(const Scene &scene, const SurfacePoint &sp, const ShadingPoint &shd, int depth, AGZ::ObjArena<> &arena) const;
+    Spectrum E2_right(const Scene &scene, const SurfacePoint &sp, const ShadingPoint &shd) const;
 
     Spectrum S_right(const Scene &scene, const SurfacePoint &sp, const ShadingPoint &shd, int depth, AGZ::ObjArena<> &arena) const;
 
     Spectrum Ls_right(const Scene &scene, const MediumPoint &mp, int depth, AGZ::ObjArena<> &arena) const;
 
-    // r»÷ÖÐµÄsp¾ö¶¨ËüµÄmedium£¬ÈôÃ»»÷ÖÐ£¬¾ÍÊÇglobal medium
-    // D2(x \leftarrow Phi)¶ÔÓ¦r = x + t\Phi
+    // rï¿½ï¿½ï¿½Ðµï¿½spï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½mediumï¿½ï¿½ï¿½ï¿½Ã»ï¿½ï¿½ï¿½Ð£ï¿½ï¿½ï¿½ï¿½ï¿½global medium
+    // D2(x \leftarrow Phi)ï¿½ï¿½Ó¦r = x + t\Phi
     Spectrum D2_left(const Scene &scene, const Ray &r, int depth, AGZ::ObjArena<> &arena) const;
 
-    // ÒÑÖªr³öÈ¥ºóÅöµ½ÁËsp£¬ÇóÉÏÃæµÄD2_left½á¹û
+    // ï¿½ï¿½Öªrï¿½ï¿½È¥ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½spï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½D2_leftï¿½ï¿½ï¿½
     Spectrum D2_left(const Scene &scene, const Ray &r, const SurfacePoint &sp, int depth, AGZ::ObjArena<> &arena) const;
 
     Spectrum L_left(const Scene &scene, const Ray &r, int depth, AGZ::ObjArena<> &arena) const;

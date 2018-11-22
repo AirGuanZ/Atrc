@@ -23,7 +23,7 @@ PerfectSpecularTransmission::PerfectSpecularTransmission(const Spectrum &rc, con
     AGZ_ASSERT(fresnel_);
 }
 
-Spectrum PerfectSpecularTransmission::Eval(const Vec3 &wi, const Vec3 &wo) const
+Spectrum PerfectSpecularTransmission::Eval([[maybe_unused]] const Vec3 &wi, [[maybe_unused]] const Vec3 &wo) const
 {
     return Spectrum();
 }
@@ -54,7 +54,7 @@ Option<BxDFSampleWiResult> PerfectSpecularTransmission::SampleWi(const Vec3 &wo)
     return ret;
 }
 
-Real PerfectSpecularTransmission::SampleWiPDF(const Vec3 &wi, const Vec3 &wo) const
+Real PerfectSpecularTransmission::SampleWiPDF([[maybe_unused]] const Vec3 &wi, [[maybe_unused]] const Vec3 &wo) const
 {
     return 0;
 }

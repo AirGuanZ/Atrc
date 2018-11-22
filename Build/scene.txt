@@ -2,7 +2,7 @@
 integrator = { type = VolumetricPathTracer; maxDepth = 50; };
 
 # Renderer
-renderer = { type = ParallelRenderer; workerCount = 6; };
+renderer = { type = ParallelRenderer; workerCount = 10; };
 
 # SubareaRenderer
 subareaRenderer = { type = JitteredSubareaRenderer; spp = 1; };

@@ -14,20 +14,20 @@ namespace
             
         }
 
-        Spectrum Eval(const Vec3 &wi, const Vec3 &wo, BxDFType type) const override
+        Spectrum Eval(const Vec3 &wi, const Vec3 &wo, [[maybe_unused]] BxDFType type) const override
         {
             AGZ_ASSERT(IsNormalized(wi));
             AGZ_ASSERT(IsNormalized(wo));
             return SPECTRUM::BLACK;
         }
 
-        Option<BSDFSampleWiResult> SampleWi(const Vec3 &wo, BxDFType type) const override
+        Option<BSDFSampleWiResult> SampleWi(const Vec3 &wo, [[maybe_unused]] BxDFType type) const override
         {
             AGZ_ASSERT(IsNormalized(wo));
             return None;
         }
 
-        Real SampleWiPDF(const Vec3 &wi, const Vec3 &wo, BxDFType type) const override
+        Real SampleWiPDF(const Vec3 &wi, const Vec3 &wo, [[maybe_unused]] BxDFType type) const override
         {
             AGZ_ASSERT(IsNormalized(wi));
             AGZ_ASSERT(IsNormalized(wo));

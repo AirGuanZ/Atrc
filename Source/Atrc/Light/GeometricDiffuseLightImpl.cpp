@@ -46,12 +46,12 @@ bool GeometricDiffuseLightImpl::IsDelta() const
     return false;
 }
 
-Spectrum GeometricDiffuseLightImpl::AreaLe(const SurfacePoint &sp) const
+Spectrum GeometricDiffuseLightImpl::AreaLe([[maybe_unused]] const SurfacePoint &sp) const
 {
     return radiance_;
 }
 
-Spectrum GeometricDiffuseLightImpl::NonareaLe(const Ray &r) const
+Spectrum GeometricDiffuseLightImpl::NonareaLe([[maybe_unused]] const Ray &r) const
 {
     return SPECTRUM::BLACK;
 }

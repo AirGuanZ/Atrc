@@ -127,7 +127,7 @@ AABB BVH::WorldBound() const
     });
 }
 
-const Material *BVH::GetMaterial(const SurfacePoint &sp) const
+const Material *BVH::GetMaterial([[maybe_unused]] const SurfacePoint &sp) const
 {
     return &STATIC_UNCALLABLE_MATERIAL;
 }
@@ -208,7 +208,7 @@ namespace
             return FillLeaf(nodeArena.Create<TNode>(), start, end);
         }
 
-        // °ÑËùÓÐÈý½ÇÐÎ»®·Öµ½Ò»¶ÑbucketsÖÐ£¬È»ºó´Óbuckets¼äÏ¶ÖÐÑ¡ÔñÒ»¸ö×î¼Ñ»®·Öµã
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½Öµï¿½Ò»ï¿½ï¿½bucketsï¿½Ð£ï¿½È»ï¿½ï¿½ï¿½bucketsï¿½ï¿½Ï¶ï¿½ï¿½Ñ¡ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½Ñ»ï¿½ï¿½Öµï¿½
 
         constexpr int BUCKET_COUNT = 12;
 

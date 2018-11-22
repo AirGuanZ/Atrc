@@ -4,7 +4,7 @@ AGZ_NS_BEG(Atrc)
 
 namespace
 {
-    // ¼ÆËãÕÛÉä·½Ïò£¬·¢ÉúÈ«·´ÉäÊ±·µ»ØNone
+    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ä·½ï¿½ò£¬·ï¿½ï¿½ï¿½È«ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½None
     Option<Vec3> GetRefractDirection(const Vec3 &wo, const Vec3 &nor, float eta)
     {
         Real cosThetaI = Abs(wo.z);
@@ -23,7 +23,7 @@ PerfectSpecular::PerfectSpecular(const Spectrum &rc, const Dielectric *fresnel)
     AGZ_ASSERT(fresnel_);
 }
 
-Spectrum PerfectSpecular::Eval(const Vec3 &wi, const Vec3 &wo) const
+Spectrum PerfectSpecular::Eval([[maybe_unused]] const Vec3 &wi, [[maybe_unused]] const Vec3 &wo) const
 {
     return Spectrum();
 }
@@ -32,7 +32,7 @@ Option<BxDFSampleWiResult> PerfectSpecular::SampleWi(const Vec3 &wo) const
 {
     Vec3 nor = wo.z > 0 ? Vec3::UNIT_Z() : -Vec3::UNIT_Z();
 
-    // ÏÈËãfresnelÁ¿£¬¸ù¾Ý¸ÅÂÊÑ¡·´Éä»¹ÊÇÕÛÉä
+    // ï¿½ï¿½ï¿½ï¿½fresnelï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý¸ï¿½ï¿½ï¿½Ñ¡ï¿½ï¿½ï¿½ä»¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     auto Fr = fresnel_->Eval(float(wo.z));
     if(Rand() < Fr.r)
     {
@@ -44,12 +44,12 @@ Option<BxDFSampleWiResult> PerfectSpecular::SampleWi(const Vec3 &wo) const
         return ret;
     }
 
-    // ÕÛÉä¶ÔÓ¦µÄÊ±Í¸Ã÷ÎïÌå£¬¹Êwo¿ÉÄÜÊÇ´ÓÄÚ²¿ÍùÍâ²¿£¬Ó¦Çø±ð¶Ô´ý
+    // ï¿½ï¿½ï¿½ï¿½ï¿½Ó¦ï¿½ï¿½Ê±Í¸ï¿½ï¿½ï¿½ï¿½ï¿½å£¬ï¿½ï¿½woï¿½ï¿½ï¿½ï¿½ï¿½Ç´ï¿½ï¿½Ú²ï¿½ï¿½ï¿½ï¿½â²¿ï¿½ï¿½Ó¦ï¿½ï¿½ï¿½ï¿½Ô´ï¿½
 
     float etaI = wo.z > 0.0 ? fresnel_->GetEtaI() : fresnel_->GetEtaT();
     float etaT = wo.z > 0.0 ? fresnel_->GetEtaT() : fresnel_->GetEtaI();
 
-    // ÕÛÉä·½Ïò
+    // ï¿½ï¿½ï¿½ä·½ï¿½ï¿½
 
     float eta = etaI / etaT;
     auto wi = GetRefractDirection(wo, nor, eta);
@@ -64,7 +64,7 @@ Option<BxDFSampleWiResult> PerfectSpecular::SampleWi(const Vec3 &wo) const
     return ret;
 }
 
-Real PerfectSpecular::SampleWiPDF(const Vec3 &wi, const Vec3 &wo) const
+Real PerfectSpecular::SampleWiPDF([[maybe_unused]] const Vec3 &wi, [[maybe_unused]] const Vec3 &wo) const
 {
     return 0;
 }

@@ -44,7 +44,7 @@ public:
         return Geo()->WorldBound();
     }
 
-    const Material *GetMaterial(const SurfacePoint &sp) const override
+    const Material *GetMaterial([[maybe_unused]] const SurfacePoint &sp) const override
     {
         return &STATIC_BLACK_MATERIAL;
     }

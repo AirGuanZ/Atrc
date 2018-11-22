@@ -33,7 +33,7 @@ void SkyLight::PreprocessScene(const Scene &scene)
 
 LightSampleToResult SkyLight::SampleLi(const SurfacePoint &sp) const
 {
-    // Ö»ÔÚspµÄÕý°ëÇòÉÏ²ÉÑù
+    // Ö»ï¿½ï¿½spï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï²ï¿½ï¿½ï¿½
     Real u = Rand(), v = Rand();
     auto [sam, pdf] = AGZ::Math::DistributionTransform::
         ZWeightedOnUnitHemisphere<Real>::Transform({ u, v });
@@ -74,7 +74,7 @@ bool SkyLight::IsDelta() const
     return false;
 }
 
-Spectrum SkyLight::AreaLe(const SurfacePoint &sp) const
+Spectrum SkyLight::AreaLe([[maybe_unused]] const SurfacePoint &sp) const
 {
     return Spectrum();
 }

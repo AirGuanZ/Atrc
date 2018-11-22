@@ -36,7 +36,7 @@ namespace
         return r.Between(t);
     }
 
-    // ½öÉèÖÃspµÄt£¬pos£¬wo£¬geoUV
+    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½spï¿½ï¿½tï¿½ï¿½posï¿½ï¿½woï¿½ï¿½geoUV
     bool EvalIntersectionWithTriangle(
         const Vec3 &A, const Vec3 &B_A, const Vec3 &C_A,
         const Ray &r, SurfacePoint *sp)
@@ -224,14 +224,14 @@ AABB TriangleBVHCore::LocalBound() const
     AGZ_ASSERT(!nodes_.empty());
 
     return AGZ::TypeOpr::MatchVar(nodes_[0],
-        [&](const Leaf &leaf)
+        [&]([[maybe_unused]] const Leaf &leaf)
     {
         AABB ret;
         for(auto &tri : triangles_)
         {
             ret.Expand(tri.A)
-                .Expand(tri.A + tri.B_A)
-                .Expand(tri.A + tri.C_A);
+               .Expand(tri.A + tri.B_A)
+               .Expand(tri.A + tri.C_A);
         }
         return ret;
     },
@@ -346,8 +346,8 @@ namespace
             allBound.Expand(tri[2].pos);
         }
 
-        // Ñ¡Ôñ»®·ÖÖá
-        // ÈôËùÓÐcentroid¶¼ÔÚÍ¬Ò»¸öÎ»ÖÃ£¬Ôò´´½¨Ò»¸öÒ¶½Úµã
+        // Ñ¡ï¿½ñ»®·ï¿½ï¿½ï¿½
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½centroidï¿½ï¿½ï¿½ï¿½Í¬Ò»ï¿½ï¿½Î»ï¿½Ã£ï¿½ï¿½ò´´½ï¿½Ò»ï¿½ï¿½Ò¶ï¿½Úµï¿½
 
         AABB centroidBound;
         for(uint32_t i = start; i < end; ++i)
@@ -361,7 +361,7 @@ namespace
             return FillLeaf(nodeArena.Create<TNode>(), start, end);
         }
 
-        // °ÑËùÓÐÈý½ÇÐÎ»®·Öµ½Ò»¶ÑbucketsÖÐ£¬È»ºó´Óbuckets¼äÏ¶ÖÐÑ¡ÔñÒ»¸ö×î¼Ñ»®·Öµã
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½Öµï¿½Ò»ï¿½ï¿½bucketsï¿½Ð£ï¿½È»ï¿½ï¿½ï¿½bucketsï¿½ï¿½Ï¶ï¿½ï¿½Ñ¡ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½Ñ»ï¿½ï¿½Öµï¿½
 
         /*constexpr int BUCKET_COUNT = 12;
 
@@ -537,7 +537,7 @@ void TriangleBVHCore::InitBVH(const Vertex *vertices, uint32_t triangleCount)
     if(!triangleCount)
         throw ArgumentException("TriangleBVHCore::InitBVH: triangleCount must be non-zero");
 
-    // BVHÊ÷ÐÎ½á¹¹¹¹Ôì
+    // BVHï¿½ï¿½ï¿½Î½á¹¹ï¿½ï¿½ï¿½ï¿½
 
     std::vector<TriangleInfo> triInfo(triangleCount);
     std::vector<uint32_t> triIdxMap(triangleCount);
@@ -568,8 +568,8 @@ void TriangleBVHCore::InitBVH(const Vertex *vertices, uint32_t triangleCount)
 
 GeometrySampleResult TriangleBVHCore::Sample() const
 {
-    // ÔÚ[0, surfaceArea]¼äÉú³ÉÒ»¸öËæ»úÊý£¬È»ºóÔÚtriangles_Ãæ»ýÇ°×ººÍÖÐÓÃ¶þ·Ö²éÕÒÑ¡Ò»¸öÈý½ÇÐÎ
-    // ²¢ÔÚÈý½ÇÐÎÉÏ¾ùÔÈ²ÉÑù
+    // ï¿½ï¿½[0, surfaceArea]ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È»ï¿½ï¿½ï¿½ï¿½triangles_ï¿½ï¿½ï¿½Ç°×ºï¿½ï¿½ï¿½ï¿½ï¿½Ã¶ï¿½ï¿½Ö²ï¿½ï¿½ï¿½Ñ¡Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¾ï¿½ï¿½È²ï¿½ï¿½ï¿½
 
     Real u = AGZ::Math::Random::Uniform(Real(0.0), SurfaceArea());
     auto upper = std::lower_bound(areaPrefixSum_.begin(), areaPrefixSum_.end(), u);
@@ -654,17 +654,17 @@ GeometrySampleResult TriangleBVH::Sample() const
     };
 }
 
-Real TriangleBVH::SamplePDF(const Vec3 &pos) const
+Real TriangleBVH::SamplePDF([[maybe_unused]] const Vec3 &pos) const
 {
     return 1 / surfaceArea_;
 }
 
-GeometrySampleResult TriangleBVH::Sample(const Vec3 &dst) const
+GeometrySampleResult TriangleBVH::Sample([[maybe_unused]] const Vec3 &dst) const
 {
     return Sample();
 }
 
-Real TriangleBVH::SamplePDF(const Vec3 &pos, const Vec3 &dst) const
+Real TriangleBVH::SamplePDF(const Vec3 &pos, [[maybe_unused]] const Vec3 &dst) const
 {
     return SamplePDF(pos);
 }

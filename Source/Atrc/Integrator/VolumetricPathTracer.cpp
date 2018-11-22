@@ -28,14 +28,14 @@ Spectrum VolumetricPathTracer::L2_right(const Scene &scene, const SurfacePoint &
     ShadingPoint shdPnt;
     sp.entity->GetMaterial(sp)->Shade(sp, &shdPnt, arena);
 
-    auto e1 = E1_right(scene, sp, shdPnt, depth, arena);
-    auto e2 = E2_right(scene, sp, shdPnt, depth, arena);
+    auto e1 = E1_right(scene, sp, shdPnt);
+    auto e2 = E2_right(scene, sp, shdPnt);
     auto s  = S_right(scene, sp, shdPnt, depth, arena);
 
     return e1 + e2 + s;
 }
 
-Spectrum VolumetricPathTracer::E1_right(const Scene &scene, const SurfacePoint &sp, const ShadingPoint &shd, int depth, AGZ::ObjArena<> &arena) const
+Spectrum VolumetricPathTracer::E1_right(const Scene &scene, const SurfacePoint &sp, const ShadingPoint &shd) const
 {
     auto bsdfSample = shd.bsdf->SampleWi(sp.wo, BXDF_ALL);
     if(!bsdfSample || !bsdfSample->coef)
@@ -88,7 +88,7 @@ Spectrum VolumetricPathTracer::E1_right(const Scene &scene, const SurfacePoint &
          * le / (bsdfSample->pdf + lpdf);
 }
 
-Spectrum VolumetricPathTracer::E2_right(const Scene &scene, const SurfacePoint &sp, const ShadingPoint &shd, int depth, AGZ::ObjArena<> &arena) const
+Spectrum VolumetricPathTracer::E2_right(const Scene &scene, const SurfacePoint &sp, const ShadingPoint &shd) const
 {
     auto [light, lpdf] = scene.SampleLight();
     if(!light)

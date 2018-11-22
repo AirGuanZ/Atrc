@@ -2,7 +2,7 @@
 
 AGZ_NS_BEG(Atrc)
 
-void Light::PreprocessScene(const Scene &scene)
+void Light::PreprocessScene([[maybe_unused]] const Scene &scene)
 {
     // do nothing
 }

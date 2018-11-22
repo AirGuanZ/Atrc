@@ -11,7 +11,7 @@
 #include <Atrc/Geometry/Sphere.h>
 #include <Atrc/Geometry/TriangleBVH.h>
 
-#include <Atrc/Integrator/AmbientOcclusion.h>
+#include <Atrc/Integrator/AmbientOcclusionIntegrator.h>
 #include <Atrc/Integrator/PathTracer.h>
 #include <Atrc/Integrator/PureColorIntegrator.h>
 #include <Atrc/Integrator/VolumetricPathTracer.h>

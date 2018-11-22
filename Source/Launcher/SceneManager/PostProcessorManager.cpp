@@ -1,6 +1,6 @@
 #include "PostProcessorManager.h"
 
-Atrc::PostProcessStage *ACESFilmCreator::Create(const ConfigGroup &params, ObjArena<> &arena) const
+Atrc::PostProcessStage *ACESFilmCreator::Create([[maybe_unused]] const ConfigGroup &params, ObjArena<> &arena) const
 {
     return arena.Create<Atrc::ACESFilm>();
 }

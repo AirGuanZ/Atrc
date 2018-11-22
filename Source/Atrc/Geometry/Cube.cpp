@@ -200,7 +200,7 @@ GeometrySampleResult Cube::Sample() const
     return ret;
 }
 
-Real Cube::SamplePDF(const Vec3 &pos) const
+Real Cube::SamplePDF([[maybe_unused]] const Vec3 &pos) const
 {
     return 1 / surfaceArea_;
 }

@@ -1,6 +1,6 @@
 #include "RendererManager.h"
 
-Atrc::ProgressReporter *DefaultProgressReporterCreator::Create(const ConfigGroup &params, ObjArena<> &arena) const
+Atrc::ProgressReporter *DefaultProgressReporterCreator::Create([[maybe_unused]] const ConfigGroup &params, ObjArena<> &arena) const
 {
     return arena.Create<Atrc::DefaultProgressReporter>();
 }
@@ -11,7 +11,7 @@ Atrc::Renderer *ParallelRendererCreator::Create(const ConfigGroup &params, ObjAr
     return arena.Create<Atrc::ParallelRenderer>(workerCount);
 }
 
-Atrc::Renderer *SerialRendererCreator::Create(const ConfigGroup &params, ObjArena<> &arena) const
+Atrc::Renderer *SerialRendererCreator::Create([[maybe_unused]] const ConfigGroup &params, ObjArena<> &arena) const
 {
     return arena.Create<Atrc::SerialRenderer>();
 }
