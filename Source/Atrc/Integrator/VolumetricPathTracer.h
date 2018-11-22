@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <Atrc/Core/Core.h>
 
@@ -15,7 +15,6 @@ public:
 
 private:
 
-    // Medium��sp�Դ�
     Spectrum L_right(const Scene &scene, const SurfacePoint &sp, int depth, AGZ::ObjArena<> &arena) const;
 
     Spectrum L2_right(const Scene &scene, const SurfacePoint &sp, int depth, AGZ::ObjArena<> &arena) const;
@@ -28,11 +27,10 @@ private:
 
     Spectrum Ls_right(const Scene &scene, const MediumPoint &mp, int depth, AGZ::ObjArena<> &arena) const;
 
-    // r���е�sp��������medium����û���У�����global medium
-    // D2(x \leftarrow Phi)��Ӧr = x + t\Phi
+    // 沿着-r.dir方向的D2_left值
     Spectrum D2_left(const Scene &scene, const Ray &r, int depth, AGZ::ObjArena<> &arena) const;
 
-    // ��֪r��ȥ��������sp���������D2_left���
+    // 已知r发射出去击中了sp，求D2_left
     Spectrum D2_left(const Scene &scene, const Ray &r, const SurfacePoint &sp, int depth, AGZ::ObjArena<> &arena) const;
 
     Spectrum L_left(const Scene &scene, const Ray &r, int depth, AGZ::ObjArena<> &arena) const;

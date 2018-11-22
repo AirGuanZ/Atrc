@@ -36,7 +36,6 @@ namespace
         return r.Between(t);
     }
 
-    // ������sp��t��pos��wo��geoUV
     bool EvalIntersectionWithTriangle(
         const Vec3 &A, const Vec3 &B_A, const Vec3 &C_A,
         const Ray &r, SurfacePoint *sp)
@@ -346,9 +345,6 @@ namespace
             allBound.Expand(tri[2].pos);
         }
 
-        // ѡ�񻮷���
-        // ������centroid����ͬһ��λ�ã��򴴽�һ��Ҷ�ڵ�
-
         AABB centroidBound;
         for(uint32_t i = start; i < end; ++i)
             centroidBound.Expand(tris.GetInfo(i).centroid);
@@ -360,8 +356,6 @@ namespace
             *nodeCount += 1;
             return FillLeaf(nodeArena.Create<TNode>(), start, end);
         }
-
-        // �����������λ��ֵ�һ��buckets�У�Ȼ���buckets��϶��ѡ��һ����ѻ��ֵ�
 
         /*constexpr int BUCKET_COUNT = 12;
 
@@ -568,9 +562,6 @@ void TriangleBVHCore::InitBVH(const Vertex *vertices, uint32_t triangleCount)
 
 GeometrySampleResult TriangleBVHCore::Sample() const
 {
-    // ��[0, surfaceArea]������һ���������Ȼ����triangles_���ǰ׺�����ö��ֲ���ѡһ��������
-    // �����������Ͼ��Ȳ���
-
     Real u = AGZ::Math::Random::Uniform(Real(0.0), SurfaceArea());
     auto upper = std::lower_bound(areaPrefixSum_.begin(), areaPrefixSum_.end(), u);
 

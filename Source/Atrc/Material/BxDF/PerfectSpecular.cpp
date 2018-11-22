@@ -1,10 +1,10 @@
-#include <Atrc/Material/BxDF/PerfectSpecular.h>
+﻿#include <Atrc/Material/BxDF/PerfectSpecular.h>
 
 AGZ_NS_BEG(Atrc)
 
 namespace
 {
-    // �������䷽�򣬷���ȫ����ʱ����None
+    // 计算折射方向向量，发生全反射时返回None
     Option<Vec3> GetRefractDirection(const Vec3 &wo, const Vec3 &nor, float eta)
     {
         Real cosThetaI = Abs(wo.z);
@@ -32,7 +32,6 @@ Option<BxDFSampleWiResult> PerfectSpecular::SampleWi(const Vec3 &wo) const
 {
     Vec3 nor = wo.z > 0 ? Vec3::UNIT_Z() : -Vec3::UNIT_Z();
 
-    // ����fresnel�������ݸ���ѡ���仹������
     auto Fr = fresnel_->Eval(float(wo.z));
     if(Rand() < Fr.r)
     {
@@ -44,12 +43,10 @@ Option<BxDFSampleWiResult> PerfectSpecular::SampleWi(const Vec3 &wo) const
         return ret;
     }
 
-    // �����Ӧ��ʱ͸�����壬��wo�����Ǵ��ڲ����ⲿ��Ӧ����Դ�
+    // 如果是由内向外，etaI和etaT要反过来
 
     float etaI = wo.z > 0.0 ? fresnel_->GetEtaI() : fresnel_->GetEtaT();
     float etaT = wo.z > 0.0 ? fresnel_->GetEtaT() : fresnel_->GetEtaI();
-
-    // ���䷽��
 
     float eta = etaI / etaT;
     auto wi = GetRefractDirection(wo, nor, eta);

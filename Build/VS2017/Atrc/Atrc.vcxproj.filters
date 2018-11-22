@@ -202,9 +202,6 @@
     <ClInclude Include="..\..\..\Source\Atrc\Renderer\DefaultProgressReporter.h">
       <Filter>Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\Atrc\Integrator\AmbientOcclusion.h">
-      <Filter>Integrator</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Source\Atrc\Core\PostProcessor.h">
       <Filter>Core</Filter>
     </ClInclude>
@@ -213,6 +210,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Source\Atrc\PostProcessor\ACESFilm.h">
       <Filter>PostProcessor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Light\CubeEnvironmentLight.h">
+      <Filter>Light</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Integrator\AmbientOcclusionIntegrator.h">
+      <Filter>Integrator</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -335,6 +338,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Source\Atrc\PostProcessor\ACESFilm.cpp">
       <Filter>PostProcessor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Light\CubeEnvironmentLight.cpp">
+      <Filter>Light</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
