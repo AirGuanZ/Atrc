@@ -2,9 +2,12 @@
 
 一些实现过程中的思路记录在[Atrc](https://airguanz.github.io/all.html?tag=Atrc)中。已支持：
 
-* Multiple Importance Sampling
-* Torrance-Sparrow Mircofacet Model
-* Participating Medium Rendering
+* 直接光照的多重重要性采样
+* Torrance-Sparrow微表面模型
+* 带介质的路径追踪器
+* 多边形模型加载
+* BVH等加速求交数据结构
+* 用脚本描述所有的场景元素和渲染配置
 
 ## Script
 
