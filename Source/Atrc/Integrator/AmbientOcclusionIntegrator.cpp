@@ -19,8 +19,8 @@ Spectrum AmbientOcclusionIntegrator::GetRadiance(const Scene &scene, const Ray &
 
     dir = sp.geoLocal.Local2World(dir);
 
-    SurfacePoint sp2;
-    if(scene.FindCloestIntersection(Ray(sp.pos, dir, EPS), &sp2) && sp2.t <= maxOccuT_)
+    Ray newRay(sp.pos, dir, EPS, Max(EPS, maxOccuT_));
+    if(scene.HasIntersection(newRay))
         return Spectrum();
     return objColor_ * Dot(dir, sp.geoLocal.ez) / pdf;
 }

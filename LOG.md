@@ -121,4 +121,12 @@ I wrote this record at 04:12 on my ubuntu VM. Fuck `std::wifstream`!
 
 ## 2018.11.22
 
-CubeEnvironmentLight已实现。
+Environment Mapping done！不过Cube Map用起来有点蛋疼，每次都要去核对六张图需不需要翻转、旋转什么的。
+
+## 2018.11.23
+
+写了EntityProjector和EnvironmentLightProjector，也就是可以求球谐函数的投影系数了。
+
+把ObjectManager这一大坨给抽离出来成为单独的项目，免得每个项目都要写一遍基本的参数解析。
+
+等等，我是不是把BDPT给忘了？……咳咳……

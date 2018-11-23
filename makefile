@@ -6,6 +6,7 @@ LD_FLAGS = -lpthread
 TARGETS =
 
 CPP_FILES = $(shell find ./Source/Atrc/ -name "*.cpp")
+CPP_FILES += $(shell find ./Source/ObjMgr/ -name "*.cpp")
 OPP_FILES = $(patsubst %.cpp, %.o, $(CPP_FILES))
 DPP_FILES = $(patsubst %.cpp, %.d, $(CPP_FILES))
 
@@ -72,6 +73,7 @@ $(DPP_FILES) : %.d : %.cpp
 -include $(DPP_FILES)
 
 $(eval $(call add_target,Launcher,LAUNCHER))
+$(eval $(call add_target,SHTool,SHTOOL))
 
 .PHONY : clean
 clean :
