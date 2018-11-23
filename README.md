@@ -89,8 +89,6 @@ postProcessors = (
 
 ## Screenshots
 
-见[Gallery](https://airguanz.github.io/indep_pages/atrc-gallery.html)。
-
 ![SS1](./Gallery/show-time-1.png)
 
 ![SS2](./Gallery/show-time-2.png)
