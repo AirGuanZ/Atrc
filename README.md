@@ -22,7 +22,7 @@ renderer = { type = ParallelRenderer; workerCount = 6; };
 subareaRenderer = { type = JitteredSubareaRenderer; spp = 10; };
 # 输出文件属性
 output = { filename = "./Build/Output.png"; width = 640; height = 480; };
-# 进度显示配置
+# 进度显示配
 reporter = { type = Default; };
 # 摄像机属性
 camera = {
@@ -94,5 +94,3 @@ postProcessors = (
 ![SS1](./Gallery/show-time-1.png)
 
 ![SS2](./Gallery/show-time-2.png)
-
-![SS3](./Gallery/show-time-3.png)

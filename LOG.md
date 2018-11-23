@@ -118,3 +118,13 @@ I wrote this record at 04:12 on my ubuntu VM. Fuck `std::wifstream`!
 ## 2018.11.21
 
 这几天各种跑腿办手续，真是累啊。今天就只写了个CubeMapper，明天基于此搞个Environment Mapping。
+
+## 2018.11.22
+
+Environment Mapping done！不过Cube Map用起来有点蛋疼，每次都要去核对六张图需不需要翻转、旋转什么的。
+
+## 2018.11.23
+
+写了EntityProjector和EnvironmentLightProjector，也就是可以求球谐函数的投影系数了。
+
+等等，我是不是把BDPT给忘了？……咳咳……
