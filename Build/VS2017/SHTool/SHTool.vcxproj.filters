@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClInclude Include="..\..\..\Source\SHTool\Common.h" />
+    <ClInclude Include="..\..\..\Source\SHTool\SphericalHarmonics\Projector.h">
+      <Filter>SphericalHarmonics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\SHTool\SphericalHarmonics\SphericalHarmonics.h">
+      <Filter>SphericalHarmonics</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\Source\SHTool\Main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="SphericalHarmonics">
+      <UniqueIdentifier>{40d2d09c-b1ec-4d63-b55e-e41ef19529ee}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

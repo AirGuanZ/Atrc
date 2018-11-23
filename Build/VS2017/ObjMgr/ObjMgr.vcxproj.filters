@@ -1,0 +1,77 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="ObjectManager">
+      <UniqueIdentifier>{9c22fdf5-17d4-4e3e-bab6-71d7cd797ad7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ParamParser">
+      <UniqueIdentifier>{cb36dc32-c3b0-4522-8d25-40fa8745d9cf}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\Source\ObjMgr\ObjectManager\EntityCreator.cpp">
+      <Filter>ObjectManager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\ObjMgr\ObjectManager\GeometryManager.cpp">
+      <Filter>ObjectManager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\ObjMgr\ObjectManager\IntegratorManager.cpp">
+      <Filter>ObjectManager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\ObjMgr\ObjectManager\LightManager.cpp">
+      <Filter>ObjectManager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\ObjMgr\ObjectManager\MaterialManager.cpp">
+      <Filter>ObjectManager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\ObjMgr\ObjectManager\MediumManager.cpp">
+      <Filter>ObjectManager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\ObjMgr\ObjectManager\PostProcessorManager.cpp">
+      <Filter>ObjectManager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\ObjMgr\ObjectManager\RendererManager.cpp">
+      <Filter>ObjectManager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\ObjMgr\ObjectManager\TextureManager.cpp">
+      <Filter>ObjectManager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\ObjMgr\ParamParser\ParamParser.cpp">
+      <Filter>ParamParser</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\Source\ObjMgr\ObjectManager\EntityCreator.h">
+      <Filter>ObjectManager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\ObjMgr\ObjectManager\GeometryManager.h">
+      <Filter>ObjectManager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\ObjMgr\ObjectManager\IntegratorManager.h">
+      <Filter>ObjectManager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\ObjMgr\ObjectManager\LightManager.h">
+      <Filter>ObjectManager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\ObjMgr\ObjectManager\MaterialManager.h">
+      <Filter>ObjectManager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\ObjMgr\ObjectManager\MediumManager.h">
+      <Filter>ObjectManager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\ObjMgr\ObjectManager\PostProcessorManager.h">
+      <Filter>ObjectManager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\ObjMgr\ObjectManager\RendererManager.h">
+      <Filter>ObjectManager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\ObjMgr\ObjectManager\TextureManager.h">
+      <Filter>ObjectManager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\ObjMgr\ParamParser\ParamParser.h">
+      <Filter>ParamParser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\ObjMgr\Common.h" />
+    <ClInclude Include="..\..\..\Source\ObjMgr\ObjectManager.h" />
+  </ItemGroup>
+</Project>

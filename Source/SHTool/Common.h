@@ -1,3 +1,5 @@
+#pragma once
+
 #include <Atrc/Atrc.h>
 
 using Atrc::Light;

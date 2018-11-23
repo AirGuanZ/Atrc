@@ -2,82 +2,9 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\Launcher\Main.cpp" />
-    <ClCompile Include="..\..\..\Source\Launcher\ParamParser\ParamParser.cpp">
-      <Filter>ParamParser</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\Launcher\SceneManager\SceneManager.cpp">
-      <Filter>SceneManager</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\Launcher\SceneManager\EntityCreator.cpp">
-      <Filter>SceneManager</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\Launcher\SceneManager\GeometryManager.cpp">
-      <Filter>SceneManager</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\Launcher\SceneManager\IntegratorManager.cpp">
-      <Filter>SceneManager</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\Launcher\SceneManager\LightManager.cpp">
-      <Filter>SceneManager</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\Launcher\SceneManager\MaterialManager.cpp">
-      <Filter>SceneManager</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\Launcher\SceneManager\MediumManager.cpp">
-      <Filter>SceneManager</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\Launcher\SceneManager\RendererManager.cpp">
-      <Filter>SceneManager</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\Launcher\SceneManager\TextureManager.cpp">
-      <Filter>SceneManager</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\Launcher\SceneManager\PostProcessorManager.cpp">
-      <Filter>SceneManager</Filter>
-    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Launcher\SceneManager.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <Filter Include="ParamParser">
-      <UniqueIdentifier>{17d23527-e081-47a8-b433-142e4348d5b2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="SceneManager">
-      <UniqueIdentifier>{d0237d5d-94c1-45c3-a658-9610ce801f8c}</UniqueIdentifier>
-    </Filter>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\..\Source\Launcher\Common.h" />
-    <ClInclude Include="..\..\..\Source\Launcher\ParamParser\ParamParser.h">
-      <Filter>ParamParser</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Source\Launcher\SceneManager\SceneManager.h">
-      <Filter>SceneManager</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Source\Launcher\SceneManager\EntityCreator.h">
-      <Filter>SceneManager</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Source\Launcher\SceneManager\GeometryManager.h">
-      <Filter>SceneManager</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Source\Launcher\SceneManager\IntegratorManager.h">
-      <Filter>SceneManager</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Source\Launcher\SceneManager\LightManager.h">
-      <Filter>SceneManager</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Source\Launcher\SceneManager\MaterialManager.h">
-      <Filter>SceneManager</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Source\Launcher\SceneManager\MediumManager.h">
-      <Filter>SceneManager</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Source\Launcher\SceneManager\RendererManager.h">
-      <Filter>SceneManager</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Source\Launcher\SceneManager\TextureManager.h">
-      <Filter>SceneManager</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Source\Launcher\SceneManager\PostProcessorManager.h">
-      <Filter>SceneManager</Filter>
-    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Launcher\SceneManager.h" />
   </ItemGroup>
 </Project>

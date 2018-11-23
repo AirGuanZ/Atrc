@@ -1,4 +1,6 @@
-﻿#include "SphericalHarmonics.h"
+﻿#pragma once
+
+#include "SphericalHarmonics.h"
 
 template<int L, int M>
 class EntityProjector
