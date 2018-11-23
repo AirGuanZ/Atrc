@@ -4,7 +4,7 @@ Diary/
 *.a
 *.dtmp
 Build/Launcher
-Build/Test01_SSBScene
+Build/SHTool
 
 *.TMP
 .vscode/

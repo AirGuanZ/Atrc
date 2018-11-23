@@ -72,6 +72,7 @@ $(DPP_FILES) : %.d : %.cpp
 -include $(DPP_FILES)
 
 $(eval $(call add_target,Launcher,LAUNCHER))
+$(eval $(call add_target,SHTool,SHTOOL))
 
 .PHONY : clean
 clean :
