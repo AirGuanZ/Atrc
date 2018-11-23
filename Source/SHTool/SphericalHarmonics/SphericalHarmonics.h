@@ -100,5 +100,6 @@ namespace SHImpl
 template<int L, int M>
 Atrc::Real SH(const Vec3 &dir)
 {
+    static_assert(L < 3 && M <= L);
     return SHImpl::SHAux<L, M>::Eval(dir);
 }

@@ -2,13 +2,13 @@
 integrator = { type = PathTracer; maxDepth = 50; };
 
 # Renderer
-renderer = { type = ParallelRenderer; workerCount = 6; };
+renderer = { type = ParallelRenderer; workerCount = 11; };
 
 # SubareaRenderer
-subareaRenderer = { type = JitteredSubareaRenderer; spp = 1; };
+subareaRenderer = { type = JitteredSubareaRenderer; spp = 1000; };
 
 # Image properties
-output = { filename = "./Build/Output.png"; width = 1920; height = 1080; };
+output = { filename = "./Build/Output.png"; width = 3840; height = 2160; };
 
 # Progress reporter
 reporter = { type = Default; };
@@ -56,7 +56,7 @@ entities = (
     geometry = {
         type = TriangleBVH;
         path = "./Assets/Statue_Bressant_1M_Poly.obj";
-        transform = ((Translate, 0.0, 0.02, -1.1), (RotateZ, Deg, -90), (Scale, 0.0050));
+        transform = ((Translate, 0.0, 0.02, -0.945), (RotateZ, Deg, -90), (Scale, 0.0050));
     };
     material = {
         type = Metal;

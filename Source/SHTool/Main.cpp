@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "SphericalHarmonics/SphericalHarmonics.h"
+#include "SphericalHarmonics/Projector.h"
 
 using namespace std;
 
