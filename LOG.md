@@ -118,3 +118,7 @@ I wrote this record at 04:12 on my ubuntu VM. Fuck `std::wifstream`!
 ## 2018.11.21
 
 这几天各种跑腿办手续，真是累啊。今天就只写了个CubeMapper，明天基于此搞个Environment Mapping。
+
+## 2018.11.22
+
+CubeEnvironmentLight已实现。
