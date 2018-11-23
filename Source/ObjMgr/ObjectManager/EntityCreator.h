@@ -2,6 +2,8 @@
 
 #include "../Common.h"
 
+AGZ_NS_BEG(ObjMgr)
+
 using EntityCreator = ObjectCreator<Atrc::Entity>;
 using EntityManager = ObjectManager<Atrc::Entity>;
 
@@ -34,3 +36,5 @@ public:
 
     Atrc::Entity *Create(const ConfigGroup &params, ObjArena<> &arena) const override;
 };
+
+AGZ_NS_END(ObjMgr)

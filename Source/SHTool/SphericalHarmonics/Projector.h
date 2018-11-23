@@ -66,7 +66,7 @@ Spectrum EnvironmentLightProjector<L, M>::Project(const Light *envLight, int N)
         auto [dir, pdf] = AGZ::Math::DistributionTransform::
                             UniformOnUnitSphere<Real>::Transform({ u0, u1 });
         
-        auto le = envLight->NonareaLe(Ray(Vec3(0), dir, EPS));
+        auto le = envLight->NonareaLe(Ray(Vec3(0.0), dir, EPS));
         auto sh = SH<L, M>(dir);
 
         ret += le * sh / pdf;

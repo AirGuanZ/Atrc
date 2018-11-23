@@ -2,6 +2,8 @@
 
 #include "../Common.h"
 
+AGZ_NS_BEG(ObjMgr)
+
 using GeometryCreator = ObjectCreator<Atrc::Geometry>;
 using GeometryManager = ObjectManager<Atrc::Geometry>;
 
@@ -39,3 +41,5 @@ public:
 
     Atrc::Geometry *Create(const ConfigGroup &params, ObjArena<> &arena) const override;
 };
+
+AGZ_NS_END(ObjMgr)

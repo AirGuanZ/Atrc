@@ -1,6 +1,8 @@
 #include "../ParamParser/ParamParser.h"
 #include "EntityCreator.h"
 
+AGZ_NS_BEG(ObjMgr)
+
 namespace
 {
     Atrc::MediumInterface ParseMediumInterface(const ConfigGroup &params, ObjArena<> &arena)
@@ -39,3 +41,5 @@ Atrc::Entity *GeometricDiffuseLightCreator::Create(const ConfigGroup &params, Ob
 
     return arena.Create<Atrc::GeometricDiffuseLight>(medium, geometry, radiance);
 }
+
+AGZ_NS_END(ObjMgr)

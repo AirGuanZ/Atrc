@@ -1,6 +1,8 @@
 #include "../ParamParser/ParamParser.h"
 #include "GeometryManager.h"
 
+AGZ_NS_BEG(ObjMgr)
+
 Atrc::Geometry *SphereCreator::Create(const ConfigGroup &params, ObjArena<> &arena) const
 {
     auto radius = params["radius"].AsValue().Parse<Atrc::Real>();
@@ -45,3 +47,5 @@ Atrc::Geometry *TriangleBVHCreator::Create(const ConfigGroup &params, ObjArena<>
 
     return arena.Create<Atrc::TriangleBVH>(transform, core);
 }
+
+AGZ_NS_END(ObjMgr)

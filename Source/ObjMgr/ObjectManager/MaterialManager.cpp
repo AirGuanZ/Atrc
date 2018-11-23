@@ -2,6 +2,8 @@
 #include "MaterialManager.h"
 #include "TextureManager.h"
 
+AGZ_NS_BEG(ObjMgr)
+
 FresnelType FresnelCreator::Name2Type(const Str8 &name)
 {
     if(name == "FresnelConductor")
@@ -131,3 +133,5 @@ Atrc::Material *UncallableMaterialCreator::Create([[maybe_unused]] const ConfigG
 {
     return &Atrc::STATIC_UNCALLABLE_MATERIAL;
 }
+
+AGZ_NS_END(ObjMgr)

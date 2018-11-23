@@ -1,5 +1,7 @@
 #include "ParamParser.h"
 
+AGZ_NS_BEG(ObjMgr)
+
 using namespace Atrc;
 
 Spectrum ParamParser::ParseSpectrum(const ConfigNode &node)
@@ -148,3 +150,5 @@ Transform ParamParser::ParseTransform(const ConfigNode &node)
         throw SceneInitializationException(err.what());
     }
 }
+
+AGZ_NS_END(ObjMgr)

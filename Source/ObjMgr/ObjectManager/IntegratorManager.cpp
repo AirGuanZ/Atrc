@@ -1,6 +1,8 @@
 #include "../ParamParser/ParamParser.h"
 #include "IntegratorManager.h"
 
+AGZ_NS_BEG(ObjMgr)
+
 Atrc::Integrator *PureColorIntegratorCreator::Create(const ConfigGroup &params, ObjArena<> &arena) const
 {
     auto background = ParamParser::ParseSpectrum(params["background"]);
@@ -27,3 +29,5 @@ Atrc::Integrator *AmbientOcclusionIntegratorCreator::Create(const ConfigGroup &p
     auto object = ParamParser::ParseSpectrum(params["object"]);
     return arena.Create<Atrc::AmbientOcclusionIntegrator>(maxOccuT, background, object);
 }
+
+AGZ_NS_END(ObjMgr)

@@ -2,6 +2,8 @@
 #include "LightManager.h"
 #include "TextureManager.h"
 
+AGZ_NS_BEG(ObjMgr)
+
 namespace
 {
     auto LoadTexture(const Str8 &filename)
@@ -40,3 +42,5 @@ Atrc::Light *SkyLightCreator::Create(const ConfigGroup &params, ObjArena<> &aren
 
     return arena.Create<Atrc::SkyLight>(top, bottom);
 }
+
+AGZ_NS_END(ObjMgr)

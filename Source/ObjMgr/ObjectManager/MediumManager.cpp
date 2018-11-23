@@ -1,6 +1,8 @@
 #include "../ParamParser/ParamParser.h"
 #include "MediumManager.h"
 
+AGZ_NS_BEG(ObjMgr)
+
 Atrc::Medium *HomongeneousMediumCreator::Create(const ConfigGroup &params, ObjArena<> &arena) const
 {
     auto sigmaA = ParamParser::ParseSpectrum(params["sigmaA"]);
@@ -10,3 +12,5 @@ Atrc::Medium *HomongeneousMediumCreator::Create(const ConfigGroup &params, ObjAr
 
     return arena.Create<Atrc::HomogeneousMedium>(sigmaA, sigmaS, le, g);
 }
+
+AGZ_NS_END(ObjMgr)

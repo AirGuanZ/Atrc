@@ -2,6 +2,8 @@
 
 #include "../Common.h"
 
+AGZ_NS_BEG(ObjMgr)
+
 using ProgressReporterCreator = ObjectCreator<Atrc::ProgressReporter>;
 using ProgressReporterManager = ObjectManager<Atrc::ProgressReporter>;
 
@@ -49,3 +51,5 @@ public:
 
     Atrc::SubareaRenderer *Create(const ConfigGroup &params, ObjArena<> &arena) const override;
 };
+
+AGZ_NS_END(ObjMgr)

@@ -2,6 +2,8 @@
 
 #include "../Common.h"
 
+AGZ_NS_BEG(ObjMgr)
+
 using LightCreator = ObjectCreator<Atrc::Light>;
 using LightManager = ObjectManager<Atrc::Light>;
 
@@ -41,3 +43,5 @@ public:
 
     Atrc::Light *Create(const ConfigGroup &params, ObjArena<> &arena) const override;
 };
+
+AGZ_NS_END(ObjMgr)

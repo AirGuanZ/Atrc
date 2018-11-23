@@ -2,6 +2,8 @@
 
 #include "../Common.h"
 
+AGZ_NS_BEG(ObjMgr)
+
 class ParamParsingError : public SceneInitializationException
 {
 public:
@@ -30,3 +32,5 @@ public:
     // ((Scale, 5.0), (Translate, 0.1, 0.6, 0.7), (RotateX, Deg, 47))
     static Atrc::Transform ParseTransform(const ConfigNode &node);
 };
+
+AGZ_NS_END(ObjMgr)

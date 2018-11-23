@@ -1,7 +1,7 @@
-#include "../ParamParser/ParamParser.h"
-#include "EntityCreator.h"
-#include "LightManager.h"
-#include "SceneManager.h"
+ï»¿#include "SceneManager.h"
+
+using namespace AGZ;
+using namespace ObjMgr;
 
 namespace
 {
@@ -42,7 +42,7 @@ void SceneManager::Initialize(const ConfigGroup &params)
     if(IsAvailable())
         throw SceneInitializationException("Scene: reinitialized");
 
-    // ÉãÏñ»ú
+    // æ‘„åƒæœº
 
     auto outputWidth  = params["output.width"].AsValue().Parse<uint32_t>();
     auto outputHeight = params["output.height"].AsValue().Parse<uint32_t>();
@@ -53,7 +53,7 @@ void SceneManager::Initialize(const ConfigGroup &params)
     std::vector<Atrc::Entity*> entities;
     std::vector<Atrc::Light*> lights;
 
-    // Ô¤¶¨ÒåÔªËØ
+    // é¢„å®šä¹‰å…ƒç´ 
 
     InitializePublicDefinition<Atrc::Geometry>("pub_geometry", params, arena_);
     InitializePublicDefinition<Atrc::Light>   ("pub_light",    params, arena_);
@@ -65,7 +65,7 @@ void SceneManager::Initialize(const ConfigGroup &params)
     InitializePublicDefinition<Atrc::Renderer>        ("pub_renderer",   params, arena_);
     InitializePublicDefinition<Atrc::ProgressReporter>("pub_reporter", params, arena_);
 
-    // ´´½¨ÊµÌå
+    // åˆ›å»ºå®ä½“
 
     auto &entArr = params["entities"].AsArray();
     for(size_t i = 0; i < entArr.Size(); ++i)
@@ -80,7 +80,7 @@ void SceneManager::Initialize(const ConfigGroup &params)
             lights.push_back(light);
     }
 
-    // ´´½¨¹âÔ´
+    // åˆ›å»ºå…‰æº
 
     auto &lgtArr = params["lights"].AsArray();
     for(size_t i = 0; i < lgtArr.Size(); ++i)

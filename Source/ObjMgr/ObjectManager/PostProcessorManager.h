@@ -2,6 +2,8 @@
 
 #include "../Common.h"
 
+AGZ_NS_BEG(ObjMgr)
+
 using PostProcessorStageCreator = ObjectCreator<Atrc::PostProcessStage>;
 using PostProcessorStageManager = ObjectManager<Atrc::PostProcessStage>;
 
@@ -22,3 +24,5 @@ public:
 
     Atrc::PostProcessStage *Create(const ConfigGroup &params, ObjArena<> &arena) const override;
 };
+
+AGZ_NS_END(ObjMgr)

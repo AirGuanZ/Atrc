@@ -1,5 +1,7 @@
 #include "RendererManager.h"
 
+AGZ_NS_BEG(ObjMgr)
+
 Atrc::ProgressReporter *DefaultProgressReporterCreator::Create([[maybe_unused]] const ConfigGroup &params, ObjArena<> &arena) const
 {
     return arena.Create<Atrc::DefaultProgressReporter>();
@@ -23,3 +25,5 @@ Atrc::SubareaRenderer *JitteredSubareaRendererCreator::Create(const ConfigGroup 
         throw SceneInitializationException("JitteredSubareaRendererCreator: invalid spp");
     return arena.Create<Atrc::JitteredSubareaRenderer>(spp);
 }
+
+AGZ_NS_END(ObjMgr)

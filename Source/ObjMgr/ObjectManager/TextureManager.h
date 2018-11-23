@@ -4,6 +4,8 @@
 
 #include "../Common.h"
 
+AGZ_NS_BEG(ObjMgr)
+
 class TextureManager : public AGZ::Singleton<TextureManager>
 {
     ObjArena<> arena_;
@@ -13,3 +15,5 @@ public:
 
     const AGZ::Texture2D<Atrc::Spectrum> *Load(const Str8 &filename);
 };
+
+AGZ_NS_END(ObjMgr)

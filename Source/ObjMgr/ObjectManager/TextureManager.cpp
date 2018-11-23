@@ -1,5 +1,7 @@
 #include "TextureManager.h"
 
+AGZ_NS_BEG(ObjMgr)
+
 const AGZ::Texture2D<Atrc::Spectrum> *TextureManager::Load(const Str8 &filename)
 {
     auto it = path2Tex_.find(filename);
@@ -20,3 +22,5 @@ const AGZ::Texture2D<Atrc::Spectrum> *TextureManager::Load(const Str8 &filename)
         return nullptr;
     }
 }
+
+AGZ_NS_END(ObjMgr)

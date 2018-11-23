@@ -2,6 +2,8 @@
 
 #include "../Common.h"
 
+AGZ_NS_BEG(ObjMgr)
+
 using MediumCreator = ObjectCreator<Atrc::Medium>;
 using MediumManager = ObjectManager<Atrc::Medium>;
 
@@ -17,3 +19,5 @@ public:
 
     Atrc::Medium* Create(const ConfigGroup &params, ObjArena<> &arena) const override;
 };
+
+AGZ_NS_END(ObjMgr)

@@ -2,6 +2,8 @@
 
 #include "../Common.h"
 
+AGZ_NS_BEG(ObjMgr)
+
 using IntegratorCreator = ObjectCreator<Atrc::Integrator>;
 using IntegratorManager = ObjectManager<Atrc::Integrator>;
 
@@ -47,3 +49,5 @@ public:
 
     Atrc::Integrator *Create(const ConfigGroup &params, ObjArena<> &arena) const override;
 };
+
+AGZ_NS_END(ObjMgr)

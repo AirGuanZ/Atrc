@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Common.h"
+#include <ObjMgr/ObjectManager.h>
 
 // output = {
 //     width  = 640;
@@ -24,12 +24,12 @@
 
 class SceneManager : public AGZ::Singleton<SceneManager>
 {
-    ObjArena<> arena_;
+    AGZ::ObjArena<> arena_;
     Atrc::Scene scene_;
 
 public:
 
-    void Initialize(const ConfigGroup &params);
+    void Initialize(const AGZ::ConfigGroup &params);
 
     bool IsAvailable() const;
 

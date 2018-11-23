@@ -2,6 +2,8 @@
 
 #include "../Common.h"
 
+AGZ_NS_BEG(ObjMgr)
+
 using MaterialCreator = ObjectCreator<Atrc::Material>;
 using MaterialManager = ObjectManager<Atrc::Material>;
 
@@ -87,3 +89,5 @@ SIMPLE_MATERIAL_CREATOR(TextureScaler);
 SIMPLE_MATERIAL_CREATOR(UncallableMaterial);
 
 #undef SIMPLE_MATERIAL_CREATOR
+
+AGZ_NS_END(ObjMgr)

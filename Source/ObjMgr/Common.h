@@ -1,8 +1,10 @@
-#pragma once
+﻿#pragma once
 
 #include <unordered_map>
 
 #include <Atrc/Atrc.h>
+
+AGZ_NS_BEG(ObjMgr)
 
 using AGZ::Option;
 using AGZ::Some;
@@ -47,23 +49,21 @@ public:
 
     using Creator = ObjectCreator<T>;
 
-    // ��ʼ��ȫ�ֹ���Ԫ�أ��������������б�����
+    // 用contents中的name=configNode对初始化definitions
     void InitializePublicDefinitions(const ConfigGroup &contents, ObjArena<> &arena)
     {
         for(auto it : contents.GetChildren())
             definitions_[it.first] = ObjectManager<T>::GetInstance().Create(it.second->AsGroup(), arena);
     }
 
-    // ע��һ���µ�ObjectCreator
     void AddCreator(const Creator *creator)
     {
         AGZ_ASSERT(creator);
         name2Creator_[creator->GetName()] = creator;
     }
 
-    // ����rightItem��ȡ��һ������object
-    // ��node��$name��ʽ��value����ʾ������һ�����ж���
-    // ����nodeӦ����group��������Ҫ������Ԫ�����ͼ�����
+    // 若node是形如$name的value，则直接用name到definitions中查找结果
+    // 否则，node必须是group，交给creator创建对应的scene object
     T *GetSceneObject(const ConfigNode &node, ObjArena<> &arena)
     {
         if(node.IsValue())
@@ -99,3 +99,5 @@ T *GetSceneObject(const ConfigNode &node, ObjArena<> &arena)
 {
     return ObjectManager<T>::GetInstance().GetSceneObject(node, arena);
 }
+
+AGZ_NS_END(ObjMgr)
