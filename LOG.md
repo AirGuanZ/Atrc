@@ -134,3 +134,5 @@ Environment Mapping done！不过Cube Map用起来有点蛋疼，每次都要去
 ## 2018.11.24
 
 写了个Sphere Environment Light。
+
+简单地抽出来了一个并行任务调度器，放进了AGZ Utils中，从而简化了ParallelRenderer的编写。其实做这个主要是因为SHTool也要做类似的并行化，偏偏又因为接口原因没法纳入Atrc原本的体系中。本着DRY的原则，就做了这么个局部重构。
