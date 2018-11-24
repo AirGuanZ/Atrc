@@ -130,3 +130,7 @@ Environment Mapping done！不过Cube Map用起来有点蛋疼，每次都要去
 把ObjectManager这一大坨给抽离出来成为单独的项目，免得每个项目都要写一遍基本的参数解析。
 
 等等，我是不是把BDPT给忘了？……咳咳……
+
+## 2018.11.24
+
+写了个Sphere Environment Light。

@@ -10,7 +10,7 @@ public:
 
     explicit PathTracer(int maxDepth);
 
-    Spectrum GetRadiance(const Scene &scene, const Ray &r, AGZ::ObjArena<> &arena) const override;
+    Spectrum Eval(const Scene &scene, const Ray &r, AGZ::ObjArena<> &arena) const override;
 
 private:
 

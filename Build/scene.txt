@@ -5,7 +5,7 @@ integrator = { type = PathTracer; maxDepth = 50; };
 renderer = { type = ParallelRenderer; workerCount = 6; };
 
 # SubareaRenderer
-subareaRenderer = { type = JitteredSubareaRenderer; spp = 10; };
+subareaRenderer = { type = JitteredSubareaRenderer; spp = 1; };
 
 # Image properties
 output = { filename = "./Build/Output.png"; width = 640; height = 480; };
@@ -113,19 +113,19 @@ lights = (
 #    top    = (0.4, 0.7, 0.9);
 #    bottom = (1.0);
 #}
-#{
-#    type = CubeEnvironmentLight;
-#    posX = "./Assets/PineForest/front.jpg";
-#    posY = "./Assets/PineForest/left.jpg";
-#    posZ = "./Assets/PineForest/up.jpg";
-#    negX = "./Assets/PineForest/back.jpg";
-#    negY = "./Assets/PineForest/right.jpg";
-#    negZ = "./Assets/PineForest/down.jpg";
-#}
 {
-    type = SphereEnvironmentLight;
-    tex = "./Assets/SkySphere.jpg";
+    type = CubeEnvironmentLight;
+    posX = "./Assets/PineForest/front.jpg";
+    posY = "./Assets/PineForest/left.jpg";
+    posZ = "./Assets/PineForest/up.jpg";
+    negX = "./Assets/PineForest/back.jpg";
+    negY = "./Assets/PineForest/right.jpg";
+    negZ = "./Assets/PineForest/down.jpg";
 }
+#{
+#    type = SphereEnvironmentLight;
+#    tex = "./Assets/SkySphere.jpg";
+#}
 );
 
 postProcessors = (

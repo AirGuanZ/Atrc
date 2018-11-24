@@ -8,7 +8,7 @@ VolumetricPathTracer::VolumetricPathTracer(int maxDepth)
     AGZ_ASSERT(maxDepth >= 1);
 }
 
-Spectrum VolumetricPathTracer::GetRadiance(const Scene &scene, const Ray &r, AGZ::ObjArena<> &arena) const
+Spectrum VolumetricPathTracer::Eval(const Scene &scene, const Ray &r, AGZ::ObjArena<> &arena) const
 {
     return L_left(scene, r, 1, arena);
 }

@@ -8,7 +8,7 @@ PureColorIntegrator::PureColorIntegrator(const Spectrum &background, const Spect
     
 }
 
-Spectrum PureColorIntegrator::GetRadiance(const Scene &scene, const Ray &r, [[maybe_unused]] AGZ::ObjArena<> &arena) const
+Spectrum PureColorIntegrator::Eval(const Scene &scene, const Ray &r, [[maybe_unused]] AGZ::ObjArena<> &arena) const
 {
     return scene.HasIntersection(r) ? entity_ : background_;
 }

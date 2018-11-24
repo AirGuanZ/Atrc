@@ -8,7 +8,7 @@ PathTracer::PathTracer(int maxDepth)
     AGZ_ASSERT(maxDepth >= 1);
 }
 
-Spectrum PathTracer::GetRadiance(const Scene &scene, const Ray &r, AGZ::ObjArena<> &arena) const
+Spectrum PathTracer::Eval(const Scene &scene, const Ray &r, AGZ::ObjArena<> &arena) const
 {
     SurfacePoint sp;
     if(!scene.FindCloestIntersection(r, &sp))

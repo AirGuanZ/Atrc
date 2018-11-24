@@ -14,7 +14,7 @@ public:
 
     explicit AmbientOcclusionIntegrator(Real maxOccuT, const Spectrum &backgroundColor, const Spectrum &objectColor);
 
-    Spectrum GetRadiance(const Scene &scene, const Ray &r, AGZ::ObjArena<> &arena) const override;
+    Spectrum Eval(const Scene &scene, const Ray &r, AGZ::ObjArena<> &arena) const override;
 };
 
 AGZ_NS_END(Atrc)

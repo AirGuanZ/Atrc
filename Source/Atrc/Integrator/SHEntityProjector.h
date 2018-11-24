@@ -4,14 +4,14 @@
 
 AGZ_NS_BEG(Atrc)
 
-class PureColorIntegrator : public Integrator
+class SHEntityProjector : public Integrator
 {
-    Spectrum background_;
-    Spectrum entity_;
+    Real(*sh_)(const Vec3&);
+    int N_;
 
 public:
 
-    PureColorIntegrator(const Spectrum &background, const Spectrum &entity);
+    SHEntityProjector(int l, int m, int N);
 
     Spectrum Eval(const Scene &scene, const Ray &r, AGZ::ObjArena<> &arena) const override;
 };

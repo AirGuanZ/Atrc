@@ -8,7 +8,7 @@ AmbientOcclusionIntegrator::AmbientOcclusionIntegrator(Real maxOccuT, const Spec
     AGZ_ASSERT(maxOccuT > 0.0);
 }
 
-Spectrum AmbientOcclusionIntegrator::GetRadiance(const Scene &scene, const Ray &r, [[maybe_unused]] AGZ::ObjArena<> &arena) const
+Spectrum AmbientOcclusionIntegrator::Eval(const Scene &scene, const Ray &r, [[maybe_unused]] AGZ::ObjArena<> &arena) const
 {
     SurfacePoint sp;
     if(!scene.FindCloestIntersection(r, &sp))

@@ -12,8 +12,7 @@ public:
 
     virtual ~Integrator() = default;
 
-    // 计算沿-r.dir方向击中r.ori的radiance
-    virtual Spectrum GetRadiance(const Scene &scene, const Ray &r, AGZ::ObjArena<> &arena) const = 0;
+    virtual Spectrum Eval(const Scene &scene, const Ray &r, AGZ::ObjArena<> &arena) const = 0;
 };
 
 AGZ_NS_END(Atrc)

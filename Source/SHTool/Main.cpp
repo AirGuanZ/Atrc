@@ -1,6 +1,7 @@
 #include <iostream>
 
-#include "SphericalHarmonics/Projector.h"
+#include "ObjMgr/Common.h"
+#include "ObjMgr/ObjectManager/CameraManager.h"
 
 using namespace AGZ;
 using namespace std;
@@ -27,6 +28,11 @@ void ProjectEntity(const Str8 &descFilename)
         cout << "Failed to load configuration from: " << descFilename.ToStdString() << endl;
         return;
     }
+
+    ObjArena<> arena;
+
+    auto &conf = configFile.Root();
+    auto camera = ObjMgr::CameraManager::GetInstance().GetSceneObject(conf["camera"], arena);
 
 
 }

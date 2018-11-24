@@ -19,11 +19,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\Source\SHTool\Common.h" />
-    <ClInclude Include="..\..\..\Source\SHTool\SphericalHarmonics\Projector.h" />
-    <ClInclude Include="..\..\..\Source\SHTool\SphericalHarmonics\SphericalHarmonics.h" />
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="..\..\..\Source\SHTool\Main.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

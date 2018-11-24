@@ -27,7 +27,7 @@ void JitteredSubareaRenderer::Render(const Scene &scene, const Integrator &integ
             {
                 Real xOffset = xBaseCoef * Rand();
                 Real yOffset = -yBaseCoef * Rand();
-                pixel += integrator.GetRadiance(
+                pixel += integrator.Eval(
                     scene, cam->GetRay({ xBase + xOffset, yBase + yOffset }), arena);
             }
             rt(px, py) = pixel / spp_;
