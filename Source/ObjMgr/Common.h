@@ -100,4 +100,12 @@ T *GetSceneObject(const ConfigNode &node, ObjArena<> &arena)
     return ObjectManager<T>::GetInstance().GetSceneObject(node, arena);
 }
 
+template<typename T>
+void InitializePublicDefinition(const Str8 &fieldName, const ConfigGroup &root, ObjArena<> &arena)
+{
+    auto grp = root.Find(fieldName);
+    if(grp)
+        ObjectManager<T>::GetInstance().InitializePublicDefinitions(grp->AsGroup(), arena);
+}
+
 AGZ_NS_END(ObjMgr)

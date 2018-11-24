@@ -122,6 +122,7 @@
     <ClCompile Include="..\..\..\Source\Atrc\Medium\HenyeyGreenstein.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\PostProcessor\ACESFilm.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\PostProcessor\GammaCorrector.cpp" />
+    <ClCompile Include="..\..\..\Source\Atrc\Renderer\DefaultProgressReporter.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Renderer\ParallelRenderer.cpp" />
     <ClInclude Include="..\..\..\Source\Atrc\Medium\HomogeneousMedium.h" />
     <ClCompile Include="..\..\..\Source\Atrc\Medium\HomogeneousMedium.cpp" />

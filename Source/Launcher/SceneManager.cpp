@@ -1,19 +1,7 @@
-﻿#include <ObjMgr/ParamParser.h>
-#include "SceneManager.h"
+﻿#include "SceneManager.h"
 
 using namespace AGZ;
 using namespace ObjMgr;
-
-namespace
-{
-    template<typename T>
-    void InitializePublicDefinition(const Str8 &fieldName, const ConfigGroup &root, ObjArena<> &arena)
-    {
-        auto grp = root.Find(fieldName);
-        if(grp)
-            ObjectManager<T>::GetInstance().InitializePublicDefinitions(grp->AsGroup(), arena);
-    }
-}
 
 void SceneManager::Initialize(const ConfigGroup &params)
 {
@@ -21,10 +9,6 @@ void SceneManager::Initialize(const ConfigGroup &params)
         throw SceneInitializationException("Scene: reinitialized");
 
     // 摄像机
-
-    auto outputWidth  = params["output.width"].AsValue().Parse<uint32_t>();
-    auto outputHeight = params["output.height"].AsValue().Parse<uint32_t>();
-    auto aspectRatio = Atrc::Real(outputWidth) / outputHeight;
 
     auto camera = CameraManager::GetInstance().GetSceneObject(params["camera"], arena_);
 
@@ -34,14 +18,16 @@ void SceneManager::Initialize(const ConfigGroup &params)
     // 预定义元素
 
     InitializePublicDefinition<Atrc::Geometry>("pub_geometry", params, arena_);
-    InitializePublicDefinition<Atrc::Light>   ("pub_light",    params, arena_);
     InitializePublicDefinition<Atrc::Material>("pub_material", params, arena_);
+    InitializePublicDefinition<Atrc::Light>   ("pub_light",    params, arena_);
     InitializePublicDefinition<Atrc::Medium>  ("pub_medium",   params, arena_);
     InitializePublicDefinition<Atrc::Entity>  ("pub_entity",   params, arena_);
 
-    InitializePublicDefinition<Atrc::Integrator>      ("pub_integrator", params, arena_);
-    InitializePublicDefinition<Atrc::Renderer>        ("pub_renderer",   params, arena_);
-    InitializePublicDefinition<Atrc::ProgressReporter>("pub_reporter", params, arena_);
+    InitializePublicDefinition<Atrc::PostProcessStage>("pub_postprocessor", params, arena_);
+    InitializePublicDefinition<Atrc::Camera>          ("pub_geometry",      params, arena_);
+    InitializePublicDefinition<Atrc::Integrator>      ("pub_integrator",    params, arena_);
+    InitializePublicDefinition<Atrc::Renderer>        ("pub_renderer",      params, arena_);
+    InitializePublicDefinition<Atrc::ProgressReporter>("pub_reporter",      params, arena_);
 
     // 创建实体
 

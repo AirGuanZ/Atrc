@@ -1,6 +1,5 @@
 #pragma once
 
-#include <iostream>
 #include <mutex>
 
 #include <Atrc/Core/Core.h>
@@ -12,23 +11,17 @@ class DefaultProgressReporter : public ProgressReporter
     std::mutex outMut;
     Real lastProgress_ = -1.0;
 
+    AGZ::Clock clock_;
+
 public:
 
-    void Report(Real percent) override
-    {
-        std::lock_guard<std::mutex> lk(outMut);
-        if(percent <= lastProgress_)
-            return;
+    void Begin() override;
 
-        std::cout << "Progress: " << percent << "%" << std::endl;
-        lastProgress_ = percent;
-    }
+    void End() override;
 
-    void Message(const Str8 &msg) override
-    {
-        std::lock_guard<std::mutex> lk(outMut);
-        std::cout << msg.ToStdString() << std::endl;
-    }
+    void Report(Real percent) override;
+
+    void Message(const Str8 &msg) override;
 };
 
 AGZ_NS_END(Atrc)

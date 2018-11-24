@@ -24,6 +24,7 @@ Texture2D<Color3b> ToSavedImage(const RenderTarget &origin)
     });
 }
 
+// 返回配置文件路径
 Option<Str8> ParseParam(int argc, char *argv[])
 {
     AGZ_ASSERT(argv);
@@ -56,26 +57,20 @@ int Run(const Str8 &sceneDescFilename)
     sceneMgr.Initialize(config.Root());
     RenderTarget renderTarget(width, height);
 
-    auto renderer        = RendererManager        ::GetInstance().GetSceneObject(conf["renderer"],        arena);
-    auto subareaRenderer = SubareaRendererManager ::GetInstance().GetSceneObject(conf["subareaRenderer"], arena);
-    auto integrator      = IntegratorManager      ::GetInstance().GetSceneObject(conf["integrator"],      arena);
-    auto reporter        = ProgressReporterManager::GetInstance().GetSceneObject(conf["reporter"],        arena);
+    auto renderer        = GetSceneObject<Renderer>        (conf["renderer"],        arena);
+    auto subareaRenderer = GetSceneObject<SubareaRenderer> (conf["subareaRenderer"], arena);
+    auto integrator      = GetSceneObject<Integrator>      (conf["integrator"],      arena);
+    auto reporter        = GetSceneObject<ProgressReporter>(conf["reporter"],        arena);
 
     PostProcessor postProcessor;
     if(auto pps = conf.Find("postProcessors"))
     {
         auto &arrPP = pps->AsArray();
         for(size_t i = 0; i < arrPP.Size(); ++i)
-            postProcessor.AddStage(PostProcessorStageManager::GetInstance().GetSceneObject(arrPP[i], arena));
+            postProcessor.AddStage(GetSceneObject<PostProcessStage>(arrPP[i], arena));
     }
 
-    cout << "Start rendering..." << endl;
-
-    Clock timer;
     renderer->Render(*subareaRenderer, sceneMgr.GetScene(), *integrator, &renderTarget, reporter);
-    auto deltaTime = timer.Milliseconds() / 1000.0;
-
-    cout << "Complete rendering...Total time: " << deltaTime << "s." << endl;
 
     postProcessor.Process(renderTarget);
     TextureFile::WriteRGBToPNG(filename.ToStdWString(), ToSavedImage(renderTarget));

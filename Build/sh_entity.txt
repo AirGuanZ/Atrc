@@ -1,0 +1,38 @@
+# Camera
+camera = {
+    type = Perspective;
+    aspectRatio = 1.3333333;
+    eye  = (-7, 0, 0);
+    dst  = (0, 0, 1);
+    up   = (0, 0, 1);
+    FOVz = Deg(70);
+};
+
+# Renderer
+renderer = { type = ParallelRenderer; workerCount = 6; };
+
+# SubareaRenderer
+subareaRenderer = { type = JitteredSubareaRenderer; spp = 100; };
+
+# Image properties
+output = { filename = "./Build/sh_entity.output"; width = 640; height = 480; };
+
+sampleCount = 10;
+
+# Entity list
+entities = ({
+    type = GeometricEntity;
+    geometry = {
+        type = TriangleBVH;
+        path = "./Assets/Statue_Bressant_1M_Poly.obj";
+        transform = (Translate(0.0, 0.02, -0.945), RotateZ(Deg(-90)), Scale(0.0050));
+    };
+    material = {
+        type = Metal;
+        rc = (0.9, 0.4, 0.2);
+        etaI = 1;
+        etaT = 0.1;
+        k = 0.2;
+        roughness = 0.02;
+    };
+});

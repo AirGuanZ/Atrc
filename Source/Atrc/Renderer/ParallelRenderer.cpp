@@ -77,6 +77,9 @@ void ParallelRenderer::Render(
     param.reportMut = &reportMut;
     param.taskCount = tasks.size();
 
+    if(reporter)
+        reporter->Begin();
+
     std::vector<std::thread> workers;
     if(workerCount_)
         workers.reserve(workerCount_);
@@ -86,6 +89,9 @@ void ParallelRenderer::Render(
 
     for(auto &worker : workers)
         worker.join();
+
+    if(reporter)
+        reporter->End();
 }
 
 AGZ_NS_END(Atrc)

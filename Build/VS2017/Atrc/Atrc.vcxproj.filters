@@ -360,5 +360,8 @@
     <ClCompile Include="..\..\..\Source\Atrc\Integrator\SHLightProjector.cpp">
       <Filter>Integrator</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Renderer\DefaultProgressReporter.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

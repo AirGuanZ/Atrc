@@ -27,6 +27,10 @@ public:
 
     virtual ~ProgressReporter() = default;
 
+    virtual void Begin() = 0;
+
+    virtual void End() = 0;
+
     virtual void Report(Real percent) = 0;
 
     virtual void Message(const Str8 &msg) = 0;
