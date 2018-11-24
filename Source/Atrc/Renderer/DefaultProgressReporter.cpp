@@ -21,7 +21,6 @@ void DefaultProgressReporter::Report(Real percent)
     std::lock_guard<std::mutex> lk(outMut);
     if(percent <= lastProgress_)
         return;
-
     std::cout << "Progress: " << percent << "%" << std::endl;
     lastProgress_ = percent;
 }

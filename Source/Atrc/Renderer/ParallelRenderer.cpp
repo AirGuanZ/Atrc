@@ -4,51 +4,10 @@
 
 AGZ_NS_BEG(Atrc)
 
-void ParallelRenderer::Worker(Param &param)
-{
-    try
-    {
-        for(;;)
-        {
-            bool done = true;
-            SubareaRect area = { 0, 0, 0, 0 };
-
-            {
-                std::lock_guard<std::mutex> lk(*param.mut);
-                if(!param.tasks->empty())
-                {
-                    area = param.tasks->front();
-                    param.tasks->pop();
-                    done = false;
-                }
-            }
-
-            if(done)
-                break;
-
-            param.subareaRenderer->Render(
-                *param.scene, *param.integrator, *param.output, area);
-            if(param.reporter)
-                param.reporter->Report(100.0 * (++param.finishedCount) / param.taskCount);
-        }
-    }
-    catch(const std::exception &err)
-    {
-        if(param.reporter)
-            param.reporter->Message(Str8("Exception in subrendering thread: ") + err.what());
-    }
-    catch(...)
-    {
-        if(param.reporter)
-            param.reporter->Message("Unknown exception in subrendering thread");
-    }
-}
-
 ParallelRenderer::ParallelRenderer(int workerCount)
+    : workerCount_(workerCount)
 {
-    if(workerCount <= 0)
-        workerCount = std::thread::hardware_concurrency();
-    workerCount_ = (std::max)(1, workerCount) - 1;
+
 }
 
 void ParallelRenderer::Render(
@@ -67,31 +26,31 @@ void ParallelRenderer::Render(
     if(y < h)
         tasks.push({ 0, w, y, h });
 
-    std::mutex mut, reportMut;
-    Param param = {
-        &scene, &integrator, output, &subareaRenderer,
-        &mut, &tasks
-    };
-
-    param.reporter  = reporter;
-    param.reportMut = &reportMut;
-    param.taskCount = tasks.size();
-
     if(reporter)
         reporter->Begin();
 
-    std::vector<std::thread> workers;
-    if(workerCount_)
-        workers.reserve(workerCount_);
-    for(int i = 0; i < workerCount_; ++i)
-        workers.emplace_back(Worker, std::ref(param));
-    Worker(param);
+    std::atomic<size_t> finishedCount = 0;
+    size_t totalCount = tasks.size();
 
-    for(auto &worker : workers)
-        worker.join();
+    auto func = [&](const SubareaRect &subarea, AGZ::NoSharedParam_t)
+    {
+        subareaRenderer.Render(scene, integrator, *output, subarea);
+        auto percent = 100.0 * ++finishedCount / totalCount;
+        reporter->Report(percent);
+    };
 
-    if(reporter)
-        reporter->End();
+    AGZ::StaticTaskDispatcher<SubareaRect, AGZ::NoSharedParam_t> dispatcher(workerCount_);
+
+    if(dispatcher.Run(func, AGZ::NO_SHARED_PARAM, tasks))
+    {
+        if(reporter)
+            reporter->End();
+    }
+    else if(reporter)
+    {
+        for(auto &err : dispatcher.GetExceptions())
+            reporter->Message(err.what());
+    }
 }
 
 AGZ_NS_END(Atrc)
