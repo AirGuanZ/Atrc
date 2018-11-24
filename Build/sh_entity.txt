@@ -8,16 +8,13 @@ camera = {
     FOVz = Deg(70);
 };
 
-# Renderer
-renderer = { type = ParallelRenderer; workerCount = 6; };
-
-# SubareaRenderer
-subareaRenderer = { type = JitteredSubareaRenderer; spp = 100; };
-
 # Image properties
-output = { filename = "./Build/sh_entity.output"; width = 640; height = 480; };
+output = { filename = "./Build/sh_entity1.png"; width = 640; height = 480; };
 
-sampleCount = 10;
+spp = 10;
+N   = 10;
+
+workerCount = 6;
 
 # Entity list
 entities = ({

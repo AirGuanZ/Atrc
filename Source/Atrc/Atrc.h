@@ -14,8 +14,6 @@
 #include <Atrc/Integrator/AmbientOcclusionIntegrator.h>
 #include <Atrc/Integrator/PathTracer.h>
 #include <Atrc/Integrator/PureColorIntegrator.h>
-#include <Atrc/Integrator/SHEntityProjector.h>
-#include <Atrc/Integrator/SHLightProjector.h>
 #include <Atrc/Integrator/VolumetricPathTracer.h>
 
 #include <Atrc/Light/CubeEnvironmentLight.h>

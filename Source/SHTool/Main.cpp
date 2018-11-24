@@ -1,8 +1,7 @@
 #include <iostream>
 
-#include "ObjMgr/Common.h"
-#include "ObjMgr/ObjectManager/CameraManager.h"
 #include "ObjMgr/ObjectManager.h"
+#include "SHProjector.h"
 
 using namespace AGZ;
 using namespace Atrc;
@@ -88,38 +87,28 @@ void ProjectEntity(const Str8 &descFilename)
         scene.entities_.push_back(ent);
     }
 
-    // 其他配置元素
-
-    auto renderer        = ObjMgr::GetSceneObject<Renderer>        (conf["renderer"],        arena);
-    auto subareaRenderer = ObjMgr::GetSceneObject<SubareaRenderer> (conf["subareaRenderer"], arena);
-
     // 输出配置
 
     [[maybe_unused]] auto filename     = conf["output.filename"].AsValue();
     auto outputWidth  = conf["output.width"].AsValue().Parse<uint32_t>();
     auto outputHeight = conf["output.height"].AsValue().Parse<uint32_t>();
-    auto sampleCount  = conf["sampleCount"].AsValue().Parse<int>();
+    auto spp          = conf["spp"].AsValue().Parse<int>();
+    auto N            = conf["N"].AsValue().Parse<int>();
+    auto workerCount  = conf["workerCount"].AsValue().Parse<int>();
 
-    if(sampleCount <= 0)
-        throw ObjMgr::SceneInitializationException("Invalid sampleCount value");
+    if(spp <= 0 || N <= 0)
+        throw ObjMgr::SceneInitializationException("Invalid spp/N value");
 
     std::vector<RenderTarget> renderTargets;
+    renderTargets.reserve(9);
+    for(int i = 0; i < 9; ++i)
+        renderTargets.emplace_back(outputWidth, outputHeight);
 
-    for(int L = 0; L < 3; ++L)
-    {
-        for(int M = -L; M <= L; ++M)
-        {
-            renderTargets.emplace_back(outputWidth, outputHeight);
-            auto &renderTarget = renderTargets.back();
+    SHEntityProjector projector;
+    SHSubareaRenderer subareaRenderer(spp, N);
+    SHRenderer renderer(workerCount);
 
-            cout << "Start evaluating coefficient for (L, M) = (" << L << ", " << M << ")..." << endl;
+    DefaultProgressReporter reporter;
 
-            Clock timer;
-            SHEntityProjector integrator(L, M, sampleCount);
-            renderer->Render(*subareaRenderer, scene, integrator, &renderTarget, nullptr);
-            auto deltaTime = timer.Milliseconds() / 1000.0;
-
-            cout << "Complete evaluating...Total time: " << deltaTime << "s." << endl;
-        }
-    }
+    renderer.Render(subareaRenderer, scene, projector, renderTargets.data(), &reporter);
 }

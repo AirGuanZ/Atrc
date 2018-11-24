@@ -2,5 +2,9 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\SHTool\Main.cpp" />
+    <ClCompile Include="..\..\..\Source\SHTool\SHProjector.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\Source\SHTool\SHProjector.h" />
   </ItemGroup>
 </Project>

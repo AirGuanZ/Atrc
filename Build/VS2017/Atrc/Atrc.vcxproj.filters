@@ -220,12 +220,6 @@
     <ClInclude Include="..\..\..\Source\Atrc\Light\SphereEnvironmentLight.h">
       <Filter>Light</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\Atrc\Integrator\SHEntityProjector.h">
-      <Filter>Integrator</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Source\Atrc\Integrator\SHLightProjector.h">
-      <Filter>Integrator</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\Atrc\Core\Geometry.cpp">
@@ -353,12 +347,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Source\Atrc\Light\SphereEnvironmentLight.cpp">
       <Filter>Light</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\Atrc\Integrator\SHEntityProjector.cpp">
-      <Filter>Integrator</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\Atrc\Integrator\SHLightProjector.cpp">
-      <Filter>Integrator</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Source\Atrc\Renderer\DefaultProgressReporter.cpp">
       <Filter>Renderer</Filter>

@@ -47,8 +47,6 @@
     <ClInclude Include="..\..\..\Source\Atrc\Integrator\AmbientOcclusionIntegrator.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Integrator\PathTracer.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Integrator\PureColorIntegrator.h" />
-    <ClInclude Include="..\..\..\Source\Atrc\Integrator\SHEntityProjector.h" />
-    <ClInclude Include="..\..\..\Source\Atrc\Integrator\SHLightProjector.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Integrator\VolumetricPathTracer.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Light\CubeEnvironmentLight.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Light\DirectionalLight.h" />
@@ -96,8 +94,6 @@
     <ClCompile Include="..\..\..\Source\Atrc\Integrator\AmbientOcclusionIntegrator.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Integrator\PathTracer.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Integrator\PureColorIntegrator.cpp" />
-    <ClCompile Include="..\..\..\Source\Atrc\Integrator\SHEntityProjector.cpp" />
-    <ClCompile Include="..\..\..\Source\Atrc\Integrator\SHLightProjector.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Integrator\VolumetricPathTracer.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Light\CubeEnvironmentLight.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Light\DirectionalLight.cpp" />
