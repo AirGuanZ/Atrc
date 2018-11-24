@@ -72,18 +72,6 @@ Transform ParamParser::ParseTransform(const ConfigNode &node)
         auto &arr = node.AsArray();
         Transform ret;
 
-        auto ExtractAngle = [&](const AGZ::ConfigArray &a) -> Rad
-        {
-            if(a.Size() == 1)
-            {
-                if(a.GetTag() == "Deg")
-                    return Deg(a[0].AsValue().Parse<Real>());
-                if(a.GetTag() == "Rad")
-                    return Rad(a[0].AsValue().Parse<Real>());
-            }
-            throw ParamParsingError("ParamParser: unknown angle form");
-        };
-
         for(size_t i = 0; i < arr.Size(); ++i)
         {
 
@@ -108,15 +96,15 @@ Transform ParamParser::ParseTransform(const ConfigNode &node)
             }
             else if(t.GetTag() == "RotateX")
             {
-                ret = ret * Transform::RotateX(ExtractAngle(t[0].AsArray()));
+                ret = ret * Transform::RotateX(ParseAngle(t[0]));
             }
             else if(t.GetTag() == "RotateY")
             {
-                ret = ret * Transform::RotateY(ExtractAngle(t[0].AsArray()));
+                ret = ret * Transform::RotateY(ParseAngle(t[0]));
             }
             else if(t.GetTag() == "RotateZ")
             {
-                ret = ret * Transform::RotateZ(ExtractAngle(t[0].AsArray()));
+                ret = ret * Transform::RotateZ(ParseAngle(t[0]));
             }
             else if(t.GetTag() == "Rotate")
             {
@@ -124,7 +112,7 @@ Transform ParamParser::ParseTransform(const ConfigNode &node)
                     throw ParamParsingError("ParamParser: unknown rotate form");
 
                 auto axis = ParseVec3(t[0]);
-                Rad rad = ExtractAngle(t[1].AsArray());
+                Rad rad = ParseAngle(t[1]);
 
                 ret = ret * Transform::Rotate(axis, rad);
             }
@@ -138,6 +126,21 @@ Transform ParamParser::ParseTransform(const ConfigNode &node)
     {
         throw SceneInitializationException(err.what());
     }
+}
+
+Rad ParamParser::ParseAngle(const ConfigNode &node)
+{
+    if(!node.IsArray())
+        throw ParamParsingError("ParamParser: unknown angle form");
+    auto &a = node.AsArray();
+    if(a.Size() == 1)
+    {
+        if(a.GetTag() == "Rad")
+            return Rad(a[0].AsValue().Parse<Real>());
+        if(a.GetTag() == "Deg")
+            return Deg(a[0].AsValue().Parse<Real>());
+    }
+    throw ParamParsingError("ParamParser: unknown angle form");
 }
 
 AGZ_NS_END(ObjMgr)

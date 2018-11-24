@@ -44,4 +44,14 @@ public:
     Atrc::Light *Create(const ConfigGroup &params, ObjArena<> &arena) const override;
 };
 
+// tex = filename
+class SphereEnvironmentLightCreator : public LightCreator, public AGZ::Singleton<SphereEnvironmentLightCreator>
+{
+public:
+
+    Str8 GetName() const override { return "SphereEnvironmentLight"; }
+
+    Atrc::Light *Create(const ConfigGroup &params, ObjArena<> &arena) const override;
+};
+
 AGZ_NS_END(ObjMgr)

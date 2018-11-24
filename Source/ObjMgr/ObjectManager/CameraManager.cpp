@@ -8,20 +8,9 @@ Atrc::Camera *PerspectiveCameraCreator::Create(const ConfigGroup &params, ObjAre
     auto eye = ParamParser::ParseVec3(params["eye"]);
     auto dst = ParamParser::ParseVec3(params["dst"]);
     auto up  = ParamParser::ParseVec3(params["up"]);
-    auto dir = dst - eye;
-
+    auto rad = ParamParser::ParseAngle(params["FOVz"]);
     auto aspectRatio = params["aspectRatio"].AsValue().Parse<Atrc::Real>();
-
-    Atrc::Rad rad;
-    auto &angle = params["FOVz"].AsArray();
-    if(angle.Size() != 1)
-        throw SceneInitializationException("Scene: invalid angle form for FOVy");
-    if(angle.GetTag() == "Rad")
-        rad = Atrc::Rad(angle[0].AsValue().Parse<Atrc::Real>());
-    else if(angle.GetTag() == "Deg")
-        rad = Atrc::Deg(angle[0].AsValue().Parse<Atrc::Real>());
-    else
-        throw SceneInitializationException("Scene: invalid angle form for FOVy");
+    auto dir = dst - eye;
 
     return arena.Create<Atrc::PerspectiveCamera>(eye, dir, up, rad, aspectRatio);
 }

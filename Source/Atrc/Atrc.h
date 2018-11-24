@@ -20,6 +20,7 @@
 #include <Atrc/Light/DirectionalLight.h>
 #include <Atrc/Light/GeometricDiffuseLightImpl.h>
 #include <Atrc/Light/SkyLight.h>
+#include <Atrc/Light/SphereEnvironmentLight.h>
 
 #include <Atrc/Material/BlackMaterial.h>
 #include <Atrc/Material/DiffuseMaterial.h>

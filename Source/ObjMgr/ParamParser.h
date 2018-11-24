@@ -31,6 +31,10 @@ public:
     // () => identity
     // ((Scale, 5.0), (Translate, 0.1, 0.6, 0.7), (RotateX, Deg, 47))
     static Atrc::Transform ParseTransform(const ConfigNode &node);
+
+    // Deg(70.0) => Deg(70.0)
+    // Rad(1.4)  => Rad(1.4)
+    static Atrc::Rad ParseAngle(const ConfigNode &node);
 };
 
 AGZ_NS_END(ObjMgr)

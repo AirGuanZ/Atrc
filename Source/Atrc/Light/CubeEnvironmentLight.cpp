@@ -83,7 +83,7 @@ bool CubeEnvironmentLight::IgnoreFirstMedium() const
 Spectrum CubeEnvironmentLight::NonareaLe(const Ray &r) const
 {
     auto texCoord = AGZ::CubeMapper<Real>::Map(r.dir);
-    return AGZ::LinearSampler::Sample(*envTex_[(int)texCoord.face], Vec2(texCoord.uv.u, 1 - texCoord.uv.v));
+    return AGZ::LinearSampler::Sample(*envTex_[static_cast<int>(texCoord.face)], Vec2(texCoord.uv.u, 1 - texCoord.uv.v));
 }
 
 Spectrum CubeEnvironmentLight::Power() const

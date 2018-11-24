@@ -43,4 +43,10 @@ Atrc::Light *SkyLightCreator::Create(const ConfigGroup &params, ObjArena<> &aren
     return arena.Create<Atrc::SkyLight>(top, bottom);
 }
 
+Atrc::Light *SphereEnvironmentLightCreator::Create(const ConfigGroup &params, ObjArena<> &arena) const
+{
+    auto tex = LoadTexture(params["tex"].AsValue());
+    return arena.Create<Atrc::SphereEnvironmentLight>(tex);
+}
+
 AGZ_NS_END(ObjMgr)

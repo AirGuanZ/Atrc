@@ -52,6 +52,7 @@
     <ClInclude Include="..\..\..\Source\Atrc\Light\DirectionalLight.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Light\GeometricDiffuseLightImpl.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Light\SkyLight.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Light\SphereEnvironmentLight.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Material\BxDFAggregate.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Material\BxDF\BxDF.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Material\BxDF\BxDFScaler.h" />
@@ -98,6 +99,7 @@
     <ClCompile Include="..\..\..\Source\Atrc\Light\DirectionalLight.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Light\GeometricDiffuseLightImpl.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Light\SkyLight.cpp" />
+    <ClCompile Include="..\..\..\Source\Atrc\Light\SphereEnvironmentLight.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Material\BlackMaterial.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Material\BxDFAggregate.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Material\BxDF\BxDFScaler.cpp" />

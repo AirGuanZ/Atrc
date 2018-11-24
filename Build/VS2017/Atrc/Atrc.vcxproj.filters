@@ -217,6 +217,9 @@
     <ClInclude Include="..\..\..\Source\Atrc\Integrator\AmbientOcclusionIntegrator.h">
       <Filter>Integrator</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Light\SphereEnvironmentLight.h">
+      <Filter>Light</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\Atrc\Core\Geometry.cpp">
@@ -340,6 +343,9 @@
       <Filter>PostProcessor</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Source\Atrc\Light\CubeEnvironmentLight.cpp">
+      <Filter>Light</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Light\SphereEnvironmentLight.cpp">
       <Filter>Light</Filter>
     </ClCompile>
   </ItemGroup>
