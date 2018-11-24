@@ -1,4 +1,4 @@
-#include "../ParamParser/ParamParser.h"
+#include "../ParamParser.h"
 #include "EntityCreator.h"
 
 AGZ_NS_BEG(ObjMgr)

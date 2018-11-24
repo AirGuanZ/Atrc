@@ -4,9 +4,6 @@
     <Filter Include="ObjectManager">
       <UniqueIdentifier>{9c22fdf5-17d4-4e3e-bab6-71d7cd797ad7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ParamParser">
-      <UniqueIdentifier>{cb36dc32-c3b0-4522-8d25-40fa8745d9cf}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\ObjMgr\ObjectManager\EntityCreator.cpp">
@@ -36,8 +33,9 @@
     <ClCompile Include="..\..\..\Source\ObjMgr\ObjectManager\TextureManager.cpp">
       <Filter>ObjectManager</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Source\ObjMgr\ParamParser\ParamParser.cpp">
-      <Filter>ParamParser</Filter>
+    <ClCompile Include="..\..\..\Source\ObjMgr\ParamParser.cpp" />
+    <ClCompile Include="..\..\..\Source\ObjMgr\ObjectManager\CameraManager.cpp">
+      <Filter>ObjectManager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -68,10 +66,11 @@
     <ClInclude Include="..\..\..\Source\ObjMgr\ObjectManager\TextureManager.h">
       <Filter>ObjectManager</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\ObjMgr\ParamParser\ParamParser.h">
-      <Filter>ParamParser</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Source\ObjMgr\Common.h" />
     <ClInclude Include="..\..\..\Source\ObjMgr\ObjectManager.h" />
+    <ClInclude Include="..\..\..\Source\ObjMgr\ParamParser.h" />
+    <ClInclude Include="..\..\..\Source\ObjMgr\ObjectManager\CameraManager.h">
+      <Filter>ObjectManager</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

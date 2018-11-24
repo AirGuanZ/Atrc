@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ObjectManager/CameraManager.h"
 #include "ObjectManager/EntityCreator.h"
 #include "ObjectManager/GeometryManager.h"
 #include "ObjectManager/IntegratorManager.h"
@@ -8,11 +9,17 @@
 #include "ObjectManager/MediumManager.h"
 #include "ObjectManager/PostProcessorManager.h"
 #include "ObjectManager/RendererManager.h"
-#include "ParamParser/ParamParser.h"
 
 inline void InitializeObjectManagers()
 {
     using namespace ObjMgr;
+
+    CameraCreator *CAMERA_CREATORS[] =
+    {
+        PerspectiveCameraCreator::GetInstancePtr(),
+    };
+    for(auto c : CAMERA_CREATORS)
+        CameraManager::GetInstance().AddCreator(c);
 
     EntityCreator *ENTITY_CREATORS[] =
     {

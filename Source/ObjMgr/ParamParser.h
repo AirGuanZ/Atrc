@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Common.h"
+#include "Common.h"
 
 AGZ_NS_BEG(ObjMgr)
 
@@ -19,10 +19,10 @@ class ParamParser
 {
 public:
 
-    // 0.1                => (0.1f, 0.1f, 0.1f)
-    // ()                => (0.0f, 0.0f, 0.0f)
-    // (0.1)            => (0.1f, 0.1f, 0.1f)
-    // (0.1, 0.2, 0.3)    => (0.1f, 0.2f, 0.3f)
+    // 0.1             => (0.1f, 0.1f, 0.1f)
+    // ()              => (0.0f, 0.0f, 0.0f)
+    // (0.1)           => (0.1f, 0.1f, 0.1f)
+    // (0.1, 0.2, 0.3) => (0.1f, 0.2f, 0.3f)
     static Atrc::Spectrum ParseSpectrum(const ConfigNode &node);
 
     // (0.1, 0.2, 0.3) => (0.1, 0.2, 0.3)

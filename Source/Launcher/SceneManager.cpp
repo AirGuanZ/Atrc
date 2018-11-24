@@ -1,33 +1,11 @@
-﻿#include "SceneManager.h"
+﻿#include <ObjMgr/ParamParser.h>
+#include "SceneManager.h"
 
 using namespace AGZ;
 using namespace ObjMgr;
 
 namespace
 {
-    const Atrc::Camera *ParseCamera(const ConfigGroup &params, Atrc::Real aspectRatio, ObjArena<> &arena)
-    {
-        auto eye = ParamParser::ParseVec3(params["eye"]);
-        auto dst = ParamParser::ParseVec3(params["dst"]);
-        auto dir = dst - eye;
-
-        auto up = ParamParser::ParseVec3(params["up"]);
-
-        Atrc::Rad rad;
-        auto &angle = params["FOVz"].AsArray();
-        if(angle.Size() != 2)
-            throw SceneInitializationException("Scene: invalid angle form for FOVy");
-        if(angle[0].AsValue() == "Rad")
-            rad = Atrc::Rad(angle[1].AsValue().Parse<Atrc::Real>());
-        else if(angle[0].AsValue() == "Deg")
-            rad = Atrc::Deg(angle[1].AsValue().Parse<Atrc::Real>());
-        else
-            throw SceneInitializationException("Scene: invalid angle form for FOVy");
-
-        return arena.Create<Atrc::PerspectiveCamera>(
-            eye, dir, up, rad, aspectRatio);
-    }
-
     template<typename T>
     void InitializePublicDefinition(const Str8 &fieldName, const ConfigGroup &root, ObjArena<> &arena)
     {
@@ -48,7 +26,7 @@ void SceneManager::Initialize(const ConfigGroup &params)
     auto outputHeight = params["output.height"].AsValue().Parse<uint32_t>();
     auto aspectRatio = Atrc::Real(outputWidth) / outputHeight;
 
-    auto camera = ParseCamera(params["camera"].AsGroup(), aspectRatio, arena_);
+    auto camera = CameraManager::GetInstance().GetSceneObject(params["camera"], arena_);
 
     std::vector<Atrc::Entity*> entities;
     std::vector<Atrc::Light*> lights;

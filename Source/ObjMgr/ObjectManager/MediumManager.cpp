@@ -1,4 +1,4 @@
-#include "../ParamParser/ParamParser.h"
+#include "../ParamParser.h"
 #include "MediumManager.h"
 
 AGZ_NS_BEG(ObjMgr)

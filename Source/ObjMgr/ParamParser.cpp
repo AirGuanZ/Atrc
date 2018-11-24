@@ -72,70 +72,59 @@ Transform ParamParser::ParseTransform(const ConfigNode &node)
         auto &arr = node.AsArray();
         Transform ret;
 
+        auto ExtractAngle = [&](const AGZ::ConfigArray &a) -> Rad
+        {
+            if(a.Size() == 1)
+            {
+                if(a.GetTag() == "Deg")
+                    return Deg(a[0].AsValue().Parse<Real>());
+                if(a.GetTag() == "Rad")
+                    return Rad(a[0].AsValue().Parse<Real>());
+            }
+            throw ParamParsingError("ParamParser: unknown angle form");
+        };
+
         for(size_t i = 0; i < arr.Size(); ++i)
         {
-            auto ExtractAngle = [&](const AGZ::ConfigArray &a) -> Rad
-            {
-                if(a.Size() == 3)
-                {
-                    if(a[1].AsValue() == "Deg")
-                        return Deg(a[2].AsValue().Parse<Real>());
-                    if(a[1].AsValue() == "Rad")
-                        return Rad(a[2].AsValue().Parse<Real>());
-                }
-                throw ParamParsingError("ParamParser: unknown angle form");
-            };
 
             auto &t = arr[i].AsArray();
             if(!t.Size())
                 throw ParamParsingError("ParamParser: unknown transform form");
 
-            auto &head = t[0].AsValue();
-
-            if(head == "Scale")
+            if(t.GetTag() == "Scale")
+            {
+                if(t.Size() != 1)
+                    throw ParamParsingError("ParamParser: unknown scaling form");
+                ret = ret * Transform::Scale(t[0].AsValue().Parse<Real>());
+            }
+            else if(t.GetTag() == "Translate")
+            {
+                if(t.Size() != 3)
+                    throw ParamParsingError("ParamParser: unknown translating form");
+                ret = ret * Transform::Translate(
+                    t[0].AsValue().Parse<Real>(),
+                    t[1].AsValue().Parse<Real>(),
+                    t[2].AsValue().Parse<Real>());
+            }
+            else if(t.GetTag() == "RotateX")
+            {
+                ret = ret * Transform::RotateX(ExtractAngle(t[0].AsArray()));
+            }
+            else if(t.GetTag() == "RotateY")
+            {
+                ret = ret * Transform::RotateY(ExtractAngle(t[0].AsArray()));
+            }
+            else if(t.GetTag() == "RotateZ")
+            {
+                ret = ret * Transform::RotateZ(ExtractAngle(t[0].AsArray()));
+            }
+            else if(t.GetTag() == "Rotate")
             {
                 if(t.Size() != 2)
-                    throw ParamParsingError("ParamParser: unknown transform form");
-                ret = ret * Transform::Scale(t[1].AsValue().Parse<Real>());
-            }
-            else if(head == "Translate")
-            {
-                if(t.Size() != 4)
-                    throw ParamParsingError("ParamParser: unknown transform form");
-                ret = ret * Transform::Translate(
-                    t[1].AsValue().Parse<Real>(),
-                    t[2].AsValue().Parse<Real>(),
-                    t[3].AsValue().Parse<Real>());
-            }
-            else if(head == "RotateX")
-            {
-                ret = ret * Transform::RotateX(ExtractAngle(t));
-            }
-            else if(head == "RotateY")
-            {
-                ret = ret * Transform::RotateY(ExtractAngle(t));
-            }
-            else if(head == "RotateZ")
-            {
-                ret = ret * Transform::RotateZ(ExtractAngle(t));
-            }
-            else if(head == "Rotate")
-            {
-                if(t.Size() != 1 + 3 + 2)
-                    throw ParamParsingError("ParamParser: unknown transform form");
+                    throw ParamParsingError("ParamParser: unknown rotate form");
 
-                auto axis = Vec3(
-                    t[1].AsValue().Parse<Real>(),
-                    t[2].AsValue().Parse<Real>(),
-                    t[3].AsValue().Parse<Real>());
-
-                Rad rad;
-                if(t[4].AsValue() == "Rad")
-                    rad = Rad(t[5].AsValue().Parse<Real>());
-                else if(t[4].AsValue() == "Deg")
-                    rad = Deg(t[5].AsValue().Parse<Real>());
-                else
-                    throw ParamParsingError("ParamParser: unknown angle form");
+                auto axis = ParseVec3(t[0]);
+                Rad rad = ExtractAngle(t[1].AsArray());
 
                 ret = ret * Transform::Rotate(axis, rad);
             }

@@ -1,4 +1,4 @@
-#include "../ParamParser/ParamParser.h"
+#include "../ParamParser.h"
 #include "LightManager.h"
 #include "TextureManager.h"
 

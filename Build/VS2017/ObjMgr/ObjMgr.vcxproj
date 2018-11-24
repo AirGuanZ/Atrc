@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\Source\ObjMgr\ObjectManager\CameraManager.cpp" />
     <ClCompile Include="..\..\..\Source\ObjMgr\ObjectManager\EntityCreator.cpp" />
     <ClCompile Include="..\..\..\Source\ObjMgr\ObjectManager\GeometryManager.cpp" />
     <ClCompile Include="..\..\..\Source\ObjMgr\ObjectManager\IntegratorManager.cpp" />
@@ -28,11 +29,12 @@
     <ClCompile Include="..\..\..\Source\ObjMgr\ObjectManager\PostProcessorManager.cpp" />
     <ClCompile Include="..\..\..\Source\ObjMgr\ObjectManager\RendererManager.cpp" />
     <ClCompile Include="..\..\..\Source\ObjMgr\ObjectManager\TextureManager.cpp" />
-    <ClCompile Include="..\..\..\Source\ObjMgr\ParamParser\ParamParser.cpp" />
+    <ClCompile Include="..\..\..\Source\ObjMgr\ParamParser.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Source\ObjMgr\Common.h" />
     <ClInclude Include="..\..\..\Source\ObjMgr\ObjectManager.h" />
+    <ClInclude Include="..\..\..\Source\ObjMgr\ObjectManager\CameraManager.h" />
     <ClInclude Include="..\..\..\Source\ObjMgr\ObjectManager\EntityCreator.h" />
     <ClInclude Include="..\..\..\Source\ObjMgr\ObjectManager\GeometryManager.h" />
     <ClInclude Include="..\..\..\Source\ObjMgr\ObjectManager\IntegratorManager.h" />
@@ -42,7 +44,7 @@
     <ClInclude Include="..\..\..\Source\ObjMgr\ObjectManager\PostProcessorManager.h" />
     <ClInclude Include="..\..\..\Source\ObjMgr\ObjectManager\RendererManager.h" />
     <ClInclude Include="..\..\..\Source\ObjMgr\ObjectManager\TextureManager.h" />
-    <ClInclude Include="..\..\..\Source\ObjMgr\ParamParser\ParamParser.h" />
+    <ClInclude Include="..\..\..\Source\ObjMgr\ParamParser.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
