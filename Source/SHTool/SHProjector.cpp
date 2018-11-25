@@ -18,7 +18,7 @@ namespace
     };
 }
 
-void SHEntityProjector::Project(const Ray &r, const Scene &scene, int N, Spectrum (&output)[9], AGZ::ObjArena<> &arena) const
+void SHEntityProjector::Project(const Ray &r, const Scene &scene, int N, Spectrum (&output)[9], AGZ::ObjArena<> &arena)
 {
     for(auto &s : output)
         s = Spectrum();
@@ -52,7 +52,7 @@ void SHEntityProjector::Project(const Ray &r, const Scene &scene, int N, Spectru
         s /= N;
 }
 
-void SHLightProjector::Project(const Ray &r, const Scene &scene, int N, Spectrum(&output)[9], AGZ::ObjArena<> &arena) const
+void SHLightProjector::Project(const Ray &r, const Scene &scene, int N, Spectrum (&output)[9], AGZ::ObjArena<> &arena)
 {
     for(auto &s : output)
         s = Spectrum();
@@ -78,14 +78,14 @@ void SHLightProjector::Project(const Ray &r, const Scene &scene, int N, Spectrum
         s /= N;
 }
 
-SHSubareaRenderer::SHSubareaRenderer(int spp, int N)
+SHEntitySubareaRenderer::SHEntitySubareaRenderer(int spp, int N)
     : spp_(spp), N_(N)
 {
     AGZ_ASSERT(spp >= 1 && N >= 1);
 }
 
-void SHSubareaRenderer::Render(
-    const Scene &scene, const SHProjector& projector,
+void SHEntitySubareaRenderer::Render(
+    const Scene &scene,
     RenderTarget *renderTarget, const SubareaRect &area) const
 {
     AGZ::ObjArena<> arena;
@@ -107,7 +107,7 @@ void SHSubareaRenderer::Render(
                 Real xOffset = xBaseCoef * Rand();
                 Real yOffset = -yBaseCoef * Rand();
                 Spectrum tpixel[9];
-                projector.Project(
+                SHEntityProjector::Project(
                     cam->GetRay({ xBase + xOffset, yBase + yOffset }), scene, N_, tpixel, arena);
                 for(int k = 0; k < 9; ++k)
                     pixel[k] += tpixel[k];
@@ -122,14 +122,14 @@ void SHSubareaRenderer::Render(
     }
 }
 
-SHRenderer::SHRenderer(int workerCount)
+SHEntityRenderer::SHEntityRenderer(int workerCount)
     : workerCount_(workerCount)
 {
     
 }
 
-void SHRenderer::Render(
-    const SHSubareaRenderer &subareaRenderer, const Scene &scene, const SHProjector &projector,
+void SHEntityRenderer::Render(
+    const SHEntitySubareaRenderer &subareaRenderer, const Scene &scene,
     RenderTarget *output, ProgressReporter *reporter) const
 {
     uint32_t w = output->GetWidth();
@@ -151,7 +151,7 @@ void SHRenderer::Render(
 
     auto func = [&](const SubareaRect &subarea, AGZ::NoSharedParam_t)
     {
-        subareaRenderer.Render(scene, projector, output, subarea);
+        subareaRenderer.Render(scene, output, subarea);
         auto percent = 100.0 * ++finishedCount / totalCount;
         reporter->Report(percent);
     };

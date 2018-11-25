@@ -45,6 +45,12 @@ int main(int argc, char *argv[])
     }
 }
 
+bool SaveProjectedEntity([[maybe_unused]] const Str8 &filename, [[maybe_unused]] const RenderTarget *renderTargets)
+{
+    // TODO
+    return true;
+}
+
 void ProjectEntity(const Str8 &descFilename)
 {
     Config configFile;
@@ -104,11 +110,13 @@ void ProjectEntity(const Str8 &descFilename)
     for(int i = 0; i < 9; ++i)
         renderTargets.emplace_back(outputWidth, outputHeight);
 
-    SHEntityProjector projector;
-    SHSubareaRenderer subareaRenderer(spp, N);
-    SHRenderer renderer(workerCount);
+    SHEntitySubareaRenderer subareaRenderer(spp, N);
+    SHEntityRenderer renderer(workerCount);
 
     DefaultProgressReporter reporter;
 
-    renderer.Render(subareaRenderer, scene, projector, renderTargets.data(), &reporter);
+    renderer.Render(subareaRenderer, scene, renderTargets.data(), &reporter);
+
+    if(!SaveProjectedEntity(filename, renderTargets.data()))
+        cout << "Failed to save rendered coefficients into " << filename.ToStdString() << endl;
 }

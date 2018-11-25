@@ -2,57 +2,46 @@
 
 #include <Atrc/Core/Core.h>
 
-class SHProjector
+class SHEntityProjector
 {
 public:
 
-    virtual ~SHProjector() = default;
-
-    virtual void Project(
+    static void Project(
         const Atrc::Ray &r, const Atrc::Scene &scene, int N,
-        Atrc::Spectrum(&output)[9], AGZ::ObjArena<> &arena) const = 0;
+        Atrc::Spectrum (&output)[9], AGZ::ObjArena<> &arena);
 };
 
-class SHEntityProjector : public SHProjector
+class SHLightProjector
 {
 public:
 
-    void Project(
+    static void Project(
         const Atrc::Ray &r, const Atrc::Scene &scene, int N,
-        Atrc::Spectrum (&output)[9], AGZ::ObjArena<> &arena) const override;
+        Atrc::Spectrum(&output)[9], AGZ::ObjArena<> &arena);
 };
 
-class SHLightProjector : public SHProjector
-{
-public:
-
-    void Project(
-        const Atrc::Ray &r, const Atrc::Scene &scene, int N,
-        Atrc::Spectrum(&output)[9], AGZ::ObjArena<> &arena) const override;
-};
-
-class SHSubareaRenderer
+class SHEntitySubareaRenderer
 {
     int spp_, N_;
 
 public:
 
-    explicit SHSubareaRenderer(int spp, int N);
+    explicit SHEntitySubareaRenderer(int spp, int N);
 
     void Render(
-        const Atrc::Scene &scene, const SHProjector &projector,
+        const Atrc::Scene &scene,
         Atrc::RenderTarget *renderTarget, const Atrc::SubareaRect &area) const;
 };
 
-class SHRenderer
+class SHEntityRenderer
 {
     int workerCount_;
 
 public:
 
-    explicit SHRenderer(int workerCount = -1);
+    explicit SHEntityRenderer(int workerCount = -1);
 
     void Render(
-        const SHSubareaRenderer &subareaRenderer, const Atrc::Scene &scene, const SHProjector &projector,
+        const SHEntitySubareaRenderer &subareaRenderer, const Atrc::Scene &scene,
         Atrc::RenderTarget *output, Atrc::ProgressReporter *reporter) const;
 };
