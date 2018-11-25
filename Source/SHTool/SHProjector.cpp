@@ -4,7 +4,7 @@ using namespace Atrc;
 
 namespace
 {
-    static Real (*SH_FUNCS[9])(const Vec3&) =
+    Real (*SH_FUNCS[9])(const Vec3&) =
     {
         AGZ::Math::GetSHByLM<Real>(0, 0),
         AGZ::Math::GetSHByLM<Real>(1, -1),
