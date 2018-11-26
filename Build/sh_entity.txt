@@ -14,7 +14,7 @@ output = { filename = "./Build/sh_entity1.png"; width = 640; height = 480; };
 spp = 10;
 N   = 10;
 
-workerCount = 6;
+workerCount = 11;
 
 # Entity list
 entities = ({

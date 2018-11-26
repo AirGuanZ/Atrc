@@ -15,9 +15,7 @@ class SHLightProjector
 {
 public:
 
-    static void Project(
-        const Atrc::Ray &r, const Atrc::Scene &scene, int N,
-        Atrc::Spectrum(&output)[9], AGZ::ObjArena<> &arena);
+    static void Project(const Atrc::Light *light, int N, Atrc::Spectrum(&output)[9]);
 };
 
 class SHEntitySubareaRenderer

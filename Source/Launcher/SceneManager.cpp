@@ -10,24 +10,10 @@ void SceneManager::Initialize(const ConfigGroup &params)
 
     // 摄像机
 
-    auto camera = CameraManager::GetInstance().GetSceneObject(params["camera"], arena_);
+    auto camera = GetSceneObject<Atrc::Camera>(params["camera"], arena_);
 
     std::vector<Atrc::Entity*> entities;
     std::vector<Atrc::Light*> lights;
-
-    // 预定义元素
-
-    InitializePublicDefinition<Atrc::Geometry>("pub_geometry", params, arena_);
-    InitializePublicDefinition<Atrc::Material>("pub_material", params, arena_);
-    InitializePublicDefinition<Atrc::Light>   ("pub_light",    params, arena_);
-    InitializePublicDefinition<Atrc::Medium>  ("pub_medium",   params, arena_);
-    InitializePublicDefinition<Atrc::Entity>  ("pub_entity",   params, arena_);
-
-    InitializePublicDefinition<Atrc::PostProcessStage>("pub_postprocessor", params, arena_);
-    InitializePublicDefinition<Atrc::Camera>          ("pub_geometry",      params, arena_);
-    InitializePublicDefinition<Atrc::Integrator>      ("pub_integrator",    params, arena_);
-    InitializePublicDefinition<Atrc::Renderer>        ("pub_renderer",      params, arena_);
-    InitializePublicDefinition<Atrc::ProgressReporter>("pub_reporter",      params, arena_);
 
     // 创建实体
 

@@ -52,16 +52,8 @@ void SHEntityProjector::Project(const Ray &r, const Scene &scene, int N, Spectru
         s /= N;
 }
 
-void SHLightProjector::Project(const Ray &r, const Scene &scene, int N, Spectrum (&output)[9], AGZ::ObjArena<> &arena)
+void SHLightProjector::Project(const Light *light, int N, Spectrum (&output)[9])
 {
-    for(auto &s : output)
-        s = Spectrum();
-
-    if(scene.GetLights().size() != 1)
-        return;
-
-    auto light = scene.GetLights().front();
-
     for(int i = 0; i < N; ++i)
     {
         Real u0 = Rand(), u1 = Rand();

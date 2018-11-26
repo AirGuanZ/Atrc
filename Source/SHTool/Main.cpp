@@ -25,7 +25,7 @@ int main(int argc, char *argv[])
             cout << USAGE_MSG << endl;
             return 0;
         }
-
+        
         if(argv[1] == Str8("project_entity"))
         {
             if(argc == 3)
@@ -33,7 +33,11 @@ int main(int argc, char *argv[])
                 Str8 descFilename(argv[2]);
                 ProjectEntity(descFilename);
             }
+            return 0;
         }
+        
+        cout << USAGE_MSG << endl;
+        return 0;
     }
     catch(std::exception &err)
     {
@@ -45,10 +49,20 @@ int main(int argc, char *argv[])
     }
 }
 
+/* Êñá‰ª∂ÁªìÊûÑÔºö
+    width:  uint32_t
+    height: uint32_t
+    {
+        {
+            {
+                Spectrum: float * 3
+            } * width
+        } * height
+    } * 9
+ */
 bool SaveProjectedEntity([[maybe_unused]] const Str8 &filename, [[maybe_unused]] const RenderTarget *renderTargets)
 {
-    // TODO
-    return true;
+    
 }
 
 void ProjectEntity(const Str8 &descFilename)
@@ -65,24 +79,13 @@ void ProjectEntity(const Str8 &descFilename)
     ObjArena<> arena;
     Scene scene;
 
-    InitializeObjectManagers();
+    ObjMgr::InitializeObjectManagers();
+    ObjMgr::InitializePublicObjects(conf, arena);
 
-    // ‘§∂®“Â‘™Àÿ
-
-    ObjMgr::InitializePublicDefinition<Geometry>("pub_geometry", conf, arena);
-    ObjMgr::InitializePublicDefinition<Material>("pub_material", conf, arena);
-    ObjMgr::InitializePublicDefinition<Light>   ("pub_light", conf, arena);
-    ObjMgr::InitializePublicDefinition<Medium>  ("pub_medium", conf, arena);
-    ObjMgr::InitializePublicDefinition<Entity>  ("pub_entity", conf, arena);
-
-    ObjMgr::InitializePublicDefinition<Camera>          ("pub_geometry", conf, arena);
-    ObjMgr::InitializePublicDefinition<Renderer>        ("pub_renderer", conf, arena);
-    ObjMgr::InitializePublicDefinition<ProgressReporter>("pub_reporter", conf, arena);
-
-    auto camera = ObjMgr::CameraManager::GetInstance().GetSceneObject(conf["camera"], arena);
+    auto camera = ObjMgr::GetSceneObject<Atrc::Camera>(conf["camera"], arena);
     scene.camera = camera;
 
-    // ¥¥Ω® µÃÂ
+    // ÂèñÂæóÂÆû‰ΩìÂàóË°®
 
     auto &entArr = conf["entities"].AsArray();
     for(size_t i = 0; i < entArr.Size(); ++i)
@@ -93,9 +96,9 @@ void ProjectEntity(const Str8 &descFilename)
         scene.entities_.push_back(ent);
     }
 
-    //  ‰≥ˆ≈‰÷√
+    // ÂÖ∂‰ªñÊ∏≤ÊüìÈÖçÁΩÆÈ°π
 
-    [[maybe_unused]] auto filename     = conf["output.filename"].AsValue();
+    auto filename     = conf["output.filename"].AsValue();
     auto outputWidth  = conf["output.width"].AsValue().Parse<uint32_t>();
     auto outputHeight = conf["output.height"].AsValue().Parse<uint32_t>();
     auto spp          = conf["spp"].AsValue().Parse<int>();

@@ -24,14 +24,18 @@ Texture2D<Color3b> ToSavedImage(const RenderTarget &origin)
     });
 }
 
-// ���������ļ�·��
+// 返回配置文件路径，为空时返回./Build/scene.txt，无法识别时返回None
 Option<Str8> ParseParam(int argc, char *argv[])
 {
     AGZ_ASSERT(argv);
     if(argc == 1)
         return "./Build/scene.txt";
     if(argc == 2)
+    {
+        if(argv[1] == Str8("-h") || argv[1] == Str8("--help"))
+            return None;
         return argv[1];
+    }
     return None;
 }
 
@@ -48,6 +52,10 @@ int Run(const Str8 &sceneDescFilename)
     auto &conf = config.Root();
 
     ObjArena<> arena;
+
+    InitializeObjectManagers();
+    InitializePublicObjects(conf, arena);
+
     auto &sceneMgr = SceneManager::GetInstance();
 
     auto filename = conf["output.filename"].AsValue();;
@@ -86,8 +94,6 @@ int main(int argc, char *argv[])
 #endif
 
     std::locale::global(std::locale(""));
-
-    InitializeObjectManagers();
 
     auto sceneDescFilename = ParseParam(argc, argv);
     if(!sceneDescFilename)

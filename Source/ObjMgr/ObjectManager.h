@@ -10,6 +10,9 @@
 #include "ObjectManager/PostProcessorManager.h"
 #include "ObjectManager/RendererManager.h"
 
+AGZ_NS_BEG(ObjMgr)
+
+// 注册各类内建的Object Creators
 inline void InitializeObjectManagers()
 {
     using namespace ObjMgr;
@@ -109,3 +112,21 @@ inline void InitializeObjectManagers()
     for(auto c : SUBAREARENDERER_CREATORS)
         SubareaRendererManager::GetInstance().AddCreator(c);
 }
+
+// 创建在params内公开定义的元素
+inline void InitializePublicObjects(const AGZ::ConfigGroup &params, AGZ::ObjArena<> &arena)
+{
+    InitializePublicDefinition<Atrc::Geometry>        ("pub_geometry",      params, arena);
+    InitializePublicDefinition<Atrc::Material>        ("pub_material",      params, arena);
+    InitializePublicDefinition<Atrc::Light>           ("pub_light",         params, arena);
+    InitializePublicDefinition<Atrc::Medium>          ("pub_medium",        params, arena);
+    InitializePublicDefinition<Atrc::Entity>          ("pub_entity",        params, arena);
+    InitializePublicDefinition<Atrc::PostProcessStage>("pub_postprocessor", params, arena);
+    InitializePublicDefinition<Atrc::Camera>          ("pub_camera",        params, arena);
+    InitializePublicDefinition<Atrc::Integrator>      ("pub_integrator",    params, arena);
+    InitializePublicDefinition<Atrc::SubareaRenderer> ("pub_subrenderer",   params, arena);
+    InitializePublicDefinition<Atrc::Renderer>        ("pub_renderer",      params, arena);
+    InitializePublicDefinition<Atrc::ProgressReporter>("pub_reporter",      params, arena);
+}
+
+AGZ_NS_END(ObjMgr)
