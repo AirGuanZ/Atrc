@@ -136,3 +136,15 @@ Environment Mapping done！不过Cube Map用起来有点蛋疼，每次都要去
 写了个Sphere Environment Light。
 
 简单地抽出来了一个并行任务调度器，放进了AGZ Utils中，从而简化了ParallelRenderer的编写。其实做这个主要是因为SHTool也要做类似的并行化，偏偏又因为接口原因没法纳入Atrc原本的体系中。本着DRY的原则，就做了这么个局部重构。
+
+## 2018.11.25
+
+今天主要是去上海搬东西，没怎么写代码。
+
+晚上回来过后看了看SHTool，意识到自己犯了个愚蠢的错误——Entity的球谐系数是一系列Spectrum构成的矩阵，Light的球谐系数是一个向量，求两者时需要的输入也不一样，这两个东西的Projector怎么能共用一套接口呢？于是二话不说把它们拆成了两个不相关的东西。
+
+## 2018.11.26
+
+玩成了EntityProjector、LightProjector以及EntityRenderer，3阶球谐函数的重建结果意外地很不错。
+
+

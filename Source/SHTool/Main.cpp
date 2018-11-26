@@ -11,11 +11,11 @@ const char *USAGE_MSG =
 R"___(Usage:
     shtool project_entity [entity_desc_filename]
     shtool project_light  [light_desc_filename]
-    shtool render_entity  [entity_project_result] [light_project_result] (-o [output_filename])
-    shtool render_light   [light_project_result] (-o [output_filename]))___";
+    shtool render_entity  [entity_project_result] [light_project_result] [output_filename])___";
 
 void ProjectEntity(const Str8 &descFilename);
 void ProjectLight(const Str8 &descFilename);
+void RenderEntity(const Str8 &ent, const Str8 &light, const Str8 &output);
 
 int main(int argc, char *argv[])
 {
@@ -30,10 +30,7 @@ int main(int argc, char *argv[])
         if(argv[1] == Str8("project_entity"))
         {
             if(argc == 3)
-            {
-                Str8 descFilename(argv[2]);
-                ProjectEntity(descFilename);
-            }
+                ProjectEntity(argv[2]);
             else
                 cout << USAGE_MSG << endl;
             return 0;
@@ -42,10 +39,16 @@ int main(int argc, char *argv[])
         if(argv[1] == Str8("project_light"))
         {
             if(argc == 3)
-            {
-                Str8 descFilename(argv[2]);
-                ProjectLight(descFilename);
-            }
+                ProjectLight(argv[2]);
+            else
+                cout << USAGE_MSG << endl;
+            return 0;
+        }
+
+        if(argv[1] == Str8("render_entity"))
+        {
+            if(argc == 5)
+                RenderEntity(argv[2], argv[3], argv[4]);
             else
                 cout << USAGE_MSG << endl;
             return 0;
@@ -166,11 +169,86 @@ void ProjectLight(const Str8 &descFilename)
     if(N <= 0)
         throw ObjMgr::SceneInitializationException("Invalid N value");
     
-    auto light = ObjMgr::GetSceneObject<Light>(conf, arena);
+    auto light = ObjMgr::GetSceneObject<Light>(conf["light"], arena);
 
     Spectrum output[9];
     SHLightProjector::Project(light, N, output);
 
     if(!SaveProjectedLight(filename, output))
         cout << "Failed to save rendered coefficients into " << filename.ToStdString() << endl;
+}
+
+bool LoadProjectedEntity(const Str8 &filename, RenderTarget *renderTargets)
+{
+    std::ifstream fin(filename.ToPlatformString());
+    if(!fin)
+        return false;
+
+    AGZ::BinaryIStreamDeserializer deserializer(fin);
+    for(int i = 0; i < 9; ++i)
+    {
+        if(!deserializer.Deserialize(renderTargets[i]))
+            return false;
+    }
+
+    return true;
+}
+
+bool LoadProjectedLight(const Str8 &filename, Spectrum *output)
+{
+    std::ifstream fin(filename.ToPlatformString());
+    if(!fin)
+        return false;
+
+    AGZ::BinaryIStreamDeserializer deserializer(fin);
+    for(int i = 0; i < 9; ++i)
+    {
+        if(!deserializer.Deserialize(output[i]))
+            return false;
+    }
+
+    return true;
+}
+
+Texture2D<Color3b> ToSavedImage(const RenderTarget &origin)
+{
+    return origin.Map([=](const Color3f &color)
+    {
+        return color.Map([=](float x)
+        {
+            return static_cast<uint8_t>(Clamp(x, 0.0f, 1.0f) * 255);
+        });
+    });
+}
+
+void RenderEntity(const Str8 &ent, const Str8 &light, const Str8 &output)
+{
+    RenderTarget projectedEntity[9];
+    Spectrum projectedLight[9];
+
+    if(!LoadProjectedEntity(ent, projectedEntity))
+    {
+        cout << "Failed to load projected entity info from: " << ent.ToStdString() << endl;
+        return;
+    }
+
+    if(!LoadProjectedLight(light, projectedLight))
+    {
+        cout << "Failed to load projected light info from: " << light.ToStdString() << endl;
+        return;
+    }
+
+    RenderTarget rt(projectedEntity[0].GetWidth(), projectedEntity[0].GetHeight());
+    for(uint32_t y = 0; y < rt.GetHeight(); ++y)
+    {
+        for(uint32_t x = 0; x < rt.GetWidth(); ++x)
+        {
+            Spectrum pixel;
+            for(int i = 0; i < 9; ++i)
+                pixel += projectedEntity[i](x, y) * projectedLight[i];
+            rt(x, y) = pixel;
+        }
+    }
+
+    TextureFile::WriteRGBToPNG(output.ToStdWString(), ToSavedImage(rt));
 }
