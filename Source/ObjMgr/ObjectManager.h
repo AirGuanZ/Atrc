@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "ObjectManager/CameraManager.h"
 #include "ObjectManager/EntityCreator.h"

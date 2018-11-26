@@ -22,6 +22,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SHTool", "SHTool\SHTool.vcx
 		{871D9783-674C-48E8-AC73-65E8F44B4894} = {871D9783-674C-48E8-AC73-65E8F44B4894}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "C2S", "C2S\C2S.vcxproj", "{DD59CAD3-3B6F-4D38-AD5E-1AB3C37BD754}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -62,6 +64,14 @@ Global
 		{C506C867-1C4E-44DC-96F3-473ED59C49A8}.Release|x64.Build.0 = Release|x64
 		{C506C867-1C4E-44DC-96F3-473ED59C49A8}.Release|x86.ActiveCfg = Release|Win32
 		{C506C867-1C4E-44DC-96F3-473ED59C49A8}.Release|x86.Build.0 = Release|Win32
+		{DD59CAD3-3B6F-4D38-AD5E-1AB3C37BD754}.Debug|x64.ActiveCfg = Debug|x64
+		{DD59CAD3-3B6F-4D38-AD5E-1AB3C37BD754}.Debug|x64.Build.0 = Debug|x64
+		{DD59CAD3-3B6F-4D38-AD5E-1AB3C37BD754}.Debug|x86.ActiveCfg = Debug|Win32
+		{DD59CAD3-3B6F-4D38-AD5E-1AB3C37BD754}.Debug|x86.Build.0 = Debug|Win32
+		{DD59CAD3-3B6F-4D38-AD5E-1AB3C37BD754}.Release|x64.ActiveCfg = Release|x64
+		{DD59CAD3-3B6F-4D38-AD5E-1AB3C37BD754}.Release|x64.Build.0 = Release|x64
+		{DD59CAD3-3B6F-4D38-AD5E-1AB3C37BD754}.Release|x86.ActiveCfg = Release|Win32
+		{DD59CAD3-3B6F-4D38-AD5E-1AB3C37BD754}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -19,11 +19,11 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\Source\SHTool\Main.cpp" />
-    <ClCompile Include="..\..\..\Source\SHTool\SHProjector.cpp" />
+    <ClCompile Include="..\..\..\Source\Tools\SH\Main.cpp" />
+    <ClCompile Include="..\..\..\Source\Tools\SH\SHProjector.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\Source\SHTool\SHProjector.h" />
+    <ClInclude Include="..\..\..\Source\Tools\SH\SHProjector.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

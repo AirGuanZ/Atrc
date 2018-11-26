@@ -1,4 +1,4 @@
-#include <iostream>
+﻿#include <iostream>
 
 #include "ObjMgr/ObjectManager.h"
 #include "SHProjector.h"
@@ -63,7 +63,7 @@ bool SaveProjectedEntity(const Str8 &filename, const RenderTarget *renderTargets
     std::ofstream fout(filename.ToPlatformString());
     if(!fout)
         return false;
-    AGZ::BinaryOStreamSerializer serializer(fout);
+    BinaryOStreamSerializer serializer(fout);
     for(int i = 0; i < 9; ++i)
         serializer.Serialize(renderTargets[i]);
     return serializer.Ok();

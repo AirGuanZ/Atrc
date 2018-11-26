@@ -61,9 +61,9 @@ struct Params
 {
     Str8 cubeTexFolder;
     Str8 cubeTexExt;
-    int spp;
-    uint32_t outputSize;
-    int workerCount;
+    int spp             = 1;
+    uint32_t outputSize = 256;
+    int workerCount     = -1;
     Str8 outputFilename;
 };
 
@@ -123,9 +123,9 @@ int main(int argc, char *argv[])
             return 0;
         }
 
-        int spp             = Str8(argv[3]).Parse<int>();
-        uint32_t outputSize = Str8(argv[4]).Parse<uint32_t>();
-        int workerCount     = Str8(argv[5]).Parse<int>();
+        auto spp         = Str8(argv[3]).Parse<int>();
+        auto outputSize  = Str8(argv[4]).Parse<uint32_t>();
+        auto workerCount = Str8(argv[5]).Parse<int>();
 
         if(spp <= 0)
         {
