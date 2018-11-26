@@ -9,7 +9,7 @@ camera = {
 };
 
 # Image properties
-output = { filename = "./Build/sh_entity1.png"; width = 640; height = 480; };
+output = { filename = "./Build/sh_entity.output"; width = 640; height = 480; };
 
 spp = 10;
 N   = 10;

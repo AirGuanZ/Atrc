@@ -49,20 +49,15 @@ int main(int argc, char *argv[])
     }
 }
 
-/* 文件结构：
-    width:  uint32_t
-    height: uint32_t
-    {
-        {
-            {
-                Spectrum: float * 3
-            } * width
-        } * height
-    } * 9
- */
-bool SaveProjectedEntity([[maybe_unused]] const Str8 &filename, [[maybe_unused]] const RenderTarget *renderTargets)
+bool SaveProjectedEntity(const Str8 &filename, [[maybe_unused]] const RenderTarget *renderTargets)
 {
-    // TODO
+    std::ofstream fout(filename.ToPlatformString());
+    if(!fout)
+        return false;
+    AGZ::BinaryOStreamSerializer serializer(fout);
+    for(int i = 0; i < 9; ++i)
+        serializer.Serialize(renderTargets[i]);
+    return serializer.Ok();
 }
 
 void ProjectEntity(const Str8 &descFilename)
