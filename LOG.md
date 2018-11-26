@@ -59,7 +59,7 @@ wi和wo混乱不堪，面对非对称BSDF太烧脑
 
 本来是想写个GPU加速的BVH的，但是装了CUDA过后只要写的cu代码一有什么问题，直接死机，我觉得这样下去我是调不出来的，所以暂且放下吧。
 
-尽管如此，还是死怼了一番性能，大幅优化了BVH求交速度——其实就是消除了关键路径上的一个分支，效果好得出乎我的意料了——即使是在profiler的帮助下，你永远也想不到代码的性能瓶颈在哪。
+尽管如此，还是死怼了一番性能，大幅优化了BVH求交速度——其实就是消除了关键路径上的一个分支，效果好得出乎我的意料了——即使是在profiler的帮助下，你也未必能发现代码的性能瓶颈在哪。
 
 Wait，说好的介质渲染呢？我白天推导了一番带介质的path tracer的估计量，只是还没动手写代码。
 
@@ -145,6 +145,9 @@ Environment Mapping done！不过Cube Map用起来有点蛋疼，每次都要去
 
 ## 2018.11.26
 
-玩成了EntityProjector、LightProjector以及EntityRenderer，3阶球谐函数的重建结果意外地很不错。
+完成了EntityProjector、LightProjector以及EntityRenderer，3阶球谐函数的重建效果意外地很不错。
 
+整理了项目文件结构——把SHTool重命名为SH，并将其代码挪动到/Source/Tools中。
+
+新建项目C2S，用来把立方环境贴图转换成球面环境贴图。
 

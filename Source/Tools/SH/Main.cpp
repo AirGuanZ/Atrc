@@ -27,30 +27,21 @@ int main(int argc, char *argv[])
             return 0;
         }
         
-        if(argv[1] == Str8("project_entity"))
+        if(argv[1] == Str8("project_entity") && argc == 3)
         {
-            if(argc == 3)
-                ProjectEntity(argv[2]);
-            else
-                cout << USAGE_MSG << endl;
+            ProjectEntity(argv[2]);
             return 0;
         }
 
-        if(argv[1] == Str8("project_light"))
+        if(argv[1] == Str8("project_light") && argc == 3)
         {
-            if(argc == 3)
-                ProjectLight(argv[2]);
-            else
-                cout << USAGE_MSG << endl;
+            ProjectLight(argv[2]);
             return 0;
         }
 
-        if(argv[1] == Str8("render_entity"))
+        if(argv[1] == Str8("render_entity") && argc == 5)
         {
-            if(argc == 5)
-                RenderEntity(argv[2], argv[3], argv[4]);
-            else
-                cout << USAGE_MSG << endl;
+            RenderEntity(argv[2], argv[3], argv[4]);
             return 0;
         }
         

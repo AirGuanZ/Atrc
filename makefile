@@ -34,11 +34,11 @@ run$(1) :
 	make $(1)
 	$$($(2))
 
-$(2)$(CPP_SUFFIX) = $$(shell find ./Source/$(1)/ -name "*.cpp")
+$(2)$(CPP_SUFFIX) = $$(shell find ./Source/$(3)/ -name "*.cpp")
 $(2)$(O_SUFFIX) = $$(patsubst %.cpp, %.o, $$($(2)$(CPP_SUFFIX)))
 $(2)$(D_SUFFIX) = $$(patsubst %.cpp, %.d, $$($(2)$(CPP_SUFFIX)))
 
-$$($(2)) : $$($(2)$(O_SUFFIX)) $$(ATRC)
+$$($(2)) :$$($(2)$(O_SUFFIX)) $$(ATRC) 
 	$$(CPPC) $(CPPC_FLAGS) $(LD_FLAGS) $$^ -o $$@
 
 $$($(2)$(O_SUFFIX)) : %.o : %.cpp
@@ -72,8 +72,12 @@ $(DPP_FILES) : %.d : %.cpp
 
 -include $(DPP_FILES)
 
-$(eval $(call add_target,Launcher,LAUNCHER))
-$(eval $(call add_target,SHTool,SHTOOL))
+# The main renderer launcher
+$(eval $(call add_target,Launcher,LAUNCHER,Launcher))
+# Sphere harmonics projector and reconstructor
+$(eval $(call add_target,SH,SH,Tools/SH))
+# Cube map to sphere map
+$(eval $(call add_target,C2S,C2s,Tools/C2S))
 
 .PHONY : clean
 clean :
