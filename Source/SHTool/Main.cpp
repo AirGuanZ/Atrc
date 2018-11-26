@@ -62,7 +62,7 @@ int main(int argc, char *argv[])
  */
 bool SaveProjectedEntity([[maybe_unused]] const Str8 &filename, [[maybe_unused]] const RenderTarget *renderTargets)
 {
-    
+    // TODO
 }
 
 void ProjectEntity(const Str8 &descFilename)
