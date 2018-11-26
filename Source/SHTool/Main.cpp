@@ -15,6 +15,7 @@ R"___(Usage:
     shtool render_light   [light_project_result] (-o [output_filename]))___";
 
 void ProjectEntity(const Str8 &descFilename);
+void ProjectLight(const Str8 &descFilename);
 
 int main(int argc, char *argv[])
 {
@@ -33,6 +34,20 @@ int main(int argc, char *argv[])
                 Str8 descFilename(argv[2]);
                 ProjectEntity(descFilename);
             }
+            else
+                cout << USAGE_MSG << endl;
+            return 0;
+        }
+
+        if(argv[1] == Str8("project_light"))
+        {
+            if(argc == 3)
+            {
+                Str8 descFilename(argv[2]);
+                ProjectLight(descFilename);
+            }
+            else
+                cout << USAGE_MSG << endl;
             return 0;
         }
         
@@ -49,7 +64,7 @@ int main(int argc, char *argv[])
     }
 }
 
-bool SaveProjectedEntity(const Str8 &filename, [[maybe_unused]] const RenderTarget *renderTargets)
+bool SaveProjectedEntity(const Str8 &filename, const RenderTarget *renderTargets)
 {
     std::ofstream fout(filename.ToPlatformString());
     if(!fout)
@@ -116,5 +131,46 @@ void ProjectEntity(const Str8 &descFilename)
     renderer.Render(subareaRenderer, scene, renderTargets.data(), &reporter);
 
     if(!SaveProjectedEntity(filename, renderTargets.data()))
+        cout << "Failed to save rendered coefficients into " << filename.ToStdString() << endl;
+}
+
+bool SaveProjectedLight(const Str8 &filename, const Spectrum *output)
+{
+    std::ofstream fout(filename.ToPlatformString());
+    if(!fout)
+        return false;
+    AGZ::BinaryOStreamSerializer serializer(fout);
+    for(int i = 0; i < 9; ++i)
+        serializer.Serialize(output[i]);
+    return serializer.Ok();
+}
+
+void ProjectLight(const Str8 &descFilename)
+{
+    Config configFile;
+    if(!configFile.LoadFromFile(descFilename))
+    {
+        cout << "Failed to load configuration from: " << descFilename.ToStdString() << endl;
+        return;
+    }
+
+    auto &conf = configFile.Root();
+    ObjArena<> arena;
+
+    ObjMgr::InitializeObjectManagers();
+    ObjMgr::InitializePublicObjects(conf, arena);
+
+    auto filename = conf["outputFilename"].AsValue();
+    auto N = conf["N"].AsValue().Parse<int>();
+    
+    if(N <= 0)
+        throw ObjMgr::SceneInitializationException("Invalid N value");
+    
+    auto light = ObjMgr::GetSceneObject<Light>(conf, arena);
+
+    Spectrum output[9];
+    SHLightProjector::Project(light, N, output);
+
+    if(!SaveProjectedLight(filename, output))
         cout << "Failed to save rendered coefficients into " << filename.ToStdString() << endl;
 }
