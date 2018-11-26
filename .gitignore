@@ -2,8 +2,10 @@
 *.o
 *.a
 *.dtmp
+*.tmp
 Build/Launcher
-Build/SHTool
+Build/SH
+Build/C2S
 
 *.TMP
 .vscode/

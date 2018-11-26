@@ -8,9 +8,9 @@ using namespace std;
 
 const char *USAGE_MSG =
 R"___(Usage:
-    C2S [cube_texture_folder] [file_extension] spp sidelen [output_filename]
+    C2S [cube_texture_folder] [file_extension] spp outputSize workerCount [output_filename]
 Example:
-    C2S ./CubeTextures/ jpg 1000 256 ./Output.png)___";
+    C2S ./CubeTextures/ jpg 1000 256 4 ./Output.png)___";
 
 bool LoadCubeTextures(const Str8 &foldername, const Str8 &ext, Texture2D<Spectrum> *texs)
 {
@@ -57,51 +57,106 @@ Texture2D<Color3b> ToSavedImage(const RenderTarget &origin)
     });
 }
 
+struct Params
+{
+    Str8 cubeTexFolder;
+    Str8 cubeTexExt;
+    int spp;
+    uint32_t outputSize;
+    int workerCount;
+    Str8 outputFilename;
+};
+
+int Run(const Params &params)
+{
+    Texture2D<Spectrum> cubeTexs[6];
+    if(!LoadCubeTextures(params.cubeTexFolder, params.cubeTexExt, cubeTexs))
+    {
+        cout << "Failed to load cube environment textures from: "
+             << params.cubeTexFolder.ToStdString() << endl;
+        return -1;
+    }
+    
+    Texture2D<Spectrum> output(params.outputSize, params.outputSize);
+
+    Real xyUnit = Real(1) / params.outputSize;
+
+    struct Rect { uint32_t xBegin, xEnd, yBegin, yEnd; };
+    std::queue<Rect> tasks;
+
+    for(uint32_t y = 0; y < params.outputSize; ++y)
+        tasks.push({ 0, params.outputSize, y, y + 1 });
+    
+    StaticTaskDispatcher<Rect, NoSharedParam_t> dispatcher(params.workerCount);
+    dispatcher.Run([&](const Rect &rect, NoSharedParam_t)
+    {
+        for(uint32_t y = rect.yBegin; y < rect.yEnd; ++y)
+        {
+            auto yBase = Real(y) / params.outputSize;
+            for(uint32_t x = rect.xBegin; x < rect.xEnd; ++x)
+            {
+                Spectrum pixel;
+                auto xBase = Real(x) / params.outputSize;
+                for(int i = 0; i < params.spp; ++i)
+                {
+                    Real u = xBase + Math::Random::Uniform(Real(0), xyUnit);
+                    Real v = yBase + Math::Random::Uniform(Real(0), xyUnit);
+                    pixel += SampleCubeTextures(cubeTexs, SphereMapper<Real>::InvMap({ u, v }));
+                }
+                output(x, y) = pixel / params.spp;
+            }
+        }
+    }, NO_SHARED_PARAM, tasks);
+
+    TextureFile::WriteRGBToPNG(params.outputFilename.ToStdWString(), ToSavedImage(output));
+
+    return 0;
+}
+
 int main(int argc, char *argv[])
 {
-    if(argc != 6)
+    try
     {
-        cout << USAGE_MSG << endl;
-        return 0;
-    }
-
-    Texture2D<Spectrum> cubeTexs[6];
-    if(!LoadCubeTextures(argv[1], argv[2], cubeTexs))
-    {
-        cout << "Failed to load cube environment textures from: " << argv[1] << endl;
-        return -1;
-    }
-
-    int spp = Str8(argv[3]).Parse<int>();
-    if(spp <= 0)
-    {
-        cout << "Invalid spp valid" << endl;
-        return -1;
-    }
-
-    uint32_t sidelen = Str8(argv[4]).Parse<uint32_t>();
-    Texture2D<Spectrum> output(sidelen, sidelen);
-
-    Real xyUnit = Real(1) / sidelen;
-
-    for(uint32_t y = 0; y < sidelen; ++y)
-    {
-        auto yBase = Real(y) / sidelen;
-        for(uint32_t x = 0; x < sidelen; ++x)
+        if(argc != 7)
         {
-            Spectrum pixel;
-            auto xBase = Real(x) / sidelen;
-            for(int i = 0; i < spp; ++i)
-            {
-                Real u = xBase + Math::Random::Uniform(Real(0), xyUnit);
-                Real v = yBase + Math::Random::Uniform(Real(0), xyUnit);
-                pixel += SampleCubeTextures(cubeTexs, SphereMapper<Real>::InvMap({ u, v }));
-            }
-            output(x, y) = pixel / spp;
+            cout << USAGE_MSG << endl;
+            return 0;
         }
-    }
 
-    TextureFile::WriteRGBToPNG(argv[5], ToSavedImage(output));
+        int spp             = Str8(argv[3]).Parse<int>();
+        uint32_t outputSize = Str8(argv[4]).Parse<uint32_t>();
+        int workerCount     = Str8(argv[5]).Parse<int>();
+
+        if(spp <= 0)
+        {
+            cout << "Invalid spp valid" << endl;
+            return -1;
+        }
+
+        if(outputSize <= 0)
+        {
+            cout << "Invalid output size" << endl;
+            return -1;
+        }
+
+        Params params;
+        params.cubeTexFolder  = argv[1];
+        params.cubeTexExt     = argv[2];
+        params.spp            = spp;
+        params.outputSize     = outputSize;
+        params.workerCount    = workerCount;
+        params.outputFilename = argv[6];
+
+        return Run(params);
+    }
+    catch(const std::exception &err)
+    {
+        cout << err.what() << endl;
+    }
+    catch(...)
+    {
+        cout << "An unknown error occurred..." << endl;
+    }
 
     return 0;
 }
