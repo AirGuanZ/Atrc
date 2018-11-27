@@ -56,7 +56,7 @@ $$($(2)$(D_SUFFIX)) : %.d : %.cpp
 ALL_OPP_FILES += $$($(2)$(O_SUFFIX))
 ALL_DPP_FILES += $$($(2)$(D_SUFFIX))
 
-TARGETS += $(1)
+TARGETS += ./Build/$(1)
 
 endef
 

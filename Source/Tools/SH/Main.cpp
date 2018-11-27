@@ -11,11 +11,11 @@ const char *USAGE_MSG =
 R"___(Usage:
     shtool project_entity [entity_desc_filename]
     shtool project_light  [light_desc_filename]
-    shtool render_entity  [entity_project_result] [light_project_result] [output_filename])___";
+    shtool render_entity  [entity_project_result] [light_project_result] light_rotate_z_deg [output_filename])___";
 
 void ProjectEntity(const Str8 &descFilename);
 void ProjectLight(const Str8 &descFilename);
-void RenderEntity(const Str8 &ent, const Str8 &light, const Str8 &output);
+void RenderEntity(const Str8 &ent, const Str8 &light, Math::Radf lightRotateZ, const Str8 &output);
 
 int main(int argc, char *argv[])
 {
@@ -39,9 +39,9 @@ int main(int argc, char *argv[])
             return 0;
         }
 
-        if(argv[1] == Str8("render_entity") && argc == 5)
+        if(argv[1] == Str8("render_entity") && argc == 6)
         {
-            RenderEntity(argv[2], argv[3], argv[4]);
+            RenderEntity(argv[2], argv[3], Math::Degf(Str8(argv[4]).Parse<float>()), argv[5]);
             return 0;
         }
         
@@ -212,7 +212,7 @@ Texture2D<Color3b> ToSavedImage(const RenderTarget &origin)
     });
 }
 
-void RenderEntity(const Str8 &ent, const Str8 &light, const Str8 &output)
+void RenderEntity(const Str8 &ent, const Str8 &light, Math::Radf lightRotateZ, const Str8 &output)
 {
     RenderTarget projectedEntity[9];
     Spectrum projectedLight[9];
@@ -227,6 +227,33 @@ void RenderEntity(const Str8 &ent, const Str8 &light, const Str8 &output)
     {
         cout << "Failed to load projected light info from: " << light.ToStdString() << endl;
         return;
+    }
+
+    float projectedLightR[9], projectedLightG[9], projectedLightB[9];
+    for(int i = 0; i < 9; ++i)
+    {
+        projectedLightR[i] = projectedLight[i].r;
+        projectedLightG[i] = projectedLight[i].g;
+        projectedLightB[i] = projectedLight[i].b;
+    }
+
+    auto M = Math::Mat3f::RotateZ(lightRotateZ);
+    
+    Math::RotateSH_L0(M, &projectedLightR[0]);
+    Math::RotateSH_L0(M, &projectedLightG[0]);
+    Math::RotateSH_L0(M, &projectedLightB[0]);
+    Math::RotateSH_L1(M, &projectedLightR[1]);
+    Math::RotateSH_L1(M, &projectedLightG[1]);
+    Math::RotateSH_L1(M, &projectedLightB[1]);
+    Math::RotateSH_L2(M, &projectedLightR[4]);
+    Math::RotateSH_L2(M, &projectedLightG[4]);
+    Math::RotateSH_L2(M, &projectedLightB[4]);
+
+    for(int i = 0; i < 9; ++i)
+    {
+        projectedLight[i].r = projectedLightR[i];
+        projectedLight[i].g = projectedLightG[i];
+        projectedLight[i].b = projectedLightB[i];
     }
 
     RenderTarget rt(projectedEntity[0].GetWidth(), projectedEntity[0].GetHeight());
