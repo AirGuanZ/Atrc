@@ -154,3 +154,5 @@ Environment Mapping done！不过Cube Map用起来有点蛋疼，每次都要去
 ## 2018.11.27
 
 实现了SH系数旋转。
+
+晚上发现在Ubuntu上跑得好好的根据SH系数重建图像的程序在Windows上无法加载保存好的SH系数。调了一个多小时，发现是因为保存和加载文件的时候没有加`std::ios::binary`，Fuck！

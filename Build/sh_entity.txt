@@ -11,8 +11,8 @@ camera = {
 # Image properties
 output = { filename = "./Build/sh_entity.output"; width = 600; height = 900; };
 
-spp = 100;
-N   = 10;
+spp = 1;
+N   = 1;
 
 workerCount = -1;
 

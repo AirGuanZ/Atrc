@@ -60,7 +60,7 @@ int main(int argc, char *argv[])
 
 bool SaveProjectedEntity(const Str8 &filename, const RenderTarget *renderTargets)
 {
-    std::ofstream fout(filename.ToPlatformString());
+    std::ofstream fout(filename.ToPlatformString(), std::ios::binary | std::ios::trunc);
     if(!fout)
         return false;
     BinaryOStreamSerializer serializer(fout);
@@ -130,10 +130,10 @@ void ProjectEntity(const Str8 &descFilename)
 
 bool SaveProjectedLight(const Str8 &filename, const Spectrum *output)
 {
-    std::ofstream fout(filename.ToPlatformString());
+    std::ofstream fout(filename.ToPlatformString(), std::ios::binary | std::ios::trunc);
     if(!fout)
         return false;
-    AGZ::BinaryOStreamSerializer serializer(fout);
+    BinaryOStreamSerializer serializer(fout);
     for(int i = 0; i < 9; ++i)
         serializer.Serialize(output[i]);
     return serializer.Ok();
@@ -171,33 +171,29 @@ void ProjectLight(const Str8 &descFilename)
 
 bool LoadProjectedEntity(const Str8 &filename, RenderTarget *renderTargets)
 {
-    std::ifstream fin(filename.ToPlatformString());
+    std::ifstream fin(filename.ToPlatformString(), std::ios::binary);
     if(!fin)
         return false;
-
-    AGZ::BinaryIStreamDeserializer deserializer(fin);
+    BinaryIStreamDeserializer deserializer(fin);
     for(int i = 0; i < 9; ++i)
     {
         if(!deserializer.Deserialize(renderTargets[i]))
             return false;
     }
-
     return true;
 }
 
 bool LoadProjectedLight(const Str8 &filename, Spectrum *output)
 {
-    std::ifstream fin(filename.ToPlatformString());
+    std::ifstream fin(filename.ToPlatformString(), std::ios::binary);
     if(!fin)
         return false;
-
-    AGZ::BinaryIStreamDeserializer deserializer(fin);
+    BinaryIStreamDeserializer deserializer(fin);
     for(int i = 0; i < 9; ++i)
     {
         if(!deserializer.Deserialize(output[i]))
             return false;
     }
-
     return true;
 }
 

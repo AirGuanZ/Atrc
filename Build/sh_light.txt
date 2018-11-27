@@ -2,11 +2,6 @@ outputFilename = "./Build/sh_light.output";
 N = 10000;
 
 light = {
-    type = CubeEnvironmentLight;
-    posX = "./Assets/RightLight/front.jpg";
-    posY = "./Assets/RightLight/left.jpg";
-    posZ = "./Assets/RightLight/up.jpg";
-    negX = "./Assets/RightLight/back.jpg";
-    negY = "./Assets/RightLight/right.jpg";
-    negZ = "./Assets/RightLight/down.jpg";
+    type = SphereEnvironmentLight;
+    tex = "./Assets/RightLight.png";
 };
