@@ -19,7 +19,7 @@ Option<BxDFSampleWiResult> BxDFScaler::SampleWi(const Vec3 &wo) const
     Option<BxDFSampleWiResult> ret = bxdf_->SampleWi(wo);
     if(ret)
         ret->coef *= scale_;
-    return ret;
+    return Some(*ret);
 }
 
 Real BxDFScaler::SampleWiPDF(const Vec3 &wi, const Vec3 &wo) const

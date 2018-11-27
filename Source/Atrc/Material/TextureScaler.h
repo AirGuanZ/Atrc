@@ -84,7 +84,7 @@ class TextureScaler : public Material, public SampleStrategy
             auto ret = bsdf_->SampleWi(wo, type);
             if(ret)
                 ret->coef *= scale_;
-            return ret;
+            return Some(*ret);
         }
 
         Real SampleWiPDF(const Vec3 &wi, const Vec3 &wo, BxDFType type) const override

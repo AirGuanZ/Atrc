@@ -1,4 +1,4 @@
-#include <Atrc/Material/BxDFAggregate.h>
+ï»¿#include <Atrc/Material/BxDFAggregate.h>
 
 AGZ_NS_BEG(Atrc)
 
@@ -30,7 +30,7 @@ Spectrum BxDFAggregate::Eval(const Vec3 &wi, const Vec3 &wo, BxDFType type) cons
 
 Option<BSDFSampleWiResult> BxDFAggregate::SampleWi(const Vec3 &wo, BxDFType type) const
 {
-    // ÓĞ¶àÉÙtype¶ÔµÃÉÏµÄbxdf
+    // æœ‰å¤šå°‘typeå¯¹å¾—ä¸Šçš„bxdf
 
     size_t nMatched = 0;
     for(size_t i = 0; i < bxdfCnt_; ++i)
@@ -38,7 +38,7 @@ Option<BSDFSampleWiResult> BxDFAggregate::SampleWi(const Vec3 &wo, BxDFType type
     if(!nMatched)
         return None;
 
-    // ´ÓÀïÃæÑ¡³öÒ»¸ö£¬ÓÃÀ´²ÉÑù
+    // ä»é‡Œé¢é€‰å‡ºä¸€ä¸ªï¼Œç”¨æ¥é‡‡æ ·
 
     const BxDF *bxdf = nullptr;
     auto dstIdx = AGZ::Math::Random::Uniform<size_t>(0, nMatched - 1);
@@ -51,22 +51,22 @@ Option<BSDFSampleWiResult> BxDFAggregate::SampleWi(const Vec3 &wo, BxDFType type
         }
     }
 
-    // ²ÉÑù¸Ãbxdf
+    // é‡‡æ ·è¯¥bxdf
 
     Vec3 lwo = shadingLocal_.World2Local(wo);
     auto ret = bxdf->SampleWi(lwo);
     if(!ret)
         return None;
 
-    // Èç¹ûÕâÊÇ¸öspecular£¬ÄÇÃ´coefºÍpdf¶¼¸½´øÁËdelta£¬´ËÊ±°Ñ±ğµÄbxdfËã½øÀ´Ã»ÓĞÒâÒå
+    // å¦‚æœè¿™æ˜¯ä¸ªspecularï¼Œé‚£ä¹ˆcoefå’Œpdféƒ½é™„å¸¦äº†deltaï¼Œæ­¤æ—¶æŠŠåˆ«çš„bxdfç®—è¿›æ¥æ²¡æœ‰æ„ä¹‰
     if(ret->type & BXDF_SPECULAR || nMatched <= 1)
     {
         ret->pdf /= nMatched;
         ret->wi = shadingLocal_.Local2World(ret->wi);
-        return ret;
+        return Some(*ret);
     }
 
-    // ×ÛºÏ¿¼ÂÇËùÓĞÀàĞÍ¶ÔµÃÉÏµÄbxdfµÄÒâ¼û
+    // ç»¼åˆè€ƒè™‘æ‰€æœ‰ç±»å‹å¯¹å¾—ä¸Šçš„bxdfçš„æ„è§
     for(size_t i = 0; i < bxdfCnt_; ++i)
     {
         if(bxdfs_[i]->MatchType(type) && bxdfs_[i] != bxdf)
@@ -78,7 +78,7 @@ Option<BSDFSampleWiResult> BxDFAggregate::SampleWi(const Vec3 &wo, BxDFType type
 
     ret->pdf /= nMatched;
     ret->wi = shadingLocal_.Local2World(ret->wi);
-    return ret;
+    return Some(*ret);
 }
 
 Real BxDFAggregate::SampleWiPDF(const Vec3 &wi, const Vec3 &wo, BxDFType type) const
