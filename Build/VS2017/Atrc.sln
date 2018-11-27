@@ -23,6 +23,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SHTool", "SHTool\SHTool.vcx
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "C2S", "C2S\C2S.vcxproj", "{DD59CAD3-3B6F-4D38-AD5E-1AB3C37BD754}"
+	ProjectSection(ProjectDependencies) = postProject
+		{ED1F930B-E133-4017-9CD8-9DD9AF8666EF} = {ED1F930B-E133-4017-9CD8-9DD9AF8666EF}
+		{871D9783-674C-48E8-AC73-65E8F44B4894} = {871D9783-674C-48E8-AC73-65E8F44B4894}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
