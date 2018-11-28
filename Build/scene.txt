@@ -2,13 +2,13 @@
 integrator = { type = PathTracer; maxDepth = 50; };
 
 # Renderer
-renderer = { type = ParallelRenderer; workerCount = 11; };
+renderer = { type = ParallelRenderer; workerCount = 6; };
 
 # SubareaRenderer
-subareaRenderer = { type = JitteredSubareaRenderer; spp = 1; };
+subareaRenderer = { type = JitteredSubareaRenderer; spp = 10; };
 
 # Image properties
-output = { filename = "./Build/Output.png"; width = 3840; height = 2160; };
+output = { filename = "./Build/Output.png"; width = 640; height = 480; };
 
 # Progress reporter
 reporter = { type = Default; };
@@ -16,7 +16,7 @@ reporter = { type = Default; };
 # Camera
 camera = {
     type = Perspective;
-    aspectRatio = 1.77777778;
+    aspectRatio = 1.333333333;
     eye  = (-7, 0, 0);
     dst  = (0, 0, 1.5);
     up   = (0, 0, 1);

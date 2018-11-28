@@ -33,11 +33,10 @@ Atrc::Geometry *TriangleBVHCreator::Create(const ConfigGroup &params, ObjArena<>
             AGZ::FileSys::BinaryFileCache::AutoCacheName(path),
             [&](AGZ::BinarySerializer &s) // cache builder
             {
-                s.Serialize(AGZ::FileSys::File::GetLastWriteTime(path));
+                s.Serialize(*AGZ::FileSys::File::GetLastWriteTime(path));
 
                 AGZ::Model::WavefrontObj objs;
-                if(!AGZ::Model::WavefrontObjFile::LoadFromObjFile(
-                    path.ToStdWString(), &objs))
+                if(!AGZ::Model::WavefrontObjFile::LoadFromObjFile(path, &objs))
                 {
                     throw SceneInitializationException(
                         "Failed to load obj model from " + path);
@@ -61,16 +60,7 @@ Atrc::Geometry *TriangleBVHCreator::Create(const ConfigGroup &params, ObjArena<>
                 d.Deserialize(*ret);
                 return ret;
             });
-        // AGZ::Model::WavefrontObj objs;
-        // if(!AGZ::Model::WavefrontObjFile::LoadFromObjFile(
-        //     path.ToStdWString(), &objs))
-        // {
-        //     throw SceneInitializationException(
-        //         "Failed to load obj model from " + path);
-        // }
-// 
-        // auto newCore = arena.Create<Atrc::TriangleBVHCore>(
-        //     objs.ToGeometryMeshGroup().MergeAllSubmeshes());
+
         path2Core_[path] = newCore;
         core = newCore;
     }

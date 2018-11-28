@@ -264,5 +264,5 @@ void RenderEntity(const Str8 &ent, const Str8 &light, Math::Radf lightRotateZ, c
         }
     }
 
-    TextureFile::WriteRGBToPNG(output.ToStdWString(), ToSavedImage(rt));
+    TextureFile::WriteRGBToPNG(output, ToSavedImage(rt));
 }

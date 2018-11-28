@@ -81,7 +81,7 @@ int Run(const Str8 &sceneDescFilename)
     renderer->Render(*subareaRenderer, sceneMgr.GetScene(), *integrator, &renderTarget, reporter);
 
     postProcessor.Process(renderTarget);
-    TextureFile::WriteRGBToPNG(filename.ToStdWString(), ToSavedImage(renderTarget));
+    TextureFile::WriteRGBToPNG(filename, ToSavedImage(renderTarget));
 
     return 0;
 }

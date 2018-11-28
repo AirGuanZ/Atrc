@@ -12,7 +12,7 @@ const AGZ::Texture2D<Atrc::Spectrum> *TextureManager::Load(const Str8 &filename)
     {
         auto tex = arena_.Create<AGZ::Texture2D<Atrc::Spectrum>>();
         *tex = AGZ::Texture2D<Atrc::Spectrum>(
-            AGZ::TextureFile::LoadRGBFromFile(filename.ToStdWString()).Map(
+            AGZ::TextureFile::LoadRGBFromFile(filename).Map(
                 [](const auto &c) { return c.Map([](uint8_t b) { return b / 255.0f; }); }));
         path2Tex_[filename] = tex;
         return tex;

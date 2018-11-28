@@ -29,7 +29,7 @@ public:
     struct Internal
     {
         AABB bound;
-        uint32_t rightChild;
+        uint32_t rightChild = 0;
 
         IMPL_MEMCPY_SERIALIZE
         IMPL_MEMCPY_DESERIALIZE

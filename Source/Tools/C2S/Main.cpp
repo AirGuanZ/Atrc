@@ -19,7 +19,7 @@ bool LoadCubeTextures(const Str8 &foldername, const Str8 &ext, Texture2D<Spectru
         auto load = [](Texture2D<Spectrum> &tex, const FileSys::Path8 &filename)
         {
             tex = Texture2D<Spectrum>(
-            TextureFile::LoadRGBFromFile(filename.ToStr().ToStdWString()).Map(
+            TextureFile::LoadRGBFromFile(filename.ToStr()).Map(
                 [](const auto &c) { return c.Map([](uint8_t b) { return b / 255.0f; }); }));
         };
 
@@ -108,7 +108,7 @@ int Run(const Params &params)
         }
     }, NO_SHARED_PARAM, tasks);
 
-    TextureFile::WriteRGBToPNG(params.outputFilename.ToStdWString(), ToSavedImage(output));
+    TextureFile::WriteRGBToPNG(params.outputFilename, ToSavedImage(output));
 
     return 0;
 }
