@@ -156,3 +156,7 @@ Environment Mapping done！不过Cube Map用起来有点蛋疼，每次都要去
 实现了SH系数旋转。
 
 晚上发现在Ubuntu上跑得好好的根据SH系数重建图像的程序在Windows上无法加载保存好的SH系数。调了一个多小时，发现是因为保存和加载文件的时候没有加`std::ios::binary`，Fuck！
+
+## 2018.11.28
+
+在AGZ Utils中写了个比较通用的FileCache工具，以此在Atrc中添加了TriangleBVH的磁盘cache功能，大幅减小了渲染前的预处理时间。这东西调了我老久，最后居然是一个std::optional类型忘了解引用，心好累……
