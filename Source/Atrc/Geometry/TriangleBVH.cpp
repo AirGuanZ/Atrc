@@ -116,6 +116,28 @@ TriangleBVHCore::TriangleBVHCore(const AGZ::Model::GeometryMesh &mesh)
     }
 }
 
+TriangleBVHCore::TriangleBVHCore(TriangleBVHCore &&moveFrom) noexcept
+    : areaPrefixSum_(std::move(moveFrom.areaPrefixSum_)),
+      triangles_(std::move(moveFrom.triangles_)),
+      nodes_(std::move(moveFrom.nodes_))
+{
+
+}
+
+bool TriangleBVHCore::Serialize(AGZ::BinarySerializer &serializer) const
+{
+    return serializer.Serialize(areaPrefixSum_) &&
+           serializer.Serialize(triangles_) &&
+           serializer.Serialize(nodes_);
+}
+
+bool TriangleBVHCore::Deserialize(AGZ::BinaryDeserializer &deserializer)
+{
+    return deserializer.Deserialize(areaPrefixSum_) &&
+           deserializer.Deserialize(triangles_) &&
+           deserializer.Deserialize(nodes_);
+}
+
 constexpr int TVL_TASK_STACK_SIZE = 128;
 
 bool TriangleBVHCore::HasIntersection(const Ray &r) const

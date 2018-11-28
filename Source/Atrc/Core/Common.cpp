@@ -1,2 +1,2 @@
-#define AGZ_TEXTURE_FILE_IMPL
+#define AGZ_ALL_IMPL
 #include <Utils.h>

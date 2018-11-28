@@ -6,6 +6,7 @@
 Build/Launcher
 Build/SH
 Build/C2S
+.agz.cache/
 
 *.TMP
 .vscode/

@@ -30,6 +30,9 @@ public:
     {
         AABB bound;
         uint32_t rightChild;
+
+        IMPL_MEMCPY_SERIALIZE
+        IMPL_MEMCPY_DESERIALIZE
     };
 
     struct InternalTriangle
@@ -38,11 +41,23 @@ public:
         Vec3 nor;
         Vec2 tA, tB_tA, tC_tA;
         Real surfaceArea = 0.0;
+
+        IMPL_MEMCPY_SERIALIZE
+        IMPL_MEMCPY_DESERIALIZE
     };
+
+    // 创建一个空BVH，调用其Deserialize以外的任何成员函数都是非法的
+    TriangleBVHCore() = default;
 
     TriangleBVHCore(const Vertex *vertices, uint32_t triangleCount);
 
     explicit TriangleBVHCore(const AGZ::Model::GeometryMesh &mesh);
+
+    TriangleBVHCore(TriangleBVHCore &&moveFrom) noexcept;
+
+    bool Serialize(AGZ::BinarySerializer &serializer) const;
+
+    bool Deserialize(AGZ::BinaryDeserializer &deserializer);
 
     bool HasIntersection(const Ray &r) const;
 

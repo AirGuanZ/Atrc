@@ -29,16 +29,48 @@ Atrc::Geometry *TriangleBVHCreator::Create(const ConfigGroup &params, ObjArena<>
     auto it = path2Core_.find(path);
     if(it == path2Core_.end())
     {
-        AGZ::Model::WavefrontObj objs;
-        if(!AGZ::Model::WavefrontObjFile::LoadFromObjFile(
-            path.ToStdWString(), &objs))
-        {
-            throw SceneInitializationException(
-                "Failed to load obj model from " + path);
-        }
+        auto newCore = AGZ::FileSys::BinaryFileCache::Cache(
+            AGZ::FileSys::BinaryFileCache::AutoCacheName(path),
+            [&](AGZ::BinarySerializer &s) // cache builder
+            {
+                s.Serialize(AGZ::FileSys::File::GetLastWriteTime(path));
 
-        auto newCore = arena.Create<Atrc::TriangleBVHCore>(
-            objs.ToGeometryMeshGroup().MergeAllSubmeshes());
+                AGZ::Model::WavefrontObj objs;
+                if(!AGZ::Model::WavefrontObjFile::LoadFromObjFile(
+                    path.ToStdWString(), &objs))
+                {
+                    throw SceneInitializationException(
+                        "Failed to load obj model from " + path);
+                }
+
+                auto ret = arena.Create<Atrc::TriangleBVHCore>(
+                        objs.ToGeometryMeshGroup().MergeAllSubmeshes());
+                s.Serialize(*ret);
+
+                return ret;
+            },
+            [&](AGZ::BinaryDeserializer &d)
+            {
+                AGZ::FileSys::FileTime timeInCache;
+                d.Deserialize(timeInCache);
+                return timeInCache == AGZ::FileSys::File::GetLastWriteTime(path);
+            },
+            [&](AGZ::BinaryDeserializer &d)
+            {
+                auto ret = arena.Create<Atrc::TriangleBVHCore>();
+                d.Deserialize(*ret);
+                return ret;
+            });
+        // AGZ::Model::WavefrontObj objs;
+        // if(!AGZ::Model::WavefrontObjFile::LoadFromObjFile(
+        //     path.ToStdWString(), &objs))
+        // {
+        //     throw SceneInitializationException(
+        //         "Failed to load obj model from " + path);
+        // }
+// 
+        // auto newCore = arena.Create<Atrc::TriangleBVHCore>(
+        //     objs.ToGeometryMeshGroup().MergeAllSubmeshes());
         path2Core_[path] = newCore;
         core = newCore;
     }
