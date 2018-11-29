@@ -11,7 +11,7 @@ HomogeneousMedium::HomogeneousMedium(const Spectrum &sigmaA, const Spectrum &sig
 
 Spectrum HomogeneousMedium::Tr(const Vec3 &a, const Vec3 &b) const
 {
-    return (-sigmaT_ * float((a - b).Length())).Map(Exp<float>);
+    return (-sigmaT_ * float((a - b).Length())).Map<decltype(&Exp<float>)>(&Exp<float>);
 }
 
 Either<MediumSampleLsResult, Real> HomogeneousMedium::SampleLs(const Ray &r) const
@@ -28,7 +28,7 @@ Either<MediumSampleLsResult, Real> HomogeneousMedium::SampleLs(const Ray &r) con
     Real st = -Log_e(Rand()) / sigmaT_[sampleChannel];
     bool sampleMedium = st < tMax;
 
-    auto Tr = (-sigmaT_ * Min(st, tMax)).Map(Exp<Real>);
+    auto Tr = (-sigmaT_ * Min(st, tMax)).Map<decltype(&Exp<Real>)>(&Exp<Real>);
     auto density = sampleMedium ? (sigmaT_.Map(AGZ::TypeOpr::StaticCaster<Real, float>) * Tr) : Tr;
 
     Real pdf = 0.0;
