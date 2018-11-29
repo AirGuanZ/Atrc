@@ -1,7 +1,7 @@
 CPPC = clang++
 CPPC_INCLUDE_FLAGS = -I ./Source/ -I $(AGZ_UTILS_HOME)
-CPPC_FLAGS = $(CPPC_INCLUDE_FLAGS) -std=c++17 -stdlib=libc++ -Werror -Wall -Wextra -O2
-LD_FLAGS = -lpthread
+CPPC_FLAGS = $(CPPC_INCLUDE_FLAGS) -stdlib=libc++ -std=c++17 -Werror -Wall -Wextra -O2
+LD_FLAGS = -pthread
 
 TARGETS =
 
