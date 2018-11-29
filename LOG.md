@@ -163,7 +163,23 @@ Environment Mapping done！不过Cube Map用起来有点蛋疼，每次都要去
 
 ## 2018.11.29
 
-之前在ubuntu上用的编译器一直是clang++，今天尝试在g++7.3.0上通过编译。一开始是模板参数处无法推导出函数指针类型，我手动加上了。这也就算了，通过编译后在渲染时直接卡死，暂停+打断点一看，卧槽，卡在标准库随机数生成器内部出不来……告辞！
+之前在ubuntu上用的编译器一直是clang++，今天尝试在g++7.3.0上通过编译。一开始是模板参数处无法推导出函数指针类型，我手动加上了。这也就算了，通过编译后在渲染时直接卡死，暂停+打断点一看，卧槽，卡在标准库随机数生成器内部出不来……同样是使用libstdc++，clang++就不会出问题，真是奇怪了。
 
-同样是使用libstdc++，clang++就不会出问题，真是奇怪了。
+晚上继续调试，总结出来一个最小用例：
 
+```cpp
+#include <iostream>
+#include <random>
+template<typename Engine>
+struct EngineWrapper { Engine eng; };
+template<typename Engine>
+thread_local EngineWrapper<Engine> engineWrapper;
+int main()
+{
+    int s = std::uniform_int_distribution<int>(0, 1)(
+            engineWrapper<std::default_random_engine>.eng);
+    std::cout << s << std::endl;
+}
+```
+
+最后发现是gcc thread_local的bug，沃日，告辞！
