@@ -2,6 +2,8 @@
 
 #include <Atrc/Core/Core.h>
 
+using SubareaRect = Atrc::GridDivider<uint32_t>::Grid;
+
 class SHEntityProjector
 {
 public:
@@ -28,7 +30,7 @@ public:
 
     void Render(
         const Atrc::Scene &scene,
-        Atrc::RenderTarget *renderTarget, const Atrc::SubareaRect &area) const;
+        Atrc::RenderTarget *renderTarget, const SubareaRect &area) const;
 };
 
 class SHEntityRenderer

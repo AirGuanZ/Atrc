@@ -10,20 +10,13 @@ Atrc::ProgressReporter *DefaultProgressReporterCreator::Create([[maybe_unused]] 
 Atrc::Renderer *ParallelRendererCreator::Create(const ConfigGroup &params, ObjArena<> &arena) const
 {
     auto workerCount = params["workerCount"].AsValue().Parse<int32_t>();
-    return arena.Create<Atrc::ParallelRenderer>(workerCount);
-}
+    auto spp         = params["spp"].AsValue().Parse<uint32_t>();
+    auto integrator = GetSceneObject<Atrc::Integrator>(params["integrator"], arena);
 
-Atrc::Renderer *SerialRendererCreator::Create([[maybe_unused]] const ConfigGroup &params, ObjArena<> &arena) const
-{
-    return arena.Create<Atrc::SerialRenderer>();
-}
+    if(spp <= 0)
+        throw SceneInitializationException("Invalid spp value");
 
-Atrc::SubareaRenderer *JitteredSubareaRendererCreator::Create(const ConfigGroup &params, ObjArena<> &arena) const
-{
-    auto spp = params["spp"].AsValue().Parse<uint32_t>();
-    if(spp < 1)
-        throw SceneInitializationException("JitteredSubareaRendererCreator: invalid spp");
-    return arena.Create<Atrc::JitteredSubareaRenderer>(spp);
+    return arena.Create<Atrc::ParallelRenderer>(workerCount, spp, *integrator);
 }
 
 AGZ_NS_END(ObjMgr)

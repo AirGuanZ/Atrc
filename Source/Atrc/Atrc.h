@@ -36,12 +36,8 @@
 #include <Atrc/PostProcessor/ACESFilm.h>
 #include <Atrc/PostProcessor/GammaCorrector.h>
 
-#include <Atrc/Renderer/JitteredSubareaRenderer.h>
-
 #include <Atrc/Renderer/DefaultProgressReporter.h>
-
 #include <Atrc/Renderer/ParallelRenderer.h>
-#include <Atrc/Renderer/SerialRenderer.h>
 
 AGZ_NS_BEG(Atrc)
 

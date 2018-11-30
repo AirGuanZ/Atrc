@@ -124,16 +124,8 @@ void SHEntityRenderer::Render(
     const SHEntitySubareaRenderer &subareaRenderer, const Scene &scene,
     RenderTarget *output, ProgressReporter *reporter) const
 {
-    uint32_t w = output->GetWidth();
-    uint32_t h = output->GetHeight();
-
-    std::queue<SubareaRect> tasks;
-    uint32_t yStep = w >= 256 ? 1 : 512 / w;
-    uint32_t y = 0;
-    for(; y + yStep <= h; y += yStep)
-        tasks.push({ 0, w, y, y + yStep });
-    if(y < h)
-        tasks.push({ 0, w, y, h });
+    auto tasks = Atrc::GridDivider<uint32_t>::Divide(
+        { 0, output->GetWidth(), 0, output->GetHeight() }, 32, 32);
 
     if(reporter)
         reporter->Begin();

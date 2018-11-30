@@ -1,11 +1,13 @@
-# Integrator
-integrator = { type = PathTracer; maxDepth = 50; };
-
 # Renderer
-renderer = { type = ParallelRenderer; workerCount = 11; };
-
-# SubareaRenderer
-subareaRenderer = { type = JitteredSubareaRenderer; spp = 1; };
+renderer = {
+    type        = ParallelRenderer;
+    workerCount = 11;
+    spp         = 100;
+    integrator  = {
+        type     = PathTracer;
+        maxDepth = 50;
+    };
+};
 
 # Image properties
 output = { filename = "./Build/Output.png"; width = 640; height = 480; };
@@ -68,24 +70,6 @@ entities = (
         k = 0.2;
         roughness = 0.02;
     };
-#    material = {
-#        type      = FresnelSpecular;
-#        rc        = (0.9, 0.4, 0.2);
-#        fresnel = {
-#            type = FresnelDielectric;
-#            etaI = 1.0;
-#            etaT = 1.6;
-#        };
-#    };
-#    mediumInterface = {
-#        in = {
-#            type = Homogeneous;
-#            sigmaA = (7.0);
-#            sigmaS = (0.3);
-#            le = (0.0);
-#            g = 0.3;
-#        };
-#    };
 },
 {   # right cube
     type = GeometricEntity;

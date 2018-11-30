@@ -100,17 +100,9 @@ inline void InitializeObjectManagers()
     RendererCreator *RENDERER_CREATORS[] =
     {
         ParallelRendererCreator::GetInstancePtr(),
-        SerialRendererCreator  ::GetInstancePtr(),
     };
     for(auto c : RENDERER_CREATORS)
         RendererManager::GetInstance().AddCreator(c);
-
-    SubareaRendererCreator *SUBAREARENDERER_CREATORS[] =
-    {
-        JitteredSubareaRendererCreator::GetInstancePtr(),
-    };
-    for(auto c : SUBAREARENDERER_CREATORS)
-        SubareaRendererManager::GetInstance().AddCreator(c);
 }
 
 // 创建在params内公开定义的元素
@@ -124,7 +116,6 @@ inline void InitializePublicObjects(const AGZ::ConfigGroup &params, AGZ::ObjAren
     InitializePublicDefinition<Atrc::PostProcessStage>("pub_postprocessor", params, arena);
     InitializePublicDefinition<Atrc::Camera>          ("pub_camera",        params, arena);
     InitializePublicDefinition<Atrc::Integrator>      ("pub_integrator",    params, arena);
-    InitializePublicDefinition<Atrc::SubareaRenderer> ("pub_subrenderer",   params, arena);
     InitializePublicDefinition<Atrc::Renderer>        ("pub_renderer",      params, arena);
     InitializePublicDefinition<Atrc::ProgressReporter>("pub_reporter",      params, arena);
 }

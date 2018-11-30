@@ -66,8 +66,6 @@ int Run(const Str8 &sceneDescFilename)
     RenderTarget renderTarget(width, height);
 
     auto renderer        = GetSceneObject<Renderer>        (conf["renderer"],        arena);
-    auto subareaRenderer = GetSceneObject<SubareaRenderer> (conf["subareaRenderer"], arena);
-    auto integrator      = GetSceneObject<Integrator>      (conf["integrator"],      arena);
     auto reporter        = GetSceneObject<ProgressReporter>(conf["reporter"],        arena);
 
     PostProcessor postProcessor;
@@ -78,7 +76,7 @@ int Run(const Str8 &sceneDescFilename)
             postProcessor.AddStage(GetSceneObject<PostProcessStage>(arrPP[i], arena));
     }
 
-    renderer->Render(*subareaRenderer, sceneMgr.GetScene(), *integrator, &renderTarget, reporter);
+    renderer->Render(sceneMgr.GetScene(), &renderTarget, reporter);
 
     postProcessor.Process(renderTarget);
     TextureFile::WriteRGBToPNG(filename, ToSavedImage(renderTarget));
