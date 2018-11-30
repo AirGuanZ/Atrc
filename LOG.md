@@ -183,3 +183,8 @@ int main()
 ```
 
 最后发现是gcc thread_local的bug，沃日，告辞！
+
+## 2018.11.30
+
+要做BDPT，现有的Atrc在Core Interface上必须要做修改——我默认把任务调度策略和LTE求解策略分离了，但是BDPT中有类似Light Tracing的部分必须要访问整个Film。为此我把过去的Integrator、SubareaRenderer和Renderer三者合成了一个Renderer，过去的这三个组件现在变成了一个特殊的Renderer的实现。
+

@@ -29,14 +29,15 @@ Atrc::Geometry *TriangleBVHCreator::Create(const ConfigGroup &params, ObjArena<>
     auto it = path2Core_.find(path);
     if(it == path2Core_.end())
     {
+        auto cacheFilename = AGZ::FileSys::BinaryFileCache::AutoCacheName(path);
         auto newCore = AGZ::FileSys::BinaryFileCache::Cache(
-            AGZ::FileSys::BinaryFileCache::AutoCacheName(path),
+            cacheFilename,
             [&](AGZ::BinarySerializer &s) // cache builder
             {
                 s.Serialize(*AGZ::FileSys::File::GetLastWriteTime(path));
 
-                AGZ::Model::WavefrontObj objs;
-                if(!AGZ::Model::WavefrontObjFile::LoadFromObjFile(path, &objs))
+                AGZ::Model::WavefrontObj<Atrc::Real> objs;
+                if(!AGZ::Model::WavefrontObjFile<Atrc::Real>::LoadFromObjFile(path, &objs))
                 {
                     throw SceneInitializationException(
                         "Failed to load obj model from " + path);
@@ -48,16 +49,20 @@ Atrc::Geometry *TriangleBVHCreator::Create(const ConfigGroup &params, ObjArena<>
 
                 return ret;
             },
-            [&](AGZ::BinaryDeserializer &d)
+            [&](AGZ::BinaryDeserializer &d) // cache validator
             {
                 AGZ::FileSys::FileTime timeInCache;
                 d.Deserialize(timeInCache);
-                return timeInCache == AGZ::FileSys::File::GetLastWriteTime(path);
+                return d.Ok() && timeInCache == AGZ::FileSys::File::GetLastWriteTime(path);
             },
-            [&](AGZ::BinaryDeserializer &d)
+            [&](AGZ::BinaryDeserializer &d) // cache loader
             {
                 auto ret = arena.Create<Atrc::TriangleBVHCore>();
-                d.Deserialize(*ret);
+                if(!d.Deserialize(*ret))
+                {
+                    throw SceneInitializationException(
+                        "Failed to deserialize triangle BVH from: " + cacheFilename);
+                }
                 return ret;
             });
 

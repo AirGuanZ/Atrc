@@ -85,12 +85,12 @@ TriangleBVHCore::TriangleBVHCore(const Vertex *vertices, uint32_t triangleCount)
     }
 }
 
-TriangleBVHCore::TriangleBVHCore(const AGZ::Model::GeometryMesh &mesh)
+TriangleBVHCore::TriangleBVHCore(const AGZ::Model::GeometryMesh<Real> &mesh)
 {
     AGZ_ASSERT(mesh.vertices.size() % 3 == 0);
 
     auto vertices = mesh.vertices
-    | AGZ::Map([](const AGZ::Model::GeometryMesh::Vertex &v)
+    | AGZ::Map([](const AGZ::Model::GeometryMesh<Real>::Vertex &v)
         {
             using AGZ::TypeOpr::StaticCaster;
             Vertex ret;

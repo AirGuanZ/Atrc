@@ -51,7 +51,7 @@ public:
 
     TriangleBVHCore(const Vertex *vertices, uint32_t triangleCount);
 
-    explicit TriangleBVHCore(const AGZ::Model::GeometryMesh &mesh);
+    explicit TriangleBVHCore(const AGZ::Model::GeometryMesh<Real> &mesh);
 
     TriangleBVHCore(TriangleBVHCore &&moveFrom) noexcept;
 
