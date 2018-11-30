@@ -3,14 +3,11 @@
 #include <Atrc/Core/Common.h>
 #include <Atrc/Core/Integrator.h>
 #include <Atrc/Core/Scene.h>
+#include <Atrc/Utility/GridDivider.h>
 
 AGZ_NS_BEG(Atrc)
 
-struct SubareaRect
-{
-    uint32_t xBegin, xEnd;
-    uint32_t yBegin, yEnd;
-};
+using SubareaRect = GridDivider<uint32_t>::Grid;
 
 class SubareaRenderer
 {

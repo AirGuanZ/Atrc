@@ -15,16 +15,9 @@ void ParallelRenderer::Render(
     RenderTarget *output, ProgressReporter *reporter) const
 {
     AGZ_ASSERT(output->IsAvailable());
-    uint32_t w = output->GetWidth();
-    uint32_t h = output->GetHeight();
 
-    std::queue<SubareaRect> tasks;
-    uint32_t yStep = w >= 256 ? 1 : 512 / w;
-    uint32_t y = 0;
-    for(; y + yStep <= h; y += yStep)
-        tasks.push({ 0, w, y, y + yStep });
-    if(y < h)
-        tasks.push({ 0, w, y, h });
+    std::queue<SubareaRect> tasks = GridDivider<uint32_t>::Divide(
+        { 0, output->GetWidth(), 0, output->GetHeight() }, 16, 16);
 
     if(reporter)
         reporter->Begin();
