@@ -40,6 +40,9 @@
     <Filter Include="PostProcessor">
       <UniqueIdentifier>{d9ee0966-d6df-4939-bcf9-614a3355751c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Utility">
+      <UniqueIdentifier>{5256ba2d-d8f8-486f-97f8-98cbbc9d1458}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Source\Atrc\Atrc.h" />
@@ -99,12 +102,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Source\Atrc\Entity\GeometricLightEntity.h">
       <Filter>Entity</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Source\Atrc\Renderer\SerialRenderer.h">
-      <Filter>Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Source\Atrc\Renderer\JitteredSubareaRenderer.h">
-      <Filter>Renderer</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Source\Atrc\Integrator\PureColorIntegrator.h">
       <Filter>Integrator</Filter>
@@ -220,6 +217,9 @@
     <ClInclude Include="..\..\..\Source\Atrc\Light\SphereEnvironmentLight.h">
       <Filter>Light</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Utility\GridDivider.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\Atrc\Core\Geometry.cpp">
@@ -242,9 +242,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Source\Atrc\Material\BlackMaterial.cpp">
       <Filter>Material</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\Atrc\Renderer\JitteredSubareaRenderer.cpp">
-      <Filter>Renderer</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Source\Atrc\Integrator\PureColorIntegrator.cpp">
       <Filter>Integrator</Filter>
