@@ -1,9 +1,7 @@
 #pragma once
 
 #include <Atrc/Core/Common.h>
-#include <Atrc/Core/Integrator.h>
 #include <Atrc/Core/Scene.h>
-#include <Atrc/Utility/GridDivider.h>
 
 AGZ_NS_BEG(Atrc)
 

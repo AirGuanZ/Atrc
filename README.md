@@ -14,77 +14,76 @@
 允许用脚本来指定场景元素，示例如下：
 
 ```
-# LTE求解策略
-integrator = { type = VolumetricPathTracer; maxDepth = 10; };
-# 任务调度策略
-renderer = { type = ParallelRenderer; workerCount = 6; };
-# 图像局部采样策略
-subareaRenderer = { type = JitteredSubareaRenderer; spp = 10; };
-# 输出文件属性
+# 渲染策略
+renderer = {
+    type        = ParallelRenderer; # 基本的并行渲染
+    workerCount = 11;               # 开启11个工作线程
+    spp         = 100;              # 每像素采样数
+    integrator  = {
+        type     = PathTracer; # 使用路径追踪
+        maxDepth = 50;         # 最大追踪深度
+    };
+};
+# 输出图像的属性
 output = { filename = "./Build/Output.png"; width = 640; height = 480; };
-# 进度显示配
+# 用何种方式展示进度
 reporter = { type = Default; };
-# 摄像机属性
+# 摄像机
 camera = {
-    eye  = (-7, 0, 0);
-    dst  = (0, 0, 0);
-    up   = (0, 0, 1);
-    FOVz = (Deg, 40);
+    type = Perspective;        # 透视摄像机
+    aspectRatio = 1.333333333; # 视图宽高之比
+    eye  = (-7, 0, 0);         # 视点位置
+    dst  = (0, 0, 1.5);        # lookAt位置
+    up   = (0, 0, 1);          # 用来水平倾斜摄像机的辅助向量
+    FOVz = Deg(70);            # 垂直方向视角
 };
 # 实体列表
 entities = ({
     type = GeometricEntity;
-    geometry = { # 几何属性
-        type      = Sphere;                    # 内建球体模型
-        radius    = 0.7;                       # 半径为0.7
-        transform = ((Translate, 0, 2, -0.3)); # 平移
+    geometry = {
+        type = TriangleBVH;          # 由三角形构成的BVH树
+        path = "./Assets/Model.obj"; # Wavefront模型路径
+        transform = (                # 先缩小为0.005倍大小，再向下平移1单位
+            Translate(0, 0, -1),
+            Scale(0.0050));
     };
-    material = { # 材质属性
-        type      = Metal; # 金属材质
-        rc        = (0.5); # 颜色
-        etaI      = (1);   # 外部折射率，这里为空气
-        etaT      = (0.1); # 金属折射率
-        k         = (0.1); # 吸收率
-        roughness = 0.003; # 粗糙度
+    material = {
+        type = Metal;         # 使用金属材质
+        rc = (0.9, 0.4, 0.2); # 颜色
+        etaI = 1;             # 外部折射率
+        etaT = 0.1;           # 内部折射率
+        k = 0.2;              # 吸收率
+        roughness = 0.02;     # 粗糙度
     };
 }, {
     type = GeometricEntity;
     geometry = {
-        type = TriangleBVH; # 建立三角形BVH树
-        path = "./Assets/Statue_Bressant_1M_Poly.obj"; # 模型文件路径
-        transform = ((Translate, 0.0, 0.02, -1.1), (RotateZ, Deg, -90), (Scale, 0.0050)); # 缩放之后旋转，最后平移
+        type = Cube;                           # 内建的立方体模型
+        sidelen = 1.4;                         # 边长1.4
+        transform = (                          # 先旋转再平移
+            Translate(0, -2, 0.123),
+            Rotate((1.0, 1.1, 1.2), Deg(47)));
     };
     material = {
-        type      = FresnelSpecular;  # 理想反射/折射表面
-        rc        = (0.9, 0.4, 0.2);  # 颜色
-        fresnel = { # Fresnel项
-            type = FresnelDielectric; # 使用绝缘体fresnel公式
-            etaI = 1.0;               # 外部折射率
-            etaT = 1.6;               # 材料折射率
-        };
-    };
-    mediumInterface = { # 介质属性
-        in = { # 这里只指定了内部介质，外部默认为真空
-            type = Homogeneous; # 均匀介质
-            sigmaA = (7.0);     # 吸收率
-            sigmaS = (0.3);     # 散射率
-            le = (0.0);         # 自发光
-            g = 0.3;            # 不对称系数
+        type = TextureScaler;          # 用纹理作为颜色的乘积因子
+        sampler = Linear;              # 双线性采样
+        path = "./Assets/CubeTex.png"; # 纹理路径
+        internal = {
+            type = DiffuseMaterial;   # 纹理之下采用漫反射模型
+            albedo = (0.2, 0.4, 0.8); # 反照率
         };
     };
 });
 # 光源列表
 lights = ({
-    type   = SkyLight;        # 垂直渐变环境光
-    top    = (0.4, 0.7, 0.9); # 顶部亮度
-    bottom = (1.0);           # 底部亮度
+    type = SphereEnvironmentLight;   # 使用球面映射的环境光
+    tex = "./Assets/PineForest.png"; # 纹理路径
 });
 # 后处理流程
 postProcessors = (
-{ type = ACESFilm; },                       # tone mapping
-{ type = GammaCorrection; gamma = 0.4545; } # gamma校正
+    { type = ACESFilm; },                       # Tone mapping
+    { type = GammaCorrection; gamma = 0.4545; } # Gamma correction
 );
-
 ```
 
 ## Screenshots
