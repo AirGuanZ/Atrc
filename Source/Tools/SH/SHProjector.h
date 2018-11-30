@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Atrc/Core/Core.h>
+#include <Atrc/Utility/GridDivider.h>
 
 using SubareaRect = Atrc::GridDivider<uint32_t>::Grid;
 
