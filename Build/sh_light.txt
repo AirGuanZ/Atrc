@@ -1,5 +1,7 @@
 outputFilename = "./Build/sh_light.output";
+
 N = 10000;
+Bands = 5;
 
 light = {
     type = SphereEnvironmentLight;

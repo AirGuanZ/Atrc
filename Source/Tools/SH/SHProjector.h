@@ -10,24 +10,24 @@ class SHEntityProjector
 public:
 
     static void Project(
-        const Atrc::Ray &r, const Atrc::Scene &scene, int N,
-        Atrc::Spectrum (&output)[9], AGZ::ObjArena<> &arena);
+        const Atrc::Ray &r, const Atrc::Scene &scene, int SHC, int N,
+        Atrc::Spectrum *output, AGZ::ObjArena<> &arena);
 };
 
 class SHLightProjector
 {
 public:
 
-    static void Project(const Atrc::Light *light, int N, Atrc::Spectrum(&output)[9]);
+    static void Project(const Atrc::Light *light, int SHC, int N, Atrc::Spectrum *output);
 };
 
 class SHEntitySubareaRenderer
 {
-    int spp_, N_;
+    int spp_, SHC_, N_;
 
 public:
 
-    explicit SHEntitySubareaRenderer(int spp, int N);
+    explicit SHEntitySubareaRenderer(int spp, int SHC, int N);
 
     void Render(
         const Atrc::Scene &scene,
@@ -40,7 +40,7 @@ class SHEntityRenderer
 
 public:
 
-    explicit SHEntityRenderer(int workerCount = -1);
+    explicit SHEntityRenderer(int workerCount);
 
     void Render(
         const SHEntitySubareaRenderer &subareaRenderer, const Atrc::Scene &scene,

@@ -11,12 +11,12 @@ const char *USAGE_MSG =
 R"___(Usage:
     shtool project_entity [entity_desc_filename]
     shtool project_light  [light_desc_filename]
-    shtool render_entity  [entity_project_result] [light_project_result] light_rotate_z_deg [output_filename])___";
+    shtool render_entity  [entity_project_result] [light_project_result] bands light_rotate_z_deg [output_filename])___";
 
 void Run(int argc, char *argv[]);
 void ProjectEntity(const Str8 &descFilename);
 void ProjectLight(const Str8 &descFilename);
-void RenderEntity(const Str8 &ent, const Str8 &light, Math::Radf lightRotateZ, const Str8 &output);
+void RenderEntity(const Str8 &ent, const Str8 &light, int bands, Math::Radf lightRotateZ, const Str8 &output);
 
 int main(int argc, char *argv[])
 {
@@ -60,22 +60,22 @@ void Run(int argc, char *argv[])
         return;
     }
 
-    if(argv[1] == Str8("render_entity") && argc == 6)
+    if(argv[1] == Str8("render_entity") && argc == 7)
     {
-        RenderEntity(argv[2], argv[3], Math::Degf(Str8(argv[4]).Parse<float>()), argv[5]);
+        RenderEntity(argv[2], argv[3], Str8(argv[4]).Parse<int>(), Math::Degf(Str8(argv[5]).Parse<float>()), argv[6]);
         return;
     }
 
     cout << USAGE_MSG << endl;
 }
 
-bool SaveProjectedEntity(const Str8 &filename, const RenderTarget *renderTargets)
+bool SaveProjectedEntity(const Str8 &filename, const RenderTarget *renderTargets, int SHC)
 {
     std::ofstream fout(filename.ToPlatformString(), std::ios::binary | std::ios::trunc);
     if(!fout)
         return false;
     BinaryOStreamSerializer serializer(fout);
-    for(int i = 0; i < 9; ++i)
+    for(int i = 0; i < SHC; ++i)
         serializer.Serialize(renderTargets[i]);
     return serializer.Ok();
 }
@@ -97,7 +97,7 @@ void ProjectEntity(const Str8 &descFilename)
     ObjMgr::InitializeObjectManagers();
     ObjMgr::InitializePublicObjects(conf, arena);
 
-    auto camera = ObjMgr::GetSceneObject<Atrc::Camera>(conf["camera"], arena);
+    auto camera = ObjMgr::GetSceneObject<Camera>(conf["camera"], arena);
     scene.camera = camera;
 
     // 取得实体列表
@@ -118,34 +118,37 @@ void ProjectEntity(const Str8 &descFilename)
     auto outputHeight = conf["output.height"].AsValue().Parse<uint32_t>();
     auto spp          = conf["spp"].AsValue().Parse<int>();
     auto N            = conf["N"].AsValue().Parse<int>();
+    auto bands        = conf["Bands"].AsValue().Parse<int>();
     auto workerCount  = conf["workerCount"].AsValue().Parse<int>();
 
-    if(spp <= 0 || N <= 0)
-        throw ObjMgr::SceneInitializationException("Invalid spp/N value");
+    auto SHC = bands * bands;
+
+    if(spp <= 0 || N <= 0 || bands <= 0)
+        throw ObjMgr::SceneInitializationException("Invalid spp/N/Bands value");
 
     std::vector<RenderTarget> renderTargets;
-    renderTargets.reserve(9);
-    for(int i = 0; i < 9; ++i)
+    renderTargets.reserve(SHC);
+    for(int i = 0; i < SHC; ++i)
         renderTargets.emplace_back(outputWidth, outputHeight);
 
-    SHEntitySubareaRenderer subareaRenderer(spp, N);
+    SHEntitySubareaRenderer subareaRenderer(spp, SHC, N);
     SHEntityRenderer renderer(workerCount);
 
     DefaultProgressReporter reporter;
 
     renderer.Render(subareaRenderer, scene, renderTargets.data(), &reporter);
 
-    if(!SaveProjectedEntity(filename, renderTargets.data()))
+    if(!SaveProjectedEntity(filename, renderTargets.data(), SHC))
         cout << "Failed to save rendered coefficients into " << filename.ToStdString() << endl;
 }
 
-bool SaveProjectedLight(const Str8 &filename, const Spectrum *output)
+bool SaveProjectedLight(const Str8 &filename, const Spectrum *output, int SHC)
 {
     std::ofstream fout(filename.ToPlatformString(), std::ios::binary | std::ios::trunc);
     if(!fout)
         return false;
     BinaryOStreamSerializer serializer(fout);
-    for(int i = 0; i < 9; ++i)
+    for(int i = 0; i < SHC; ++i)
         serializer.Serialize(output[i]);
     return serializer.Ok();
 }
@@ -166,27 +169,30 @@ void ProjectLight(const Str8 &descFilename)
     ObjMgr::InitializePublicObjects(conf, arena);
 
     auto filename = conf["outputFilename"].AsValue();
-    auto N = conf["N"].AsValue().Parse<int>();
-    
-    if(N <= 0)
-        throw ObjMgr::SceneInitializationException("Invalid N value");
+    auto N     = conf["N"].AsValue().Parse<int>();
+    auto bands = conf["Bands"].AsValue().Parse<int>();
+
+    auto SHC = bands * bands;
+
+    if(N <= 0 || bands <= 0)
+        throw ObjMgr::SceneInitializationException("Invalid N/Bands value");
     
     auto light = ObjMgr::GetSceneObject<Light>(conf["light"], arena);
 
-    Spectrum output[9];
-    SHLightProjector::Project(light, N, output);
+    vector<Spectrum> output(SHC);
+    SHLightProjector::Project(light, SHC, N, output.data());
 
-    if(!SaveProjectedLight(filename, output))
+    if(!SaveProjectedLight(filename, output.data(), SHC))
         cout << "Failed to save rendered coefficients into " << filename.ToStdString() << endl;
 }
 
-bool LoadProjectedEntity(const Str8 &filename, RenderTarget *renderTargets)
+bool LoadProjectedEntity(const Str8 &filename, int SHC, RenderTarget *renderTargets)
 {
     std::ifstream fin(filename.ToPlatformString(), std::ios::binary);
     if(!fin)
         return false;
     BinaryIStreamDeserializer deserializer(fin);
-    for(int i = 0; i < 9; ++i)
+    for(int i = 0; i < SHC; ++i)
     {
         if(!deserializer.Deserialize(renderTargets[i]))
             return false;
@@ -194,13 +200,13 @@ bool LoadProjectedEntity(const Str8 &filename, RenderTarget *renderTargets)
     return true;
 }
 
-bool LoadProjectedLight(const Str8 &filename, Spectrum *output)
+bool LoadProjectedLight(const Str8 &filename, int SHC, Spectrum *output)
 {
     std::ifstream fin(filename.ToPlatformString(), std::ios::binary);
     if(!fin)
         return false;
     BinaryIStreamDeserializer deserializer(fin);
-    for(int i = 0; i < 9; ++i)
+    for(int i = 0; i < SHC; ++i)
     {
         if(!deserializer.Deserialize(output[i]))
             return false;
@@ -219,25 +225,34 @@ Texture2D<Color3b> ToSavedImage(const RenderTarget &origin)
     });
 }
 
-void RenderEntity(const Str8 &ent, const Str8 &light, Math::Radf lightRotateZ, const Str8 &output)
+void RenderEntity(const Str8 &ent, const Str8 &light, int bands, Math::Radf lightRotateZ, const Str8 &output)
 {
-    RenderTarget projectedEntity[9];
-    Spectrum projectedLight[9];
+    if(bands <= 0 || bands > 5)
+    {
+        cout << "Invalid SHC value" << endl;
+        return;
+    }
 
-    if(!LoadProjectedEntity(ent, projectedEntity))
+    int SHC = bands * bands;
+
+    vector<RenderTarget> projectedEntity(SHC);
+    vector<Spectrum> projectedLight(SHC);
+
+    if(!LoadProjectedEntity(ent, SHC, projectedEntity.data()))
     {
         cout << "Failed to load projected entity info from: " << ent.ToStdString() << endl;
         return;
     }
 
-    if(!LoadProjectedLight(light, projectedLight))
+    if(!LoadProjectedLight(light, SHC, projectedLight.data()))
     {
         cout << "Failed to load projected light info from: " << light.ToStdString() << endl;
         return;
     }
 
-    float projectedLightR[9], projectedLightG[9], projectedLightB[9];
-    for(int i = 0; i < 9; ++i)
+    vector<float> projectedLightR(SHC), projectedLightG(SHC), projectedLightB(SHC);
+
+    for(int i = 0; i < SHC; ++i)
     {
         projectedLightR[i] = projectedLight[i].r;
         projectedLightG[i] = projectedLight[i].g;
@@ -245,18 +260,36 @@ void RenderEntity(const Str8 &ent, const Str8 &light, Math::Radf lightRotateZ, c
     }
 
     auto M = Math::Mat3f::RotateZ(lightRotateZ);
-    
+
     Math::RotateSH_L0(M, &projectedLightR[0]);
     Math::RotateSH_L0(M, &projectedLightG[0]);
     Math::RotateSH_L0(M, &projectedLightB[0]);
-    Math::RotateSH_L1(M, &projectedLightR[1]);
-    Math::RotateSH_L1(M, &projectedLightG[1]);
-    Math::RotateSH_L1(M, &projectedLightB[1]);
-    Math::RotateSH_L2(M, &projectedLightR[4]);
-    Math::RotateSH_L2(M, &projectedLightG[4]);
-    Math::RotateSH_L2(M, &projectedLightB[4]);
+    if(SHC >= 4)
+    {
+        Math::RotateSH_L1(M, &projectedLightR[1]);
+        Math::RotateSH_L1(M, &projectedLightG[1]);
+        Math::RotateSH_L1(M, &projectedLightB[1]);
+        if(SHC >= 9)
+        {
+            Math::RotateSH_L2(M, &projectedLightR[4]);
+            Math::RotateSH_L2(M, &projectedLightG[4]);
+            Math::RotateSH_L2(M, &projectedLightB[4]);
+            if(SHC >= 16)
+            {
+                Math::RotateSH_L3(M, &projectedLightR[9]);
+                Math::RotateSH_L3(M, &projectedLightG[9]);
+                Math::RotateSH_L3(M, &projectedLightB[9]);
+                if(SHC >= 25)
+                {
+                    Math::RotateSH_L4(M, &projectedLightR[16]);
+                    Math::RotateSH_L4(M, &projectedLightG[16]);
+                    Math::RotateSH_L4(M, &projectedLightB[16]);
+                }
+            }
+        }
+    }
 
-    for(int i = 0; i < 9; ++i)
+    for(int i = 0; i < SHC; ++i)
     {
         projectedLight[i].r = projectedLightR[i];
         projectedLight[i].g = projectedLightG[i];
@@ -269,7 +302,7 @@ void RenderEntity(const Str8 &ent, const Str8 &light, Math::Radf lightRotateZ, c
         for(uint32_t x = 0; x < rt.GetWidth(); ++x)
         {
             Spectrum pixel;
-            for(int i = 0; i < 9; ++i)
+            for(int i = 0; i < SHC; ++i)
                 pixel += projectedEntity[i](x, y) * projectedLight[i];
             rt(x, y) = pixel;
         }

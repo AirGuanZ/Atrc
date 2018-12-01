@@ -2,26 +2,10 @@
 
 using namespace Atrc;
 
-namespace
+void SHEntityProjector::Project(const Ray &r, const Scene &scene, int SHC, int N, Spectrum *output, AGZ::ObjArena<> &arena)
 {
-    Real (*SH_FUNCS[9])(const Vec3&) =
-    {
-        AGZ::Math::GetSHByLM<Real>(0, 0),
-        AGZ::Math::GetSHByLM<Real>(1, -1),
-        AGZ::Math::GetSHByLM<Real>(1, 0),
-        AGZ::Math::GetSHByLM<Real>(1, 1),
-        AGZ::Math::GetSHByLM<Real>(2, -2),
-        AGZ::Math::GetSHByLM<Real>(2, -1),
-        AGZ::Math::GetSHByLM<Real>(2, 0),
-        AGZ::Math::GetSHByLM<Real>(2, 1),
-        AGZ::Math::GetSHByLM<Real>(2, 2),
-    };
-}
-
-void SHEntityProjector::Project(const Ray &r, const Scene &scene, int N, Spectrum (&output)[9], AGZ::ObjArena<> &arena)
-{
-    for(auto &s : output)
-        s = Spectrum();
+    for(int i = 0; i < SHC; ++i)
+        output[i] = Spectrum();
 
     SurfacePoint sp;
     if(!scene.FindCloestIntersection(r, &sp))
@@ -29,6 +13,8 @@ void SHEntityProjector::Project(const Ray &r, const Scene &scene, int N, Spectru
 
     ShadingPoint shd;
     sp.entity->GetMaterial(sp)->Shade(sp, &shd, arena);
+
+    auto SHTable = AGZ::Math::GetSHTable<Real>();
 
     for(int i = 0; i < N; ++i)
     {
@@ -44,16 +30,18 @@ void SHEntityProjector::Project(const Ray &r, const Scene &scene, int N, Spectru
         auto pS2  = bsdfSample->pdf;
 
         auto pfx = f * float(cosV / pS2);
-        for(int j = 0; j < 9; ++j)
-            output[j] += float(SH_FUNCS[j](bsdfSample->wi)) * pfx;
+        for(int j = 0; j < SHC; ++j)
+            output[j] += float(SHTable[j](bsdfSample->wi)) * pfx;
     }
 
-    for(auto &s : output)
-        s /= N;
+    for(int i = 0; i < SHC; ++i)
+        output[i] /= N;
 }
 
-void SHLightProjector::Project(const Light *light, int N, Spectrum (&output)[9])
+void SHLightProjector::Project(const Light *light, int SHC, int N, Spectrum *output)
 {
+    auto SHTable = AGZ::Math::GetSHTable<Real>();
+
     for(int i = 0; i < N; ++i)
     {
         Real u0 = Rand(), u1 = Rand();
@@ -62,16 +50,16 @@ void SHLightProjector::Project(const Light *light, int N, Spectrum (&output)[9])
 
         auto le = light->NonareaLe(Ray(Vec3(0.0), dir, EPS));
         
-        for(int j = 0; j < 9; ++j)
-            output[j] += le * float(SH_FUNCS[j](dir) / pdf);
+        for(int j = 0; j < SHC; ++j)
+            output[j] += le * float(SHTable[j](dir) / pdf);
     }
 
-    for(auto &s : output)
-        s /= N;
+    for(int i = 0; i < SHC; ++i)
+        output[i] /= N;
 }
 
-SHEntitySubareaRenderer::SHEntitySubareaRenderer(int spp, int N)
-    : spp_(spp), N_(N)
+SHEntitySubareaRenderer::SHEntitySubareaRenderer(int spp, int SHC, int N)
+    : spp_(spp), SHC_(SHC), N_(N)
 {
     AGZ_ASSERT(spp >= 1 && N >= 1);
 }
@@ -85,6 +73,9 @@ void SHEntitySubareaRenderer::Render(
     auto pw = renderTarget[0].GetWidth(), ph = renderTarget[0].GetHeight();
     Real xBaseCoef = Real(2) / pw, yBaseCoef = Real(2) / ph;
     auto cam = scene.GetCamera();
+
+    std::vector<Spectrum> tPixel(SHC_);
+
     for(uint32_t py = area.yBegin; py < area.yEnd; ++py)
     {
         Real yBase = 1 - Real(2) * py / ph;
@@ -92,21 +83,23 @@ void SHEntitySubareaRenderer::Render(
         {
             Real xBase = Real(2) * px / pw - 1;
 
-            Spectrum pixel[9];
+            for(int k = 0; k < SHC_; ++k)
+                renderTarget[k](px, py) = Spectrum();
 
             for(int i = 0; i < spp_; ++i)
             {
                 Real xOffset = xBaseCoef * Rand();
                 Real yOffset = -yBaseCoef * Rand();
-                Spectrum tpixel[9];
+
                 SHEntityProjector::Project(
-                    cam->GetRay({ xBase + xOffset, yBase + yOffset }), scene, N_, tpixel, arena);
-                for(int k = 0; k < 9; ++k)
-                    pixel[k] += tpixel[k];
+                    cam->GetRay({ xBase + xOffset, yBase + yOffset }), scene, SHC_, N_, tPixel.data(), arena);
+
+                for(int k = 0; k < SHC_; ++k)
+                    renderTarget[k](px, py) += tPixel[k];
             }
 
-            for(int k = 0; k < 9; ++k)
-                renderTarget[k](px, py) = pixel[k] / spp_;
+            for(int k = 0; k < SHC_; ++k)
+                renderTarget[k](px, py) /= spp_;
 
             if(arena.GetUsedBytes() > 16 * 1024 * 1024)
                 arena.Clear();
@@ -124,7 +117,7 @@ void SHEntityRenderer::Render(
     const SHEntitySubareaRenderer &subareaRenderer, const Scene &scene,
     RenderTarget *output, ProgressReporter *reporter) const
 {
-    auto tasks = Atrc::GridDivider<uint32_t>::Divide(
+    auto tasks = GridDivider<uint32_t>::Divide(
         { 0, output->GetWidth(), 0, output->GetHeight() }, 32, 32);
 
     if(reporter)
