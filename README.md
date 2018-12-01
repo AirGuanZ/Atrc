@@ -16,9 +16,9 @@
 ```
 # 渲染策略
 renderer = {
-    type        = ParallelRenderer; # 基本的并行渲染
-    workerCount = 11;               # 开启11个工作线程
-    spp         = 100;              # 每像素采样数
+    type        = PathTracingRenderer; # 基本的并行渲染
+    workerCount = 11;                  # 开启11个工作线程
+    spp         = 100;                 # 每像素采样数
     integrator  = {
         type     = PathTracer; # 使用路径追踪
         maxDepth = 50;         # 最大追踪深度
@@ -58,9 +58,9 @@ entities = ({
 }, {
     type = GeometricEntity;
     geometry = {
-        type = Cube;                           # 内建的立方体模型
-        sidelen = 1.4;                         # 边长1.4
-        transform = (                          # 先旋转再平移
+        type = Cube;   # 内建的立方体模型
+        sidelen = 1.4; # 边长1.4
+        transform = (  # 先旋转再平移
             Translate(0, -2, 0.123),
             Rotate((1.0, 1.1, 1.2), Deg(47)));
     };
