@@ -1,4 +1,4 @@
-#include <Atrc/Integrator/PureColorIntegrator.h>
+#include <Atrc/Renderer/PathTracingIntegrator/PureColorIntegrator.h>
 
 AGZ_NS_BEG(Atrc)
 

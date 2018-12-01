@@ -13,40 +13,17 @@ R"___(Usage:
     shtool project_light  [light_desc_filename]
     shtool render_entity  [entity_project_result] [light_project_result] light_rotate_z_deg [output_filename])___";
 
+void Run(int argc, char *argv[]);
 void ProjectEntity(const Str8 &descFilename);
 void ProjectLight(const Str8 &descFilename);
 void RenderEntity(const Str8 &ent, const Str8 &light, Math::Radf lightRotateZ, const Str8 &output);
 
 int main(int argc, char *argv[])
 {
+#ifndef _DEBUG
     try
     {
-        if(argc < 2)
-        {
-            cout << USAGE_MSG << endl;
-            return 0;
-        }
-        
-        if(argv[1] == Str8("project_entity") && argc == 3)
-        {
-            ProjectEntity(argv[2]);
-            return 0;
-        }
-
-        if(argv[1] == Str8("project_light") && argc == 3)
-        {
-            ProjectLight(argv[2]);
-            return 0;
-        }
-
-        if(argv[1] == Str8("render_entity") && argc == 6)
-        {
-            RenderEntity(argv[2], argv[3], Math::Degf(Str8(argv[4]).Parse<float>()), argv[5]);
-            return 0;
-        }
-        
-        cout << USAGE_MSG << endl;
-        return 0;
+        Run(argc, argv);
     }
     catch(std::exception &err)
     {
@@ -56,6 +33,40 @@ int main(int argc, char *argv[])
     {
         cout << "An unknown error occurred..." << endl;
     }
+#else
+    Run(argc, argv);
+#endif
+
+    return 0;
+}
+
+void Run(int argc, char *argv[])
+{
+    if(argc < 2)
+    {
+        cout << USAGE_MSG << endl;
+        return;
+    }
+
+    if(argv[1] == Str8("project_entity") && argc == 3)
+    {
+        ProjectEntity(argv[2]);
+        return;
+    }
+
+    if(argv[1] == Str8("project_light") && argc == 3)
+    {
+        ProjectLight(argv[2]);
+        return;
+    }
+
+    if(argv[1] == Str8("render_entity") && argc == 6)
+    {
+        RenderEntity(argv[2], argv[3], Math::Degf(Str8(argv[4]).Parse<float>()), argv[5]);
+        return;
+    }
+
+    cout << USAGE_MSG << endl;
 }
 
 bool SaveProjectedEntity(const Str8 &filename, const RenderTarget *renderTargets)

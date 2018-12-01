@@ -102,6 +102,7 @@ int main(int argc, char *argv[])
         return -1;
     }
 
+#ifndef _DEBUG
     try
     {
         return Run(*sceneDescFilename);
@@ -114,4 +115,7 @@ int main(int argc, char *argv[])
     {
         cout << "An unknown error occurred..." << endl;
     }
+#else
+    return Run(*sceneDescFilename);
+#endif
 }

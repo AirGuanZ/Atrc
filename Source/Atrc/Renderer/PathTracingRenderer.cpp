@@ -1,10 +1,10 @@
 #include <vector>
 
-#include "ParallelRenderer.h"
+#include "PathTracingRenderer.h"
 
 AGZ_NS_BEG(Atrc)
 
-void ParallelRenderer::RenderSubarea(const Scene &scene, RenderTarget *rt, const SubareaRect &subarea) const
+void PathTracingRenderer::RenderSubarea(const Scene &scene, RenderTarget *rt, const SubareaRect &subarea) const
 {
     AGZ::ObjArena<> arena;
 
@@ -34,13 +34,13 @@ void ParallelRenderer::RenderSubarea(const Scene &scene, RenderTarget *rt, const
     }
 }
 
-ParallelRenderer::ParallelRenderer(int workerCount, uint32_t spp, const Integrator &integrator)
+PathTracingRenderer::PathTracingRenderer(int workerCount, uint32_t spp, const PathTracingIntegrator &integrator)
     : workerCount_(workerCount), spp_(spp), integrator_(integrator)
 {
 
 }
 
-void ParallelRenderer::Render(const Scene &scene, RenderTarget *rt, ProgressReporter *reporter) const
+void PathTracingRenderer::Render(const Scene &scene, RenderTarget *rt, ProgressReporter *reporter) const
 {
     AGZ_ASSERT(rt->IsAvailable());
 

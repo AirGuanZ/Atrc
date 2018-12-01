@@ -1,16 +1,14 @@
 ﻿#pragma once
 
-#include <Atrc/Core/Common.h>
-#include <Atrc/Core/Ray.h>
-#include <Atrc/Core/Scene.h>
+#include <Atrc/Core/Core.h>
 
 AGZ_NS_BEG(Atrc)
 
-class Integrator
+class PathTracingIntegrator
 {
 public:
 
-    virtual ~Integrator() = default;
+    virtual ~PathTracingIntegrator() = default;
 
     virtual Spectrum Eval(const Scene &scene, const Ray &r, AGZ::ObjArena<> &arena) const = 0;
 };

@@ -1,4 +1,4 @@
-#include <Atrc/Integrator/PathTracer.h>
+#include <Atrc/Renderer/PathTracingIntegrator/PathTracer.h>
 
 AGZ_NS_BEG(Atrc)
 

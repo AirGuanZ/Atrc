@@ -29,7 +29,6 @@
     <ClInclude Include="..\..\..\Source\Atrc\Core\Core.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Core\Entity.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Core\Geometry.h" />
-    <ClInclude Include="..\..\..\Source\Atrc\Core\Integrator.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Core\Light.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Core\Material.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Core\Medium.h" />
@@ -44,10 +43,6 @@
     <ClInclude Include="..\..\..\Source\Atrc\Geometry\Cube.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Geometry\Sphere.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Geometry\TriangleBVH.h" />
-    <ClInclude Include="..\..\..\Source\Atrc\Integrator\AmbientOcclusionIntegrator.h" />
-    <ClInclude Include="..\..\..\Source\Atrc\Integrator\PathTracer.h" />
-    <ClInclude Include="..\..\..\Source\Atrc\Integrator\PureColorIntegrator.h" />
-    <ClInclude Include="..\..\..\Source\Atrc\Integrator\VolumetricPathTracer.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Light\CubeEnvironmentLight.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Light\DirectionalLight.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Light\GeometricDiffuseLightImpl.h" />
@@ -75,6 +70,11 @@
     <ClInclude Include="..\..\..\Source\Atrc\PostProcessor\ACESFilm.h" />
     <ClInclude Include="..\..\..\Source\Atrc\PostProcessor\GammaCorrector.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Renderer\DefaultProgressReporter.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Renderer\PathTracingIntegrator\AmbientOcclusionIntegrator.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Renderer\PathTracingIntegrator\PathTracingIntegrator.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Renderer\PathTracingIntegrator\PathTracer.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Renderer\PathTracingIntegrator\PureColorIntegrator.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Renderer\PathTracingIntegrator\VolumetricPathTracer.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Utility\GridDivider.h" />
   </ItemGroup>
   <ItemGroup>
@@ -90,10 +90,6 @@
     <ClCompile Include="..\..\..\Source\Atrc\Geometry\Cube.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Geometry\Sphere.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Geometry\TriangleBVH.cpp" />
-    <ClCompile Include="..\..\..\Source\Atrc\Integrator\AmbientOcclusionIntegrator.cpp" />
-    <ClCompile Include="..\..\..\Source\Atrc\Integrator\PathTracer.cpp" />
-    <ClCompile Include="..\..\..\Source\Atrc\Integrator\PureColorIntegrator.cpp" />
-    <ClCompile Include="..\..\..\Source\Atrc\Integrator\VolumetricPathTracer.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Light\CubeEnvironmentLight.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Light\DirectionalLight.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Light\GeometricDiffuseLightImpl.cpp" />
@@ -118,10 +114,14 @@
     <ClCompile Include="..\..\..\Source\Atrc\PostProcessor\ACESFilm.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\PostProcessor\GammaCorrector.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Renderer\DefaultProgressReporter.cpp" />
-    <ClCompile Include="..\..\..\Source\Atrc\Renderer\ParallelRenderer.cpp" />
+    <ClCompile Include="..\..\..\Source\Atrc\Renderer\PathTracingIntegrator\AmbientOcclusionIntegrator.cpp" />
+    <ClCompile Include="..\..\..\Source\Atrc\Renderer\PathTracingIntegrator\PathTracer.cpp" />
+    <ClCompile Include="..\..\..\Source\Atrc\Renderer\PathTracingIntegrator\PureColorIntegrator.cpp" />
+    <ClCompile Include="..\..\..\Source\Atrc\Renderer\PathTracingIntegrator\VolumetricPathTracer.cpp" />
+    <ClCompile Include="..\..\..\Source\Atrc\Renderer\PathTracingRenderer.cpp" />
     <ClInclude Include="..\..\..\Source\Atrc\Medium\HomogeneousMedium.h" />
     <ClCompile Include="..\..\..\Source\Atrc\Medium\HomogeneousMedium.cpp" />
-    <ClInclude Include="..\..\..\Source\Atrc\Renderer\ParallelRenderer.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Renderer\PathTracingRenderer.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

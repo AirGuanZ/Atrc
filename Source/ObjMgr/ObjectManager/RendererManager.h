@@ -22,11 +22,11 @@ using RendererManager = ObjectManager<Atrc::Renderer>;
 // workerCount = int32_t
 // spp_        = int32_t
 // integrator  = IntegratorDefinition
-class ParallelRendererCreator : public RendererCreator, public AGZ::Singleton<ParallelRendererCreator>
+class PathTracingRendererCreator : public RendererCreator, public AGZ::Singleton<PathTracingRendererCreator>
 {
 public:
 
-    Str8 GetName() const override { return "ParallelRenderer"; }
+    Str8 GetName() const override { return "PathTracingRenderer"; }
 
     Atrc::Renderer *Create(const ConfigGroup &params, ObjArena<> &arena) const override;
 };

@@ -135,7 +135,7 @@ class Camera;
 class Entity;
 class Geometry;
 class Light;
-class Integrator;
+class PathTracingIntegrator;
 class Material;
 class Medium;
 class PhaseFunction;

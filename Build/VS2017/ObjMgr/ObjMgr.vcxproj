@@ -22,7 +22,7 @@
     <ClCompile Include="..\..\..\Source\ObjMgr\ObjectManager\CameraManager.cpp" />
     <ClCompile Include="..\..\..\Source\ObjMgr\ObjectManager\EntityCreator.cpp" />
     <ClCompile Include="..\..\..\Source\ObjMgr\ObjectManager\GeometryManager.cpp" />
-    <ClCompile Include="..\..\..\Source\ObjMgr\ObjectManager\IntegratorManager.cpp" />
+    <ClCompile Include="..\..\..\Source\ObjMgr\ObjectManager\PathTracingIntegratorManager.cpp" />
     <ClCompile Include="..\..\..\Source\ObjMgr\ObjectManager\LightManager.cpp" />
     <ClCompile Include="..\..\..\Source\ObjMgr\ObjectManager\MaterialManager.cpp" />
     <ClCompile Include="..\..\..\Source\ObjMgr\ObjectManager\MediumManager.cpp" />
@@ -37,7 +37,7 @@
     <ClInclude Include="..\..\..\Source\ObjMgr\ObjectManager\CameraManager.h" />
     <ClInclude Include="..\..\..\Source\ObjMgr\ObjectManager\EntityCreator.h" />
     <ClInclude Include="..\..\..\Source\ObjMgr\ObjectManager\GeometryManager.h" />
-    <ClInclude Include="..\..\..\Source\ObjMgr\ObjectManager\IntegratorManager.h" />
+    <ClInclude Include="..\..\..\Source\ObjMgr\ObjectManager\PathTracingIntegratorManager.h" />
     <ClInclude Include="..\..\..\Source\ObjMgr\ObjectManager\LightManager.h" />
     <ClInclude Include="..\..\..\Source\ObjMgr\ObjectManager\MaterialManager.h" />
     <ClInclude Include="..\..\..\Source\ObjMgr\ObjectManager\MediumManager.h" />

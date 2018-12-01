@@ -5,7 +5,6 @@
 #include <Atrc/Core/Camera.h>
 #include <Atrc/Core/Entity.h>
 #include <Atrc/Core/Geometry.h>
-#include <Atrc/Core/Integrator.h>
 #include <Atrc/Core/Light.h>
 #include <Atrc/Core/Material.h>
 #include <Atrc/Core/Medium.h>

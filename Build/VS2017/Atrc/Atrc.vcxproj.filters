@@ -19,9 +19,6 @@
     <Filter Include="Renderer">
       <UniqueIdentifier>{1c19e29f-cb60-41a7-97c0-599c11e1fe53}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Integrator">
-      <UniqueIdentifier>{9234bb83-6ce8-47f6-8e2a-28e53bb4d31d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Camera">
       <UniqueIdentifier>{44bcb54b-d304-4880-9ee5-d62c26d896ea}</UniqueIdentifier>
     </Filter>
@@ -42,6 +39,9 @@
     </Filter>
     <Filter Include="Utility">
       <UniqueIdentifier>{5256ba2d-d8f8-486f-97f8-98cbbc9d1458}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Renderer\PathTracingIntegrator">
+      <UniqueIdentifier>{50d6b6b2-edae-4cb2-82d4-d2f567a94324}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -85,9 +85,6 @@
     <ClInclude Include="..\..\..\Source\Atrc\Core\Camera.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\Atrc\Core\Integrator.h">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Source\Atrc\Core\Renderer.h">
       <Filter>Core</Filter>
     </ClInclude>
@@ -103,17 +100,8 @@
     <ClInclude Include="..\..\..\Source\Atrc\Entity\GeometricLightEntity.h">
       <Filter>Entity</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\Atrc\Integrator\PureColorIntegrator.h">
-      <Filter>Integrator</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Source\Atrc\Camera\PerspectiveCamera.h">
       <Filter>Camera</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Source\Atrc\Integrator\PathTracer.h">
-      <Filter>Integrator</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Source\Atrc\Renderer\ParallelRenderer.h">
-      <Filter>Renderer</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Source\Atrc\Material\Fresnel.h">
       <Filter>Material</Filter>
@@ -190,9 +178,6 @@
     <ClInclude Include="..\..\..\Source\Atrc\Medium\HenyeyGreenstein.h">
       <Filter>Medium</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\Atrc\Integrator\VolumetricPathTracer.h">
-      <Filter>Integrator</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Source\Atrc\Medium\HomogeneousMedium.h">
       <Filter>Medium</Filter>
     </ClInclude>
@@ -211,14 +196,29 @@
     <ClInclude Include="..\..\..\Source\Atrc\Light\CubeEnvironmentLight.h">
       <Filter>Light</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\Atrc\Integrator\AmbientOcclusionIntegrator.h">
-      <Filter>Integrator</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Source\Atrc\Light\SphereEnvironmentLight.h">
       <Filter>Light</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Source\Atrc\Utility\GridDivider.h">
       <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Renderer\PathTracingRenderer.h">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Renderer\PathTracingIntegrator\AmbientOcclusionIntegrator.h">
+      <Filter>Renderer\PathTracingIntegrator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Renderer\PathTracingIntegrator\PathTracer.h">
+      <Filter>Renderer\PathTracingIntegrator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Renderer\PathTracingIntegrator\PureColorIntegrator.h">
+      <Filter>Renderer\PathTracingIntegrator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Renderer\PathTracingIntegrator\VolumetricPathTracer.h">
+      <Filter>Renderer\PathTracingIntegrator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Renderer\PathTracingIntegrator\PathTracingIntegrator.h">
+      <Filter>Renderer\PathTracingIntegrator</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -243,17 +243,11 @@
     <ClCompile Include="..\..\..\Source\Atrc\Material\BlackMaterial.cpp">
       <Filter>Material</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Source\Atrc\Integrator\PureColorIntegrator.cpp">
-      <Filter>Integrator</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Source\Atrc\Camera\PerspectiveCamera.cpp">
       <Filter>Camera</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Source\Atrc\Core\Common.cpp">
       <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\Atrc\Integrator\PathTracer.cpp">
-      <Filter>Integrator</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Source\Atrc\Material\Fresnel.cpp">
       <Filter>Material</Filter>
@@ -321,15 +315,6 @@
     <ClCompile Include="..\..\..\Source\Atrc\Medium\HomogeneousMedium.cpp">
       <Filter>Medium</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Source\Atrc\Integrator\VolumetricPathTracer.cpp">
-      <Filter>Integrator</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\Atrc\Renderer\ParallelRenderer.cpp">
-      <Filter>Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\Atrc\Integrator\AmbientOcclusionIntegrator.cpp">
-      <Filter>Integrator</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Source\Atrc\Core\PostProcessor.cpp">
       <Filter>Core</Filter>
     </ClCompile>
@@ -347,6 +332,21 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Source\Atrc\Renderer\DefaultProgressReporter.cpp">
       <Filter>Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Renderer\PathTracingRenderer.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Renderer\PathTracingIntegrator\AmbientOcclusionIntegrator.cpp">
+      <Filter>Renderer\PathTracingIntegrator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Renderer\PathTracingIntegrator\PathTracer.cpp">
+      <Filter>Renderer\PathTracingIntegrator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Renderer\PathTracingIntegrator\PureColorIntegrator.cpp">
+      <Filter>Renderer\PathTracingIntegrator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Renderer\PathTracingIntegrator\VolumetricPathTracer.cpp">
+      <Filter>Renderer\PathTracingIntegrator</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

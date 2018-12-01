@@ -1,10 +1,10 @@
 #pragma once
 
-#include <Atrc/Core/Core.h>
+#include <Atrc/Renderer/PathTracingIntegrator/PathTracingIntegrator.h>
 
 AGZ_NS_BEG(Atrc)
 
-class PathTracer : public Integrator
+class PathTracer : public PathTracingIntegrator
 {
 public:
 

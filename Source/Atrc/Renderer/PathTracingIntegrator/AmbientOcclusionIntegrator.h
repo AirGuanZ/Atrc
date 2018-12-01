@@ -1,10 +1,10 @@
 #pragma once
 
-#include <Atrc/Core/Core.h>
+#include <Atrc/Renderer/PathTracingIntegrator/PathTracingIntegrator.h>
 
 AGZ_NS_BEG(Atrc)
 
-class AmbientOcclusionIntegrator : public Integrator
+class AmbientOcclusionIntegrator : public PathTracingIntegrator
 {
     Real maxOccuT_;
     Spectrum bgdColor_;

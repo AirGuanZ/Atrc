@@ -67,7 +67,7 @@ struct Params
     Str8 outputFilename;
 };
 
-int Run(const Params &params)
+int C2S(const Params &params)
 {
     Texture2D<Spectrum> cubeTexs[6];
     if(!LoadCubeTextures(params.cubeTexFolder, params.cubeTexExt, cubeTexs))
@@ -113,41 +113,47 @@ int Run(const Params &params)
     return 0;
 }
 
+int Run(int argc, char *argv[])
+{
+    if(argc != 7)
+    {
+        cout << USAGE_MSG << endl;
+        return 0;
+    }
+
+    auto spp = Str8(argv[3]).Parse<int>();
+    auto outputSize = Str8(argv[4]).Parse<uint32_t>();
+    auto workerCount = Str8(argv[5]).Parse<int>();
+
+    if(spp <= 0)
+    {
+        cout << "Invalid spp valid" << endl;
+        return -1;
+    }
+
+    if(outputSize <= 0)
+    {
+        cout << "Invalid output size" << endl;
+        return -1;
+    }
+
+    Params params;
+    params.cubeTexFolder = argv[1];
+    params.cubeTexExt = argv[2];
+    params.spp = spp;
+    params.outputSize = outputSize;
+    params.workerCount = workerCount;
+    params.outputFilename = argv[6];
+
+    return C2S(params);
+}
+
 int main(int argc, char *argv[])
 {
+#ifndef _DEBUG
     try
     {
-        if(argc != 7)
-        {
-            cout << USAGE_MSG << endl;
-            return 0;
-        }
-
-        auto spp         = Str8(argv[3]).Parse<int>();
-        auto outputSize  = Str8(argv[4]).Parse<uint32_t>();
-        auto workerCount = Str8(argv[5]).Parse<int>();
-
-        if(spp <= 0)
-        {
-            cout << "Invalid spp valid" << endl;
-            return -1;
-        }
-
-        if(outputSize <= 0)
-        {
-            cout << "Invalid output size" << endl;
-            return -1;
-        }
-
-        Params params;
-        params.cubeTexFolder  = argv[1];
-        params.cubeTexExt     = argv[2];
-        params.spp            = spp;
-        params.outputSize     = outputSize;
-        params.workerCount    = workerCount;
-        params.outputFilename = argv[6];
-
-        return Run(params);
+        return Run(argc, argv);
     }
     catch(const std::exception &err)
     {
@@ -159,4 +165,7 @@ int main(int argc, char *argv[])
     }
 
     return 0;
+#else
+    return Run(argc, argv);
+#endif
 }

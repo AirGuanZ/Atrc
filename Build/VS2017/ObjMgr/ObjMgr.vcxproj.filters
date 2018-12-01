@@ -12,9 +12,6 @@
     <ClCompile Include="..\..\..\Source\ObjMgr\ObjectManager\GeometryManager.cpp">
       <Filter>ObjectManager</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Source\ObjMgr\ObjectManager\IntegratorManager.cpp">
-      <Filter>ObjectManager</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Source\ObjMgr\ObjectManager\LightManager.cpp">
       <Filter>ObjectManager</Filter>
     </ClCompile>
@@ -37,15 +34,15 @@
     <ClCompile Include="..\..\..\Source\ObjMgr\ObjectManager\CameraManager.cpp">
       <Filter>ObjectManager</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Source\ObjMgr\ObjectManager\PathTracingIntegratorManager.cpp">
+      <Filter>ObjectManager</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Source\ObjMgr\ObjectManager\EntityCreator.h">
       <Filter>ObjectManager</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Source\ObjMgr\ObjectManager\GeometryManager.h">
-      <Filter>ObjectManager</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Source\ObjMgr\ObjectManager\IntegratorManager.h">
       <Filter>ObjectManager</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Source\ObjMgr\ObjectManager\LightManager.h">
@@ -70,6 +67,9 @@
     <ClInclude Include="..\..\..\Source\ObjMgr\ObjectManager.h" />
     <ClInclude Include="..\..\..\Source\ObjMgr\ParamParser.h" />
     <ClInclude Include="..\..\..\Source\ObjMgr\ObjectManager\CameraManager.h">
+      <Filter>ObjectManager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\ObjMgr\ObjectManager\PathTracingIntegratorManager.h">
       <Filter>ObjectManager</Filter>
     </ClInclude>
   </ItemGroup>

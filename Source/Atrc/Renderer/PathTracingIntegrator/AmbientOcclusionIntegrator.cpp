@@ -1,4 +1,4 @@
-#include <Atrc/Integrator/AmbientOcclusionIntegrator.h>
+#include <Atrc/Renderer/PathTracingIntegrator/AmbientOcclusionIntegrator.h>
 
 AGZ_NS_BEG(Atrc)
 

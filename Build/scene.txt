@@ -1,6 +1,6 @@
 # Renderer
 renderer = {
-    type        = ParallelRenderer;
+    type        = PathTracingRenderer;
     workerCount = 11;
     spp         = 1;
     integrator  = {

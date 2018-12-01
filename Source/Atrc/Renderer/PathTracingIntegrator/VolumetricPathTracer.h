@@ -1,11 +1,11 @@
 ﻿#pragma once
 
-#include <Atrc/Core/Core.h>
+#include <Atrc/Renderer/PathTracingIntegrator/PathTracingIntegrator.h>
 
 AGZ_NS_BEG(Atrc)
 
 // See https://airguanz.github.io/2018/10/28/LTE-with-participating-medium.html
-class VolumetricPathTracer : public Integrator
+class VolumetricPathTracer : public PathTracingIntegrator
 {
 public:
 

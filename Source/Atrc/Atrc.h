@@ -11,11 +11,6 @@
 #include <Atrc/Geometry/Sphere.h>
 #include <Atrc/Geometry/TriangleBVH.h>
 
-#include <Atrc/Integrator/AmbientOcclusionIntegrator.h>
-#include <Atrc/Integrator/PathTracer.h>
-#include <Atrc/Integrator/PureColorIntegrator.h>
-#include <Atrc/Integrator/VolumetricPathTracer.h>
-
 #include <Atrc/Light/CubeEnvironmentLight.h>
 #include <Atrc/Light/DirectionalLight.h>
 #include <Atrc/Light/GeometricDiffuseLightImpl.h>
@@ -36,8 +31,13 @@
 #include <Atrc/PostProcessor/ACESFilm.h>
 #include <Atrc/PostProcessor/GammaCorrector.h>
 
+#include <Atrc/Renderer/PathTracingIntegrator/AmbientOcclusionIntegrator.h>
+#include <Atrc/Renderer/PathTracingIntegrator/PathTracer.h>
+#include <Atrc/Renderer/PathTracingIntegrator/PureColorIntegrator.h>
+#include <Atrc/Renderer/PathTracingIntegrator/VolumetricPathTracer.h>
+
 #include <Atrc/Renderer/DefaultProgressReporter.h>
-#include <Atrc/Renderer/ParallelRenderer.h>
+#include <Atrc/Renderer/PathTracingRenderer.h>
 
 AGZ_NS_BEG(Atrc)
 

@@ -1,4 +1,4 @@
-﻿#include <Atrc/Integrator/VolumetricPathTracer.h>
+﻿#include <Atrc/Renderer/PathTracingIntegrator/VolumetricPathTracer.h>
 
 AGZ_NS_BEG(Atrc)
 

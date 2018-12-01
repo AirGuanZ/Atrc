@@ -3,7 +3,7 @@
 #include "ObjectManager/CameraManager.h"
 #include "ObjectManager/EntityCreator.h"
 #include "ObjectManager/GeometryManager.h"
-#include "ObjectManager/IntegratorManager.h"
+#include "ObjectManager/PathTracingIntegratorManager.h"
 #include "ObjectManager/LightManager.h"
 #include "ObjectManager/MaterialManager.h"
 #include "ObjectManager/MediumManager.h"
@@ -51,7 +51,7 @@ inline void InitializeObjectManagers()
     for(auto c : LIGHT_CREATORS)
         LightManager::GetInstance().AddCreator(c);
 
-    IntegratorCreator *INTEGRATOR_CREATORS[] =
+    PathTracingIntegratorCreator *INTEGRATOR_CREATORS[] =
     {
         AmbientOcclusionIntegratorCreator::GetInstancePtr(),
         PathTracerCreator                ::GetInstancePtr(),
@@ -59,7 +59,7 @@ inline void InitializeObjectManagers()
         VolumetricPathTracerCreator      ::GetInstancePtr(),
     };
     for(auto c : INTEGRATOR_CREATORS)
-        IntegratorManager::GetInstance().AddCreator(c);
+        PathTracingIntegratorManager::GetInstance().AddCreator(c);
 
     MaterialCreator *MATERIAL_CREATORS[] =
     {
@@ -99,25 +99,25 @@ inline void InitializeObjectManagers()
 
     RendererCreator *RENDERER_CREATORS[] =
     {
-        ParallelRendererCreator::GetInstancePtr(),
+        PathTracingRendererCreator::GetInstancePtr(),
     };
     for(auto c : RENDERER_CREATORS)
         RendererManager::GetInstance().AddCreator(c);
 }
 
 // 创建在params内公开定义的元素
-inline void InitializePublicObjects(const AGZ::ConfigGroup &params, AGZ::ObjArena<> &arena)
+inline void InitializePublicObjects(const ConfigGroup &params, ObjArena<> &arena)
 {
-    InitializePublicDefinition<Atrc::Geometry>        ("pub_geometry",      params, arena);
-    InitializePublicDefinition<Atrc::Material>        ("pub_material",      params, arena);
-    InitializePublicDefinition<Atrc::Light>           ("pub_light",         params, arena);
-    InitializePublicDefinition<Atrc::Medium>          ("pub_medium",        params, arena);
-    InitializePublicDefinition<Atrc::Entity>          ("pub_entity",        params, arena);
-    InitializePublicDefinition<Atrc::PostProcessStage>("pub_postprocessor", params, arena);
-    InitializePublicDefinition<Atrc::Camera>          ("pub_camera",        params, arena);
-    InitializePublicDefinition<Atrc::Integrator>      ("pub_integrator",    params, arena);
-    InitializePublicDefinition<Atrc::Renderer>        ("pub_renderer",      params, arena);
-    InitializePublicDefinition<Atrc::ProgressReporter>("pub_reporter",      params, arena);
+    InitializePublicDefinition<Atrc::Geometry>             ("pub_geometry",                params, arena);
+    InitializePublicDefinition<Atrc::Material>             ("pub_material",                params, arena);
+    InitializePublicDefinition<Atrc::Light>                ("pub_light",                   params, arena);
+    InitializePublicDefinition<Atrc::Medium>               ("pub_medium",                  params, arena);
+    InitializePublicDefinition<Atrc::Entity>               ("pub_entity",                  params, arena);
+    InitializePublicDefinition<Atrc::PostProcessStage>     ("pub_postprocessor",           params, arena);
+    InitializePublicDefinition<Atrc::Camera>               ("pub_camera",                  params, arena);
+    InitializePublicDefinition<Atrc::PathTracingIntegrator>("pub_path_tracing_integrator", params, arena);
+    InitializePublicDefinition<Atrc::Renderer>             ("pub_renderer",                params, arena);
+    InitializePublicDefinition<Atrc::ProgressReporter>     ("pub_reporter",                params, arena);
 }
 
 AGZ_NS_END(ObjMgr)

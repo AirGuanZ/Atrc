@@ -1,10 +1,10 @@
 #pragma once
 
-#include <Atrc/Core/Core.h>
+#include <Atrc/Renderer/PathTracingIntegrator/PathTracingIntegrator.h>
 
 AGZ_NS_BEG(Atrc)
 
-class PureColorIntegrator : public Integrator
+class PureColorIntegrator : public PathTracingIntegrator
 {
     Spectrum background_;
     Spectrum entity_;

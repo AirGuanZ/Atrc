@@ -53,7 +53,10 @@ Atrc::Geometry *TriangleBVHCreator::Create(const ConfigGroup &params, ObjArena<>
             {
                 AGZ::FileSys::FileTime timeInCache;
                 d.Deserialize(timeInCache);
-                return d.Ok() && timeInCache == AGZ::FileSys::File::GetLastWriteTime(path);
+                auto pathWriteTime = AGZ::FileSys::File::GetLastWriteTime(path);
+                if(!pathWriteTime)
+                    return false;
+                return d.Ok() && timeInCache == *pathWriteTime;
             },
             [&](AGZ::BinaryDeserializer &d) // cache loader
             {
