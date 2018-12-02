@@ -133,10 +133,11 @@ void ProjectEntity(const Str8 &descFilename)
 
     SHEntitySubareaRenderer subareaRenderer(spp, SHC, N);
     SHEntityRenderer renderer(workerCount);
+    SHEntityFullProjector projector(10);
 
     DefaultProgressReporter reporter;
 
-    renderer.Render(subareaRenderer, scene, renderTargets.data(), &reporter);
+    renderer.Render(subareaRenderer, scene, projector, renderTargets.data(), &reporter);
 
     if(!SaveProjectedEntity(filename, renderTargets.data(), SHC))
         cout << "Failed to save rendered coefficients into " << filename.ToStdString() << endl;

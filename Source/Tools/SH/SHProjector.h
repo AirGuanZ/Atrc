@@ -9,9 +9,35 @@ class SHEntityProjector
 {
 public:
 
-    static void Project(
+    virtual ~SHEntityProjector() = default;
+
+    virtual void Project(
         const Atrc::Ray &r, const Atrc::Scene &scene, int SHC, int N,
-        Atrc::Spectrum *output, AGZ::ObjArena<> &arena);
+        Atrc::Spectrum *output, AGZ::ObjArena<> &arena) const = 0;
+};
+
+class SHEntityDirectProjector : public SHEntityProjector
+{
+public:
+
+    void Project(
+        const Atrc::Ray &r, const Atrc::Scene &scene, int SHC, int N,
+        Atrc::Spectrum *output, AGZ::ObjArena<> &arena) const override;
+};
+
+class SHEntityFullProjector : public SHEntityProjector
+{
+    int maxDepth_;
+
+    void ProjectImpl(const Atrc::Ray &r, const Atrc::Scene &scene, int SHC,
+                     Atrc::Spectrum *output, AGZ::ObjArena<> &arena, int depth) const;
+
+public:
+
+    explicit SHEntityFullProjector(int maxDepth);
+
+    void Project(const Atrc::Ray &r, const Atrc::Scene &scene, int SHC, int N,
+                 Atrc::Spectrum *output, AGZ::ObjArena<> &arena) const override;
 };
 
 class SHLightProjector
@@ -30,7 +56,7 @@ public:
     explicit SHEntitySubareaRenderer(int spp, int SHC, int N);
 
     void Render(
-        const Atrc::Scene &scene,
+        const Atrc::Scene &scene, const SHEntityProjector &projector,
         Atrc::RenderTarget *renderTarget, const SubareaRect &area) const;
 };
 
@@ -43,6 +69,6 @@ public:
     explicit SHEntityRenderer(int workerCount);
 
     void Render(
-        const SHEntitySubareaRenderer &subareaRenderer, const Atrc::Scene &scene,
+        const SHEntitySubareaRenderer &subareaRenderer, const Atrc::Scene &scene, const SHEntityProjector &projector,
         Atrc::RenderTarget *output, Atrc::ProgressReporter *reporter) const;
 };

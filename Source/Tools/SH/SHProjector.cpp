@@ -2,7 +2,7 @@
 
 using namespace Atrc;
 
-void SHEntityProjector::Project(const Ray &r, const Scene &scene, int SHC, int N, Spectrum *output, AGZ::ObjArena<> &arena)
+void SHEntityDirectProjector::Project(const Ray &r, const Scene &scene, int SHC, int N, Spectrum *output, AGZ::ObjArena<> &arena) const
 {
     for(int i = 0; i < SHC; ++i)
         output[i] = Spectrum();
@@ -38,6 +38,79 @@ void SHEntityProjector::Project(const Ray &r, const Scene &scene, int SHC, int N
         output[i] /= N;
 }
 
+void SHEntityFullProjector::ProjectImpl(const Ray &r, const Scene &scene, int SHC, Spectrum *output, AGZ::ObjArena<> &arena, int depth) const
+{
+    if(depth > maxDepth_)
+    {
+        for(int i = 0; i < SHC; ++i)
+            output[i] = Spectrum();
+        return;
+    }
+
+    auto SHTable = AGZ::Math::GetSHTable<Real>();
+
+    SurfacePoint sp;
+    if(!scene.FindCloestIntersection(r, &sp))
+    {
+        if(depth > 1)
+        {
+            for(int i = 0; i < SHC; ++i)
+                output[i] = Spectrum(float(SHTable[i](r.dir)));
+        }
+        else
+        {
+            for(int i = 0; i < SHC; ++i)
+                output[i] = Spectrum();
+        }
+        return;
+    }
+
+    ShadingPoint shd;
+    sp.entity->GetMaterial(sp)->Shade(sp, &shd, arena);
+
+    auto bsdfSample = shd.bsdf->SampleWi(sp.wo, BXDF_ALL);
+    if(!bsdfSample)
+    {
+        for(int i = 0; i < SHC; ++i)
+            output[i] = Spectrum();
+        return;
+    }
+
+    auto f    = bsdfSample->coef;
+    auto cosV = Dot(sp.geoLocal.ez, bsdfSample->wi);
+    auto pS2  = bsdfSample->pdf;
+
+    Ray newRay(sp.pos, bsdfSample->wi, EPS);
+    ProjectImpl(newRay, scene, SHC, output, arena, depth + 1);
+
+    auto pfx = f * float(cosV / pS2);
+    for(int i = 0; i < SHC; ++i)
+        output[i] *= pfx;
+}
+
+SHEntityFullProjector::SHEntityFullProjector(int maxDepth)
+    : maxDepth_(maxDepth)
+{
+    AGZ_ASSERT(maxDepth > 0);
+}
+
+void SHEntityFullProjector::Project(const Ray &r, const Scene &scene, int SHC, int N, Spectrum *output, AGZ::ObjArena<> &arena) const
+{
+    for(int i = 0; i < SHC; ++i)
+        output[i] = Spectrum();
+
+    std::vector<Spectrum> tOutput(SHC);
+    for(int i = 0; i < N; ++i)
+    {
+        ProjectImpl(r, scene, SHC, tOutput.data(), arena, 1);
+        for(int j = 0; j < SHC; ++j)
+            output[j] += tOutput[j];
+    }
+
+    for(int i = 0; i < SHC; ++i)
+        output[i] /= N;
+}
+
 void SHLightProjector::Project(const Light *light, int SHC, int N, Spectrum *output)
 {
     auto SHTable = AGZ::Math::GetSHTable<Real>();
@@ -65,7 +138,7 @@ SHEntitySubareaRenderer::SHEntitySubareaRenderer(int spp, int SHC, int N)
 }
 
 void SHEntitySubareaRenderer::Render(
-    const Scene &scene,
+    const Scene &scene, const SHEntityProjector &projector,
     RenderTarget *renderTarget, const SubareaRect &area) const
 {
     AGZ::ObjArena<> arena;
@@ -91,7 +164,7 @@ void SHEntitySubareaRenderer::Render(
                 Real xOffset = xBaseCoef * Rand();
                 Real yOffset = -yBaseCoef * Rand();
 
-                SHEntityProjector::Project(
+                projector.Project(
                     cam->GetRay({ xBase + xOffset, yBase + yOffset }), scene, SHC_, N_, tPixel.data(), arena);
 
                 for(int k = 0; k < SHC_; ++k)
@@ -114,7 +187,7 @@ SHEntityRenderer::SHEntityRenderer(int workerCount)
 }
 
 void SHEntityRenderer::Render(
-    const SHEntitySubareaRenderer &subareaRenderer, const Scene &scene,
+    const SHEntitySubareaRenderer &subareaRenderer, const Scene &scene, const SHEntityProjector &projector,
     RenderTarget *output, ProgressReporter *reporter) const
 {
     auto tasks = GridDivider<uint32_t>::Divide(
@@ -128,7 +201,7 @@ void SHEntityRenderer::Render(
 
     auto func = [&](const SubareaRect &subarea, AGZ::NoSharedParam_t)
     {
-        subareaRenderer.Render(scene, output, subarea);
+        subareaRenderer.Render(scene, projector, output, subarea);
         auto percent = 100.0 * ++finishedCount / totalCount;
         reporter->Report(percent);
     };
