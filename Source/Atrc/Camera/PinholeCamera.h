@@ -19,7 +19,7 @@ public:
         const Vec2 &filmSize, const Vec2 &sensorRectSize,
         Real sensorPinholeDistance, const Vec3 &pinholePos, const Vec3 &lookAt, const Vec3 &u);
     
-    Ray GetRay(const Vec2 &rasterPos) const;
+    CameraRay GetRay(const Vec2 &rasterPos) const;
 };
 
 AGZ_NS_END(Atrc)

@@ -17,8 +17,8 @@ void PathTracingRenderer::RenderSubarea(const Scene &scene, RenderTarget *rt, co
             for(uint32_t i = 0; i < spp_; ++i)
             {
                 Real xOffset = Rand(), yOffset = Rand();
-                pixel += integrator_.Eval(
-                    scene, cam->GetRay({ px + xOffset, py + yOffset }), arena);
+                auto [r, we] = cam->GetRay({ px + xOffset, py + yOffset });
+                pixel += we * integrator_.Eval(scene, r, arena);
             }
             rt->At(px, py) = pixel / spp_;
 

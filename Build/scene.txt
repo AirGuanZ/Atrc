@@ -2,7 +2,7 @@
 renderer = {
     type        = PathTracingRenderer;
     workerCount = 11;
-    spp         = 10;
+    spp         = 1000;
     integrator  = {
         type     = PathTracer;
         maxDepth = 50;
@@ -98,15 +98,6 @@ entities = (
 
 # Light list
 lights = (
-#{
-#    type = CubeEnvironmentLight;
-#    posX = "./Assets/PineForest/front.jpg";
-#    posY = "./Assets/PineForest/left.jpg";
-#    posZ = "./Assets/PineForest/up.jpg";
-#    negX = "./Assets/PineForest/back.jpg";
-#    negY = "./Assets/PineForest/right.jpg";
-#    negZ = "./Assets/PineForest/down.jpg";
-#}
 {
     type = SphereEnvironmentLight;
     tex = "./Assets/PineForest.png";
@@ -116,6 +107,6 @@ lights = (
 postProcessors = (
 { type = HorizontalFlipper; },
 { type = VerticalFlipper; },
-#{ type = ACESFilm; },
-#{ type = GammaCorrection; gamma = 0.4545; }
+{ type = ACESFilm; },
+#{ type = GammaCorrection; gamma = 1.0; }
 );

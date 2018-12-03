@@ -16,7 +16,7 @@ PinholeCamera::PinholeCamera(
     R_ = Mat3::FromCols(ex, ey, ez);
 }
 
-Ray PinholeCamera::GetRay(const Vec2 &rasterPos) const
+CameraRay PinholeCamera::GetRay(const Vec2 &rasterPos) const
 {
     Real xS = wS_ * (rasterPos.x / wI_) - halfWS_;
     Real yS = halfHS_ - hS_ * (rasterPos.y / hI_);
@@ -24,7 +24,7 @@ Ray PinholeCamera::GetRay(const Vec2 &rasterPos) const
     Vec3 origin = T_;
     Vec3 direction = R_ * Vec3(L_, xS, -yS);
 
-    return Ray(origin, direction.Normalize(), EPS);
+    return { Ray(origin, direction.Normalize(), EPS), Spectrum(1.0f) };
 }
 
 AGZ_NS_END(Atrc)

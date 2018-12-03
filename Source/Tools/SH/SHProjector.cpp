@@ -158,11 +158,11 @@ void SHEntitySubareaRenderer::Render(
             {
                 Real xOffset = Rand(), yOffset = Rand();
 
-                projector.Project(
-                    cam->GetRay({ px + xOffset, py + yOffset }), scene, SHC_, N_, tPixel.data(), arena);
+                auto [r, we] = cam->GetRay({ px + xOffset, py + yOffset });
+                projector.Project(r, scene, SHC_, N_, tPixel.data(), arena);
 
                 for(int k = 0; k < SHC_; ++k)
-                    renderTarget[k](px, py) += tPixel[k];
+                    renderTarget[k](px, py) += we * tPixel[k];
             }
 
             for(int k = 0; k < SHC_; ++k)
