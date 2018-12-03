@@ -7,11 +7,19 @@ AGZ_NS_BEG(ObjMgr)
 using CameraCreator = ObjectCreator<Atrc::Camera>;
 using CameraManager = ObjectManager<Atrc::Camera>;
 
-class PerspectiveCameraCreator : public CameraCreator, public AGZ::Singleton<PerspectiveCameraCreator>
+// film.width  = uint32_t
+// film.height = uint32_t
+// sensor.width    = Real
+// sensor.height   = Real
+// sensor.distance = Real
+// pinholePos = Vec3
+// lookAt     = Vec3
+// up         = Vec3
+class PinholeCameraCreator : public CameraCreator, public AGZ::Singleton<PinholeCameraCreator>
 {
 public:
 
-    Str8 GetName() const override { return "Perspective"; }
+    Str8 GetName() const override { return "Pinhole"; }
 
     Atrc::Camera *Create(const ConfigGroup &params, ObjArena<> &arena) const override;
 };

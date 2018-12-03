@@ -221,8 +221,16 @@ bool TriangleBVHCore::FindIntersection(const Ray &r, SurfacePoint *sp) const
         {
             if(internal.bound.HasIntersection(tr, invDir))
             {
-                tasks[taskTop++] = taskNodeIdx + 1;
-                tasks[taskTop++] = internal.rightChild;
+                if(r.dir[uint8_t(internal.splitAxis)] > 0)
+                {
+                    tasks[taskTop++] = taskNodeIdx + 1;
+                    tasks[taskTop++] = internal.rightChild;
+                }
+                else
+                {
+                    tasks[taskTop++] = internal.rightChild;
+                    tasks[taskTop++] = taskNodeIdx + 1;
+                }
             }
         });
     }
@@ -290,17 +298,17 @@ namespace
     {
         TNode *left, *right;
         AABB bound;
+        TriangleBVHCore::Axis splitAxis;
     };
 
-    using Axis = uint8_t;
-    constexpr Axis X = 0, Y = 1, Z = 2;
+    using Axis = TriangleBVHCore::Axis;
 
     Axis SelectAxisWithMaxExtent(const Vec3 &delta)
     {
         AGZ_ASSERT(delta.x >= 0.0 && delta.y >= 0.0 && delta.z >= 0.0);
         if(delta.x < delta.y)
-            return delta.y < delta.z ? Z : Y;
-        return delta.x < delta.z ? Z : X;
+            return delta.y < delta.z ? Axis::Z : Axis::Y;
+        return delta.x < delta.z ? Axis::Z : Axis::X;
     }
 
     TNode *FillLeaf(TNode *ret, uint32_t start, uint32_t end)
@@ -373,7 +381,7 @@ namespace
 
         Vec3 centroidDelta = centroidBound.high - centroidBound.low;
         Axis splitAxis = SelectAxisWithMaxExtent(centroidDelta);
-        if(centroidDelta[splitAxis] <= 0.0)
+        if(centroidDelta[uint8_t(splitAxis)] <= 0.0)
         {
             *nodeCount += 1;
             return FillLeaf(nodeArena.Create<TNode>(), start, end);
@@ -456,12 +464,12 @@ namespace
 
         std::sort(&tris.triIdxMap[0] + start, &tris.triIdxMap[0] + end, [&](uint32_t L, uint32_t R)
         {
-            return tris.triInfo[L].centroid[splitAxis] < tris.triInfo[R].centroid[splitAxis];
+            return tris.triInfo[L].centroid[uint8_t(splitAxis)] < tris.triInfo[R].centroid[uint8_t(splitAxis)];
         });
         uint32_t splitIdx = (start + end) / 2;
 
         auto *ret = nodeArena.Create<TNode>();
-        *ret = TInternal{ nullptr, nullptr, allBound };
+        *ret = TInternal{ nullptr, nullptr, allBound, splitAxis };
         auto &internal = std::get<TInternal>(*ret);
 
         taskQueue->push({ start, splitIdx, &internal.left });
@@ -539,7 +547,7 @@ namespace
             },
                 [&](const TInternal &internal)
             {
-                nodes.emplace_back(TriangleBVHCore::Internal{ internal.bound, 0 });
+                nodes.emplace_back(TriangleBVHCore::Internal{ internal.bound, 0, internal.splitAxis });
 
                 tasks.push({ internal.right, &std::get<TriangleBVHCore::Internal>(nodes.back()).rightChild });
                 tasks.push({ internal.left, nullptr });

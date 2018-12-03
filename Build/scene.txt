@@ -2,27 +2,33 @@
 renderer = {
     type        = PathTracingRenderer;
     workerCount = 11;
-    spp         = 1;
+    spp         = 10;
     integrator  = {
         type     = PathTracer;
         maxDepth = 50;
     };
 };
 
-# Image properties
-output = { filename = "./Build/Output.png"; width = 640; height = 480; };
+# Output filename
+outputFilename = "./Build/Output.png";
 
 # Progress reporter
 reporter = { type = Default; };
 
 # Camera
 camera = {
-    type = Perspective;
-    aspectRatio = 1.333333333;
-    eye  = (-7, 0, 0);
-    dst  = (0, 0, 1.5);
-    up   = (0, 0, 1);
-    FOVz = Deg(70);
+    type = Pinhole;
+    film = {
+        width  = 640;
+        height = 480;
+    };
+    sensor = {
+        width    = 2.0;
+        distance = 1;
+    };
+    pinholePos = (-7, 0, 0);
+    lookAt     = (0, 0, 1.5);
+    up         = (0, 0, 1);
 };
 
 # Entity list
@@ -108,6 +114,8 @@ lights = (
 );
 
 postProcessors = (
+{ type = HorizontalFlipper; },
+{ type = VerticalFlipper; },
 #{ type = ACESFilm; },
 #{ type = GammaCorrection; gamma = 0.4545; }
 );

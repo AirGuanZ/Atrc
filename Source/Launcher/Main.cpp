@@ -58,9 +58,9 @@ int Run(const Str8 &sceneDescFilename)
 
     auto &sceneMgr = SceneManager::GetInstance();
 
-    auto filename = conf["output.filename"].AsValue();;
-    auto width    = conf["output.width"].AsValue().Parse<uint32_t>();
-    auto height   = conf["output.height"].AsValue().Parse<uint32_t>();
+    auto filename = conf["outputFilename"].AsValue();
+    auto width    = conf["camera.film.width"].AsValue().Parse<uint32_t>();
+    auto height   = conf["camera.film.height"].AsValue().Parse<uint32_t>();
 
     sceneMgr.Initialize(config.Root());
     RenderTarget renderTarget(width, height);
@@ -70,11 +70,7 @@ int Run(const Str8 &sceneDescFilename)
 
     PostProcessor postProcessor;
     if(auto pps = conf.Find("postProcessors"))
-    {
-        auto &arrPP = pps->AsArray();
-        for(size_t i = 0; i < arrPP.Size(); ++i)
-            postProcessor.AddStage(GetSceneObject<PostProcessStage>(arrPP[i], arena));
-    }
+        ObjMgr::AddPostProcessors(postProcessor, pps->AsArray(), arena);
 
     renderer->Render(sceneMgr.GetScene(), &renderTarget, reporter);
 

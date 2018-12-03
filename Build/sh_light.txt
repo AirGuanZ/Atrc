@@ -1,6 +1,6 @@
 outputFilename = "./Build/sh_light.output";
 
-N = 10000;
+N = 1000000;
 Bands = 5;
 
 light = {

@@ -21,6 +21,8 @@ public:
 
     using Node = AGZ::TypeOpr::Variant<Leaf, Internal>;
 
+    enum class Axis : uint8_t { X, Y, Z };
+
     struct Leaf
     {
         uint32_t start, end;
@@ -30,6 +32,7 @@ public:
     {
         AABB bound;
         uint32_t rightChild = 0;
+        Axis splitAxis = Axis::X;
 
         IMPL_MEMCPY_SERIALIZE
         IMPL_MEMCPY_DESERIALIZE

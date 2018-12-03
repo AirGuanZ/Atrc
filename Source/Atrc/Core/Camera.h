@@ -5,14 +5,21 @@
 
 AGZ_NS_BEG(Atrc)
 
+// 定义和符号含义见 https://airguanz.github.io/2018/12/02/camera-models.html
 class Camera
 {
+protected:
+
+    Real wI_, hI_;
+
 public:
+
+    Camera(Real wI, Real hI): wI_(wI), hI_(hI) { }
 
     virtual ~Camera() = default;
 
-    // x in [-1, 1], y in [-1, 1]
-    virtual Ray GetRay(const Vec2 &scrPos) const = 0;
+    // rasterPos为像素坐标系中的位置，
+    virtual Ray GetRay(const Vec2 &rasterPos) const = 0;
 };
 
 AGZ_NS_END(Atrc)

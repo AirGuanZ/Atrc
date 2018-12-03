@@ -113,9 +113,9 @@ void ProjectEntity(const Str8 &descFilename)
 
     // 其他渲染配置项
 
-    auto filename     = conf["output.filename"].AsValue();
-    auto outputWidth  = conf["output.width"].AsValue().Parse<uint32_t>();
-    auto outputHeight = conf["output.height"].AsValue().Parse<uint32_t>();
+    auto filename     = conf["outputFilename"].AsValue();
+    auto outputWidth  = conf["camera.film.width"].AsValue().Parse<uint32_t>();
+    auto outputHeight = conf["camera.film.height"].AsValue().Parse<uint32_t>();
     auto spp          = conf["spp"].AsValue().Parse<int>();
     auto N            = conf["N"].AsValue().Parse<int>();
     auto bands        = conf["Bands"].AsValue().Parse<int>();
@@ -125,6 +125,10 @@ void ProjectEntity(const Str8 &descFilename)
 
     if(spp <= 0 || N <= 0 || bands <= 0)
         throw ObjMgr::SceneInitializationException("Invalid spp/N/Bands value");
+    
+    PostProcessor postProcessor;
+    if(auto pps = conf.Find("postProcessors"))
+        ObjMgr::AddPostProcessors(postProcessor, pps->AsArray(), arena);
 
     std::vector<RenderTarget> renderTargets;
     renderTargets.reserve(SHC);
@@ -133,11 +137,25 @@ void ProjectEntity(const Str8 &descFilename)
 
     SHEntitySubareaRenderer subareaRenderer(spp, SHC, N);
     SHEntityRenderer renderer(workerCount);
-    SHEntityFullProjector projector(10);
+
+    SHEntityProjector *projector;
+    if(conf["projector.type"].AsValue() == "Full")
+    {
+        auto maxDepth = conf["projector.maxDepth"].AsValue().Parse<int>();
+        if(maxDepth <= 0)
+            throw ObjMgr::SceneInitializationException("Invalid projector.maxDepth value");
+        projector = arena.Create<SHEntityFullProjector>(maxDepth);
+    }
+    else if(conf["projector.type"].AsValue() == "Direct")
+        projector = arena.Create<SHEntityDirectProjector>();
+    else
+        throw ObjMgr::SceneInitializationException("Unknown projector type");
 
     DefaultProgressReporter reporter;
 
-    renderer.Render(subareaRenderer, scene, projector, renderTargets.data(), &reporter);
+    renderer.Render(subareaRenderer, scene, *projector, renderTargets.data(), &reporter);
+    for(auto &rt : renderTargets)
+        postProcessor.Process(rt);
 
     if(!SaveProjectedEntity(filename, renderTargets.data(), SHC))
         cout << "Failed to save rendered coefficients into " << filename.ToStdString() << endl;

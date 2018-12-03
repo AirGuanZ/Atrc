@@ -143,29 +143,23 @@ void SHEntitySubareaRenderer::Render(
 {
     AGZ::ObjArena<> arena;
 
-    auto pw = renderTarget[0].GetWidth(), ph = renderTarget[0].GetHeight();
-    Real xBaseCoef = Real(2) / pw, yBaseCoef = Real(2) / ph;
     auto cam = scene.GetCamera();
 
     std::vector<Spectrum> tPixel(SHC_);
 
     for(uint32_t py = area.yBegin; py < area.yEnd; ++py)
     {
-        Real yBase = 1 - Real(2) * py / ph;
         for(uint32_t px = area.xBegin; px < area.xEnd; ++px)
         {
-            Real xBase = Real(2) * px / pw - 1;
-
             for(int k = 0; k < SHC_; ++k)
                 renderTarget[k](px, py) = Spectrum();
 
             for(int i = 0; i < spp_; ++i)
             {
-                Real xOffset = xBaseCoef * Rand();
-                Real yOffset = -yBaseCoef * Rand();
+                Real xOffset = Rand(), yOffset = Rand();
 
                 projector.Project(
-                    cam->GetRay({ xBase + xOffset, yBase + yOffset }), scene, SHC_, N_, tPixel.data(), arena);
+                    cam->GetRay({ px + xOffset, py + yOffset }), scene, SHC_, N_, tPixel.data(), arena);
 
                 for(int k = 0; k < SHC_; ++k)
                     renderTarget[k](px, py) += tPixel[k];

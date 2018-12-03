@@ -8,23 +8,17 @@ void PathTracingRenderer::RenderSubarea(const Scene &scene, RenderTarget *rt, co
 {
     AGZ::ObjArena<> arena;
 
-    auto pw = rt->GetWidth(), ph = rt->GetHeight();
-    Real xBaseCoef = Real(2) / pw, yBaseCoef = Real(2) / ph;
     auto cam = scene.GetCamera();
     for(uint32_t py = subarea.yBegin; py < subarea.yEnd; ++py)
     {
-        Real yBase = 1 - Real(2) * py / ph;
         for(uint32_t px = subarea.xBegin; px < subarea.xEnd; ++px)
         {
-            Real xBase = Real(2) * px / pw - 1;
-
             Spectrum pixel = SPECTRUM::BLACK;
             for(uint32_t i = 0; i < spp_; ++i)
             {
-                Real xOffset = xBaseCoef * Rand();
-                Real yOffset = -yBaseCoef * Rand();
+                Real xOffset = Rand(), yOffset = Rand();
                 pixel += integrator_.Eval(
-                    scene, cam->GetRay({ xBase + xOffset, yBase + yOffset }), arena);
+                    scene, cam->GetRay({ px + xOffset, py + yOffset }), arena);
             }
             rt->At(px, py) = pixel / spp_;
 

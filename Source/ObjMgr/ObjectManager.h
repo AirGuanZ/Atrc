@@ -19,7 +19,8 @@ inline void InitializeObjectManagers()
 
     CameraCreator *CAMERA_CREATORS[] =
     {
-        PerspectiveCameraCreator::GetInstancePtr(),
+        //PerspectiveCameraCreator::GetInstancePtr(),
+        PinholeCameraCreator::GetInstancePtr(),
     };
     for(auto c : CAMERA_CREATORS)
         CameraManager::GetInstance().AddCreator(c);
@@ -84,8 +85,10 @@ inline void InitializeObjectManagers()
 
     PostProcessorStageCreator *POSTPROCESSOR_STAGE_CREATORS[] =
     {
-        ACESFilmCreator      ::GetInstancePtr(),
-        GammaCorrectorCreator::GetInstancePtr(),
+        ACESFilmCreator         ::GetInstancePtr(),
+        GammaCorrectorCreator   ::GetInstancePtr(),
+        HorizontalFlipperCreator::GetInstancePtr(),
+        VerticalFlipperCreator  ::GetInstancePtr(),
     };
     for(auto c : POSTPROCESSOR_STAGE_CREATORS)
         PostProcessorStageManager::GetInstance().AddCreator(c);

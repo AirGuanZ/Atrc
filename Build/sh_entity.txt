@@ -1,18 +1,28 @@
 # Camera
 camera = {
-    type = Perspective;
-    aspectRatio = 0.666666;
-    eye  = (-7, 0, 0);
-    dst  = (0, 0, 0);
-    up   = (0, 0, 1);
-    FOVz = Deg(28);
+    type = Pinhole;
+    film = {
+        width  = 600;
+        height = 900;
+    };
+    sensor = {
+        width    = 0.3;
+        distance = 1;
+    };
+    pinholePos = (-7, 0, 0);
+    lookAt     = (0, 0, 0);
+    up         = (0, 0, 1);
 };
 
 # Image properties
-output = { filename = "./Build/sh_entity.output"; width = 600; height = 900; };
+outputFilename = "./Build/sh_entity.output";
 
-spp   = 10;
-N     = 10;
+projector = {
+    type = Direct;
+};
+
+spp   = 20;
+N     = 50;
 Bands = 5;
 
 workerCount = -1;
@@ -23,18 +33,15 @@ entities = ({
     geometry = {
         type = TriangleBVH;
         path = "./Assets/Statue_Bressant_1M_Poly.obj";
-        transform = (Translate(0.0, 0.02, -0.945), RotateZ(Deg(-90)), Scale(0.0050));
+        transform = (Translate(0, 0, -0.945), RotateZ(Deg(-90)), Scale(0.0050));
     };
-    #material = {
-    #    type = Metal;
-    #    rc = (0.9, 0.4, 0.2);
-    #    etaI = 1;
-    #    etaT = 0.1;
-    #    k = 0.2;
-    #    roughness = 0.02;
-    #};
     material = {
         type = DiffuseMaterial;
         albedo = (0.8);
     };
 });
+
+postProcessors = (
+{ type = HorizontalFlipper; },
+{ type = VerticalFlipper; }
+);

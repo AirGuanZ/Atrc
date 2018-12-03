@@ -12,6 +12,7 @@ using AGZ::None;
 
 using AGZ::ObjArena;
 using AGZ::Config;
+using AGZ::ConfigArray;
 using AGZ::ConfigGroup;
 using AGZ::ConfigNode;
 

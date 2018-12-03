@@ -2,7 +2,7 @@
 
 #include <Atrc/Accelarator/BVH.h>
 
-#include <Atrc/Camera/PerspectiveCamera.h>
+#include <Atrc/Camera/PinholeCamera.h>
 
 #include <Atrc/Entity/GeometricEntity.h>
 #include <Atrc/Entity/GeometricLightEntity.h>
@@ -30,6 +30,8 @@
 
 #include <Atrc/PostProcessor/ACESFilm.h>
 #include <Atrc/PostProcessor/GammaCorrector.h>
+#include <Atrc/PostProcessor/HorizontalFlipper.h>
+#include <Atrc/PostProcessor/VerticalFlipper.h>
 
 #include <Atrc/Renderer/PathTracingIntegrator/AmbientOcclusionIntegrator.h>
 #include <Atrc/Renderer/PathTracingIntegrator/PathTracer.h>
