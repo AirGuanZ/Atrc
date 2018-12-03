@@ -100,9 +100,6 @@
     <ClInclude Include="..\..\..\Source\Atrc\Entity\GeometricLightEntity.h">
       <Filter>Entity</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\Atrc\Camera\PerspectiveCamera.h">
-      <Filter>Camera</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Source\Atrc\Material\Fresnel.h">
       <Filter>Material</Filter>
     </ClInclude>
@@ -220,6 +217,15 @@
     <ClInclude Include="..\..\..\Source\Atrc\Renderer\PathTracingIntegrator\PathTracingIntegrator.h">
       <Filter>Renderer\PathTracingIntegrator</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Camera\PinholeCamera.h">
+      <Filter>Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\PostProcessor\HorizontalFlipper.h">
+      <Filter>PostProcessor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\PostProcessor\VerticalFlipper.h">
+      <Filter>PostProcessor</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\Atrc\Core\Geometry.cpp">
@@ -242,9 +248,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Source\Atrc\Material\BlackMaterial.cpp">
       <Filter>Material</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\Atrc\Camera\PerspectiveCamera.cpp">
-      <Filter>Camera</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Source\Atrc\Core\Common.cpp">
       <Filter>Core</Filter>
@@ -347,6 +350,15 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Source\Atrc\Renderer\PathTracingIntegrator\VolumetricPathTracer.cpp">
       <Filter>Renderer\PathTracingIntegrator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Camera\PinholeCamera.cpp">
+      <Filter>Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\PostProcessor\HorizontalFlipper.cpp">
+      <Filter>PostProcessor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\PostProcessor\VerticalFlipper.cpp">
+      <Filter>PostProcessor</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

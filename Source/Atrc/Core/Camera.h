@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <Atrc/Core/Common.h>
 #include <Atrc/Core/Ray.h>

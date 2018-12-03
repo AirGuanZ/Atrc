@@ -21,7 +21,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\..\Source\Atrc\Accelarator\BVH.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Atrc.h" />
-    <ClInclude Include="..\..\..\Source\Atrc\Camera\PerspectiveCamera.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Camera\PinholeCamera.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Core\AABB.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Core\BSDF.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Core\Camera.h" />
@@ -69,6 +69,8 @@
     <ClInclude Include="..\..\..\Source\Atrc\Medium\HenyeyGreenstein.h" />
     <ClInclude Include="..\..\..\Source\Atrc\PostProcessor\ACESFilm.h" />
     <ClInclude Include="..\..\..\Source\Atrc\PostProcessor\GammaCorrector.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\PostProcessor\HorizontalFlipper.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\PostProcessor\VerticalFlipper.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Renderer\DefaultProgressReporter.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Renderer\PathTracingIntegrator\AmbientOcclusionIntegrator.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Renderer\PathTracingIntegrator\PathTracingIntegrator.h" />
@@ -79,7 +81,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\Atrc\Accelarator\BVH.cpp" />
-    <ClCompile Include="..\..\..\Source\Atrc\Camera\PerspectiveCamera.cpp" />
+    <ClCompile Include="..\..\..\Source\Atrc\Camera\PinholeCamera.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Core\Common.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Core\Entity.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Core\Geometry.cpp" />
@@ -113,6 +115,8 @@
     <ClCompile Include="..\..\..\Source\Atrc\Medium\HenyeyGreenstein.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\PostProcessor\ACESFilm.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\PostProcessor\GammaCorrector.cpp" />
+    <ClCompile Include="..\..\..\Source\Atrc\PostProcessor\HorizontalFlipper.cpp" />
+    <ClCompile Include="..\..\..\Source\Atrc\PostProcessor\VerticalFlipper.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Renderer\DefaultProgressReporter.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Renderer\PathTracingIntegrator\AmbientOcclusionIntegrator.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Renderer\PathTracingIntegrator\PathTracer.cpp" />
