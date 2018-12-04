@@ -22,6 +22,7 @@
     <ClInclude Include="..\..\..\Source\Atrc\Accelarator\BVH.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Atrc.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Camera\PinholeCamera.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Camera\ThinLensCamera.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Core\AABB.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Core\BSDF.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Core\Camera.h" />
@@ -82,6 +83,8 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\Atrc\Accelarator\BVH.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Camera\PinholeCamera.cpp" />
+    <ClCompile Include="..\..\..\Source\Atrc\Camera\ThinLensCamera.cpp" />
+    <ClCompile Include="..\..\..\Source\Atrc\Core\Camera.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Core\Common.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Core\Entity.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Core\Geometry.cpp" />

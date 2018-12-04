@@ -226,6 +226,9 @@
     <ClInclude Include="..\..\..\Source\Atrc\PostProcessor\VerticalFlipper.h">
       <Filter>PostProcessor</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Camera\ThinLensCamera.h">
+      <Filter>Camera</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\Atrc\Core\Geometry.cpp">
@@ -359,6 +362,12 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Source\Atrc\PostProcessor\VerticalFlipper.cpp">
       <Filter>PostProcessor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Camera\ThinLensCamera.cpp">
+      <Filter>Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Core\Camera.cpp">
+      <Filter>Core</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
