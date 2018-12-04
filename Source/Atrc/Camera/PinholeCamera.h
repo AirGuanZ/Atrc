@@ -4,14 +4,9 @@
 
 AGZ_NS_BEG(Atrc)
 
-class PinholeCamera : public Camera
+class PinholeCamera : public CommonTransformCamera
 {
-    Real wS_, hS_, halfWS_, halfHS_;
-
     Real L_;
-
-    Mat3 R_;
-    Vec3 T_;
 
 public:
 
