@@ -8,8 +8,8 @@ AGZ_NS_BEG(Atrc)
 struct CameraRay
 {
     Ray ray;
-    Spectrum we; // We^{(j)} * cos * area(Mj)
-    Real pdf = 1;
+    Spectrum we;  // We^{(j)} * cos * area(Mj)
+    Real pdf = 1; // 采样ray.dir的概率密度函数值
 };
 
 // 定义和符号含义见 https://airguanz.github.io/2018/12/02/camera-models.html
