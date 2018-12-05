@@ -46,7 +46,7 @@ SceneLightSampleResult Scene::SampleLight() const
     };
 }
 
-Real Scene::SampleLightPDF(const Light *light) const
+Real Scene::SampleLightPDF([[maybe_unused]] const Light *light) const
 {
     AGZ_ASSERT(light && lights_.size());
     return Real(1) / lights_.size();

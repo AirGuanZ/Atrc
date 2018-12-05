@@ -30,7 +30,7 @@ AABB GeometricEntity::WorldBound() const
     return geometry_->WorldBound();
 }
 
-const Material *GeometricEntity::GetMaterial(const SurfacePoint &sp) const
+const Material *GeometricEntity::GetMaterial([[maybe_unused]] const SurfacePoint &sp) const
 {
     AGZ_ASSERT(material_ && sp.entity == this);
     return material_;

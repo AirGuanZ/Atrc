@@ -28,8 +28,8 @@ void PathTracingRenderer::RenderSubarea(const Scene &scene, RenderTarget *rt, co
     }
 }
 
-PathTracingRenderer::PathTracingRenderer(int workerCount, uint32_t spp, const PathTracingIntegrator &integrator)
-    : workerCount_(workerCount), spp_(spp), integrator_(integrator)
+PathTracingRenderer::PathTracingRenderer(int workerCount, uint32_t spp, uint32_t taskGridSize, const PathTracingIntegrator &integrator)
+    : workerCount_(workerCount), spp_(spp), taskGridSize_(taskGridSize), integrator_(integrator)
 {
 
 }
@@ -39,7 +39,7 @@ void PathTracingRenderer::Render(const Scene &scene, RenderTarget *rt, ProgressR
     AGZ_ASSERT(rt->IsAvailable());
 
     std::queue<SubareaRect> tasks = GridDivider<uint32_t>::Divide(
-        { 0, rt->GetWidth(), 0, rt->GetHeight() }, 16, 16);
+        { 0, rt->GetWidth(), 0, rt->GetHeight() }, taskGridSize_, taskGridSize_);
 
     if(reporter)
         reporter->Begin();

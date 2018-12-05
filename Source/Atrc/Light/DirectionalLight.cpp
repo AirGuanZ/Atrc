@@ -38,7 +38,7 @@ LightSampleToResult DirectionalLight::SampleLi(const SurfacePoint &sp) const
     return ret;
 }
 
-Real DirectionalLight::SampleLiPDF([[maybe_unused]] const Vec3 &pos, [[maybe_unused]] const SurfacePoint &dst, bool posOnLight) const
+Real DirectionalLight::SampleLiPDF([[maybe_unused]] const Vec3 &pos, [[maybe_unused]] const SurfacePoint &dst, [[maybe_unused]] bool posOnLight) const
 {
     AGZ_ASSERT(!posOnLight);
     return 0.0;

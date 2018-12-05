@@ -11,12 +11,13 @@ Atrc::Renderer *PathTracingRendererCreator::Create(const ConfigGroup &params, Ob
 {
     auto workerCount = params["workerCount"].AsValue().Parse<int32_t>();
     auto spp         = params["spp"].AsValue().Parse<uint32_t>();
-    auto integrator = GetSceneObject<Atrc::PathTracingIntegrator>(params["integrator"], arena);
+    auto gridSize    = params["gridSize"].AsValue().Parse<uint32_t>();
+    auto integrator  = GetSceneObject<Atrc::PathTracingIntegrator>(params["integrator"], arena);
 
-    if(spp <= 0)
-        throw SceneInitializationException("Invalid spp value");
+    if(spp <= 0 || gridSize <= 0)
+        throw SceneInitializationException("Invalid spp/gridSize value");
 
-    return arena.Create<Atrc::PathTracingRenderer>(workerCount, spp, *integrator);
+    return arena.Create<Atrc::PathTracingRenderer>(workerCount, spp, gridSize, *integrator);
 }
 
 AGZ_NS_END(ObjMgr)

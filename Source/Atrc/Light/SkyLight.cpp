@@ -1,4 +1,4 @@
-#include <Atrc/Light/SkyLight.h>
+﻿#include <Atrc/Light/SkyLight.h>
 
 AGZ_NS_BEG(Atrc)
 
@@ -33,7 +33,6 @@ void SkyLight::PreprocessScene(const Scene &scene)
 
 LightSampleToResult SkyLight::SampleLi(const SurfacePoint &sp) const
 {
-    // ֻ��sp���������ϲ���
     Real u = Rand(), v = Rand();
     auto [sam, pdf] = AGZ::Math::DistributionTransform::
         ZWeightedOnUnitHemisphere<Real>::Transform({ u, v });
@@ -50,7 +49,7 @@ LightSampleToResult SkyLight::SampleLi(const SurfacePoint &sp) const
     return ret;
 }
 
-Real SkyLight::SampleLiPDF(const Vec3 &pos, const SurfacePoint &dst, bool posOnLight) const
+Real SkyLight::SampleLiPDF(const Vec3 &pos, const SurfacePoint &dst, [[maybe_unused]] bool posOnLight) const
 {
     AGZ_ASSERT(!posOnLight);
 

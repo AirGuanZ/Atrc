@@ -41,7 +41,7 @@ LightSampleToResult SphereEnvironmentLight::SampleLi(const SurfacePoint &sp) con
     return ret;
 }
 
-Real SphereEnvironmentLight::SampleLiPDF(const Vec3 &pos, const SurfacePoint &dst, bool posOnLight) const
+Real SphereEnvironmentLight::SampleLiPDF(const Vec3 &pos, const SurfacePoint &dst, [[maybe_unused]] bool posOnLight) const
 {
     AGZ_ASSERT(!posOnLight);
 

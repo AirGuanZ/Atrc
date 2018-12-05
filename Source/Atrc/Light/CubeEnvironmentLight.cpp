@@ -46,7 +46,7 @@ LightSampleToResult CubeEnvironmentLight::SampleLi(const SurfacePoint &sp) const
     return ret;
 }
 
-Real CubeEnvironmentLight::SampleLiPDF(const Vec3 &pos, const SurfacePoint &dst, bool posOnLight) const
+Real CubeEnvironmentLight::SampleLiPDF(const Vec3 &pos, const SurfacePoint &dst, [[maybe_unused]] bool posOnLight) const
 {
     AGZ_ASSERT(!posOnLight);
 

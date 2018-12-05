@@ -12,13 +12,16 @@ class PathTracingRenderer : public Renderer
 
     int workerCount_;
     uint32_t spp_;
+
+    uint32_t taskGridSize_;
+
     const PathTracingIntegrator &integrator_;
 
     void RenderSubarea(const Scene &scene, RenderTarget *rt, const SubareaRect &subarea) const;
 
 public:
 
-    PathTracingRenderer(int workerCount, uint32_t spp, const PathTracingIntegrator &integrator);
+    PathTracingRenderer(int workerCount, uint32_t spp, uint32_t taskGridSize, const PathTracingIntegrator &integrator);
 
     void Render(const Scene &scene, RenderTarget *rt, ProgressReporter *reporter) const override;
 };

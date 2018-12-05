@@ -20,7 +20,8 @@ using RendererCreator = ObjectCreator<Atrc::Renderer>;
 using RendererManager = ObjectManager<Atrc::Renderer>;
 
 // workerCount = int32_t
-// spp_        = int32_t
+// spp         = uint32_t
+// gridSize    = uint32_t
 // integrator  = IntegratorDefinition
 class PathTracingRendererCreator : public RendererCreator, public AGZ::Singleton<PathTracingRendererCreator>
 {
