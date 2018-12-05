@@ -6,14 +6,14 @@ AGZ_NS_BEG(Atrc)
 
 class SphereEnvironmentLight : public Light
 {
-    const AGZ::Texture2D<Spectrum> *envTex_;
+    const Texture *envTex_;
 
     Vec3 worldCentre_;
     Real worldRadius_;
 
 public:
 
-    explicit SphereEnvironmentLight(const AGZ::Texture2D<Spectrum> *envTex);
+    explicit SphereEnvironmentLight(const Texture *envTex);
 
     void PreprocessScene(const Scene &scene) override;
 

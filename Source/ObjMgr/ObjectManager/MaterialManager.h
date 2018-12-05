@@ -80,8 +80,7 @@ SIMPLE_MATERIAL_CREATOR(Metal);
 // roughness = Real
 SIMPLE_MATERIAL_CREATOR(Plastic);
 
-// sampler  = Linear/Nearest
-// path     = "filename"
+// texture  = Texture
 // internal = MaterialDefinition
 SIMPLE_MATERIAL_CREATOR(TextureScaler);
 

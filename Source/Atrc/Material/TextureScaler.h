@@ -4,59 +4,9 @@
 
 AGZ_NS_BEG(Atrc)
 
-class NearestSampler
+class TextureScaler : public Material
 {
-protected:
-
-    static Spectrum SampleTexture(const AGZ::Texture2D<Spectrum> &tex, const Vec2 &uv)
-    {
-        return AGZ::NearestSampler::Sample(tex, uv);
-    }
-};
-
-class LinearSampler
-{
-protected:
-
-    static Spectrum SampleTexture(const AGZ::Texture2D<Spectrum> &tex, const Vec2 &uv)
-    {
-        return AGZ::LinearSampler::Sample(tex, uv);
-    }
-};
-
-class DynamicSampler
-{
-public:
-
-    enum Strategy
-    {
-        Linear,
-        Nearest,
-    };
-
-    void SetSampleStrategy(Strategy strategy)
-    {
-        strategy_ = strategy;
-    }
-
-private:
-
-    Strategy strategy_ = Linear;
-
-protected:
-
-    Spectrum SampleTexture(const AGZ::Texture2D<Spectrum> &tex, const Vec2 &uv) const
-    {
-        if(strategy_ == Linear)
-            return AGZ::LinearSampler::Sample(tex, uv);
-        return AGZ::NearestSampler::Sample(tex, uv);
-    }
-};
-
-template<typename SampleStrategy = NearestSampler>
-class TextureScaler : public Material, public SampleStrategy
-{
-    const AGZ::Texture2D<Spectrum> *tex_;
+    const Texture *tex_;
     const Material *mat_;
 
     class BSDFScaler : public BSDF
@@ -97,7 +47,7 @@ class TextureScaler : public Material, public SampleStrategy
 
 public:
 
-    TextureScaler(const AGZ::Texture2D<Spectrum> *tex, const Material *mat)
+    TextureScaler(const Texture *tex, const Material *mat)
         : tex_(tex), mat_(mat)
     {
         AGZ_ASSERT(tex && mat);
@@ -107,7 +57,7 @@ public:
     {
         mat_->Shade(sp, dst, arena);
 
-        Spectrum scale = SampleStrategy::SampleTexture(*tex_, sp.usrUV);
+        Spectrum scale = tex_->Sample(sp.usrUV);
         dst->bsdf = arena.Create<BSDFScaler>(
             dst->bsdf->GetShadingLocal(), dst->bsdf->GetGeometryLocal(), scale, dst->bsdf);
     }

@@ -17,20 +17,6 @@ outputFilename = "./Build/Output.png";
 reporter = { type = Default; };
 
 # Camera
-#camera = {
-#    type = Pinhole;
-#    film = {
-#        width  = 640;
-#        height = 480;
-#    };
-#    sensor = {
-#        width    = 2.0;
-#        distance = 1;
-#    };
-#    pinholePos = (-7, 0, 0);
-#    lookAt     = (0, 0, 1.5);
-#    up         = (0, 0, 1);
-#};
 camera = {
     type = ThinLens;
     film = {
@@ -105,8 +91,12 @@ entities = (
     };
     material = {
         type = TextureScaler;
-        sampler = Linear;
-        path = "./Assets/CubeTex.png";
+        texture = {
+            type = Image;
+            filename = "./Assets/CubeTex.png";
+            sampler = Linear;
+            wrapper = Clamp;
+        };
         internal = {
             type = DiffuseMaterial;
             albedo = (0.2, 0.4, 0.8);
@@ -118,14 +108,58 @@ entities = (
 # Light list
 lights = (
 {
-    type = SphereEnvironmentLight;
-    tex = "./Assets/PineForest.png";
+    type = CubeEnvironmentLight;
+    posX = {
+        type = Image;
+        filename = "./Assets/PineForest/front.jpg";
+        sampler = Linear;
+        wrapper = Clamp;
+    };
+    posY = {
+        type = Image;
+        filename = "./Assets/PineForest/left.jpg";
+        sampler = Linear;
+        wrapper = Clamp;
+    };
+    posZ = {
+        type = Image;
+        filename = "./Assets/PineForest/up.jpg";
+        sampler = Linear;
+        wrapper = Clamp;
+    };
+    negX = {
+        type = Image;
+        filename = "./Assets/PineForest/back.jpg";
+        sampler = Linear;
+        wrapper = Clamp;
+    };
+    negY = {
+        type = Image;
+        filename = "./Assets/PineForest/right.jpg";
+        sampler = Linear;
+        wrapper = Clamp;
+    };
+    negZ = {
+        type = Image;
+        filename = "./Assets/PineForest/down.jpg";
+        sampler = Linear;
+        wrapper = Clamp;
+    };
 }
+#{
+#    type = SphereEnvironmentLight;
+#    tex = {
+#        type     = Image;
+#        filename = "./Assets/PineForest.png";
+#        sampler  = Linear;
+#        wrapper  = Clamp;
+#    };
+#}
 );
 
 postProcessors = (
-{ type = HorizontalFlipper; },
-{ type = VerticalFlipper; },
-{ type = ACESFilm; },
-#{ type = GammaCorrection; gamma = 1.0; }
+    { type = HorizontalFlipper; },
+    { type = VerticalFlipper; },
+    { type = ACESFilm; },
+    #{ type = GammaCorrection; gamma = 0.6; }
 );

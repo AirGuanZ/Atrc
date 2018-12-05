@@ -188,3 +188,28 @@ int main()
 
 要做BDPT，现有的Atrc在Core Interface上必须要做修改——我默认把任务调度策略和LTE求解策略分离了，但是BDPT中有类似Light Tracing的部分必须要访问整个Film。为此我把过去的Integrator、SubareaRenderer和Renderer三者合成了一个Renderer，过去的这三个组件现在变成了一个特殊的Renderer的实现。
 
+## 2018.12.1
+
+一口气把SH的投影、重建和系数旋转做到了5阶，话说我基本看不出低频光源下用4阶和用5阶的区别……
+
+此外，原来的Integrator是核心接口的一部分，现在只适用于PathTracingRenderer，因此仅应作为后者的组件出现。所以我把Integrator开除出了Core Interface，而只是作为PathTracingRenderer的下属。
+
+## 2018.12.2
+
+让SH支持了任意bouces number的间接照明，其实这东西和path tracing差不多，不知道为什么那么多文章将它作为“拓展”、“advanced topic”来介绍。
+
+## 2018.12.3
+
+修改了Camera相关的Core Interface以支持摄像机采样以及measure function，丢掉了原来的PerspectiveCamera，重写了一个比较严格的PinholeCamera。PinholeCamera画出来的东西是上下左右颠倒的，为此又添加了两个用来翻转图像的post-processor stage。
+
+## 2018.12.4
+
+没做什么东西，只把Camera相关的local-world变换从PinholeCamera中抽取出来，使得其他类型的Camera也可以使用这部分代码。
+
+## 2018.12.5
+
+实现了薄凸透镜摄像机模型，途中还纠正了一个AGZ Utils中计算UnitDisk上均匀采样的pdf的bug，终于又可以画景深效果了。
+
+把PathTracingRenderer划分任务时用的grid大小做进了脚本参数，随便改了改，效率瞬间提升15%，这是为什么？Cache的原因吗？不科学啊……
+
+

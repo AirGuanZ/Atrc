@@ -9,6 +9,7 @@
 #include "ObjectManager/MediumManager.h"
 #include "ObjectManager/PostProcessorManager.h"
 #include "ObjectManager/RendererManager.h"
+#include "ObjectManager/TextureManager.h"
 
 AGZ_NS_BEG(ObjMgr)
 
@@ -106,6 +107,14 @@ inline void InitializeObjectManagers()
     };
     for(auto c : RENDERER_CREATORS)
         RendererManager::GetInstance().AddCreator(c);
+
+    TextureCreator *TEXTURE_CREATORS[] =
+    {
+        ConstantTextureCreator::GetInstancePtr(),
+        ImageTextureCreator   ::GetInstancePtr(),
+    };
+    for(auto c : TEXTURE_CREATORS)
+        TextureManager::GetInstance().AddCreator(c);
 }
 
 // 创建在params内公开定义的元素
@@ -121,6 +130,7 @@ inline void InitializePublicObjects(const ConfigGroup &params, ObjArena<> &arena
     InitializePublicDefinition<Atrc::PathTracingIntegrator>("pub_path_tracing_integrator", params, arena);
     InitializePublicDefinition<Atrc::Renderer>             ("pub_renderer",                params, arena);
     InitializePublicDefinition<Atrc::ProgressReporter>     ("pub_reporter",                params, arena);
+    InitializePublicDefinition<Atrc::Texture>              ("pub_texture",                 params, arena);
 }
 
 AGZ_NS_END(ObjMgr)

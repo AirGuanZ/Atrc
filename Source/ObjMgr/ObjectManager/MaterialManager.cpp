@@ -112,21 +112,15 @@ Atrc::Material *PlasticCreator::Create(const ConfigGroup &params, ObjArena<> &ar
 
 Atrc::Material *TextureScalerCreator::Create(const ConfigGroup &params, ObjArena<> &arena) const
 {
-    auto sampler = params["sampler"].AsValue();
+    auto tex = GetSceneObject<Atrc::Texture>(params["texture"], arena);
+    auto mat = GetSceneObject<Atrc::Material>(params["internal"], arena);
 
-    auto texPath = params["path"].AsValue();
-    auto tex = TextureManager::GetInstance().Load(texPath);
     if(!tex)
-        throw SceneInitializationException("Invalid texture path: " + texPath);
+        throw SceneInitializationException("TextureScalerCreator: failed to create texture object");
+    if(!mat)
+        throw SceneInitializationException("TextureScalerCreator: failed to create internal material object");
 
-    auto internal = GetSceneObject<Atrc::Material>(params["internal"], arena);
-
-    if(sampler == "Linear")
-        return arena.Create<Atrc::TextureScaler<Atrc::LinearSampler>>(tex, internal);
-    if(sampler == "Nearest")
-        return arena.Create<Atrc::TextureScaler<Atrc::NearestSampler>>(tex, internal);
-
-    throw SceneInitializationException("Unknown texture sampler: " + sampler);
+    return arena.Create<Atrc::TextureScaler>(tex, mat);
 }
 
 Atrc::Material *UncallableMaterialCreator::Create([[maybe_unused]] const ConfigGroup &params, [[maybe_unused]] ObjArena<> &arena) const

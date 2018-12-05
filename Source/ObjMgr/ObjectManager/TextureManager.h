@@ -6,14 +6,29 @@
 
 AGZ_NS_BEG(ObjMgr)
 
-class TextureManager : public AGZ::Singleton<TextureManager>
-{
-    ObjArena<> arena_;
-    std::unordered_map<Str8, const AGZ::Texture2D<Atrc::Spectrum>*> path2Tex_;
+using TextureCreator = ObjectCreator<Atrc::Texture>;
+using TextureManager = ObjectManager<Atrc::Texture>;
 
+// value = Spectrum
+class ConstantTextureCreator : public TextureCreator, public AGZ::Singleton<ConstantTextureCreator>
+{
 public:
 
-    const AGZ::Texture2D<Atrc::Spectrum> *Load(const Str8 &filename);
+    Str8 GetName() const override { return "Constant"; }
+
+    Atrc::Texture *Create(const ConfigGroup &params, ObjArena<> &arena) const override;
+};
+
+// filename = "path"
+// sampler = Nearest/Linear
+// wrapper = Clamp
+class ImageTextureCreator : public TextureCreator, public AGZ::Singleton<ImageTextureCreator>
+{
+public:
+
+    Str8 GetName() const override { return "Image"; }
+
+    Atrc::Texture *Create(const ConfigGroup &params, ObjArena<> &arena) const override;
 };
 
 AGZ_NS_END(ObjMgr)

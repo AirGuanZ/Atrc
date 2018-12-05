@@ -8,14 +8,14 @@ class CubeEnvironmentLight : public Light
 {
     // 0: +X, 1: +Y, 2: +Z
     // 3: -X, 4: -Y, 5: -Z
-    const AGZ::Texture2D<Spectrum> *envTex_[6];
+    const Texture *envTex_[6];
 
     Vec3 worldCentre_;
     Real worldRadius_;
 
 public:
 
-    explicit CubeEnvironmentLight(const AGZ::Texture2D<Spectrum> **envTex);
+    explicit CubeEnvironmentLight(const Texture **envTex);
 
     void PreprocessScene(const Scene &scene) override;
 

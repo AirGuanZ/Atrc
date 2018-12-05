@@ -42,6 +42,9 @@
 #include <Atrc/Renderer/DefaultProgressReporter.h>
 #include <Atrc/Renderer/PathTracingRenderer.h>
 
+#include <Atrc/Texture/ConstantTexture.h>
+#include <Atrc/Texture/ImageTexture.h>
+
 AGZ_NS_BEG(Atrc)
 
 using GeometricDiffuseLight = GeometricLightEntity<GeometricDiffuseLightImpl>;

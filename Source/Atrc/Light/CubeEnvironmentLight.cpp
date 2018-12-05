@@ -2,7 +2,7 @@
 
 AGZ_NS_BEG(Atrc)
 
-CubeEnvironmentLight::CubeEnvironmentLight(const AGZ::Texture2D<Spectrum> **envTex)
+CubeEnvironmentLight::CubeEnvironmentLight(const Texture **envTex)
     : worldRadius_(0)
 {
     AGZ_ASSERT(envTex);
@@ -83,7 +83,7 @@ bool CubeEnvironmentLight::IgnoreFirstMedium() const
 Spectrum CubeEnvironmentLight::NonareaLe(const Ray &r) const
 {
     auto texCoord = AGZ::CubeMapper<Real>::Map(r.dir);
-    return AGZ::LinearSampler::Sample(*envTex_[static_cast<int>(texCoord.face)], Vec2(texCoord.uv.u, 1 - texCoord.uv.v));
+    return envTex_[static_cast<int>(texCoord.face)]->Sample({ texCoord.uv.u, texCoord.uv.v });
 }
 
 Spectrum CubeEnvironmentLight::Power() const

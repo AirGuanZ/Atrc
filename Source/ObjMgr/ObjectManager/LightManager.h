@@ -7,12 +7,12 @@ AGZ_NS_BEG(ObjMgr)
 using LightCreator = ObjectCreator<Atrc::Light>;
 using LightManager = ObjectManager<Atrc::Light>;
 
-// posX = filename
-// posY = filename
-// posZ = filename
-// negX = filename
-// negY = filename
-// negZ = filename
+// posX = Texture
+// posY = Texture
+// posZ = Texture
+// negX = Texture
+// negY = Texture
+// negZ = Texture
 class CubeEnvironmentLightCreator : public LightCreator, public AGZ::Singleton<CubeEnvironmentLightCreator>
 {
 public:
@@ -44,7 +44,7 @@ public:
     Atrc::Light *Create(const ConfigGroup &params, ObjArena<> &arena) const override;
 };
 
-// tex = filename
+// tex = Texture
 class SphereEnvironmentLightCreator : public LightCreator, public AGZ::Singleton<SphereEnvironmentLightCreator>
 {
 public:

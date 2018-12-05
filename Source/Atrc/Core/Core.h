@@ -13,4 +13,5 @@
 #include <Atrc/Core/Renderer.h>
 #include <Atrc/Core/Scene.h>
 #include <Atrc/Core/SurfacePoint.h>
+#include <Atrc/Core/Texture.h>
 #include <Atrc/Core/Transform.h>

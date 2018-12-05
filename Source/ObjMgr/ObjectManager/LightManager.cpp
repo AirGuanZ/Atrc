@@ -6,24 +6,24 @@ AGZ_NS_BEG(ObjMgr)
 
 namespace
 {
-    auto LoadTexture(const Str8 &filename)
+    auto LoadTexture(const ConfigNode &params, ObjArena<> &arena)
     {
-        auto ret = TextureManager::GetInstance().Load(filename);
+        auto ret = GetSceneObject<Atrc::Texture>(params, arena);
         if(!ret)
-            throw SceneInitializationException("Failed to load texture from: " + filename);
+            throw SceneInitializationException("Failed to create texture object for light source");
         return ret;
     }
 }
 
 Atrc::Light *CubeEnvironmentLightCreator::Create(const ConfigGroup &params, ObjArena<> &arena) const
 {
-    auto posX = LoadTexture(params["posX"].AsValue());
-    auto posY = LoadTexture(params["posY"].AsValue());
-    auto posZ = LoadTexture(params["posZ"].AsValue());
-    auto negX = LoadTexture(params["negX"].AsValue());
-    auto negY = LoadTexture(params["negY"].AsValue());
-    auto negZ = LoadTexture(params["negZ"].AsValue());
-    const AGZ::Texture2D<Atrc::Spectrum> *texArr[] = { posX, posY, posZ, negX, negY, negZ };
+    auto posX = LoadTexture(params["posX"], arena);
+    auto posY = LoadTexture(params["posY"], arena);
+    auto posZ = LoadTexture(params["posZ"], arena);
+    auto negX = LoadTexture(params["negX"], arena);
+    auto negY = LoadTexture(params["negY"], arena);
+    auto negZ = LoadTexture(params["negZ"], arena);
+    const Atrc::Texture *texArr[] = { posX, posY, posZ, negX, negY, negZ };
     return arena.Create<Atrc::CubeEnvironmentLight>(texArr);
 }
 
@@ -45,7 +45,7 @@ Atrc::Light *SkyLightCreator::Create(const ConfigGroup &params, ObjArena<> &aren
 
 Atrc::Light *SphereEnvironmentLightCreator::Create(const ConfigGroup &params, ObjArena<> &arena) const
 {
-    auto tex = LoadTexture(params["tex"].AsValue());
+    auto tex = LoadTexture(params["tex"], arena);
     return arena.Create<Atrc::SphereEnvironmentLight>(tex);
 }
 
