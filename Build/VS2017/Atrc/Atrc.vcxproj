@@ -38,6 +38,7 @@
     <ClInclude Include="..\..\..\Source\Atrc\Core\Renderer.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Core\Scene.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Core\SurfacePoint.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Core\Texture.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Core\Transform.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Entity\GeometricEntity.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Entity\GeometricLightEntity.h" />
@@ -78,6 +79,8 @@
     <ClInclude Include="..\..\..\Source\Atrc\Renderer\PathTracingIntegrator\PathTracer.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Renderer\PathTracingIntegrator\PureColorIntegrator.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Renderer\PathTracingIntegrator\VolumetricPathTracer.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Texture\ConstantTexture.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Texture\ImageTexture.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Utility\GridDivider.h" />
   </ItemGroup>
   <ItemGroup>
@@ -126,6 +129,8 @@
     <ClCompile Include="..\..\..\Source\Atrc\Renderer\PathTracingIntegrator\PureColorIntegrator.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Renderer\PathTracingIntegrator\VolumetricPathTracer.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Renderer\PathTracingRenderer.cpp" />
+    <ClCompile Include="..\..\..\Source\Atrc\Texture\ConstantTexture.cpp" />
+    <ClCompile Include="..\..\..\Source\Atrc\Texture\ImageTexture.cpp" />
     <ClInclude Include="..\..\..\Source\Atrc\Medium\HomogeneousMedium.h" />
     <ClCompile Include="..\..\..\Source\Atrc\Medium\HomogeneousMedium.cpp" />
     <ClInclude Include="..\..\..\Source\Atrc\Renderer\PathTracingRenderer.h" />

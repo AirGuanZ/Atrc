@@ -43,6 +43,9 @@
     <Filter Include="Renderer\PathTracingIntegrator">
       <UniqueIdentifier>{50d6b6b2-edae-4cb2-82d4-d2f567a94324}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Texture">
+      <UniqueIdentifier>{efc6420e-63b2-4fbd-ae66-1a23acf44f2d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Source\Atrc\Atrc.h" />
@@ -229,6 +232,15 @@
     <ClInclude Include="..\..\..\Source\Atrc\Camera\ThinLensCamera.h">
       <Filter>Camera</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Core\Texture.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Texture\ConstantTexture.h">
+      <Filter>Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Texture\ImageTexture.h">
+      <Filter>Texture</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\Atrc\Core\Geometry.cpp">
@@ -368,6 +380,12 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Source\Atrc\Core\Camera.cpp">
       <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Texture\ConstantTexture.cpp">
+      <Filter>Texture</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Texture\ImageTexture.cpp">
+      <Filter>Texture</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

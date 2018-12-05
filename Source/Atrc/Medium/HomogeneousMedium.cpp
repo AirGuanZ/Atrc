@@ -54,7 +54,7 @@ Either<MediumSampleLsResult, Real> HomogeneousMedium::SampleLs(const Ray &r) con
     ret.medPnt.pos    = r.At(st + r.minT);
     ret.medPnt.wo     = -r.dir;
     ret.medPnt.medium = this;
-    ret.pdf              = pdf;
+    ret.pdf           = pdf;
 
     return ret;
 }

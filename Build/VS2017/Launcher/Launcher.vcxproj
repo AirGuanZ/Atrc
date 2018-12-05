@@ -19,11 +19,11 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\Source\Launcher\Main.cpp" />
-    <ClCompile Include="..\..\..\Source\Launcher\SceneManager.cpp" />
+    <ClCompile Include="..\..\..\Source\Tools\Launcher\Main.cpp" />
+    <ClCompile Include="..\..\..\Source\Tools\Launcher\SceneManager.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\Source\Launcher\SceneManager.h" />
+    <ClInclude Include="..\..\..\Source\Tools\Launcher\SceneManager.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
