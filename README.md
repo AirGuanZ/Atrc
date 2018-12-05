@@ -1,13 +1,14 @@
 # Atrc
 
-一些实现过程中的思路记录在[Atrc](https://airguanz.github.io/all.html?tag=Atrc)中。已支持：
+AirGuanZ的离线渲染实验室，主要包括：
 
-* 直接光照的多重重要性采样
-* Torrance-Sparrow微表面模型
-* 带介质的路径追踪器
-* 多边形模型加载
-* BVH等加速求交数据结构
-* 用脚本描述所有的场景元素和渲染配置
+* 离线渲染核心组件，位于`Source/Atrc`中
+* 从配置参数创建渲染器对象的解析库，位于`Source/ObjMgr`中
+* 在上面两者的基础上搭建的离线渲染器，位于`Source/Launcher`中
+* 将使用立方体映射的纹理转换为使用球面映射的纹理的工具，位于`Source/C2S`中
+* 使用1~5阶球谐函数进行场景的静态投影、重建和光源旋转的工具，位于`Source/SH`中
+
+一些实现过程中的思路记录在[Atrc](https://airguanz.github.io/all.html?tag=Atrc)。
 
 ## Script
 
@@ -72,8 +73,12 @@ entities = (
     };
     material = {
         type = TextureScaler;          # 在其他材质基础上叠加一个由纹理指定的乘数因子
-        sampler = Linear;              # 双线性采样
-        path = "./Assets/CubeTex.png"; # 纹理路径
+        texture = {
+            type = Image;                      # 图像类型的纹理
+            filename = "./Assets/CubeTex.png"; # 文件路径
+            sampler = Linear;                  # 使用双线性采样
+            wrapper = Clamp;                   # 将越界纹理坐标clamp到[0, 1]
+        };
         internal = {
             type = DiffuseMaterial;   # 内部采用理想漫反射材质
             albedo = (0.2, 0.4, 0.8); # 反照率
@@ -85,7 +90,12 @@ entities = (
 lights = (
 {
     type = SphereEnvironmentLight;   # 使用球面纹理映射的环境光
-    tex = "./Assets/PineForest.png"; # 纹理路径
+    tex = {                          # 纹理描述
+        type     = Image;
+        filename = "./Assets/Environment.png";
+        sampler  = Linear;
+        wrapper  = Clamp;
+    };
 }
 );
 # 后处理流程，从上往下依次执行
@@ -93,7 +103,6 @@ postProcessors = (
     { type = HorizontalFlipper; },           # 小孔摄像机成像是上下颠倒的，因此要水平、垂直各翻转一次
     { type = VerticalFlipper; },
     { type = ACESFilm; },                    # Tone mapping
-    { type = GammaCorrection; gamma = 1.0; } # Gamma矫正
 );
 
 ```
