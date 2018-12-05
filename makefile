@@ -73,7 +73,7 @@ $(DPP_FILES) : %.d : %.cpp
 -include $(DPP_FILES)
 
 # The main renderer launcher
-$(eval $(call add_target,Launcher,LAUNCHER_TARGET,Launcher))
+$(eval $(call add_target,Launcher,LAUNCHER_TARGET,Tools/Launcher))
 # Sphere harmonics projector and reconstructor
 $(eval $(call add_target,SH,SH_TARGET,Tools/SH))
 # Cube map to sphere map

@@ -1,16 +1,18 @@
 # Atrc
 
-AirGuanZ的离线渲染实验室，主要包括：
+AirGuanZ的离线渲染实验室，主要以学习为目的。其内容包括：
 
-* 离线渲染核心组件，位于`Source/Atrc`中
-* 从配置参数创建渲染器对象的解析库，位于`Source/ObjMgr`中
-* 在上面两者的基础上搭建的离线渲染器，位于`Source/Launcher`中
-* 将使用立方体映射的纹理转换为使用球面映射的纹理的工具，位于`Source/C2S`中
-* 使用1~5阶球谐函数进行场景的静态投影、重建和光源旋转的工具，位于`Source/SH`中
+* 离线渲染核心组件库，位于`Source/Atrc`中
+* 解析配置参数创建渲染器对象的辅助库，位于`Source/ObjMgr`中
+* 在上面两者的基础上搭建的离线渲染器，位于`Source/Tools/Launcher`中
+* 将使用立方体映射的纹理转换为使用球面映射的纹理的工具，位于`Source/Tools/C2S`中
+* 使用1~5阶球谐函数进行场景的静态投影、重建和光源旋转的工具，位于`Source/Tools/SH`中
+
+项目支持MSVC（仅有VS2017解决方案）、g++和clang++编译。
 
 一些实现过程中的思路记录在[Atrc](https://airguanz.github.io/all.html?tag=Atrc)。
 
-## Script
+## Launcher Script
 
 允许用脚本来指定场景元素，示例如下：
 
