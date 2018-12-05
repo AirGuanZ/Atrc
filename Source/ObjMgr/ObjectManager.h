@@ -19,8 +19,8 @@ inline void InitializeObjectManagers()
 
     CameraCreator *CAMERA_CREATORS[] =
     {
-        //PerspectiveCameraCreator::GetInstancePtr(),
-        PinholeCameraCreator::GetInstancePtr(),
+        PinholeCameraCreator ::GetInstancePtr(),
+        ThinLensCameraCreator::GetInstancePtr(),
     };
     for(auto c : CAMERA_CREATORS)
         CameraManager::GetInstance().AddCreator(c);

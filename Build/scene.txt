@@ -2,7 +2,7 @@
 renderer = {
     type        = PathTracingRenderer;
     workerCount = 11;
-    spp         = 1;
+    spp         = 1000;
     integrator  = {
         type     = PathTracer;
         maxDepth = 50;
@@ -16,19 +16,37 @@ outputFilename = "./Build/Output.png";
 reporter = { type = Default; };
 
 # Camera
+#camera = {
+#    type = Pinhole;
+#    film = {
+#        width  = 640;
+#        height = 480;
+#    };
+#    sensor = {
+#        width    = 2.0;
+#        distance = 1;
+#    };
+#    pinholePos = (-7, 0, 0);
+#    lookAt     = (0, 0, 1.5);
+#    up         = (0, 0, 1);
+#};
 camera = {
-    type = Pinhole;
+    type = ThinLens;
     film = {
-        width  = 640;
-        height = 480;
+        width  = 1920;
+        height = 1080;
     };
     sensor = {
-        width    = 2.0;
+        width    = 2;
         distance = 1;
     };
-    pinholePos = (-7, 0, 0);
-    lookAt     = (0, 0, 1.5);
-    up         = (0, 0, 1);
+    lens = {
+        radius = 0;
+        focalPlaneDistance = 7;
+    };
+    lensPos = (-7, 0, 0);
+    lookAt  = (0, 0, 1.5);
+    up      = (0, 0, 1);
 };
 
 # Entity list

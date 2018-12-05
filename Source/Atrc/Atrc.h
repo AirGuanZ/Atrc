@@ -3,6 +3,7 @@
 #include <Atrc/Accelarator/BVH.h>
 
 #include <Atrc/Camera/PinholeCamera.h>
+#include <Atrc/Camera/ThinLensCamera.h>
 
 #include <Atrc/Entity/GeometricEntity.h>
 #include <Atrc/Entity/GeometricLightEntity.h>
