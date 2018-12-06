@@ -82,4 +82,20 @@ Camera *ThinLensCameraCreator::Create(const ConfigGroup &params, ObjArena<> &are
         lensPos, lookAt, up, sD, lensRadius, focalDistance);
 }
 
+Camera *EnvironmentCameraCreator::Create(const ConfigGroup &params, ObjArena<> &arena) const
+{
+    auto filmWidth  = params["film.width"] .AsValue().Parse<uint32_t>();
+    auto filmHeight = params["film.height"].AsValue().Parse<uint32_t>();
+    if(!filmWidth || !filmHeight)
+        throw SceneInitializationException("EnvironmentCameraCreator: invalid film size");
+    
+    auto centrePos = ParamParser::ParseVec3(params["centrePos"]);
+    auto lookAt    = ParamParser::ParseVec3(params["lookAt"]);
+    auto up        = ParamParser::ParseVec3(params["up"]);
+
+    return arena.Create<Atrc::EnvironmentCamera>(
+        Vec2(Real(filmWidth), Real(filmHeight)),
+        centrePos, lookAt, up);
+}
+
 AGZ_NS_END(ObjMgr)

@@ -43,4 +43,18 @@ public:
     Atrc::Camera *Create(const ConfigGroup &params, ObjArena<> &arena) const override;
 };
 
+// film.width  = uint32_t
+// film.height = uint32_t
+// centrePos   = Vec3
+// lookAt      = Vec3
+// up          = Vec3
+class EnvironmentCameraCreator : public CameraCreator, public AGZ::Singleton<EnvironmentCameraCreator>
+{
+public:
+
+    Str8 GetName() const override { return "Environment"; }
+
+    Atrc::Camera *Create(const ConfigGroup &params, ObjArena<> &arena) const override;
+};
+
 AGZ_NS_END(ObjMgr)

@@ -2,7 +2,7 @@
 renderer = {
     type        = PathTracingRenderer;
     workerCount = 11;
-    spp         = 100;
+    spp         = 10;
     gridSize    = 5;
     integrator  = {
         type     = PathTracer;
@@ -17,23 +17,33 @@ outputFilename = "./Build/Output.png";
 reporter = { type = Default; };
 
 # Camera
+#camera = {
+#    type = ThinLens;
+#    film = {
+#        width  = 640;
+#        height = 480;
+#    };
+#    sensor = {
+#        width    = 2;
+#        distance = 1;
+#    };
+#    lens = {
+#        radius = 0;
+#        focalPlaneDistance = 7;
+#    };
+#    lensPos = (-7, 0, 0);
+#    lookAt  = (0, 0, 1.5);
+#    up      = (0, 0, 1);
+#};
 camera = {
-    type = ThinLens;
+    type = Environment;
     film = {
-        width  = 640;
+        width  = 960;
         height = 480;
     };
-    sensor = {
-        width    = 2;
-        distance = 1;
-    };
-    lens = {
-        radius = 0;
-        focalPlaneDistance = 7;
-    };
-    lensPos = (-7, 0, 0);
-    lookAt  = (0, 0, 1.5);
-    up      = (0, 0, 1);
+    centrePos = (-3, 0, 0);
+    lookAt    = (0, 0, 0);
+    up        = (0, 0, 1);
 };
 
 # Entity list
@@ -158,8 +168,8 @@ lights = (
 );
 
 postProcessors = (
-    { type = HorizontalFlipper; },
-    { type = VerticalFlipper; },
+    #{ type = HorizontalFlipper; },
+    #{ type = VerticalFlipper; },
     { type = ACESFilm; },
     #{ type = GammaCorrection; gamma = 0.6; }
 );

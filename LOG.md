@@ -212,4 +212,4 @@ int main()
 
 把PathTracingRenderer划分任务时用的grid大小做进了脚本参数，随便改了改，效率瞬间提升15%，这是为什么？Cache的原因吗？不科学啊……
 
-
+原来的代码在许多地方直接使用了AGZ::Texture2D，采样方式、坐标wrap方式各自为政，混乱不堪；这回在Core Interface中添加了Texture，也把它加入了Creator/Manager体系，用起来舒服多了。

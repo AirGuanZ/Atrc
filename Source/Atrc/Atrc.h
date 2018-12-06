@@ -2,6 +2,7 @@
 
 #include <Atrc/Accelarator/BVH.h>
 
+#include <Atrc/Camera/EnvironmentCamera.h>
 #include <Atrc/Camera/PinholeCamera.h>
 #include <Atrc/Camera/ThinLensCamera.h>
 

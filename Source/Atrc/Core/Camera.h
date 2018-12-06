@@ -8,7 +8,7 @@ AGZ_NS_BEG(Atrc)
 struct CameraRay
 {
     Ray ray;
-    Spectrum we;  // We^{(j)} * cos * area(Mj)
+    Spectrum qe;
     Real pdf = 1; // 采样ray.dir的概率密度函数值
 };
 

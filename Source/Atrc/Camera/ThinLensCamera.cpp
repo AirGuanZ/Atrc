@@ -50,14 +50,14 @@ CameraRay ThinLensCamera::GetRay(const Vec2 &rasterPos) const
     Real cosFactor  = localDir.x; // Dot(UNIT_X, localDir)
     Real cosFactor3 = cosFactor * cosFactor * cosFactor;
     Real pdf = xSample.pdf / (lensRadius_ * lensRadius_) * (L_ * L_) / cosFactor3;
-    Real we  = L_ * L_ / (areaLens_ * cosFactor3);
+    Real qe  = L_ * L_ / (areaLens_ * cosFactor3);
 
     return {
         Ray(
             LocalPoint2World(x),
             LocalVector2World((p - x).Normalize()),
             EPS),
-        Spectrum(float(we)),
+        Spectrum(float(qe)),
         pdf
     };
 }
