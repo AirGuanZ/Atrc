@@ -241,6 +241,9 @@
     <ClInclude Include="..\..\..\Source\Atrc\Texture\ImageTexture.h">
       <Filter>Texture</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Camera\EnvironmentCamera.h">
+      <Filter>Camera</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\Atrc\Core\Geometry.cpp">
@@ -386,6 +389,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Source\Atrc\Texture\ImageTexture.cpp">
       <Filter>Texture</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Camera\EnvironmentCamera.cpp">
+      <Filter>Camera</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
