@@ -45,6 +45,7 @@
     <ClInclude Include="..\..\..\Source\Atrc\Entity\GeometricLightEntity.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Geometry\Cube.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Geometry\Sphere.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Geometry\Triangle.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Geometry\TriangleBVH.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Light\CubeEnvironmentLight.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Light\DirectionalLight.h" />
@@ -66,6 +67,7 @@
     <ClInclude Include="..\..\..\Source\Atrc\Material\FresnelSpecular.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Material\IdealMirror.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Material\Metal.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Material\NormalMapper.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Material\Plastic.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Material\TextureScaler.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Material\UncallableMaterial.h" />
@@ -99,6 +101,7 @@
     <ClCompile Include="..\..\..\Source\Atrc\Entity\GeometricEntity.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Geometry\Cube.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Geometry\Sphere.cpp" />
+    <ClCompile Include="..\..\..\Source\Atrc\Geometry\Triangle.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Geometry\TriangleBVH.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Light\CubeEnvironmentLight.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Light\DirectionalLight.cpp" />
@@ -119,6 +122,7 @@
     <ClCompile Include="..\..\..\Source\Atrc\Material\FresnelSpecular.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Material\IdealMirror.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Material\Metal.cpp" />
+    <ClCompile Include="..\..\..\Source\Atrc\Material\NormalMapper.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Material\Plastic.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Medium\HenyeyGreenstein.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\PostProcessor\ACESFilm.cpp" />

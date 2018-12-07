@@ -244,6 +244,12 @@
     <ClInclude Include="..\..\..\Source\Atrc\Camera\EnvironmentCamera.h">
       <Filter>Camera</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Geometry\Triangle.h">
+      <Filter>Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Material\NormalMapper.h">
+      <Filter>Material</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\Atrc\Core\Geometry.cpp">
@@ -392,6 +398,12 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Source\Atrc\Camera\EnvironmentCamera.cpp">
       <Filter>Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Geometry\Triangle.cpp">
+      <Filter>Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Atrc\Material\NormalMapper.cpp">
+      <Filter>Material</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
