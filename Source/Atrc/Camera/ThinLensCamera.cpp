@@ -55,7 +55,7 @@ CameraRay ThinLensCamera::GetRay(const Vec2 &rasterPos) const
     return {
         Ray(
             LocalPoint2World(x),
-            LocalVector2World((p - x).Normalize()),
+            LocalVector2World((p - x)).Normalize(),
             EPS),
         Spectrum(float(qe)),
         pdf
