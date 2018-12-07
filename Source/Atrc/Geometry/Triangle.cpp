@@ -109,11 +109,6 @@ AABB Triangle::LocalBound() const
 {
     AABB ret;
     ret.Expand(A).Expand(A + B_A).Expand(A + C_A);
-    /*for(int i = 0; i < 3; ++i)
-    {
-        if(ret.high[i] <= ret.low[i])
-            ret.high[i] = ret.low[i] + Real(0.01) * Abs(ret.low[i]) + Real(0.01);
-    }*/
     return ret;
 }
 

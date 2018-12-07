@@ -213,3 +213,11 @@ int main()
 把PathTracingRenderer划分任务时用的grid大小做进了脚本参数，随便改了改，效率瞬间提升15%，这是为什么？Cache的原因吗？不科学啊……
 
 原来的代码在许多地方直接使用了AGZ::Texture2D，采样方式、坐标wrap方式各自为政，混乱不堪；这回在Core Interface中添加了Texture，也把它加入了Creator/Manager体系，用起来舒服多了。
+
+## 2018.12.6
+
+添加了Environment Camera，这东西的film上的均匀采样并不对应sensor上的均匀采样，于是我不得不干掉原来的We体系，换成基于film的Qe体系，而推导Qe和We间的关系又花费了一些时间。
+
+## 2018.12.7
+
+想加Normal mapping，于是写了个简单的NormalMapper，由于没有单独的Triangle Geometry Object，一时居然找不到好的测试场景。于是写了个单独的Triangle类，结果测试的时候物体下面的阴影怎么看都很奇怪。一开始以为是Triangle这边local coord system有问题，通过换成mirror材质否认了这一猜想，然后看了半天diffuse材质的wi采样，也没什么错误。我甚至怀疑到path tracer上去了，可是换成volumetric path tracer，问题依然。也设想了是has intersection不对，可是看代码怎么也看不出差错。最后我认为可能是shadow ray测试不对，于是把path tracer的MIS of direct illumination给拆开，结果bsdf sampling的结果是对的，而light sampling的结果就不对，果然问题在这！然而这个MIS我已经用了很久，没道理会有这么明显的bug啊。看了半天，我突然想起triangle不同于以往的geometry object，它的bound可能在某一维度上宽度为0，检查了一番相关代码，也改了一两个不合理之处，而bug变得更加玄学了——地面阴影会随着三角形形状变化而变化，而这个变化显得丝毫没有规律和道理。最后，我也不知道是为什么，检查了一下environment light中计算world radius的代码，结果发现自己不慎把一个+写成了-……而这个问题在过去的场景中恰好没有很好地暴露出来。
