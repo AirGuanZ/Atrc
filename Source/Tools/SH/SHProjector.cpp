@@ -26,7 +26,7 @@ void SHEntityDirectProjector::Project(const Ray &r, const Scene &scene, int SHC,
             continue;
 
         auto f    = bsdfSample->coef;
-        auto cosV = Dot(sp.geoLocal.ez, bsdfSample->wi);
+        auto cosV = Dot(shd.normal, bsdfSample->wi);
         auto pS2  = bsdfSample->pdf;
 
         auto pfx = f * float(cosV / pS2);
@@ -77,7 +77,7 @@ void SHEntityFullProjector::ProjectImpl(const Ray &r, const Scene &scene, int SH
     }
 
     auto f    = bsdfSample->coef;
-    auto cosV = Dot(sp.geoLocal.ez, bsdfSample->wi);
+    auto cosV = Dot(shd.normal, bsdfSample->wi);
     auto pS2  = bsdfSample->pdf;
 
     Ray newRay(sp.pos, bsdfSample->wi, EPS);

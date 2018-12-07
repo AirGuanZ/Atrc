@@ -2,8 +2,8 @@
 
 AGZ_NS_BEG(Atrc)
 
-BxDFAggregate::BxDFAggregate(const LocalCoordSystem &shdLocal, const LocalCoordSystem &geoLocal)
-    : BSDF(shdLocal, geoLocal), bxdfCnt_(0)
+BxDFAggregate::BxDFAggregate(const Vec3 &shdNor, const LocalCoordSystem &geoLocal)
+    : BSDF(shdNor, geoLocal), bxdfCnt_(0)
 {
 
 }
@@ -16,7 +16,7 @@ void BxDFAggregate::AddBxDF(const BxDF *bxdf)
 
 Spectrum BxDFAggregate::Eval(const Vec3 &wi, const Vec3 &wo, BxDFType type) const
 {
-    Vec3 lwi = shadingLocal_.World2Local(wi), lwo = shadingLocal_.World2Local(wo);
+    Vec3 lwi = geometryLocal_.World2Local(wi), lwo = geometryLocal_.World2Local(wo);
 
     Spectrum ret;
     for(size_t i = 0; i < bxdfCnt_; ++i)
@@ -53,7 +53,7 @@ Option<BSDFSampleWiResult> BxDFAggregate::SampleWi(const Vec3 &wo, BxDFType type
 
     // 采样该bxdf
 
-    Vec3 lwo = shadingLocal_.World2Local(wo);
+    Vec3 lwo = geometryLocal_.World2Local(wo);
     auto ret = bxdf->SampleWi(lwo);
     if(!ret)
         return None;
@@ -62,7 +62,7 @@ Option<BSDFSampleWiResult> BxDFAggregate::SampleWi(const Vec3 &wo, BxDFType type
     if(ret->type & BXDF_SPECULAR || nMatched <= 1)
     {
         ret->pdf /= nMatched;
-        ret->wi = shadingLocal_.Local2World(ret->wi);
+        ret->wi = geometryLocal_.Local2World(ret->wi);
         return Some(*ret);
     }
 
@@ -77,13 +77,13 @@ Option<BSDFSampleWiResult> BxDFAggregate::SampleWi(const Vec3 &wo, BxDFType type
     }
 
     ret->pdf /= nMatched;
-    ret->wi = shadingLocal_.Local2World(ret->wi);
+    ret->wi = geometryLocal_.Local2World(ret->wi);
     return Some(*ret);
 }
 
 Real BxDFAggregate::SampleWiPDF(const Vec3 &wi, const Vec3 &wo, BxDFType type) const
 {
-    Vec3 lwi = shadingLocal_.World2Local(wi), lwo = shadingLocal_.World2Local(wo);
+    Vec3 lwi = geometryLocal_.World2Local(wi), lwo = geometryLocal_.World2Local(wo);
 
     int nMatched = 0; Real ret = 0.0;
     for(size_t i = 0; i < bxdfCnt_; ++i)

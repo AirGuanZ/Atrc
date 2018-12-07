@@ -65,18 +65,17 @@ Spectrum PathTracer::E1(const Scene &scene, const SurfacePoint &sp, const Shadin
 
         if(bsdfSample->type & BXDF_SPECULAR)
         {
-            return bsdfSample->coef * Abs(Dot(shd.shdLocal.ez, bsdfSample->wi))
+            return bsdfSample->coef * Abs(Dot(shd.normal, bsdfSample->wi))
                  * light->AreaLe(newInct) / bsdfSample->pdf;
         }
 
         Real lpdf = scene.SampleLightPDF(light) * light->SampleLiPDF(newInct.pos, sp);
-        return bsdfSample->coef * Abs(Dot(shd.shdLocal.ez, bsdfSample->wi))
+        return bsdfSample->coef * Abs(Dot(shd.normal, bsdfSample->wi))
              * light->AreaLe(newInct) / (bsdfSample->pdf + lpdf);
     }
 
     auto [light, lpdf] = scene.SampleLight();
 
-    // delta光源无法被BSDF采样命中
     if(!light || light->IsDelta())
         return Spectrum();
 
@@ -84,13 +83,13 @@ Spectrum PathTracer::E1(const Scene &scene, const SurfacePoint &sp, const Shadin
     if(!le)
         return Spectrum();
 
-    // Specular BSDF的coef和pdf都是delta
+    // Specular BSDF锟斤拷coef锟斤拷pdf锟斤拷锟斤拷delta
     if(bsdfSample->type & BXDF_SPECULAR)
-        return bsdfSample->coef * Abs(Dot(shd.shdLocal.ez, bsdfSample->wi))
+        return bsdfSample->coef * Abs(Dot(shd.normal, bsdfSample->wi))
         * le / bsdfSample->pdf;
 
     lpdf *= light->SampleLiPDF(sp.pos + bsdfSample->wi, sp, false);
-    return bsdfSample->coef * Abs(Dot(shd.shdLocal.ez, bsdfSample->wi))
+    return bsdfSample->coef * Abs(Dot(shd.normal, bsdfSample->wi))
          * le / (bsdfSample->pdf + lpdf);
 }
 
@@ -108,7 +107,7 @@ Spectrum PathTracer::E2(const Scene &scene, const SurfacePoint &sp, const Shadin
     if(!f)
         return Spectrum();
 
-    // Shadow ray测试
+    // Shadow ray
     Ray shadowRay(sp.pos, lightSample.wi, EPS, (lightSample.pos - sp.pos).Length() - EPS);
     if(scene.HasIntersection(shadowRay) ||
         ((Dot(sp.wo,          sp.geoLocal.ez) <= 0.0) ^
@@ -117,15 +116,14 @@ Spectrum PathTracer::E2(const Scene &scene, const SurfacePoint &sp, const Shadin
 
     lpdf *= lightSample.pdf;
 
-    // Delta light的pdf是delta
     if(light->IsDelta())
     {
-        return f * Abs(Dot(sp.geoLocal.ez, lightSample.wi))
+        return f * Abs(Dot(shd.normal, lightSample.wi))
              * lightSample.radiance / lpdf;
     }
 
     Real bpdf = shd.bsdf->SampleWiPDF(lightSample.wi, sp.wo, BxDFType(BXDF_ALL & ~BXDF_SPECULAR));
-    return f * Abs(Dot(sp.geoLocal.ez, lightSample.wi))
+    return f * Abs(Dot(shd.normal, lightSample.wi))
          * lightSample.radiance / (bpdf + lpdf);
 }
 
@@ -140,7 +138,7 @@ Spectrum PathTracer::S(const Scene &scene, const SurfacePoint &sp, const Shading
     if(!scene.FindCloestIntersection(newRay, &newInct))
         return Spectrum();
 
-    return bsdfSample->coef * Abs(Dot(shd.shdLocal.ez, bsdfSample->wi))
+    return bsdfSample->coef * Abs(Dot(shd.normal, bsdfSample->wi))
          * Ls(scene, newInct, depth + 1, arena) / bsdfSample->pdf;
 }
 

@@ -15,10 +15,10 @@ void Metal::Shade(const SurfacePoint &sp, ShadingPoint *dst, AGZ::ObjArena<> &ar
 {
     AGZ_ASSERT(dst);
 
-    auto *bsdf = arena.Create<BxDFAggregate>(sp.geoLocal, sp.geoLocal);
+    auto *bsdf = arena.Create<BxDFAggregate>(sp.geoLocal.ez, sp.geoLocal);
     bsdf->AddBxDF(&torranceSparrow_);
 
-    dst->shdLocal = sp.geoLocal;
+    dst->normal = sp.geoLocal.ez;
     dst->bsdf = bsdf;
 }
 

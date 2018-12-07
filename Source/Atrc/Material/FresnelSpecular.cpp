@@ -16,11 +16,11 @@ void FresnelSpecular::Shade(const SurfacePoint &sp, ShadingPoint *dst, AGZ::ObjA
 {
     AGZ_ASSERT(dst);
 
-    auto bsdf = arena.Create<BxDFAggregate>(sp.geoLocal, sp.geoLocal);
+    auto bsdf = arena.Create<BxDFAggregate>(sp.geoLocal.ez, sp.geoLocal);
     bsdf->AddBxDF(arena.Create<PerfectSpecular>(rc_, fresnel_));
 
     dst->bsdf = bsdf;
-    dst->shdLocal = sp.geoLocal;
+    dst->normal = sp.geoLocal.ez;
 }
 
 AGZ_NS_END(Atrc)

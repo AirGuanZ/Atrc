@@ -38,13 +38,13 @@ class BSDF
 {
 protected:
 
-    LocalCoordSystem shadingLocal_;
+    Vec3 shadingNormal_;
     LocalCoordSystem geometryLocal_;
 
 public:
 
-    BSDF(const LocalCoordSystem &shadingLocal, const LocalCoordSystem &geometryLocal)
-        : shadingLocal_(shadingLocal), geometryLocal_(geometryLocal)
+    BSDF(const Vec3 &shadingNormal, const LocalCoordSystem &geometryLocal)
+        : shadingNormal_(shadingNormal), geometryLocal_(geometryLocal)
     {
         
     }
@@ -59,7 +59,7 @@ public:
     // 给定某wi，假设这时SampleWi的采样结果，返回pdf
     virtual Real SampleWiPDF(const Vec3 &wi, const Vec3 &wo, BxDFType type) const = 0;
 
-    const LocalCoordSystem &GetShadingLocal() const { return shadingLocal_; }
+    const Vec3 &GetShadingNormal() const { return shadingNormal_; }
     const LocalCoordSystem &GetGeometryLocal() const { return geometryLocal_; }
 };
 

@@ -16,7 +16,7 @@ class BxDFAggregate : public BSDF
 
 public:
 
-    BxDFAggregate(const LocalCoordSystem &shdLocal, const LocalCoordSystem &geoLocal);
+    BxDFAggregate(const Vec3 &shdNor, const LocalCoordSystem &geoLocal);
 
     void AddBxDF(const BxDF *bxdf);
 

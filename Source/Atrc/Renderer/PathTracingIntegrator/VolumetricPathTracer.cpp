@@ -55,12 +55,12 @@ Spectrum VolumetricPathTracer::E1_right(const Scene &scene, const SurfacePoint &
 
         if(bsdfSample->type & BXDF_SPECULAR)
         {
-            return bsdfSample->coef * Abs(Dot(shd.shdLocal.ez, bsdfSample->wi))
+            return bsdfSample->coef * Abs(Dot(shd.normal, bsdfSample->wi))
                  * tr * light->AreaLe(newInct) / bsdfSample->pdf;
         }
 
         Real lpdf = scene.SampleLightPDF(light) * light->SampleLiPDF(newInct.pos, sp);
-        return bsdfSample->coef * Abs(Dot(shd.shdLocal.ez, bsdfSample->wi))
+        return bsdfSample->coef * Abs(Dot(shd.normal, bsdfSample->wi))
              * tr * light->AreaLe(newInct) / (bsdfSample->pdf + lpdf);
     }
 
@@ -79,12 +79,12 @@ Spectrum VolumetricPathTracer::E1_right(const Scene &scene, const SurfacePoint &
 
     if(bsdfSample->type & BXDF_SPECULAR)
     {
-        return bsdfSample->coef * Abs(Dot(shd.shdLocal.ez, bsdfSample->wi))
+        return bsdfSample->coef * Abs(Dot(shd.normal, bsdfSample->wi))
              * le / bsdfSample->pdf;
     }
 
     lpdf *= light->SampleLiPDF(sp.pos + bsdfSample->wi, sp, false);
-    return bsdfSample->coef * Abs(Dot(shd.shdLocal.ez, bsdfSample->wi))
+    return bsdfSample->coef * Abs(Dot(shd.normal, bsdfSample->wi))
          * le / (bsdfSample->pdf + lpdf);
 }
 
@@ -121,12 +121,12 @@ Spectrum VolumetricPathTracer::E2_right(const Scene &scene, const SurfacePoint &
 
     if(light->IsDelta())
     {
-        return f * Abs(Dot(sp.geoLocal.ez, lightSample.wi))
+        return f * Abs(Dot(shd.normal, lightSample.wi))
              * tr * lightSample.radiance / lpdf;
     }
 
     Real bpdf = shd.bsdf->SampleWiPDF(lightSample.wi, sp.wo, BxDFType(BXDF_ALL & ~BXDF_SPECULAR));
-    return f * Abs(Dot(sp.geoLocal.ez, lightSample.wi))
+    return f * Abs(Dot(shd.normal, lightSample.wi))
          * tr * lightSample.radiance / (bpdf + lpdf);
 }
 
@@ -142,7 +142,7 @@ Spectrum VolumetricPathTracer::S_right(const Scene &scene, const SurfacePoint &s
     if(!d2)
         return Spectrum();
 
-    return bsdfSample->coef * Abs(Dot(shd.shdLocal.ez, bsdfSample->wi))
+    return bsdfSample->coef * Abs(Dot(shd.normal, bsdfSample->wi))
          * d2 / bsdfSample->pdf;
 }
 

@@ -17,9 +17,9 @@ class TextureScaler : public Material
     public:
 
         BSDFScaler(
-            const LocalCoordSystem &shadingLocal, const LocalCoordSystem &geoLocal,
+            const Vec3 &shadingNormal, const LocalCoordSystem &geoLocal,
             const Spectrum &scale, BSDF *bsdf)
-            : BSDF(shadingLocal, geoLocal), scale_(scale), bsdf_(bsdf)
+            : BSDF(shadingNormal, geoLocal), scale_(scale), bsdf_(bsdf)
         {
             AGZ_ASSERT(bsdf);
         }
@@ -59,7 +59,7 @@ public:
 
         Spectrum scale = tex_->Sample(sp.usrUV);
         dst->bsdf = arena.Create<BSDFScaler>(
-            dst->bsdf->GetShadingLocal(), dst->bsdf->GetGeometryLocal(), scale, dst->bsdf);
+            dst->bsdf->GetShadingNormal(), dst->bsdf->GetGeometryLocal(), scale, dst->bsdf);
     }
 };
 
