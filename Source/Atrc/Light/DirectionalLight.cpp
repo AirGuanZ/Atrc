@@ -13,13 +13,8 @@ void DirectionalLight::PreprocessScene(const Scene &scene)
     AGZ_ASSERT(!worldRadius_);
 
     auto &wb = scene.GetWorldBound();
-    if(wb.IsEmpty())
-    {
-        worldRadius_ = 1;
-        return;
-    }
 
-    worldCentre_ = Real(0.5) * (wb.high - wb.low);
+    worldCentre_ = Real(0.5) * (wb.high + wb.low);
 
     auto hd = wb.high - worldCentre_;
     worldRadius_ = Real(1.01) * hd.Length();

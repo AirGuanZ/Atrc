@@ -39,6 +39,7 @@ inline void InitializeObjectManagers()
     {
         CubeCreator       ::GetInstancePtr(),
         SphereCreator     ::GetInstancePtr(),
+        TriangleCreator   ::GetInstancePtr(),
         TriangleBVHCreator::GetInstancePtr(),
     };
     for(auto c : GEOMETRY_CREATORS)

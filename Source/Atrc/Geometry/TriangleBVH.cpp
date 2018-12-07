@@ -243,7 +243,7 @@ bool TriangleBVHCore::FindIntersection(const Ray &r, SurfacePoint *sp) const
 
     const auto &tri = triangles_[sp->flag0];
     sp->usrUV = tri.tA + sp->geoUV.u * tri.tB_tA + sp->geoUV.v * tri.tC_tA;
-    sp->geoLocal = LocalCoordSystem::FromEz(tri.nor);
+    sp->geoLocal = { tri.ex, Cross(tri.nor, tri.ex), tri.nor };
 
     return true;
 }
@@ -500,6 +500,25 @@ namespace
         return ret;
     }
 
+    // Solve dpdu.Normalize() for P = A + (u - uA)dpdu + (v - vA)dpdv
+    Vec3 ComputeNormalizedDpdu(
+        const Vec3 &A, const Vec3 &B, const Vec3 &C,
+        const Vec2 &a, const Vec2 &b, const Vec2 c,
+        const Vec3 &normal)
+    {
+        Real m00 = b.u - a.u, m01 = b.v - a.v;
+        Real m10 = c.u - a.u, m11 = c.v - a.v;
+        Real det = m00 * m11 - m01 * m10;
+
+        if(!det)
+            return LocalCoordSystem::FromEz(normal).ex;
+        
+        Real invDet = 1 / det;
+        Vec3 dpdu = m11 * invDet * (B - A) - m01 * invDet * (C - A);
+        
+        return dpdu.Normalize();
+    }
+
     struct CompactTask
     {
         const TNode *tree;
@@ -539,6 +558,11 @@ namespace
                     intTri.B_A   = tri[1].pos - tri[0].pos;
                     intTri.C_A   = tri[2].pos - tri[0].pos;
                     intTri.nor   = tri[0].nor;
+                    intTri.ex    = ComputeNormalizedDpdu(
+                                        tri[0].pos, tri[1].pos, tri[2].pos,
+                                        tri[0].uv,  tri[1].uv,  tri[2].uv,
+                                        tri[0].nor);
+                    //intTri.ey    = Cross(intTri.nor, intTri.ex);
                     intTri.tA    = tri[0].uv;
                     intTri.tB_tA = tri[1].uv - tri[0].uv;
                     intTri.tC_tA = tri[2].uv - tri[0].uv;

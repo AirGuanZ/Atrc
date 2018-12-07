@@ -41,9 +41,8 @@ public:
     struct InternalTriangle
     {
         Vec3 A, B_A, C_A;
-        Vec3 nor;
+        Vec3 nor, ex; //, ey; // dpdu.Normalize(): ex, nor: ez, ez \times ex: ey
         Vec2 tA, tB_tA, tC_tA;
-        Real surfaceArea = 0.0;
 
         IMPL_MEMCPY_SERIALIZE
         IMPL_MEMCPY_DESERIALIZE

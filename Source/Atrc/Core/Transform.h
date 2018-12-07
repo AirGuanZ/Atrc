@@ -133,8 +133,6 @@ public:
     AABB ApplyToAABB(const AABB &aabb) const
     {
         AABB ret;
-        if(aabb.IsEmpty())
-            return ret;
         ret.Expand(ApplyToPoint(aabb.low))
            .Expand(ApplyToPoint(Vec3(aabb.high.x, aabb.low.y,  aabb.low.z)))
            .Expand(ApplyToPoint(Vec3(aabb.low.x,  aabb.high.y, aabb.low.z)))
@@ -149,8 +147,6 @@ public:
     AABB ApplyInverseToAABB(const AABB &aabb) const
     {
         AABB ret;
-        if(aabb.IsEmpty())
-            return ret;
         ret.Expand(ApplyInverseToPoint(aabb.low))
            .Expand(ApplyInverseToPoint(Vec3(aabb.high.x, aabb.low.y,  aabb.low.z)))
            .Expand(ApplyInverseToPoint(Vec3(aabb.low.x,  aabb.high.y, aabb.low.z)))

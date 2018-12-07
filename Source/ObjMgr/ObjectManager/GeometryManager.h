@@ -29,6 +29,22 @@ public:
     Atrc::Geometry *Create(const ConfigGroup &params, ObjArena<> &arena) const override;
 };
 
+// A = Vec3
+// B = Vec3
+// C = Vec3
+// tA = Vec2
+// tB = Vec2
+// tC = Vec2
+// transform = Transform
+class TriangleCreator : public GeometryCreator, public AGZ::Singleton<TriangleCreator>
+{
+public:
+
+    Str8 GetName() const override { return "Triangle"; }
+
+    Atrc::Geometry *Create(const ConfigGroup &params, ObjArena<> &arena) const override;
+};
+
 // path = ...
 // transform = Transform
 class TriangleBVHCreator : public GeometryCreator, public AGZ::Singleton<TriangleBVHCreator>

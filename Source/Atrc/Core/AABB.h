@@ -12,7 +12,7 @@ public:
     Vec3 low  = Vec3(RealT::Max());
     Vec3 high = Vec3(RealT::Min());
 
-    // 若(high - low)的任意一个维度<=0，则视为Entity
+    // 若(high - low)的任意一个维度<=0，则视为Empty
     bool IsEmpty() const
     {
         return low.x >= high.x || low.y >= high.y || low.z >= high.z;

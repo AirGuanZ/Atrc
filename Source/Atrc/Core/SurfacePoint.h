@@ -26,7 +26,7 @@ struct LocalCoordSystem
             ex = Cross(ez, Vec3::UNIT_Y()).Normalize();
         else
             ex = Cross(ez, Vec3::UNIT_X()).Normalize();
-        return { ex, Cross(ez, ex), ez };
+        return { ex, Cross(ez, ex), ez.Normalize() };
     }
 };
 

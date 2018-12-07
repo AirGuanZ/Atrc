@@ -2,7 +2,7 @@
 renderer = {
     type        = PathTracingRenderer;
     workerCount = 11;
-    spp         = 10;
+    spp         = 1000;
     gridSize    = 5;
     integrator  = {
         type     = PathTracer;
@@ -17,46 +17,60 @@ outputFilename = "./Build/Output.png";
 reporter = { type = Default; };
 
 # Camera
-#camera = {
-#    type = ThinLens;
-#    film = {
-#        width  = 640;
-#        height = 480;
-#    };
-#    sensor = {
-#        width    = 2;
-#        distance = 1;
-#    };
-#    lens = {
-#        radius = 0;
-#        focalPlaneDistance = 7;
-#    };
-#    lensPos = (-7, 0, 0);
-#    lookAt  = (0, 0, 1.5);
-#    up      = (0, 0, 1);
-#};
 camera = {
-    type = Environment;
+    type = ThinLens;
     film = {
-        width  = 960;
+        width  = 640;
         height = 480;
     };
-    centrePos = (-3, 0, 0);
-    lookAt    = (0, 0, 0);
-    up        = (0, 0, 1);
+    sensor = {
+        width    = 2;
+        distance = 1;
+    };
+    lens = {
+        radius = 0;
+        focalPlaneDistance = 7;
+    };
+    lensPos = (-7, 0, 0);
+    lookAt  = (0, 0, 1.5);
+    up      = (0, 0, 1);
 };
+#camera = {
+#    type = Environment;
+#    film = {
+#        width  = 960;
+#        height = 480;
+#    };
+#    centrePos = (-3, 0, 0);
+#    lookAt    = (0, 0, 0);
+#    up        = (0, 0, 1);
+#};
 
 # Entity list
 entities = (
-{   # ground
+{
     type = GeometricEntity;
     geometry = {
-        type      = Sphere;
-        radius    = 200;
-        transform = (Translate(0, 0, -201));
+        type = Triangle;
+        A  = (-2, -4, 0); B = (-2, 4, 0); C = (2, 4, 0);
+        tA = (0, 0); tB = (0, 1); tC = (1, 1);
+        transform = (Translate(0, 0, -1));
     };
     material = {
-        type   = DiffuseMaterial;
+        type = DiffuseMaterial;
+        albedo = (0.5);
+    };
+},
+{
+    type = GeometricEntity;
+    geometry = {
+        type = Triangle;
+        A  = (-2, -4, -1); B = (2, 4, -1); C = (2, -4, -1);
+        tA = (0, 0); tB = (1, 1); tC = (1, 0);
+        transform = (Translate(0, 0, 0));
+    };
+    material = {
+        type = DiffuseMaterial;
         albedo = (0.5);
     };
 },
@@ -156,20 +170,11 @@ lights = (
         wrapper = Clamp;
     };
 }
-#{
-#    type = SphereEnvironmentLight;
-#    tex = {
-#        type     = Image;
-#        filename = "./Assets/PineForest.png";
-#        sampler  = Linear;
-#        wrapper  = Clamp;
-#    };
-#}
 );
 
 postProcessors = (
-    #{ type = HorizontalFlipper; },
-    #{ type = VerticalFlipper; },
+    { type = HorizontalFlipper; },
+    { type = VerticalFlipper; },
     { type = ACESFilm; },
     #{ type = GammaCorrection; gamma = 0.6; }
 );

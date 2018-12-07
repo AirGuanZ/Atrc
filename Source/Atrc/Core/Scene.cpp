@@ -65,6 +65,7 @@ bool Scene::HasIntersection(const Ray &r) const
 
 bool Scene::FindCloestIntersection(const Ray &r, SurfacePoint *sp) const
 {
+    AGZ_ASSERT(r.IsNormalized());
     sp->t = RealT::Infinity();
     for(auto ent : entities_)
     {

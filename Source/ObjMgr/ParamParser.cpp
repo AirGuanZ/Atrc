@@ -47,6 +47,23 @@ Spectrum ParamParser::ParseSpectrum(const ConfigNode &node)
     throw ParamParsingError("ParamParser: unknown spectrum form");
 }
 
+Vec2 ParamParser::ParseVec2(const ConfigNode &node)
+{
+    try
+    {
+        auto &arr = node.AsArray();
+        if(arr.Size() != 2)
+            throw ParamParsingError("ParamParser: unknown vec2 form");
+
+        return Vec2(arr[0].AsValue().Parse<Real>(),
+                    arr[1].AsValue().Parse<Real>());
+    }
+    catch(const std::exception &err)
+    {
+        throw SceneInitializationException(err.what());
+    }
+}
+
 Vec3 ParamParser::ParseVec3(const ConfigNode &node)
 {
     try

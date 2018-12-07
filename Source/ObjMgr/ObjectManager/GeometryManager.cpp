@@ -19,6 +19,19 @@ Atrc::Geometry *CubeCreator::Create(const ConfigGroup &params, ObjArena<> &arena
     return arena.Create<Atrc::Cube>(transform, sidelen);
 }
 
+Atrc::Geometry *TriangleCreator::Create(const ConfigGroup &params, ObjArena<> &arena) const
+{
+    auto A  = ParamParser::ParseVec3(params["A"]);
+    auto B  = ParamParser::ParseVec3(params["B"]);
+    auto C  = ParamParser::ParseVec3(params["C"]);
+    auto tA = ParamParser::ParseVec2(params["tA"]);
+    auto tB = ParamParser::ParseVec2(params["tB"]);
+    auto tC = ParamParser::ParseVec2(params["tC"]);
+    auto transform = ParamParser::ParseTransform(params["transform"]);
+
+    return arena.Create<Atrc::Triangle>(transform, A, B, C, tA, tB, tC);
+}
+
 Atrc::Geometry *TriangleBVHCreator::Create(const ConfigGroup &params, ObjArena<> &arena) const
 {
     auto path = params["path"].AsValue();

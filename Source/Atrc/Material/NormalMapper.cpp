@@ -14,7 +14,7 @@ Vec3 NormalMapper::GetLocalNormal(const Vec2 &texCoord) const
     return texel.Map([](float c)
     {
         return 2 * Real(c) - 1;
-    });
+    }).Normalize();
 }
 
 AGZ_NS_END(Atrc)

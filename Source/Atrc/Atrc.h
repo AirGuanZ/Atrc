@@ -11,6 +11,7 @@
 
 #include <Atrc/Geometry/Cube.h>
 #include <Atrc/Geometry/Sphere.h>
+#include <Atrc/Geometry/Triangle.h>
 #include <Atrc/Geometry/TriangleBVH.h>
 
 #include <Atrc/Light/CubeEnvironmentLight.h>

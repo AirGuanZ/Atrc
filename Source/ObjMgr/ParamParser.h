@@ -25,6 +25,9 @@ public:
     // (0.1, 0.2, 0.3) => (0.1f, 0.2f, 0.3f)
     static Atrc::Spectrum ParseSpectrum(const ConfigNode &node);
 
+    // (0.1, 0.2) => (0.1, 0.2)
+    static Atrc::Vec2 ParseVec2(const ConfigNode &node);
+
     // (0.1, 0.2, 0.3) => (0.1, 0.2, 0.3)
     static Atrc::Vec3 ParseVec3(const ConfigNode &node);
 
