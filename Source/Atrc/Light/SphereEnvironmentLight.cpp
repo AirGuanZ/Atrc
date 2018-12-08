@@ -17,7 +17,7 @@ void SphereEnvironmentLight::PreprocessScene(const Scene &scene)
     worldCentre_ = Real(0.5) * (wb.high + wb.low);
 
     auto hd = wb.high - worldCentre_;
-    worldRadius_ = Real(1.01) * hd.Length();
+    worldRadius_ = Real(1.1) * hd.Length();
 }
 
 LightSampleToResult SphereEnvironmentLight::SampleLi(const SurfacePoint &sp) const

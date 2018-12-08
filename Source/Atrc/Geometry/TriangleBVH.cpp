@@ -557,7 +557,10 @@ namespace
                     intTri.A     = tri[0].pos;
                     intTri.B_A   = tri[1].pos - tri[0].pos;
                     intTri.C_A   = tri[2].pos - tri[0].pos;
-                    intTri.nor   = tri[0].nor;
+                    intTri.nor = Cross(intTri.B_A, intTri.C_A).Normalize();
+                    if(Dot(intTri.nor, tri[0].nor) <= 0)
+                        intTri.nor = -intTri.nor;
+                    //intTri.nor   = tri[0].nor;
                     intTri.ex    = ComputeNormalizedDpdu(
                                         tri[0].pos, tri[1].pos, tri[2].pos,
                                         tri[0].uv,  tri[1].uv,  tri[2].uv,

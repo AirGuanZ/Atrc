@@ -53,7 +53,7 @@ DEFINE_ATRC_EXCEPTION(UnreachableException);
 using Real = double;
 using RealT = AGZ::Math::FP<Real>;
 
-constexpr Real EPS = Real(1e-6);
+extern Real EPS;
 
 using Vec2 = AGZ::Math::Vec2<Real>;
 using Vec3 = AGZ::Math::Vec3<Real>;

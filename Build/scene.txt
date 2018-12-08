@@ -2,8 +2,8 @@
 renderer = {
     type        = PathTracingRenderer;
     workerCount = 6;
-    spp         = 300;
-    gridSize    = 40;
+    spp         = 4000;
+    gridSize    = 16;
     integrator  = {
         type     = PathTracer;
         maxDepth = 50;
@@ -20,8 +20,8 @@ reporter = { type = Default; };
 camera = {
     type = ThinLens;
     film = {
-        width  = 640;
-        height = 480;
+        width  = 600;
+        height = 900;
     };
     sensor = {
         width    = 2;
@@ -31,8 +31,8 @@ camera = {
         radius = 0;
         focalPlaneDistance = 7;
     };
-    lensPos = (-7, 0, 0);
-    lookAt  = (0, 0, 0);
+    lensPos = (-1.5, 0, 0.7);
+    lookAt  = (0, 0, 0.5);
     up      = (0, 0, 1);
 };
 
@@ -42,14 +42,14 @@ entities = (
     type = GeometricEntity;
     geometry = {
         type = Triangle;
-        A  = (-4, -4, 0); B = (-4, 4, 0); C = (4, 4, 0);
+        A  = (-0.5, -0.5, 0); B = (-0.5, 0.5, 0); C = (0.5, 0.5, 0);
         tA = (1, 1); tB = (0, 1); tC = (0, 0);
-        transform = (Translate(0, 0, 0), RotateZ(Deg(0)), RotateY(Deg(-90)));
+        transform = (Translate(0, 0, -1));
     };
     material = {
         type = DiffuseMaterial;
         albedo = (0.5);
-        normalMap = {
+        normalMap0 = {
             type = Image;
             filename = "./Assets/ExampleNormalMap.png";
             sampler = Nearest;
@@ -61,14 +61,14 @@ entities = (
     type = GeometricEntity;
     geometry = {
         type = Triangle;
-        A  = (-4, -4, 0); B = (4, 4, 0); C = (4, -4, 0);
+        A  = (-0.5, -0.5, 0); B = (0.5, 0.5, 0); C = (0.5, -0.5, 0);
         tA = (1, 1); tB = (0, 0); tC = (1, 0);
-        transform = (Translate(0, 0, 0), RotateZ(Deg(0)), RotateY(Deg(-90)));
+        transform = (Translate(0, 0, -1));
     };
     material = {
         type = DiffuseMaterial;
         albedo = (0.5);
-        normalMap = {
+        normalMap0 = {
             type = Image;
             filename = "./Assets/ExampleNormalMap.png";
             sampler = Nearest;
@@ -108,6 +108,33 @@ entities = (
 #        roughness = 0.02;
 #    };
 #},
+{   # centre model
+    type = GeometricEntity;
+    geometry = {
+        type = TriangleBVH;
+        path = "./Assets/7.obj";
+        transform = (Translate(0.25, 0, 0), Translate(0, 1.2, -1.01), RotateZ(Deg(0)), RotateX(Deg(90)), Scale(1.2));
+    };
+    material = {
+        type = TextureScaler;
+        texture = {
+            type = Image;
+            filename = "./Assets/11.jpg";
+            sampler = Linear;
+            wrapper = Clamp;
+        };
+        internal = {
+            type = DiffuseMaterial;
+            albedo = (1.0);
+            normalMap0 = {
+                type = Image;
+                filename = "./Assets/2.jpg";
+                sampler = Nearest;
+                wrapper = Clamp;
+            };
+        };
+    };
+},
 #{   # right cube
 #    type = GeometricEntity;
 #    geometry = {
@@ -180,13 +207,13 @@ lights = (
         sampler = Linear;
         wrapper = Clamp;
     };
-    transform = (RotateZ(Deg(-150)));
+    transform = (RotateZ(Deg(-30)));
 }
 );
 
 postProcessors = (
     { type = HorizontalFlipper; },
     { type = VerticalFlipper; },
-    #{ type = ACESFilm; },
+    { type = ACESFilm; },
     #{ type = GammaCorrection; gamma = 0.6; }
 );
