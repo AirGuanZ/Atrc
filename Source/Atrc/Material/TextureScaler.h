@@ -59,7 +59,7 @@ public:
 
         Spectrum scale = tex_->Sample(sp.usrUV);
         dst->bsdf = arena.Create<BSDFScaler>(
-            dst->bsdf->GetShadingNormal(), dst->bsdf->GetGeometryLocal(), scale, dst->bsdf);
+            dst->bsdf->GetShadingLocal().ez, dst->bsdf->GetGeometryLocal(), scale, dst->bsdf);
     }
 };
 

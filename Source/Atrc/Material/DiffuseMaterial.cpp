@@ -4,20 +4,21 @@
 
 AGZ_NS_BEG(Atrc)
 
-DiffuseMaterial::DiffuseMaterial(const Spectrum &albedo)
-    : color_(AGZ::Math::InvPI<float> * albedo)
+DiffuseMaterial::DiffuseMaterial(const Spectrum &albedo, const NormalMapper *norMap)
+    : color_(AGZ::Math::InvPI<float> * albedo), norMap_(norMap)
 {
-
+    AGZ_ASSERT(norMap);
 }
 
 void DiffuseMaterial::Shade(const SurfacePoint &sp, ShadingPoint *dst, AGZ::ObjArena<> &arena) const
 {
     AGZ_ASSERT(dst);
 
-    auto bsdf = arena.Create<BxDFAggregate>(sp.geoLocal.ez, sp.geoLocal);
-    bsdf->AddBxDF(arena.Create<DiffuseBRDF>(color_));
+    auto lclShdNor = norMap_->GetLocalNormal(sp.usrUV);
+    dst->normal = sp.geoLocal.Local2World(lclShdNor);
 
-    dst->normal = sp.geoLocal.ez;
+    auto bsdf = arena.Create<BxDFAggregate>(dst->normal, sp.geoLocal);
+    bsdf->AddBxDF(arena.Create<DiffuseBRDF>(lclShdNor, color_));
     dst->bsdf = bsdf;
 }
 

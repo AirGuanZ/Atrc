@@ -2,15 +2,15 @@
 
 AGZ_NS_BEG(Atrc)
 
-DiffuseBRDF::DiffuseBRDF(const Spectrum &color)
-    : BxDF(BXDF_DIFFUSE | BXDF_REFLECTION), color_(color)
+DiffuseBRDF::DiffuseBRDF(const Vec3 &lclShdNor, const Spectrum &color)
+    : BxDF(BXDF_DIFFUSE | BXDF_REFLECTION), localShadingNormal_(lclShdNor), color_(color)
 {
 
 }
 
 Spectrum DiffuseBRDF::Eval(const Vec3 &wi, const Vec3 &wo) const
 {
-    if(wi.z <= 0.0 || wo.z <= 0.0)
+    if(Dot(wi, localShadingNormal_) <= 0 || wi.z < 0 || wo.z <= 0)
         return Spectrum();
     return color_;
 }
@@ -19,7 +19,7 @@ Option<BxDFSampleWiResult> DiffuseBRDF::SampleWi(const Vec3 &wo) const
 {
     AGZ_ASSERT(IsNormalized(wo));
 
-    if(wo.z <= 0.0)
+    if(wo.z <= 0)
         return None;
 
     Real u = Rand(), v = Rand();
@@ -28,7 +28,10 @@ Option<BxDFSampleWiResult> DiffuseBRDF::SampleWi(const Vec3 &wo) const
 
     BxDFSampleWiResult ret;
 
-    ret.wi   = sam;
+    ret.wi = LocalCoordSystem::FromEz(localShadingNormal_).Local2World(sam);
+    if(ret.wi.z <= 0)
+        return None;
+
     ret.pdf  = pdf;
     ret.coef = color_;
     ret.type = type_;
@@ -41,11 +44,12 @@ Real DiffuseBRDF::SampleWiPDF(const Vec3 &wi, const Vec3 &wo) const
     AGZ_ASSERT(IsNormalized(wi));
     AGZ_ASSERT(IsNormalized(wo));
 
-    if(wi.z <= 0.0 || wo.z <= 0.0)
-        return 0.0;
+    if(Dot(wi, localShadingNormal_) <= 0 || wi.z <= 0 || wo.z <= 0)
+        return 0;
 
     return AGZ::Math::DistributionTransform
-        ::ZWeightedOnUnitHemisphere<Real>::PDF(wi);
+        ::ZWeightedOnUnitHemisphere<Real>::PDF(
+            LocalCoordSystem::FromEz(localShadingNormal_).World2Local(wi));
 }
 
 AGZ_NS_END(Atrc)

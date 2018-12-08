@@ -8,12 +8,14 @@ class SphereEnvironmentLight : public Light
 {
     const Texture *envTex_;
 
+    Transform local2World_;
+
     Vec3 worldCentre_;
     Real worldRadius_;
 
 public:
 
-    explicit SphereEnvironmentLight(const Texture *envTex);
+    SphereEnvironmentLight(const Texture *envTex, const Transform &local2World);
 
     void PreprocessScene(const Scene &scene) override;
 

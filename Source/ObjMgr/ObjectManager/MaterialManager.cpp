@@ -57,6 +57,22 @@ const Atrc::SchlickApproximation *FresnelCreator::CreateSchlickApproximation(con
     return arena.Create<Atrc::SchlickApproximation>(etaI, etaT);
 }
 
+const Atrc::NormalMapper* NormalMapperCreator::CreateNormalMapper(const ConfigGroup &params, ObjArena<> &arena)
+{
+    auto node = params.Find("normalMap");
+    if(!node)
+    {
+        static Atrc::TrivialNormalMapper trivialNorMap;
+        return &trivialNorMap;
+    }
+
+    auto tex = GetSceneObject<Atrc::Texture>(*node, arena);
+    if(!tex)
+        throw SceneInitializationException("Failed to initialize texture for normal mapping");
+
+    return arena.Create<Atrc::TextureNormalMapper>(tex);
+}
+
 Atrc::Material *BlackMaterialCreator::Create([[maybe_unused]] const ConfigGroup &params, [[maybe_unused]] ObjArena<> &arena) const
 {
     return &Atrc::STATIC_BLACK_MATERIAL;
@@ -65,7 +81,8 @@ Atrc::Material *BlackMaterialCreator::Create([[maybe_unused]] const ConfigGroup 
 Atrc::Material *DiffuseMaterialCreator::Create(const ConfigGroup &params, ObjArena<> &arena) const
 {
     auto albedo = ParamParser::ParseSpectrum(params["albedo"]);
-    return arena.Create<Atrc::DiffuseMaterial>(albedo);
+    auto norMap = NormalMapperCreator::CreateNormalMapper(params, arena);
+    return arena.Create<Atrc::DiffuseMaterial>(albedo, norMap);
 }
 
 Atrc::Material *FresnelSpecularCreator::Create(const ConfigGroup &params, ObjArena<> &arena) const

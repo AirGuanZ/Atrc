@@ -37,7 +37,7 @@ CameraRay EnvironmentCamera::GetRay(const Vec2 &rasterPos) const
     Real phi1 = PI / 2 - PI * Min<Real>(uint32_t(rasterPos.y), hI_ - 1) / hI_;
     Real phi2 = PI / 2 - PI * Min<Real>(uint32_t(rasterPos.y) + 1, hI_) / hI_;
 
-    Real qe = 2 * PI * PI / Abs(theta1WI - theta2WI) * (Cos(phi) / (hI_ * (Sin(phi1) - Sin(phi2))));
+    Real qe = 2 * PI * PI / Abs((theta1WI - theta2WI) * (Cos(phi) / (hI_ * (Sin(phi1) - Sin(phi2)))));
 
     return {
         Ray(LocalPoint2World(Vec3(Real(0))), LocalVector2World(dir), EPS),

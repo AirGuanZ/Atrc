@@ -1,6 +1,5 @@
 #include "../ParamParser.h"
 #include "LightManager.h"
-#include "TextureManager.h"
 
 AGZ_NS_BEG(ObjMgr)
 
@@ -46,7 +45,11 @@ Atrc::Light *SkyLightCreator::Create(const ConfigGroup &params, ObjArena<> &aren
 Atrc::Light *SphereEnvironmentLightCreator::Create(const ConfigGroup &params, ObjArena<> &arena) const
 {
     auto tex = LoadTexture(params["tex"], arena);
-    return arena.Create<Atrc::SphereEnvironmentLight>(tex);
+    Atrc::Transform transform;
+    auto transNode = params.Find("transform");
+    if(transNode)
+        transform = ParamParser::ParseTransform(*transNode);
+    return arena.Create<Atrc::SphereEnvironmentLight>(tex, transform);
 }
 
 AGZ_NS_END(ObjMgr)

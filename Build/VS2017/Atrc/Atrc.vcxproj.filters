@@ -250,6 +250,9 @@
     <ClInclude Include="..\..\..\Source\Atrc\Material\NormalMapper.h">
       <Filter>Material</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Source\Atrc\Renderer\PathTracingIntegrator\ShadingNormalIntegrator.h">
+      <Filter>Renderer\PathTracingIntegrator</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\Atrc\Core\Geometry.cpp">
@@ -402,8 +405,8 @@
     <ClCompile Include="..\..\..\Source\Atrc\Geometry\Triangle.cpp">
       <Filter>Geometry</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Source\Atrc\Material\NormalMapper.cpp">
-      <Filter>Material</Filter>
+    <ClCompile Include="..\..\..\Source\Atrc\Renderer\PathTracingIntegrator\ShadingNormalIntegrator.cpp">
+      <Filter>Renderer\PathTracingIntegrator</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

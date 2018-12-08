@@ -2,8 +2,8 @@
 
 AGZ_NS_BEG(Atrc)
 
-SphereEnvironmentLight::SphereEnvironmentLight(const Texture *envTex)
-    : envTex_(envTex), worldRadius_(Real(0))
+SphereEnvironmentLight::SphereEnvironmentLight(const Texture *envTex, const Transform &local2World)
+    : envTex_(envTex), local2World_(local2World), worldRadius_(Real(0))
 {
     AGZ_ASSERT(envTex);
 }
@@ -73,7 +73,7 @@ bool SphereEnvironmentLight::IgnoreFirstMedium() const
 Spectrum SphereEnvironmentLight::NonareaLe(const Ray &r) const
 {
     AGZ_ASSERT(r.IsNormalized());
-    auto texCoord = AGZ::SphereMapper<Real>::Map(r.dir);
+    auto texCoord = AGZ::SphereMapper<Real>::Map(local2World_.ApplyInverseToVector(r.dir));
     return envTex_->Sample(texCoord);
 }
 

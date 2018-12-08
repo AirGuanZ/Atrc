@@ -39,6 +39,7 @@
 #include <Atrc/Renderer/PathTracingIntegrator/AmbientOcclusionIntegrator.h>
 #include <Atrc/Renderer/PathTracingIntegrator/PathTracer.h>
 #include <Atrc/Renderer/PathTracingIntegrator/PureColorIntegrator.h>
+#include <Atrc/Renderer/PathTracingIntegrator/ShadingNormalIntegrator.h>
 #include <Atrc/Renderer/PathTracingIntegrator/VolumetricPathTracer.h>
 
 #include <Atrc/Renderer/DefaultProgressReporter.h>

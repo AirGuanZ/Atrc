@@ -18,7 +18,7 @@ void Plastic::Shade(const SurfacePoint &sp, ShadingPoint *dst, AGZ::ObjArena<> &
     AGZ_ASSERT(dst);
 
     auto *bsdf = arena.Create<BxDFAggregate>(sp.geoLocal.ez, sp.geoLocal);
-    bsdf->AddBxDF(arena.Create<DiffuseBRDF>(kd_));
+    bsdf->AddBxDF(arena.Create<DiffuseBRDF>(Vec3::UNIT_Z(), kd_));
     bsdf->AddBxDF(&torranceSparrow_);
 
     dst->normal = sp.geoLocal.ez;

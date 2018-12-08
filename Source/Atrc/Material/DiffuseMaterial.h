@@ -1,16 +1,18 @@
 #pragma once
 
 #include <Atrc/Core/Core.h>
+#include <Atrc/Material/NormalMapper.h>
 
 AGZ_NS_BEG(Atrc)
 
 class DiffuseMaterial : public Material
 {
     Spectrum color_;
+    const NormalMapper *norMap_;
 
 public:
 
-    explicit DiffuseMaterial(const Spectrum &albedo);
+    DiffuseMaterial(const Spectrum &albedo, const NormalMapper *norMap);
 
     void Shade(const SurfacePoint &sp, ShadingPoint *dst, AGZ::ObjArena<> &arena) const override;
 };

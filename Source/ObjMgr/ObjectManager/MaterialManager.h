@@ -40,6 +40,16 @@ public:
     static const Atrc::SchlickApproximation *CreateSchlickApproximation(const ConfigGroup &params, ObjArena<> &arena);
 };
 
+//================================= NormalMapper Creator =================================
+
+class NormalMapperCreator
+{
+public:
+
+    // 若params["normalMap"]存在，则以它为texture创建一个normalMapper，否则返回一个trivial normal mapper
+    static const Atrc::NormalMapper *CreateNormalMapper(const ConfigGroup &params, ObjArena<> &arena);
+};
+
 #define SIMPLE_MATERIAL_CREATOR(MAT_NAME) \
     class MAT_NAME##Creator : public MaterialCreator, public AGZ::Singleton<MAT_NAME##Creator> \
     { \

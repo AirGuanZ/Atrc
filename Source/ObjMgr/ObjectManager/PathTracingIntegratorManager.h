@@ -50,6 +50,15 @@ public:
     Atrc::PathTracingIntegrator *Create(const ConfigGroup &params, ObjArena<> &arena) const override;
 };
 
+class ShadingNormalIntegratorCreator : public PathTracingIntegratorCreator, public AGZ::Singleton<ShadingNormalIntegratorCreator>
+{
+public:
+
+    Str8 GetName() const override { return "ShadingNormalIntegrator"; }
+
+    Atrc::PathTracingIntegrator *Create(const ConfigGroup &params, ObjArena<> &arena) const override;
+};
+
 // SHEntityProjector和SHLightProjector是特殊用途的Integrator，它们计算的不是radiance而是SH coefficients
 // 没有从脚本文件创建它们的理由，所以这里不为之准备Creator
 

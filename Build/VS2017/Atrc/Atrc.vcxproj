@@ -81,6 +81,7 @@
     <ClInclude Include="..\..\..\Source\Atrc\Renderer\PathTracingIntegrator\PathTracingIntegrator.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Renderer\PathTracingIntegrator\PathTracer.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Renderer\PathTracingIntegrator\PureColorIntegrator.h" />
+    <ClInclude Include="..\..\..\Source\Atrc\Renderer\PathTracingIntegrator\ShadingNormalIntegrator.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Renderer\PathTracingIntegrator\VolumetricPathTracer.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Texture\ConstantTexture.h" />
     <ClInclude Include="..\..\..\Source\Atrc\Texture\ImageTexture.h" />
@@ -122,7 +123,6 @@
     <ClCompile Include="..\..\..\Source\Atrc\Material\FresnelSpecular.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Material\IdealMirror.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Material\Metal.cpp" />
-    <ClCompile Include="..\..\..\Source\Atrc\Material\NormalMapper.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Material\Plastic.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Medium\HenyeyGreenstein.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\PostProcessor\ACESFilm.cpp" />
@@ -133,6 +133,7 @@
     <ClCompile Include="..\..\..\Source\Atrc\Renderer\PathTracingIntegrator\AmbientOcclusionIntegrator.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Renderer\PathTracingIntegrator\PathTracer.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Renderer\PathTracingIntegrator\PureColorIntegrator.cpp" />
+    <ClCompile Include="..\..\..\Source\Atrc\Renderer\PathTracingIntegrator\ShadingNormalIntegrator.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Renderer\PathTracingIntegrator\VolumetricPathTracer.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Renderer\PathTracingRenderer.cpp" />
     <ClCompile Include="..\..\..\Source\Atrc\Texture\ConstantTexture.cpp" />

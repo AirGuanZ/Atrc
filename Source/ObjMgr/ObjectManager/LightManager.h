@@ -45,6 +45,7 @@ public:
 };
 
 // tex = Texture
+// transform = Transform or null
 class SphereEnvironmentLightCreator : public LightCreator, public AGZ::Singleton<SphereEnvironmentLightCreator>
 {
 public:

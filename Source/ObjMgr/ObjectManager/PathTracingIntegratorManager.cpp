@@ -30,4 +30,9 @@ Atrc::PathTracingIntegrator *AmbientOcclusionIntegratorCreator::Create(const Con
     return arena.Create<Atrc::AmbientOcclusionIntegrator>(maxOccuT, background, object);
 }
 
+Atrc::PathTracingIntegrator *ShadingNormalIntegratorCreator::Create(const ConfigGroup &params, ObjArena<> &arena) const
+{
+    return arena.Create<Atrc::ShadingNormalIntegrator>();
+}
+
 AGZ_NS_END(ObjMgr)

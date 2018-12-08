@@ -6,11 +6,12 @@ AGZ_NS_BEG(Atrc)
 
 class DiffuseBRDF : public BxDF
 {
+    Vec3 localShadingNormal_;
     Spectrum color_;
 
 public:
 
-    explicit DiffuseBRDF(const Spectrum &color);
+    DiffuseBRDF(const Vec3 &lclShdNor, const Spectrum &color);
 
     Spectrum Eval(const Vec3 &wi, const Vec3 &wo) const override;
 

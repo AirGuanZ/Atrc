@@ -60,6 +60,7 @@ inline void InitializeObjectManagers()
         AmbientOcclusionIntegratorCreator::GetInstancePtr(),
         PathTracerCreator                ::GetInstancePtr(),
         PureColorIntegratorCreator       ::GetInstancePtr(),
+        ShadingNormalIntegratorCreator   ::GetInstancePtr(),
         VolumetricPathTracerCreator      ::GetInstancePtr(),
     };
     for(auto c : INTEGRATOR_CREATORS)
