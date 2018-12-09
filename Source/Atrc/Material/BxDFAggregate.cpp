@@ -22,7 +22,7 @@ Spectrum BxDFAggregate::Eval(const Vec3 &wi, const Vec3 &wo, BxDFType type) cons
     for(size_t i = 0; i < bxdfCnt_; ++i)
     {
         if(bxdfs_[i]->MatchType(type))
-            ret += bxdfs_[i]->Eval(lwi, lwo);
+            ret += bxdfs_[i]->Eval(shadingLocal_, lwi, lwo);
     }
 
     return ret;
@@ -54,7 +54,7 @@ Option<BSDFSampleWiResult> BxDFAggregate::SampleWi(const Vec3 &wo, BxDFType type
     // 采样该bxdf
 
     Vec3 lwo = geometryLocal_.World2Local(wo);
-    auto ret = bxdf->SampleWi(lwo);
+    auto ret = bxdf->SampleWi(shadingLocal_, lwo);
     if(!ret)
         return None;
 
@@ -71,8 +71,8 @@ Option<BSDFSampleWiResult> BxDFAggregate::SampleWi(const Vec3 &wo, BxDFType type
     {
         if(bxdfs_[i]->MatchType(type) && bxdfs_[i] != bxdf)
         {
-            ret->pdf += bxdfs_[i]->SampleWiPDF(ret->wi, lwo);
-            ret->coef += bxdfs_[i]->Eval(ret->wi, lwo);
+            ret->pdf += bxdfs_[i]->SampleWiPDF(shadingLocal_, ret->wi, lwo);
+            ret->coef += bxdfs_[i]->Eval(shadingLocal_, ret->wi, lwo);
         }
     }
 
@@ -91,7 +91,7 @@ Real BxDFAggregate::SampleWiPDF(const Vec3 &wi, const Vec3 &wo, BxDFType type) c
         if(bxdfs_[i]->MatchType(type))
         {
             ++nMatched;
-            ret += bxdfs_[i]->SampleWiPDF(lwi, lwo);
+            ret += bxdfs_[i]->SampleWiPDF(shadingLocal_, lwi, lwo);
         }
     }
 

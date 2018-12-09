@@ -23,11 +23,11 @@ public:
 
     bool MatchType(BxDFType type) const { return (type_ & type) == type_; }
 
-    virtual Spectrum Eval(const Vec3 &wi, const Vec3 &wo) const = 0;
+    virtual Spectrum Eval(const LocalCoordSystem &localShdCoord, const Vec3 &wi, const Vec3 &wo) const = 0;
 
-    virtual Option<BxDFSampleWiResult> SampleWi(const Vec3 &wo) const = 0;
+    virtual Option<BxDFSampleWiResult> SampleWi(const LocalCoordSystem &localShdCoord, const Vec3 &wo) const = 0;
 
-    virtual Real SampleWiPDF(const Vec3 &wi, const Vec3 &wo) const = 0;
+    virtual Real SampleWiPDF(const LocalCoordSystem &localShdCoord, const Vec3 &wi, const Vec3 &wo) const = 0;
 };
 
 AGZ_NS_END(Atrc)

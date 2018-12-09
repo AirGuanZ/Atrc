@@ -4,20 +4,20 @@
 
 AGZ_NS_BEG(Atrc)
 
+// 已支持shading normal和geometry normal分别处理
 class DiffuseBRDF : public BxDF
 {
-    Vec3 localShadingNormal_;
     Spectrum color_;
 
 public:
 
-    DiffuseBRDF(const Vec3 &lclShdNor, const Spectrum &color);
+    explicit DiffuseBRDF(const Spectrum &color);
 
-    Spectrum Eval(const Vec3 &wi, const Vec3 &wo) const override;
+    Spectrum Eval(const LocalCoordSystem &localShdCoord, const Vec3 &wi, const Vec3 &wo) const override;
 
-    Option<BxDFSampleWiResult> SampleWi(const Vec3 &wo) const override;
+    Option<BxDFSampleWiResult> SampleWi(const LocalCoordSystem &localShdCoord, const Vec3 &wo) const override;
 
-    Real SampleWiPDF(const Vec3 &wi, const Vec3 &wo) const override;
+    Real SampleWiPDF(const LocalCoordSystem &localShdCoord, const Vec3 &wi, const Vec3 &wo) const override;
 };
 
 AGZ_NS_END(Atrc)

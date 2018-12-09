@@ -2,7 +2,7 @@
 renderer = {
     type        = PathTracingRenderer;
     workerCount = 6;
-    spp         = 4000;
+    spp         = 1;
     gridSize    = 16;
     integrator  = {
         type     = PathTracer;

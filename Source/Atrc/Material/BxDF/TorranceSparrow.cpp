@@ -18,7 +18,7 @@ TorranceSparrow::TorranceSparrow(const Spectrum &rc, const MicrofacetDistributio
     AGZ_ASSERT(md && fresnel);
 }
 
-Spectrum TorranceSparrow::Eval(const Vec3 &wi, const Vec3 &wo) const
+Spectrum TorranceSparrow::Eval(const LocalCoordSystem &localShdCoord, const Vec3 &wi, const Vec3 &wo) const
 {
     if(wi.z <= 0.0 || wo.z <= 0.0)
         return Spectrum();
@@ -30,14 +30,14 @@ Spectrum TorranceSparrow::Eval(const Vec3 &wi, const Vec3 &wo) const
            (4 * CosTheta(wi) * CosTheta(wo));
 }
 
-Option<BxDFSampleWiResult> TorranceSparrow::SampleWi(const Vec3 &wo) const
+Option<BxDFSampleWiResult> TorranceSparrow::SampleWi(const LocalCoordSystem &localShdCoord, const Vec3 &wo) const
 {
     auto mdSam = md_->SampleWi(wo);
     if(!mdSam)
         return None;
 
     BxDFSampleWiResult ret;
-    ret.coef = Eval(mdSam->wi, wo);
+    ret.coef = Eval(localShdCoord, mdSam->wi, wo);
     ret.wi   = mdSam->wi;
     ret.pdf  = mdSam->pdf;
     ret.type = type_;
@@ -45,7 +45,7 @@ Option<BxDFSampleWiResult> TorranceSparrow::SampleWi(const Vec3 &wo) const
     return ret;
 }
 
-Real TorranceSparrow::SampleWiPDF(const Vec3 &wi, const Vec3 &wo) const
+Real TorranceSparrow::SampleWiPDF(const LocalCoordSystem &localShdCoord, const Vec3 &wi, const Vec3 &wo) const
 {
     return md_->SampleWiPDF(wi, wo);
 }

@@ -37,11 +37,11 @@ public:
 
     TorranceSparrow(const Spectrum &rc, const MicrofacetDistribution *md, const Fresnel *fresnel);
 
-    Spectrum Eval(const Vec3 &wi, const Vec3 &wo) const override;
+    Spectrum Eval(const LocalCoordSystem &localShdCoord, const Vec3 &wi, const Vec3 &wo) const override;
 
-    Option<BxDFSampleWiResult> SampleWi(const Vec3 &wo) const override;
+    Option<BxDFSampleWiResult> SampleWi(const LocalCoordSystem &localShdCoord, const Vec3 &wo) const override;
 
-    Real SampleWiPDF(const Vec3 &wi, const Vec3 &wo) const override;
+    Real SampleWiPDF(const LocalCoordSystem &localShdCoord, const Vec3 &wi, const Vec3 &wo) const override;
 };
 
 AGZ_NS_END(Atrc)

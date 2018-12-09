@@ -5,6 +5,7 @@
 
 AGZ_NS_BEG(Atrc)
 
+// ÒÑÖ§³Önormal mapping
 class DiffuseMaterial : public Material
 {
     Spectrum color_;

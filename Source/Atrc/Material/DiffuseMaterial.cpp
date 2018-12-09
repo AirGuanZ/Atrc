@@ -18,7 +18,7 @@ void DiffuseMaterial::Shade(const SurfacePoint &sp, ShadingPoint *dst, AGZ::ObjA
     dst->normal = sp.geoLocal.Local2World(lclShdNor);
 
     auto bsdf = arena.Create<BxDFAggregate>(dst->normal, sp.geoLocal);
-    bsdf->AddBxDF(arena.Create<DiffuseBRDF>(lclShdNor, color_));
+    bsdf->AddBxDF(arena.Create<DiffuseBRDF>(color_));
     dst->bsdf = bsdf;
 }
 

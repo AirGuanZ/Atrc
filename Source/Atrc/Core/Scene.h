@@ -1,6 +1,5 @@
 #pragma once
 
-#include <map>
 #include <vector>
 
 #include <Atrc/Core/Common.h>
