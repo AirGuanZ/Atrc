@@ -23,12 +23,16 @@ PerfectSpecularTransmission::PerfectSpecularTransmission(const Spectrum &rc, con
     AGZ_ASSERT(fresnel_);
 }
 
-Spectrum PerfectSpecularTransmission::Eval(const LocalCoordSystem &localShdCoord, [[maybe_unused]] const Vec3 &wi, [[maybe_unused]] const Vec3 &wo) const
+Spectrum PerfectSpecularTransmission::Eval(
+    [[maybe_unused]] const LocalCoordSystem &localShdCoord,
+    [[maybe_unused]] const Vec3 &wi,
+    [[maybe_unused]] const Vec3 &wo) const
 {
     return Spectrum();
 }
 
-Option<BxDFSampleWiResult> PerfectSpecularTransmission::SampleWi(const LocalCoordSystem &localShdCoord, const Vec3 &wo) const
+Option<BxDFSampleWiResult> PerfectSpecularTransmission::SampleWi(
+    [[maybe_unused]] const LocalCoordSystem &localShdCoord, const Vec3 &wo) const
 {
     // 折射对应的时透明物体，故wo可能是从内部往外部，应区别对待
 
@@ -54,7 +58,10 @@ Option<BxDFSampleWiResult> PerfectSpecularTransmission::SampleWi(const LocalCoor
     return ret;
 }
 
-Real PerfectSpecularTransmission::SampleWiPDF(const LocalCoordSystem &localShdCoord, [[maybe_unused]] const Vec3 &wi, [[maybe_unused]] const Vec3 &wo) const
+Real PerfectSpecularTransmission::SampleWiPDF(
+    [[maybe_unused]] const LocalCoordSystem &localShdCoord,
+    [[maybe_unused]] const Vec3 &wi,
+    [[maybe_unused]] const Vec3 &wo) const
 {
     return 0;
 }

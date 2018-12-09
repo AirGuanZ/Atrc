@@ -23,12 +23,16 @@ PerfectSpecular::PerfectSpecular(const Spectrum &rc, const Dielectric *fresnel)
     AGZ_ASSERT(fresnel_);
 }
 
-Spectrum PerfectSpecular::Eval([[maybe_unused]] const LocalCoordSystem &localShdCoord, [[maybe_unused]] const Vec3 &wi, [[maybe_unused]] const Vec3 &wo) const
+Spectrum PerfectSpecular::Eval(
+    [[maybe_unused]] const LocalCoordSystem &localShdCoord,
+    [[maybe_unused]] const Vec3 &wi,
+    [[maybe_unused]] const Vec3 &wo) const
 {
     return Spectrum();
 }
 
-Option<BxDFSampleWiResult> PerfectSpecular::SampleWi([[maybe_unused]] const LocalCoordSystem &localShdCoord, const Vec3 &wo) const
+Option<BxDFSampleWiResult> PerfectSpecular::SampleWi(
+    [[maybe_unused]] const LocalCoordSystem &localShdCoord, const Vec3 &wo) const
 {
     Vec3 nor = wo.z > 0 ? Vec3::UNIT_Z() : -Vec3::UNIT_Z();
 
@@ -61,7 +65,10 @@ Option<BxDFSampleWiResult> PerfectSpecular::SampleWi([[maybe_unused]] const Loca
     return ret;
 }
 
-Real PerfectSpecular::SampleWiPDF([[maybe_unused]] const LocalCoordSystem &localShdCoord, [[maybe_unused]] const Vec3 &wi, [[maybe_unused]] const Vec3 &wo) const
+Real PerfectSpecular::SampleWiPDF(
+    [[maybe_unused]] const LocalCoordSystem &localShdCoord,
+    [[maybe_unused]] const Vec3 &wi,
+    [[maybe_unused]] const Vec3 &wo) const
 {
     return 0;
 }
