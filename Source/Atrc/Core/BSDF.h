@@ -46,7 +46,9 @@ public:
     BSDF(const Vec3 &shadingNormal, const LocalCoordSystem &geometryLocal)
         : shadingLocal_(LocalCoordSystem::FromEz(shadingNormal)), geometryLocal_(geometryLocal)
     {
-        
+        shadingLocal_.ex = shadingLocal_.ex.Normalize();
+        shadingLocal_.ey = shadingLocal_.ey.Normalize();
+        shadingLocal_.ez = shadingLocal_.ez.Normalize();
     }
 
     virtual ~BSDF() = default;

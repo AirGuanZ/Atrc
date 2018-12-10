@@ -31,10 +31,14 @@ class TextureScaler : public Material
 
         Option<BSDFSampleWiResult> SampleWi(const Vec3 &wo, BxDFType type) const override
         {
+            AGZ_ASSERT(IsNormalized(wo));
             auto ret = bsdf_->SampleWi(wo, type);
             if(ret)
+            {
                 ret->coef *= scale_;
-            return Some(*ret);
+                AGZ_ASSERT(IsNormalized(ret->wi));
+            }
+            return ret;
         }
 
         Real SampleWiPDF(const Vec3 &wi, const Vec3 &wo, BxDFType type) const override

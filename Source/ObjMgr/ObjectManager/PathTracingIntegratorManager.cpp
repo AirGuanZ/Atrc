@@ -30,7 +30,7 @@ Atrc::PathTracingIntegrator *AmbientOcclusionIntegratorCreator::Create(const Con
     return arena.Create<Atrc::AmbientOcclusionIntegrator>(maxOccuT, background, object);
 }
 
-Atrc::PathTracingIntegrator *ShadingNormalIntegratorCreator::Create(const ConfigGroup &params, ObjArena<> &arena) const
+Atrc::PathTracingIntegrator *ShadingNormalIntegratorCreator::Create([[maybe_unused]] const ConfigGroup &params, ObjArena<> &arena) const
 {
     return arena.Create<Atrc::ShadingNormalIntegrator>();
 }

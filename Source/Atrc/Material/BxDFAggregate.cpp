@@ -53,7 +53,7 @@ Option<BSDFSampleWiResult> BxDFAggregate::SampleWi(const Vec3 &wo, BxDFType type
 
     // 采样该bxdf
 
-    Vec3 lwo = geometryLocal_.World2Local(wo);
+    Vec3 lwo = geometryLocal_.World2Local(wo).Normalize();
     auto ret = bxdf->SampleWi(shadingLocal_, lwo);
     if(!ret)
         return None;
@@ -62,8 +62,9 @@ Option<BSDFSampleWiResult> BxDFAggregate::SampleWi(const Vec3 &wo, BxDFType type
     if(ret->type & BXDF_SPECULAR || nMatched <= 1)
     {
         ret->pdf /= nMatched;
-        ret->wi = geometryLocal_.Local2World(ret->wi);
-        return Some(*ret);
+        ret->wi = geometryLocal_.Local2World(ret->wi).Normalize();
+        AGZ_ASSERT(IsNormalized(ret->wi));
+        return ret;
     }
 
     // 综合考虑所有类型对得上的bxdf的意见
@@ -77,13 +78,14 @@ Option<BSDFSampleWiResult> BxDFAggregate::SampleWi(const Vec3 &wo, BxDFType type
     }
 
     ret->pdf /= nMatched;
-    ret->wi = geometryLocal_.Local2World(ret->wi);
-    return Some(*ret);
+    ret->wi = geometryLocal_.Local2World(ret->wi).Normalize();
+    AGZ_ASSERT(IsNormalized(ret->wi));
+    return ret;
 }
 
 Real BxDFAggregate::SampleWiPDF(const Vec3 &wi, const Vec3 &wo, BxDFType type) const
 {
-    Vec3 lwi = geometryLocal_.World2Local(wi), lwo = geometryLocal_.World2Local(wo);
+    Vec3 lwi = geometryLocal_.World2Local(wi).Normalize(), lwo = geometryLocal_.World2Local(wo).Normalize();
 
     int nMatched = 0; Real ret = 0.0;
     for(size_t i = 0; i < bxdfCnt_; ++i)

@@ -1,8 +1,8 @@
 # Renderer
 renderer = {
     type        = PathTracingRenderer;
-    workerCount = 6;
-    spp         = 1;
+    workerCount = 11;
+    spp         = 100;
     gridSize    = 16;
     integrator  = {
         type     = PathTracer;
@@ -160,55 +160,55 @@ entities = (
 
 # Light list
 lights = (
-#{
-#    type = CubeEnvironmentLight;
-#    posX = {
-#        type = Image;
-#        filename = "./Assets/PineForest/front.jpg";
-#        sampler = Linear;
-#        wrapper = Clamp;
-#    };
-#    posY = {
-#        type = Image;
-#        filename = "./Assets/PineForest/left.jpg";
-#        sampler = Linear;
-#        wrapper = Clamp;
-#    };
-#    posZ = {
-#        type = Image;
-#        filename = "./Assets/PineForest/up.jpg";
-#        sampler = Linear;
-#        wrapper = Clamp;
-#    };
-#    negX = {
-#        type = Image;
-#        filename = "./Assets/PineForest/back.jpg";
-#        sampler = Linear;
-#        wrapper = Clamp;
-#    };
-#    negY = {
-#        type = Image;
-#        filename = "./Assets/PineForest/right.jpg";
-#        sampler = Linear;
-#        wrapper = Clamp;
-#    };
-#    negZ = {
-#        type = Image;
-#        filename = "./Assets/PineForest/down.jpg";
-#        sampler = Linear;
-#        wrapper = Clamp;
-#    };
-#}
 {
-    type = SphereEnvironmentLight;
-    tex = {
+    type = CubeEnvironmentLight;
+    posX = {
         type = Image;
-        filename = "./Assets/RightLight.png";
+        filename = "./Assets/PineForest/front.jpg";
         sampler = Linear;
         wrapper = Clamp;
     };
-    transform = (RotateZ(Deg(-30)));
+    posY = {
+        type = Image;
+        filename = "./Assets/PineForest/left.jpg";
+        sampler = Linear;
+        wrapper = Clamp;
+    };
+    posZ = {
+        type = Image;
+        filename = "./Assets/PineForest/up.jpg";
+        sampler = Linear;
+        wrapper = Clamp;
+    };
+    negX = {
+        type = Image;
+        filename = "./Assets/PineForest/back.jpg";
+        sampler = Linear;
+        wrapper = Clamp;
+    };
+    negY = {
+        type = Image;
+        filename = "./Assets/PineForest/right.jpg";
+        sampler = Linear;
+        wrapper = Clamp;
+    };
+    negZ = {
+        type = Image;
+        filename = "./Assets/PineForest/down.jpg";
+        sampler = Linear;
+        wrapper = Clamp;
+    };
 }
+#{
+#    type = SphereEnvironmentLight;
+#    tex = {
+#        type = Image;
+#        filename = "./Assets/RightLight.png";
+#        sampler = Linear;
+#        wrapper = Clamp;
+#    };
+#    transform = (RotateZ(Deg(-30)));
+#}
 );
 
 postProcessors = (

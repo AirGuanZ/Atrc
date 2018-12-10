@@ -295,7 +295,7 @@ namespace
         for(uint32_t i = 0; i < right.size(); ++i)
             ents[splitIdx + i] = right[i];
 
-        auto *ret = nodeArena.Create<TNode>();
+        auto ret = nodeArena.Create<TNode>();
         *ret = TInternal{ nullptr, nullptr, allBound };
 
         auto &internal = std::get<TInternal>(*ret);

@@ -28,7 +28,8 @@ Option<BxDFSampleWiResult> DiffuseBRDF::SampleWi(const LocalCoordSystem &localSh
 
     BxDFSampleWiResult ret;
 
-    ret.wi = localShdCoord.Local2World(sam);
+    ret.wi = localShdCoord.Local2World(sam).Normalize();
+    AGZ_ASSERT(IsNormalized(ret.wi));
     if(ret.wi.z <= 0)
         return None;
 

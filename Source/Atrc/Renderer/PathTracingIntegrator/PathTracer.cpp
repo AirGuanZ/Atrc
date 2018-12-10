@@ -10,6 +10,8 @@ PathTracer::PathTracer(int maxDepth)
 
 Spectrum PathTracer::Eval(const Scene &scene, const Ray &r, AGZ::ObjArena<> &arena) const
 {
+    AGZ_ASSERT(r.IsNormalized());
+
     SurfacePoint sp;
     if(!scene.FindCloestIntersection(r, &sp))
     {
@@ -57,6 +59,7 @@ Spectrum PathTracer::E1(const Scene &scene, const SurfacePoint &sp, const Shadin
 
     SurfacePoint newInct;
     Ray newRay(sp.pos, bsdfSample->wi, EPS);
+    AGZ_ASSERT(newRay.IsNormalized());
     if(scene.FindCloestIntersection(newRay, &newInct))
     {
         auto light = newInct.entity->AsLight();
@@ -109,6 +112,7 @@ Spectrum PathTracer::E2(const Scene &scene, const SurfacePoint &sp, const Shadin
 
     // Shadow ray
     Ray shadowRay(sp.pos, lightSample.wi, EPS, (lightSample.pos - sp.pos).Length() - EPS);
+    AGZ_ASSERT(shadowRay.IsNormalized());
     if(Dot(lightSample.wi, sp.geoLocal.ez) <= 0.0 || scene.HasIntersection(shadowRay))
         return Spectrum();
 
@@ -133,6 +137,7 @@ Spectrum PathTracer::S(const Scene &scene, const SurfacePoint &sp, const Shading
 
     SurfacePoint newInct;
     Ray newRay(sp.pos, bsdfSample->wi, EPS);
+    AGZ_ASSERT(newRay.IsNormalized());
     if(!scene.FindCloestIntersection(newRay, &newInct))
         return Spectrum();
 
