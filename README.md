@@ -1,5 +1,7 @@
 # Atrc
 
+本项目正在重构中，重构分支为[remake](https://github.com/AirGuanZ/Atrc/tree/remake)。
+
 AirGuanZ的离线渲染实验室，主要以学习为目的。其内容包括：
 
 * 离线渲染核心组件库，位于`Source/Atrc`中
