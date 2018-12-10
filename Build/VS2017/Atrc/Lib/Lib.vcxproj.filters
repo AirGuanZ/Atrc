@@ -1,0 +1,120 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source">
+      <UniqueIdentifier>{02f2351d-ba2c-4f3b-ba1b-ac3195c53eb0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Core">
+      <UniqueIdentifier>{687a99c5-5539-4bfb-9f3f-f5d0c2aadab5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Camera">
+      <UniqueIdentifier>{3e80ab4d-c02c-4777-b749-3c120e0249bf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Entity">
+      <UniqueIdentifier>{d10465e5-c72c-4f03-9a8b-caba0c457df8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Geometry">
+      <UniqueIdentifier>{7c7d756f-3067-4cab-a925-f99e36acc5a0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Renderer">
+      <UniqueIdentifier>{3432d4c1-7cad-43f0-9202-3569a57b3069}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Renderer\PathTracingIntegrator">
+      <UniqueIdentifier>{2f415c8c-6060-43aa-8bea-b495f94275f3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Material">
+      <UniqueIdentifier>{0a717e25-d7ac-4661-8eae-d04801977279}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Utility">
+      <UniqueIdentifier>{68a5545a-f8a4-42ac-8a27-b606dda54166}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\AABB.h">
+      <Filter>Source\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\Camera.h">
+      <Filter>Source\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\Common.h">
+      <Filter>Source\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\Entity.h">
+      <Filter>Source\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\Geometry.h">
+      <Filter>Source\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\Light.h">
+      <Filter>Source\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\Material.h">
+      <Filter>Source\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\Ray.h">
+      <Filter>Source\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\Renderer.h">
+      <Filter>Source\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\Scene.h">
+      <Filter>Source\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\SurfacePoint.h">
+      <Filter>Source\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\Texture.h">
+      <Filter>Source\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\Transform.h">
+      <Filter>Source\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Camera\PinholeCamera.h">
+      <Filter>Source\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Entity\GeometricEntity.h">
+      <Filter>Source\Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Geometry\Sphere.h">
+      <Filter>Source\Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingRenderer.h">
+      <Filter>Source\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\ShadingNormalIntegrator.h">
+      <Filter>Source\Renderer\PathTracingIntegrator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\PureBlack.h">
+      <Filter>Source\Material</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Utility\GridDivider.h">
+      <Filter>Source\Utility</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Core\Common.cpp">
+      <Filter>Source\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Core\Scene.cpp">
+      <Filter>Source\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Camera\PinholeCamera.cpp">
+      <Filter>Source\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Entity\GeometricEntity.cpp">
+      <Filter>Source\Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Geometry\Sphere.cpp">
+      <Filter>Source\Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingRenderer.cpp">
+      <Filter>Source\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\ShadingNormalIntegrator.cpp">
+      <Filter>Source\Renderer\PathTracingIntegrator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\PureBlack.cpp">
+      <Filter>Source\Material</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
