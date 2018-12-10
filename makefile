@@ -1,16 +1,16 @@
 CPPC = clang++
 CPPC_INCLUDE_FLAGS = -I ./Source/ -I $(AGZ_UTILS_HOME)
-CPPC_FLAGS = $(CPPC_INCLUDE_FLAGS) -stdlib=libc++ -std=c++17 -Werror -Wall -Wextra -O2
+CPPC_FLAGS = $(CPPC_INCLUDE_FLAGS) -stdlib=libc++ -std=c++17 -Wall -Wextra -O2
 LD_FLAGS = -pthread
 
 TARGETS =
 
-CPP_FILES = $(shell find ./Source/Atrc/ -name "*.cpp")
-CPP_FILES += $(shell find ./Source/ObjMgr/ -name "*.cpp")
+CPP_FILES = $(shell find ./Source/Atrc/Lib/ -name "*.cpp")
+# CPP_FILES += $(shell find ./Source/ObjMgr/ -name "*.cpp")
 OPP_FILES = $(patsubst %.cpp, %.o, $(CPP_FILES))
 DPP_FILES = $(patsubst %.cpp, %.d, $(CPP_FILES))
 
-ATRC = ./Build/atrc.a
+LIB = ./Build/lib.a
 
 CPP_SUFFIX = _CPP_FILES
 O_SUFFIX = _O_FILES
@@ -19,7 +19,7 @@ D_SUFFIX = _D_FILES
 ALL_OPP_FILES = $(OPP_FILES)
 ALL_DPP_FILES = $(DPP_FILES)
 
-$(ATRC) : $(OPP_FILES)
+$(LIB) : $(OPP_FILES)
 	ar -r $@ $^
 
 define add_target
@@ -34,11 +34,11 @@ run$(1) :
 	make $(1)
 	$$($(2))
 
-$(2)$(CPP_SUFFIX) = $$(shell find ./Source/$(3)/ -name "*.cpp")
+$(2)$(CPP_SUFFIX) = $$(shell find ./Source/Atrc/$(3)/ -name "*.cpp")
 $(2)$(O_SUFFIX) = $$(patsubst %.cpp, %.o, $$($(2)$(CPP_SUFFIX)))
 $(2)$(D_SUFFIX) = $$(patsubst %.cpp, %.d, $$($(2)$(CPP_SUFFIX)))
 
-$$($(2)) :$$($(2)$(O_SUFFIX)) $$(ATRC) 
+$$($(2)) :$$($(2)$(O_SUFFIX)) $$(LIB) 
 	$$(CPPC) $(CPPC_FLAGS) $(LD_FLAGS) $$^ -o $$@
 
 $$($(2)$(O_SUFFIX)) : %.o : %.cpp
@@ -73,18 +73,14 @@ $(DPP_FILES) : %.d : %.cpp
 -include $(DPP_FILES)
 
 # The main renderer launcher
-$(eval $(call add_target,Launcher,LAUNCHER_TARGET,Tools/Launcher))
-# Sphere harmonics projector and reconstructor
-$(eval $(call add_target,SH,SH_TARGET,Tools/SH))
-# Cube map to sphere map
-$(eval $(call add_target,C2S,C2S_TARGET,Tools/C2S))
+$(eval $(call add_target,Launcher,LAUNCHER_TARGET,Launcher))
 
 .PHONT : all
 all :
-	make Launcher SH C2S
+	make Launcher
 
 .PHONY : clean
 clean :
-	rm -f $(ATRC) $(TARGETS)
+	rm -f $(LIB) $(TARGETS)
 	rm -f $(ALL_OPP_FILES) $(ALL_DPP_FILES)
 	rm -f $(shell find ./Source/ -name "*.dtmp")

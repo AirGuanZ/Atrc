@@ -1,9 +1,0 @@
-outputFilename = "./Build/sh_light.output";
-
-N = 1000000;
-Bands = 5;
-
-light = {
-    type = SphereEnvironmentLight;
-    tex = "./Assets/RightLight.png";
-};
