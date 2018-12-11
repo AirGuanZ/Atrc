@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include <Atrc/Lib/Camera/PinholeCamera.h>
 #include <Atrc/Lib/Entity/GeometricEntity.h>
 #include <Atrc/Lib/FilmFilter/BoxFilter.h>
@@ -31,7 +29,7 @@ int main()
     Scene scene(entities, 2, nullptr, 0, &camera);
 
     ShadingNormalIntegrator integrator;
-    PathTracingRenderer renderer(1, 32, integrator);
+    PathTracingRenderer renderer(-1, 16, integrator);
 
     BoxFilter filter(Vec2(3.0));
     Film film({ 640, 480 }, filter);

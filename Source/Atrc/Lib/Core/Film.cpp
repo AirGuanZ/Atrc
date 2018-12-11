@@ -30,10 +30,10 @@ void FilmGrid::AddSample(const Vec2 &pos, const Spectrum &value) noexcept
 {
     Vec2 r = filter_.GetRadius();
 
-    auto xBegin = Max<int32_t>(pixelRect_.low.x,  std::ceil (pos.x - r.x - Real(0.5)));
-    auto yBegin = Max<int32_t>(pixelRect_.low.y,  std::ceil (pos.y - r.y - Real(0.5)));
-    auto xEnd   = Min<int32_t>(pixelRect_.high.x, std::floor(pos.x + r.x - Real(0.5)) + 1);
-    auto yEnd   = Min<int32_t>(pixelRect_.high.y, std::floor(pos.y + r.y - Real(0.5)) + 1);
+    auto xBegin = Max<int32_t>(pixelRect_.low.x,  int32_t(std::ceil (pos.x - r.x - Real(0.5))));
+    auto yBegin = Max<int32_t>(pixelRect_.low.y,  int32_t(std::ceil (pos.y - r.y - Real(0.5))));
+    auto xEnd   = Min<int32_t>(pixelRect_.high.x, int32_t(std::floor(pos.x + r.x - Real(0.5)) + 1));
+    auto yEnd   = Min<int32_t>(pixelRect_.high.y, int32_t(std::floor(pos.y + r.y - Real(0.5)) + 1));
 
     for(int32_t y = yBegin; y < yEnd; ++y)
     {
