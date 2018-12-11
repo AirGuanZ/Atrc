@@ -5,18 +5,25 @@
 namespace Atrc
 {
 
-FilmGrid::FilmGrid(
-    const Recti &pixelRect, const FilmFilter &filter,
-    AGZ::Texture2D<Spectrum> &accValues, AGZ::Texture2D<Spectrum> &weights)
+FilmGrid::FilmGrid(const Recti &pixelRect, const FilmFilter &filter)
     : filter_(filter), pixelRect_(pixelRect),
-      accValues_(accValues),
-      weights_(weights)
+      accValues_(pixelRect.GetDeltaX(), pixelRect.GetDeltaY(), Spectrum()),
+      weights_(pixelRect.GetDeltaX(), pixelRect.GetDeltaY(), Spectrum())
 {
     Vec2 r = filter.GetRadius();
-    samplingRect_.low.x = pixelRect.low.x + Real(0.5) - r.x;
-    samplingRect_.low.y = pixelRect.low.y + Real(0.5) - r.y;
-    samplingRect_.high.x = pixelRect.high.x - Real(0.5) + r.x;
-    samplingRect_.high.y = pixelRect.high.y - Real(0.5) + r.y;
+    samplingRect_.low.x = int32_t(std::floor(pixelRect.low.x + Real(0.5) - r.x));
+    samplingRect_.low.y = int32_t(std::floor(pixelRect.low.y + Real(0.5) - r.y));
+    samplingRect_.high.x = int32_t(std::ceil(pixelRect.high.x - Real(0.5) + r.x)) + 1;
+    samplingRect_.high.y = int32_t(std::ceil(pixelRect.high.y - Real(0.5) + r.y)) + 1;
+}
+
+FilmGrid::FilmGrid(FilmGrid &&moveFrom) noexcept
+    : filter_(moveFrom.filter_),
+      pixelRect_(moveFrom.pixelRect_), samplingRect_(moveFrom.samplingRect_),
+      accValues_(std::move(moveFrom.accValues_)),
+      weights_(std::move(moveFrom.weights_))
+{
+
 }
 
 void FilmGrid::AddSample(const Vec2 &pos, const Spectrum &value) noexcept
@@ -30,11 +37,13 @@ void FilmGrid::AddSample(const Vec2 &pos, const Spectrum &value) noexcept
 
     for(int32_t y = yBegin; y < yEnd; ++y)
     {
+        int32_t ly = ly = y - pixelRect_.low.y;
         for(int32_t x = xBegin; x < xEnd; ++x)
         {
             Spectrum w = filter_.Eval(pos.x - (x + Real(0.5)), pos.y - (y + Real(0.5)));
-            accValues_(x, y) += w * value;
-            weights_(x, y) += w;
+            int32_t lx = x - pixelRect_.low.x;
+            accValues_(lx, ly) += w * value;
+            weights_(lx, ly) += w;
         }
     }
 }
@@ -52,7 +61,25 @@ FilmGrid Film::CreateFilmGrid(const Recti &pixelRect) noexcept
 {
     AGZ_ASSERT(pixelRect.low.x >= 0 && pixelRect.low.y >= 0);
     AGZ_ASSERT(pixelRect.high.x <= resolution_.x && pixelRect.high.y <= resolution_.y);
-    return FilmGrid(pixelRect, filter_, accValues_, weights_);
+    return FilmGrid(pixelRect, filter_);
+}
+
+void Film::MergeFilmGrid(const FilmGrid &filmGrid) noexcept
+{
+    std::lock_guard<std::mutex> lk(mut_);
+    
+    for(int32_t y = filmGrid.pixelRect_.low.y;
+        y < filmGrid.pixelRect_.high.y; ++y)
+    {
+        int32_t ly = y - filmGrid.pixelRect_.low.y;
+        for(int32_t x = filmGrid.pixelRect_.low.x;
+            x < filmGrid.pixelRect_.high.x; ++x)
+        {
+            int32_t lx = x - filmGrid.pixelRect_.low.x;
+            accValues_(x, y) += filmGrid.accValues_(lx, ly);
+            weights_(x, y) += filmGrid.weights_(lx, ly);
+        }
+    }
 }
 
 AGZ::Texture2D<Spectrum> Film::GetImage() const

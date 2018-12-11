@@ -16,11 +16,11 @@ PinholeCamera::PinholeCamera(
     R_ = Mat3::FromCols(ex, ey, ez);
 }
 
-PinholeCamera::GenerateRayResult PinholeCamera::GenerateRay(const Vec2 &rasterPos) const noexcept
+PinholeCamera::GenerateRayResult PinholeCamera::GenerateRay(const CameraSample &sample) const noexcept
 {
     auto sensorPos = Vec2(
-        sensorWidth_ *  (rasterPos.x / filmWidth_ - Real(0.5)),
-        sensorHeight_ * (Real(0.5) - rasterPos.y / filmHeight_));
+        sensorWidth_ *  (sample.film.x / filmWidth_ - Real(0.5)),
+        sensorHeight_ * (Real(0.5) - sample.film.y / filmHeight_));
     return {
         Ray(T_, R_ * Vec3(L_, sensorPos.x, -sensorPos.y), EPS),
         Spectrum(1.0f), Real(1)

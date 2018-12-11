@@ -19,7 +19,7 @@ public:
         uint32_t filmWidth, uint32_t filmHeight, const Vec2 &sensorRectSize,
         Real sensorPinholeDistance, const Vec3 &pinholePos, const Vec3 &lookAt, const Vec3 &u);
     
-    GenerateRayResult GenerateRay(const Vec2 &rasterPos) const noexcept override;
+    GenerateRayResult GenerateRay(const CameraSample &sample) const noexcept override;
 };
 
 AGZ_NS_END(Atrc)

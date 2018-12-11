@@ -17,22 +17,20 @@ public:
 
 class PathTracingRenderer : public Renderer
 {
-    using SubareaRect = GridDivider<uint32_t>::Grid;
+    using Grid = GridDivider<int32_t>::Grid;
 
     int workerCount_;
-    uint32_t spp_;
-
-    uint32_t taskGridSize_;
+    int taskGridSize_;
 
     const PathTracingIntegrator &integrator_;
 
-    void RenderSubarea(const Scene &scene, RenderTarget *rt, const SubareaRect &subarea) const;
+    void RenderGrid(const Scene &scene, FilmGrid *filmGrid, Sampler *sampler) const;
 
 public:
 
-    PathTracingRenderer(int workerCount, uint32_t spp, uint32_t taskGridSize, const PathTracingIntegrator &integrator);
+    PathTracingRenderer(int workerCount, int taskGridSize, const PathTracingIntegrator &integrator) noexcept;
 
-    void Render(const Scene &scene, RenderTarget *rt) const override;
+    void Render(const Scene &scene, Sampler *sampler, Film *film) const override;
 };
 
 } // namespace Atrc

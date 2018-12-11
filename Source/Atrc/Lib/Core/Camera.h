@@ -14,6 +14,12 @@ protected:
 
 public:
 
+    struct CameraSample
+    {
+        Vec2 film;
+        Vec2 lens;
+    };
+
     Camera(uint32_t filmWidth, uint32_t filmHeight);
 
     virtual ~Camera() = default;
@@ -21,11 +27,11 @@ public:
     struct GenerateRayResult
     {
         Ray r;
-        Spectrum qe;
+        Spectrum weight;
         Real pdf;
     };
 
-    virtual GenerateRayResult GenerateRay(const Vec2 &imagePos) const noexcept = 0;
+    virtual GenerateRayResult GenerateRay(const CameraSample &sample) const noexcept = 0;
 };
 
 // ================================= Implementation

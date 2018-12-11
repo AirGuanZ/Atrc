@@ -10,7 +10,7 @@ Spectrum ShadingNormalIntegrator::Eval(const Scene &scene, const Ray &r, Arena &
         return Spectrum();
     ShadingPoint shd = inct.entity->GetMaterial(inct)->GetShadingPoint(inct, arena);
     return shd.coordSys.ez.Map(
-        [](Real c){ return Saturate(float(c) / 2 + 0.5f); });
+        [](Real c){ return Saturate(c / 2 + Real(0.5)); });
 }
 
 } // namespace Atrc

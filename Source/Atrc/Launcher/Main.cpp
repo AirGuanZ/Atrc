@@ -2,10 +2,12 @@
 
 #include <Atrc/Lib/Camera/PinholeCamera.h>
 #include <Atrc/Lib/Entity/GeometricEntity.h>
+#include <Atrc/Lib/FilmFilter/BoxFilter.h>
 #include <Atrc/Lib/Geometry/Sphere.h>
 #include <Atrc/Lib/Material/PureBlack.h>
 #include <Atrc/Lib/Renderer/PathTracingIntegrator/ShadingNormalIntegrator.h>
 #include <Atrc/Lib/Renderer/PathTracingRenderer.h>
+#include <Atrc/Lib/Sampler/NativeSampler.h>
 
 using namespace Atrc;
 
@@ -29,12 +31,14 @@ int main()
     Scene scene(entities, 2, nullptr, 0, &camera);
 
     ShadingNormalIntegrator integrator;
-    PathTracingRenderer renderer(-1, 1000, 16, integrator);
+    PathTracingRenderer renderer(1, 32, integrator);
 
-    RenderTarget renderTarget(640, 480);
-    renderer.Render(scene, &renderTarget);
+    BoxFilter filter(Vec2(3.0));
+    Film film({ 640, 480 }, filter);
+    NativeSampler sampler(42, 100);
+    renderer.Render(scene, &sampler, &film);
 
-    AGZ::TextureFile::WriteRGBToPNG("./Output.png", renderTarget.Map(
+    AGZ::TextureFile::WriteRGBToPNG("./Output.png", film.GetImage().Map(
         [](const Spectrum &c)
         {
             return c.Map(

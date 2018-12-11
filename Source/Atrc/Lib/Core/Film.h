@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include <mutex>
 #include <Utils/Texture.h>
 
 #include <Atrc/Lib/Core/Common.h>
@@ -28,18 +29,20 @@ class FilmGrid
     const FilmFilter &filter_;
 
     Recti pixelRect_;
-    Rect samplingRect_;
+    Recti samplingRect_;
 
-    AGZ::Texture2D<Spectrum> &accValues_;
-    AGZ::Texture2D<Spectrum> &weights_;
+    AGZ::Texture2D<Spectrum> accValues_;
+    AGZ::Texture2D<Spectrum> weights_;
 
 public:
 
-    FilmGrid(
-        const Recti &pixelRect, const FilmFilter &filter,
-        AGZ::Texture2D<Spectrum> &accValues, AGZ::Texture2D<Spectrum> &weights);
+    friend class Film;
 
-    Rect GetSamplingRect() const noexcept;
+    FilmGrid(const Recti &pixelRect, const FilmFilter &filter);
+
+    FilmGrid(FilmGrid &&moveFrom) noexcept;
+
+    Recti GetSamplingRect() const noexcept;
 
     void AddSample(const Vec2 &pos, const Spectrum &value) noexcept;
 };
@@ -53,6 +56,8 @@ class Film
 
     Vec2i resolution_;
 
+    std::mutex mut_;
+
 public:
 
     Film(const Vec2i &resolution, const FilmFilter &filter);
@@ -60,6 +65,8 @@ public:
     Vec2i GetResolution() const noexcept;
 
     FilmGrid CreateFilmGrid(const Recti &pixelRect) noexcept;
+
+    void MergeFilmGrid(const FilmGrid &filmGrid) noexcept;
 
     AGZ::Texture2D<Spectrum> GetImage() const;
 };
@@ -77,7 +84,7 @@ inline Vec2 FilmFilter::GetRadius() const noexcept
     return radius_;
 }
 
-inline Rect FilmGrid::GetSamplingRect() const noexcept
+inline Recti FilmGrid::GetSamplingRect() const noexcept
 {
     return samplingRect_;
 }

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstdint>
+
 #include <Utils/Alloc.h>
 #include <Utils/Math.h>
 #include <Utils/String.h>
@@ -70,10 +72,9 @@ inline Real Cos(const Vec3 &L, const Vec3 &R) noexcept
 
 // ================================= Spectrum
 
-using AGZ::Math::Color3f;
 using AGZ::Math::Color3b;
 
-using Spectrum = Color3f;
+using Spectrum = AGZ::Math::Color3<Real>;
 
 namespace SPECTRUM = AGZ::Math::COLOR;
 
