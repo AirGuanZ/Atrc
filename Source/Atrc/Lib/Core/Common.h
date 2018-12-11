@@ -29,9 +29,15 @@ using AGZ::Str8;
 
 // ================================= Math
 
-using Vec2 = AGZ::Math::Vec2<Real>;
-using Vec3 = AGZ::Math::Vec3<Real>;
-using Vec4 = AGZ::Math::Vec4<Real>;
+using Vec2  = AGZ::Math::Vec2<Real>;
+using Vec3  = AGZ::Math::Vec3<Real>;
+using Vec4  = AGZ::Math::Vec4<Real>;
+using Vec2u = AGZ::Math::Vec2<uint32_t>;
+using Vec2i = AGZ::Math::Vec2<int32_t>;
+
+using Rect  = AGZ::Math::Rect<Real>;
+using Rectu = AGZ::Math::Rect<uint32_t>;
+using Recti = AGZ::Math::Rect<int32_t>;
 
 using Mat3 = AGZ::Math::Mat3<Real>;
 using Mat4 = AGZ::Math::Mat4<Real>;

@@ -23,6 +23,8 @@ public:
 
     Real SurfaceArea() const noexcept override;
 
+    CoordSystem GetShadingCoordSys(const GeometryIntersection &inct) const noexcept override;
+
     AABB GetLocalBound() const noexcept override;
 
     SampleResult Sample() const noexcept override;

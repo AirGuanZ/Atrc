@@ -24,6 +24,8 @@ public:
 
     Vec3 World2Local(const Vec3 &world) const noexcept;
 
+    CoordSystem World2Local(const CoordSystem &world) const noexcept;
+
     bool InPositiveHemisphere(const Vec3 &v) const noexcept;
 };
 
@@ -77,6 +79,11 @@ inline Vec3 CoordSystem::Local2World(const Vec3 &local) const noexcept
 inline Vec3 CoordSystem::World2Local(const Vec3 &world) const noexcept
 {
     return Vec3(Dot(ex, world), Dot(ey, world), Dot(ez, world));
+}
+
+inline CoordSystem CoordSystem::World2Local(const CoordSystem &world) const noexcept
+{
+    return CoordSystem(World2Local(world.ex), World2Local(world.ey), World2Local(world.ez));
 }
 
 inline bool CoordSystem::InPositiveHemisphere(const Vec3 &v) const noexcept

@@ -6,7 +6,7 @@
 namespace Atrc
 {
 
-enum BSDFComponentType
+enum BSDFType
 {
     BSDF_DIFFUSE  = (1 << 0),
     BSDF_GLOSSY   = (1 << 1),
@@ -19,7 +19,7 @@ enum BSDFComponentType
     BSDF_ALL  = BSDF_DIFFUSE | BSDF_GLOSSY | BSDF_SPECULAR | BSDF_REFLECTION | BSDF_TRANSMISSION
 };
 
-bool Contains(BSDFComponentType set, BSDFComponentType subset) noexcept;
+bool Contains(BSDFType set, BSDFType subset) noexcept;
 
 class BSDF
 {
@@ -30,10 +30,13 @@ public:
         Vec3 wi;
         Real pdf;
         Spectrum coef;
-        BSDFComponentType type;
+        BSDFType type;
+        bool isDelta;
     };
 
     virtual ~BSDF() = default;
+
+    virtual Spectrum GetAlbedo(BSDFType type) const noexcept = 0;
 
     virtual Spectrum Eval(
         const CoordSystem &shd, const CoordSystem &geo,

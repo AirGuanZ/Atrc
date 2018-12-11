@@ -107,6 +107,11 @@ Real Sphere::SurfaceArea() const noexcept
     return 4 * PI * sR * sR;
 }
 
+CoordSystem Sphere::GetShadingCoordSys(const GeometryIntersection &inct) const noexcept
+{
+    return inct.coordSys;
+}
+
 AABB Sphere::GetLocalBound() const noexcept
 {
     return { Vec3(-radius_), Vec3(radius_) };
