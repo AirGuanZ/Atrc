@@ -40,7 +40,7 @@ void FilmGrid::AddSample(const Vec2 &pos, const Spectrum &value) noexcept
         int32_t ly = ly = y - pixelRect_.low.y;
         for(int32_t x = xBegin; x < xEnd; ++x)
         {
-            Vec2 rel = pos - (Vec2(x, y) + Vec2(Real(0.5)));
+            Vec2 rel = pos - (Vec2(Real(x), Real(y)) + Vec2(Real(0.5)));
             if(Abs(rel.x) > r.x || Abs(rel.y) > r.y)
                 continue;
             Spectrum w = filter_.Eval(pos.x - (x + Real(0.5)), pos.y - (y + Real(0.5)));

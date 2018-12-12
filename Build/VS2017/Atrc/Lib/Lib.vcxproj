@@ -95,7 +95,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <FloatingPointModel>Fast</FloatingPointModel>
+      <FloatingPointModel>Precise</FloatingPointModel>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -111,7 +111,7 @@
       <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <FloatingPointModel>Fast</FloatingPointModel>
+      <FloatingPointModel>Precise</FloatingPointModel>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -129,7 +129,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <FloatingPointModel>Fast</FloatingPointModel>
+      <FloatingPointModel>Precise</FloatingPointModel>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -149,7 +149,7 @@
       <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <FloatingPointModel>Fast</FloatingPointModel>
+      <FloatingPointModel>Precise</FloatingPointModel>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -178,13 +178,22 @@
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Entity\GeometricEntity.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\FilmFilter\BoxFilter.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Geometry\Sphere.h" />
-    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\PureBlack.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Geometry\TriangleBVH.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Light\CubeEnvironmentLight.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Light\SkyLight.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\BxDF\BxDF_Black.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\BxDF\BxDF_Diffuse.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\IdealBlack.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\IdealDiffuse.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\Utility\BxDF.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\Utility\BxDFAggregate.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\Utility\NormalMapper.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\NativePathTracingIntegrator.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\ShadingNormalIntegrator.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingRenderer.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Sampler\NativeSampler.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Texture\ConstantTexture.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Texture\ImageTexture.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Utility\GridDivider.h" />
   </ItemGroup>
   <ItemGroup>
@@ -195,11 +204,20 @@
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Entity\GeometricEntity.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\FilmFilter\BoxFilter.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Geometry\Sphere.cpp" />
-    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\PureBlack.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Geometry\TriangleBVH.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Light\CubeEnvironmentLight.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Light\SkyLight.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\BxDF\BxDF_Black.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\BxDF\BxDF_Diffuse.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\IdealBlack.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\IdealDiffuse.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\Utility\NormalMapper.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\NativePathTracingIntegrator.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\ShadingNormalIntegrator.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingRenderer.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Sampler\NativeSampler.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Texture\ConstantTexture.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Texture\ImageTexture.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

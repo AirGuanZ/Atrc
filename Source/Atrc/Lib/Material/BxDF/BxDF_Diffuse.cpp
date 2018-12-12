@@ -28,9 +28,9 @@ Option<BxDF::SampleWiResult> BxDF_Diffuse::SampleWi(const CoordSystem &geoInShd,
 
     auto [sam, pdf] = AGZ::Math::DistributionTransform
         ::ZWeightedOnUnitHemisphere<Real>::Transform(sample);
-    if(geoInShd.World2Local(sam).z <= 0)
+    if(geoInShd.World2Local(sam).z <= 0 || !pdf)
         return None;
-        
+
     SampleWiResult ret;
     ret.coef    = albedo_ / PI;
     ret.pdf     = pdf;

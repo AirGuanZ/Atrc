@@ -16,7 +16,7 @@ TextureNormalMapper::TextureNormalMapper(const Texture *tex) noexcept
 
 Vec3 TextureNormalMapper::GetLocalNormal(const Vec2 &uv) const noexcept
 {
-    return tex_->Sample(uv).Map([](float c) { return Real(2) * c - 1; });
+    return tex_->Sample(uv).Map([](Real c) { return 2 * c - 1; });
 }
 
 } // namespace Atrc

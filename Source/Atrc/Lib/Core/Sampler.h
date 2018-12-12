@@ -22,16 +22,6 @@ public:
     virtual Real GetReal() = 0;
 
     virtual Vec2 GetReal2() = 0;
-
-    static int Real2Int(Real real, int begin, int end) noexcept;
 };
-
-// ================================= Implementation
-
-inline int Sampler::Real2Int(Real real, int begin, int end) noexcept
-{
-    int delta = end - begin;
-    return begin + (std::min<int>)(real * delta, delta - 1);
-}
 
 } // namespace Atrc

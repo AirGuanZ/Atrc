@@ -37,6 +37,15 @@
     <Filter Include="Source\FilmFilter">
       <UniqueIdentifier>{d727d914-d0f4-47c3-be5c-bb0e27228631}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\Material\BxDF">
+      <UniqueIdentifier>{1a7110c9-124e-4b7e-bc09-3be0abda53ea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Light">
+      <UniqueIdentifier>{da8ac573-5fe3-4641-ba17-9f36333d4a88}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Texture">
+      <UniqueIdentifier>{372fadfc-a8cf-4524-9e82-84cf62158725}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\AABB.h">
@@ -93,9 +102,6 @@
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\ShadingNormalIntegrator.h">
       <Filter>Source\Renderer\PathTracingIntegrator</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\PureBlack.h">
-      <Filter>Source\Material</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Utility\GridDivider.h">
       <Filter>Source\Utility</Filter>
     </ClInclude>
@@ -120,6 +126,36 @@
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\FilmFilter\BoxFilter.h">
       <Filter>Source\FilmFilter</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Geometry\TriangleBVH.h">
+      <Filter>Source\Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\IdealBlack.h">
+      <Filter>Source\Material</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\IdealDiffuse.h">
+      <Filter>Source\Material</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\BxDF\BxDF_Black.h">
+      <Filter>Source\Material\BxDF</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\BxDF\BxDF_Diffuse.h">
+      <Filter>Source\Material\BxDF</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Light\CubeEnvironmentLight.h">
+      <Filter>Source\Light</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Light\SkyLight.h">
+      <Filter>Source\Light</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\NativePathTracingIntegrator.h">
+      <Filter>Source\Renderer\PathTracingIntegrator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Texture\ConstantTexture.h">
+      <Filter>Source\Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Texture\ImageTexture.h">
+      <Filter>Source\Texture</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Core\Common.cpp">
@@ -143,9 +179,6 @@
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\ShadingNormalIntegrator.cpp">
       <Filter>Source\Renderer\PathTracingIntegrator</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\PureBlack.cpp">
-      <Filter>Source\Material</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Core\Film.cpp">
       <Filter>Source\Core</Filter>
     </ClCompile>
@@ -157,6 +190,36 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\FilmFilter\BoxFilter.cpp">
       <Filter>Source\FilmFilter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Geometry\TriangleBVH.cpp">
+      <Filter>Source\Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\IdealBlack.cpp">
+      <Filter>Source\Material</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\IdealDiffuse.cpp">
+      <Filter>Source\Material</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\BxDF\BxDF_Black.cpp">
+      <Filter>Source\Material\BxDF</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\BxDF\BxDF_Diffuse.cpp">
+      <Filter>Source\Material\BxDF</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Light\CubeEnvironmentLight.cpp">
+      <Filter>Source\Light</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Light\SkyLight.cpp">
+      <Filter>Source\Light</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\NativePathTracingIntegrator.cpp">
+      <Filter>Source\Renderer\PathTracingIntegrator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Texture\ConstantTexture.cpp">
+      <Filter>Source\Texture</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Texture\ImageTexture.cpp">
+      <Filter>Source\Texture</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -4,7 +4,7 @@ AGZ_NS_BEG(Atrc)
 
 namespace
 {
-    float Byte2Spectrum(uint32_t b) { return b / 255.0f; }
+    Real Byte2Spectrum(uint32_t b) { return b / Real(255); }
 
     Spectrum NearestSampleStrategy(const AGZ::Texture2D<Color3b> &tex, const Vec2 &uv)
     {
