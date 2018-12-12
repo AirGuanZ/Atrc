@@ -17,14 +17,14 @@ Spectrum NativePathTracingIntegrator::Eval(
     Spectrum coef = Spectrum(Real(1)), ret = Spectrum();
     Ray ray = r;
 
-    for(int i = 0; i <= maxDepth_; ++i)
+    for(int i = 1; i <= maxDepth_; ++i)
     {
         // Russian roulette strategy
 
         if(i > minDepth_)
         {
             if(sampler->GetReal() > contProb_)
-                return Spectrum();
+                break;
             coef /= contProb_;
         }
 

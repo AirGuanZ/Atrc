@@ -17,7 +17,7 @@ int main()
     Sphere sphere(Transform(), 1.0);
 
     DefaultNormalMapper normalMapper;
-    ConstantTexture albedoMap(Spectrum(0.8));
+    ConstantTexture albedoMap(Spectrum(0.9));
 
     IdealDiffuse mat(&albedoMap, &normalMapper);
 
@@ -43,12 +43,12 @@ int main()
     Scene scene(entities, 2, lights, 1, &camera);
     sky.PreprocessScene(scene);
 
-    NativePathTracingIntegrator integrator(5, 50, 0.8);
+    NativePathTracingIntegrator integrator(10, 50, 0.8);
     PathTracingRenderer renderer(-1, 32, integrator);
 
     BoxFilter filter(Vec2(0.5));
     Film film({ 640, 480 }, filter);
-    NativeSampler sampler(42, 100);
+    NativeSampler sampler(42, 1000);
     renderer.Render(scene, &sampler, &film);
 
     AGZ::TextureFile::WriteRGBToPNG("./Output.png", film.GetImage().Map(

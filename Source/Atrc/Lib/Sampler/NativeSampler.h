@@ -13,6 +13,8 @@ class NativeSampler : public Sampler
     std::uniform_real_distribution<Real> dis_;
     std::default_random_engine rng_;
 
+    int initSeed_;
+
     int spp_;
     int remainSpp_;
 
