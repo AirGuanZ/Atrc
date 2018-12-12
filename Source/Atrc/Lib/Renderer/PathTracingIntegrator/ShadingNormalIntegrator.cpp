@@ -3,7 +3,7 @@
 namespace Atrc
 {
 
-Spectrum ShadingNormalIntegrator::Eval(const Scene &scene, const Ray &r, Sampler *sampler, Arena &arena) const
+Spectrum ShadingNormalIntegrator::Eval(const Scene &scene, const Ray &r, [[maybe_unused]] Sampler *sampler, Arena &arena) const
 {
     Intersection inct;
     if(!scene.FindIntersection(r, &inct))

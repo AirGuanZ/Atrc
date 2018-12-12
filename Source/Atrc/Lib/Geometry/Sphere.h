@@ -21,7 +21,7 @@ public:
 
     bool FindIntersection(const Ray &r, GeometryIntersection *sp) const noexcept override;
 
-    Real SurfaceArea() const noexcept override;
+    Real GetSurfaceArea() const noexcept override;
 
     CoordSystem GetShadingCoordSys(const GeometryIntersection &inct) const noexcept override;
 
@@ -29,7 +29,7 @@ public:
 
     AABB GetLocalBound() const noexcept override;
 
-    SampleResult Sample() const noexcept override;
+    SampleResult Sample(const Vec3 &sample) const noexcept override;
 
     Real SamplePDF(const Vec3 &pos) const noexcept override;
 };

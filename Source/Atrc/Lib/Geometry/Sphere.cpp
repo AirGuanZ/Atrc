@@ -101,7 +101,7 @@ bool Sphere::FindIntersection(const Ray &_r, GeometryIntersection *inct) const n
     return true;
 }
 
-Real Sphere::SurfaceArea() const noexcept
+Real Sphere::GetSurfaceArea() const noexcept
 {
     Real sR = local2World_.ScaleFactor() * radius_;
     return 4 * PI * sR * sR;
@@ -122,11 +122,10 @@ AABB Sphere::GetLocalBound() const noexcept
     return { Vec3(-radius_), Vec3(radius_) };
 }
 
-Sphere::SampleResult Sphere::Sample() const noexcept
+Sphere::SampleResult Sphere::Sample(const Vec3 &sample) const noexcept
 {
-    Real u = Rand(), v = Rand();
     auto [sam, pdf] = AGZ::Math::DistributionTransform
-                      ::UniformOnUnitSphere<Real>::Transform({ u, v });
+                      ::UniformOnUnitSphere<Real>::Transform(sample.xy());
 
     SampleResult ret;
     ret.pos = local2World_.ApplyToPoint(radius_ * sam);

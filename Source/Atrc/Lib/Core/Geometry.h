@@ -28,7 +28,7 @@ public:
 
     virtual Vec2 GetShadingUV(const Intersection &inct) const noexcept = 0;
 
-    virtual Real SurfaceArea() const noexcept = 0;
+    virtual Real GetSurfaceArea() const noexcept = 0;
 
     virtual AABB GetLocalBound() const noexcept = 0;
 
@@ -41,11 +41,11 @@ public:
         Real pdf;
     };
 
-    virtual SampleResult Sample() const noexcept = 0;
+    virtual SampleResult Sample(const Vec3 &sample) const noexcept = 0;
 
     virtual Real SamplePDF(const Vec3 &pos) const noexcept = 0;
 
-    virtual SampleResult Sample(const Vec3 &ref) const noexcept;
+    virtual SampleResult Sample(const Vec3 &ref, const Vec3 &sample) const noexcept;
 
     virtual Real SamplePDF(const Vec3 &pos, const Vec3 &ref) const noexcept;
 };
@@ -63,9 +63,9 @@ inline AABB Geometry::GetWorldBound() const noexcept
     return local2World_.ApplyToAABB(GetLocalBound());
 }
 
-inline Geometry::SampleResult Geometry::Sample([[maybe_unused]] const Vec3 &ref) const noexcept
+inline Geometry::SampleResult Geometry::Sample([[maybe_unused]] const Vec3 &ref, const Vec3 &sample) const noexcept
 {
-    return Sample();
+    return Sample(sample);
 }
 
 inline Real Geometry::SamplePDF(const Vec3 &pos, [[maybe_unused]] const Vec3 &ref) const noexcept

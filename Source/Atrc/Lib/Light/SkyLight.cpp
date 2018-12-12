@@ -49,7 +49,7 @@ Real SkyLight::SampleWiPDF(
         ZWeightedOnUnitHemisphere<Real>::PDF(lwi);
 }
 
-Spectrum SkyLight::AreaLe(const Intersection &inct) const noexcept
+Spectrum SkyLight::AreaLe([[maybe_unused]] const Intersection &inct) const noexcept
 {
     return Spectrum();
 }

@@ -2,6 +2,7 @@
 #include <Atrc/Lib/Entity/GeometricEntity.h>
 #include <Atrc/Lib/FilmFilter/BoxFilter.h>
 #include <Atrc/Lib/Geometry/Sphere.h>
+#include <Atrc/Lib/Geometry/TriangleBVH.h>
 #include <Atrc/Lib/Light/SkyLight.h>
 #include <Atrc/Lib/Material/IdealDiffuse.h>
 #include <Atrc/Lib/Renderer/PathTracingIntegrator/NativePathTracingIntegrator.h>

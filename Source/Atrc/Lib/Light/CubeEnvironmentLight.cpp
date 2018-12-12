@@ -50,7 +50,7 @@ Real CubeEnvironmentLight::SampleWiPDF(
         ZWeightedOnUnitHemisphere<Real>::PDF(lwi);
 }
 
-Spectrum CubeEnvironmentLight::AreaLe(const Intersection &inct) const noexcept
+Spectrum CubeEnvironmentLight::AreaLe([[maybe_unused]] const Intersection &inct) const noexcept
 {
     return Spectrum();
 }
