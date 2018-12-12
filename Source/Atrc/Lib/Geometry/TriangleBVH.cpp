@@ -43,7 +43,6 @@ namespace
 
 #ifdef AGZ_USE_SSE2
 
-    // SSE load要求地址为16字节对齐
     template<>
     struct alignas(16) BVHNode<float>
     {
@@ -52,16 +51,21 @@ namespace
         float high[3];
         uint32_t begin, end;
 
-        // 参见 http://www.flipcode.com/archives/SSE_RayBox_Intersection_Test.shtml
         bool HasIntersect(const float *pOri, const float *pInvDir, float t0, float t1) const noexcept
         {
             AGZ_ASSERT(size_t(pOri) % 16 == 0 && size_t(pInvDir) % 16 == 0);
 
-            static const float fltPLusInf = -logf(0);
-            static const float alignas(16) psCstPlusInf[4] =
-            { fltPLusInf,  fltPLusInf,  fltPLusInf,  fltPLusInf };
-            static const float alignas(16) psCstMinusInf[4] =
-            { -fltPLusInf, -fltPLusInf, -fltPLusInf, -fltPLusInf };
+            // 参见 http://www.flipcode.com/archives/SSE_RayBox_Intersection_Test.shtml
+            alignas(16) static const float psCstPlusInf[4] =
+            {
+                -logf(0), -logf(0), -logf(0), -logf(0)
+            };
+            alignas(16) static const float psCstMinusInf[4] =
+            {
+                logf(0), logf(0), logf(0), logf(0)
+            };
+
+            AGZ_ASSERT(size_t(psCstPlusInf) % 16 == 0 && size_t(psCstMinusInf) % 16 == 0);
 
             const __m128 plusInf  = _mm_load_ps(psCstPlusInf);
             const __m128 minusInf = _mm_load_ps(psCstMinusInf);
@@ -95,13 +99,36 @@ namespace
             lmax = _mm_min_ss(lmax, lmax1);
             lmin = _mm_max_ss(lmin, lmin1);
 
-            return _mm_comige_ss(lmax, _mm_setzero_ps())
-                 & _mm_comige_ss(lmax, lmin);
+            float t0_, t1_;
+            _mm_store_ss(&t0_, lmin);
+            _mm_store_ss(&t1_, lmax);
+
+            return t1_ >= t0 && t1 >= t0_;
         }
     };
 
 #endif
 
+    bool HasIntersectionWithTriangle(
+        const Ray &r, const Vec3 &A, const Vec3 &B_A, const Vec3 &C_A) noexcept
+    {
+        // TODO
+        return false;
+    }
+
+    struct TriangleIntersectionRecoed
+    {
+        Real t;
+        Vec2 uv;
+    };
+
+    bool FindIntersectionWithTriangle(
+        const Ray &r, const Vec3 &A, const Vec3 &B_A, const Vec3 &C_A,
+        TriangleIntersectionRecoed *record) noexcept
+    {
+        // TODO
+        return false;
+    }
 }
 
 struct alignas(16) TriangleBVHNode : public BVHNode<Real> { };
