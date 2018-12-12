@@ -29,7 +29,7 @@ public:
     
     Option<SampleWiResult> SampleWi(
         const CoordSystem &shd, const CoordSystem &geo,
-        const Vec3 &wo, BSDFType type) const noexcept override;
+        const Vec3 &wo, BSDFType type, const Vec2 &sample) const noexcept override;
 
     Real SampleWiPDF(
         const CoordSystem &shd, const CoordSystem &geo,
@@ -41,7 +41,7 @@ public:
 template<uint8_t MAX_BXDF_CNT>
 BxDFAggregate<MAX_BXDF_CNT>::BxDFAggregate(
     const CoordSystem &shd, const CoordSystem &geo) noexcept
-    : geoInShd_(shd.World2Local(geo)), bxdfCnt_(0)
+    : bxdfCnt_(0), geoInShd_(shd.World2Local(geo))
 {
 
 }
@@ -68,15 +68,15 @@ Spectrum BxDFAggregate<MAX_BXDF_CNT>::GetAlbedo(BSDFType type) const noexcept
 
 template<uint8_t MAX_BXDF_CNT>
 Spectrum BxDFAggregate<MAX_BXDF_CNT>::Eval(
-    const CoordSystem &shd, const CoordSystem &geo,
+    const CoordSystem &shd, [[maybe_unused]] const CoordSystem &geo,
     const Vec3 &wi, const Vec3 &wo, BSDFType type) const noexcept
 {
-    Vec3 lwi = shd.World2Local(wi), lwo = geo.World2Local(wo);
+    Vec3 lwi = shd.World2Local(wi), lwo = shd.World2Local(wo);
     Spectrum ret;
     for(uint8_t i = 0; i < bxdfCnt_; ++i)
     {
         if(bxdfs_[i]->MatchType(type))
-            ret += bxdfs_->Eval(geoInShd_, lwi, lwo);
+            ret += bxdfs_[i]->Eval(geoInShd_, lwi, lwo);
     }
     return ret;
 }
@@ -84,8 +84,8 @@ Spectrum BxDFAggregate<MAX_BXDF_CNT>::Eval(
 template<uint8_t MAX_BXDF_CNT>
 Option<typename BxDFAggregate<MAX_BXDF_CNT>::SampleWiResult>
 BxDFAggregate<MAX_BXDF_CNT>::SampleWi(
-    const CoordSystem &shd, const CoordSystem &geo,
-    const Vec3 &wo, BSDFType type) const noexcept
+    const CoordSystem &shd, [[maybe_unused]] const CoordSystem &geo,
+    const Vec3 &wo, BSDFType type, const Vec2 &sample) const noexcept
 {
     // 有多少bxdf的type对得上
 
@@ -95,10 +95,16 @@ BxDFAggregate<MAX_BXDF_CNT>::SampleWi(
     if(!nMatched)
         return None;
     
-    // 从中选出一个
+    // 从sample中抽取一个整数用来选择bxdf
+    
+    auto [dstIdx, newSampleX] = AGZ::Math::DistributionTransform
+        ::SampleExtractor<Real>::ExtractInteger<uint8_t>(sample.x, 0, nMatched);
+    Vec2 newSample(newSampleX, sample.y);
+    
+    // 选出bxdf
 
     const BxDF *bxdf = nullptr;
-    auto dstIdx = AGZ::Math::Random::Uniform<uint8_t>(0, nMatched - 1);
+    auto dstIdx = Sampler::Real2Int(sample.x, 0, nMatched);
     for(uint8_t i = 0, j = 0; i < bxdfCnt_; ++i)
     {
         if(bxdfs_[i]->MatchType(type) && j++ == dstIdx)
@@ -111,7 +117,7 @@ BxDFAggregate<MAX_BXDF_CNT>::SampleWi(
     // 采样选出的bxdf
 
     Vec3 lwo = shd.World2Local(wo);
-    auto ret = bxdf->SampleWi(geoInShd_, lwo);
+    auto ret = bxdf->SampleWi(geoInShd_, lwo, newSample);
     if(!ret)
         return None;
     
@@ -141,7 +147,7 @@ BxDFAggregate<MAX_BXDF_CNT>::SampleWi(
 
 template<uint8_t MAX_BXDF_CNT>
 Real BxDFAggregate<MAX_BXDF_CNT>::SampleWiPDF(
-    const CoordSystem &shd, const CoordSystem &geo,
+    const CoordSystem &shd, [[maybe_unused]] const CoordSystem &geo,
         const Vec3 &wi, const Vec3 &wo, BSDFType type) const noexcept
 {
     Vec3 lwi = shd.World2Local(wi), lwo = shd.World2Local(wo);

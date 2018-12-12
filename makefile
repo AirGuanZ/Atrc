@@ -10,7 +10,7 @@ CPP_FILES = $(shell find ./Source/Atrc/Lib/ -name "*.cpp")
 OPP_FILES = $(patsubst %.cpp, %.o, $(CPP_FILES))
 DPP_FILES = $(patsubst %.cpp, %.d, $(CPP_FILES))
 
-LIB = ./Build/lib.a
+LIB = ./Build/Lib.a
 
 CPP_SUFFIX = _CPP_FILES
 O_SUFFIX = _O_FILES

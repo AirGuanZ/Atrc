@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Atrc/Lib/Core/Common.h>
+#include <Atrc/Lib/Core/Sampler.h>
 #include <Atrc/Lib/Core/SurfacePoint.h>
 
 namespace Atrc
@@ -16,6 +17,7 @@ enum BSDFType
     BSDF_TRANSMISSION = (1 << 4),
 
     BSDF_NONE = 0,
+    BSDF_NULL = (1 << 5),
     BSDF_ALL  = BSDF_DIFFUSE | BSDF_GLOSSY | BSDF_SPECULAR | BSDF_REFLECTION | BSDF_TRANSMISSION
 };
 
@@ -40,15 +42,15 @@ public:
 
     virtual Spectrum Eval(
         const CoordSystem &shd, const CoordSystem &geo,
-        const Vec3 &wi, const Vec3 &wo) const noexcept = 0;
+        const Vec3 &wi, const Vec3 &wo, BSDFType type) const noexcept = 0;
 
     virtual Option<SampleWiResult> SampleWi(
         const CoordSystem &shd, const CoordSystem &geo,
-        const Vec3 &wo) const noexcept = 0;
+        const Vec3 &wo, BSDFType type, const Vec2 &sample) const noexcept = 0;
 
     virtual Real SampleWiPDF(
         const CoordSystem &shd, const CoordSystem &geo,
-        const Vec3 &wi, const Vec3 &wo) const noexcept = 0;
+        const Vec3 &wi, const Vec3 &wo, BSDFType type) const noexcept = 0;
 };
 
 class Material
@@ -59,5 +61,12 @@ public:
 
     virtual ShadingPoint GetShadingPoint(const Intersection &inct, Arena &arena) const = 0;
 };
+
+// ================================= Implementation
+
+inline bool Contains(BSDFType set, BSDFType subset) noexcept
+{
+    return (subset & set) == subset;
+}
 
 } // namespace Atrc

@@ -26,6 +26,8 @@ public:
 
     virtual CoordSystem GetShadingCoordSys(const GeometryIntersection &inct) const noexcept = 0;
 
+    virtual Vec2 GetShadingUV(const Intersection &inct) const noexcept = 0;
+
     virtual Real SurfaceArea() const noexcept = 0;
 
     virtual AABB GetLocalBound() const noexcept = 0;

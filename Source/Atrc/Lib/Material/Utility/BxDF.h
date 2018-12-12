@@ -27,29 +27,25 @@ public:
 
     virtual Spectrum Eval(const CoordSystem &geoInShd, const Vec3 &wi, const Vec3 &wo) const noexcept = 0;
 
-    virtual Option<SampleWiResult> SampleWi(const CoordSystem &geoInShd, const Vec3 &wo) const noexcept = 0;
+    virtual Option<SampleWiResult> SampleWi(const CoordSystem &geoInShd, const Vec3 &wo, const Vec2 &sample) const noexcept = 0;
 
     virtual Real SampleWiPDF(const CoordSystem &geoInShd, const Vec3 &wi, const Vec3 &wo) const noexcept = 0;
 };
 
 // ================================= Implementation
 
-BxDF::BxDF(BSDFType type) noexcept
+inline BxDF::BxDF(BSDFType type) noexcept
     : type_(type)
 {
-    AGZ_ASSERT(Contains(type, BSDF_DIFFUSE) ||
-               Contains(type, BSDF_GLOSSY) ||
-               Contains(type, BSDF_SPECULAR));
-    AGZ_ASSERT(Contains(type, BSDF_REFLECTION) ||
-               Contains(type, BSDF_TRANSMISSION));
+    
 }
 
-BSDFType BxDF::GetType() const noexcept
+inline BSDFType BxDF::GetType() const noexcept
 {
     return type_;
 }
 
-bool BxDF::MatchType(BSDFType type) const noexcept
+inline bool BxDF::MatchType(BSDFType type) const noexcept
 {
     return Contains(type, GetType());
 }

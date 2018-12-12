@@ -12,7 +12,7 @@ public:
 
     virtual ~PathTracingIntegrator() = default;
 
-    virtual Spectrum Eval(const Scene &scene, const Ray &r, Arena &arena) const = 0;
+    virtual Spectrum Eval(const Scene &scene, const Ray &r, Sampler *sampler, Arena &arena) const = 0;
 };
 
 class PathTracingRenderer : public Renderer

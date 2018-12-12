@@ -22,6 +22,8 @@ bld/
 [Oo]bj/
 [Ll]og/
 
+Output.png
+
 *.o
 *.d
 *.dtmp

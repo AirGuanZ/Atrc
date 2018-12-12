@@ -29,17 +29,17 @@ bool NativeSampler::NextSample()
 Camera::CameraSample NativeSampler::GetCameraSample()
 {
     Camera::CameraSample ret;
-    ret.film = pixel_.Map(AGZ::TypeOpr::StaticCaster<Real, int32_t>) + GetSample2D();
-    ret.lens = GetSample2D();
+    ret.film = pixel_.Map(AGZ::TypeOpr::StaticCaster<Real, int32_t>) + GetReal2();
+    ret.lens = GetReal2();
     return ret;
 }
 
-Real NativeSampler::GetSample()
+Real NativeSampler::GetReal()
 {
     return dis_(rng_);
 }
 
-Vec2 NativeSampler::GetSample2D()
+Vec2 NativeSampler::GetReal2()
 {
     Real x = dis_(rng_), y = dis_(rng_);
     return { x, y };

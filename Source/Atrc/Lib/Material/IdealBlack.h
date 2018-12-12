@@ -5,13 +5,13 @@
 namespace Atrc
 {
 
-class PureBlack : public Material
+class IdealBlack : public Material
 {
 public:
 
     ShadingPoint GetShadingPoint(const Intersection &inct, Arena &arena) const noexcept override;
 };
 
-inline const PureBlack STATIC_PURE_BLACK;
+inline const IdealBlack STATIC_IDEAL_BLACK;
 
 } // namespace Atrc

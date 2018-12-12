@@ -11,10 +11,10 @@ FilmGrid::FilmGrid(const Recti &pixelRect, const FilmFilter &filter)
       weights_(pixelRect.GetDeltaX(), pixelRect.GetDeltaY(), Spectrum())
 {
     Vec2 r = filter.GetRadius();
-    samplingRect_.low.x = int32_t(std::floor(pixelRect.low.x + Real(0.5) - r.x));
-    samplingRect_.low.y = int32_t(std::floor(pixelRect.low.y + Real(0.5) - r.y));
-    samplingRect_.high.x = int32_t(std::ceil(pixelRect.high.x - Real(0.5) + r.x)) + 1;
-    samplingRect_.high.y = int32_t(std::ceil(pixelRect.high.y - Real(0.5) + r.y)) + 1;
+    samplingRect_.low.x  = int32_t(std::floor(pixelRect.low.x + Real(0.5) - r.x));
+    samplingRect_.low.y  = int32_t(std::floor(pixelRect.low.y + Real(0.5) - r.y));
+    samplingRect_.high.x = int32_t(std::ceil(pixelRect.high.x - Real(0.5) + r.x));
+    samplingRect_.high.y = int32_t(std::ceil(pixelRect.high.y - Real(0.5) + r.y));
 }
 
 FilmGrid::FilmGrid(FilmGrid &&moveFrom) noexcept
@@ -40,6 +40,9 @@ void FilmGrid::AddSample(const Vec2 &pos, const Spectrum &value) noexcept
         int32_t ly = ly = y - pixelRect_.low.y;
         for(int32_t x = xBegin; x < xEnd; ++x)
         {
+            Vec2 rel = pos - (Vec2(x, y) + Vec2(Real(0.5)));
+            if(Abs(rel.x) > r.x || Abs(rel.y) > r.y)
+                continue;
             Spectrum w = filter_.Eval(pos.x - (x + Real(0.5)), pos.y - (y + Real(0.5)));
             int32_t lx = x - pixelRect_.low.x;
             accValues_(lx, ly) += w * value;

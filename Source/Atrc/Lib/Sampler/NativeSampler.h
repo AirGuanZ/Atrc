@@ -31,9 +31,9 @@ public:
 
     Camera::CameraSample GetCameraSample() override;
 
-    Real GetSample() override;
+    Real GetReal() override;
 
-    Vec2 GetSample2D() override;
+    Vec2 GetReal2() override;
 };
 
 } // namespace Atrc

@@ -112,6 +112,11 @@ CoordSystem Sphere::GetShadingCoordSys(const GeometryIntersection &inct) const n
     return inct.coordSys;
 }
 
+Vec2 Sphere::GetShadingUV(const Intersection &inct) const noexcept
+{
+    return inct.uv;
+}
+
 AABB Sphere::GetLocalBound() const noexcept
 {
     return { Vec3(-radius_), Vec3(radius_) };

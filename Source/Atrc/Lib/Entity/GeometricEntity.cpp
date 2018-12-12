@@ -36,6 +36,12 @@ CoordSystem GeometricEntity::GetShadingCoordSys(const Intersection &inct) const 
     return geometry_->GetShadingCoordSys(inct);
 }
 
+Vec2 GeometricEntity::GetShadingUV(const Intersection &inct) const noexcept
+{
+    AGZ_ASSERT(inct.entity == this);
+    return geometry_->GetShadingUV(inct);
+}
+
 const Material *GeometricEntity::GetMaterial([[maybe_unused]] const Intersection &inct) const noexcept
 {
     AGZ_ASSERT(material_ && inct.entity == this);

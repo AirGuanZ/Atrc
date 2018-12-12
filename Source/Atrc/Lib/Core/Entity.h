@@ -23,6 +23,8 @@ public:
 
     virtual CoordSystem GetShadingCoordSys(const Intersection &inct) const noexcept = 0;
 
+    virtual Vec2 GetShadingUV(const Intersection &inct) const noexcept = 0;
+
     virtual const Material *GetMaterial(const Intersection &inct) const noexcept = 0;
 
     virtual const Light *AsLight() const noexcept = 0;

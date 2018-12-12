@@ -22,9 +22,11 @@ public:
 
     virtual ~Light() = default;
 
-    virtual SampleWiResult SampleWi(const Intersection &inct) const noexcept = 0;
+    virtual void PreprocessScene(const Scene &scene) = 0;
 
-    virtual Real SampleWiPDF(const Vec3 &pos, const Intersection &inct, bool onLight) const noexcept = 0;
+    virtual SampleWiResult SampleWi(const Intersection &inct, const ShadingPoint &shd, const Vec2 &sample) const noexcept = 0;
+
+    virtual Real SampleWiPDF(const Vec3 &pos, const Intersection &inct, const ShadingPoint &shd, bool onLight) const noexcept = 0;
 
     virtual Spectrum AreaLe(const Intersection &inct) const noexcept = 0;
 
