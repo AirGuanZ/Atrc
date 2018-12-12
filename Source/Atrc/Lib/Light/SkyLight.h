@@ -1,27 +1,23 @@
 #pragma once
 
 #include <Atrc/Lib/Core/Light.h>
-#include <Atrc/Lib/Core/Texture.h>
 
 namespace Atrc
 {
 
-class CubeEnvironmentLight : public Light
+class SkyLight : public Light
 {
-    // 0 : +X
-    // 1 : +Y
-    // 2 : +Z
-    // 3 : -X
-    // 4 : -Y
-    // 5 : -Z
-    const Texture *envTex_[6];
+    Spectrum top_;
+    Spectrum bottom_;
 
     Vec3 worldCentre_;
     Real worldRadius_;
 
 public:
 
-    explicit CubeEnvironmentLight(const Texture **envTex) noexcept;
+    explicit SkyLight(const Spectrum &topAndBottom);
+
+    SkyLight(const Spectrum &top, const Spectrum &bottom);
 
     void PreprocessScene(const Scene &scene) override;
 

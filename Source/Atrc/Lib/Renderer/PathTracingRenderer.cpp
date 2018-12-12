@@ -21,7 +21,7 @@ void PathTracingRenderer::RenderGrid(const Scene &scene, FilmGrid *filmGrid, Sam
                 auto camSam = sampler->GetCameraSample();
                 auto [r, w, pdf] = cam->GenerateRay(camSam);
 
-                Spectrum value = integrator_.Eval(scene, r, arena); 
+                Spectrum value = integrator_.Eval(scene, r, sampler, arena); 
                 filmGrid->AddSample(camSam.film, (w / pdf) * value);
 
                 if(arena.GetUsedBytes() > 16 * 1024 * 1024)

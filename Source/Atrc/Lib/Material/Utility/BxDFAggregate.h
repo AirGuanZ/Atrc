@@ -104,7 +104,6 @@ BxDFAggregate<MAX_BXDF_CNT>::SampleWi(
     // 选出bxdf
 
     const BxDF *bxdf = nullptr;
-    auto dstIdx = Sampler::Real2Int(sample.x, 0, nMatched);
     for(uint8_t i = 0, j = 0; i < bxdfCnt_; ++i)
     {
         if(bxdfs_[i]->MatchType(type) && j++ == dstIdx)

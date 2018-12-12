@@ -40,4 +40,12 @@ Option<BxDF::SampleWiResult> BxDF_Diffuse::SampleWi(const CoordSystem &geoInShd,
     return ret;
 }
 
+Real BxDF_Diffuse::SampleWiPDF(const CoordSystem &geoInShd, const Vec3 &wi, const Vec3 &wo) const noexcept
+{
+    if(wi.z <= 0 || wo.z <= 0 || geoInShd.World2Local(wi).z <= 0 || geoInShd.World2Local(wo).z <= 0)
+        return 0;
+    return AGZ::Math::DistributionTransform
+        ::ZWeightedOnUnitHemisphere<Real>::PDF(wi.Normalize());
+}
+
 } // namespace Atrc

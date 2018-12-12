@@ -2,10 +2,12 @@
 #include <Atrc/Lib/Entity/GeometricEntity.h>
 #include <Atrc/Lib/FilmFilter/BoxFilter.h>
 #include <Atrc/Lib/Geometry/Sphere.h>
-#include <Atrc/Lib/Material/IdealBlack.h>
-#include <Atrc/Lib/Renderer/PathTracingIntegrator/ShadingNormalIntegrator.h>
+#include <Atrc/Lib/Light/SkyLight.h>
+#include <Atrc/Lib/Material/IdealDiffuse.h>
+#include <Atrc/Lib/Renderer/PathTracingIntegrator/NativePathTracingIntegrator.h>
 #include <Atrc/Lib/Renderer/PathTracingRenderer.h>
 #include <Atrc/Lib/Sampler/NativeSampler.h>
+#include <Atrc/Lib/Texture/ConstantTexture.h>
 
 using namespace Atrc;
 
@@ -14,21 +16,34 @@ int main()
     Sphere ground(Transform::Translate({ 0.0, 0.0, -201.0 }), 200.0);
     Sphere sphere(Transform(), 1.0);
 
-    GeometricEntity groundEntity(&ground, &STATIC_IDEAL_BLACK);
-    GeometricEntity sphereEntity(&sphere, &STATIC_IDEAL_BLACK);
+    DefaultNormalMapper normalMapper;
+    ConstantTexture albedoMap(Spectrum(0.8));
+
+    IdealDiffuse mat(&albedoMap, &normalMapper);
+
+    GeometricEntity groundEntity(&ground, &mat);
+    GeometricEntity sphereEntity(&sphere, &mat);
 
     const Entity *entities[] =
     {
         &groundEntity, &sphereEntity
     };
 
+    SkyLight sky(Spectrum(1.0));
+
+    const Light *lights[] =
+    {
+        &sky
+    };
+
     PinholeCamera camera(
         640, 480, { 2.0, 1.5 },
         1.0, Vec3(-7, 0, 0), Vec3(0.0), Vec3(0, 0, 1));
 
-    Scene scene(entities, 2, nullptr, 0, &camera);
+    Scene scene(entities, 2, lights, 1, &camera);
+    sky.PreprocessScene(scene);
 
-    ShadingNormalIntegrator integrator;
+    NativePathTracingIntegrator integrator(5, 50, 0.8);
     PathTracingRenderer renderer(-1, 32, integrator);
 
     BoxFilter filter(Vec2(0.5));

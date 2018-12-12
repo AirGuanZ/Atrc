@@ -7,6 +7,8 @@
 namespace Atrc
 {
 
+class Scene;
+
 class Light
 {
 public:
@@ -31,8 +33,6 @@ public:
     virtual Spectrum AreaLe(const Intersection &inct) const noexcept = 0;
 
     virtual Spectrum NonAreaLe(const Ray &r) const noexcept = 0;
-
-    virtual Spectrum Power() const = 0;
 };
 
 } // namespace Atrc
