@@ -1,0 +1,87 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source">
+      <UniqueIdentifier>{1265ac6d-c510-460f-a4d7-530794ffb3c6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\BuiltinCreator">
+      <UniqueIdentifier>{1c4f4b82-29c3-41d4-80e2-f8814206da04}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Mgr\BuiltinCreatorRegister.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Mgr\Common.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Mgr\Context.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Mgr\Parser.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Mgr\BuiltinCreator\CameraCreator.h">
+      <Filter>Source\BuiltinCreator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Mgr\BuiltinCreator\EntityCreator.h">
+      <Filter>Source\BuiltinCreator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Mgr\BuiltinCreator\FilmFilterCreator.h">
+      <Filter>Source\BuiltinCreator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Mgr\BuiltinCreator\GeometryCreator.h">
+      <Filter>Source\BuiltinCreator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Mgr\BuiltinCreator\LightCreator.h">
+      <Filter>Source\BuiltinCreator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Mgr\BuiltinCreator\MaterialCreator.h">
+      <Filter>Source\BuiltinCreator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Mgr\BuiltinCreator\RendererCreator.h">
+      <Filter>Source\BuiltinCreator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Mgr\BuiltinCreator\SamplerCreator.h">
+      <Filter>Source\BuiltinCreator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Mgr\BuiltinCreator\TextureCreator.h">
+      <Filter>Source\BuiltinCreator</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\Source\Atrc\Mgr\BuiltinCreatorRegister.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\Mgr\Parser.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\Mgr\BuiltinCreator\CameraCreator.cpp">
+      <Filter>Source\BuiltinCreator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\Mgr\BuiltinCreator\EntityCreator.cpp">
+      <Filter>Source\BuiltinCreator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\Mgr\BuiltinCreator\FilmFilterCreator.cpp">
+      <Filter>Source\BuiltinCreator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\Mgr\BuiltinCreator\GeometryCreator.cpp">
+      <Filter>Source\BuiltinCreator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\Mgr\BuiltinCreator\LightCreator.cpp">
+      <Filter>Source\BuiltinCreator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\Mgr\BuiltinCreator\MaterialCreator.cpp">
+      <Filter>Source\BuiltinCreator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\Mgr\BuiltinCreator\RendererCreator.cpp">
+      <Filter>Source\BuiltinCreator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\Mgr\BuiltinCreator\SamplerCreator.cpp">
+      <Filter>Source\BuiltinCreator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\Mgr\BuiltinCreator\TextureCreator.cpp">
+      <Filter>Source\BuiltinCreator</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
