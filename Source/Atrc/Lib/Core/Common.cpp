@@ -1,6 +1,8 @@
 #define AGZ_ALL_IMPL
 
+// ReSharper disable CppUnusedIncludeDirective
 #include <Utils.h>
+// ReSharper restore CppUnusedIncludeDirective
 
 #include <Atrc/Lib/Core/Common.h>
 
