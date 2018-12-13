@@ -88,6 +88,19 @@ inline bool operator!(const Spectrum &s) noexcept
     return s == SPECTRUM::BLACK;
 }
 
+// ================================= Important Interface
+
+class Camera;
+class Entity;
+class FilmFilter;
+class Geometry;
+class Light;
+class Material;
+class PathTracingIntegrator;
+class Renderer;
+class Sampler;
+class Texture;
+
 // ================================= Exception
 
 class Exception

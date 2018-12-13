@@ -45,7 +45,7 @@ int main()
     sky.PreprocessScene(scene);
 
     NativePathTracingIntegrator integrator(10, 50, 1.0);
-    PathTracingRenderer renderer(6, 32, integrator);
+    PathTracingRenderer renderer(-1, 32, integrator);
 
     BoxFilter filter(Vec2(0.5));
     Film film({ 640, 480 }, filter);

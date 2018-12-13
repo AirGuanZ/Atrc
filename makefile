@@ -6,7 +6,7 @@ LD_FLAGS = -pthread
 TARGETS =
 
 CPP_FILES = $(shell find ./Source/Atrc/Lib/ -name "*.cpp")
-# CPP_FILES += $(shell find ./Source/ObjMgr/ -name "*.cpp")
+CPP_FILES += $(shell find ./Source/Atrc/Mgr/ -name "*.cpp")
 OPP_FILES = $(patsubst %.cpp, %.o, $(CPP_FILES))
 DPP_FILES = $(patsubst %.cpp, %.d, $(CPP_FILES))
 
