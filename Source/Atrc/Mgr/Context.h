@@ -1,5 +1,6 @@
 #pragma once
 
+#include <typeinfo>
 #include <tuple>
 #include <unordered_map>
 
@@ -44,9 +45,9 @@ public:
 class Context
 {
     template<typename...Ts>
-    using FactoryTuple = std::tuple<Factory<Ts>...>;
+    using FactoryList = std::tuple<Factory<Ts>...>;
 
-    FactoryTuple<
+    FactoryList<
         Camera,
         Entity,
         FilmFilter,
@@ -131,7 +132,7 @@ void Context::AddCreator(const Creator<T> *creator)
 template<typename T>
 const T *Context::Create(const ConfigNode &definition)
 {
-    try
+    ATRC_MGR_TRY
     {
         const T *ret = std::get<Factory<T>>(factories_).Create(definition, *this, arena_);
         if(!ret)
@@ -139,7 +140,7 @@ const T *Context::Create(const ConfigNode &definition)
         return ret;
     }
     ATRC_MGR_CATCH_AND_RETHROW(
-        "When creating : " + Str8(typeid(T).name()) + " with " + definition.ToString())
+        "In creating : " + Str8(typeid(T).name()) + " with " + definition.ToString())
 }
 
 } // namespace Atrc::Mgr

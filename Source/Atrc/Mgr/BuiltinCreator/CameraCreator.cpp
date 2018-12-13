@@ -7,7 +7,7 @@ namespace Atrc::Mgr
 
 const Camera *PinholeCameraCreator::Create(const ConfigGroup &group, Context &context, Arena &arena)
 {
-    try
+    ATRC_MGR_TRY
     {
         auto filmSize = Parser::ParseVec2i(context.Root()["film.size"]);
         if(filmSize.x <= 0 || filmSize.y <= 0)
@@ -32,7 +32,7 @@ const Camera *PinholeCameraCreator::Create(const ConfigGroup &group, Context &co
             filmSize.x, filmSize.y, sensorRectSize,
             sensorDistance, pinholePos, lookAt, up);
     }
-    ATRC_MGR_CATCH_AND_RETHROW("When creating pinhole camera: " + group.ToString())
+    ATRC_MGR_CATCH_AND_RETHROW("In creating pinhole camera: " + group.ToString())
 }
 
 } // namespace Atrc::Mgr

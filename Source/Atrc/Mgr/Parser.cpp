@@ -5,7 +5,7 @@ namespace Atrc::Mgr::Parser
 
 Spectrum ParseSpectrum(const ConfigNode &node)
 {
-    try
+    ATRC_MGR_TRY
     {
         if(auto arr = node.TryAsArray())
         {
@@ -31,12 +31,12 @@ Spectrum ParseSpectrum(const ConfigNode &node)
 
         throw MgrErr("Invalid spectrum form");
     }
-    ATRC_MGR_CATCH_AND_RETHROW("When parsing spectrum: " + node.ToString())
+    ATRC_MGR_CATCH_AND_RETHROW("In parsing spectrum: " + node.ToString())
 }
 
 Vec2i ParseVec2i(const ConfigNode &node)
 {
-    try
+    ATRC_MGR_TRY
     {
         if(auto arr = node.TryAsArray())
         {
@@ -48,12 +48,12 @@ Vec2i ParseVec2i(const ConfigNode &node)
         }
         throw MgrErr("Invalid vec2i form");
     }
-    ATRC_MGR_CATCH_AND_RETHROW("When parsing vec2i: " + node.ToString())
+    ATRC_MGR_CATCH_AND_RETHROW("In parsing vec2i: " + node.ToString())
 }
 
 Vec2 ParseVec2(const ConfigNode &node)
 {
-    try
+    ATRC_MGR_TRY
     {
         if(auto arr = node.TryAsArray())
         {
@@ -65,12 +65,12 @@ Vec2 ParseVec2(const ConfigNode &node)
         }
         throw MgrErr("Invalid vec2 form");
     }
-    ATRC_MGR_CATCH_AND_RETHROW("When parsing vec2: " + node.ToString())
+    ATRC_MGR_CATCH_AND_RETHROW("In parsing vec2: " + node.ToString())
 }
 
 Vec3 ParseVec3(const ConfigNode &node)
 {
-    try
+    ATRC_MGR_TRY
     {
         if(auto arr = node.TryAsArray())
         {
@@ -83,12 +83,12 @@ Vec3 ParseVec3(const ConfigNode &node)
         }
         throw MgrErr("Invalid vec3 form");
     }
-    ATRC_MGR_CATCH_AND_RETHROW("When parsing vec3: " + node.ToString())
+    ATRC_MGR_CATCH_AND_RETHROW("In parsing vec3: " + node.ToString())
 }
 
 Rad ParseAngle(const ConfigNode &node)
 {
-    try
+    ATRC_MGR_TRY
     {
         if(auto arr = node.TryAsArray())
         {
@@ -101,12 +101,12 @@ Rad ParseAngle(const ConfigNode &node)
         }
         throw MgrErr("Invalid angle form");
     }
-    ATRC_MGR_CATCH_AND_RETHROW("When parsing angle: " + node.ToString())
+    ATRC_MGR_CATCH_AND_RETHROW("In parsing angle: " + node.ToString())
 }
 
 Transform ParseTransform(const ConfigNode &node)
 {
-    try
+    ATRC_MGR_TRY
     {
         if(!node.IsArray())
             throw MgrErr("Array expected");
@@ -119,7 +119,7 @@ Transform ParseTransform(const ConfigNode &node)
                 throw MgrErr("Array expected");
             auto &unit = arr[i].AsArray();
 
-            try
+            ATRC_MGR_TRY
             {
                 if(unit.GetTag() == "Translate")
                 {
@@ -164,12 +164,12 @@ Transform ParseTransform(const ConfigNode &node)
                 else
                     throw MgrErr("Unknown transform unit type");
             }
-            ATRC_MGR_CATCH_AND_RETHROW("When parsing transform unit: " + unit.ToString());
+            ATRC_MGR_CATCH_AND_RETHROW("In parsing transform unit: " + unit.ToString());
         }
 
         return ret;
     }
-    ATRC_MGR_CATCH_AND_RETHROW("When parsing transform: " + node.ToString())
+    ATRC_MGR_CATCH_AND_RETHROW("In parsing transform: " + node.ToString())
 }
 
 } // namespace Atrc::Mgr::Parser

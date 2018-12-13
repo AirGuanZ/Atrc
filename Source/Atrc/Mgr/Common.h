@@ -39,6 +39,8 @@ public:
     const std::exception *TryGetLeaf() const noexcept { return leaf_.get(); }
 };
 
+#define ATRC_MGR_TRY try
+
 #define ATRC_MGR_CATCH_AND_RETHROW(MSG) \
     catch(const ::Atrc::Mgr::MgrErr &err) \
     { \
