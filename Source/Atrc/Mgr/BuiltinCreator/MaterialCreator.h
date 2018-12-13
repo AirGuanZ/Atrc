@@ -5,6 +5,8 @@
 namespace Atrc::Mgr
 {
 
+void RegisterBuiltinMaterialCreators(Context &context);
+
 /*
     type = IdealBlack
 */
@@ -14,7 +16,7 @@ public:
 
     Str8 GetTypeName() const override { return "IdealBlack"; }
 
-    const Material *Create(const ConfigGroup &group, Context &context, Arena &arena) override;
+    Material *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
 };
 
 /*
@@ -28,7 +30,7 @@ public:
 
     Str8 GetTypeName() const override { return "IdealDiffuse"; }
 
-    const Material *Create(const ConfigGroup &group, Context &context, Arena &arena) override;
+    Material *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
 };
 
 } // namespace Atrc::Mgr

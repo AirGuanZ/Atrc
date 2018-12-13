@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include <Atrc/Lib/Camera/PinholeCamera.h>
 #include <Atrc/Lib/Entity/GeometricEntity.h>
 #include <Atrc/Lib/FilmFilter/BoxFilter.h>
@@ -10,11 +12,68 @@
 #include <Atrc/Lib/Sampler/NativeSampler.h>
 #include <Atrc/Lib/Texture/ConstantTexture.h>
 
+#include <Atrc/Mgr/BuiltinCreatorRegister.h>
+#include <Atrc/Mgr/Parser.h>
+#include <Atrc/Mgr/Context.h>
+
 using namespace Atrc;
 
-int main()
+int Run()
 {
-    Sphere ground(Transform::Translate({ 0.0, 0.0, -201.0 }), 200.0);
+    AGZ::Config config;
+    if(!config.LoadFromFile("./Build/scene.txt"))
+    {
+        throw Mgr::MgrErr("Failed to load configuration file");
+        return -1;
+    }
+    auto &root = config.Root();
+
+    Mgr::Context context(root);
+    Mgr::RegisterBuiltinCreators(context);
+
+    std::vector<Entity*> entities;
+    std::vector<Light*> lights;
+
+    auto &entArr = root["entities"].AsArray();
+    for(size_t i = 0; i < entArr.Size(); ++i)
+        entities.push_back(context.Create<Entity>(entArr[i]));
+    
+    auto &lghtArr = root["lights"].AsArray();
+    for(size_t i = 0; i < lghtArr.Size(); ++i)
+        lights.push_back(context.Create<Light>(lghtArr[i]));
+    
+    auto camera   = context.Create<Camera>(root["camera"]);
+    auto renderer = context.Create<Renderer>(root["renderer"]);
+    auto sampler  = context.Create<Sampler>(root["sampler"]);
+    auto filter   = context.Create<FilmFilter>(root["film.filter"]);
+
+    auto outputFilename = root["outputFilename"].AsValue();
+
+    auto filmSize = Mgr::Parser::ParseVec2i(root["film.size"]);
+    if(filmSize.x <= 0 || filmSize.y <= 0)
+        throw Mgr::MgrErr("Invalid film size value");
+
+    Film film(filmSize, *filter);
+
+    std::vector<const Entity*> cEntities;
+    std::vector<const Light*> cLights;
+
+    cEntities.reserve(entities.size());
+    for(auto ent : entities)
+        cEntities.push_back(ent);
+
+    cLights.reserve(lights.size());
+    for(auto lht : lights)
+        cLights.push_back(lht);
+    
+    Scene scene(cEntities.data(), cEntities.size(), cLights.data(), cLights.size(), camera);
+
+    for(auto lht : lights)
+        lht->PreprocessScene(scene);
+    
+    renderer->Render(scene, sampler, &film);
+
+    /*Sphere ground(Transform::Translate({ 0.0, 0.0, -201.0 }), 200.0);
     Sphere sphere(Transform(), 1.0);
 
     DefaultNormalMapper normalMapper;
@@ -50,7 +109,7 @@ int main()
     BoxFilter filter(Vec2(0.5));
     Film film({ 640, 480 }, filter);
     NativeSampler sampler(42, 500);
-    renderer.Render(scene, &sampler, &film);
+    renderer.Render(scene, &sampler, &film);*/
 
     AGZ::TextureFile::WriteRGBToPNG("./Output.png", film.GetImage().Map(
         [](const Spectrum &c)
@@ -63,4 +122,36 @@ int main()
             );
         }
     ));
+
+    return 0;
+}
+
+int main()
+{
+    try
+    {
+        return Run();
+    }
+    catch(const Mgr::MgrErr &err)
+    {
+        const Mgr::MgrErr *pErr = &err;
+        while(pErr)
+        {
+            std::cout << pErr->GetMsg().ToStdString() << std::endl;
+            if(pErr->TryGetLeaf())
+            {
+                std::cout << pErr->TryGetLeaf()->what() << std::endl;
+                break;
+            }
+            pErr = pErr->TryGetInterior();
+        }
+    }
+    catch(const std::exception &err)
+    {
+        std::cout << err.what() << std::endl;
+    }
+    catch(...)
+    {
+        std::cout << "An unknown error occurred..." << std::endl;
+    }
 }

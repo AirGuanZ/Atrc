@@ -1,9 +1,13 @@
 #pragma once
 
+#include <Utils/Texture.h>
+
 #include <Atrc/Mgr/Context.h>
 
 namespace Atrc::Mgr
 {
+
+void RegisterBuiltinTextureCreators(Context &context);
 
 /*
     type = Constant
@@ -16,7 +20,7 @@ public:
 
     Str8 GetTypeName() const override { return "Constant"; }
 
-    const Texture *Create(const ConfigGroup &group, Context &context, Arena &arena) override;
+    Texture *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
 };
 
 /*
@@ -28,13 +32,13 @@ public:
 */
 class ImageTextureCreator : public Creator<Texture>
 {
-    std::unordered_map<Str8, const AGZ::Texture2D<Color3b>*> path2Tex_;
+    mutable std::unordered_map<Str8, const AGZ::Texture2D<Color3b>*> path2Tex_;
 
 public:
 
     Str8 GetTypeName() const override { return "Image"; }
 
-    const Texture *Create(const ConfigGroup &group, Context &context, Arena &arena) override;
+    Texture *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
 };
 
 } // namespace Atrc::Mgr

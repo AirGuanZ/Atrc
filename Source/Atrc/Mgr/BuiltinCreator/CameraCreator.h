@@ -5,6 +5,8 @@
 namespace Atrc::Mgr
 {
 
+void RegisterBuiltinCameraCreators(Context &context);
+
 /*
     type = Pinhole
 
@@ -22,7 +24,7 @@ public:
 
     Str8 GetTypeName() const override { return "Pinhole"; }
 
-    const Camera *Create(const ConfigGroup &group, Context &context, Arena &arena) override;
+    Camera *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
 };
 
 } // namespace Atrc::Mgr

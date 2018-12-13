@@ -6,7 +6,14 @@
 namespace Atrc::Mgr
 {
 
-const Texture *ConstantTextureCreator::Create(const ConfigGroup &group, [[maybe_unused]] Context &context, Arena &arena)
+void RegisterBuiltinTextureCreators(Context &context)
+{
+    static const ConstantTextureCreator constantTextureCreator;
+    context.AddCreator(&constantTextureCreator);
+    context.AddCreator(context.CreateWithInteriorArena<ImageTextureCreator>());
+}
+
+Texture *ConstantTextureCreator::Create(const ConfigGroup &group, [[maybe_unused]] Context &context, Arena &arena) const
 {
     ATRC_MGR_TRY
     {
@@ -16,7 +23,7 @@ const Texture *ConstantTextureCreator::Create(const ConfigGroup &group, [[maybe_
     ATRC_MGR_CATCH_AND_RETHROW("In creating constant texture: " + group.ToString())
 }
 
-const Texture *ImageTextureCreator::Create(const ConfigGroup &group, [[maybe_unused]] Context &context, Arena &arena)
+Texture *ImageTextureCreator::Create(const ConfigGroup &group, [[maybe_unused]] Context &context, Arena &arena) const
 {
     ATRC_MGR_TRY
     {

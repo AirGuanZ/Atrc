@@ -18,7 +18,6 @@ SkyLight::SkyLight(const Spectrum &top, const Spectrum &bottom)
 
 void SkyLight::PreprocessScene(const Scene &scene)
 {
-    AGZ_ASSERT(!worldRadius_);
     auto wb = scene.GetWorldBound();
     worldCentre_ = (wb.high + wb.low) / 2;
     worldRadius_ = Real(1.01) * (wb.high - worldCentre_).Length();

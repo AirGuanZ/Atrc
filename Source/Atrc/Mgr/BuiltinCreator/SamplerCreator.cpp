@@ -6,7 +6,13 @@
 namespace Atrc::Mgr
 {
 
-const Sampler *NativeSamplerCreator::Create(const ConfigGroup &group, Context &context, Arena &arena)
+void RegisterBuiltinSamplerCreators(Context &context)
+{
+    static const NativeSamplerCreator nativeSamplerCreator;
+    context.AddCreator(&nativeSamplerCreator);
+}
+
+Sampler *NativeSamplerCreator::Create(const ConfigGroup &group, [[maybe_unused]] Context &context, Arena &arena) const
 {
     ATRC_MGR_TRY
     {

@@ -4,7 +4,13 @@
 namespace Atrc::Mgr
 {
 
-const FilmFilter *BoxFilterCreator::Create(const ConfigGroup &group, [[maybe_unused]] Context &context, Arena &arena)
+void RegisterBuiltinFilmFilterCreators(Context &context)
+{
+    static const BoxFilterCreator boxFilterCreator;
+    context.AddCreator(&boxFilterCreator);
+}
+
+FilmFilter *BoxFilterCreator::Create(const ConfigGroup &group, [[maybe_unused]] Context &context, Arena &arena) const
 {
     ATRC_MGR_TRY
     {

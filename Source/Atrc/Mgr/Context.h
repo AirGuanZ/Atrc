@@ -23,20 +23,20 @@ public:
 
     virtual Str8 GetTypeName() const = 0;
 
-    virtual const T *Create(const ConfigGroup &group, Context &context, Arena &arena) = 0;
+    virtual T *Create(const ConfigGroup &group, Context &context, Arena &arena) const = 0;
 };
 
 template<typename T>
 class Factory
 {
-    std::unordered_map<Str8, Creator<T>*> creators_;
-    std::unordered_map<Str8, const T*> pubObjs_;
+    std::unordered_map<Str8, const Creator<T>*> creators_;
+    std::unordered_map<Str8, T*> pubObjs_;
 
 public:
 
     // 若definition.IsGroup，则通过其definition["type"]在creators中查找合适的creator进行创建
     // 若definition.IsValue，则在pubObjs中查找它，找不到的话就在root中进行find，结果cache在pubObjs中
-    const T *Create(const ConfigNode &definition, Context &context, Arena &arena);
+    T *Create(const ConfigNode &definition, Context &context, Arena &arena);
 
     // 添加对creator的支持，不持有其所有权
     void AddCreator(const Creator<T> *creator);
@@ -61,11 +61,11 @@ class Context
     > factories_;
 
     const ConfigGroup &root_;
-    Arena &arena_;
+    Arena arena_;
 
 public:
 
-    Context(const ConfigGroup &root, Arena &arena);
+    Context(const ConfigGroup &root);
 
     const ConfigGroup &Root() const noexcept { return root_; }
 
@@ -73,13 +73,16 @@ public:
     void AddCreator(const Creator<T> *creator);
 
     template<typename T>
-    const T *Create(const ConfigNode &definition);
+    T *Create(const ConfigNode &definition);
+
+    template<typename T, typename...Args>
+    T *CreateWithInteriorArena(Args&&...args);
 };
 
 // ================================= Implementation
 
 template<typename T>
-const T *Factory<T>::Create(const ConfigNode &definition, Context &context, Arena &arena)
+T *Factory<T>::Create(const ConfigNode &definition, Context &context, Arena &arena)
 {
     if(auto val = definition.TryAsValue())
     {
@@ -117,8 +120,8 @@ void Factory<T>::AddCreator(const Creator<T> *creator)
     creators_[creator->GetTypeName()] = creator;
 }
 
-inline Context::Context(const ConfigGroup &root, Arena &arena)
-    : root_(root), arena_(arena)
+inline Context::Context(const ConfigGroup &root)
+    : root_(root)
 {
     
 }
@@ -130,17 +133,23 @@ void Context::AddCreator(const Creator<T> *creator)
 }
 
 template<typename T>
-const T *Context::Create(const ConfigNode &definition)
+T *Context::Create(const ConfigNode &definition)
 {
     ATRC_MGR_TRY
     {
-        const T *ret = std::get<Factory<T>>(factories_).Create(definition, *this, arena_);
+        T *ret = std::get<Factory<T>>(factories_).Create(definition, *this, arena_);
         if(!ret)
             throw MgrErr("Context::Create: factory returns nullptr");
         return ret;
     }
     ATRC_MGR_CATCH_AND_RETHROW(
         "In creating : " + Str8(typeid(T).name()) + " with " + definition.ToString())
+}
+
+template<typename T, typename...Args>
+T *Context::CreateWithInteriorArena(Args&&...args)
+{
+    return arena_.Create<T>(std::forward<Args>(args)...);
 }
 
 } // namespace Atrc::Mgr

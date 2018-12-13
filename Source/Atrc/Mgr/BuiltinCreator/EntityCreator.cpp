@@ -4,7 +4,13 @@
 namespace Atrc::Mgr
 {
 
-const Entity *GeometricEntityCreator::Create(const ConfigGroup &group, Context &context, Arena &arena)
+void RegisterBuiltinEntityCreators(Context &context)
+{
+    static const GeometricEntityCreator geometricEntityCreator;
+    context.AddCreator(&geometricEntityCreator);
+}
+
+Entity *GeometricEntityCreator::Create(const ConfigGroup &group, Context &context, Arena &arena) const
 {
     ATRC_MGR_TRY
     {

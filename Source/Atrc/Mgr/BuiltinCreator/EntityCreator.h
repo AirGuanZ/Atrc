@@ -5,6 +5,8 @@
 namespace Atrc::Mgr
 {
 
+void RegisterBuiltinEntityCreators(Context &context);
+
 /*
     type     = Geometric
     
@@ -17,7 +19,7 @@ public:
 
     Str8 GetTypeName() const override { return "Geometric"; }
 
-    const Entity *Create(const ConfigGroup &group, Context &context, Arena &arena) override;
+    Entity *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
 };
 
 } // namespace Atrc::Mgr

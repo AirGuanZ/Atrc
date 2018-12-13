@@ -5,6 +5,8 @@
 namespace Atrc::Mgr
 {
 
+void RegisterBuiltinLightCreators(Context &context);
+
 /*
     type = Sky
 
@@ -17,7 +19,7 @@ public:
 
     Str8 GetTypeName() const override { return "Sky"; }
 
-    const Light *Create(const ConfigGroup &group, Context &context, Arena &arena) override;
+    Light *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
 };
 
 // type = CubeEnvironment
@@ -33,7 +35,7 @@ public:
 
     Str8 GetTypeName() const override { return "CubeEnvironment"; }
 
-    const Light *Create(const ConfigGroup &group, Context &context, Arena &arena) override;
+    Light *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
 };
 
 } // namespace Atrc::Mgr

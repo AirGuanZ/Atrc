@@ -6,6 +6,14 @@
 namespace Atrc::Mgr
 {
 
+void RegisterBuiltinMaterialCreators(Context &context)
+{
+    static const IdealBlackCreator idealBlackCreator;
+    static const IdealDiffuseCreator idealDiffuseCreator;
+    context.AddCreator(&idealBlackCreator);
+    context.AddCreator(&idealDiffuseCreator);
+}
+
 namespace
 {
     // 若group.Find("normalMapper")不为nullptr，则以之为texture创建一个texture normal mapper，否则返回default normal mapper
@@ -18,20 +26,20 @@ namespace
                 auto tex = context.Create<Texture>(*texNode);
                 return arena.Create<TextureNormalMapper>(tex);
             }
-            static DefaultNormalMapper DEFAULT_NORMAL_MAPPER;
+            static const DefaultNormalMapper DEFAULT_NORMAL_MAPPER;
             return &DEFAULT_NORMAL_MAPPER;
         }
         ATRC_MGR_CATCH_AND_RETHROW("In creating normal mapper: " + group.ToString())
     }
 }
 
-const Material *IdealBlackCreator::Create(
-    [[maybe_unused]] const ConfigGroup &group, [[maybe_unused]] Context &context, [[maybe_unused]] Arena &arena)
+Material *IdealBlackCreator::Create(
+    [[maybe_unused]] const ConfigGroup &group, [[maybe_unused]] Context &context, [[maybe_unused]] Arena &arena) const
 {
     return &STATIC_IDEAL_BLACK;
 }
 
-const Material *IdealDiffuseCreator::Create(const ConfigGroup &group, Context &context, Arena &arena)
+Material *IdealDiffuseCreator::Create(const ConfigGroup &group, Context &context, Arena &arena) const
 {
     ATRC_MGR_TRY
     {

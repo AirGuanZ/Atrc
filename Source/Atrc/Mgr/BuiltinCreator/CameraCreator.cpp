@@ -5,7 +5,13 @@
 namespace Atrc::Mgr
 {
 
-const Camera *PinholeCameraCreator::Create(const ConfigGroup &group, Context &context, Arena &arena)
+void RegisterBuiltinCameraCreators(Context &context)
+{
+    static const PinholeCameraCreator pinholeCameraCreator;
+    context.AddCreator(&pinholeCameraCreator);
+}
+
+Camera *PinholeCameraCreator::Create(const ConfigGroup &group, Context &context, Arena &arena) const
 {
     ATRC_MGR_TRY
     {

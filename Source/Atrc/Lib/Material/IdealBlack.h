@@ -12,6 +12,6 @@ public:
     ShadingPoint GetShadingPoint(const Intersection &inct, Arena &arena) const noexcept override;
 };
 
-inline const IdealBlack STATIC_IDEAL_BLACK;
+inline IdealBlack STATIC_IDEAL_BLACK;
 
 } // namespace Atrc

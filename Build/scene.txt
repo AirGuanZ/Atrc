@@ -1,0 +1,5 @@
+# Scene description file for Atrc Launcher
+
+film = {
+    size = (640, 480);
+};

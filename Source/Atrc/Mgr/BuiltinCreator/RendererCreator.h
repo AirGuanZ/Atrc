@@ -5,6 +5,8 @@
 namespace Atrc::Mgr
 {
 
+void RegisterBuiltinRendererCreators(Context &context);
+
 /*
     type = PathTracing
 
@@ -18,7 +20,7 @@ public:
 
     Str8 GetTypeName() const override { return "PathTracing"; }
 
-    const Renderer *Create(const ConfigGroup &group, Context &context, Arena &arena) override;
+    Renderer *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
 };
 
 } // namespace Atrc::Mgr

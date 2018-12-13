@@ -5,7 +5,13 @@
 namespace Atrc::Mgr
 {
 
-const Geometry *SphereCreator::Create(const ConfigGroup &group, [[maybe_unused]] Context &context, Arena &arena)
+void RegisterBuiltinGeometryCreators(Context &context)
+{
+    static const SphereCreator sphereCreator;
+    context.AddCreator(&sphereCreator);
+}
+
+Geometry *SphereCreator::Create(const ConfigGroup &group, [[maybe_unused]] Context &context, Arena &arena) const
 {
     ATRC_MGR_TRY
     {

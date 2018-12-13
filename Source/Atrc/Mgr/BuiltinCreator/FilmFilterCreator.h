@@ -5,6 +5,8 @@
 namespace Atrc::Mgr
 {
 
+void RegisterBuiltinFilmFilterCreators(Context &context);
+
 /*
     type = Box
 
@@ -16,7 +18,7 @@ public:
 
     Str8 GetTypeName() const override { return "Box"; }
 
-    const FilmFilter *Create(const ConfigGroup &group, Context &context, Arena &arena) override;
+    FilmFilter *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
 };
 
 } // namespace Atrc::Mgr

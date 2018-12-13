@@ -5,6 +5,8 @@
 namespace Atrc::Mgr
 {
 
+void RegisterBuiltinGeometryCreators(Context &context);
+
 /*
     type = Sphere
 
@@ -17,7 +19,7 @@ public:
 
     Str8 GetTypeName() const override { return "Sphere"; }
 
-    const Geometry *Create(const ConfigGroup &group, Context &context, Arena &arena) override;
+    Geometry *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
 };
 
 } // namespace Atrc::Mgr

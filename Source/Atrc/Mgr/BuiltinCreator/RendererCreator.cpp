@@ -4,7 +4,13 @@
 namespace Atrc::Mgr
 {
 
-const Renderer *PathTracingRendererCreator::Create(const ConfigGroup &group, Context &context, Arena &arena)
+void RegisterBuiltinRendererCreators(Context &context)
+{
+    static const PathTracingRendererCreator pathTracingRendererCreator;
+    context.AddCreator(&pathTracingRendererCreator);
+}
+
+Renderer *PathTracingRendererCreator::Create(const ConfigGroup &group, Context &context, Arena &arena) const
 {
     ATRC_MGR_TRY
     {

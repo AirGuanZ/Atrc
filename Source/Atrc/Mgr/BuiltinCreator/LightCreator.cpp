@@ -6,7 +6,15 @@
 namespace Atrc::Mgr
 {
 
-const Light *SkyLightCreator::Create(const ConfigGroup &group, [[maybe_unused]] Context &context, Arena &arena)
+void RegisterBuiltinLightCreators(Context &context)
+{
+    static const SkyLightCreator skyLightCreator;
+    static const CubeEnvironmentLightCreator cubeEnvironmentLight;
+    context.AddCreator(&skyLightCreator);
+    context.AddCreator(&cubeEnvironmentLight);
+}
+
+Light *SkyLightCreator::Create(const ConfigGroup &group, [[maybe_unused]] Context &context, Arena &arena) const
 {
     ATRC_MGR_TRY
     {
@@ -17,7 +25,7 @@ const Light *SkyLightCreator::Create(const ConfigGroup &group, [[maybe_unused]] 
     ATRC_MGR_CATCH_AND_RETHROW("In creating sky light: " + group.ToString())
 }
 
-const Light *CubeEnvironmentLightCreator::Create(const ConfigGroup &group, Context &context, Arena &arena)
+Light *CubeEnvironmentLightCreator::Create(const ConfigGroup &group, Context &context, Arena &arena) const
 {
     ATRC_MGR_TRY
     {
