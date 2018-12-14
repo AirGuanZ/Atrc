@@ -32,7 +32,7 @@ inline Ray::Ray(
 
 inline Vec3 Ray::At(Real t) const noexcept
 {
-    return o  + t * d;
+    return o + t * d;
 }
 
 inline bool Ray::Between(Real t) const noexcept

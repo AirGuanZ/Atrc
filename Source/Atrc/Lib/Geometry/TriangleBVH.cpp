@@ -27,7 +27,7 @@ struct TriangleBVHCorePrimitiveInfo
 namespace
 {
     template<typename T>
-    struct BVHNode
+    struct alignas(16) BVHNode
     {
         T low[3], high[3];
         uint32_t start, end;  
@@ -71,6 +71,8 @@ namespace
         float high[4];
         uint32_t rightOffset;
         uint32_t start, end;
+
+        BVHNode() { low[3] = high[3] = 0; }
 
         bool IsLeaf() const noexcept
         {
@@ -132,7 +134,7 @@ namespace
 
             *t = Max(t0, t0_);
 
-            return t1_ >= t0 && t1 >= t0_;
+            return _mm_comige_ss(lmax, lmin) && t1_ >= t0 && t1 >= t0_;
         }
     };
 
@@ -266,9 +268,9 @@ namespace
             {
                 auto &tri = triangles[i];
                 allBound.Expand(tri.vtx[0].pos)
-                    .Expand(tri.vtx[1].pos)
-                    .Expand(tri.vtx[2].pos);
-                centroidBound.Expand(triangles[i].centroid);
+                        .Expand(tri.vtx[1].pos)
+                        .Expand(tri.vtx[2].pos);
+                centroidBound.Expand(tri.centroid);
             }
 
             AGZ_ASSERT(task.start < task.end);
@@ -307,7 +309,7 @@ namespace
                 Real splitPos = (centroidBound.high[splitAxis] + centroidBound.low[splitAxis]) / 2;
 
                 splitIdx = task.start;
-                for(uint32_t i = 0; i < task.end; ++i)
+                for(uint32_t i = task.start; i < task.end; ++i)
                 {
                     if(triangles[i].centroid[splitAxis] < splitPos)
                         std::swap(triangles[i], triangles[splitIdx++]);
@@ -335,6 +337,8 @@ namespace
             AGZ_ASSERT(task.fillback);
             *task.fillback = interior;
 
+            ret.nodeCount += 1;
+
             tasks.push({ &interior->left,  task.start, splitIdx, task.depth + 1 });
             tasks.push({ &interior->right, splitIdx,   task.end, task.depth + 1 });
         }
@@ -343,8 +347,8 @@ namespace
     }
 
     Vec3 ComputeEx(
-        const Vec3 &A, const Vec3 &B_A, const Vec3 &C_A,
-        const Vec2 &a, const Vec2 &b_a, const Vec2 &c_a,
+        const Vec3 &B_A, const Vec3 &C_A,
+        const Vec2 &b_a, const Vec2 &c_a,
         const Vec3 &ez)
     {
         Real m00 = b_a.u, m01 = b_a.v;
@@ -383,7 +387,7 @@ namespace
             if(task.fillback)
                 *task.fillback = nextNodeIdx;
 
-            if(!tree->left && !tree->right) // 内部节点
+            if(tree->left && tree->right) // 内部节点
             {
                 auto &nNode = node[nextNodeIdx++];
                 for(int i = 0; i < 3; ++i)
@@ -391,8 +395,6 @@ namespace
                     nNode.low[i]  = tree->bounding.low[i];
                     nNode.high[i] = tree->bounding.high[i];
                 }
-                nNode.low[3]  = 0;
-                nNode.high[3] = 0;
                 nNode.start   = 0;
                 nNode.end     = 0;
 
@@ -410,8 +412,6 @@ namespace
                     nNode.low[i] = tree->bounding.low[i];
                     nNode.high[i] = tree->bounding.high[i];
                 }
-                nNode.low[3]      = 0;
-                nNode.high[3]     = 0;
                 nNode.start       = start;
                 nNode.end         = end;
                 nNode.rightOffset = 0;
@@ -446,8 +446,8 @@ namespace
                         primInfo.coordSys.ez = -primInfo.coordSys.ez;
 
                     primInfo.coordSys.ex = ComputeEx(
-                        prim.A, prim.B_A, prim.C_A,
-                        primInfo.tA, primInfo.tB_tA, primInfo.tC_tA,
+                        prim.B_A, prim.C_A,
+                        primInfo.tB_tA, primInfo.tC_tA,
                         primInfo.coordSys.ez);
                     primInfo.coordSys.ey = Cross(
                         primInfo.coordSys.ez, primInfo.coordSys.ex).Normalize();
@@ -524,7 +524,6 @@ bool TriangleBVHCore::HasIntersection(Ray r) const noexcept
             if(node.HasIntersect(ori, invDir, r.t0, r.t1, &t))
             {
                 AGZ_ASSERT(top + 2 <= TVL_STK_SIZE);
-                r.t0 = t;
                 tasks[top++] = taskNodeIdx + 1;
                 tasks[top++] = node.rightOffset;
             }
@@ -552,10 +551,7 @@ bool TriangleBVHCore::FindIntersection(Ray r, GeometryIntersection *inct) const 
 
     int top = 0; Real t;
     if(nodes_[0].HasIntersect(ori, invDir, r.t0, r.t1, &t))
-    {
-        r.t0 = t;
         tasks[top++] = 0;
-    }
     else
         return false;
 
@@ -571,8 +567,7 @@ bool TriangleBVHCore::FindIntersection(Ray r, GeometryIntersection *inct) const 
 
         if(node.rightOffset)
         {
-            Real tLeft  = std::numeric_limits<Real>::lowest();
-            Real tRight = std::numeric_limits<Real>::lowest();
+            Real tLeft, tRight;
 
             bool addLeft  = nodes_[taskNodeIdx + 1] .HasIntersect(ori, invDir, r.t0, r.t1, &tLeft);
             bool addRight = nodes_[node.rightOffset].HasIntersect(ori, invDir, r.t0, r.t1, &tRight);
@@ -604,8 +599,8 @@ bool TriangleBVHCore::FindIntersection(Ray r, GeometryIntersection *inct) const 
                 auto &prim = prims_[i];
                 if(FindIntersectionWithTriangle(r, prim.A, prim.B_A, prim.C_A, &trc) && trc.t < rc.t)
                 {
-                    rc    = trc;
-                    r.t1  = trc.t;
+                    rc = trc;
+                    r.t1 = trc.t;
                     flag0 = i;
                 }
             }

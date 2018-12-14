@@ -55,7 +55,7 @@ Spectrum SkyLight::AreaLe([[maybe_unused]] const Intersection &inct) const noexc
 
 Spectrum SkyLight::NonAreaLe(const Ray &r) const noexcept
 {
-    float topWeight = Real(0.5) * r.d.Normalize().z + Real(0.5);
+    Real topWeight = Real(0.5) * r.d.Normalize().z + Real(0.5);
     return topWeight * top_ + (1 - topWeight) * bottom_;
 }
 

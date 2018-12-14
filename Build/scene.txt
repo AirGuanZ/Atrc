@@ -1,7 +1,7 @@
 # Scene description file for Atrc Launcher
 
 film = {
-    size = (640, 480);
+    size = (1920, 1080);
     filter = {
         type = Box;
         sidelen = 1;
@@ -10,7 +10,8 @@ film = {
 
 sampler = {
     type = Native;
-    spp = 1;
+    seed = 42;
+    spp = 1000;
 };
 
 camera = {
@@ -40,7 +41,7 @@ mat = {
     type = IdealDiffuse;
     albedo = {
         type = Constant;
-        texel = (0.8);
+        texel = (0.7);
     };
 };
 
@@ -54,12 +55,21 @@ entities = (
     };
     material = mat;
 },
+#{
+#    type = Geometric;
+#    geometry = {
+#        type = Sphere;
+#        radius = 1;
+#        transform = ();
+#    };
+#    material = mat;
+#}
 {
     type = Geometric;
     geometry = {
-        type = Sphere;
-        radius = 1;
-        transform = ();
+        type = TriangleBVH;
+        filename = "./Asset/dragon_vrip.obj";
+        transform = (Translate(0, 0, -1), Scale(0.1));
     };
     material = mat;
 }
