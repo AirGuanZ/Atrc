@@ -6,7 +6,9 @@
 namespace Atrc
 {
 
-struct TriangleBVHNode;
+struct TriangleBVHCoreNode;
+struct TriangleBVHCorePrimitive;
+struct TriangleBVHCorePrimitiveInfo;
 
 class TriangleBVHCore
 {
@@ -19,31 +21,52 @@ public:
         Vec2 uv;
     };
 
-    // 创建一个空BVH，调用其Deserialize之外的任何成员函数都是非法的
-    TriangleBVHCore() = default;
-
     TriangleBVHCore(const Vertex *vertices, uint32_t triangleCount);
 
     TriangleBVHCore(TriangleBVHCore &&moveFrom) noexcept;
 
-    bool Serialize(AGZ::BinaryDeserializer &serializer) const;
-
-    bool Deserialize(AGZ::BinaryDeserializer &deserializer) const;
+    ~TriangleBVHCore();
 
     AABB GetLocalBound() const noexcept;
 
-    bool HasIntersection(const Ray &r) const noexcept;
+    bool HasIntersection(Ray r) const noexcept;
 
-    bool FindIntersection(const Ray &r, GeometryIntersection *inct) const noexcept;
+    bool FindIntersection(Ray r, GeometryIntersection *inct) const noexcept;
 
-    Geometry::SampleResult Sample() const;
+    CoordSystem GetShadingCoordSys(const GeometryIntersection &inct) const noexcept;
+
+    Geometry::SampleResult Sample(const Vec3 &sample) const;
 
 private:
 
     void InitBVH(const Vertex *vtx, uint32_t triangleCount);
 
-    AABB localBound_;
-    TriangleBVHNode *nodes_;
+    std::vector<Real> areaPrefixSum_;
+
+    TriangleBVHCoreNode          *nodes_;
+    TriangleBVHCorePrimitive     *prims_;
+    TriangleBVHCorePrimitiveInfo *primsInfo_;
+};
+
+class TriangleBVH : public Geometry
+{
+    const TriangleBVHCore &core_;
+
+public:
+
+    TriangleBVH(const Transform &local2World, const TriangleBVHCore &core) noexcept;
+
+    bool HasIntersection(const Ray &r) const noexcept override;
+
+    bool FindIntersection(const Ray &r, GeometryIntersection *inct) const noexcept override;
+
+    Real GetSurfaceArea() const noexcept override;
+
+    AABB GetLocalBound() const noexcept override;
+
+    SampleResult Sample(const Vec3 &sample) const noexcept override;
+
+    Real SamplePDF(const Vec3 &pos) const noexcept override;
 };
 
 } // namespace Atrc

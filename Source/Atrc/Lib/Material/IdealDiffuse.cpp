@@ -15,8 +15,8 @@ IdealDiffuse::IdealDiffuse(const Texture *albedoMap, const NormalMapper *normalM
 ShadingPoint IdealDiffuse::GetShadingPoint(const Intersection &inct, Arena &arena) const noexcept
 {
     ShadingPoint ret;
-    ret.uv       = inct.entity->GetShadingUV(inct);
-    ret.coordSys = inct.entity->GetShadingCoordSys(inct);
+    ret.uv       = inct.usr.uv;
+    ret.coordSys = inct.usr.coordSys;
 
     Vec3 localNormal = normalMapper_->GetLocalNormal(ret.uv);
     Vec3 worldNormal = ret.coordSys.Local2World(localNormal);

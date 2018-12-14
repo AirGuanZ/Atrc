@@ -20,12 +20,9 @@ using namespace Atrc;
 
 int Run()
 {
-    AGZ::Config config;
+    /*AGZ::Config config;
     if(!config.LoadFromFile("./Build/scene.txt"))
-    {
         throw Mgr::MgrErr("Failed to load configuration file");
-        return -1;
-    }
     auto &root = config.Root();
 
     Mgr::Context context(root);
@@ -71,9 +68,11 @@ int Run()
     for(auto lht : lights)
         lht->PreprocessScene(scene);
     
-    renderer->Render(scene, sampler, &film);
+    renderer->Render(scene, sampler, &film);*/
 
-    /*Sphere ground(Transform::Translate({ 0.0, 0.0, -201.0 }), 200.0);
+    Str8 outputFilename = "./Output.png";
+
+    Sphere ground(Transform::Translate({ 0.0, 0.0, -201.0 }), 200.0);
     Sphere sphere(Transform(), 1.0);
 
     DefaultNormalMapper normalMapper;
@@ -108,10 +107,11 @@ int Run()
 
     BoxFilter filter(Vec2(0.5));
     Film film({ 640, 480 }, filter);
-    NativeSampler sampler(42, 500);
-    renderer.Render(scene, &sampler, &film);*/
+    NativeSampler sampler(42, 100);
 
-    AGZ::TextureFile::WriteRGBToPNG("./Output.png", film.GetImage().Map(
+    renderer.Render(scene, &sampler, &film);
+
+    AGZ::TextureFile::WriteRGBToPNG(outputFilename, film.GetImage().Map(
         [](const Spectrum &c)
         {
             return c.Map(

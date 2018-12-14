@@ -11,8 +11,8 @@ ShadingPoint IdealBlack::GetShadingPoint(const Intersection &inct, Arena &arena)
     static const BxDF_Black bxdf;
 
     ShadingPoint ret;
-    ret.uv       = inct.entity->GetShadingUV(inct);
-    ret.coordSys = inct.entity->GetShadingCoordSys(inct);
+    ret.uv       = inct.usr.uv;
+    ret.coordSys = inct.usr.coordSys;
 
     auto bsdf = arena.Create<BxDFAggregate<1>>(ret.coordSys, inct.coordSys);
     bsdf->AddBxDF(&bxdf);

@@ -92,11 +92,13 @@ bool Sphere::FindIntersection(const Ray &_r, GeometryIntersection *inct) const n
         ey = Cross(nor, ex);
     }
 
-    inct->t        = t;
-    inct->pos      = local2World_.ApplyToPoint(pos) ;
-    inct->wr       = -_r.d;
-    inct->uv       = uv;
-    inct->coordSys = local2World_.ApplyToCoordSystem({ ex, ey, nor });
+    inct->t            = t;
+    inct->pos          = local2World_.ApplyToPoint(pos) ;
+    inct->wr           = -_r.d;
+    inct->uv           = uv;
+    inct->coordSys     = local2World_.ApplyToCoordSystem({ ex, ey, nor });
+    inct->usr.uv       = uv;
+    inct->usr.coordSys = inct->coordSys;
 
     return true;
 }
@@ -105,16 +107,6 @@ Real Sphere::GetSurfaceArea() const noexcept
 {
     Real sR = local2World_.ScaleFactor() * radius_;
     return 4 * PI * sR * sR;
-}
-
-CoordSystem Sphere::GetShadingCoordSys(const GeometryIntersection &inct) const noexcept
-{
-    return inct.coordSys;
-}
-
-Vec2 Sphere::GetShadingUV(const Intersection &inct) const noexcept
-{
-    return inct.uv;
 }
 
 AABB Sphere::GetLocalBound() const noexcept

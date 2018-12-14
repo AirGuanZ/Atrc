@@ -22,10 +22,6 @@ public:
 
     AABB GetWorldBound() const noexcept override;
 
-    CoordSystem GetShadingCoordSys(const Intersection &inct) const noexcept override;
-
-    Vec2 GetShadingUV(const Intersection &inct) const noexcept override;
-
     const Material *GetMaterial(const Intersection &inct) const noexcept override;
 
     const Light *AsLight() const noexcept override;

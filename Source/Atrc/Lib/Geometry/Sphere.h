@@ -23,10 +23,6 @@ public:
 
     Real GetSurfaceArea() const noexcept override;
 
-    CoordSystem GetShadingCoordSys(const GeometryIntersection &inct) const noexcept override;
-
-    Vec2 GetShadingUV(const Intersection &inct) const noexcept override;
-
     AABB GetLocalBound() const noexcept override;
 
     SampleResult Sample(const Vec3 &sample) const noexcept override;

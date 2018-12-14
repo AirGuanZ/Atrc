@@ -47,7 +47,7 @@ void PathTracingRenderer::Render(const Scene &scene, Sampler *sampler, Film *fil
     auto func = [&](const Grid &task, AGZ::NoSharedParam_t)
     {
         auto filmGrid = film->CreateFilmGrid(task);
-        int32_t taskID = task.low.x * tasks.size() + task.low.y;
+        int32_t taskID = task.low.x * int32_t(tasks.size()) + task.low.y;
         auto gridSampler = sampler->Clone(taskID);
         RenderGrid(scene, &filmGrid, gridSampler.get());
         film->MergeFilmGrid(filmGrid);

@@ -37,6 +37,12 @@ struct GeometryIntersection
     Vec2 uv;              // 交点在几何体上的参数坐标
     CoordSystem coordSys; // 交点所在曲面的局部坐标系
     uint32_t flag0 = 0;   // 由实体设置的辅助标记，含义由其自行定义
+
+    struct
+    {
+        Vec2 uv;
+        CoordSystem coordSys;
+    } usr; // 那些可能不由几何体的固有性质决定，而是可以被用户提供的数据调整的量
 };
 
 // 射线与实体求交的结果

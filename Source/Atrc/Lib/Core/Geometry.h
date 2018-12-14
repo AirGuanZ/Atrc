@@ -24,10 +24,6 @@ public:
 
     virtual bool FindIntersection(const Ray &r, GeometryIntersection *inct) const noexcept = 0;
 
-    virtual CoordSystem GetShadingCoordSys(const GeometryIntersection &inct) const noexcept = 0;
-
-    virtual Vec2 GetShadingUV(const Intersection &inct) const noexcept = 0;
-
     virtual Real GetSurfaceArea() const noexcept = 0;
 
     virtual AABB GetLocalBound() const noexcept = 0;
