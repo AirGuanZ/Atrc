@@ -18,16 +18,25 @@ Camera *PinholeCameraCreator::Create(const ConfigGroup &group, Context &context,
         auto filmSize = Parser::ParseVec2i(context.Root()["film.size"]);
         if(filmSize.x <= 0 || filmSize.y <= 0)
             throw MgrErr("Invalid film size value");
-        
-        auto sensorRectSize = Parser::ParseVec2(group["sensorRectSize"]);
+
+        Vec2 sensorRectSize;
+        if(auto widthNode = group.Find("sensorWidth"))
+        {
+            sensorRectSize.x = widthNode->Parse<Real>();
+            sensorRectSize.y = sensorRectSize.x / filmSize.x * filmSize.y;
+        }
+        else
+            sensorRectSize = Parser::ParseVec2(group["sensorRectSize"]);
+
         if(sensorRectSize.x <= 0 || sensorRectSize.y <= 0)
             throw MgrErr("Invalid sensor rect size value");
         
         auto sensorDistance = group["sensorDistance"].Parse<Real>();
+
         if(sensorDistance <= 0)
             throw MgrErr("Invalid sensorDistance value");
         
-        auto pinholePos = Parser::ParseVec3(group["pinholePos"]);
+        auto pinholePos = Parser::ParseVec3(group["pos"]);
         auto lookAt     = Parser::ParseVec3(group["lookAt"]);
         auto up         = Parser::ParseVec3(group["up"]);
 

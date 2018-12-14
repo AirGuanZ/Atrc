@@ -12,9 +12,9 @@ void RegisterBuiltinCameraCreators(Context &context);
 
     (global) film.size = Vec2i
     
-    sensorRectSize = Vec2
+    sensorRectSize = Vec2 | sensorWidth = Real
     sensorDistance = Real
-    pinholePos     = Vec3
+    pos            = Vec3
     lookAt         = Vec3
     up             = Vec3
 */

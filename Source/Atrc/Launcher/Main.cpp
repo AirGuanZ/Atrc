@@ -20,13 +20,20 @@ using namespace Atrc;
 
 int Run()
 {
-    /*AGZ::Config config;
+    AGZ::Config config;
     if(!config.LoadFromFile("./Build/scene.txt"))
         throw Mgr::MgrErr("Failed to load configuration file");
     auto &root = config.Root();
 
     Mgr::Context context(root);
     Mgr::RegisterBuiltinCreators(context);
+
+    auto camera   = context.Create<Camera>(root["camera"]);
+    auto renderer = context.Create<Renderer>(root["renderer"]);
+    auto sampler  = context.Create<Sampler>(root["sampler"]);
+    auto filter   = context.Create<FilmFilter>(root["film.filter"]);
+
+    auto outputFilename = root["outputFilename"].AsValue();
 
     std::vector<Entity*> entities;
     std::vector<Light*> lights;
@@ -38,13 +45,6 @@ int Run()
     auto &lghtArr = root["lights"].AsArray();
     for(size_t i = 0; i < lghtArr.Size(); ++i)
         lights.push_back(context.Create<Light>(lghtArr[i]));
-    
-    auto camera   = context.Create<Camera>(root["camera"]);
-    auto renderer = context.Create<Renderer>(root["renderer"]);
-    auto sampler  = context.Create<Sampler>(root["sampler"]);
-    auto filter   = context.Create<FilmFilter>(root["film.filter"]);
-
-    auto outputFilename = root["outputFilename"].AsValue();
 
     auto filmSize = Mgr::Parser::ParseVec2i(root["film.size"]);
     if(filmSize.x <= 0 || filmSize.y <= 0)
@@ -68,9 +68,9 @@ int Run()
     for(auto lht : lights)
         lht->PreprocessScene(scene);
     
-    renderer->Render(scene, sampler, &film);*/
+    renderer->Render(scene, sampler, &film);
 
-    Str8 outputFilename = "./Output.png";
+    /*Str8 outputFilename = "./Output.png";
 
     Sphere ground(Transform::Translate({ 0.0, 0.0, -201.0 }), 200.0);
     Sphere sphere(Transform(), 1.0);
@@ -109,7 +109,7 @@ int Run()
     Film film({ 640, 480 }, filter);
     NativeSampler sampler(42, 100);
 
-    renderer.Render(scene, &sampler, &film);
+    renderer.Render(scene, &sampler, &film);*/
 
     AGZ::TextureFile::WriteRGBToPNG(outputFilename, film.GetImage().Map(
         [](const Spectrum &c)

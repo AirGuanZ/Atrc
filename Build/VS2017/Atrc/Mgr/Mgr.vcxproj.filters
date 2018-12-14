@@ -48,6 +48,9 @@
     <ClInclude Include="..\..\..\..\Source\Atrc\Mgr\BuiltinCreator\TextureCreator.h">
       <Filter>Source\BuiltinCreator</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Mgr\BuiltinCreator\PathTracingIntegratorCreator.h">
+      <Filter>Source\BuiltinCreator</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\Source\Atrc\Mgr\BuiltinCreatorRegister.cpp">
@@ -81,6 +84,9 @@
       <Filter>Source\BuiltinCreator</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\Source\Atrc\Mgr\BuiltinCreator\TextureCreator.cpp">
+      <Filter>Source\BuiltinCreator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\Mgr\BuiltinCreator\PathTracingIntegratorCreator.cpp">
       <Filter>Source\BuiltinCreator</Filter>
     </ClCompile>
   </ItemGroup>

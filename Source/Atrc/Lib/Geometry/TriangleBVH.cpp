@@ -492,6 +492,11 @@ AABB TriangleBVHCore::GetLocalBound() const noexcept
     };
 }
 
+Real TriangleBVHCore::GetSurfaceArea() const noexcept
+{
+    return areaPrefixSum_.back();
+}
+
 namespace
 {
     constexpr int TVL_STK_SIZE = 128;
@@ -697,6 +702,30 @@ bool TriangleBVH::FindIntersection(const Ray &r, GeometryIntersection *inct) con
     inct->coordSys     = local2World_.ApplyToCoordSystem(inct->coordSys);
     inct->usr.coordSys = local2World_.ApplyToCoordSystem(inct->usr.coordSys);
     return true;
+}
+
+AABB TriangleBVH::GetLocalBound() const noexcept
+{
+    return core_.GetLocalBound();
+}
+
+Real TriangleBVH::GetSurfaceArea() const noexcept
+{
+    return local2World_.ScaleFactor() * local2World_.ScaleFactor() * core_.GetSurfaceArea();
+}
+
+Geometry::SampleResult TriangleBVH::Sample(const Vec3 &sample) const noexcept
+{
+    auto sam = core_.Sample(sample);
+    sam.pos = local2World_.ApplyToPoint(sam.pos);
+    sam.nor = local2World_.ApplyToVector(sam.nor).Normalize();
+    sam.pdf = 1 / GetSurfaceArea();
+    return sam;
+}
+
+Real TriangleBVH::SamplePDF(const Vec3 &pos) const noexcept
+{
+    return 1 / GetSurfaceArea();
 }
 
 } // namespace Atrc

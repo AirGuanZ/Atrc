@@ -2,4 +2,73 @@
 
 film = {
     size = (640, 480);
+    filter = {
+        type = Box;
+        sidelen = 1;
+    };
 };
+
+sampler = {
+    type = Native;
+    spp = 1;
+};
+
+camera = {
+    type = Pinhole;
+    sensorWidth = 2;
+    sensorDistance = 1;
+    pos = (-7, 0, 0);
+    lookAt = (0, 0, 0);
+    up = (0, 0, 1);
+};
+
+renderer = {
+    type = PathTracing;
+    integrator = {
+        type = NativePathTracing;
+        minDepth = 10;
+        maxDepth = 20;
+        contProb = 0.9;
+    };
+    workerCount = 6;
+    taskGridSize = 32;
+};
+
+outputFilename = "./Output.png";
+
+mat = {
+    type = IdealDiffuse;
+    albedo = {
+        type = Constant;
+        texel = (0.8);
+    };
+};
+
+entities = (
+{
+    type = Geometric;
+    geometry = {
+        type = Sphere;
+        radius = 200;
+        transform = (Translate(0, 0, -201));
+    };
+    material = mat;
+},
+{
+    type = Geometric;
+    geometry = {
+        type = Sphere;
+        radius = 1;
+        transform = ();
+    };
+    material = mat;
+}
+);
+
+lights = (
+{
+    type = Sky;
+    top = (1);
+    bottom = (1);
+}
+);

@@ -29,11 +29,11 @@ public:
 
     AABB GetLocalBound() const noexcept;
 
+    Real GetSurfaceArea() const noexcept;
+
     bool HasIntersection(Ray r) const noexcept;
 
     bool FindIntersection(Ray r, GeometryIntersection *inct) const noexcept;
-
-    CoordSystem GetShadingCoordSys(const GeometryIntersection &inct) const noexcept;
 
     Geometry::SampleResult Sample(const Vec3 &sample) const;
 
