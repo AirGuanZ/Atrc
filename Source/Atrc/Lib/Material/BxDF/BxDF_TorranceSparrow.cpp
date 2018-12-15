@@ -16,6 +16,9 @@ Spectrum BxDF_TorranceSparrow::GetAlbedo() const noexcept
 
 Spectrum BxDF_TorranceSparrow::Eval(const CoordSystem &geoInShd, const Vec3 &wi, const Vec3 &wo) const noexcept
 {
+    if(wi.z <= 0 || wo.z <= 0 || !geoInShd.InPositiveHemisphere(wi) || !geoInShd.InPositiveHemisphere(wo))
+        return Spectrum();
+
     Vec3 nWi = wi.Normalize(), nWo = wo.Normalize();
     Vec3 H = (nWi + nWo).Normalize();
     Real G = md_->G(H, nWi, nWo);
@@ -46,6 +49,8 @@ Option<BxDF::SampleWiResult> BxDF_TorranceSparrow::SampleWi(const CoordSystem &g
 
 Real BxDF_TorranceSparrow::SampleWiPDF(const CoordSystem &geoInShd, const Vec3 &wi, const Vec3 &wo) const noexcept
 {
+    if(wi.z <= 0 || wo.z <= 0 || !geoInShd.InPositiveHemisphere(wi) || !geoInShd.InPositiveHemisphere(wo))
+        return 0;
     return md_->SampleWiPDF(geoInShd, wi.Normalize(), wo.Normalize());
 }
 
