@@ -63,9 +63,12 @@ using AGZ::Math::ApproxEq;
 using AGZ::Math::Arcsin;
 using AGZ::Math::Arctan2;
 using AGZ::Math::Clamp;
+using AGZ::Math::Cos;
 using AGZ::Math::Min;
 using AGZ::Math::Max;
+using AGZ::Math::Pow;
 using AGZ::Math::Saturate;
+using AGZ::Math::Sin;
 using AGZ::Math::Sqrt;
 
 constexpr Real PI = AGZ::Math::PI<Real>;

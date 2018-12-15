@@ -49,6 +49,9 @@
     <Filter Include="Source\PostProcessor">
       <UniqueIdentifier>{bfdba0bc-931a-4f03-b3d3-3071414d0499}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\Material\MicrofacetDistribution">
+      <UniqueIdentifier>{08fe4577-bed9-4d1b-b52c-ba6524ca379c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\AABB.h">
@@ -159,9 +162,6 @@
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Texture\ImageTexture.h">
       <Filter>Source\Texture</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\BxDF\TorranceSparrow.h">
-      <Filter>Source\Material\BxDF</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\Utility\Fresnel.h">
       <Filter>Source\Material\Utility</Filter>
     </ClInclude>
@@ -170,6 +170,18 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\PostProcessor\FlipImage.h">
       <Filter>Source\PostProcessor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\MicrofacetDistribution\BlinnPhong.h">
+      <Filter>Source\Material\MicrofacetDistribution</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\BxDF\BxDF_TorranceSparrow.h">
+      <Filter>Source\Material\BxDF</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\Utility\MicrofacetDistribution.h">
+      <Filter>Source\Material\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\CoordSystem.h">
+      <Filter>Source\Core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -244,6 +256,12 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\PostProcessor\FlipImage.cpp">
       <Filter>Source\PostProcessor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\MicrofacetDistribution\BlinnPhone.cpp">
+      <Filter>Source\Material\MicrofacetDistribution</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\BxDF\BxDF_TorranceSparrow.cpp">
+      <Filter>Source\Material\BxDF</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
