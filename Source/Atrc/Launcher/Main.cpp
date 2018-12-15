@@ -21,10 +21,11 @@ int Run()
     Mgr::Context context(root);
     Mgr::RegisterBuiltinCreators(context);
 
-    auto camera   = context.Create<Camera>(root["camera"]);
-    auto renderer = context.Create<Renderer>(root["renderer"]);
-    auto sampler  = context.Create<Sampler>(root["sampler"]);
+    auto camera   = context.Create<Camera>    (root["camera"]);
+    auto renderer = context.Create<Renderer>  (root["renderer"]);
+    auto sampler  = context.Create<Sampler>   (root["sampler"]);
     auto filter   = context.Create<FilmFilter>(root["film.filter"]);
+    auto reporter = context.Create<Reporter>  (root["reporter"]);
 
     auto outputFilename = root["outputFilename"].AsValue();
 
@@ -86,7 +87,7 @@ int Run()
     for(auto lht : lights)
         lht->PreprocessScene(scene);
     
-    renderer->Render(scene, sampler, &film);
+    renderer->Render(scene, sampler, &film, reporter);
 
     auto image = film.GetImage();
     postProcessChain.Process(&image);

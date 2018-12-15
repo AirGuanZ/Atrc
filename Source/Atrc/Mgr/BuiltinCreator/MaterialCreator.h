@@ -23,12 +23,34 @@ public:
     type = IdealDiffuse
 
     albedo = Texture
+
+    normalMapper = NormalMapper | null
 */
 class IdealDiffuseCreator : public Creator<Material>
 {
 public:
 
     Str8 GetTypeName() const override { return "IdealDiffuse"; }
+
+    Material *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
+};
+
+/*
+    type = TSMetal
+
+    etaI      = Spectrum
+    etaT      = Spectrum
+    k         = Spectrum
+    rc        = Texture
+    roughness = Texture
+
+    normalMapper = NormalMapper | null
+*/
+class TSMetalCreator : public Creator<Material>
+{
+public:
+
+    Str8 GetTypeName() const override { return "TSMetal"; }
 
     Material *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
 };

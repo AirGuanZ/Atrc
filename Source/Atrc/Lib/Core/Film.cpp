@@ -69,8 +69,6 @@ FilmGrid Film::CreateFilmGrid(const Recti &pixelRect) noexcept
 
 void Film::MergeFilmGrid(const FilmGrid &filmGrid) noexcept
 {
-    std::lock_guard<std::mutex> lk(mut_);
-    
     for(int32_t y = filmGrid.pixelRect_.low.y;
         y < filmGrid.pixelRect_.high.y; ++y)
     {

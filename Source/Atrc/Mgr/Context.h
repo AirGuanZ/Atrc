@@ -57,6 +57,7 @@ class Context
         PathTracingIntegrator,
         PostProcessor,
         Renderer,
+        Reporter,
         Sampler,
         Texture
     > factories_;
@@ -93,7 +94,7 @@ T *Factory<T>::Create(const ConfigNode &definition, Context &context, Arena &are
 
         auto node = context.Root().Find(*val);
         if(!node)
-            return nullptr;
+            throw MgrErr("Object definition not found: " + *val);
         
         // 先把pubObjs_[*val]设为nullptr，避免对同一类型同一名字的循环引用，这样可以消除循环引用产生的死循环
         pubObjs_[*val] = nullptr;
@@ -106,12 +107,11 @@ T *Factory<T>::Create(const ConfigNode &definition, Context &context, Arena &are
     {
         auto it = creators_.find((*grp)["type"].AsValue());
         if(it == creators_.end())
-            return nullptr;
-
+            throw MgrErr("Unknown object type");
         return it->second->Create(*grp, context, arena);
     }
 
-    return nullptr;
+    throw MgrErr("Invalid object definition form");
 }
 
 template<typename T>

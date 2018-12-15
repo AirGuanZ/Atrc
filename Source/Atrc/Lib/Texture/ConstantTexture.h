@@ -2,7 +2,8 @@
 
 #include <Atrc/Lib/Core/Texture.h>
 
-AGZ_NS_BEG(Atrc)
+namespace Atrc
+{
 
 class ConstantTexture : public Texture
 {
@@ -15,4 +16,17 @@ public:
     Spectrum Sample(const Vec2 &uv) const noexcept override;
 };
 
-AGZ_NS_END(Atrc)
+class ConstantTexture1 : public Texture
+{
+    Real texel_;
+
+public:
+
+    explicit ConstantTexture1(Real texel) noexcept;
+
+    Spectrum Sample(const Vec2 &texCoord) const noexcept override;
+
+    Real Sample1(const Vec2 &texCoord) const noexcept override;
+};
+
+} // namespace Atrc

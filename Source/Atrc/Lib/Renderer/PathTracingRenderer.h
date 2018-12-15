@@ -30,7 +30,7 @@ public:
 
     PathTracingRenderer(int workerCount, int taskGridSize, const PathTracingIntegrator &integrator) noexcept;
 
-    void Render(const Scene &scene, Sampler *sampler, Film *film) const override;
+    void Render(const Scene &scene, Sampler *sampler, Film *film, Reporter *reporter) const override;
 };
 
 } // namespace Atrc

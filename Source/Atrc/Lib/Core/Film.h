@@ -1,6 +1,5 @@
 ﻿#pragma once
 
-#include <mutex>
 #include <Utils/Texture.h>
 
 #include <Atrc/Lib/Core/Common.h>
@@ -55,8 +54,6 @@ class Film
     AGZ::Texture2D<Spectrum> weights_;
 
     Vec2i resolution_;
-
-    std::mutex mut_;
 
 public:
 

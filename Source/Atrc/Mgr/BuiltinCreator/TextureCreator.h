@@ -24,6 +24,20 @@ public:
 };
 
 /*
+    type = Constant1
+
+    texel = Real
+*/
+class ConstantTexture1Creator : public Creator<Texture>
+{
+public:
+
+    Str8 GetTypeName() const override { return "Constant1"; }
+
+    Texture *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
+};
+
+/*
     type = Image
 
     filename = String

@@ -610,15 +610,17 @@ bool TriangleBVHCore::FindIntersection(Ray r, GeometryIntersection *inct) const 
     if(RealT(rc.t).IsInfinity())
         return false;
 
+    auto &primInfo = primsInfo_[flag0];
+
     inct->t        = rc.t;
     inct->pos      = r.At(rc.t);
     inct->wr       = -r.d;
     inct->uv       = rc.uv;
-    inct->coordSys = primsInfo_[flag0].coordSys;
+    inct->coordSys = primInfo.coordSys;
     inct->flag0    = flag0;
 
     // TODO: inct->usr
-    inct->usr.uv       = rc.uv;
+    inct->usr.uv       = primInfo.tA + rc.uv.u * primInfo.tB_tA + rc.uv.v * primInfo.tC_tA;
     inct->usr.coordSys = inct->coordSys;
 
     return true;

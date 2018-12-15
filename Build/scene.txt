@@ -1,7 +1,7 @@
 # Scene description file for Atrc Launcher
 
 film = {
-    size = (640, 480);
+    size = (600, 900);
     filter = {
         type = Box;
         sidelen = 1;
@@ -11,14 +11,14 @@ film = {
 sampler = {
     type = Native;
     seed = 42;
-    spp = 10;
+    spp = 100;
 };
 
 camera = {
     type = Pinhole;
-    sensorWidth = 2;
+    sensorWidth = 1;
     sensorDistance = 1;
-    pos = (-7, 0, 0);
+    pos = (-7, 0, 1.5);
     lookAt = (0, 0, 1);
     up = (0, 0, 1);
 };
@@ -31,11 +31,13 @@ renderer = {
         maxDepth = 20;
         contProb = 0.9;
     };
-    workerCount = 6;
-    taskGridSize = 32;
+    workerCount = -1;
+    taskGridSize = 64;
 };
 
 outputFilename = "./Output.png";
+
+reporter = { type = Default; };
 
 mat = {
     type = IdealDiffuse;
@@ -55,14 +57,42 @@ entities = (
     };
     material = mat;
 },
-{
+###{
     type = Geometric;
     geometry = {
         type = TriangleBVH;
         filename = "./Asset/dragon_vrip.obj";
         transform = (Translate(0, 0, -1), Scale(0.1));
     };
-    material = mat;
+    material = {
+        type = TSMetal;
+        etaI = (1);
+        etaT = (0.1);
+        k = (0.2);
+        rc = {
+            type = Constant;
+            texel = (0.7, 0.4, 0.2);
+        };
+        roughness = {
+            type = Constant;
+            texel = (0.01);
+        };
+    };
+}###
+{
+    type = Geometric;
+    geometry = {
+        type = TriangleBVH;
+        filename = "./Asset/10.obj";
+        transform = (Translate(-3, 2, -1), RotateZ(Deg(200)), RotateX(Deg(90)), Scale(0.06));
+    };
+    material = {
+        type = IdealDiffuse;
+        albedo = {
+            type = Image;
+            filename = "./Asset/6166.png";
+        };
+    };
 }
 );
 

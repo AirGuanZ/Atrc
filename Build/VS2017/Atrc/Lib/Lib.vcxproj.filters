@@ -52,6 +52,9 @@
     <Filter Include="Source\Material\MicrofacetDistribution">
       <UniqueIdentifier>{08fe4577-bed9-4d1b-b52c-ba6524ca379c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\Reporter">
+      <UniqueIdentifier>{9d09bb28-3570-4c67-9128-4354086186ed}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\AABB.h">
@@ -183,6 +186,15 @@
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\CoordSystem.h">
       <Filter>Source\Core</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\TSMetal.h">
+      <Filter>Source\Material</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\Reporter.h">
+      <Filter>Source\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Reporter\DefaultReporter.h">
+      <Filter>Source\Reporter</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Core\Common.cpp">
@@ -251,9 +263,6 @@
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\Utility\Fresnel.cpp">
       <Filter>Source\Material\Utility</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Core\PostProcessorChain.cpp">
-      <Filter>Source\Core</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\PostProcessor\FlipImage.cpp">
       <Filter>Source\PostProcessor</Filter>
     </ClCompile>
@@ -262,6 +271,15 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\BxDF\BxDF_TorranceSparrow.cpp">
       <Filter>Source\Material\BxDF</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Core\PostProcessor.cpp">
+      <Filter>Source\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\TSMetal.cpp">
+      <Filter>Source\Material</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Reporter\DefaultReporter.cpp">
+      <Filter>Source\Reporter</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

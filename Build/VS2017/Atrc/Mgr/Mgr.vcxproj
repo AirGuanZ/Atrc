@@ -165,6 +165,7 @@
     <ClInclude Include="..\..\..\..\Source\Atrc\Mgr\BuiltinCreator\PathTracingIntegratorCreator.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Mgr\BuiltinCreator\PostProcessorCreator.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Mgr\BuiltinCreator\RendererCreator.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Mgr\BuiltinCreator\ReporterCreator.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Mgr\BuiltinCreator\SamplerCreator.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Mgr\BuiltinCreator\TextureCreator.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Mgr\Common.h" />
@@ -182,6 +183,7 @@
     <ClCompile Include="..\..\..\..\Source\Atrc\Mgr\BuiltinCreator\PathTracingIntegratorCreator.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Mgr\BuiltinCreator\PostProcessorCreator.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Mgr\BuiltinCreator\RendererCreator.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Atrc\Mgr\BuiltinCreator\ReporterCreator.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Mgr\BuiltinCreator\SamplerCreator.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Mgr\BuiltinCreator\TextureCreator.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Mgr\Parser.cpp" />

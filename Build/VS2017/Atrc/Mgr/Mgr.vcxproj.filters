@@ -54,6 +54,9 @@
     <ClInclude Include="..\..\..\..\Source\Atrc\Mgr\BuiltinCreator\PostProcessorCreator.h">
       <Filter>Source\BuiltinCreator</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Mgr\BuiltinCreator\ReporterCreator.h">
+      <Filter>Source\BuiltinCreator</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\Source\Atrc\Mgr\BuiltinCreatorRegister.cpp">
@@ -93,6 +96,9 @@
       <Filter>Source\BuiltinCreator</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\Source\Atrc\Mgr\BuiltinCreator\PostProcessorCreator.cpp">
+      <Filter>Source\BuiltinCreator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\Mgr\BuiltinCreator\ReporterCreator.cpp">
       <Filter>Source\BuiltinCreator</Filter>
     </ClCompile>
   </ItemGroup>

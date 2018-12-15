@@ -9,7 +9,9 @@ namespace Atrc::Mgr
 void RegisterBuiltinTextureCreators(Context &context)
 {
     static const ConstantTextureCreator constantTextureCreator;
+    static const ConstantTexture1Creator constantTextureCreator1;
     context.AddCreator(&constantTextureCreator);
+    context.AddCreator(&constantTextureCreator1);
     context.AddCreator(context.CreateWithInteriorArena<ImageTextureCreator>());
 }
 
@@ -19,6 +21,16 @@ Texture *ConstantTextureCreator::Create(const ConfigGroup &group, [[maybe_unused
     {
         auto texel = Parser::ParseSpectrum(group["texel"]);
         return arena.Create<ConstantTexture>(texel);
+    }
+    ATRC_MGR_CATCH_AND_RETHROW("In creating constant texture: " + group.ToString())
+}
+
+Texture *ConstantTexture1Creator::Create(const ConfigGroup &group, [[maybe_unused]] Context &context, Arena &arena) const
+{
+    ATRC_MGR_TRY
+    {
+        Real texel = group["texel"].Parse<Real>();
+        return arena.Create<ConstantTexture1>(texel);
     }
     ATRC_MGR_CATCH_AND_RETHROW("In creating constant texture: " + group.ToString())
 }

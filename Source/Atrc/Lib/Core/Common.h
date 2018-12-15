@@ -105,6 +105,7 @@ using Image = AGZ::Texture2D<Spectrum>;
 
 class Camera;
 class Entity;
+class Film;
 class FilmFilter;
 class Geometry;
 class Light;
@@ -112,6 +113,7 @@ class Material;
 class PathTracingIntegrator;
 class PostProcessor;
 class Renderer;
+class Reporter;
 class Sampler;
 class Texture;
 
