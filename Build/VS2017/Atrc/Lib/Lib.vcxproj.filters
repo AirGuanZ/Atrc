@@ -46,6 +46,9 @@
     <Filter Include="Source\Texture">
       <UniqueIdentifier>{372fadfc-a8cf-4524-9e82-84cf62158725}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\PostProcessor">
+      <UniqueIdentifier>{bfdba0bc-931a-4f03-b3d3-3071414d0499}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\AABB.h">
@@ -156,6 +159,18 @@
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Texture\ImageTexture.h">
       <Filter>Source\Texture</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\BxDF\TorranceSparrow.h">
+      <Filter>Source\Material\BxDF</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\Utility\Fresnel.h">
+      <Filter>Source\Material\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\PostProcessor.h">
+      <Filter>Source\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\PostProcessor\FlipImage.h">
+      <Filter>Source\PostProcessor</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Core\Common.cpp">
@@ -220,6 +235,15 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Texture\ImageTexture.cpp">
       <Filter>Source\Texture</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\Utility\Fresnel.cpp">
+      <Filter>Source\Material\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Core\PostProcessorChain.cpp">
+      <Filter>Source\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\PostProcessor\FlipImage.cpp">
+      <Filter>Source\PostProcessor</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

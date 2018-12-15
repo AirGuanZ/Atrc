@@ -68,7 +68,7 @@ public:
 
     void MergeFilmGrid(const FilmGrid &filmGrid) noexcept;
 
-    AGZ::Texture2D<Spectrum> GetImage() const;
+    Image GetImage() const;
 };
 
 // ================================= Implementation

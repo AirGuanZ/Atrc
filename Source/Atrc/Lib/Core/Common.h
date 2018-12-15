@@ -6,6 +6,12 @@
 #include <Utils/Math.h>
 #include <Utils/String.h>
 
+namespace AGZ
+{
+    template<typename Pixel>
+    class Texture2D;
+}
+
 namespace Atrc
 {
 // ================================= Memory
@@ -88,6 +94,10 @@ inline bool operator!(const Spectrum &s) noexcept
     return s == SPECTRUM::BLACK;
 }
 
+// ================================= Image
+
+using Image = AGZ::Texture2D<Spectrum>;
+
 // ================================= Important Interface
 
 class Camera;
@@ -97,6 +107,7 @@ class Geometry;
 class Light;
 class Material;
 class PathTracingIntegrator;
+class PostProcessor;
 class Renderer;
 class Sampler;
 class Texture;
@@ -111,7 +122,7 @@ public:
 
     explicit Exception(Str8 msg) noexcept : msg_(std::move(msg)) { }
 
-    const Str8 What() const noexcept { return msg_; }
+    const Str8 &What() const noexcept { return msg_; }
 };
 
 #define DEFINE_ATRC_EXCEPTION(NAME) \

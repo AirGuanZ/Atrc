@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include <Atrc/Lib/Core/Film.h>
+#include <Atrc/Lib/Core/PostProcessor.h>
 #include <Atrc/Lib/Core/Renderer.h>
 #include <Atrc/Lib/Core/Scene.h>
 
@@ -30,17 +31,42 @@ int Run()
     std::vector<Entity*> entities;
     std::vector<Light*> lights;
 
-    auto &entArr = root["entities"].AsArray();
-    for(size_t i = 0; i < entArr.Size(); ++i)
-        entities.push_back(context.Create<Entity>(entArr[i]));
-    
-    auto &lghtArr = root["lights"].AsArray();
-    for(size_t i = 0; i < lghtArr.Size(); ++i)
-        lights.push_back(context.Create<Light>(lghtArr[i]));
+    ATRC_MGR_TRY
+    {
+        auto &entArr = root["entities"].AsArray();
+        for(size_t i = 0; i < entArr.Size(); ++i)
+            entities.push_back(context.Create<Entity>(entArr[i]));
+    }
+    ATRC_MGR_CATCH_AND_RETHROW("In creating entities")
 
-    auto filmSize = Mgr::Parser::ParseVec2i(root["film.size"]);
-    if(filmSize.x <= 0 || filmSize.y <= 0)
-        throw Mgr::MgrErr("Invalid film size value");
+    ATRC_MGR_TRY
+    {
+        auto &lghtArr = root["lights"].AsArray();
+        for(size_t i = 0; i < lghtArr.Size(); ++i)
+            lights.push_back(context.Create<Light>(lghtArr[i]));
+    }
+    ATRC_MGR_CATCH_AND_RETHROW("In creating lights")
+
+    Vec2i filmSize;
+    ATRC_MGR_TRY
+    {
+        filmSize = Mgr::Parser::ParseVec2i(root["film.size"]);
+        if(filmSize.x <= 0 || filmSize.y <= 0)
+            throw Mgr::MgrErr("Invalid film size value");
+    }
+    ATRC_MGR_CATCH_AND_RETHROW("In creating film")
+
+    PostProcessorChain postProcessChain;
+    ATRC_MGR_TRY
+    {
+        if(auto ppNode = root.Find("postProcessors"))
+        {
+            auto &arr = ppNode->AsArray();
+            for(size_t i = 0; i < arr.Size(); ++i)
+                postProcessChain.AddBack(context.Create<PostProcessor>(arr[i]));
+        }
+    }
+    ATRC_MGR_CATCH_AND_RETHROW("In creating post processors")
 
     Film film(filmSize, *filter);
 
@@ -62,7 +88,10 @@ int Run()
     
     renderer->Render(scene, sampler, &film);
 
-    AGZ::TextureFile::WriteRGBToPNG(outputFilename, film.GetImage().Map(
+    auto image = film.GetImage();
+    postProcessChain.Process(&image);
+
+    AGZ::TextureFile::WriteRGBToPNG(outputFilename, image.Map(
     [](const Spectrum &c)
     {
         return c.Map([](Real s)

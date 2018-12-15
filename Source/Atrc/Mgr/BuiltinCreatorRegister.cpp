@@ -5,6 +5,7 @@
 #include <Atrc/Mgr/BuiltinCreator/LightCreator.h>
 #include <Atrc/Mgr/BuiltinCreator/MaterialCreator.h>
 #include <Atrc/Mgr/BuiltinCreator/PathTracingIntegratorCreator.h>
+#include <Atrc/Mgr/BuiltinCreator/PostProcessorCreator.h>
 #include <Atrc/Mgr/BuiltinCreator/RendererCreator.h>
 #include <Atrc/Mgr/BuiltinCreator/SamplerCreator.h>
 #include <Atrc/Mgr/BuiltinCreator/TextureCreator.h>
@@ -24,6 +25,7 @@ void RegisterBuiltinCreators(Context &context)
         RegisterBuiltinLightCreators                (context);
         RegisterBuiltinMaterialCreators             (context);
         RegisterBuiltinPathTracingIntegratorCreators(context);
+        RegisterBuiltinPostProcessorCreators        (context);
         RegisterBuiltinRendererCreators             (context);
         RegisterBuiltinSamplerCreators              (context);
         RegisterBuiltinTextureCreators              (context);

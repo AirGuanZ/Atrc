@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -168,6 +168,7 @@
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\Geometry.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\Light.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\Material.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\PostProcessor.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\Ray.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\Renderer.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\Sampler.h" />
@@ -183,11 +184,14 @@
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Light\SkyLight.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\BxDF\BxDF_Black.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\BxDF\BxDF_Diffuse.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\BxDF\TorranceSparrow.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\IdealBlack.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\IdealDiffuse.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\Utility\BxDF.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\Utility\BxDFAggregate.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\Utility\Fresnel.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\Utility\NormalMapper.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\PostProcessor\FlipImage.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\NativePathTracingIntegrator.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\ShadingNormalIntegrator.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingRenderer.h" />
@@ -200,6 +204,7 @@
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Camera\PinholeCamera.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Core\Common.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Core\Film.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Core\PostProcessorChain.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Core\Scene.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Entity\GeometricEntity.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\FilmFilter\BoxFilter.cpp" />
@@ -211,7 +216,9 @@
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\BxDF\BxDF_Diffuse.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\IdealBlack.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\IdealDiffuse.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\Utility\Fresnel.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\Utility\NormalMapper.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\PostProcessor\FlipImage.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\NativePathTracingIntegrator.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\ShadingNormalIntegrator.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingRenderer.cpp" />

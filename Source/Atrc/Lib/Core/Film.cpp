@@ -85,10 +85,10 @@ void Film::MergeFilmGrid(const FilmGrid &filmGrid) noexcept
     }
 }
 
-AGZ::Texture2D<Spectrum> Film::GetImage() const
+Image Film::GetImage() const
 {
     AGZ_ASSERT(accValues_.IsAvailable() && accValues_.GetSize() == weights_.GetSize());
-    AGZ::Texture2D<Spectrum> ret(accValues_.GetWidth(), accValues_.GetHeight());
+    Image ret(accValues_.GetWidth(), accValues_.GetHeight());
     for(uint32_t y = 0; y < ret.GetHeight(); ++y)
     {
         for(uint32_t x = 0; x < ret.GetWidth(); ++x)

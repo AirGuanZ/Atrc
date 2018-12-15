@@ -55,6 +55,7 @@ class Context
         Light,
         Material,
         PathTracingIntegrator,
+        PostProcessor,
         Renderer,
         Sampler,
         Texture
@@ -65,7 +66,7 @@ class Context
 
 public:
 
-    Context(const ConfigGroup &root);
+    explicit Context(const ConfigGroup &root);
 
     const ConfigGroup &Root() const noexcept { return root_; }
 
