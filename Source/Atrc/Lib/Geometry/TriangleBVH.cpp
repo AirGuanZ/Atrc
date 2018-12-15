@@ -27,7 +27,7 @@ struct TriangleBVHCorePrimitiveInfo
 namespace
 {
     template<typename T>
-    struct alignas(16) BVHNode
+    struct /*alignas(16)*/ BVHNode
     {
         T low[3], high[3];
         uint32_t start, end;  
@@ -64,6 +64,7 @@ namespace
 
 #ifdef AGZ_USE_SSE2
 
+    /*
     template<>
     struct alignas(16) BVHNode<float>
     {
@@ -136,7 +137,7 @@ namespace
 
             return _mm_comige_ss(lmax, lmin) && t1_ >= t0 && t1 >= t0_;
         }
-    };
+    };*/
 
 #endif
 
@@ -208,13 +209,13 @@ namespace
     }
 }
 
-struct alignas(16) TriangleBVHCoreNode : BVHNode<Real> { };
+struct /*alignas(16)*/ TriangleBVHCoreNode : BVHNode<Real> { };
 
 static_assert(sizeof(TriangleBVHCoreNode) == sizeof(BVHNode<Real>));
 
 #ifdef AGZ_USE_SSE2
 
-static_assert(alignof(TriangleBVHCoreNode) % 16 == 0);
+/*static_assert(alignof(TriangleBVHCoreNode) % 16 == 0);*/
 
 #endif
 
@@ -477,7 +478,7 @@ TriangleBVHCore::TriangleBVHCore(TriangleBVHCore &&moveFrom) noexcept
 TriangleBVHCore::~TriangleBVHCore()
 {
     if(nodes_)
-        AGZ::CRTAllocator::FreeAligned(nodes_);
+        AGZ::CRTAllocator::Free(nodes_); /* FreeAligned(nodes_); */
     if(prims_)
         AGZ::CRTAllocator::Free(prims_);
     if(primsInfo_)
@@ -666,7 +667,7 @@ void TriangleBVHCore::InitBVH(const Vertex *vtx, uint32_t triangleCount)
     auto [root, nodeCount] = BuildBVH(triangles.data(), triangleCount, 5, TVL_STK_SIZE / 2, arena);
 
     nodes_ = static_cast<TriangleBVHCoreNode*>(AGZ::CRTAllocator::Malloc(
-        sizeof(TriangleBVHCoreNode) * nodeCount, alignof(TriangleBVHCoreNode)));
+        sizeof(TriangleBVHCoreNode) * nodeCount/*, alignof(TriangleBVHCoreNode)*/));
     prims_ = static_cast<TriangleBVHCorePrimitive*>(AGZ::CRTAllocator::Malloc(
         sizeof(TriangleBVHCorePrimitive) * triangleCount));
     primsInfo_ = static_cast<TriangleBVHCorePrimitiveInfo*>(AGZ::CRTAllocator::Malloc(
