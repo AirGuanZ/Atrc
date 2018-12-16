@@ -128,7 +128,6 @@ class FilmFilter;
 class Geometry;
 class Light;
 class Material;
-class PathTracingIntegrator;
 class PostProcessor;
 class Renderer;
 class Reporter;

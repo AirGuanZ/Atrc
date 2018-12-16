@@ -40,10 +40,15 @@ outputFilename = "./Output.png";
 reporter = { type = Default; };
 
 mat = {
-    type = IdealDiffuse;
-    albedo = {
+    type = IdealMirror;
+    rc = {
         type = Constant;
-        texel = (0.7);
+        texel = (0.95);
+    };
+    fresnel = {
+        type = Dielectric;
+        etaI = 1;
+        etaT = 0.1;
     };
 };
 
@@ -57,25 +62,6 @@ entities = (
     };
     material = mat;
 },
-###{
-    type = Geometric;
-    geometry = {
-        type = Sphere;
-        radius = 1;
-        transform = (Translate(0, 0, 0));
-    };
-    material = {
-        type = ONMatte;
-        albedo = {
-            type = Constant1;
-            texel = 0.7;
-        };
-        sigma = {
-            type = Constant1;
-            texel = 0.2;
-        };
-    };
-}###
 {
     type = Geometric;
     geometry = {
@@ -99,49 +85,10 @@ blackTexture = {
 };
 
 lights = (
-###{
+{
     type = Sky;
     top = (1);
     bottom = (1);
-}
-{
-    type = CubeEnvironment;
-    posX = blackTexture;
-    posY = {
-        type = Constant1;
-        texel = 2;
-    };
-    posZ = blackTexture;
-    negX = blackTexture;
-    negY = blackTexture;
-    negZ = blackTexture;
-}###
-{
-    type = CubeEnvironment;
-    posX = {
-        type = Image;
-        filename = "./Asset/PineForest/front.jpg";
-    };
-    posY = {
-        type = Image;
-        filename = "./Asset/PineForest/left.jpg";
-    };
-    posZ = {
-        type = Image;
-        filename = "./Asset/PineForest/up.jpg";
-    };
-    negX = {
-        type = Image;
-        filename = "./Asset/PineForest/back.jpg";
-    };
-    negY = {
-        type = Image;
-        filename = "./Asset/PineForest/right.jpg";
-    };
-    negZ = {
-        type = Image;
-        filename = "./Asset/PineForest/down.jpg";
-    };
 }
 );
 

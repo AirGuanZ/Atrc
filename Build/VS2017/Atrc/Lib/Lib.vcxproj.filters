@@ -201,6 +201,15 @@
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\ONMatte.h">
       <Filter>Source\Material</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\Utility\MaterialHelper.h">
+      <Filter>Source\Material\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\BxDF\BxDF_SpecularReflection.h">
+      <Filter>Source\Material\BxDF</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\IdealMirror.h">
+      <Filter>Source\Material</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Core\Common.cpp">
@@ -291,6 +300,12 @@
       <Filter>Source\Material\BxDF</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\ONMatte.cpp">
+      <Filter>Source\Material</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\BxDF\BxDF_PerfectSpecular.cpp">
+      <Filter>Source\Material\BxDF</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\IdealMirror.cpp">
       <Filter>Source\Material</Filter>
     </ClCompile>
   </ItemGroup>

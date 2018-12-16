@@ -622,23 +622,7 @@ bool TriangleBVHCore::FindIntersection(Ray r, GeometryIntersection *inct) const 
     inct->usr.uv   = primInfo.tA + rc.uv.u * primInfo.tB_tA + rc.uv.v * primInfo.tC_tA;
 
     Vec3 usrZ = (primInfo.nA + rc.uv.u * primInfo.nB_nA + rc.uv.v * primInfo.nC_nA).Normalize();
-    if(ApproxEq(usrZ, primInfo.coordSys.ez, EPS))
-        inct->usr.coordSys = primInfo.coordSys;
-    else
-    {
-        Vec3 ez = primInfo.coordSys.ez;
-
-        Vec3 axis = Cross(ez, usrZ);
-        Real theta = Arccos(Dot(usrZ, ez));
-
-        auto rot = AGZ::Math::Quaternion<Real>::Rotate(axis, Rad(theta));
-        AGZ_ASSERT(ApproxEq(rot.Apply(ez), usrZ, Real(2e-3)));
-
-        Vec3 usrX = Apply(rot, primInfo.coordSys.ex);
-        Vec3 usrY = Cross(usrZ, usrX);
-
-        inct->usr.coordSys = CoordSystem(usrX, usrY, usrZ);
-    }
+    inct->usr.coordSys = primInfo.coordSys.RotateToNewEz(usrZ);
 
     return true;
 }

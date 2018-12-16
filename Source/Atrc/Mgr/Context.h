@@ -9,6 +9,12 @@
 
 #include <Atrc/Mgr/Common.h>
 
+namespace Atrc
+{
+    class Fresnel;
+    class PathTracingIntegrator;
+} // namespace Atrc
+
 namespace Atrc::Mgr
 {
 
@@ -51,6 +57,7 @@ class Context
         Camera,
         Entity,
         FilmFilter,
+        Fresnel,
         Geometry,
         Light,
         Material,

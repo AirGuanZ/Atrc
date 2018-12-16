@@ -6,11 +6,14 @@
 
 namespace Atrc
 {
+
+class Fresnel;
     
 // 基于Torrance-Sparrow模型的金属材质
 class TSMetal : public Material
 {
-    Spectrum etaI_, etaT_, k_;
+    const Fresnel *fresnel_;
+
     const Texture *rc_;
     const Texture *roughness_;
 
@@ -19,7 +22,7 @@ class TSMetal : public Material
 public:
 
     TSMetal(
-        const Spectrum &etaI, const Spectrum &etaT, const Spectrum &k,
+        const Fresnel *fresnel,
         const Texture *rc, const Texture *roughness, const NormalMapper *normalMapper) noexcept;
 
     ShadingPoint GetShadingPoint(const Intersection &inct, Arena &arena) const override;

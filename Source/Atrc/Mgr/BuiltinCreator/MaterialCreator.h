@@ -35,22 +35,11 @@ public:
     Material *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
 };
 
-/*
-    type = TSMetal
-
-    etaI      = Spectrum
-    etaT      = Spectrum
-    k         = Spectrum
-    rc        = Texture
-    roughness = Texture
-
-    normalMapper = NormalMapper | null
-*/
-class TSMetalCreator : public Creator<Material>
+class IdealMirrorCreator : public Creator<Material>
 {
 public:
 
-    Str8 GetTypeName() const override { return "TSMetal"; }
+    Str8 GetTypeName() const override { return "IdealMirror"; }
 
     Material *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
 };
@@ -68,6 +57,26 @@ class ONMatteCreator : public Creator<Material>
 public:
 
     Str8 GetTypeName() const override { return "ONMatte"; }
+
+    Material *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
+};
+
+/*
+    type = TSMetal
+
+    etaI      = Spectrum
+    etaT      = Spectrum
+    k         = Spectrum
+    rc        = Texture
+    roughness = Texture
+
+    normalMapper = NormalMapper | null
+*/
+class TSMetalCreator : public Creator<Material>
+{
+public:
+
+    Str8 GetTypeName() const override { return "TSMetal"; }
 
     Material *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
 };
