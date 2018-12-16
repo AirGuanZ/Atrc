@@ -32,7 +32,7 @@ renderer = {
         contProb = 0.9;
     };
     workerCount = -1;
-    taskGridSize = 32;
+    taskGridSize = 16;
 };
 
 outputFilename = "./Output.png";
@@ -60,22 +60,19 @@ entities = (
 ###{
     type = Geometric;
     geometry = {
-        type = TriangleBVH;
-        filename = "./Asset/dragon_vrip.obj";
-        transform = (Translate(0, 0, -1), Scale(0.1));
+        type = Sphere;
+        radius = 1;
+        transform = (Translate(0, 0, 0));
     };
     material = {
-        type = TSMetal;
-        etaI = (1);
-        etaT = (0.1);
-        k = (0.2);
-        rc = {
-            type = Constant;
-            texel = (0.7, 0.4, 0.2);
+        type = ONMatte;
+        albedo = {
+            type = Constant1;
+            texel = 0.7;
         };
-        roughness = {
-            type = Constant;
-            texel = (0.01);
+        sigma = {
+            type = Constant1;
+            texel = 0.2;
         };
     };
 }###
@@ -96,11 +93,55 @@ entities = (
 }
 );
 
+blackTexture = {
+    type = Constant1;
+    texel = 0;
+};
+
 lights = (
-{
+###{
     type = Sky;
     top = (1);
     bottom = (1);
+}
+{
+    type = CubeEnvironment;
+    posX = blackTexture;
+    posY = {
+        type = Constant1;
+        texel = 2;
+    };
+    posZ = blackTexture;
+    negX = blackTexture;
+    negY = blackTexture;
+    negZ = blackTexture;
+}###
+{
+    type = CubeEnvironment;
+    posX = {
+        type = Image;
+        filename = "./Asset/PineForest/front.jpg";
+    };
+    posY = {
+        type = Image;
+        filename = "./Asset/PineForest/left.jpg";
+    };
+    posZ = {
+        type = Image;
+        filename = "./Asset/PineForest/up.jpg";
+    };
+    negX = {
+        type = Image;
+        filename = "./Asset/PineForest/back.jpg";
+    };
+    negY = {
+        type = Image;
+        filename = "./Asset/PineForest/right.jpg";
+    };
+    negZ = {
+        type = Image;
+        filename = "./Asset/PineForest/down.jpg";
+    };
 }
 );
 

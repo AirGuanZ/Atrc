@@ -195,6 +195,7 @@
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\IdealBlack.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\IdealDiffuse.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\MicrofacetDistribution\BlinnPhong.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\ONMatte.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\TSMetal.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\Utility\BxDF.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\Utility\BxDFAggregate.h" />
@@ -230,6 +231,7 @@
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\IdealBlack.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\IdealDiffuse.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\MicrofacetDistribution\BlinnPhone.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\ONMatte.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\TSMetal.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\Utility\Fresnel.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\Utility\NormalMapper.cpp" />

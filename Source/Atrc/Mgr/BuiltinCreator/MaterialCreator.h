@@ -55,4 +55,21 @@ public:
     Material *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
 };
 
+/*
+    type = ONMatte
+
+    albedo = Texture
+    sigma  = Texture
+
+    normalMapper = NormalMapper | null
+*/
+class ONMatteCreator : public Creator<Material>
+{
+public:
+
+    Str8 GetTypeName() const override { return "ONMatte"; }
+
+    Material *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
+};
+
 } // namespace Atrc::Mgr

@@ -198,6 +198,9 @@
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\BxDF\BxDF_OrenNayar.h">
       <Filter>Source\Material\BxDF</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\ONMatte.h">
+      <Filter>Source\Material</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Core\Common.cpp">
@@ -286,6 +289,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\BxDF\BxDF_OrenNayar.cpp">
       <Filter>Source\Material\BxDF</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\ONMatte.cpp">
+      <Filter>Source\Material</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

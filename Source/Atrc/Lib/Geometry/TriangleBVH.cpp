@@ -632,13 +632,6 @@ bool TriangleBVHCore::FindIntersection(Ray r, GeometryIntersection *inct) const 
         Real theta = Arccos(Dot(usrZ, ez));
 
         auto rot = AGZ::Math::Quaternion<Real>::Rotate(axis, Rad(theta));
-        /*std::cout << usrZ.x << " " << usrZ.y << " " << usrZ.z << std::endl;
-        std::cout << ez.x << " " << ez.y << " " << ez.z << std::endl;
-        std::cout << theta << std::endl;
-        auto rs = rot.Apply(ez);
-        auto rs2 = AGZ::Math::Quaternion<Real>::Rotate(axis, Rad(2 * theta)).Apply(ez);
-        std::cout << rs.x << " " << rs.y << " " << rs.z << std::endl;
-        std::cout << rs2.x << " " << rs2.y << " " << rs2.z << std::endl;*/
         AGZ_ASSERT(ApproxEq(rot.Apply(ez), usrZ, Real(2e-3)));
 
         Vec3 usrX = Apply(rot, primInfo.coordSys.ex);

@@ -21,8 +21,9 @@ Spectrum BxDF_OrenNayar::Eval(const CoordSystem &geoInShd, const Vec3 &wi, const
     if(wi.z <= 0 || wo.z <= 0 || !geoInShd.InPositiveHemisphere(wi) || !geoInShd.InPositiveHemisphere(wo))
         return Spectrum();
 
-    Real phiI = Phi(wi), phiO = Phi(wo);
-    auto [beta, alpha] = std::minmax(phiI, phiO);
+    Vec3 lwi = wi.Normalize(), lwo = wo.Normalize();
+    Real phiI = Phi(lwi), phiO = Phi(lwo);
+    auto [beta, alpha] = std::minmax(Arccos(CosTheta(lwi)), Arccos(CosTheta(lwo)));
 
     return albedo_ / PI * (A_ + B_ * Max(Real(0), Cos(phiI - phiO)) * Sin(alpha) * Tan(beta));
 }

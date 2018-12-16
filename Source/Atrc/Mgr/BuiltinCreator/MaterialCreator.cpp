@@ -1,5 +1,6 @@
 #include <Atrc/Lib/Material/IdealBlack.h>
 #include <Atrc/Lib/Material/IdealDiffuse.h>
+#include <Atrc/Lib/Material/ONMatte.h>
 #include <Atrc/Lib/Material/TSMetal.h>
 #include <Atrc/Mgr/BuiltinCreator/MaterialCreator.h>
 #include <Atrc/Mgr/Parser.h>
@@ -11,9 +12,11 @@ void RegisterBuiltinMaterialCreators(Context &context)
 {
     static const IdealBlackCreator idealBlackCreator;
     static const IdealDiffuseCreator idealDiffuseCreator;
+    static const ONMatteCreator oNMatteCreator;
     static const TSMetalCreator tSMetalCreator;
     context.AddCreator(&idealBlackCreator);
     context.AddCreator(&idealDiffuseCreator);
+    context.AddCreator(&oNMatteCreator);
     context.AddCreator(&tSMetalCreator);
 }
 
@@ -68,7 +71,20 @@ Material *TSMetalCreator::Create(const ConfigGroup &group, Context &context, Are
 
         return arena.Create<TSMetal>(etaI, etaT, k, rc, roughness, normalMapper);
     }
-    ATRC_MGR_CATCH_AND_RETHROW("In creating torrance sparrow metal material: " + group.ToString())
+    ATRC_MGR_CATCH_AND_RETHROW("In creating Torrance-Sparrow metal material: " + group.ToString())
+}
+
+Material *ONMatteCreator::Create(const ConfigGroup &group, Context &context, Arena &arena) const
+{
+    ATRC_MGR_TRY
+    {
+        auto albedoMap    = context.Create<Texture>(group["albedo"]);
+        auto sigmaMap     = context.Create<Texture>(group["sigma"]);
+        auto normalMapper = CreateNormalMapper(group, context, arena);
+
+        return arena.Create<ONMatte>(albedoMap, sigmaMap, normalMapper);
+    }
+    ATRC_MGR_CATCH_AND_RETHROW("In creating Oren-Nayar matte material: " + group.ToString())
 }
 
 } // namespace Atrc::Mgr
