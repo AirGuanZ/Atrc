@@ -16,19 +16,19 @@ Spectrum BxDF_Diffuse::GetAlbedo() const noexcept
 
 Spectrum BxDF_Diffuse::Eval(const CoordSystem &geoInShd, const Vec3 &wi, const Vec3 &wo) const noexcept
 {
-    if(wi.z <= 0 || wo.z <= 0 || geoInShd.World2Local(wi).z <= 0 || geoInShd.World2Local(wo).z <= 0)
+    if(wi.z <= 0 || wo.z <= 0 || !geoInShd.InPositiveHemisphere(wi) || !geoInShd.InPositiveHemisphere(wo))
         return Spectrum();
     return albedo_ / PI;
 }
 
 Option<BxDF::SampleWiResult> BxDF_Diffuse::SampleWi(const CoordSystem &geoInShd, const Vec3 &wo, const Vec2 &sample) const noexcept
 {
-    if(wo.z <= 0 || geoInShd.World2Local(wo).z <= 0)
+    if(wo.z <= 0 || !geoInShd.InPositiveHemisphere(wo))
         return None;
 
     auto [sam, pdf] = AGZ::Math::DistributionTransform
         ::ZWeightedOnUnitHemisphere<Real>::Transform(sample);
-    if(geoInShd.World2Local(sam).z <= 0 || !pdf)
+    if(!geoInShd.InPositiveHemisphere(sam) || !pdf)
         return None;
 
     SampleWiResult ret;
@@ -42,7 +42,7 @@ Option<BxDF::SampleWiResult> BxDF_Diffuse::SampleWi(const CoordSystem &geoInShd,
 
 Real BxDF_Diffuse::SampleWiPDF(const CoordSystem &geoInShd, const Vec3 &wi, const Vec3 &wo) const noexcept
 {
-    if(wi.z <= 0 || wo.z <= 0 || geoInShd.World2Local(wi).z <= 0 || geoInShd.World2Local(wo).z <= 0)
+    if(wi.z <= 0 || wo.z <= 0 || !geoInShd.InPositiveHemisphere(wi) || !geoInShd.InPositiveHemisphere(wo))
         return 0;
     return AGZ::Math::DistributionTransform
         ::ZWeightedOnUnitHemisphere<Real>::PDF(wi.Normalize());

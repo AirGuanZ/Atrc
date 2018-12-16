@@ -2,7 +2,7 @@
 #include <stack>
 
 #include <Atrc/Lib/Geometry/TriangleBVH.h>
-
+#include <iostream>
 #ifdef AGZ_USE_SSE2
 
 #include <emmintrin.h>
@@ -619,10 +619,33 @@ bool TriangleBVHCore::FindIntersection(Ray r, GeometryIntersection *inct) const 
     inct->uv       = rc.uv;
     inct->coordSys = primInfo.coordSys;
     inct->flag0    = flag0;
+    inct->usr.uv   = primInfo.tA + rc.uv.u * primInfo.tB_tA + rc.uv.v * primInfo.tC_tA;
 
-    // TODO: inct->usr
-    inct->usr.uv       = primInfo.tA + rc.uv.u * primInfo.tB_tA + rc.uv.v * primInfo.tC_tA;
-    inct->usr.coordSys = inct->coordSys;
+    Vec3 usrZ = (primInfo.nA + rc.uv.u * primInfo.nB_nA + rc.uv.v * primInfo.nC_nA).Normalize();
+    if(ApproxEq(usrZ, primInfo.coordSys.ez, EPS))
+        inct->usr.coordSys = primInfo.coordSys;
+    else
+    {
+        Vec3 ez = primInfo.coordSys.ez;
+
+        Vec3 axis = Cross(ez, usrZ);
+        Real theta = Arccos(Dot(usrZ, ez));
+
+        auto rot = AGZ::Math::Quaternion<Real>::Rotate(axis, Rad(theta));
+        /*std::cout << usrZ.x << " " << usrZ.y << " " << usrZ.z << std::endl;
+        std::cout << ez.x << " " << ez.y << " " << ez.z << std::endl;
+        std::cout << theta << std::endl;
+        auto rs = rot.Apply(ez);
+        auto rs2 = AGZ::Math::Quaternion<Real>::Rotate(axis, Rad(2 * theta)).Apply(ez);
+        std::cout << rs.x << " " << rs.y << " " << rs.z << std::endl;
+        std::cout << rs2.x << " " << rs2.y << " " << rs2.z << std::endl;*/
+        AGZ_ASSERT(ApproxEq(rot.Apply(ez), usrZ, Real(2e-3)));
+
+        Vec3 usrX = Apply(rot, primInfo.coordSys.ex);
+        Vec3 usrY = Cross(usrZ, usrX);
+
+        inct->usr.coordSys = CoordSystem(usrX, usrY, usrZ);
+    }
 
     return true;
 }

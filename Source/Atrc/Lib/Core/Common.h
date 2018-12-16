@@ -60,6 +60,7 @@ using Deg = AGZ::Math::Deg<Real>;
 
 using AGZ::Math::Abs;
 using AGZ::Math::ApproxEq;
+using AGZ::Math::Arccos;
 using AGZ::Math::Arcsin;
 using AGZ::Math::Arctan2;
 using AGZ::Math::Clamp;
@@ -70,6 +71,7 @@ using AGZ::Math::Pow;
 using AGZ::Math::Saturate;
 using AGZ::Math::Sin;
 using AGZ::Math::Sqrt;
+using AGZ::Math::Tan;
 
 constexpr Real PI = AGZ::Math::PI<Real>;
 constexpr Real InvPI = AGZ::Math::InvPI<Real>;
@@ -82,6 +84,22 @@ inline Real Rand() noexcept
 inline Real Cos(const Vec3 &L, const Vec3 &R) noexcept
 {
     return Dot(L, R) / (L.Length() * R.Length());
+}
+
+// ================================= (theta, phi) in local coord
+
+// w must be normalized
+inline Real CosTheta(const Vec3 &w) noexcept
+{
+    return w.z;
+}
+
+inline Real Phi(const Vec3 &w) noexcept
+{
+    if(!w.y && !w.x)
+        return 0;
+    Real ret = Arctan2(w.y, w.x);
+    return ret < 0 ? (ret + 2 * PI) : ret;
 }
 
 // ================================= Spectrum

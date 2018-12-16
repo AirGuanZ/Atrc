@@ -27,9 +27,9 @@ public:
 
     virtual Spectrum Eval(const CoordSystem &geoInShd, const Vec3 &wi, const Vec3 &wo) const noexcept = 0;
 
-    virtual Option<SampleWiResult> SampleWi(const CoordSystem &geoInShd, const Vec3 &wo, const Vec2 &sample) const noexcept = 0;
+    virtual Option<SampleWiResult> SampleWi(const CoordSystem &geoInShd, const Vec3 &wo, const Vec2 &sample) const noexcept;
 
-    virtual Real SampleWiPDF(const CoordSystem &geoInShd, const Vec3 &wi, const Vec3 &wo) const noexcept = 0;
+    virtual Real SampleWiPDF(const CoordSystem &geoInShd, const Vec3 &wi, const Vec3 &wo) const noexcept;
 };
 
 // ================================= Implementation
@@ -48,6 +48,32 @@ inline BSDFType BxDF::GetType() const noexcept
 inline bool BxDF::MatchType(BSDFType type) const noexcept
 {
     return Contains(type, GetType());
+}
+
+inline Option<BxDF::SampleWiResult> BxDF::SampleWi(const CoordSystem &geoInShd, const Vec3 &wo, const Vec2 &sample) const noexcept
+{
+    if(wo.z <= 0 || !geoInShd.InPositiveHemisphere(wo))
+        return None;
+
+    auto[sam, pdf] = AGZ::Math::DistributionTransform
+        ::ZWeightedOnUnitHemisphere<Real>::Transform(sample);
+    if(!geoInShd.InPositiveHemisphere(sam) || !pdf)
+        return None;
+
+    SampleWiResult ret;
+    ret.coef    = Eval(geoInShd, sam, wo);
+    ret.pdf     = pdf;
+    ret.type    = type_;
+    ret.wi      = sam;
+    ret.isDelta = false;
+    return ret;
+}
+
+inline Real BxDF::SampleWiPDF(const CoordSystem &geoInShd, const Vec3 &wi, const Vec3 &wo) const noexcept
+{
+    if(wi.z <= 0 || wo.z <= 0 || !geoInShd.InPositiveHemisphere(wi) || !geoInShd.InPositiveHemisphere(wo))
+        return 0;
+    return AGZ::Math::DistributionTransform::ZWeightedOnUnitHemisphere<Real>::PDF(wi.Normalize());
 }
 
 } // namespace Atrc

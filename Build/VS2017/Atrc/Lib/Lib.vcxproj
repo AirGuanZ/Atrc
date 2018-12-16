@@ -190,6 +190,7 @@
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Light\SkyLight.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\BxDF\BxDF_Black.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\BxDF\BxDF_Diffuse.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\BxDF\BxDF_OrenNayar.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\BxDF\BxDF_TorranceSparrow.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\IdealBlack.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\IdealDiffuse.h" />
@@ -224,6 +225,7 @@
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Light\SkyLight.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\BxDF\BxDF_Black.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\BxDF\BxDF_Diffuse.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\BxDF\BxDF_OrenNayar.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\BxDF\BxDF_TorranceSparrow.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\IdealBlack.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\IdealDiffuse.cpp" />

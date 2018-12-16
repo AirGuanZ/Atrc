@@ -195,6 +195,9 @@
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Reporter\DefaultReporter.h">
       <Filter>Source\Reporter</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\BxDF\BxDF_OrenNayar.h">
+      <Filter>Source\Material\BxDF</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Core\Common.cpp">
@@ -280,6 +283,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Reporter\DefaultReporter.cpp">
       <Filter>Source\Reporter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\BxDF\BxDF_OrenNayar.cpp">
+      <Filter>Source\Material\BxDF</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
