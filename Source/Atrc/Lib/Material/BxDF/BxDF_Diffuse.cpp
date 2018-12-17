@@ -1,4 +1,4 @@
-#include <Atrc/Lib/Material/BxDF/BxDF_Diffuse.h>
+﻿#include <Atrc/Lib/Material/BxDF/BxDF_Diffuse.h>
 
 /*
     NOTE: wo.z <= 0时，diffuse bxdf的eval结果应该是0，但在存在法线偏移时，wo有可能在

@@ -206,6 +206,7 @@
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\Utility\MicrofacetDistribution.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\Utility\NormalMapper.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\PostProcessor\FlipImage.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\MISPathTracingIntegrator.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\NativePathTracingIntegrator.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\ShadingNormalIntegrator.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingRenderer.h" />
@@ -218,6 +219,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Camera\PinholeCamera.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Core\Common.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Core\CoordSystem.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Core\Film.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Core\PostProcessor.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Core\Scene.cpp" />
@@ -241,6 +243,7 @@
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\Utility\Fresnel.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\Utility\NormalMapper.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\PostProcessor\FlipImage.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\MISPathTracingIntegrator.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\NativePathTracingIntegrator.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\ShadingNormalIntegrator.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingRenderer.cpp" />

@@ -210,6 +210,9 @@
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\IdealMirror.h">
       <Filter>Source\Material</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\MISPathTracingIntegrator.h">
+      <Filter>Source\Renderer\PathTracingIntegrator</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Core\Common.cpp">
@@ -307,6 +310,12 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\IdealMirror.cpp">
       <Filter>Source\Material</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\MISPathTracingIntegrator.cpp">
+      <Filter>Source\Renderer\PathTracingIntegrator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Core\CoordSystem.cpp">
+      <Filter>Source\Core</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
