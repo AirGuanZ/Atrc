@@ -18,7 +18,7 @@ namespace
 
         Str8 GetTypeName() const override { return "Conductor"; }
 
-        Fresnel *Create(const ConfigGroup &group, Context &context, Arena &arena) const override
+        Fresnel *Create(const ConfigGroup &group, [[maybe_unused]] Context &context, Arena &arena) const override
         {
             ATRC_MGR_TRY
             {
@@ -37,7 +37,7 @@ namespace
 
         Str8 GetTypeName() const override { return "Dielectric"; }
 
-        Fresnel *Create(const ConfigGroup &group, Context &context, Arena &arena) const override
+        Fresnel *Create(const ConfigGroup &group, [[maybe_unused]] Context &context, Arena &arena) const override
         {
             ATRC_MGR_TRY
             {
@@ -55,7 +55,7 @@ namespace
 
         Str8 GetTypeName() const override { return "Schlick"; }
 
-        Fresnel *Create(const ConfigGroup &group, Context &context, Arena &arena) const override
+        Fresnel *Create(const ConfigGroup &group, [[maybe_unused]] Context &context, Arena &arena) const override
         {
             ATRC_MGR_TRY
             {

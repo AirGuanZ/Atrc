@@ -47,7 +47,7 @@ Option<BlinnPhong::SampleWiResult> BlinnPhong::SampleWi(const CoordSystem &geoIn
     return ret;
 }
 
-Real BlinnPhong::SampleWiPDF(const CoordSystem &geoInShd, const Vec3 &wi, const Vec3 &wo) const noexcept
+Real BlinnPhong::SampleWiPDF([[maybe_unused]] const CoordSystem &geoInShd, const Vec3 &wi, const Vec3 &wo) const noexcept
 {
     Vec3 H = (wi + wo).Normalize();
     Real cosTheta = H.z;

@@ -21,7 +21,7 @@ public:
 
     void PreprocessScene(const Scene &scene) override;
 
-    SampleWiResult SampleWi(const Intersection &inct, const ShadingPoint &shd, const Vec2 &sample) const noexcept override;
+    SampleWiResult SampleWi(const Intersection &inct, const ShadingPoint &shd, const Vec3 &sample) const noexcept override;
 
     Real SampleWiPDF(const Vec3 &pos, const Intersection &inct, const ShadingPoint &shd, bool onLight) const noexcept override;
 

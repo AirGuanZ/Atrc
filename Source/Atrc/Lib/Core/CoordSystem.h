@@ -66,21 +66,4 @@ inline bool CoordSystem::InPositiveHemisphere(const Vec3 &v) const noexcept
     return Dot(ez, v) > 0;
 }
 
-inline CoordSystem CoordSystem::RotateToNewEz(Vec3 newEz) const noexcept
-{
-    newEz = newEz.Normalize();
-    if(ApproxEq(ez, newEz, EPS))
-        return *this;
-
-    Vec3 rotateAxis = Cross(ez, newEz);
-    Real theta = Arccos(Dot(newEz, ez));
-    auto rot = AGZ::Math::Quaternion<Real>::Rotate(rotateAxis, Rad(theta));
-    AGZ_ASSERT(ApproxEq(rot.Apply(ez), newEz, Real(1e-3)));
-
-    Vec3 newEx = rot.Apply(ex);
-    Vec3 newEy = Cross(newEz, newEx);
-
-    return CoordSystem(newEx, newEy, newEz);
-}
-
 } // namespace Atrc

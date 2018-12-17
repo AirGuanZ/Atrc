@@ -8,6 +8,23 @@ namespace Atrc::Mgr
 void RegisterBuiltinPathTracingIntegratorCreators(Context &context);
 
 /*
+    type = MISPathTracing
+
+    minDepth       = int
+    maxDepth       = int
+    contProb       = Real
+    sampleAllLight = True | False
+*/
+class MISPathTracingIntegratorCreator : public Creator<PathTracingIntegrator>
+{
+public:
+
+    Str8 GetTypeName() const override { return "MISPathTracing"; }
+
+    PathTracingIntegrator *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
+};
+
+/*
     type = NativePathTracing
 
     minDepth = int

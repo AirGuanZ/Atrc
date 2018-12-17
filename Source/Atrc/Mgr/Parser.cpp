@@ -172,4 +172,18 @@ Transform ParseTransform(const ConfigNode &node)
     ATRC_MGR_CATCH_AND_RETHROW("In parsing transform: " + node.ToString())
 }
 
+bool ParseBool(const ConfigNode &node)
+{
+    ATRC_MGR_TRY
+    {
+        auto &s = node.AsValue();
+        if(s == "True")
+            return true;
+        if(s == "False")
+            return false;
+        throw MgrErr("Unknown boolean value");
+    }
+    ATRC_MGR_CATCH_AND_RETHROW("In parsing bool: " + node.ToString())
+}
+
 } // namespace Atrc::Mgr::Parser

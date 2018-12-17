@@ -49,4 +49,10 @@ Rad ParseAngle(const ConfigNode &node);
 */
 Transform ParseTransform(const ConfigNode &node);
 
+/*
+    True  => true
+    False => false
+*/
+bool ParseBool(const ConfigNode &node);
+
 } // namespace Atrc::Mgr::Parser

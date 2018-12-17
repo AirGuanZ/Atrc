@@ -42,7 +42,7 @@ public:
         Real pdf;
     };
 
-    Option<SampleLightResult> SampleLight() const noexcept;
+    Option<SampleLightResult> SampleLight(Real sample) const noexcept;
 
     Real SampleLightPDF(const Light *light) const noexcept;
 

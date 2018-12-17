@@ -28,7 +28,7 @@ Spectrum NativePathTracingIntegrator::Eval(
             coef /= contProb_;
         }
 
-        // Find cloest intersection
+        // Find closest intersection
 
         Intersection inct;
         if(!scene.FindIntersection(ray, &inct))
@@ -57,8 +57,7 @@ Spectrum NativePathTracingIntegrator::Eval(
         // Update coef and construct the next ray
 
         coef *= bsdfSample->coef * Abs(Cos(bsdfSample->wi, shd.coordSys.ez)) / bsdfSample->pdf;
-
-        ray = Ray(inct.pos + EPS * inct.coordSys.ez, bsdfSample->wi, EPS);
+ray = Ray(inct.pos + EPS * inct.coordSys.ez, bsdfSample->wi, EPS);
     }
 
     return ret;

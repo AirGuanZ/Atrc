@@ -22,6 +22,8 @@ public:
     virtual Real GetReal() = 0;
 
     virtual Vec2 GetReal2() = 0;
+
+    virtual Vec3 GetReal3() = 0;
 };
 
 } // namespace Atrc

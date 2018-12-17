@@ -25,10 +25,10 @@ void CubeEnvironmentLight::PreprocessScene(const Scene &scene)
 }
 
 Light::SampleWiResult CubeEnvironmentLight::SampleWi(
-    const Intersection &inct, const ShadingPoint &shd, const Vec2 &sample) const noexcept
+    const Intersection &inct, const ShadingPoint &shd, const Vec3 &sample) const noexcept
 {
     auto [sam, pdf] = AGZ::Math::DistributionTransform::
-        ZWeightedOnUnitHemisphere<Real>::Transform(sample);
+        ZWeightedOnUnitHemisphere<Real>::Transform(sample.xy());
     sam = shd.coordSys.Local2World(sam);
 
     SampleWiResult ret;
