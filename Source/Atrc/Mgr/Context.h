@@ -61,6 +61,7 @@ class Context
         Geometry,
         Light,
         Material,
+        Medium,
         PathTracingIntegrator,
         PostProcessor,
         Renderer,

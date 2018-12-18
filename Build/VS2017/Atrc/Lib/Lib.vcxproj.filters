@@ -222,6 +222,9 @@
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Entity\GeometricDiffuseLight.h">
       <Filter>Source\Entity</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\Medium.h">
+      <Filter>Source\Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Core\Common.cpp">

@@ -173,6 +173,7 @@
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\Geometry.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\Light.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\Material.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\Medium.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\PostProcessor.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\Ray.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\Renderer.h" />

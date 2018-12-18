@@ -3,8 +3,8 @@
 namespace Atrc
 {
 
-GeometricEntity::GeometricEntity(const Geometry *geometry, const Material *material) noexcept
-    : geometry_(geometry), material_(material)
+GeometricEntity::GeometricEntity(const Geometry *geometry, const Material *material, const MediumInterface &mediumInterface) noexcept
+    : geometry_(geometry), material_(material), mediumInterface_(mediumInterface)
 {
     AGZ_ASSERT(geometry && material);
 }
@@ -21,6 +21,7 @@ bool GeometricEntity::FindIntersection(const Ray &r, Intersection *inct) const n
     if(!geometry_->FindIntersection(r, inct))
         return false;
     inct->entity = this;
+    inct->mediumInterface = mediumInterface_;
     return true;
 }
 

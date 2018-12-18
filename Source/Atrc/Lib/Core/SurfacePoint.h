@@ -2,6 +2,7 @@
 
 #include <Atrc/Lib/Core/Common.h>
 #include <Atrc/Lib/Core/CoordSystem.h>
+#include <Atrc/Lib/Core/Medium.h>
 
 namespace Atrc
 {
@@ -26,9 +27,10 @@ struct GeometryIntersection
 };
 
 // 射线与实体求交的结果
-struct Intersection : public GeometryIntersection
+struct Intersection : GeometryIntersection
 {
     const Entity *entity; // 实体指针
+    MediumInterface mediumInterface;
 };
 
 // Intersection对应的着色信息
