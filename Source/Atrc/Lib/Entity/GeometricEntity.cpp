@@ -41,4 +41,9 @@ const Light *GeometricEntity::AsLight() const noexcept
     return nullptr;
 }
 
+Light *GeometricEntity::AsLight() noexcept
+{
+    return nullptr;
+}
+
 } // namespace Atrc

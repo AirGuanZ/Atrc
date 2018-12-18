@@ -10,7 +10,7 @@ film = {
 
 sampler = {
     type = Native;
-    spp = 1000;
+    spp = 4000;
 };
 
 camera = {
@@ -29,7 +29,7 @@ renderer = {
         minDepth = 10;
         maxDepth = 20;
         contProb = 0.9;
-        sampleAllLights = False;
+        sampleAllLights = True;
     };
     workerCount = -1;
     taskGridSize = 16;
@@ -56,6 +56,24 @@ entities = (
         transform = (Translate(0, 0, -201));
     };
     material = mat;
+},###
+{
+    type = GeometricDiffuse;
+    geometry = {
+        type = Sphere;
+        radius = 0.4;
+        transform = (Translate(-3, 3, 2.5));
+    };
+    radiance = (50);
+},
+###{
+    type = GeometricDiffuse;
+    geometry = {
+        type = Sphere;
+        radius = 0.4;
+        transform = (Translate(-4, -4, 2.5));
+    };
+    radiance = (20);
 },###
 {
     type = Geometric;
@@ -106,8 +124,8 @@ blackTexture = {
 lights = (
 {
     type = Sky;
-    top = (1);
-    bottom = (1);
+    top = (0.1);
+    bottom = (0.1);
 }
 );
 

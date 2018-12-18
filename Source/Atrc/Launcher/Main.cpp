@@ -76,7 +76,11 @@ int Run()
 
     cEntities.reserve(entities.size());
     for(auto ent : entities)
+    {
         cEntities.push_back(ent);
+        if(auto lht = ent->AsLight())
+            lights.push_back(lht);
+    }
 
     cLights.reserve(lights.size());
     for(auto lht : lights)

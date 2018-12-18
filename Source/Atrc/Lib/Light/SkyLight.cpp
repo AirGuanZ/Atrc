@@ -40,7 +40,7 @@ Light::SampleWiResult SkyLight::SampleWi(
 }
 
 Real SkyLight::SampleWiPDF(
-    const Vec3 &pos, const Intersection &inct, const ShadingPoint &shd, bool onLight) const noexcept
+    const Vec3 &pos, const Vec3 &nor, const Intersection &inct, const ShadingPoint &shd, bool onLight) const noexcept
 {
     AGZ_ASSERT(!onLight);
     Vec3 lwi = shd.coordSys.World2Local(pos - inct.pos).Normalize();

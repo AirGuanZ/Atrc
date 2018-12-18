@@ -182,6 +182,7 @@
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\SurfacePoint.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\Texture.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\Transform.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Entity\GeometricDiffuseLight.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Entity\GeometricEntity.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\FilmFilter\BoxFilter.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Geometry\Sphere.h" />
@@ -225,6 +226,7 @@
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Core\Film.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Core\PostProcessor.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Core\Scene.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Entity\GeometricDiffuseLight.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Entity\GeometricEntity.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\FilmFilter\BoxFilter.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Geometry\Sphere.cpp" />

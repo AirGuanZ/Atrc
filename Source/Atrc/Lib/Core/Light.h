@@ -28,7 +28,7 @@ public:
 
     virtual SampleWiResult SampleWi(const Intersection &inct, const ShadingPoint &shd, const Vec3 &sample) const noexcept = 0;
 
-    virtual Real SampleWiPDF(const Vec3 &pos, const Intersection &inct, const ShadingPoint &shd, bool onLight) const noexcept = 0;
+    virtual Real SampleWiPDF(const Vec3 &pos, const Vec3 &nor, const Intersection &inct, const ShadingPoint &shd, bool onLight) const noexcept = 0;
 
     virtual Spectrum AreaLe(const Intersection &inct) const noexcept = 0;
 

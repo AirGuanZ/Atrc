@@ -8,6 +8,21 @@ namespace Atrc::Mgr
 void RegisterBuiltinEntityCreators(Context &context);
 
 /*
+    type = GeometricDiffuse
+
+    geometry = GeometryDefinition
+    radiance = Spectrum
+*/
+class GeometricDiffuseLightCreator : public Creator<Entity>
+{
+public:
+
+    Str8 GetTypeName() const override { return "GeometricDiffuse"; }
+
+    Entity *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
+};
+
+/*
     type     = Geometric
     
     geometry = GeometryDefinition

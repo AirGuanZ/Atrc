@@ -219,6 +219,9 @@
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Utility\TriangleAux.h">
       <Filter>Source\Utility</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Entity\GeometricDiffuseLight.h">
+      <Filter>Source\Entity</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Core\Common.cpp">
@@ -325,6 +328,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Geometry\Triangle.cpp">
       <Filter>Source\Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Entity\GeometricDiffuseLight.cpp">
+      <Filter>Source\Entity</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -97,6 +97,7 @@ Spectrum MISPathTracingIntegrator::Eval(
             Spectrum f = bsdfSample->coef * Abs(Cos(bsdfSample->wi, shd.coordSys.ez));
             ray = Ray(inct.pos, bsdfSample->wi, EPS);
             Intersection tInct;
+
             if(scene.FindIntersection(ray, &tInct))
             {
                 auto light = tInct.entity->AsLight();
@@ -104,12 +105,12 @@ Spectrum MISPathTracingIntegrator::Eval(
                 {
                     if(bsdfSample->isDelta)
                         ret += coef * f * light->AreaLe(tInct) / bsdfSample->pdf;
-                    
-                    Real lpdf = light->SampleWiPDF(tInct.pos, inct, shd, true);
-                    if(!sampleAllLights_)
-                        lpdf *= scene.SampleLightPDF(light);
-                    
-                    ret += coef * f * light->AreaLe(tInct) / (bsdfSample->pdf + lpdf);
+                    else
+                    {
+                        Real lpdf = scene.SampleLightPDF(light) *
+                            light->SampleWiPDF(tInct.pos, tInct.coordSys.ez, inct, shd, true);
+                        ret += coef * f * light->AreaLe(tInct) / (bsdfSample->pdf + lpdf);
+                    }
                 }
 
                 coef *= f / bsdfSample->pdf;
@@ -118,20 +119,43 @@ Spectrum MISPathTracingIntegrator::Eval(
             }
             else
             {
-                auto light = scene.SampleLight(sampler->GetReal());
-                if(light)
+                if(sampleAllLights_)
                 {
+                    for(auto light : scene.GetLights())
+                    {
+                        auto le = light->NonAreaLe(r);
+                        if(!le)
+                            continue;
+                        if(bsdfSample->isDelta)
+                            ret += coef * f * le / bsdfSample->pdf;
+                        else
+                        {
+                            Real lpdf = light->SampleWiPDF(
+                                inct.pos + ray.d, Vec3::UNIT_X(), inct, shd, false);
+                            ret += coef * f * le / (bsdfSample->pdf + lpdf);
+                        }
+                    }
+                }
+                else
+                {
+                    auto light = scene.SampleLight(sampler->GetReal());
+                    if(!light)
+                        break;
+
                     auto le = light->light->NonAreaLe(r);
                     if(!le)
-                        return Spectrum();
-                    
+                        break;
+
                     if(bsdfSample->isDelta)
                         ret += coef * f * le / bsdfSample->pdf;
-
-                    Real lpdf = light->pdf * light->light->SampleWiPDF(
-                                                inct.pos + ray.d, inct, shd, false);
-                    ret += coef * f * le / (bsdfSample->pdf + lpdf);
+                    else
+                    {
+                        Real lpdf = light->pdf * light->light->SampleWiPDF(
+                            inct.pos + ray.d, Vec3::UNIT_X(), inct, shd, false);
+                        ret += coef * f * le / (bsdfSample->pdf + lpdf);
+                    }
                 }
+
                 break;
             }
         }
