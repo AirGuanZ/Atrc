@@ -4,6 +4,6 @@
 
 ## Screenshots
 
-![SS1](./Gallery/show-time-1.png)
+![SS1](./Diary/1920x1080/30_2018_12_07_TriangleMirror.png)
 
-![SS2](./Gallery/show-time-2.png)
+![SS2](./Diary/Misc/2018_12_18_Human.png)
