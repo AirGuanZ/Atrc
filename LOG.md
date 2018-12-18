@@ -220,7 +220,7 @@ int main()
 
 ## 2018.12.7
 
-想加Normal mapping，于是写了个简单的NormalMapper，由于没有单独的Triangle Geometry Object，一时居然找不到好的测试场景。于是写了个单独的Triangle类，结果测试的时候物体下面的阴影怎么看都很奇怪。一开始以为是Triangle这边local coord system有问题，通过换成mirror材质否认了这一猜想，然后看了半天diffuse材质的wi采样，也没什么错误。我甚至怀疑到path tracer上去了，可是换成volumetric path tracer，问题依然。也设想了是has intersection不对，可是看代码怎么也看不出差错。最后我认为可能是shadow ray测试不对，于是把path tracer的MIS of direct illumination给拆开，结果bsdf sampling的结果是对的，而light sampling的结果就不对，果然问题在这！然而这个MIS我已经用了很久，没道理会有这么明显的bug啊。看了半天，我突然想起triangle不同于以往的geometry object，它的bound可能在某一维度上宽度为0，检查了一番相关代码，也改了一两个不合理之处，而bug变得更加玄学了——地面阴影会随着三角形形状变化而变化，而这个变化显得丝毫没有规律和道理。最后，我也不知道是为什么，检查了一下environment light中计算world radius的代码，结果发现自己不慎把一个+写成了-……而这个问题在过去的场景中恰好没有很好地暴露出来。
+想加Normal mapping，于是写了个简单的NormalMapper，由于没有单独的Triangle Geometry Object，一时居然找不到好的测试场景。于是写了个单独的Triangle类，结果测试的时候物体下面的阴影怎么看都很奇怪。一开始以为是Triangle这边local coord system有问题，通过换成mirror材质否认了这一猜想，然后看了半天diffuse材质的wi采样，也没什么错误。我甚至怀疑到path tracer上去了，可是换成volumetric path tracer，问题依然。也设想了是has intersection不对，可是看代码怎么也看不出差错。最后我认为可能是shadow ray测试不对，于是把path tracer的MIS of direct illumination给拆开，结果bsdf sampling的结果是对的，而light sampling的结果就不对，果然问题在这！然而这个MIS我已经用了很久，没道理会有这么明显的bug啊。看了半天，我突然想起triangle不同于以往的geometry object，它的bound可能在某一维度上宽度为0，检查了一番相关代码，也改了一两个不合理之处，而bug变得更加玄学了——地面阴影会随着三角形形状变化而变化，而这个变化显得丝毫没有规律和道理。最后，我也不知道是为什么，检查了一下environment light中计算world radius的代码，结果发现自己不慎把一个+写成了-……
 
 ## 2018.12.8
 
@@ -242,3 +242,35 @@ int main()
 6. 全局BVH没法用，TriangleBVH代码丑。
 
 以及一些其它的细枝末节的问题。
+
+## 2018.12.11
+
+看到Alvy Ray Smith 1995年的一篇文章，把将像素看作一个矩形的做法严肃地批判了一番，吓得我赶紧按照他的建议做了个基于sampling-reconstruction体系。
+
+## 2018.12.12
+
+实现了CubeEnvironmentLight、SkyLight以及NativePathTracingIntegrator，之间夹杂了许许多多的接口调整。终于又画出了两个理想漫反射球体叠在一起的场景。
+
+## 2018.12.13
+
+完成了解析脚本创建场景的框架。
+
+## 2018.12.14
+
+重新写了一个Triangle BVH，速度比重构前的版本不知高到哪里去了。值得一提的是我精心编写的SIMD加速代码被MSVC生成的代码吊起来打 = =
+
+## 2018.12.15
+
+实现了基于Torrance-Sparrow微表面模型的金属材质。
+
+## 2018.12.16
+
+实现了Oren-Nayar模型和理想镜面反射。
+
+## 2018.12.17
+
+实现了用多重重要性采样技术计算直接光照的Path Tracer。
+
+## 2018.12.18
+
+实现了基于TriangleBVH的漫射光源，以及对TriangleBVH的磁盘cache。

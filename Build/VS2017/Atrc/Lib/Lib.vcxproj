@@ -1,0 +1,264 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>15.0</VCProjectVersion>
+    <ProjectGuid>{D80C4AB1-1513-4B81-8D9B-5AD096ADC4B6}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>Lib</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(AGZ_UTILS_HOME);$(SolutionDir)..\..\..\Source\;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(AGZ_UTILS_HOME);$(SolutionDir)..\..\..\Source\;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>$(AGZ_UTILS_HOME);$(SolutionDir)..\..\..\Source\;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>$(AGZ_UTILS_HOME);$(SolutionDir)..\..\..\Source\;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <FloatingPointModel>Precise</FloatingPointModel>
+      <AssemblerOutput>NoListing</AssemblerOutput>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <FloatingPointModel>Precise</FloatingPointModel>
+      <AssemblerOutput>NoListing</AssemblerOutput>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <FloatingPointModel>Precise</FloatingPointModel>
+      <AssemblerOutput>NoListing</AssemblerOutput>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <FloatingPointModel>Precise</FloatingPointModel>
+      <AssemblerOutput>NoListing</AssemblerOutput>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Camera\PinholeCamera.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\AABB.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\Camera.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\Common.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\CoordSystem.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\Entity.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\Film.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\Geometry.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\Light.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\Material.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\Medium.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\PostProcessor.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\Ray.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\Renderer.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\Reporter.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\Sampler.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\Scene.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\SurfacePoint.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\Texture.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\Transform.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Entity\GeometricDiffuseLight.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Entity\GeometricEntity.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\FilmFilter\BoxFilter.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Geometry\Sphere.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Geometry\Triangle.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Geometry\TriangleBVH.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Light\CubeEnvironmentLight.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Light\SkyLight.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\BxDF\BxDF_Black.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\BxDF\BxDF_Diffuse.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\BxDF\BxDF_OrenNayar.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\BxDF\BxDF_SpecularReflection.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\BxDF\BxDF_TorranceSparrow.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\IdealBlack.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\IdealDiffuse.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\IdealMirror.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\MicrofacetDistribution\BlinnPhong.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\ONMatte.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\TSMetal.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\Utility\BxDF.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\Utility\BxDFAggregate.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\Utility\Fresnel.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\Utility\MaterialHelper.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\Utility\MicrofacetDistribution.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\Utility\NormalMapper.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\PostProcessor\FlipImage.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\MISPathTracingIntegrator.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\NativePathTracingIntegrator.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\ShadingNormalIntegrator.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingRenderer.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Reporter\DefaultReporter.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Sampler\NativeSampler.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Texture\ConstantTexture.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Texture\ImageTexture.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Utility\GridDivider.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Utility\TriangleAux.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Camera\PinholeCamera.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Core\Common.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Core\CoordSystem.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Core\Film.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Core\PostProcessor.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Core\Scene.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Entity\GeometricDiffuseLight.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Entity\GeometricEntity.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\FilmFilter\BoxFilter.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Geometry\Sphere.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Geometry\Triangle.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Geometry\TriangleBVH.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Light\CubeEnvironmentLight.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Light\SkyLight.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\BxDF\BxDF_Black.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\BxDF\BxDF_Diffuse.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\BxDF\BxDF_OrenNayar.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\BxDF\BxDF_PerfectSpecular.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\BxDF\BxDF_TorranceSparrow.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\IdealBlack.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\IdealDiffuse.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\IdealMirror.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\MicrofacetDistribution\BlinnPhone.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\ONMatte.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\TSMetal.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\Utility\Fresnel.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\Utility\NormalMapper.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\PostProcessor\FlipImage.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\MISPathTracingIntegrator.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\NativePathTracingIntegrator.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\ShadingNormalIntegrator.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingRenderer.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Reporter\DefaultReporter.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Sampler\NativeSampler.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Texture\ConstantTexture.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Texture\ImageTexture.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
