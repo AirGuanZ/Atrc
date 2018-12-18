@@ -3,6 +3,12 @@
 #include <Atrc/Lib/Core/AABB.h>
 #include <Atrc/Lib/Core/Geometry.h>
 
+namespace AGZ
+{
+    class BinarySerializer;
+    class BinaryDeserializer;
+}
+
 namespace Atrc
 {
 
@@ -10,7 +16,7 @@ struct TriangleBVHCoreNode;
 struct TriangleBVHCorePrimitive;
 struct TriangleBVHCorePrimitiveInfo;
 
-class TriangleBVHCore
+class TriangleBVHCore : public AGZ::Uncopiable
 {
 public:
 
@@ -27,6 +33,10 @@ public:
 
     ~TriangleBVHCore();
 
+    bool Serialize(AGZ::BinarySerializer &serializer) const;
+
+    static Option<TriangleBVHCore> DeserializeFromScratch(AGZ::BinaryDeserializer &deserializer);
+
     AABB GetLocalBound() const noexcept;
 
     Real GetSurfaceArea() const noexcept;
@@ -39,10 +49,13 @@ public:
 
 private:
 
+    TriangleBVHCore() { }
+
     void InitBVH(const Vertex *vtx, uint32_t triangleCount);
 
     std::vector<Real> areaPrefixSum_;
 
+    uint32_t nodeCount_;
     TriangleBVHCoreNode          *nodes_;
     TriangleBVHCorePrimitive     *prims_;
     TriangleBVHCorePrimitiveInfo *primsInfo_;

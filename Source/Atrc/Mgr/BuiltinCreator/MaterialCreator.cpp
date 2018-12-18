@@ -1,3 +1,6 @@
+#include <Utils/FileSys.h>
+#include <Utils/Serialize.h>
+
 #include <Atrc/Lib/Material/IdealBlack.h>
 #include <Atrc/Lib/Material/IdealDiffuse.h>
 #include <Atrc/Lib/Material/IdealMirror.h>

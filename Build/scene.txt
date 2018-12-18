@@ -10,7 +10,7 @@ film = {
 
 sampler = {
     type = Native;
-    spp = 4000;
+    spp = 1;
 };
 
 camera = {
@@ -112,6 +112,10 @@ entities = (
             type = Image;
             filename = "./Asset/8.png";
         };
+        normalMapper = {
+            type = Image;
+            filename = "./Asset/9.png";
+        };
     };
 }
 );
@@ -122,11 +126,11 @@ blackTexture = {
 };
 
 lights = (
-{
+###{
     type = Sky;
     top = (0.1);
     bottom = (0.1);
-}
+}###
 );
 
 postProcessors = (

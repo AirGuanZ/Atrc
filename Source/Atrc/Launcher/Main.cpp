@@ -106,8 +106,17 @@ int Run()
     return 0;
 }
 
+#if defined(_WIN32) && defined(_DEBUG)
+#include <crtdbg.h>
+#endif
+
 int main()
 {
+#if defined(_WIN32) && defined(_DEBUG)
+    _CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG)
+        | _CRTDBG_LEAK_CHECK_DF);
+#endif
+
     try
     {
         return Run();

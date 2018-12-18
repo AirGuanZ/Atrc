@@ -1,6 +1,8 @@
 ﻿#include <queue>
 #include <stack>
 
+#include <Utils/Serialize.h>
+
 #include <Atrc/Lib/Geometry/TriangleBVH.h>
 #include <Atrc/Lib/Utility/TriangleAux.h>
 
@@ -16,6 +18,9 @@ namespace Atrc
 struct TriangleBVHCorePrimitive
 {
     Vec3 A, B_A, C_A;
+
+    IMPL_MEMCPY_SERIALIZE
+    IMPL_MEMCPY_DESERIALIZE
 };
 
 struct TriangleBVHCorePrimitiveInfo
@@ -23,6 +28,9 @@ struct TriangleBVHCorePrimitiveInfo
     Vec3 nA, nB_nA, nC_nA;
     Vec2 tA, tB_tA, tC_tA;
     CoordSystem coordSys;
+
+    IMPL_MEMCPY_SERIALIZE
+    IMPL_MEMCPY_DESERIALIZE
 };
 
 namespace
@@ -396,14 +404,15 @@ namespace
 }
 
 TriangleBVHCore::TriangleBVHCore(const Vertex *vertices, uint32_t triangleCount)
-    : nodes_(nullptr), prims_(nullptr), primsInfo_(nullptr)
+    : nodes_(nullptr), nodeCount_(0), prims_(nullptr), primsInfo_(nullptr)
 {
     AGZ_ASSERT(vertices && triangleCount);
     InitBVH(vertices, triangleCount);
 }
 
 TriangleBVHCore::TriangleBVHCore(TriangleBVHCore &&moveFrom) noexcept
-    : nodes_(moveFrom.nodes_), prims_(moveFrom.prims_), primsInfo_(moveFrom.primsInfo_)
+    : areaPrefixSum_(std::move(moveFrom.areaPrefixSum_)), nodeCount_(moveFrom.nodeCount_),
+      nodes_(moveFrom.nodes_), prims_(moveFrom.prims_), primsInfo_(moveFrom.primsInfo_)
 {
     moveFrom.nodes_     = nullptr;
     moveFrom.prims_     = nullptr;
@@ -418,6 +427,80 @@ TriangleBVHCore::~TriangleBVHCore()
         AGZ::CRTAllocator::Free(prims_);
     if(primsInfo_)
         AGZ::CRTAllocator::Free(primsInfo_);
+}
+
+bool TriangleBVHCore::Serialize(AGZ::BinarySerializer &serializer) const
+{
+    if(!serializer.Serialize(areaPrefixSum_))
+        return false;
+    if(!serializer.Serialize(nodeCount_))
+        return false;
+    for(uint32_t i = 0; i < nodeCount_; ++i)
+    {
+        if(!serializer.Serialize(nodes_[i]))
+            return false;
+    }
+    for(uint32_t i = 0; i < areaPrefixSum_.size(); ++i)
+    {
+        if(!serializer.Serialize(prims_[i]) || !serializer.Serialize(primsInfo_[i]))
+            return false;
+    }
+    return true;
+}
+
+Option<TriangleBVHCore> TriangleBVHCore::DeserializeFromScratch(AGZ::BinaryDeserializer &deserializer)
+{
+    auto OAreaPrefixSum = deserializer.DeserializeFromScratch<std::vector<Real>>();
+    if(!OAreaPrefixSum)
+        return None;
+
+    auto ONodeCount = deserializer.DeserializeFromScratch<uint32_t>();
+    if(!ONodeCount)
+        return None;
+
+    TriangleBVHCoreNode *nodes = nullptr;
+    TriangleBVHCorePrimitive *prims = nullptr;
+    TriangleBVHCorePrimitiveInfo *primsInfo = nullptr;
+
+    try
+    {
+        nodes = static_cast<TriangleBVHCoreNode*>(
+                    AGZ::CRTAllocator::Malloc(sizeof(TriangleBVHCoreNode) * *ONodeCount));
+        prims = static_cast<TriangleBVHCorePrimitive*>(
+                    AGZ::CRTAllocator::Malloc(sizeof(TriangleBVHCorePrimitive) * OAreaPrefixSum->size()));
+        primsInfo = static_cast<TriangleBVHCorePrimitiveInfo*>(
+                    AGZ::CRTAllocator::Malloc(sizeof(TriangleBVHCorePrimitiveInfo) * OAreaPrefixSum->size()));
+        for(uint32_t i = 0; i < *ONodeCount; ++i)
+        {
+            if(!deserializer.Deserialize(nodes[i]))
+                throw Exception("");
+        }
+        for(uint32_t i = 0; i < OAreaPrefixSum->size(); ++i)
+        {
+            if(!deserializer.Deserialize(prims[i]) || !deserializer.Deserialize(primsInfo[i]))
+                throw Exception("");
+        }
+    }
+    catch(...)
+    {
+        if(nodes)
+            AGZ::CRTAllocator::Free(nodes);
+        if(prims)
+            AGZ::CRTAllocator::Free(prims);
+        if(primsInfo)
+            AGZ::CRTAllocator::Free(primsInfo);
+        return None;
+    }
+
+    TriangleBVHCore core;
+
+    core.areaPrefixSum_ = std::move(*OAreaPrefixSum);
+    core.nodeCount_     = *ONodeCount;
+    core.nodes_         = nodes;
+    core.prims_         = prims;
+    core.primsInfo_     = primsInfo;
+
+    return Some(std::move(core));
 }
 
 AABB TriangleBVHCore::GetLocalBound() const noexcept
@@ -613,6 +696,8 @@ void TriangleBVHCore::InitBVH(const Vertex *vtx, uint32_t triangleCount)
     areaPrefixSum_.resize(triangleCount);
     for(uint32_t i = 0; i < triangleCount; ++i)
         areaPrefixSum_[i] = GetTriangleArea(prims_[i].B_A, prims_[i].C_A);
+
+    nodeCount_ = nodeCount;
 }
 
 TriangleBVH::TriangleBVH(const Transform &local2World, const TriangleBVHCore &core) noexcept
