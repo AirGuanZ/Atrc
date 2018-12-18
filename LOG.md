@@ -250,3 +250,27 @@ int main()
 ## 2018.12.12
 
 实现了CubeEnvironmentLight、SkyLight以及NativePathTracingIntegrator，之间夹杂了许许多多的接口调整。终于又画出了两个理想漫反射球体叠在一起的场景。
+
+## 2018.12.13
+
+完成了解析脚本创建场景的框架。
+
+## 2018.12.14
+
+重新写了一个Triangle BVH，速度比重构前的版本不知高到哪里去了。值得一提的是我精心编写的SIMD加速代码被MSVC生成的代码吊起来打 = =
+
+## 2018.12.15
+
+实现了基于Torrance-Sparrow微表面模型的金属材质。
+
+## 2018.12.16
+
+实现了Oren-Nayar模型和理想镜面反射。
+
+## 2018.12.17
+
+实现了用多重重要性采样技术计算直接光照的Path Tracer。
+
+## 2018.12.18
+
+实现了基于TriangleBVH的漫射光源，以及对TriangleBVH的磁盘cache。
