@@ -119,7 +119,10 @@ namespace
 
         auto mesh = deserializer.DeserializeFromScratch<TriangleBVHCore>();
         if(!mesh)
-            throw MgrErr("Failed to deserialize triangle BVH mesh from " + cacheFilename);
+        {
+            fin.close();
+            return RecreateTriangleMesh(filename, cacheFilename, arena);
+        }
 
         return arena.Create<TriangleBVHCore>(std::move(*mesh));
     }
