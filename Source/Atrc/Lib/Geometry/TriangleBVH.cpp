@@ -2,7 +2,8 @@
 #include <stack>
 
 #include <Atrc/Lib/Geometry/TriangleBVH.h>
-#include <iostream>
+#include <Atrc/Lib/Utility/TriangleAux.h>
+
 #ifdef AGZ_USE_SSE2
 
 #include <emmintrin.h>
@@ -141,72 +142,6 @@ namespace
 
 #endif
 
-    bool HasIntersectionWithTriangle(
-        const Ray &r, const Vec3 &A, const Vec3 &B_A, const Vec3 &C_A) noexcept
-    {
-        Vec3 s1 = Cross(r.d, C_A);
-        Real div = Dot(s1, B_A);
-        if(!div)
-            return false;
-        Real invDiv = 1 / div;
-
-        Vec3 o_A = r.o - A;
-        Real alpha = Dot(o_A, s1) * invDiv;
-        if(alpha < 0 || alpha > 1)
-            return false;
-
-        Vec3 s2 = Cross(o_A, B_A);
-        Real beta = Dot(r.d, s2) * invDiv;
-        if(beta < 0 || alpha + beta > 1)
-            return false;
-
-        Real t = Dot(C_A, s2) * invDiv;
-        return r.Between(t);
-    }
-
-    struct TriangleIntersectionRecoed
-    {
-        Real t;
-        Vec2 uv;
-    };
-
-    bool FindIntersectionWithTriangle(
-        const Ray &r, const Vec3 &A, const Vec3 &B_A, const Vec3 &C_A,
-        TriangleIntersectionRecoed *record) noexcept
-    {
-        AGZ_ASSERT(record);
-
-        Vec3 s1 = Cross(r.d, C_A);
-        Real div = Dot(s1, B_A);
-        if(!div)
-            return false;
-        Real invDiv = 1 / div;
-
-        Vec3 o_A = r.o - A;
-        Real alpha = Dot(o_A, s1) * invDiv;
-        if(alpha < 0)
-            return false;
-
-        Vec3 s2 = Cross(o_A, B_A);
-        Real beta = Dot(r.d, s2) * invDiv;
-        if(beta < 0 || alpha + beta > 1)
-            return false;
-
-        Real t = Dot(C_A, s2) * invDiv;
-
-        if(!r.Between(t))
-            return false;
-
-        record->t  = t;
-        record->uv = Vec2(alpha, beta);
-
-        return true;
-    }
-
-    Real GetTriangleArea(const Vec3 &B_A, const Vec3 &C_A) noexcept
-    {
-        return Cross(B_A, C_A).Length() / 2;
-    }
 }
 
 struct /*alignas(16)*/ TriangleBVHCoreNode : BVHNode<Real> { };

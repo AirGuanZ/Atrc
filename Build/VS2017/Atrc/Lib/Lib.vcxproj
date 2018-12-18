@@ -185,6 +185,7 @@
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Entity\GeometricEntity.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\FilmFilter\BoxFilter.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Geometry\Sphere.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Geometry\Triangle.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Geometry\TriangleBVH.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Light\CubeEnvironmentLight.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Light\SkyLight.h" />
@@ -215,6 +216,7 @@
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Texture\ConstantTexture.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Texture\ImageTexture.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Utility\GridDivider.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Utility\TriangleAux.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Camera\PinholeCamera.cpp" />
@@ -226,6 +228,7 @@
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Entity\GeometricEntity.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\FilmFilter\BoxFilter.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Geometry\Sphere.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Geometry\Triangle.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Geometry\TriangleBVH.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Light\CubeEnvironmentLight.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Light\SkyLight.cpp" />

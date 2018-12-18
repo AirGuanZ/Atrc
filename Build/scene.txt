@@ -1,7 +1,7 @@
 # Scene description file for Atrc Launcher
 
 film = {
-    size = (600, 600);
+    size = (600, 900);
     filter = {
         type = Box;
         sidelen = 1;
@@ -10,16 +10,15 @@ film = {
 
 sampler = {
     type = Native;
-    seed = 42;
-    spp = 100;
+    spp = 1000;
 };
 
 camera = {
     type = Pinhole;
     sensorWidth = 1;
-    sensorDistance = 4;
-    pos = (-7, 0, 2.4);
-    lookAt = (0, 0, 2.4);
+    sensorDistance = 1;
+    pos = (-7, 0, 1);
+    lookAt = (0, 0, 1.5);
     up = (0, 0, 1);
 };
 
@@ -49,12 +48,36 @@ mat = {
 };
 
 entities = (
-{
+###{
     type = Geometric;
     geometry = {
         type = Sphere;
         radius = 200;
         transform = (Translate(0, 0, -201));
+    };
+    material = mat;
+},###
+{
+    type = Geometric;
+    geometry = {
+        type = Triangle;
+        A = (-2, -2, 0);
+        B = (-2, 2, 0);
+        C = (2, 2, 0);
+        tA = (0, 0); tB = (0, 1); tC = (1, 1);
+        transform = (Translate(0, 0, -1));
+    };
+    material = mat;
+},
+{
+    type = Geometric;
+    geometry = {
+        type = Triangle;
+        A = (-2, -2, 0);
+        B = (2, 2, 0);
+        C = (2, -2, 0);
+        tA = (0, 0); tB = (1, 1); tC = (1, 0);
+        transform = (Translate(0, 0, -1));
     };
     material = mat;
 },
@@ -63,7 +86,7 @@ entities = (
     geometry = {
         type = TriangleBVH;
         filename = "./Asset/4.obj";
-        transform = (Translate(-2, 0.4, 1.8), RotateZ(Deg(-90)), RotateX(Deg(90)), Scale(0.0035), Translate(-1300, -800, -1800));
+        transform = (Translate(0, 0.4, 1.8), RotateZ(Deg(-90)), RotateX(Deg(90)), Scale(0.0035), Translate(-1300, -800, -1800));
     };
     material = {
         type = IdealDiffuse;

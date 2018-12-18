@@ -31,6 +31,26 @@ public:
 };
 
 /*
+    type = Triangle
+
+    A = Vec3
+    B = Vec3
+    C = Vec3
+    tA = Vec2
+    tB = Vec2
+    tC = Vec2
+    transform = Transform
+*/
+class TriangleCreator : public Creator<Geometry>
+{
+public:
+
+    Str8 GetTypeName() const override { return "Triangle"; }
+
+    Geometry *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
+};
+
+/*
     type = TriangleBVH
 
     filename  = Filename
