@@ -55,6 +55,9 @@
     <Filter Include="Source\Reporter">
       <UniqueIdentifier>{9d09bb28-3570-4c67-9128-4354086186ed}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\Medium">
+      <UniqueIdentifier>{b3f4b308-8cbf-4f5a-8fd8-57bbe11acbf9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\AABB.h">
@@ -225,6 +228,18 @@
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\Medium.h">
       <Filter>Source\Core</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Medium\HomogeneousMedium.h">
+      <Filter>Source\Medium</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\VolumetricPathTracingIntegrator.h">
+      <Filter>Source\Renderer\PathTracingIntegrator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\BxDF\BxDF_Void.h">
+      <Filter>Source\Material\BxDF</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\InvisibleSurface.h">
+      <Filter>Source\Material</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Core\Common.cpp">
@@ -334,6 +349,18 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Entity\GeometricDiffuseLight.cpp">
       <Filter>Source\Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Medium\HomogeneousMedium.cpp">
+      <Filter>Source\Medium</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\VolumetricPathTracingIntegrator.cpp">
+      <Filter>Source\Renderer\PathTracingIntegrator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\BxDF\BxDF_Void.cpp">
+      <Filter>Source\Material\BxDF</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\InvisibleSurface.cpp">
+      <Filter>Source\Material</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

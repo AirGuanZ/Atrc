@@ -57,6 +57,12 @@
     <ClInclude Include="..\..\..\..\Source\Atrc\Mgr\BuiltinCreator\ReporterCreator.h">
       <Filter>Source\BuiltinCreator</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Mgr\BuiltinCreator\MediumCreator.h">
+      <Filter>Source\BuiltinCreator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Mgr\SceneBuilder.h">
+      <Filter>Source</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\Source\Atrc\Mgr\BuiltinCreatorRegister.cpp">
@@ -100,6 +106,12 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\Source\Atrc\Mgr\BuiltinCreator\ReporterCreator.cpp">
       <Filter>Source\BuiltinCreator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\Mgr\BuiltinCreator\MediumCreator.cpp">
+      <Filter>Source\BuiltinCreator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\Mgr\SceneBuilder.cpp">
+      <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
