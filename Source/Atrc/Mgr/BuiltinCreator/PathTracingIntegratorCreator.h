@@ -19,7 +19,7 @@ class MISPathTracingIntegratorCreator : public Creator<PathTracingIntegrator>
 {
 public:
 
-    Str8 GetTypeName() const override { return "MISPathTracing"; }
+    Str8 GetTypeName() const override { return "MIS"; }
 
     PathTracingIntegrator *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
 };
@@ -35,7 +35,7 @@ class NativePathTracingIntegratorCreator : public Creator<PathTracingIntegrator>
 {
 public:
 
-    Str8 GetTypeName() const override { return "NativePathTracing"; }
+    Str8 GetTypeName() const override { return "Native"; }
 
     PathTracingIntegrator *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
 };

@@ -25,7 +25,7 @@ camera = {
 renderer = {
     type = PathTracing;
     integrator = {
-        type = MISPathTracing;
+        type = MIS;
         minDepth = 10;
         maxDepth = 20;
         contProb = 0.9;
@@ -49,15 +49,6 @@ mat = {
 
 entities = (
 ###{
-    type = Geometric;
-    geometry = {
-        type = Sphere;
-        radius = 200;
-        transform = (Translate(0, 0, -201));
-    };
-    material = mat;
-},###
-{
     type = GeometricDiffuse;
     geometry = {
         type = Sphere;
@@ -65,15 +56,6 @@ entities = (
         transform = (Translate(-3, 3, 2.5));
     };
     radiance = (50);
-},
-###{
-    type = GeometricDiffuse;
-    geometry = {
-        type = Sphere;
-        radius = 0.4;
-        transform = (Translate(-4, -4, 2.5));
-    };
-    radiance = (20);
 },###
 {
     type = Geometric;
@@ -131,11 +113,11 @@ blackTexture = {
 };
 
 lights = (
-###{
+{
     type = Sky;
-    top = (0.1);
-    bottom = (0.1);
-}###
+    top = (1);
+    bottom = (1);
+}
 );
 
 postProcessors = (
