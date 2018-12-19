@@ -4,6 +4,7 @@
 #include <Atrc/Lib/Material/IdealBlack.h>
 #include <Atrc/Lib/Material/IdealDiffuse.h>
 #include <Atrc/Lib/Material/IdealMirror.h>
+#include <Atrc/Lib/Material/InvisibleSurface.h>
 #include <Atrc/Lib/Material/ONMatte.h>
 #include <Atrc/Lib/Material/TSMetal.h>
 #include <Atrc/Lib/Material/Utility/Fresnel.h>
@@ -76,11 +77,13 @@ void RegisterBuiltinMaterialCreators(Context &context)
     static const IdealBlackCreator idealBlackCreator;
     static const IdealDiffuseCreator idealDiffuseCreator;
     static const IdealMirrorCreator idealMirrorCreator;
+    static const InvisibleSurfaceCreator invisibleSurfaceCreator;
     static const ONMatteCreator oNMatteCreator;
     static const TSMetalCreator tSMetalCreator;
     context.AddCreator(&idealBlackCreator);
     context.AddCreator(&idealDiffuseCreator);
     context.AddCreator(&idealMirrorCreator);
+    context.AddCreator(&invisibleSurfaceCreator);
     context.AddCreator(&oNMatteCreator);
     context.AddCreator(&tSMetalCreator);
 
@@ -137,6 +140,13 @@ Material *IdealMirrorCreator::Create(const ConfigGroup &group, Context &context,
         return arena.Create<IdealMirror>(rcMap, fresnel);
     }
     ATRC_MGR_CATCH_AND_RETHROW("In creating ideal mirror material: " + group.ToString())
+}
+
+Material *InvisibleSurfaceCreator::Create(
+    [[maybe_unused]] const ConfigGroup &group, [[maybe_unused]] Context &context, [[maybe_unused]] Arena &arena) const
+{
+    static InvisibleSurface STATIC_INVISIBLE_SURFACE;
+    return &STATIC_INVISIBLE_SURFACE;
 }
 
 Material *ONMatteCreator::Create(const ConfigGroup &group, Context &context, Arena &arena) const

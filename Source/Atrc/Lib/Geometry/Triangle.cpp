@@ -94,7 +94,7 @@ Geometry::SampleResult Triangle::Sample(const Vec3 &sample) const noexcept
     return ret;
 }
 
-Real Triangle::SamplePDF(const Vec3 &pos) const noexcept
+Real Triangle::SamplePDF([[maybe_unused]] const Vec3 &pos) const noexcept
 {
     return 1 / GetSurfaceArea();
 }

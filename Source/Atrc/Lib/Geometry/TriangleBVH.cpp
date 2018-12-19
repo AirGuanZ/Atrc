@@ -404,7 +404,7 @@ namespace
 }
 
 TriangleBVHCore::TriangleBVHCore(const Vertex *vertices, uint32_t triangleCount)
-    : nodes_(nullptr), nodeCount_(0), prims_(nullptr), primsInfo_(nullptr)
+    : nodeCount_(0), nodes_(nullptr), prims_(nullptr), primsInfo_(nullptr)
 {
     AGZ_ASSERT(vertices && triangleCount);
     InitBVH(vertices, triangleCount);

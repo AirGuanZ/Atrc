@@ -6,8 +6,9 @@
 #include <Atrc/Lib/Core/Scene.h>
 
 #include <Atrc/Mgr/BuiltinCreatorRegister.h>
-#include <Atrc/Mgr/Parser.h>
 #include <Atrc/Mgr/Context.h>
+#include <Atrc/Mgr/Parser.h>
+#include <Atrc/Mgr/SceneBuilder.h>
 
 using namespace Atrc;
 
@@ -21,32 +22,14 @@ int Run()
     Mgr::Context context(root);
     Mgr::RegisterBuiltinCreators(context);
 
-    auto camera   = context.Create<Camera>    (root["camera"]);
     auto renderer = context.Create<Renderer>  (root["renderer"]);
     auto sampler  = context.Create<Sampler>   (root["sampler"]);
     auto filter   = context.Create<FilmFilter>(root["film.filter"]);
     auto reporter = context.Create<Reporter>  (root["reporter"]);
 
+    auto scene = Mgr::SceneBuilder::Build(root, context);
+
     auto outputFilename = root["outputFilename"].AsValue();
-
-    std::vector<Entity*> entities;
-    std::vector<Light*> lights;
-
-    ATRC_MGR_TRY
-    {
-        auto &entArr = root["entities"].AsArray();
-        for(size_t i = 0; i < entArr.Size(); ++i)
-            entities.push_back(context.Create<Entity>(entArr[i]));
-    }
-    ATRC_MGR_CATCH_AND_RETHROW("In creating entities")
-
-    ATRC_MGR_TRY
-    {
-        auto &lghtArr = root["lights"].AsArray();
-        for(size_t i = 0; i < lghtArr.Size(); ++i)
-            lights.push_back(context.Create<Light>(lghtArr[i]));
-    }
-    ATRC_MGR_CATCH_AND_RETHROW("In creating lights")
 
     Vec2i filmSize;
     ATRC_MGR_TRY
@@ -70,27 +53,6 @@ int Run()
     ATRC_MGR_CATCH_AND_RETHROW("In creating post processors")
 
     Film film(filmSize, *filter);
-
-    std::vector<const Entity*> cEntities;
-    std::vector<const Light*> cLights;
-
-    cEntities.reserve(entities.size());
-    for(auto ent : entities)
-    {
-        cEntities.push_back(ent);
-        if(auto lht = ent->AsLight())
-            lights.push_back(lht);
-    }
-
-    cLights.reserve(lights.size());
-    for(auto lht : lights)
-        cLights.push_back(lht);
-    
-    Scene scene(cEntities.data(), cEntities.size(), cLights.data(), cLights.size(), camera);
-
-    for(auto lht : lights)
-        lht->PreprocessScene(scene);
-    
     renderer->Render(scene, sampler, &film, reporter);
 
     auto image = film.GetImage();
@@ -123,8 +85,7 @@ int main()
     }
     catch(const Mgr::MgrErr &err)
     {
-        const Mgr::MgrErr *pErr = &err;
-        while(pErr)
+        for(auto pErr = &err; pErr; pErr = pErr->TryGetInterior())
         {
             std::cout << pErr->GetMsg().ToStdString() << std::endl;
             if(pErr->TryGetLeaf())
@@ -132,7 +93,6 @@ int main()
                 std::cout << pErr->TryGetLeaf()->what() << std::endl;
                 break;
             }
-            pErr = pErr->TryGetInterior();
         }
     }
     catch(const std::exception &err)

@@ -8,7 +8,7 @@ namespace Atrc::Mgr
 
 namespace
 {
-    MediumInterface CreateMediumInterface(const ConfigGroup &group, Context &context, Arena &arena)
+    MediumInterface CreateMediumInterface(const ConfigGroup &group, Context &context, [[maybe_unused]] Arena &arena)
     {
         ATRC_MGR_TRY
         {

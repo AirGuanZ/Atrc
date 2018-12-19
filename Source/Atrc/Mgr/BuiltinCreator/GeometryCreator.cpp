@@ -32,7 +32,7 @@ Geometry *SphereCreator::Create(const ConfigGroup &group, [[maybe_unused]] Conte
     ATRC_MGR_CATCH_AND_RETHROW("In creating sphere: " + group.ToString())
 }
 
-Geometry *TriangleCreator::Create(const ConfigGroup &group, Context &context, Arena &arena) const
+Geometry *TriangleCreator::Create(const ConfigGroup &group, [[maybe_unused]] Context &context, Arena &arena) const
 {
     ATRC_MGR_TRY
     {

@@ -108,7 +108,7 @@ Spectrum MISPathTracingIntegrator::Eval(
                     else
                     {
                         Real lpdf = scene.SampleLightPDF(light) *
-                            light->SampleWiPDF(tInct.pos, tInct.coordSys.ez, inct, shd, true);
+                            light->SampleWiAreaPDF(tInct.pos, tInct.coordSys.ez, inct, shd);
                         ret += coef * f * light->AreaLe(tInct) / (bsdfSample->pdf + lpdf);
                     }
                 }
@@ -130,8 +130,7 @@ Spectrum MISPathTracingIntegrator::Eval(
                             ret += coef * f * le / bsdfSample->pdf;
                         else
                         {
-                            Real lpdf = light->SampleWiPDF(
-                                inct.pos + ray.d, Vec3::UNIT_X(), inct, shd, false);
+                            Real lpdf = light->SampleWiNonAreaPDF(ray.d, inct, shd);
                             ret += coef * f * le / (bsdfSample->pdf + lpdf);
                         }
                     }
@@ -150,8 +149,7 @@ Spectrum MISPathTracingIntegrator::Eval(
                         ret += coef * f * le / bsdfSample->pdf;
                     else
                     {
-                        Real lpdf = light->pdf * light->light->SampleWiPDF(
-                            inct.pos + ray.d, Vec3::UNIT_X(), inct, shd, false);
+                        Real lpdf = light->pdf * light->light->SampleWiNonAreaPDF(ray.d, inct, shd);
                         ret += coef * f * le / (bsdfSample->pdf + lpdf);
                     }
                 }

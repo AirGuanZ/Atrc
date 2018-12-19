@@ -18,6 +18,15 @@ Scene::Scene(
         worldBound_ |= ent->GetWorldBound();
 }
 
+Scene::Scene(Scene &&moveFrom) noexcept
+    : entities_(std::move(moveFrom.entities_)),
+      lights_(std::move(moveFrom.lights_)),
+      camera_(moveFrom.camera_),
+      worldBound_(moveFrom.worldBound_)
+{
+
+}
+
 const Camera *Scene::GetCamera() const noexcept
 {
     return camera_;

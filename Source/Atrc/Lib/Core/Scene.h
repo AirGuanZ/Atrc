@@ -27,6 +27,8 @@ public:
         const Entity **entities, size_t entityCount,
         const Light **lights,    size_t lightCount,
         const Camera *camera);
+
+    Scene(Scene &&moveFrom) noexcept;
     
     const Camera *GetCamera() const noexcept;
 

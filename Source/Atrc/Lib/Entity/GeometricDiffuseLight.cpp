@@ -31,7 +31,7 @@ AABB GeometricDiffuseLight::GetWorldBound() const
     return geometry_->GetWorldBound();
 }
 
-const Material *GeometricDiffuseLight::GetMaterial(const Intersection &inct) const noexcept
+const Material *GeometricDiffuseLight::GetMaterial([[maybe_unused]] const Intersection &inct) const noexcept
 {
     return &STATIC_IDEAL_BLACK;
 }
@@ -65,12 +65,25 @@ Light::SampleWiResult GeometricDiffuseLight::SampleWi(const Intersection &inct, 
     return ret;
 }
 
-Real GeometricDiffuseLight::SampleWiPDF(
+Real GeometricDiffuseLight::SampleWiAreaPDF(
+    const Vec3 &pos, const Vec3 &nor, const Intersection &inct, [[maybe_unused]] const ShadingPoint &shd) const noexcept
+{
+    return geometry_->SamplePDF(pos, inct.pos) * (pos - inct.pos).LengthSquare() / Cos(nor, inct.pos - pos);
+}
+
+Real GeometricDiffuseLight::SampleWiNonAreaPDF(
+    [[maybe_unused]] const Vec3 &wi,
+    [[maybe_unused]] const Intersection &inct, [[maybe_unused]] const ShadingPoint &shd) const noexcept
+{
+    return 0;
+}
+
+/*Real GeometricDiffuseLight::SampleWiPDF(
     const Vec3 &pos, const Vec3 &nor, const Intersection &inct,
     [[maybe_unused]] const ShadingPoint &shd, [[maybe_unused]] bool onLight) const noexcept
 {
     return onLight ? geometry_->SamplePDF(pos, inct.pos) * (pos - inct.pos).LengthSquare() / Cos(nor, inct.pos - pos) : Real(0);
-}
+}*/
 
 Spectrum GeometricDiffuseLight::AreaLe([[maybe_unused]] const Intersection &inct) const noexcept
 {
@@ -78,7 +91,7 @@ Spectrum GeometricDiffuseLight::AreaLe([[maybe_unused]] const Intersection &inct
     return radiance_;
 }
 
-Spectrum GeometricDiffuseLight::NonAreaLe(const Ray &r) const noexcept
+Spectrum GeometricDiffuseLight::NonAreaLe([[maybe_unused]] const Ray &r) const noexcept
 {
     return Spectrum();
 }

@@ -10,15 +10,15 @@ film = {
 
 sampler = {
     type = Native;
-    spp = 1;
+    spp = 100;
 };
 
 camera = {
     type = Pinhole;
     sensorWidth = 1;
-    sensorDistance = 1;
+    sensorDistance = 1.8;
     pos = (-7, 0, 1);
-    lookAt = (0, 0, 1.5);
+    lookAt = (0, 0, 1.1);
     up = (0, 0, 1);
 };
 
@@ -104,7 +104,12 @@ entities = (
     geometry = {
         type = TriangleBVH;
         filename = "./Asset/4.obj";
-        transform = (Translate(0, 0.4, 1.8), RotateZ(Deg(-90)), RotateX(Deg(90)), Scale(0.0035), Translate(-1300, -800, -1800));
+        transform = (
+            Translate(0, 0.4, 1.8),
+            RotateZ(Deg(-90)),
+            RotateX(Deg(90)),
+            Scale(0.0035),
+            Translate(-1300, -800, -1800));
     };
     material = {
         type = IdealDiffuse;

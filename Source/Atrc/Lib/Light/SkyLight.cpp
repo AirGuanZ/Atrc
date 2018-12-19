@@ -39,11 +39,17 @@ Light::SampleWiResult SkyLight::SampleWi(
     return ret;
 }
 
-Real SkyLight::SampleWiPDF(
-    const Vec3 &pos, const Vec3 &nor, const Intersection &inct, const ShadingPoint &shd, bool onLight) const noexcept
+Real SkyLight::SampleWiAreaPDF(
+    [[maybe_unused]] const Vec3 &pos, [[maybe_unused]] const Vec3 &nor,
+    [[maybe_unused]] const Intersection &inct, [[maybe_unused]] const ShadingPoint &shd) const noexcept
 {
-    AGZ_ASSERT(!onLight);
-    Vec3 lwi = shd.coordSys.World2Local(pos - inct.pos).Normalize();
+    return 0;
+}
+
+Real SkyLight::SampleWiNonAreaPDF(
+    const Vec3 &wi, [[maybe_unused]] const Intersection &inct, const ShadingPoint &shd) const noexcept
+{
+    Vec3 lwi = shd.coordSys.World2Local(wi).Normalize();
     return AGZ::Math::DistributionTransform::
         ZWeightedOnUnitHemisphere<Real>::PDF(lwi);
 }

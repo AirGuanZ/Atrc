@@ -24,7 +24,7 @@ public:
 
     albedo = Texture
 
-    normalMapper = NormalMapper | null
+    normalMapper = Texture | null
 */
 class IdealDiffuseCreator : public Creator<Material>
 {
@@ -35,6 +35,12 @@ public:
     Material *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
 };
 
+/*
+    type = IdealMirror
+
+    rc = Texture
+    fresnel = Fresnel
+*/
 class IdealMirrorCreator : public Creator<Material>
 {
 public:
@@ -45,12 +51,24 @@ public:
 };
 
 /*
+    type = Invisible
+*/
+class InvisibleSurfaceCreator : public Creator<Material>
+{
+public:
+
+    Str8 GetTypeName() const override { return "Invisible"; }
+
+    Material *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
+};
+
+/*
     type = ONMatte
 
     albedo = Texture
     sigma  = Texture
 
-    normalMapper = NormalMapper | null
+    normalMapper = Texture | null
 */
 class ONMatteCreator : public Creator<Material>
 {
@@ -70,7 +88,7 @@ public:
     rc        = Texture
     roughness = Texture
 
-    normalMapper = NormalMapper | null
+    normalMapper = Texture | null
 */
 class TSMetalCreator : public Creator<Material>
 {
