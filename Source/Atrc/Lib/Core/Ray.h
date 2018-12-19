@@ -19,6 +19,8 @@ public:
     Vec3 At(Real t) const noexcept;
 
     bool Between(Real t) const noexcept;
+
+    Ray Normalize() const noexcept;
 };
 
 // ================================= Implementation
@@ -38,6 +40,12 @@ inline Vec3 Ray::At(Real t) const noexcept
 inline bool Ray::Between(Real t) const noexcept
 {
     return t0 <= t && t <= t1;
+}
+
+inline Ray Ray::Normalize() const noexcept
+{
+    Real len = d.Length();
+    return Ray(o, d / len, t0 * len, t1 * len);
 }
 
 } // namespace Atrc

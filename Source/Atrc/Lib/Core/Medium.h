@@ -1,4 +1,6 @@
-#pragma once
+﻿#pragma once
+
+#include <Utils/Misc.h>
 
 #include <Atrc/Lib/Core/Common.h>
 
@@ -28,16 +30,15 @@ public:
 
     virtual Spectrum Tr(const Vec3 &a, const Vec3 &b) const = 0;
 
-    struct SampleLsResult
-    {
-        MediumPoint medPnt;
-        Real medPdf; // medPdfΪ0��ʾendPdf��Ч
-        Real endPdf;
-    };
+    struct MediumLsSample { MediumPoint pnt; Real pdf; };
 
-    virtual  SampleLsResult SampleLs(const Ray &r) const = 0;
+    // MediumLsSample为介质中的采样点，Real为采样到终点（非介质）时的概率密度函数值
+    using SampleLsResult = Variant<MediumLsSample, Real>;
 
-    virtual MediumShadingPoint Shade(const MediumPoint &medPnt, Arena &arena) const = 0;
+    // assert r is normalized
+    virtual  SampleLsResult SampleLs(const Ray &r, const Vec3 &sample) const = 0;
+
+    virtual MediumShadingPoint GetShadingPoint(const MediumPoint &medPnt, Arena &arena) const = 0;
 };
 
 class PhaseFunction

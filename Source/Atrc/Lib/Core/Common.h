@@ -65,6 +65,8 @@ using AGZ::Math::Arcsin;
 using AGZ::Math::Arctan2;
 using AGZ::Math::Clamp;
 using AGZ::Math::Cos;
+using AGZ::Math::Exp;
+using AGZ::Math::Log_e;
 using AGZ::Math::Min;
 using AGZ::Math::Max;
 using AGZ::Math::Pow;
@@ -107,6 +109,8 @@ inline Real Phi(const Vec3 &w) noexcept
 using AGZ::Math::Color3b;
 
 using Spectrum = AGZ::Math::Color3<Real>;
+
+constexpr int SPECTRUM_CHANNEL_COUNT = 3;
 
 namespace SPECTRUM = AGZ::Math::COLOR;
 
