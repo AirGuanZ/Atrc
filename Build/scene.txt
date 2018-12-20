@@ -10,6 +10,7 @@ film = {
 
 sampler = {
     type = Native;
+    seed = 42;
     spp = 1000;
 };
 
@@ -25,7 +26,7 @@ camera = {
 renderer = {
     type = PathTracing;
     integrator = {
-        type = Volumetric;
+        type = Native;
         minDepth = 10;
         maxDepth = 20;
         contProb = 0.9;
@@ -48,7 +49,7 @@ mat = {
 };
 
 entities = (
-{
+###{
     type = GeometricDiffuse;
     geometry = {
         type = Sphere;
@@ -56,7 +57,7 @@ entities = (
         transform = (Translate(-3, 3, 2.5));
     };
     radiance = (50);
-},
+},###
 {
     type = Geometric;
     geometry = {
@@ -83,7 +84,7 @@ entities = (
 },
 {
     type = Geometric;
-    geometry = {
+    geometry1 = {
         type = TriangleBVH;
         filename = "./Asset/4.obj";
         transform = (
@@ -93,7 +94,7 @@ entities = (
             Scale(0.0035),
             Translate(-1300, -800, -1800));
     };
-    material = {
+    material1 = {
         type = IdealDiffuse;
         albedo = {
             type = Image;
@@ -102,6 +103,23 @@ entities = (
         normalMapper = {
             type = Image;
             filename = "./Asset/9.png";
+        };
+    };
+    geometry = {
+        type = Sphere;
+        radius = 1;
+        transform = ();
+    };
+    material = {
+        type = IdealSpecular;
+        rc = {
+            type = Constant1;
+            texel = 0.8;
+        };
+        fresnel = {
+            type = Schlick;
+            etaI = 1;
+            etaT = 1.6;
         };
     };
 }
@@ -113,11 +131,11 @@ blackTexture = {
 };
 
 lights = (
-###{
+{
     type = Sky;
     top = (1);
     bottom = (1);
-}###
+}
 );
 
 postProcessors = (

@@ -38,6 +38,9 @@ protected:
 public:
 
     Dielectric(Real etaI, Real etaT) noexcept;
+
+    Real GetEtaI() const noexcept { return etaI; }
+    Real GetEtaT() const noexcept { return etaT; }
 };
 
 // 使用fresnel公式的绝缘体fresnel项

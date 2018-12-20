@@ -51,6 +51,21 @@ public:
 };
 
 /*
+    type = IdealSpecular
+
+    rc = Texture
+    fresnel = Dielectric
+*/
+class IdealSpecularCreator : public Creator<Material>
+{
+public:
+
+    Str8 GetTypeName() const override { return "IdealSpecular"; }
+
+    Material *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
+};
+
+/*
     type = Invisible
 */
 class InvisibleSurfaceCreator : public Creator<Material>

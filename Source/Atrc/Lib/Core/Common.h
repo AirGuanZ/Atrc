@@ -78,11 +78,6 @@ using AGZ::Math::Tan;
 constexpr Real PI = AGZ::Math::PI<Real>;
 constexpr Real InvPI = AGZ::Math::InvPI<Real>;
 
-inline Real Rand() noexcept
-{
-    return AGZ::Math::Random::Uniform<Real>(0, 1);
-}
-
 inline Real Cos(const Vec3 &L, const Vec3 &R) noexcept
 {
     return Dot(L, R) / (L.Length() * R.Length());

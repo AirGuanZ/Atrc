@@ -87,6 +87,9 @@ Spectrum VolumetricPathTracingIntegrator::Eval(const Scene &scene, const Ray &_r
 
     for(int depth = 1; depth <= maxDepth_; ++depth)
     {
+        if(!coef)
+            break;
+
         // Russian roulette strategy
 
         if(depth > minDepth_)

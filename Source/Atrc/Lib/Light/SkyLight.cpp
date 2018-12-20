@@ -37,6 +37,10 @@ Light::SampleWiResult SkyLight::SampleWi(
     ret.pdf      = pdf;
     ret.isDelta  = false;
     ret.isInf    = true;
+
+    if(!ret.pdf)
+        ret.radiance = Spectrum();
+
     return ret;
 }
 

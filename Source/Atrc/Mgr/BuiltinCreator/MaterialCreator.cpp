@@ -4,6 +4,7 @@
 #include <Atrc/Lib/Material/IdealBlack.h>
 #include <Atrc/Lib/Material/IdealDiffuse.h>
 #include <Atrc/Lib/Material/IdealMirror.h>
+#include <Atrc/Lib/Material/IdealSpecular.h>
 #include <Atrc/Lib/Material/InvisibleSurface.h>
 #include <Atrc/Lib/Material/ONMatte.h>
 #include <Atrc/Lib/Material/TSMetal.h>
@@ -77,12 +78,14 @@ void RegisterBuiltinMaterialCreators(Context &context)
     static const IdealBlackCreator idealBlackCreator;
     static const IdealDiffuseCreator idealDiffuseCreator;
     static const IdealMirrorCreator idealMirrorCreator;
+    static const IdealSpecularCreator idealSpecularCreator;
     static const InvisibleSurfaceCreator invisibleSurfaceCreator;
     static const ONMatteCreator oNMatteCreator;
     static const TSMetalCreator tSMetalCreator;
     context.AddCreator(&idealBlackCreator);
     context.AddCreator(&idealDiffuseCreator);
     context.AddCreator(&idealMirrorCreator);
+    context.AddCreator(&idealSpecularCreator);
     context.AddCreator(&invisibleSurfaceCreator);
     context.AddCreator(&oNMatteCreator);
     context.AddCreator(&tSMetalCreator);
@@ -140,6 +143,17 @@ Material *IdealMirrorCreator::Create(const ConfigGroup &group, Context &context,
         return arena.Create<IdealMirror>(rcMap, fresnel);
     }
     ATRC_MGR_CATCH_AND_RETHROW("In creating ideal mirror material: " + group.ToString())
+}
+
+Material *IdealSpecularCreator::Create(const ConfigGroup &group, Context &context, Arena &arena) const
+{
+    ATRC_MGR_TRY
+    {
+        auto rcMap = context.Create<Texture>(group["rc"]);
+        auto fresnel = context.Create<Fresnel>(group["fresnel"]);
+        return arena.Create<IdealSpecular>(rcMap, fresnel);
+    }
+    ATRC_MGR_CATCH_AND_RETHROW("In creating ideal specular material: " + group.ToString())
 }
 
 Material *InvisibleSurfaceCreator::Create(
