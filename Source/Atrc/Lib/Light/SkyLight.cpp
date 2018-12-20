@@ -36,6 +36,7 @@ Light::SampleWiResult SkyLight::SampleWi(
     ret.radiance = NonAreaLe(Ray(ret.pos, sam, EPS));
     ret.pdf      = pdf;
     ret.isDelta  = false;
+    ret.isInf    = true;
     return ret;
 }
 

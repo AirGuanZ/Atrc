@@ -20,6 +20,7 @@ public:
         Spectrum radiance;
         Real pdf;
         bool isDelta;
+        bool isInf;
     };
 
     virtual ~Light() = default;

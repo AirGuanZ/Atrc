@@ -61,6 +61,7 @@ Light::SampleWiResult GeometricDiffuseLight::SampleWi(const Intersection &inct, 
     ret.radiance = radiance_;
     ret.pdf      = gRet.pdf * (ret.pos - inct.pos).LengthSquare() / Cos(gRet.nor, -ret.wi);
     ret.isDelta  = false;
+    ret.isInf    = false;
 
     return ret;
 }

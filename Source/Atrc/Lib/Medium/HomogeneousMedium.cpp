@@ -18,22 +18,22 @@ namespace
         explicit HenyeyGreenstein(const Vec3 &wo, Real g)
             : wo(wo.Normalize()), g(g) { }
 
-        SampleWiResult SampleWi() const override
+        SampleWiResult SampleWi(const Vec2 &sample) const override
         {
             SampleWiResult ret;
-            Real u = Rand(), v = Rand(), cosTheta;
+            Real cosTheta;
 
             if(Abs(g) < EPS)
-                cosTheta = 1 - 2 * u;
+                cosTheta = 1 - 2 * sample.x;
             else
             {
-                Real t = (1 - g * g) / (1 - g + 2 * g * u);
+                Real t = (1 - g * g) / (1 - g + 2 * g * sample.x);
                 cosTheta = 1 / (2 * g) * (1 + g * g - t * t);
             }
 
             Real sinTheta = Sqrt(Max(Real(0), 1 - cosTheta * cosTheta));
 
-            Real phi = 2 * PI * v;
+            Real phi = 2 * PI * sample.y;
 
             auto dem = float(1 + g * g + 2 * g * cosTheta);
             ret.coef = float(1 / (4 * PI) * (1 - g * g) / (dem * Sqrt(dem)));
@@ -59,6 +59,11 @@ Spectrum HomogeneousMedium::Tr(const Vec3 &a, const Vec3 &b) const
 #else
     return (-sigmaT_ * Real((a - b).Length())).Map(Exp<Real>);
 #endif
+}
+
+Spectrum HomogeneousMedium::TrToInf([[maybe_unused]] const Vec3 &a, [[maybe_unused]] const Vec3 &d) const
+{
+    return Spectrum(!!sigmaT_ ? Real(0) : Real(1));
 }
 
 Medium::SampleLsResult HomogeneousMedium::SampleLs(const Ray &r, const Vec3 &sample) const

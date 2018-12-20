@@ -43,7 +43,14 @@ Scene SceneBuilder::Build(const ConfigGroup &root, Context &context)
         for(auto lht : lights)
             cLights.push_back(lht);
 
-        Scene scene(cEntities.data(), cEntities.size(), cLights.data(), cLights.size(), camera);
+        Medium *globalMedium = nullptr;
+        if(auto medNode = root.Find("globalMedium"))
+            globalMedium = context.Create<Medium>(*medNode);
+
+        Scene scene(
+            cEntities.data(), cEntities.size(),
+            cLights.data(), cLights.size(),
+            camera, globalMedium);
 
         for(auto lht : lights)
             lht->PreprocessScene(scene);

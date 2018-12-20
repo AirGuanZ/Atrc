@@ -16,6 +16,8 @@ public:
 
     Spectrum Tr(const Vec3 &a, const Vec3 &b) const override;
 
+    Spectrum TrToInf(const Vec3 &a, const Vec3 &d) const override;
+
     SampleLsResult SampleLs(const Ray &r, const Vec3 &sample) const override;
 
     MediumShadingPoint GetShadingPoint(const MediumPoint &medPnt, Arena &arena) const override;

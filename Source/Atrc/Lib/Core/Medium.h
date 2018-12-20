@@ -30,6 +30,8 @@ public:
 
     virtual Spectrum Tr(const Vec3 &a, const Vec3 &b) const = 0;
 
+    virtual Spectrum TrToInf(const Vec3 &a, const Vec3 &d) const = 0;
+
     struct MediumLsSample { MediumPoint pnt; Real pdf; };
 
     // MediumLsSample为介质中的采样点，Real为采样到终点（非介质）时的概率密度函数值
@@ -53,7 +55,7 @@ public:
         Vec3 wi;
     };
 
-    virtual SampleWiResult SampleWi() const = 0;
+    virtual SampleWiResult SampleWi(const Vec2 &sample) const = 0;
 };
 
 struct MediumInterface

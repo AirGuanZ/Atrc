@@ -6,8 +6,8 @@ namespace Atrc
 Scene::Scene(
     const Entity **entities, size_t entityCount,
     const Light **lights,    size_t lightCount,
-    const Camera *camera)
-    : entities_(entityCount), lights_(lightCount), camera_(camera)
+    const Camera *camera, const Medium *globalMedium)
+    : entities_(entityCount), lights_(lightCount), camera_(camera), globalMedium_(globalMedium)
 {
     AGZ_ASSERT((!entityCount || entities) && (!lightCount || lights) && camera);
 
@@ -40,6 +40,11 @@ const std::vector<const Entity*> Scene::GetEntities() const noexcept
 const std::vector<const Light*> Scene::GetLights() const noexcept
 {
     return lights_;
+}
+
+const Medium *Scene::GetGlobalMedium() const noexcept
+{
+    return globalMedium_;
 }
 
 const AABB &Scene::GetWorldBound() const noexcept

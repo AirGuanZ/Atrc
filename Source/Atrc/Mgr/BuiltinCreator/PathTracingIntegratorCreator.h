@@ -52,4 +52,21 @@ public:
     PathTracingIntegrator *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
 };
 
+/*
+    type = Volumetric
+
+    minDepth       = int
+    maxDepth       = int
+    contProb       = Real
+    sampleAllLight = True | False
+*/
+class VolumetricPathTracingIntegratorCreator : public Creator<PathTracingIntegrator>
+{
+public:
+
+    Str8 GetTypeName() const override { return "Volumetric"; }
+
+    PathTracingIntegrator *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
+};
+
 } // namespace Atrc::Mgr

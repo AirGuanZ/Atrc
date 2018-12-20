@@ -12,12 +12,16 @@
 namespace Atrc
 {
 
+class Medium;
+
 class Scene
 {
     std::vector<const Entity*> entities_;
     std::vector<const Light*> lights_;
 
     const Camera *camera_;
+
+    const Medium *globalMedium_;
 
     AABB worldBound_;
 
@@ -26,7 +30,7 @@ public:
     Scene(
         const Entity **entities, size_t entityCount,
         const Light **lights,    size_t lightCount,
-        const Camera *camera);
+        const Camera *camera, const Medium *globalMedium);
 
     Scene(Scene &&moveFrom) noexcept;
     
@@ -35,6 +39,8 @@ public:
     const std::vector<const Entity*> GetEntities() const noexcept;
 
     const std::vector<const Light*> GetLights() const noexcept;
+
+    const Medium *GetGlobalMedium() const noexcept;
 
     const AABB &GetWorldBound() const noexcept;
 
