@@ -37,7 +37,7 @@ void FilmGrid::AddSample(const Vec2 &pos, const Spectrum &value) noexcept
 
     for(int32_t y = yBegin; y < yEnd; ++y)
     {
-        int32_t ly = ly = y - pixelRect_.low.y;
+        int32_t ly = y - pixelRect_.low.y;
         for(int32_t x = xBegin; x < xEnd; ++x)
         {
             Vec2 rel = pos - (Vec2(Real(x), Real(y)) + Vec2(Real(0.5)));

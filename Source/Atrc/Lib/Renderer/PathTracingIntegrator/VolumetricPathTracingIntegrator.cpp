@@ -1,4 +1,4 @@
-#include <Atrc/Lib/Renderer/PathTracingIntegrator/VolumetricPathTracingIntegrator.h>
+﻿#include <Atrc/Lib/Renderer/PathTracingIntegrator/VolumetricPathTracingIntegrator.h>
 
 namespace Atrc
 {
@@ -79,7 +79,7 @@ Spectrum VolumetricPathTracingIntegrator::Eval(const Scene &scene, const Ray &_r
 {
     // Invariant: keep r normalized
 
-    Spectrum coef = Spectrum(Real(1));
+    auto coef = Spectrum(Real(1));
     Ray r = _r.Normalize();
 
     Intersection inct;
@@ -98,8 +98,6 @@ Spectrum VolumetricPathTracingIntegrator::Eval(const Scene &scene, const Ray &_r
                 break;
             coef /= contProb_;
         }
-
-        Ray newRay = r;
 
         Real sampleInctPDF = 1; // 如果没有采样介质中的点，那么选择采样inct的pdf
 

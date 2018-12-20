@@ -1,7 +1,7 @@
 # Scene description file for Atrc Launcher
 
 film = {
-    size = (1024, 1024);
+    size = (600, 600);
     filter = {
         type = Box;
         sidelen = 1;
@@ -11,7 +11,7 @@ film = {
 sampler = {
     type = Native;
     seed = 42;
-    spp = 10000;
+    spp = 1000;
 };
 
 camera = {
@@ -32,7 +32,7 @@ renderer = {
         contProb = 1;
         sampleAllLights = True;
     };
-    workerCount = 11;
+    workerCount = 6;
     taskGridSize = 16;
 };
 
@@ -82,7 +82,7 @@ entities = (
     };
     material = mat;
 },
-{
+###{
     type = Geometric;
     geometry = {
         type = TriangleBVH;
@@ -112,7 +112,7 @@ entities = (
             k = (0.2);
         };
     };
-},
+},###
 {
     type = Geometric;
     geometry = {
@@ -151,12 +151,12 @@ entities = (
     type = Geometric;
     geometry = {
         type = TriangleBVH;
-        filename = "./Asset/happy.obj";
+        filename = "./Asset/happy_vrip.obj";
         transform = (
-            Translate(-0.4, -0.7, -1.3),
-            RotateZ(Deg(160)),
-            RotateY(Deg(90)),
-            Scale(6),
+            Translate(-0.4, -0.7, -0.09),
+            RotateZ(Deg(250)),
+            RotateX(Deg(90)),
+            Scale(0.03),
         );
     };
     material = {

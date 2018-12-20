@@ -5,7 +5,7 @@ namespace Atrc
 
 CoordSystem CoordSystem::RotateToNewEz(Vec3 newEz) const noexcept
 {
-    newEz = newEz.Normalize();
+    /*newEz = newEz.Normalize();
     if(ApproxEq(ez, newEz, EPS))
         return *this;
 
@@ -16,9 +16,10 @@ CoordSystem CoordSystem::RotateToNewEz(Vec3 newEz) const noexcept
     AGZ_ASSERT(ApproxEq(rot.Apply(ez).Normalize(), newEz, Real(1e-3)));
 
     Vec3 newEx = rot.Apply(ex);
-    Vec3 newEy = Cross(newEz, newEx);
+    Vec3 newEy = Cross(newEz, newEx);*/
 
-
+    auto newEy = Cross(newEz, ex);
+    auto newEx = Cross(newEy, newEz);
     return CoordSystem(newEx, newEy, newEz);
 }
 

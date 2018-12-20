@@ -1,4 +1,4 @@
-#include <atomic>
+ï»¿#include <atomic>
 #include <mutex>
 #include <Utils/Thread.h>
 
@@ -23,7 +23,7 @@ void PathTracingRenderer::RenderGrid(const Scene &scene, FilmGrid *filmGrid, Sam
                 auto camSam = sampler->GetCameraSample();
                 auto [r, w, pdf] = cam->GenerateRay(camSam);
 
-                Spectrum value = integrator_.Eval(scene, r, sampler, arena); 
+                Spectrum value = w * integrator_.Eval(scene, r, sampler, arena) / pdf;
                 filmGrid->AddSample(camSam.film, (w / pdf) * value);
 
                 if(arena.GetUsedBytes() > 16 * 1024 * 1024)
@@ -60,10 +60,10 @@ void PathTracingRenderer::Render(const Scene &scene, Sampler *sampler, Film *fil
 
         auto filmGrid = film->CreateFilmGrid(task);
         RenderGrid(scene, &filmGrid, gridSampler.get());
-
+        
         film->MergeFilmGrid(filmGrid);
 
-        // filmGrid¼äÎŞÈÎºÎoverlap£¬¹ÊÖ»ĞèÒª¶Ôreporter¼ÓËø¼´¿É
+        // filmGridé—´æ— ä»»ä½•overlapï¼Œæ•…åªéœ€è¦å¯¹reporteråŠ é”å³å¯
         std::lock_guard<std::mutex> lk(mergeMut);
 
         Real percent = Real(100) * ++finishedTaskCount / totalTaskCount;

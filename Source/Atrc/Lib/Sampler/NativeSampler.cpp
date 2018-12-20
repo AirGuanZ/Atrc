@@ -17,7 +17,7 @@ std::unique_ptr<Sampler> NativeSampler::Clone(int seed) const
 
 void NativeSampler::StartPixel(const Vec2i &pixel)
 {
-    remainSpp_ = spp_;
+    remainSpp_ = spp_ - 1;
     pixel_ = pixel;
 }
 

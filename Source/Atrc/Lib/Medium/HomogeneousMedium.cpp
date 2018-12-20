@@ -76,7 +76,7 @@ Medium::SampleLsResult HomogeneousMedium::SampleLs(const Ray &r, const Vec3 &sam
     Real tMax = r.t1 - r.t0;
 
     int channel = AGZ::Math::DistributionTransform::UniformInteger<Real>
-        ::Transform<int>(sample.x, 0, SPECTRUM_CHANNEL_COUNT - 1);
+        ::Transform<int>(sample.x, 0, SPECTRUM_CHANNEL_COUNT);
     Real st = -Log_e(sample.y) / sigmaT_[channel];
     bool sampleMedium = st < tMax;
 

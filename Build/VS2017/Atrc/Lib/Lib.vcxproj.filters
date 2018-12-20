@@ -240,6 +240,12 @@
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\InvisibleSurface.h">
       <Filter>Source\Material</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\BxDF\BxDF_Specular.h">
+      <Filter>Source\Material\BxDF</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\IdealSpecular.h">
+      <Filter>Source\Material</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Core\Common.cpp">
@@ -360,6 +366,12 @@
       <Filter>Source\Material\BxDF</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\InvisibleSurface.cpp">
+      <Filter>Source\Material</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\BxDF\BxDF_Specular.cpp">
+      <Filter>Source\Material\BxDF</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\IdealSpecular.cpp">
       <Filter>Source\Material</Filter>
     </ClCompile>
   </ItemGroup>
