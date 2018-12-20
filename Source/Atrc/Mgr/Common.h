@@ -26,7 +26,7 @@ public:
         : interior_(std::make_shared<MgrErr>(interior)), msg_(std::move(msg)) { }
 
     MgrErr(const std::exception &leaf, Str8 msg)
-        : leaf_(std::make_shared<std::exception>(leaf)), msg_(std::move(msg)) { }
+        : leaf_(std::make_shared<std::runtime_error>(leaf.what())), msg_(std::move(msg)) { }
 
     explicit MgrErr(Str8 msg) : msg_(std::move(msg)) { }
 

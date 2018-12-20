@@ -49,15 +49,15 @@ mat = {
 };
 
 entities = (
-###{
+{
     type = GeometricDiffuse;
     geometry = {
         type = Sphere;
         radius = 0.8;
-        transform = (Translate(0, 0, 4));
+        transform = (Translate(-2, 0, 4));
     };
     radiance = (50);
-},###
+},
 {
     type = Geometric;
     geometry = {
@@ -86,11 +86,43 @@ entities = (
     type = Geometric;
     geometry = {
         type = TriangleBVH;
+        filename = "./Asset/Le_Transi_De_Rene_De_Chalon.obj";
+        transform = (
+            Translate(0, 0.0, -1),
+            RotateZ(Deg(-100)),
+            RotateX(Deg(90)),
+            Translate(0, 0, 0),
+            Scale(0.06),
+        );
+    };
+    material = {
+        type = TSMetal;
+        rc = {
+            type = Constant;
+            texel = (0.7, 0.4, 0.2);
+        };
+        roughness = {
+            type = Constant1;
+            texel = 0.01;
+        };
+        fresnel = {
+            type = Conductor;
+            etaI = (1);
+            etaT = (0.1);
+            k = (0.2);
+        };
+    };
+},
+{
+    type = Geometric;
+    geometry = {
+        type = TriangleBVH;
         filename = "./Asset/bun_zipper.obj";
         transform = (
-            Translate(0, 0.0, -0.823),
-            RotateZ(Deg(-90)),
-            Scale(0.035),
+            Translate(-0.3, 0.7, -0.9),
+            RotateZ(Deg(-60)),
+            #RotateY(Deg(90)),
+            Scale(0.015),
         );
     };
     material = {
@@ -108,10 +140,30 @@ entities = (
     medium = {
         in = {
             type = Homogeneous;
-            sigmaA = (0.75);
+            sigmaA = (2);
             sigmaS = (10);
             le = (0);
-            g = -0.3;
+            g = 0.3;
+        };
+    };
+},
+{
+    type = Geometric;
+    geometry = {
+        type = TriangleBVH;
+        filename = "./Asset/happy.obj";
+        transform = (
+            Translate(-0.4, -0.7, -1.3),
+            RotateZ(Deg(160)),
+            RotateY(Deg(90)),
+            Scale(6),
+        );
+    };
+    material = {
+        type = IdealDiffuse;
+        albedo = {
+            type = Constant;
+            texel = (0.3, 0.5, 0.6);  
         };
     };
 }
@@ -123,11 +175,11 @@ blackTexture = {
 };
 
 lights = (
-{
+###{
     type = Sky;
     top = (1);
     bottom = (1);
-}
+}###
 );
 
 postProcessors = (

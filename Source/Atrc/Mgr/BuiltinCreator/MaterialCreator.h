@@ -97,9 +97,7 @@ public:
 /*
     type = TSMetal
 
-    etaI      = Spectrum
-    etaT      = Spectrum
-    k         = Spectrum
+    fresnel   = Fresnel
     rc        = Texture
     roughness = Texture
 
