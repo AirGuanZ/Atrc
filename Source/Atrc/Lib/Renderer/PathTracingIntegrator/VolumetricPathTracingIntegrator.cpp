@@ -126,6 +126,7 @@ Spectrum VolumetricPathTracingIntegrator::Eval(const Scene &scene, const Ray &_r
 
                 auto phSample = shd.ph->SampleWi(sampler->GetReal2());
                 r =  Ray(medSample->pnt.pos, phSample.wi.Normalize(), EPS);
+                AGZ_ASSERT(r.d.Length() > 0);
 
                 auto trLeftRt = TrLeLeft(scene, r, &inct);
                 ret += coef * trLeftRt.trle;
@@ -143,7 +144,7 @@ Spectrum VolumetricPathTracingIntegrator::Eval(const Scene &scene, const Ray &_r
         // 采样inct
 
         auto tr = med ? med->Tr(r.o, inct.pos) : Spectrum(Real(1));
-        coef *= tr;
+        coef *= tr / sampleInctPDF;
 
         ShadingPoint shd = inct.entity->GetMaterial(inct)->GetShadingPoint(inct, arena);
 
@@ -168,14 +169,17 @@ Spectrum VolumetricPathTracingIntegrator::Eval(const Scene &scene, const Ray &_r
         {
             Spectrum f = bsdfSample->coef * Abs(Cos(bsdfSample->wi, shd.coordSys.ez));
             r = Ray(inct.pos, bsdfSample->wi.Normalize(), EPS);
+            AGZ_ASSERT(r.d.Length() > 0);
             Intersection tInct;
+
+            auto nMed = inct.mediumInterface.GetMedium(inct.coordSys.ez, bsdfSample->wi);
 
             if(scene.FindIntersection(r, &tInct))
             {
                 auto light = tInct.entity->AsLight();
                 if(light)
                 {
-                    auto tr = med ? med->Tr(r.o, tInct.pos) : Spectrum(Real(1));
+                    auto tr = nMed ? nMed->Tr(r.o, tInct.pos) : Spectrum(Real(1));
 
                     if(bsdfSample->isDelta)
                         ret += tr * coef * f * light->AreaLe(tInct) / bsdfSample->pdf;
@@ -194,7 +198,7 @@ Spectrum VolumetricPathTracingIntegrator::Eval(const Scene &scene, const Ray &_r
             else
             {
                 isInctValid = false;
-                auto tr = med ? med->TrToInf(r.o, r.d) : Spectrum(Real(1));
+                auto tr = nMed ? nMed->TrToInf(r.o, r.d) : Spectrum(Real(1));
 
                 if(sampleAllLights_)
                 {

@@ -80,6 +80,8 @@ bool Scene::HasIntersection(const Ray &r) const noexcept
 
 bool Scene::FindIntersection(const Ray &r, Intersection *inct) const noexcept
 {
+    AGZ_ASSERT(r.d.Length() > 0);
+
     inct->t = RealT::Infinity();
     Intersection nInct;
     for(auto ent : GetEntities())

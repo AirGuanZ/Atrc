@@ -1,7 +1,7 @@
 # Scene description file for Atrc Launcher
 
 film = {
-    size = (600, 900);
+    size = (1024, 1024);
     filter = {
         type = Box;
         sidelen = 1;
@@ -11,28 +11,28 @@ film = {
 sampler = {
     type = Native;
     seed = 42;
-    spp = 1000;
+    spp = 10000;
 };
 
 camera = {
     type = Pinhole;
     sensorWidth = 1;
     sensorDistance = 1.8;
-    pos = (-7, 0, 1);
-    lookAt = (0, 0, 1.1);
+    pos = (-7, 0, 0.4);
+    lookAt = (0, 0, 0.4);
     up = (0, 0, 1);
 };
 
 renderer = {
     type = PathTracing;
     integrator = {
-        type = Native;
+        type = Volumetric;
         minDepth = 10;
-        maxDepth = 20;
-        contProb = 0.9;
+        maxDepth = 30;
+        contProb = 1;
         sampleAllLights = True;
     };
-    workerCount = -1;
+    workerCount = 11;
     taskGridSize = 16;
 };
 
@@ -44,7 +44,7 @@ mat = {
     type = IdealDiffuse;
     albedo = {
         type = Constant;
-        texel = (0.8);
+        texel = (0.4);
     };
 };
 
@@ -53,8 +53,8 @@ entities = (
     type = GeometricDiffuse;
     geometry = {
         type = Sphere;
-        radius = 0.4;
-        transform = (Translate(-3, 3, 2.5));
+        radius = 0.8;
+        transform = (Translate(0, 0, 4));
     };
     radiance = (50);
 },###
@@ -62,9 +62,9 @@ entities = (
     type = Geometric;
     geometry = {
         type = Triangle;
-        A = (-2, -2, 0);
-        B = (-2, 2, 0);
-        C = (2, 2, 0);
+        A = (-1.5, -1.5, 0);
+        B = (-1.5, 1.5, 0);
+        C = (1.5, 1.5, 0);
         tA = (0, 0); tB = (0, 1); tC = (1, 1);
         transform = (Translate(0, 0, -1));
     };
@@ -74,9 +74,9 @@ entities = (
     type = Geometric;
     geometry = {
         type = Triangle;
-        A = (-2, -2, 0);
-        B = (2, 2, 0);
-        C = (2, -2, 0);
+        A = (-1.5, -1.5, 0);
+        B = (1.5, 1.5, 0);
+        C = (1.5, -1.5, 0);
         tA = (0, 0); tB = (1, 1); tC = (1, 0);
         transform = (Translate(0, 0, -1));
     };
@@ -84,42 +84,34 @@ entities = (
 },
 {
     type = Geometric;
-    geometry1 = {
-        type = TriangleBVH;
-        filename = "./Asset/4.obj";
-        transform = (
-            Translate(0, 0.4, 1.8),
-            RotateZ(Deg(-90)),
-            RotateX(Deg(90)),
-            Scale(0.0035),
-            Translate(-1300, -800, -1800));
-    };
-    material1 = {
-        type = IdealDiffuse;
-        albedo = {
-            type = Image;
-            filename = "./Asset/8.png";
-        };
-        normalMapper = {
-            type = Image;
-            filename = "./Asset/9.png";
-        };
-    };
     geometry = {
-        type = Sphere;
-        radius = 1;
-        transform = ();
+        type = TriangleBVH;
+        filename = "./Asset/bun_zipper.obj";
+        transform = (
+            Translate(0, 0.0, -0.823),
+            RotateZ(Deg(-90)),
+            Scale(0.035),
+        );
     };
     material = {
         type = IdealSpecular;
         rc = {
-            type = Constant1;
-            texel = 0.8;
+            type = Constant;
+            texel = (0.6, 0.95, 0.75);
         };
         fresnel = {
-            type = Schlick;
+            type = Dielectric;
             etaI = 1;
             etaT = 1.6;
+        };
+    };
+    medium = {
+        in = {
+            type = Homogeneous;
+            sigmaA = (0.75);
+            sigmaS = (10);
+            le = (0);
+            g = -0.3;
         };
     };
 }

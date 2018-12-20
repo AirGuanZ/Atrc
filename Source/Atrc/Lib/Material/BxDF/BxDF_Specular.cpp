@@ -72,11 +72,22 @@ Option<BxDF_Specular::SampleWiResult> BxDF_Specular::SampleWi(
     auto wi = GetRefractDirection(nWo, nor, eta);
 
     SampleWiResult ret;
-    ret.wi   = wi->Normalize();
-    ret.pdf  = 1 - Fr.r;
-    ret.coef = eta * eta * rc_ * (Spectrum(1.0f) - Fr) / Abs(ret.wi.z);
-    ret.type = BSDFType(BSDF_SPECULAR | BSDF_TRANSMISSION);
-    ret.isDelta = true;
+    if(!wi)
+    {
+        ret.wi   = Vec3(-nWo.xy(), nWo.z).Normalize();
+        ret.coef = rc_ * Fr / Abs(ret.wi.z);
+        ret.pdf  = 1;
+        ret.type = BSDFType(BSDF_SPECULAR | BSDF_REFLECTION);
+        ret.isDelta = true;
+    }
+    else
+    {
+        ret.wi   = wi->Normalize();
+        ret.pdf  = 1 - Fr.r;
+        ret.coef = eta * eta * rc_ * (Spectrum(1.0f) - Fr) / Abs(ret.wi.z);
+        ret.type = BSDFType(BSDF_SPECULAR | BSDF_TRANSMISSION);
+        ret.isDelta = true;
+    }
 
     if(ret.coef.HasInf())
     {
