@@ -137,4 +137,37 @@ Real Sphere::SamplePDF(const Vec3 &) const noexcept
     return 1 / (4 * PI * r * r);
 }
 
+Geometry::SampleResult Sphere::Sample(const Vec3 &ref, const Vec3 &sample) const noexcept
+{
+    Vec3 lref = local2World_.ApplyInverseToPoint(ref);
+    Real d = lref.Length();
+    if(d <= radius_)
+        return Sample(sample);
+
+    Real cosTheta = Min(radius_ / d, Real(1));
+    auto [sam, pdf] = AGZ::Math::DistributionTransform::UniformOnCone<Real>
+                        ::Transform(cosTheta, sample.xy());
+
+    sam = CoordSystem::FromEz(lref).Local2World(sam).Normalize();
+    Real r = radius_ * local2World_.ScaleFactor();
+
+    SampleResult ret;
+    ret.nor = local2World_.ApplyToVector(sam).Normalize();
+    ret.pos = local2World_.ApplyToPoint(radius_ * sam);
+    ret.pdf = pdf / (r * r);
+
+    return ret;
+}
+
+Real Sphere::SamplePDF(const Vec3 &pos, const Vec3 &ref) const noexcept
+{
+    Vec3 lref = local2World_.ApplyInverseToPoint(ref);
+    Real d = lref.Length();
+    if(d <= radius_)
+        return SamplePDF(pos);
+    Real cosTheta = Min(radius_ / d, Real(1));
+    Real r = radius_ * local2World_.ScaleFactor();
+    return AGZ::Math::DistributionTransform::UniformOnCone<Real>::PDF(cosTheta) / (r * r);
+}
+
 } // namespace Atrc

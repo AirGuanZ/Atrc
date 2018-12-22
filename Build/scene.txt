@@ -10,8 +10,7 @@ film = {
 
 sampler = {
     type = Native;
-    seed = 42;
-    spp = 1000;
+    spp = 10000;
 };
 
 camera = {
@@ -44,7 +43,7 @@ mat = {
     type = IdealDiffuse;
     albedo = {
         type = Constant;
-        texel = (0.4);
+        texel = (0.2);
     };
 };
 
@@ -82,17 +81,17 @@ entities = (
     };
     material = mat;
 },
-###{
+{
     type = Geometric;
     geometry = {
         type = TriangleBVH;
         filename = "./Asset/Le_Transi_De_Rene_De_Chalon.obj";
         transform = (
-            Translate(0, 0.0, -1),
+            Translate(0, -0.12, 0.6),
             RotateZ(Deg(-100)),
             RotateX(Deg(90)),
             Translate(0, 0, 0),
-            Scale(0.06),
+            Scale(0.004),
         );
     };
     material = {
@@ -112,7 +111,7 @@ entities = (
             k = (0.2);
         };
     };
-},###
+},
 {
     type = Geometric;
     geometry = {
@@ -153,10 +152,10 @@ entities = (
         type = TriangleBVH;
         filename = "./Asset/happy_vrip.obj";
         transform = (
-            Translate(-0.4, -0.7, -0.09),
+            Translate(-0.4, -0.7, -0.24),
             RotateZ(Deg(250)),
             RotateX(Deg(90)),
-            Scale(0.03),
+            Scale(0.025),
         );
     };
     material = {
