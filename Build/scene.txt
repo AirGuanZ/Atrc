@@ -10,7 +10,7 @@ film = {
 
 sampler = {
     type = Native;
-    spp = 1000;
+    spp = 100000;
 };
 
 camera = {
@@ -116,14 +116,15 @@ entities = (
     type = Geometric;
     geometry = {
         type = TriangleBVH;
-        filename = "./Asset/Dragon_1.obj";
+        filename = "./Asset/bird.obj";
         transform = (
-            Translate(-0.35, 0.8, -0.62),
-            RotateZ(Deg(-60)),
-            #RotateY(Deg(90)),
-            Scale(0.005),
+            Translate(0, 0.85, -1),
+            RotateZ(Deg(-70)),
+            RotateX(Deg(90)),
+            Scale(0.003),
         );
     };
+    material1 = mat;
     material = {
         type = IdealSpecular;
         rc = {
