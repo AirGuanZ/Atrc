@@ -380,5 +380,8 @@
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\VolPathTracingIntegrator.cpp">
       <Filter>Source\Renderer\PathTracingIntegrator</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Core\Light.cpp">
+      <Filter>Source\Core</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

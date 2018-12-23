@@ -51,45 +51,27 @@ void GeometricDiffuseLight::PreprocessScene([[maybe_unused]] const Scene &scene)
     // do nothing
 }
 
-Light::SampleWiResult GeometricDiffuseLight::SampleWi(const Intersection &inct, [[maybe_unused]] const ShadingPoint &shd, const Vec3 &sample) const noexcept
+Light::SampleWiResult GeometricDiffuseLight::SampleWi(const Vec3 &pos, const Vec3 &sample) const noexcept
 {
-    return SampleWi(inct.pos, sample);
-}
-
-Real GeometricDiffuseLight::SampleWiAreaPDF(
-    const Vec3 &pos, const Vec3 &nor, const Intersection &inct, [[maybe_unused]] const ShadingPoint &shd) const noexcept
-{
-    return SampleWiAreaPDF(pos, nor, inct.pos);
-}
-
-Real GeometricDiffuseLight::SampleWiNonAreaPDF(
-    [[maybe_unused]] const Vec3 &wi,
-    [[maybe_unused]] const Intersection &inct, [[maybe_unused]] const ShadingPoint &shd) const noexcept
-{
-    return 0;
-}
-
-Light::SampleWiResult GeometricDiffuseLight::SampleWi(const Vec3 &medPos, const Vec3 &sample) const noexcept
-{
-    Geometry::SampleResult gRet = geometry_->Sample(medPos, sample);
+    Geometry::SampleResult gRet = geometry_->Sample(pos, sample);
 
     SampleWiResult ret;
     ret.pos = gRet.pos;
-    ret.wi = gRet.pos - medPos;
+    ret.wi = gRet.pos - pos;
     ret.radiance = radiance_;
-    ret.pdf = gRet.pdf * (ret.pos - medPos).LengthSquare() / Cos(gRet.nor, -ret.wi);
+    ret.pdf = gRet.pdf * (ret.pos - pos).LengthSquare() / Cos(gRet.nor, -ret.wi);
     ret.isDelta = false;
     ret.isInf = false;
 
     return ret;
 }
 
-Real GeometricDiffuseLight::SampleWiAreaPDF(const Vec3 &pos, const Vec3 &nor, const Vec3 &medPos) const noexcept
+Real GeometricDiffuseLight::SampleWiAreaPDF(const Vec3 &pos, const Vec3 &nor, const Vec3 &dst) const noexcept
 {
-    return geometry_->SamplePDF(pos, medPos) * (pos - medPos).LengthSquare() / Cos(nor, medPos - pos);
+    return geometry_->SamplePDF(pos, dst) * (pos - dst).LengthSquare() / Cos(nor, dst - pos);
 }
 
-Real GeometricDiffuseLight::SampleWiNonAreaPDF([[maybe_unused]] const Vec3 &wi, [[maybe_unused]] const Vec3 &medPos) const noexcept
+Real GeometricDiffuseLight::SampleWiNonAreaPDF([[maybe_unused]] const Vec3 &wi, [[maybe_unused]] const Vec3 &dst) const noexcept
 {
     return 0;
 }

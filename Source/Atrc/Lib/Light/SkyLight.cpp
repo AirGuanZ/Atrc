@@ -60,13 +60,13 @@ Real SkyLight::SampleWiNonAreaPDF(
         ZWeightedOnUnitHemisphere<Real>::PDF(lwi);
 }
 
-Light::SampleWiResult SkyLight::SampleWi(const Vec3 &medPos, const Vec3 &sample) const noexcept
+Light::SampleWiResult SkyLight::SampleWi(const Vec3 &pos, const Vec3 &sample) const noexcept
 {
     auto[sam, pdf] = AGZ::Math::DistributionTransform::
         UniformOnUnitSphere<Real>::Transform(sample.xy());
 
     SampleWiResult ret;
-    ret.pos      = medPos + 2 * sam * worldRadius_;
+    ret.pos      = pos + 2 * sam * worldRadius_;
     ret.wi       = sam;
     ret.radiance = NonAreaLe(Ray(ret.pos, sam, EPS));
     ret.pdf      = pdf;
