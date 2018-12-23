@@ -61,6 +61,34 @@ Real CubeEnvironmentLight::SampleWiNonAreaPDF(
         ZWeightedOnUnitHemisphere<Real>::PDF(lwi);
 }
 
+Light::SampleWiResult CubeEnvironmentLight::SampleWi(const Vec3 &medPos, const Vec3 &sample) const noexcept
+{
+    auto[sam, pdf] = AGZ::Math::DistributionTransform::
+        UniformOnUnitSphere<Real>::Transform(sample.xy());
+
+    SampleWiResult ret;
+    ret.pos = medPos + 2 * sam * worldRadius_;
+    ret.wi = sam;
+    ret.radiance = NonAreaLe(Ray(ret.pos, sam, EPS));
+    ret.pdf = pdf;
+    ret.isDelta = false;
+    ret.isInf = true;
+
+    return ret;
+}
+
+Real CubeEnvironmentLight::SampleWiAreaPDF(
+    [[maybe_unused]] const Vec3 &pos, [[maybe_unused]] const Vec3 &nor,
+    [[maybe_unused]] const Vec3 &medPos) const noexcept
+{
+    return 0;
+}
+
+Real CubeEnvironmentLight::SampleWiNonAreaPDF([[maybe_unused]] const Vec3 &wi, [[maybe_unused]] const Vec3 &medPos) const noexcept
+{
+    return AGZ::Math::DistributionTransform::UniformOnUnitSphere<Real>::PDF();
+}
+
 Spectrum CubeEnvironmentLight::AreaLe([[maybe_unused]] const Intersection &inct) const noexcept
 {
     return Spectrum();

@@ -1,3 +1,5 @@
+#pragma once
+
 #include <Atrc/Lib/Renderer/PathTracingRenderer.h>
 
 namespace Atrc

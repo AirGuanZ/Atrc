@@ -217,6 +217,7 @@
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\MISPathTracingIntegrator.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\NativePathTracingIntegrator.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\ShadingNormalIntegrator.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\VolPathTracingIntegrator.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\VolumetricPathTracingIntegrator.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingRenderer.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Reporter\DefaultReporter.h" />
@@ -263,6 +264,7 @@
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\MISPathTracingIntegrator.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\NativePathTracingIntegrator.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\ShadingNormalIntegrator.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\VolPathTracingIntegrator.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\VolumetricPathTracingIntegrator.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingRenderer.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Reporter\DefaultReporter.cpp" />

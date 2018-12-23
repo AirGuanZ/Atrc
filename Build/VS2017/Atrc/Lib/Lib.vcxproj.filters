@@ -246,6 +246,9 @@
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\IdealSpecular.h">
       <Filter>Source\Material</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\VolPathTracingIntegrator.h">
+      <Filter>Source\Renderer\PathTracingIntegrator</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Core\Common.cpp">
@@ -373,6 +376,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\IdealSpecular.cpp">
       <Filter>Source\Material</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\VolPathTracingIntegrator.cpp">
+      <Filter>Source\Renderer\PathTracingIntegrator</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

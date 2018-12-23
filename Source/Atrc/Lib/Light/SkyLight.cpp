@@ -1,5 +1,6 @@
 ﻿#include <Atrc/Lib/Core/Scene.h>
 #include <Atrc/Lib/Light/SkyLight.h>
+#include <Texture/SphereMap.h>
 
 namespace Atrc
 {
@@ -57,6 +58,34 @@ Real SkyLight::SampleWiNonAreaPDF(
     Vec3 lwi = shd.coordSys.World2Local(wi).Normalize();
     return AGZ::Math::DistributionTransform::
         ZWeightedOnUnitHemisphere<Real>::PDF(lwi);
+}
+
+Light::SampleWiResult SkyLight::SampleWi(const Vec3 &medPos, const Vec3 &sample) const noexcept
+{
+    auto[sam, pdf] = AGZ::Math::DistributionTransform::
+        UniformOnUnitSphere<Real>::Transform(sample.xy());
+
+    SampleWiResult ret;
+    ret.pos      = medPos + 2 * sam * worldRadius_;
+    ret.wi       = sam;
+    ret.radiance = NonAreaLe(Ray(ret.pos, sam, EPS));
+    ret.pdf      = pdf;
+    ret.isDelta  = false;
+    ret.isInf    = true;
+
+    return ret;
+}
+
+Real SkyLight::SampleWiAreaPDF(
+    [[maybe_unused]] const Vec3 &pos, [[maybe_unused]] const Vec3 &nor,
+    [[maybe_unused]] const Vec3 &medPos) const noexcept
+{
+    return 0;
+}
+
+Real SkyLight::SampleWiNonAreaPDF([[maybe_unused]] const Vec3 &wi, [[maybe_unused]] const Vec3 &medPos) const noexcept
+{
+    return AGZ::Math::DistributionTransform::UniformOnUnitSphere<Real>::PDF();
 }
 
 Spectrum SkyLight::AreaLe([[maybe_unused]] const Intersection &inct) const noexcept
