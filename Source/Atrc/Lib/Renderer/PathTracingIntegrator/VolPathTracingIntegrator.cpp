@@ -1,4 +1,4 @@
-#include <Atrc/Lib/Renderer/PathTracingIntegrator/VolPathTracingIntegrator.h>
+ï»¿#include <Atrc/Lib/Renderer/PathTracingIntegrator/VolPathTracingIntegrator.h>
 
 namespace Atrc
 {
@@ -43,6 +43,33 @@ namespace
         Real bpdf = shd.bsdf->SampleWiPDF(shd.coordSys, inct.coordSys, lightSample.wi, inct.wr, bsdfType);
         return f / (lightSample.pdf + bpdf);
     }
+
+    Spectrum MISSampleLight(
+        const Medium *med, const Scene &scene, const Light *light,
+        const MediumPoint &mpnt, const MediumShadingPoint &mshd, const Vec3 &sample)
+    {
+        auto lightSample = light->SampleWi(mpnt.pos, sample);
+        if(!lightSample.radiance || !lightSample.pdf)
+            return Spectrum();
+
+        Ray shadowRay(mpnt.pos, lightSample.wi.Normalize(), EPS, (lightSample.pos - mpnt.pos).Length() - EPS);
+        if(scene.HasIntersection(shadowRay))
+            return Spectrum();
+
+        auto eval = mshd.ph->Eval(lightSample.wi, mpnt.wo);
+        if(!eval)
+            return Spectrum();
+
+        auto tr = med ? (lightSample.isInf ? med->TrToInf(mpnt.pos, lightSample.wi)
+                                           : med->Tr(mpnt.pos, lightSample.pos))
+                      : Spectrum(Real(1));
+        auto f = tr * eval * lightSample.radiance;
+
+        if(lightSample.isDelta)
+            return f / lightSample.pdf;
+
+        return f / (lightSample.pdf + eval);
+    }
 }
 
 Spectrum VolPathTracingIntegrator::Eval(const Scene &scene, const Ray &_r, Sampler *sampler, Arena &arena) const
@@ -76,19 +103,22 @@ Spectrum VolPathTracingIntegrator::Eval(const Scene &scene, const Ray &_r, Sampl
             coef /= contProb_;
         }
 
+        if(coef.r < EPS && coef.g < EPS && coef.b < EPS)
+            break;
+
         auto med = isInctValid ? inct.mediumInterface.GetMedium(inct.coordSys.ez, -r.d)
                                : scene.GetGlobalMedium();
 
-        // ²ÉÑùmediumºÍinct
+        // é‡‡æ ·mediumå’Œinct
 
-        bool sampleMed = false; // ²ÉÑùµãÊÇ·ñÂäÔÚÁË½éÖÊµ±ÖÐ
-        Real sampleInctPDF = 1; // Èç¹û²ÉÑùÁËinct£¨¼´!sampleMed£©£¬ÄÇÃ´ÕâÒ»ÐÐÎªµÄPDFÊÇ¶àÉÙ
+        bool sampleMed = false; // é‡‡æ ·ç‚¹æ˜¯å¦è½åœ¨äº†ä»‹è´¨å½“ä¸­
+        Real sampleInctPDF = 1; // å¦‚æžœé‡‡æ ·äº†inctï¼ˆå³!sampleMedï¼‰ï¼Œé‚£ä¹ˆè¿™ä¸€è¡Œä¸ºçš„PDFæ˜¯å¤šå°‘
         MediumShadingPoint mshd; ShadingPoint shd;
         MediumPoint mpnt;
 
         if(med)
         {
-            // ¹¹ÔìÓÃÀ´²ÉÑù½éÖÊ/inctµÄray
+            // æž„é€ ç”¨æ¥é‡‡æ ·ä»‹è´¨/inctçš„ray
 
             Real sampleMedT1 = isInctValid ? (inct.t - EPS) : RealT::Infinity().Value();
             Ray sampleMedRay(r.o, r.d.Normalize(), EPS, Max(EPS, sampleMedT1));
@@ -97,23 +127,156 @@ Spectrum VolPathTracingIntegrator::Eval(const Scene &scene, const Ray &_r, Sampl
             if(auto medSample = std::get_if<Medium::MediumLsSample>(&tMedSample))
             {
                 mpnt = medSample->pnt;
-                coef *= med->Tr(mpnt.pos, sampleMedRay.o) / medSample->pdf;
                 mshd = med->GetShadingPoint(mpnt, arena);
+                coef *= med->Tr(mpnt.pos, sampleMedRay.o) / medSample->pdf;
+                ret += coef * mshd.le;
+                coef *= mshd.sigmaS;
                 sampleMed = true;
             }
         }
 
         if(!sampleMed)
         {
+            if(!isInctValid)
+                break;
             shd = inct.entity->GetMaterial(inct)->GetShadingPoint(inct, arena);
-            coef = Tr(med, r.o, inct.pos) / sampleInctPDF;
+            coef *= Tr(med, r.o, inct.pos) / sampleInctPDF;
         }
 
-        // ²ÉÑù¹âÔ´ÒÔ¼ÆËãÖ±½Ó¹âÕÕ
+        // é‡‡æ ·å…‰æºä»¥è®¡ç®—ç›´æŽ¥å…‰ç…§
 
         if(sampleAllLights_)
         {
-            
+            if(sampleMed)
+            {
+                for(auto light : scene.GetLights())
+                    ret += coef * MISSampleLight(med, scene, light, mpnt, mshd, sampler->GetReal3());
+            }
+            else
+            {
+                for(auto light : scene.GetLights())
+                    ret += coef * MISSampleLight(med, scene, light, inct, shd, sampler->GetReal3());
+            }
+        }
+        else if(auto light = scene.SampleLight(sampler->GetReal()))
+        {
+            if(sampleMed)
+            {
+                ret += coef * MISSampleLight(
+                    med, scene, light->light, mpnt, mshd, sampler->GetReal3()) / light->pdf;
+            }
+            else
+            {
+                ret += coef * MISSampleLight(
+                    med, scene, light->light, inct, shd, sampler->GetReal3()) / light->pdf;
+            }
+        }
+
+        // é‡‡æ ·bsdf/phä»¥æž„é€ ä¸‹ä¸€æ¡ray nR
+
+        Vec3 nPos = sampleMed ? mpnt.pos : inct.pos;
+        Vec3 nDir; Spectrum nCoef;
+        bool isNDirDelta = false;
+        Real nDirPDF;
+
+        if(sampleMed)
+        {
+            auto phSample = mshd.ph->SampleWi(sampler->GetReal2());
+            nDir    = phSample.wi.Normalize();
+            nCoef   = Spectrum(phSample.coef);
+            nDirPDF = 1;
+        }
+        else
+        {
+            auto bsdfSample = shd.bsdf->SampleWi(
+                shd.coordSys, inct.coordSys, inct.wr, BSDF_ALL, sampler->GetReal2());
+            if(!bsdfSample)
+                break;
+            nDir        = bsdfSample->wi.Normalize();
+            nCoef       = bsdfSample->coef * Abs(Cos(bsdfSample->wi, shd.coordSys.ez));;
+            nDirPDF     = bsdfSample->pdf;
+            isNDirDelta = bsdfSample->isDelta;
+        }
+
+        Ray nR(nPos, nDir, EPS);
+
+        // æ±‚nRä¸Žåœºæ™¯çš„äº¤ç‚¹ï¼Œä»¥è®¡ç®—MISä¸‹çš„ç›´æŽ¥å…‰ç…§
+        // å¹¶æ›´æ–°rä¸Žinct
+
+        Intersection nInct;
+        if(scene.FindIntersection(nR, &nInct))
+        {
+            auto nMed = nInct.mediumInterface.GetMedium(nInct.coordSys.ez, nInct.wr);
+
+            auto light = nInct.entity->AsLight();
+            if(light)
+            {
+                auto tr = Tr(nMed, nR.o, nInct.pos);
+                Real lpdf = sampleAllLights_ ? Real(1) : scene.SampleLightPDF(light);
+
+                if(isNDirDelta)
+                    ret += tr * coef * nCoef * light->AreaLe(nInct) / nDirPDF;
+                else
+                {
+                    if(sampleMed)
+                        lpdf *= light->SampleWiAreaPDF(nInct.pos, nInct.coordSys.ez, mpnt.pos);
+                    else
+                        lpdf *= light->SampleWiAreaPDF(nInct.pos, nInct.coordSys.ez, inct, shd);
+                    ret += tr * coef * nCoef * light->AreaLe(nInct) / (nDirPDF + lpdf);
+                }
+            }
+
+            coef *= nCoef / nDirPDF;
+            isInctValid = true;
+            r    = nR;
+            inct = nInct;
+        }
+        else
+        {
+            auto tr = Tr2Inf(scene.GetGlobalMedium(), nR.o, nR.d);
+
+            if(sampleAllLights_)
+            {
+                for(auto lht : scene.GetLights())
+                {
+                    auto le = lht->NonAreaLe(nR);
+                    if(!le)
+                        continue;
+                    if(isNDirDelta)
+                        ret += coef * tr * nCoef * le / nDirPDF;
+                    else
+                    {
+                        Real lpdf;
+                        if(sampleMed)
+                            lpdf = lht->SampleWiNonAreaPDF(nR.d, mpnt.pos);
+                        else
+                            lpdf = lht->SampleWiNonAreaPDF(nR.d, inct, shd);
+                        ret += coef * tr * nCoef * le / (nDirPDF + lpdf);
+                    }
+                }
+            }
+            else if(auto lht = scene.SampleLight(sampler->GetReal()))
+            {
+                auto le = lht->light->NonAreaLe(nR);
+                if(!!le)
+                {
+                    if(isNDirDelta)
+                        ret += coef * tr * nCoef * le / nDirPDF;
+                    else
+                    {
+                        Real lpdf = lht->pdf;
+                        if(sampleMed)
+                            lpdf *= lht->light->SampleWiNonAreaPDF(nR.d, mpnt.pos);
+                        else
+                            lpdf *= lht->light->SampleWiNonAreaPDF(nR.d, inct, shd);
+                        ret += coef * tr * nCoef * le / (nDirPDF + lpdf);
+                    }
+                }
+            }
+
+            coef *= nCoef / nDirPDF;
+            isInctValid = false;
+            r = nR;
         }
     }
 

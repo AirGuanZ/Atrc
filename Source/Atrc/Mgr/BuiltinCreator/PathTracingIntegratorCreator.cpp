@@ -14,10 +14,12 @@ void RegisterBuiltinPathTracingIntegratorCreators(Context &context)
     static const NativePathTracingIntegratorCreator nativePathTracingIntegratorCreator;
     static const ShadingNormalIntegratorCreator shadingNormalIntegratorCreator;
     static const VolumetricPathTracingIntegratorCreator volumetricPathTracingIntegratorCreator;
+    static const VolPathTracingIntegratorCreator volPathTracingIntegratorCreator;
     context.AddCreator(&iMISPathTracingIntegratorCreator);
     context.AddCreator(&nativePathTracingIntegratorCreator);
     context.AddCreator(&shadingNormalIntegratorCreator);
     context.AddCreator(&volumetricPathTracingIntegratorCreator);
+    context.AddCreator(&volPathTracingIntegratorCreator);
 }
 
 PathTracingIntegrator *MISPathTracingIntegratorCreator::Create(
@@ -79,6 +81,28 @@ PathTracingIntegrator *VolumetricPathTracingIntegratorCreator::Create(
     {
         int minDepth  = group["minDepth"].Parse<int>();
         int maxDepth  = group["maxDepth"].Parse<int>();
+        Real contProb = group["contProb"].Parse<Real>();
+        bool sampleAllLights = Parser::ParseBool(group["sampleAllLights"]);
+
+        if(minDepth <= 0 || maxDepth < minDepth)
+            throw MgrErr("Invalid min/max depth value");
+
+        if(contProb <= 0 || contProb > 1)
+            throw MgrErr("Invalid contProb value");
+
+        return arena.Create<VolumetricPathTracingIntegrator>(
+            minDepth, maxDepth, contProb, sampleAllLights);
+    }
+    ATRC_MGR_CATCH_AND_RETHROW("In creating volumetric path tracing integrator: " + group.ToString())
+}
+
+PathTracingIntegrator *VolPathTracingIntegratorCreator::Create(
+    const ConfigGroup &group, [[maybe_unused]] Context &context, Arena &arena) const
+{
+    ATRC_MGR_TRY
+    {
+        int minDepth = group["minDepth"].Parse<int>();
+        int maxDepth = group["maxDepth"].Parse<int>();
         Real contProb = group["contProb"].Parse<Real>();
         bool sampleAllLights = Parser::ParseBool(group["sampleAllLights"]);
 

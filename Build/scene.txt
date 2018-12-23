@@ -10,7 +10,7 @@ film = {
 
 sampler = {
     type = Native;
-    spp = 10000;
+    spp = 100;
 };
 
 camera = {
@@ -25,9 +25,9 @@ camera = {
 renderer = {
     type = PathTracing;
     integrator = {
-        type = Volumetric;
+        type = Vol;
         minDepth = 10;
-        maxDepth = 30;
+        maxDepth = 100;
         contProb = 1;
         sampleAllLights = True;
     };
