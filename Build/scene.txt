@@ -10,7 +10,7 @@ film = {
 
 sampler = {
     type = Native;
-    spp = 100;
+    spp = 1000;
 };
 
 camera = {
@@ -116,12 +116,12 @@ entities = (
     type = Geometric;
     geometry = {
         type = TriangleBVH;
-        filename = "./Asset/bun_zipper.obj";
+        filename = "./Asset/Dragon_1.obj";
         transform = (
-            Translate(-0.3, 0.7, -0.9),
+            Translate(-0.35, 0.8, -0.62),
             RotateZ(Deg(-60)),
             #RotateY(Deg(90)),
-            Scale(0.015),
+            Scale(0.005),
         );
     };
     material = {
