@@ -10,7 +10,7 @@ film = {
 
 sampler = {
     type = Native;
-    spp = 100000;
+    spp = 100;
 };
 
 camera = {
