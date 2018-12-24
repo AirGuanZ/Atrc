@@ -3,8 +3,10 @@
 namespace Atrc
 {
     
-VolPathTracingIntegrator::VolPathTracingIntegrator(int minDepth, int maxDepth, Real contProb, bool sampleAllLights) noexcept
-    : minDepth_(minDepth), maxDepth_(maxDepth), contProb_(contProb), sampleAllLights_(sampleAllLights)
+VolPathTracingIntegrator::VolPathTracingIntegrator(
+    int minDepth, int maxDepth, Real contProb, bool sampleAllLights, bool lightInMedium) noexcept
+    : minDepth_(minDepth), maxDepth_(maxDepth), contProb_(contProb),
+      sampleAllLights_(sampleAllLights), lightInMedium_(lightInMedium)
 {
 
 }
@@ -133,6 +135,8 @@ Spectrum VolPathTracingIntegrator::Eval(const Scene &scene, const Ray &_r, Sampl
                 coef *= mshd.sigmaS;
                 sampleMed = true;
             }
+            else
+                sampleInctPDF = std::get<Real>(tMedSample);
         }
 
         if(!sampleMed)
@@ -149,8 +153,11 @@ Spectrum VolPathTracingIntegrator::Eval(const Scene &scene, const Ray &_r, Sampl
         {
             if(sampleMed)
             {
-                for(auto light : scene.GetLights())
-                    ret += coef * MISSampleLight(med, scene, light, mpnt, mshd, sampler->GetReal3());
+                if(lightInMedium_)
+                {
+                    for(auto light : scene.GetLights())
+                        ret += coef * MISSampleLight(med, scene, light, mpnt, mshd, sampler->GetReal3());
+                }
             }
             else
             {
@@ -184,7 +191,7 @@ Spectrum VolPathTracingIntegrator::Eval(const Scene &scene, const Ray &_r, Sampl
             auto phSample = mshd.ph->SampleWi(sampler->GetReal2());
             nDir    = phSample.wi.Normalize();
             nCoef   = Spectrum(phSample.coef);
-            nDirPDF = 1;
+            nDirPDF = phSample.coef;
         }
         else
         {
@@ -206,23 +213,26 @@ Spectrum VolPathTracingIntegrator::Eval(const Scene &scene, const Ray &_r, Sampl
         Intersection nInct;
         if(scene.FindIntersection(nR, &nInct))
         {
-            auto nMed = nInct.mediumInterface.GetMedium(nInct.coordSys.ez, nInct.wr);
-
-            auto light = nInct.entity->AsLight();
-            if(light)
+            if(!sampleMed || lightInMedium_)
             {
-                auto tr = Tr(nMed, nR.o, nInct.pos);
-                Real lpdf = sampleAllLights_ ? Real(1) : scene.SampleLightPDF(light);
+                auto nMed = nInct.mediumInterface.GetMedium(nInct.coordSys.ez, nInct.wr);
 
-                if(isNDirDelta)
-                    ret += tr * coef * nCoef * light->AreaLe(nInct) / nDirPDF;
-                else
+                auto light = nInct.entity->AsLight();
+                if(light)
                 {
-                    if(sampleMed)
-                        lpdf *= light->SampleWiAreaPDF(nInct.pos, nInct.coordSys.ez, mpnt.pos);
+                    auto tr = Tr(nMed, nR.o, nInct.pos);
+                    Real lpdf = sampleAllLights_ ? Real(1) : scene.SampleLightPDF(light);
+
+                    if(isNDirDelta)
+                        ret += tr * coef * nCoef * light->AreaLe(nInct) / nDirPDF;
                     else
-                        lpdf *= light->SampleWiAreaPDF(nInct.pos, nInct.coordSys.ez, inct, shd);
-                    ret += tr * coef * nCoef * light->AreaLe(nInct) / (nDirPDF + lpdf);
+                    {
+                        if(sampleMed)
+                            lpdf *= light->SampleWiAreaPDF(nInct.pos, nInct.coordSys.ez, mpnt.pos);
+                        else
+                            lpdf *= light->SampleWiAreaPDF(nInct.pos, nInct.coordSys.ez, inct, shd);
+                        ret += tr * coef * nCoef * light->AreaLe(nInct) / (nDirPDF + lpdf);
+                    }
                 }
             }
 
@@ -233,43 +243,46 @@ Spectrum VolPathTracingIntegrator::Eval(const Scene &scene, const Ray &_r, Sampl
         }
         else
         {
-            auto tr = Tr2Inf(scene.GetGlobalMedium(), nR.o, nR.d);
-
-            if(sampleAllLights_)
+            if(!sampleMed || lightInMedium_)
             {
-                for(auto lht : scene.GetLights())
+                auto tr = Tr2Inf(scene.GetGlobalMedium(), nR.o, nR.d);
+
+                if(sampleAllLights_)
                 {
-                    auto le = lht->NonAreaLe(nR);
-                    if(!le)
-                        continue;
-                    if(isNDirDelta)
-                        ret += coef * tr * nCoef * le / nDirPDF;
-                    else
+                    for(auto lht : scene.GetLights())
                     {
-                        Real lpdf;
-                        if(sampleMed)
-                            lpdf = lht->SampleWiNonAreaPDF(nR.d, mpnt.pos);
+                        auto le = lht->NonAreaLe(nR);
+                        if(!le)
+                            continue;
+                        if(isNDirDelta)
+                            ret += coef * tr * nCoef * le / nDirPDF;
                         else
-                            lpdf = lht->SampleWiNonAreaPDF(nR.d, inct, shd);
-                        ret += coef * tr * nCoef * le / (nDirPDF + lpdf);
+                        {
+                            Real lpdf;
+                            if(sampleMed)
+                                lpdf = lht->SampleWiNonAreaPDF(nR.d, mpnt.pos);
+                            else
+                                lpdf = lht->SampleWiNonAreaPDF(nR.d, inct, shd);
+                            ret += coef * tr * nCoef * le / (nDirPDF + lpdf);
+                        }
                     }
                 }
-            }
-            else if(auto lht = scene.SampleLight(sampler->GetReal()))
-            {
-                auto le = lht->light->NonAreaLe(nR);
-                if(!!le)
+                else if(auto lht = scene.SampleLight(sampler->GetReal()))
                 {
-                    if(isNDirDelta)
-                        ret += coef * tr * nCoef * le / nDirPDF;
-                    else
+                    auto le = lht->light->NonAreaLe(nR);
+                    if(!!le)
                     {
-                        Real lpdf = lht->pdf;
-                        if(sampleMed)
-                            lpdf *= lht->light->SampleWiNonAreaPDF(nR.d, mpnt.pos);
+                        if(isNDirDelta)
+                            ret += coef * tr * nCoef * le / nDirPDF;
                         else
-                            lpdf *= lht->light->SampleWiNonAreaPDF(nR.d, inct, shd);
-                        ret += coef * tr * nCoef * le / (nDirPDF + lpdf);
+                        {
+                            Real lpdf = lht->pdf;
+                            if(sampleMed)
+                                lpdf *= lht->light->SampleWiNonAreaPDF(nR.d, mpnt.pos);
+                            else
+                                lpdf *= lht->light->SampleWiNonAreaPDF(nR.d, inct, shd);
+                            ret += coef * tr * nCoef * le / (nDirPDF + lpdf);
+                        }
                     }
                 }
             }

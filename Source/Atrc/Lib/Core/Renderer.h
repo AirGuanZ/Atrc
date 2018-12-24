@@ -2,10 +2,10 @@
 
 #include <Utils/Texture.h>
 
-#include <Atrc/Lib/Core/Film.h>
 #include <Atrc/Lib/Core/Reporter.h>
 #include <Atrc/Lib/Core/Sampler.h>
 #include <Atrc/Lib/Core/Scene.h>
+#include <Atrc/Lib/Core/TFilm.h>
 
 namespace Atrc
 {

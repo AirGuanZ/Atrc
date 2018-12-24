@@ -122,7 +122,6 @@ using Image = AGZ::Texture2D<Spectrum>;
 
 class Camera;
 class Entity;
-class Film;
 class FilmFilter;
 class Geometry;
 class Light;
@@ -135,6 +134,12 @@ class Renderer;
 class Reporter;
 class Sampler;
 class Texture;
+
+template<typename> class TFilm;
+using Film = TFilm<Spectrum>;
+
+template<typename> class TFilmGrid;
+using FilmGrid = TFilmGrid<Spectrum>;
 
 // ================================= Exception
 

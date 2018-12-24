@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Atrc/Lib/Core/Film.h>
+#include <Atrc/Lib/Core/TFilm.h>
 
 namespace Atrc
 {
@@ -13,7 +13,7 @@ public:
 
     explicit BoxFilter(const Vec2 &radius) noexcept;
 
-    Spectrum Eval(Real relX, Real relY) const noexcept override;
+    Real Eval(Real relX, Real relY) const noexcept override;
 };
 
 } // namespace Atrc

@@ -11,10 +11,11 @@ class VolPathTracingIntegrator : public PathTracingIntegrator
     Real contProb_;
 
     bool sampleAllLights_;
+    bool lightInMedium_;
 
 public:
 
-    VolPathTracingIntegrator(int minDepth, int maxDepth, Real contProb, bool sampleAllLights) noexcept;
+    VolPathTracingIntegrator(int minDepth, int maxDepth, Real contProb, bool sampleAllLights, bool lightInMedium) noexcept;
 
     Spectrum Eval(const Scene &scene, const Ray &_r, Sampler *sampler, Arena &arena) const override;
 };

@@ -14,7 +14,7 @@ NativePathTracingIntegrator::NativePathTracingIntegrator(
 Spectrum NativePathTracingIntegrator::Eval(
     const Scene &scene, const Ray &r, Sampler *sampler, Arena &arena) const
 {
-    Spectrum coef = Spectrum(Real(1)), ret = Spectrum();
+    Spectrum coef = Spectrum(Real(1)), ret;
     Ray ray = r;
 
     for(int i = 1; i <= maxDepth_; ++i)

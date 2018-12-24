@@ -1,9 +1,9 @@
 #include <iostream>
 
-#include <Atrc/Lib/Core/Film.h>
 #include <Atrc/Lib/Core/PostProcessor.h>
 #include <Atrc/Lib/Core/Renderer.h>
 #include <Atrc/Lib/Core/Scene.h>
+#include <Atrc/Lib/Core/TFilm.h>
 
 #include <Atrc/Mgr/BuiltinCreatorRegister.h>
 #include <Atrc/Mgr/Context.h>

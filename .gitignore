@@ -8,6 +8,7 @@
 *.sln.docstates
 
 .agz.cache/*
+Asset/*
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs

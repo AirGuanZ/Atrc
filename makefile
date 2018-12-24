@@ -74,10 +74,11 @@ $(DPP_FILES) : %.d : %.cpp
 
 # The main renderer launcher
 $(eval $(call add_target,Launcher,LAUNCHER_TARGET,Launcher))
+$(eval $(call add_target,SH2D,SH2D_TARGET,SH2D))
 
 .PHONT : all
 all :
-	make Launcher
+	make $(TARGETS)
 
 .PHONY : clean
 clean :

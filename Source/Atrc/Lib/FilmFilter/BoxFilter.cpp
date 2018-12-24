@@ -9,9 +9,9 @@ BoxFilter::BoxFilter(const Vec2 &radius) noexcept
 
 }
 
-Spectrum BoxFilter::Eval([[maybe_unused]] Real relX, [[maybe_unused]] Real relY) const noexcept
+Real BoxFilter::Eval([[maybe_unused]] Real relX, [[maybe_unused]] Real relY) const noexcept
 {
-    return Spectrum(Real(1));
+    return 1;
 }
 
 } // namespace Atrc

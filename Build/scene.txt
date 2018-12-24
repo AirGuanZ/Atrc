@@ -1,7 +1,7 @@
 # Scene description file for Atrc Launcher
 
 film = {
-    size = (600, 600);
+    size = (1024, 1024);
     filter = {
         type = Box;
         sidelen = 1;
@@ -10,7 +10,7 @@ film = {
 
 sampler = {
     type = Native;
-    spp = 100;
+    spp = 10000;
 };
 
 camera = {
@@ -27,11 +27,12 @@ renderer = {
     integrator = {
         type = Vol;
         minDepth = 10;
-        maxDepth = 100;
+        maxDepth = 200;
         contProb = 1;
         sampleAllLights = True;
+        lightInMedium = False;
     };
-    workerCount = 6;
+    workerCount = 11;
     taskGridSize = 16;
 };
 
@@ -39,11 +40,54 @@ outputFilename = "./Output.png";
 
 reporter = { type = Default; };
 
-mat = {
+groundMat = {
     type = IdealDiffuse;
     albedo = {
+        type = Image;
+        filename = "./Asset/ground.jpeg";
+    };
+    ###type = TSMetal;
+    rc = {
+        type = Image;
+        filename = "./Asset/ground.jpeg";
+    };
+    roughness = {
+        type = Constant1;
+        texel = 0.01;
+    };
+    fresnel = {
+        type = Conductor;
+        etaI = (1);
+        etaT = (0.3);
+        k = (0.3);
+    };###
+};
+
+crabMat = {
+    ###type = TSMetal;
+    rc = {
         type = Constant;
-        texel = (0.2);
+        texel = (0.8);
+    };
+    roughness = {
+        type = Constant1;
+        texel = 0.01;
+    };
+    fresnel = {
+        type = Conductor;
+        etaI = (1);
+        etaT = (0.1);
+        k = (0.1);
+    };###
+    type = IdealSpecular;
+    rc = {
+        type = Constant;
+        texel = (0.98);
+    };
+    fresnel = {
+        type = Dielectric;
+        etaI = 1;
+        etaT = 1.55;
     };
 };
 
@@ -52,10 +96,10 @@ entities = (
     type = GeometricDiffuse;
     geometry = {
         type = Sphere;
-        radius = 0.8;
-        transform = (Translate(-2, 0, 4));
+        radius = 2;
+        transform = (Translate(-2, 0, 6));
     };
-    radiance = (50);
+    radiance = (15);
 },
 {
     type = Geometric;
@@ -67,7 +111,7 @@ entities = (
         tA = (0, 0); tB = (0, 1); tC = (1, 1);
         transform = (Translate(0, 0, -1));
     };
-    material = mat;
+    material = groundMat;
 },
 {
     type = Geometric;
@@ -79,7 +123,7 @@ entities = (
         tA = (0, 0); tB = (1, 1); tC = (1, 0);
         transform = (Translate(0, 0, -1));
     };
-    material = mat;
+    material = groundMat;
 },
 {
     type = Geometric;
@@ -87,22 +131,22 @@ entities = (
         type = TriangleBVH;
         filename = "./Asset/Le_Transi_De_Rene_De_Chalon.obj";
         transform = (
-            Translate(0, -0.12, 0.6),
+            Translate(0, 0.05, -1.03),
             RotateZ(Deg(-100)),
             RotateX(Deg(90)),
             Translate(0, 0, 0),
-            Scale(0.004),
+            Scale(0.06),
         );
     };
     material = {
         type = TSMetal;
         rc = {
             type = Constant;
-            texel = (0.7, 0.4, 0.2);
+            texel = (0.7, 0.3, 0.2);
         };
         roughness = {
             type = Constant1;
-            texel = 0.01;
+            texel = 0.05;
         };
         fresnel = {
             type = Conductor;
@@ -116,15 +160,40 @@ entities = (
     type = Geometric;
     geometry = {
         type = TriangleBVH;
-        filename = "./Asset/bird.obj";
+        filename = "./Asset/Dark_Finger_Reef_Crab.obj";
+        transform = (
+            Translate(-1, 0.45, -0.9),
+            RotateZ(Deg(-70)),
+            Scale(0.004),
+        );
+    };
+    material = crabMat;
+},
+{
+    type = Geometric;
+    geometry = {
+        type = TriangleBVH;
+        filename = "./Asset/Dark_Finger_Reef_Crab.obj";
+        transform = (
+            Translate(-1, -0.05, -0.96),
+            RotateZ(Deg(-120)),
+            Scale(0.0015),
+        );
+    };
+    material = crabMat;
+},
+{
+    type = Geometric;
+    geometry = {
+        type = TriangleBVH;
+        filename = "./Asset/Status.obj";
         transform = (
             Translate(0, 0.85, -1),
-            RotateZ(Deg(-70)),
-            RotateX(Deg(90)),
+            RotateZ(Deg(-160)),
+            RotateY(Deg(90)),
             Scale(0.003),
         );
     };
-    material1 = mat;
     material = {
         type = IdealSpecular;
         rc = {
@@ -140,7 +209,7 @@ entities = (
     medium = {
         in = {
             type = Homogeneous;
-            sigmaA = (2);
+            sigmaA = (4);
             sigmaS = (10);
             le = (0);
             g = 0.3;
@@ -153,7 +222,7 @@ entities = (
         type = TriangleBVH;
         filename = "./Asset/happy_vrip.obj";
         transform = (
-            Translate(-0.4, -0.7, -0.24),
+            Translate(-0.4, -0.7, -0.26),
             RotateZ(Deg(250)),
             RotateX(Deg(90)),
             Scale(0.025),
@@ -177,7 +246,7 @@ blackTexture = {
 lights = (
 ###{
     type = Sky;
-    top = (1);
+    top = b(200, 250, 255);
     bottom = (1);
 }###
 );
