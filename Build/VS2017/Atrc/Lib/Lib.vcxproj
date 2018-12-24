@@ -169,7 +169,6 @@
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\Common.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\CoordSystem.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\Entity.h" />
-    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\Film.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\Geometry.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\Light.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\Material.h" />
@@ -182,6 +181,7 @@
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\Scene.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\SurfacePoint.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\Texture.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\TFilm.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\Transform.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Entity\GeometricDiffuseLight.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Entity\GeometricEntity.h" />
@@ -201,6 +201,7 @@
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\IdealBlack.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\IdealDiffuse.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\IdealMirror.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\IdealScaler.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\IdealSpecular.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\InvisibleSurface.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\MicrofacetDistribution\BlinnPhong.h" />
@@ -218,11 +219,11 @@
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\NativePathTracingIntegrator.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\ShadingNormalIntegrator.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\VolPathTracingIntegrator.h" />
-    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\VolumetricPathTracingIntegrator.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingRenderer.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Reporter\DefaultReporter.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Sampler\NativeSampler.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Texture\ConstantTexture.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Texture\HDRTexture.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Texture\ImageTexture.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Utility\GridDivider.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Utility\TriangleAux.h" />
@@ -231,7 +232,6 @@
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Camera\PinholeCamera.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Core\Common.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Core\CoordSystem.cpp" />
-    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Core\Film.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Core\Light.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Core\PostProcessor.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Core\Scene.cpp" />
@@ -253,6 +253,7 @@
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\IdealBlack.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\IdealDiffuse.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\IdealMirror.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\IdealScaler.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\IdealSpecular.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\InvisibleSurface.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\MicrofacetDistribution\BlinnPhone.cpp" />
@@ -266,11 +267,11 @@
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\NativePathTracingIntegrator.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\ShadingNormalIntegrator.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\VolPathTracingIntegrator.cpp" />
-    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\VolumetricPathTracingIntegrator.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingRenderer.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Reporter\DefaultReporter.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Sampler\NativeSampler.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Texture\ConstantTexture.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Texture\HDRTexture.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Texture\ImageTexture.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

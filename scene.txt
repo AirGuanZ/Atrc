@@ -1,7 +1,7 @@
 # Scene description file for Atrc Launcher
 
 film = {
-    size = (1024, 1024);
+    size = (600, 600);
     filter = {
         type = Box;
         sidelen = 1;
@@ -10,7 +10,7 @@ film = {
 
 sampler = {
     type = Native;
-    spp = 10000;
+    spp = 1;
 };
 
 camera = {

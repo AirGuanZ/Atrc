@@ -1,0 +1,162 @@
+# Scene description file for Atrc Launcher
+
+film = {
+    size = (600, 600);
+    filter = {
+        type = Box;
+        sidelen = 1;
+    };
+};
+
+sampler = {
+    type = Native;
+    spp = 10000;
+};
+
+camera = {
+    type = Pinhole;
+    sensorWidth = 1;
+    sensorDistance = 1.8;
+    pos = (-7, 0, 0.4);
+    lookAt = (0, 0, 0);
+    up = (0, 0, 1);
+};
+
+renderer = {
+    type = PathTracing;
+    integrator = {
+        type = Vol;
+        minDepth = 10;
+        maxDepth = 200;
+        contProb = 1;
+        sampleAllLights = True;
+        lightInMedium = False;
+    };
+    workerCount = 6;
+    taskGridSize = 16;
+};
+
+outputFilename = "./Output.png";
+
+reporter = { type = Default; };
+
+groundMat = {
+    type = IdealScaler;
+    scale = {
+        type = Constant1;
+        texel = 0.4;
+    };
+    internal = {
+        type = IdealDiffuse;
+        albedo = {
+            type = Image;
+            filename = "./Asset/ground.jpeg";
+        };
+        ###type = TSMetal;
+        rc = {
+            type = Image;
+            filename = "./Asset/ground.jpeg";
+        };
+        roughness = {
+            type = Constant1;
+            texel = 0.01;
+        };
+        fresnel = {
+            type = Conductor;
+            etaI = (1);
+            etaT = (0.3);
+            k = (0.3);
+        };###
+    };
+};
+
+appleMat = {
+    type = IdealSpecular;
+    rc = {
+        type = Constant;
+        texel = (0.8);
+    };
+    fresnel = {
+        type = Dielectric;
+        etaI = 1;
+        etaT = 1.55;
+    };
+};
+
+entities = (
+{
+    type = GeometricDiffuse;
+    geometry = {
+        type = Sphere;
+        radius = 3;
+        transform = (Translate(-3, 3, 5));
+    };
+    radiance = (10);
+},
+{
+    type = Geometric;
+    geometry = {
+        type = Triangle;
+        A = (-3, -3, 0);
+        B = (-3, 3, 0);
+        C = (3, 3, 0);
+        tA = (0, 0); tB = (0, 1); tC = (1, 1);
+        transform = (Translate(0, 0, -1));
+    };
+    material = groundMat;
+},
+{
+    type = Geometric;
+    geometry = {
+        type = Triangle;
+        A = (-3, -3, 0);
+        B = (3, 3, 0);
+        C = (3, -3, 0);
+        tA = (0, 0); tB = (1, 1); tC = (1, 0);
+        transform = (Translate(0, 0, -1));
+    };
+    material = groundMat;
+},
+{
+    type = Geometric;
+    geometry = {
+        type = TriangleBVH;
+        filename = "./Asset/Apple.obj";
+        transform = (
+            Translate(0, 0, -0.95),
+            RotateZ(Deg(250)),
+            #RotateX(Deg(90)),
+            #RotateY(Deg(90)),
+            Scale(2.5),
+        );
+    };
+    #material = appleMat;
+    material = {
+        type = IdealSpecular;
+        rc = {
+            type = Constant;
+            texel = (0.6, 0.95, 0.75);
+        };
+        fresnel = {
+            type = Dielectric;
+            etaI = 1;
+            etaT = 1.6;
+        };
+    };
+    medium = {
+        in = {
+            type = Homogeneous;
+            sigmaA = (1);
+            sigmaS = (10);
+            le = (0);
+            g = 0.3;
+        };
+    };
+}
+);
+
+lights = ();
+
+postProcessors = (
+    { type = FlipImage; }
+);
