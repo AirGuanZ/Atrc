@@ -38,11 +38,31 @@ public:
 };
 
 /*
+    type = HDR
+
+    filename = String
+    sampler  = Nearest | Linear
+    wrapper  = Clamp
+    reverseV = True | False | null(False)
+*/
+class HDRTextureCreator : public Creator<Texture>
+{
+    mutable std::unordered_map<Str8, const AGZ::Texture2D<Color3f>*> path2Tex_;
+
+public:
+
+    Str8 GetTypeName() const override { return "HDR"; }
+
+    Texture *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
+};
+
+/*
     type = Image
 
     filename = String
     sampler  = Nearest | Linear
     wrapper  = Clamp
+    reverseV = True | False | null(False)
 */
 class ImageTextureCreator : public Creator<Texture>
 {

@@ -4,6 +4,7 @@
 #include <Atrc/Lib/Material/IdealBlack.h>
 #include <Atrc/Lib/Material/IdealDiffuse.h>
 #include <Atrc/Lib/Material/IdealMirror.h>
+#include <Atrc/Lib/Material/IdealScaler.h>
 #include <Atrc/Lib/Material/IdealSpecular.h>
 #include <Atrc/Lib/Material/InvisibleSurface.h>
 #include <Atrc/Lib/Material/ONMatte.h>
@@ -78,6 +79,7 @@ void RegisterBuiltinMaterialCreators(Context &context)
     static const IdealBlackCreator idealBlackCreator;
     static const IdealDiffuseCreator idealDiffuseCreator;
     static const IdealMirrorCreator idealMirrorCreator;
+    static const IdealScalerCreator idealScalerCreator;
     static const IdealSpecularCreator idealSpecularCreator;
     static const InvisibleSurfaceCreator invisibleSurfaceCreator;
     static const ONMatteCreator oNMatteCreator;
@@ -85,6 +87,7 @@ void RegisterBuiltinMaterialCreators(Context &context)
     context.AddCreator(&idealBlackCreator);
     context.AddCreator(&idealDiffuseCreator);
     context.AddCreator(&idealMirrorCreator);
+    context.AddCreator(&idealScalerCreator);
     context.AddCreator(&idealSpecularCreator);
     context.AddCreator(&invisibleSurfaceCreator);
     context.AddCreator(&oNMatteCreator);
@@ -143,6 +146,17 @@ Material *IdealMirrorCreator::Create(const ConfigGroup &group, Context &context,
         return arena.Create<IdealMirror>(rcMap, fresnel);
     }
     ATRC_MGR_CATCH_AND_RETHROW("In creating ideal mirror material: " + group.ToString())
+}
+
+Material *IdealScalerCreator::Create(const ConfigGroup &group, Context &context, Arena &arena) const
+{
+    ATRC_MGR_TRY
+    {
+        auto scaleMap = context.Create<Texture>(group["scale"]);
+        auto internal = context.Create<Material>(group["internal"]);
+        return arena.Create<IdealScaler>(scaleMap, internal);
+    }
+    ATRC_MGR_CATCH_AND_RETHROW("In creating ideal scaler material: " + group.ToString())
 }
 
 Material *IdealSpecularCreator::Create(const ConfigGroup &group, Context &context, Arena &arena) const

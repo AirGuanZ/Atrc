@@ -41,26 +41,33 @@ outputFilename = "./Output.png";
 reporter = { type = Default; };
 
 groundMat = {
-    type = IdealDiffuse;
-    albedo = {
-        type = Image;
-        filename = "./Asset/ground.jpeg";
-    };
-    ###type = TSMetal;
-    rc = {
-        type = Image;
-        filename = "./Asset/ground.jpeg";
-    };
-    roughness = {
+    type = IdealScaler;
+    scale = {
         type = Constant1;
-        texel = 0.01;
+        texel = 0.5;
     };
-    fresnel = {
-        type = Conductor;
-        etaI = (1);
-        etaT = (0.3);
-        k = (0.3);
-    };###
+    internal = {
+        type = IdealDiffuse;
+        albedo = {
+            type = Image;
+            filename = "./Asset/ground.jpeg";
+        };
+        ###type = TSMetal;
+        rc = {
+            type = Image;
+            filename = "./Asset/ground.jpeg";
+        };
+        roughness = {
+            type = Constant1;
+            texel = 0.01;
+        };
+        fresnel = {
+            type = Conductor;
+            etaI = (1);
+            etaT = (0.3);
+            k = (0.3);
+        };###
+    };
 };
 
 crabMat = {
@@ -96,10 +103,10 @@ entities = (
     type = GeometricDiffuse;
     geometry = {
         type = Sphere;
-        radius = 2;
-        transform = (Translate(-2, 0, 6));
+        radius = 3;
+        transform = (Translate(-3, 3, 5));
     };
-    radiance = (15);
+    radiance = (10);
 },
 {
     type = Geometric;
@@ -209,7 +216,7 @@ entities = (
     medium = {
         in = {
             type = Homogeneous;
-            sigmaA = (4);
+            sigmaA = (1);
             sigmaS = (10);
             le = (0);
             g = 0.3;

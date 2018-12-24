@@ -6,12 +6,12 @@
 
 AGZ_NS_BEG(Atrc)
 
-class ImageTexture : public Texture
+class HDRTexture : public Texture
 {
     using TexCoordWrapper = Real(*)(Real);
-    using Sampler = Spectrum(*)(const AGZ::Texture2D<Color3b>&, const Vec2&);
+    using Sampler = Spectrum(*)(const AGZ::Texture2D<Color3f>&, const Vec2&);
 
-    const AGZ::Texture2D<Color3b> &tex_;
+    const AGZ::Texture2D<Color3f> &tex_;
 
     TexCoordWrapper texCoordWrapper_;
     Sampler sampler_;
@@ -31,8 +31,8 @@ public:
         Clamp,
     };
 
-    ImageTexture(
-        const AGZ::Texture2D<Color3b> &tex,
+    HDRTexture(
+        const AGZ::Texture2D<Color3f> &tex,
         SampleStrategy sampleStrategy, WrapStrategy wrapStrategy,
         bool reverseV) noexcept;
 

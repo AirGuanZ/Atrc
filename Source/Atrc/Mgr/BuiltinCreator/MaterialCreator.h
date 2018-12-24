@@ -51,6 +51,21 @@ public:
 };
 
 /*
+    type = IdealScaler
+
+    scale = Texture
+    internal = Material
+*/
+class IdealScalerCreator : public Creator<Material>
+{
+public:
+
+    Str8 GetTypeName() const override { return "IdealScaler"; }
+
+    Material *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
+};
+
+/*
     type = IdealSpecular
 
     rc = Texture

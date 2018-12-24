@@ -12,11 +12,8 @@
 
 using namespace Atrc;
 
-int Run()
+int Run(const AGZ::Config &config)
 {
-    AGZ::Config config;
-    if(!config.LoadFromFile("./Build/scene.txt"))
-        throw Mgr::MgrErr("Failed to load configuration file");
     auto &root = config.Root();
 
     Mgr::Context context(root);
@@ -72,7 +69,7 @@ int Run()
 #include <crtdbg.h>
 #endif
 
-int main()
+int main(int argc, char *argv[])
 {
 #if defined(_WIN32) && defined(_DEBUG)
     _CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG)
@@ -81,7 +78,33 @@ int main()
 
     try
     {
-        return Run();
+        AGZ::Config config;
+        
+        if(argc == 1)
+        {
+            if(!config.LoadFromFile("./scene.txt"))
+                throw Mgr::MgrErr("Failed to load configuration file from ./scene.txt");
+        }
+        else if(argc == 2)
+        {
+            if(!config.LoadFromFile(argv[1]))
+                throw Mgr::MgrErr("Failed to load configuration file from " + Str8(argv[1]));
+        }
+        else if(Str8(argv[1]) == "-m" && argc == 3)
+        {
+            if(!config.LoadFromMemory(argv[2]))
+                throw Mgr::MgrErr("Failed to load configuration from memory");
+        }
+        else
+        {
+            std::cout << "Usage:"                                     << std::endl
+                      << "    Launcher (load from ./scene.txt)"       << std::endl
+                      << "    Launcher filename (load from filename)" << std::endl
+                      << "    Launcher -m content (load from string)" << std::endl;
+            return 0;
+        }
+
+        return Run(config);
     }
     catch(const Mgr::MgrErr &err)
     {

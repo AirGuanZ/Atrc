@@ -1,26 +1,26 @@
-#include <Atrc/Lib/Texture/ImageTexture.h>
+#include <Utils/Misc.h>
+
+#include <Atrc/Lib/Texture/HDRTexture.h>
 
 AGZ_NS_BEG(Atrc)
 
 namespace
 {
-    Real Byte2Spectrum(uint32_t b) { return b / Real(255); }
-
-    Spectrum NearestSampleStrategy(const AGZ::Texture2D<Color3b> &tex, const Vec2 &uv)
+    Spectrum NearestSampleStrategy(const AGZ::Texture2D<Color3f> &tex, const Vec2 &uv)
     {
         return AGZ::NearestSampler::Sample(tex, uv,
-            [](const Color3b &c)
+            [](const Spectrum &c)
             {
-                return c.Map(Byte2Spectrum);
+                return c.Map(AGZ::TypeOpr::StaticCaster<Real, float>);
             });
     }
 
-    Spectrum LinearSampleStrategy(const AGZ::Texture2D<Color3b> &tex, const Vec2 &uv)
+    Spectrum LinearSampleStrategy(const AGZ::Texture2D<Color3f> &tex, const Vec2 &uv)
     {
         return AGZ::LinearSampler::Sample(tex, uv,
-            [](const Color3b &c)
+            [](const Spectrum &c)
             {
-                return c.Map(Byte2Spectrum);
+                return c.Map(AGZ::TypeOpr::StaticCaster<Real, float>);
             });
     }
 
@@ -30,8 +30,8 @@ namespace
     }
 }
 
-ImageTexture::ImageTexture(
-    const AGZ::Texture2D<Color3b> &tex,
+HDRTexture::HDRTexture(
+    const AGZ::Texture2D<Color3f> &tex,
     SampleStrategy sampleStrategy, WrapStrategy wrapStrategy,
     bool reverseV) noexcept
     : tex_(tex), reverseV_(reverseV)
@@ -58,7 +58,7 @@ ImageTexture::ImageTexture(
     }
 }
 
-Spectrum ImageTexture::Sample(const Vec2 &uv) const noexcept
+Spectrum HDRTexture::Sample(const Vec2 &uv) const noexcept
 {
     return sampler_(tex_, (reverseV_ ? Vec2(uv.u, 1 - uv.v) : uv).Map(texCoordWrapper_));
 }

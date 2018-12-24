@@ -102,6 +102,7 @@ inline Real Phi(const Vec3 &w) noexcept
 // ================================= Spectrum
 
 using AGZ::Math::Color3b;
+using AGZ::Math::Color3f;
 
 using Spectrum = AGZ::Math::Color3<Real>;
 
