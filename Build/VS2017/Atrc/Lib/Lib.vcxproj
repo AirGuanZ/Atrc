@@ -190,6 +190,8 @@
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Geometry\Triangle.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Geometry\TriangleBVH.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Light\CubeEnvironmentLight.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Light\EnvironmentLight.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Light\InfiniteLight.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Light\SkyLight.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\BxDF\BxDF_Black.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\BxDF\BxDF_Diffuse.h" />
@@ -225,6 +227,7 @@
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Texture\ConstantTexture.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Texture\HDRTexture.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Texture\ImageTexture.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Texture\TextureMultiplier.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Utility\GridDivider.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Utility\TriangleAux.h" />
   </ItemGroup>
@@ -242,6 +245,8 @@
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Geometry\Triangle.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Geometry\TriangleBVH.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Light\CubeEnvironmentLight.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Light\EnvironmentLight.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Light\InfiniteLight.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Light\SkyLight.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\BxDF\BxDF_Black.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\BxDF\BxDF_Diffuse.cpp" />
@@ -273,6 +278,7 @@
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Texture\ConstantTexture.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Texture\HDRTexture.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Texture\ImageTexture.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Texture\TextureMultiplier.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

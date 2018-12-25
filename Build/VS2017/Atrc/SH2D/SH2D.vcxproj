@@ -168,11 +168,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\Source\Atrc\SH2D\LightProjector.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\SH2D\ProjectResult.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\SH2D\SceneProjector.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\Source\Atrc\SH2D\LightProjector.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\SH2D\Main.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Atrc\SH2D\ProjectResult.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\SH2D\SceneProjector.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -189,6 +189,7 @@
     <ClCompile Include="..\..\..\..\Source\Atrc\Mgr\BuiltinCreator\ReporterCreator.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Mgr\BuiltinCreator\SamplerCreator.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Mgr\BuiltinCreator\TextureCreator.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Atrc\Mgr\Context.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Mgr\Parser.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Mgr\SceneBuilder.cpp" />
   </ItemGroup>
