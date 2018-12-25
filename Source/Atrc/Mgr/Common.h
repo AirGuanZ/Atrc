@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Utils/Config.h>
+#include <Utils/FileSys.h>
 
 #include <Atrc/Lib/Core/Common.h>
 
@@ -12,6 +13,7 @@ using AGZ::ConfigArray;
 using AGZ::ConfigGroup;
 using AGZ::ConfigNode;
 using AGZ::ConfigValue;
+using AGZ::FileSys::Path8;
 using AGZ::Str8;
 
 class MgrErr

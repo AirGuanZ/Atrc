@@ -38,13 +38,13 @@ Texture *ConstantTexture1Creator::Create(const ConfigGroup &group, [[maybe_unuse
     ATRC_MGR_CATCH_AND_RETHROW("In creating constant texture: " + group.ToString())
 }
 
-Texture *HDRTextureCreator::Create(const ConfigGroup &group, [[maybe_unused]] Context &context, Arena &arena) const
+Texture *HDRTextureCreator::Create(const ConfigGroup &group, Context &context, Arena &arena) const
 {
     ATRC_MGR_TRY
     {
         const AGZ::Texture2D<Color3f> *tex;
 
-        const Str8 &filename = group["filename"].AsValue();
+        const Str8 filename = context.GetPathInWorkspace(group["filename"].AsValue());
         auto it = path2Tex_.find(filename);
         if(it != path2Tex_.end())
             tex = it->second;
@@ -87,21 +87,25 @@ Texture *HDRTextureCreator::Create(const ConfigGroup &group, [[maybe_unused]] Co
     ATRC_MGR_CATCH_AND_RETHROW("In creating hdr texture: " + group.ToString())
 }
 
-Texture *ImageTextureCreator::Create(const ConfigGroup &group, [[maybe_unused]] Context &context, Arena &arena) const
+Texture *ImageTextureCreator::Create(const ConfigGroup &group, Context &context, Arena &arena) const
 {
     ATRC_MGR_TRY
     {
         const AGZ::Texture2D<Color3b> *tex;
 
-        const Str8 &filename = group["filename"].AsValue();
+        const Str8 filename = context.GetPathInWorkspace(group["filename"].AsValue());
         auto it = path2Tex_.find(filename);
         if(it != path2Tex_.end())
             tex = it->second;
         else
         {
-            auto ttex = arena.Create<AGZ::Texture2D<Color3b>>();
-            *ttex = AGZ::Texture2D<Color3b>(AGZ::TextureFile::LoadRGBFromFile(filename));
-            tex = ttex;
+            ATRC_MGR_TRY
+            {
+                auto ttex = arena.Create<AGZ::Texture2D<Color3b>>();
+                *ttex = AGZ::Texture2D<Color3b>(AGZ::TextureFile::LoadRGBFromFile(filename));
+                tex = ttex;
+            }
+            ATRC_MGR_CATCH_AND_RETHROW("Failed to load image from " + filename)
         }
 
         auto samplingStrategy = ImageTexture::Linear;

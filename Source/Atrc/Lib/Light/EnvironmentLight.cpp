@@ -14,7 +14,7 @@ Spectrum EnvironmentLight::NonAreaLe(const Ray &r) const noexcept
 {
     Vec3 d = local2World_.ApplyInverseToVector(r.d).Normalize();
     Real u = Saturate(Phi(d) / (2 * PI));
-    Real v = Saturate(1 - Arcsin(Saturate(d.z)));
+    Real v = 1 - Saturate((Arcsin(Clamp<Real>(d.z, -1, 1)) + PI / 2) / PI);
     return tex_->Sample({ u, v });
 }
 

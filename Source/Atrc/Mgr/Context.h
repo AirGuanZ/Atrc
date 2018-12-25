@@ -4,6 +4,7 @@
 #include <tuple>
 #include <unordered_map>
 
+#include <Utils/FileSys.h>
 #include <Utils/Misc.h>
 #include <Utils/Config.h>
 
@@ -73,9 +74,12 @@ class Context
     const ConfigGroup &root_;
     Arena arena_;
 
+    Path8 workspace_;
+    Path8 configPath_;
+
 public:
 
-    explicit Context(const ConfigGroup &root);
+    explicit Context(const ConfigGroup &root, const Str8 &configFilename);
 
     const ConfigGroup &Root() const noexcept { return root_; }
 
@@ -87,6 +91,8 @@ public:
 
     template<typename T, typename...Args>
     T *CreateWithInteriorArena(Args&&...args);
+
+    Str8 GetPathInWorkspace(const Str8 &subFilename) const;
 };
 
 // ================================= Implementation
@@ -127,12 +133,6 @@ void Factory<T>::AddCreator(const Creator<T> *creator)
 {
     AGZ_ASSERT(creator);
     creators_[creator->GetTypeName()] = creator;
-}
-
-inline Context::Context(const ConfigGroup &root)
-    : root_(root)
-{
-    
 }
 
 template<typename T>

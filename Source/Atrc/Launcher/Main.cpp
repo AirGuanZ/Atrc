@@ -12,11 +12,11 @@
 
 using namespace Atrc;
 
-int Run(const AGZ::Config &config)
+int Run(const AGZ::Config &config, const Str8 &configFilename)
 {
     auto &root = config.Root();
 
-    Mgr::Context context(root);
+    Mgr::Context context(root, configFilename);
     Mgr::RegisterBuiltinCreators(context);
 
     auto renderer = context.Create<Renderer>  (root["renderer"]);
@@ -26,7 +26,7 @@ int Run(const AGZ::Config &config)
 
     auto scene = Mgr::SceneBuilder::Build(root, context);
 
-    auto outputFilename = root["outputFilename"].AsValue();
+    auto outputFilename = context.GetPathInWorkspace(root["outputFilename"].AsValue());
 
     Vec2i filmSize;
     ATRC_MGR_TRY
@@ -79,15 +79,18 @@ int main(int argc, char *argv[])
     try
     {
         AGZ::Config config;
+        Str8 configFilename;
         
         if(argc == 1)
         {
-            if(!config.LoadFromFile("./scene.txt"))
+            configFilename = "./scene.txt";
+            if(!config.LoadFromFile(configFilename))
                 throw Mgr::MgrErr("Failed to load configuration file from ./scene.txt");
         }
         else if(argc == 2)
         {
-            if(!config.LoadFromFile(argv[1]))
+            configFilename = argv[1];
+            if(!config.LoadFromFile(configFilename))
                 throw Mgr::MgrErr("Failed to load configuration file from " + Str8(argv[1]));
         }
         else if(Str8(argv[1]) == "-m" && argc == 3)
@@ -104,7 +107,7 @@ int main(int argc, char *argv[])
             return 0;
         }
 
-        return Run(config);
+        return Run(config, configFilename);
     }
     catch(const Mgr::MgrErr &err)
     {

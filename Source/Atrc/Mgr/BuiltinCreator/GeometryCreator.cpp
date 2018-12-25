@@ -128,13 +128,13 @@ namespace
     }
 }
 
-Geometry *TriangleBVHCreator::Create(const ConfigGroup &group, [[maybe_unused]] Context &context, Arena &arena) const
+Geometry *TriangleBVHCreator::Create(const ConfigGroup &group, Context &context, Arena &arena) const
 {
     ATRC_MGR_TRY
     {
         auto transform = Parser::ParseTransform(group["transform"]);
 
-        const Str8 &filename = group["filename"].AsValue();
+        const Str8 filename = context.GetPathInWorkspace(group["filename"].AsValue());
         const TriangleBVHCore *core;
 
         auto it = path2Core_.find(filename);

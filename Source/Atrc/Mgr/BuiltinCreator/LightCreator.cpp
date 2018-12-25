@@ -9,10 +9,12 @@ namespace Atrc::Mgr
 
 void RegisterBuiltinLightCreators(Context &context)
 {
-    static const SkyLightCreator skyLightCreator;
     static const CubeEnvironmentLightCreator cubeEnvironmentLight;
-    context.AddCreator(&skyLightCreator);
+    static const EnvironmentLightCreator environmentLightCreator;
+    static const SkyLightCreator skyLightCreator;
     context.AddCreator(&cubeEnvironmentLight);
+    context.AddCreator(&environmentLightCreator);
+    context.AddCreator(&skyLightCreator);
 }
 
 Light *CubeEnvironmentLightCreator::Create(const ConfigGroup &group, Context &context, Arena &arena) const
