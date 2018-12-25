@@ -10,7 +10,7 @@ film = {
 
 sampler = {
     type = Native;
-    spp = 10000;
+    spp = 70000;
 };
 
 camera = {
@@ -50,23 +50,8 @@ groundMat = {
         type = IdealDiffuse;
         albedo = {
             type = Image;
-            filename = "./Asset/ground.jpeg";
+            filename = "./Asset/ground.png";
         };
-        ###type = TSMetal;
-        rc = {
-            type = Image;
-            filename = "./Asset/ground.jpeg";
-        };
-        roughness = {
-            type = Constant1;
-            texel = 0.01;
-        };
-        fresnel = {
-            type = Conductor;
-            etaI = (1);
-            etaT = (0.3);
-            k = (0.3);
-        };###
     };
 };
 
@@ -97,9 +82,9 @@ entities = (
     type = Geometric;
     geometry = {
         type = Triangle;
-        A = (-3, -3, 0);
-        B = (-3, 3, 0);
-        C = (3, 3, 0);
+        A = (-1.5, -1.5, 0);
+        B = (-1.5, 1.5, 0);
+        C = (1.5, 1.5, 0);
         tA = (0, 0); tB = (0, 1); tC = (1, 1);
         transform = (Translate(0, 0, -1));
     };
@@ -109,9 +94,9 @@ entities = (
     type = Geometric;
     geometry = {
         type = Triangle;
-        A = (-3, -3, 0);
-        B = (3, 3, 0);
-        C = (3, -3, 0);
+        A = (-1.5, -1.5, 0);
+        B = (1.5, 1.5, 0);
+        C = (1.5, -1.5, 0);
         tA = (0, 0); tB = (1, 1); tC = (1, 0);
         transform = (Translate(0, 0, -1));
     };
