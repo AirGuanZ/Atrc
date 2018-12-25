@@ -172,6 +172,59 @@ Transform ParseTransform(const ConfigNode &node)
     ATRC_MGR_CATCH_AND_RETHROW("In parsing transform: " + node.ToString())
 }
 
+Mat3 ParseRotateMat(const ConfigNode &node)
+{
+    ATRC_MGR_TRY
+    {
+        if(!node.IsArray())
+            throw MgrErr("Array expected");
+        auto &arr = node.AsArray();
+
+        auto ret = Mat3::IDENTITY();
+        for(size_t i = 0; i < arr.Size(); ++i)
+        {
+            if(!arr[i].IsArray())
+                throw MgrErr("Array expected");
+            auto &unit = arr[i].AsArray();
+
+            ATRC_MGR_TRY
+            {
+                if(unit.GetTag() == "Rotate")
+                {
+                    if(unit.Size() != 2)
+                        throw MgrErr("Rotate size must be 2");
+                    ret = ret * Mat3::Rotate(
+                        ParseVec3(unit[0]), ParseAngle(unit[1]));
+                }
+                else if(unit.GetTag() == "RotateX")
+                {
+                    if(unit.Size() != 1)
+                        throw MgrErr("RotateX size must be 1");
+                    ret = ret * Mat3::RotateX(ParseAngle(unit[0]));
+                }
+                else if(unit.GetTag() == "RotateY")
+                {
+                    if(unit.Size() != 1)
+                        throw MgrErr("RotateY size must be 1");
+                    ret = ret * Mat3::RotateY(ParseAngle(unit[0]));
+                }
+                else if(unit.GetTag() == "RotateZ")
+                {
+                    if(unit.Size() != 1)
+                        throw MgrErr("RotateZ size must be 1");
+                    ret = ret * Mat3::RotateZ(ParseAngle(unit[0]));
+                }
+                else
+                    throw MgrErr("Unknown rotation type");
+            }
+            ATRC_MGR_CATCH_AND_RETHROW("In parsing rotation unit: " + unit.ToString());
+        }
+
+        return ret;
+    }
+    ATRC_MGR_CATCH_AND_RETHROW("In parsing rotation matrix: " + node.ToString())
+}
+
 bool ParseBool(const ConfigNode &node)
 {
     ATRC_MGR_TRY

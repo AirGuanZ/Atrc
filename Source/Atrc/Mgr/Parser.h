@@ -50,6 +50,15 @@ Rad ParseAngle(const ConfigNode &node);
 Transform ParseTransform(const ConfigNode &node);
 
 /*
+    (r0, r1, r2, ..., rn) => r0 * r1 * r2 * ... * rn
+    ri = Rotate(Vec3, Angle)
+       | RotateX(Angle)
+       | RotateY(Angle)
+       | RotateZ(Angle)
+*/
+Mat3 ParseRotateMat(const ConfigNode &node);
+
+/*
     True  => true
     False => false
 */

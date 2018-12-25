@@ -1,6 +1,9 @@
-﻿#include <iostream>
+﻿#include <fstream>
+#include <iostream>
 
 #include <Utils/Config.h>
+
+#include <Atrc/Lib/Core/PostProcessor.h>
 
 #include <Atrc/Mgr/BuiltinCreatorRegister.h>
 #include <Atrc/Mgr/Context.h>
@@ -60,6 +63,18 @@ void ProjectScene(const AGZ::Config &config, const Str8 &configFilename)
     if(contProb <= 0 || contProb > 1)
         throw Mgr::MgrErr("Invalid contProb value");
 
+    PostProcessorChain postProcessChain;
+    ATRC_MGR_TRY
+    {
+        if(auto ppNode = root.Find("postProcessors"))
+        {
+            auto &arr = ppNode->AsArray();
+            for(size_t i = 0; i < arr.Size(); ++i)
+                postProcessChain.AddBack(context.Create<PostProcessor>(arr[i]));
+        }
+    }
+    ATRC_MGR_CATCH_AND_RETHROW("In creating post processors")
+
     // 用于存放输出的films
 
     std::vector<Film> coefs;
@@ -91,6 +106,11 @@ void ProjectScene(const AGZ::Config &config, const Str8 &configFilename)
     result.binaryMask = binaryMask.GetImage();
     result.albedoMap  = albedoMap.GetImage();
     result.normalMap  = normalMap.GetImage();
+
+    // 后处理
+
+    for(int i = 0; i < SHC; ++i)
+        postProcessChain.Process(&result.coefs[i]);
 
     // 保存到文件
 
@@ -144,12 +164,59 @@ void ProjectLight(const AGZ::Config &config, const Str8 &configFilename)
         throw Mgr::MgrErr("Failed to serialize projected result");
 }
 
+void ReconstructImage(const AGZ::Config &config, const Str8 &configFilename)
+{
+    auto &root = config.Root();
+
+    Mgr::Context context(root, configFilename);
+    Mgr::RegisterBuiltinCreators(context);
+
+    auto sceneFilename = context.GetPathInWorkspace(root["scene"].AsValue());
+    auto lightFilename = context.GetPathInWorkspace(root["light"].AsValue());
+    auto outputFilename = context.GetPathInWorkspace(root["outputFilename"].AsValue());
+    auto rotateMat = Mgr::Parser::ParseRotateMat(root["rotation"]);
+
+    SH2D::SceneProjectResult scene;
+    {
+        std::ifstream fin(sceneFilename.ToPlatformString(), std::ifstream::binary);
+        if(!fin)
+            throw Mgr::MgrErr("Failed to open scene SH file: " + sceneFilename);
+        AGZ::BinaryIStreamDeserializer deserializer(fin);
+        if(!deserializer.Deserialize(scene))
+            throw Mgr::MgrErr("Failed to deserialize scene SH coefs");
+    }
+
+    SH2D::LightProjectResult light;
+    {
+        std::ifstream fin(lightFilename.ToPlatformString(), std::ifstream::binary);
+        if(!fin)
+            throw Mgr::MgrErr("Failed to open light SH file: " + lightFilename);
+        AGZ::BinaryIStreamDeserializer deserializer(fin);
+        if(!deserializer.Deserialize(scene))
+            throw Mgr::MgrErr("Failed to deserialize light SH coefs");
+    }
+
+    light.Rotate(rotateMat);
+
+    auto SHC = Min(scene.SHC, light.SHC);
+    auto image = SH2D::ReconstructFromSH(SHC, scene.coefs.data(), light.coefs.data());
+
+    AGZ::TextureFile::WriteRGBToPNG(outputFilename, image.Map(
+    [](const Spectrum &c)
+    {
+        return c.Map([](Real s)
+            { return uint8_t(Clamp<Real>(s * 256, 0, 255)); });
+    }));
+}
+
 const char *USAGE_MSG =
 R"___(Usage:
     SH2D ps|project_scene filename
     SH2D ps|project_scene -m dummyConfigFilename content
     SH2D pl|project_light filename
     SH2D pl|project_light -m dummyConfigFilename content
+    SH2D rc|reconstruct filename
+    SH2D rc|reconstruct -m dummyConfigFilename content
 )___";
 
 int main(int argc, char *argv[])
@@ -220,6 +287,33 @@ int main(int argc, char *argv[])
             }
 
             ProjectLight(config, configFilename);
+            return 0;
+        }
+
+        if(funcName == "rc" || funcName == "reconstruct")
+        {
+            Str8 configFilename;
+            AGZ::Config config;
+
+            if(argc == 3)
+            {
+                configFilename = argv[2];
+                if(!config.LoadFromFile(configFilename))
+                    throw Mgr::MgrErr("Failed to load configuration file from " + configFilename);
+            }
+            else if(argc == 5 && Str8(argv[2]) == "-m")
+            {
+                configFilename = argv[3];
+                if(!config.LoadFromMemory(argv[4]))
+                    throw Mgr::MgrErr("Failed to load configutation from memory");
+            }
+            else
+            {
+                std::cout << USAGE_MSG;
+                return 0;
+            }
+
+            ReconstructImage(config, configFilename);
             return 0;
         }
 

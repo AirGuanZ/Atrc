@@ -32,4 +32,6 @@ struct SceneProjectResult
     bool Deserialize(AGZ::BinaryDeserializer &ds);
 };
 
+Image ReconstructFromSH(int32_t SHC, const Image *sceneCoefs, const Spectrum *lightCoefs);
+
 } // namespace Atrc::SH2D
