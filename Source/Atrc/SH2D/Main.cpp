@@ -46,10 +46,6 @@ void ProjectScene(const AGZ::Config &config, const Str8 &configFilename)
         throw Mgr::MgrErr("Invalid SHOrder value");
     int SHC = SHOrder * SHOrder;
 
-    int sampleCount = root["sampleCount"].Parse<int>();
-    if(sampleCount <= 0)
-        throw Mgr::MgrErr("Invalid sampleCount value");
-
     int workerCount = root["workerCount"].Parse<int>();
     int taskGridSize = root["taskGridSize"].Parse<int>();
     if(taskGridSize <= 0)
@@ -108,10 +104,52 @@ void ProjectScene(const AGZ::Config &config, const Str8 &configFilename)
         throw Mgr::MgrErr("Failed to serialize projected result");
 }
 
+void ProjectLight(const AGZ::Config &config, const Str8 &configFilename)
+{
+    auto &root = config.Root();
+
+    Mgr::Context context(root, configFilename);
+    Mgr::RegisterBuiltinCreators(context);
+
+    auto light = context.Create<Light>(root["light"]);
+
+    int SHOrder = root["SHOrder"].Parse<int>();
+    if(SHOrder <= 0 || SHOrder > 4)
+        throw Mgr::MgrErr("Invalid SHOrder value");
+    int SHC = SHOrder * SHOrder;
+
+    int sampleCount = root["sampleCount"].Parse<int>();
+    if(sampleCount <= 0)
+        throw Mgr::MgrErr("Invalid sampleCount value");
+
+    auto outputFilename = context.GetPathInWorkspace(root["outputFilename"].AsValue());
+    
+    std::vector<Spectrum> coefs(SHC);
+    SH2D::LightProjector projector(SHOrder);
+    projector.Project(light, sampleCount, coefs.data());
+
+    SH2D::LightProjectResult result;
+    result.SHC = SHC;
+    result.coefs = std::move(coefs);
+
+    // 保存到文件
+
+    std::ofstream fout(outputFilename.ToPlatformString(),
+                       std::ofstream::trunc | std::ofstream::binary);
+    if(!fout)
+        throw Mgr::MgrErr("Failed to open output file: " + outputFilename);
+    AGZ::BinaryOStreamSerializer serializer(fout);
+
+    if(!serializer.Serialize(result))
+        throw Mgr::MgrErr("Failed to serialize projected result");
+}
+
 const char *USAGE_MSG =
 R"___(Usage:
     SH2D ps|project_scene filename
     SH2D ps|project_scene -m dummyConfigFilename content
+    SH2D pl|project_light filename
+    SH2D pl|project_light -m dummyConfigFilename content
 )___";
 
 int main(int argc, char *argv[])
@@ -155,6 +193,33 @@ int main(int argc, char *argv[])
             }
 
             ProjectScene(config, configFilename);
+            return 0;
+        }
+
+        if(funcName == "pl" || funcName == "project_light")
+        {
+            Str8 configFilename;
+            AGZ::Config config;
+
+            if(argc == 3)
+            {
+                configFilename = argv[2];
+                if(!config.LoadFromFile(configFilename))
+                    throw Mgr::MgrErr("Failed to load configuration file from " + configFilename);
+            }
+            else if(argc == 5 && Str8(argv[2]) == "-m")
+            {
+                configFilename = argv[3];
+                if(!config.LoadFromMemory(argv[4]))
+                    throw Mgr::MgrErr("Failed to load configutation from memory");
+            }
+            else
+            {
+                std::cout << USAGE_MSG;
+                return 0;
+            }
+
+            ProjectLight(config, configFilename);
             return 0;
         }
 
