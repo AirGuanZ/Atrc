@@ -13,7 +13,7 @@ namespace Atrc::SH2D
 SceneProjector::SceneProjector(
     int workerCount, int taskGridSize, int SHOrder,
     int minDepth, int maxDepth, Real contProb) noexcept
-    : workerCount_(workerCount), taskGridSize_(taskGridSize), SHOrder_(SHOrder),
+    : workerCount_(workerCount), taskGridSize_(taskGridSize), SHC_(SHOrder * SHOrder),
       minDepth_(minDepth), maxDepth_(maxDepth), contProb_(contProb)
 {
     AGZ_ASSERT(taskGridSize > 0);
@@ -41,7 +41,7 @@ void SceneProjector::Project(const Scene &scene, Sampler *sampler, ProjectResult
         auto gridSampler = sampler->Clone(taskID);
         
         std::vector<FilmGrid> coefsGrid;
-        for(int i = 0; i < SHOrder_; ++i)
+        for(int i = 0; i < SHC_; ++i)
             coefsGrid.push_back(result->coefs[i].CreateFilmGrid(task));
         TFilmGrid<Real> binaryMaskGrid = result->binaryMask->CreateFilmGrid(task);
         FilmGrid albedoMapGrid         = result->albedoMap->CreateFilmGrid(task);
@@ -56,7 +56,7 @@ void SceneProjector::Project(const Scene &scene, Sampler *sampler, ProjectResult
 
         ProjectGrid(scene, gridSampler.get(), &resultGrid);
 
-        for(int i = 0; i < SHOrder_; ++i)
+        for(int i = 0; i < SHC_; ++i)
             result->coefs[i].MergeFilmGrid(coefsGrid[i]);
         result->binaryMask->MergeFilmGrid(binaryMaskGrid);
         result->albedoMap->MergeFilmGrid(albedoMapGrid);
@@ -95,7 +95,7 @@ void SceneProjector::ProjectGrid(
     auto cam = scene.GetCamera();
     auto rect = result->albedoMap->GetSamplingRect();
 
-    std::vector<Spectrum> coefsPixel(SHOrder_);
+    std::vector<Spectrum> coefsPixel(SHC_);
 
     for(int32_t py = rect.low.y; py < rect.high.y; ++py)
     {
@@ -112,7 +112,7 @@ void SceneProjector::ProjectGrid(
                 Eval(scene, r, sampler, arena, &pixel);
                 auto fac = w / pdf;
 
-                for(int i = 0; i < SHOrder_; ++i)
+                for(int i = 0; i < SHC_; ++i)
                     result->coefs[i].AddSample(camSam.film, fac * pixel.coefs[i]);
                 result->binaryMask->AddSample(camSam.film, fac.r * pixel.binary);
                 result->albedoMap->AddSample(camSam.film, fac * pixel.albedo);
@@ -143,7 +143,7 @@ void SceneProjector::Eval(
     Sampler *sampler, Arena &arena, ProjectResultPixel *output) const
 {
     Spectrum coef = Spectrum(Real(1));
-    ClearPixel(SHOrder_, output);
+    ClearPixel(SHC_, output);
     Ray r = _r;
 
     auto SHTable = AGZ::Math::GetSHTable<Real>();
@@ -164,7 +164,7 @@ void SceneProjector::Eval(
         {
             if(depth > 1)
             {
-                for(int i = 0; i < SHOrder_; ++i)
+                for(int i = 0; i < SHC_; ++i)
                     output->coefs[i] = coef * Spectrum(SHTable[i](r.d.Normalize()));
             }
             break;

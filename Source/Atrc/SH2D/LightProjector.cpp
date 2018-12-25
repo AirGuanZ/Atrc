@@ -4,9 +4,9 @@ namespace Atrc::SH2D
 {
 
 LightProjector::LightProjector(int SHOrder) noexcept
-    : SHOrder_(SHOrder)
+    : SHC_(SHOrder * SHOrder)
 {
-
+    AGZ_ASSERT(0 < SHOrder && SHOrder <= 4);
 }
 
 void LightProjector::Project(const Light *light, int sampleCount, Spectrum *coefs) const
@@ -15,7 +15,7 @@ void LightProjector::Project(const Light *light, int sampleCount, Spectrum *coef
 
     auto SHTable = AGZ::Math::GetSHTable<Real>();
 
-    for(int i = 0; i < SHOrder_; ++i)
+    for(int i = 0; i < SHC_; ++i)
         coefs[i] = Spectrum();
 
     for(int n = 0; n < sampleCount; ++n)
@@ -25,13 +25,13 @@ void LightProjector::Project(const Light *light, int sampleCount, Spectrum *coef
         auto [dir, pdf] = AGZ::Math::DistributionTransform
             ::UniformOnUnitSphere<Real>::Transform({ u, v });
         
-        for(int i = 0; i < SHOrder_; ++i)
+        for(int i = 0; i < SHC_; ++i)
             coefs[i] += SHTable[i](dir) / pdf;
     }
 
     if(sampleCount > 0)
     {
-        for(int i = 0; i < SHOrder_; ++i)
+        for(int i = 0; i < SHC_; ++i)
             coefs[i] /= sampleCount;
     }
 }

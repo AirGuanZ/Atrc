@@ -41,7 +41,7 @@ private:
     int workerCount_;
     int taskGridSize_;
 
-    int SHOrder_;
+    int SHC_;
 
     int minDepth_, maxDepth_;
     Real contProb_;

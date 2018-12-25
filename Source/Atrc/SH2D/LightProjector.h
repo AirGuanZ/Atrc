@@ -7,7 +7,7 @@ namespace Atrc::SH2D
 
 class LightProjector
 {
-    int SHOrder_;
+    int SHC_;
 
 public:
 

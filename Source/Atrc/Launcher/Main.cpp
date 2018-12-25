@@ -69,6 +69,13 @@ int Run(const AGZ::Config &config, const Str8 &configFilename)
 #include <crtdbg.h>
 #endif
 
+const char *USAGE_MSG =
+R"___(Usage:
+    AtrcLauncher (load from ./Scene.txt)
+    AtrcLauncher filename (load from filename)
+    AtrcLauncher -m dummyConfigFilename content (load from string)
+)___";
+
 int main(int argc, char *argv[])
 {
 #if defined(_WIN32) && defined(_DEBUG)
@@ -83,27 +90,31 @@ int main(int argc, char *argv[])
         
         if(argc == 1)
         {
-            configFilename = "./scene.txt";
+            configFilename = "./Scene.txt";
             if(!config.LoadFromFile(configFilename))
                 throw Mgr::MgrErr("Failed to load configuration file from ./scene.txt");
         }
         else if(argc == 2)
         {
+            if(Str8(argv[1]) == "-h" || Str8(argv[1]) == "--help")
+            {
+                std::cout << USAGE_MSG;
+                return 0;
+            }
+
             configFilename = argv[1];
             if(!config.LoadFromFile(configFilename))
-                throw Mgr::MgrErr("Failed to load configuration file from " + Str8(argv[1]));
+                throw Mgr::MgrErr("Failed to load configuration file from " + configFilename);
         }
-        else if(Str8(argv[1]) == "-m" && argc == 3)
+        else if(Str8(argv[1]) == "-m" && argc == 4)
         {
-            if(!config.LoadFromMemory(argv[2]))
+            configFilename = argv[2];
+            if(!config.LoadFromMemory(argv[3]))
                 throw Mgr::MgrErr("Failed to load configuration from memory");
         }
         else
         {
-            std::cout << "Usage:"                                     << std::endl
-                      << "    Launcher (load from ./scene.txt)"       << std::endl
-                      << "    Launcher filename (load from filename)" << std::endl
-                      << "    Launcher -m content (load from string)" << std::endl;
+            std::cout << USAGE_MSG;
             return 0;
         }
 
