@@ -1,39 +1,20 @@
 #pragma once
 
-#include <Atrc/Lib/Core/Light.h>
+#include <Atrc/Lib/Light/InfiniteLight.h>
 
 namespace Atrc
 {
 
-class SkyLight : public Light
+class SkyLight : public InfiniteLight
 {
     Spectrum top_;
     Spectrum bottom_;
 
-    Vec3 worldCentre_;
-    Real worldRadius_;
-
 public:
 
-    explicit SkyLight(const Spectrum &topAndBottom);
+    explicit SkyLight(const Spectrum &topAndBottom, const Transform &local2World);
 
-    SkyLight(const Spectrum &top, const Spectrum &bottom);
-
-    void PreprocessScene(const Scene &scene) override;
-
-    SampleWiResult SampleWi(const Intersection &inct, const ShadingPoint &shd, const Vec3 &sample) const noexcept override;
-
-    Real SampleWiAreaPDF(const Vec3 &pos, const Vec3 &nor, const Intersection &inct, const ShadingPoint &shd) const noexcept override;
-
-    Real SampleWiNonAreaPDF(const Vec3 &wi, const Intersection &inct, const ShadingPoint &shd) const noexcept override;
-
-    SampleWiResult SampleWi(const Vec3 &pos, const Vec3 &sample) const noexcept override;
-
-    Real SampleWiAreaPDF(const Vec3 &pos, const Vec3 &nor, const Vec3 &medPos) const noexcept override;
-
-    Real SampleWiNonAreaPDF(const Vec3 &wi, const Vec3 &medPos) const noexcept override;
-
-    Spectrum AreaLe(const Intersection &inct) const noexcept override;
+    SkyLight(const Spectrum &top, const Spectrum &bottom, const Transform &local2World);
 
     Spectrum NonAreaLe(const Ray &r) const noexcept override;
 };

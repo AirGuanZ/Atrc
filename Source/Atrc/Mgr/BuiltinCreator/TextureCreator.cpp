@@ -1,6 +1,7 @@
 #include <Atrc/Lib/Texture/ConstantTexture.h>
 #include <Atrc/Lib/Texture/HDRTexture.h>
 #include <Atrc/Lib/Texture/ImageTexture.h>
+#include <Atrc/Lib/Texture/TextureMultiplier.h>
 #include <Atrc/Mgr/BuiltinCreator/TextureCreator.h>
 #include <Atrc/Mgr/Parser.h>
 
@@ -133,6 +134,17 @@ Texture *ImageTextureCreator::Create(const ConfigGroup &group, [[maybe_unused]] 
         return arena.Create<ImageTexture>(*tex, samplingStrategy, wrappingStrategy, reverseV);
     }
     ATRC_MGR_CATCH_AND_RETHROW("In creating image texture: " + group.ToString())
+}
+
+Texture *TextureMultiplierCreator::Create(const ConfigGroup &group, Context &context, Arena &arena) const
+{
+    ATRC_MGR_TRY
+    {
+        auto lhs = context.Create<Texture>(group["lhs"]);
+        auto rhs = context.Create<Texture>(group["rhs"]);
+        return arena.Create<TextureMultiplier>(lhs, rhs);
+    }
+    ATRC_MGR_CATCH_AND_RETHROW("In creating texture multiplier: " + group.ToString())
 }
 
 } // namespace Atrc::Mgr

@@ -1,12 +1,12 @@
 #pragma once
 
-#include <Atrc/Lib/Core/Light.h>
 #include <Atrc/Lib/Core/Texture.h>
+#include <Atrc/Lib/Light/InfiniteLight.h>
 
 namespace Atrc
 {
 
-class CubeEnvironmentLight : public Light
+class CubeEnvironmentLight : public InfiniteLight
 {
     // 0 : +X
     // 1 : +Y
@@ -16,28 +16,9 @@ class CubeEnvironmentLight : public Light
     // 5 : -Z
     const Texture *envTex_[6];
 
-    Vec3 worldCentre_;
-    Real worldRadius_;
-
 public:
 
-    explicit CubeEnvironmentLight(const Texture **envTex) noexcept;
-
-    void PreprocessScene(const Scene &scene) override;
-
-    SampleWiResult SampleWi(const Intersection &inct, const ShadingPoint &shd, const Vec3 &sample) const noexcept override;
-
-    Real SampleWiAreaPDF(const Vec3 &pos, const Vec3 &nor, const Intersection &inct, const ShadingPoint &shd) const noexcept override;
-
-    Real SampleWiNonAreaPDF(const Vec3 &wi, const Intersection &inct, const ShadingPoint &shd) const noexcept override;
-
-    SampleWiResult SampleWi(const Vec3 &pos, const Vec3 &sample) const noexcept override;
-
-    Real SampleWiAreaPDF(const Vec3 &pos, const Vec3 &nor, const Vec3 &medPos) const noexcept override;
-
-    Real SampleWiNonAreaPDF(const Vec3 &wi, const Vec3 &medPos) const noexcept override;
-
-    Spectrum AreaLe(const Intersection &inct) const noexcept override;
+    explicit CubeEnvironmentLight(const Texture **envTex, const Transform &local2World) noexcept;
 
     Spectrum NonAreaLe(const Ray &r) const noexcept override;
 };

@@ -1,7 +1,7 @@
 # Scene description file for Atrc Launcher
 
 film = {
-    size = (600, 600);
+    size = (1024, 1024);
     filter = {
         type = Box;
         sidelen = 1;
@@ -10,7 +10,7 @@ film = {
 
 sampler = {
     type = Native;
-    spp = 70000;
+    spp = 1000;
 };
 
 camera = {
@@ -32,7 +32,7 @@ renderer = {
         sampleAllLights = True;
         lightInMedium = False;
     };
-    workerCount = 6;
+    workerCount = 11;
     taskGridSize = 16;
 };
 
@@ -125,10 +125,10 @@ entities = (
         fresnel = {
             type = Dielectric;
             etaI = 1;
-            etaT = 1.6;
+            etaT = 2.05;
         };
     };
-    medium = {
+    medium1 = {
         in = {
             type = Homogeneous;
             sigmaA = (1);
@@ -140,7 +140,13 @@ entities = (
 }
 );
 
-lights = ();
+lights = (
+{
+    type = Sky;
+    top = (0.2);
+    bottom = (0.2);
+}
+);
 
 postProcessors = (
     { type = FlipImage; }

@@ -75,4 +75,19 @@ public:
     Texture *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
 };
 
+/*
+    type = Mul
+
+    lhs = Texture
+    rhs = Texture
+*/
+class TextureMultiplierCreator : public Creator<Texture>
+{
+public:
+
+    Str8 GetTypeName() const override { return "Mul"; }
+
+    Texture *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
+};
+
 } // namespace Atrc::Mgr
