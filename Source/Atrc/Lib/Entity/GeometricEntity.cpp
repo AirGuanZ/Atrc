@@ -21,6 +21,7 @@ bool GeometricEntity::FindIntersection(const Ray &r, Intersection *inct) const n
     if(!geometry_->FindIntersection(r, inct))
         return false;
     inct->entity = this;
+    inct->material = material_;
     inct->mediumInterface = mediumInterface_;
     return true;
 }
@@ -29,12 +30,6 @@ AABB GeometricEntity::GetWorldBound() const noexcept
 {
     AGZ_ASSERT(geometry_);
     return geometry_->GetWorldBound();
-}
-
-const Material *GeometricEntity::GetMaterial([[maybe_unused]] const Intersection &inct) const noexcept
-{
-    AGZ_ASSERT(material_ && inct.entity == this);
-    return material_;
 }
 
 const Light *GeometricEntity::AsLight() const noexcept

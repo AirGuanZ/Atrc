@@ -30,12 +30,11 @@ bool Triangle::FindIntersection(const Ray &r, GeometryIntersection *inct) const 
 
     Vec3 ez = Dot(-lRay.d, nor) > 0 ? nor : -nor;
 
-    inct->t        = rc.t;
-    inct->pos      = r.At(rc.t);
-    inct->wr       = -r.d;
-    inct->uv       = rc.uv;
-    inct->coordSys = local2World_.ApplyToCoordSystem(CoordSystem(ex, Cross(ez, ex), ez));
-    inct->flag0    = 0;
+    inct->t            = rc.t;
+    inct->pos          = r.At(rc.t);
+    inct->wr           = -r.d;
+    inct->uv           = rc.uv;
+    inct->coordSys     = local2World_.ApplyToCoordSystem(CoordSystem(ex, Cross(ez, ex), ez));
     inct->usr.uv       = tA + rc.uv.u * tB_tA + rc.uv.v * tC_tA;
     inct->usr.coordSys = inct->coordSys;
 

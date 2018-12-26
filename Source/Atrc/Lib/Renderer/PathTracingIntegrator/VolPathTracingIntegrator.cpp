@@ -143,7 +143,7 @@ Spectrum VolPathTracingIntegrator::Eval(const Scene &scene, const Ray &_r, Sampl
         {
             if(!isInctValid)
                 break;
-            shd = inct.entity->GetMaterial(inct)->GetShadingPoint(inct, arena);
+            shd = inct.material->GetShadingPoint(inct, arena);
             coef *= Tr(med, r.o, inct.pos) / sampleInctPDF;
         }
 

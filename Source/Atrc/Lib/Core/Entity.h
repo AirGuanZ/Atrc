@@ -21,8 +21,6 @@ public:
 
     virtual AABB GetWorldBound() const = 0;
 
-    virtual const Material *GetMaterial(const Intersection &inct) const noexcept = 0;
-
     virtual const Light *AsLight() const noexcept = 0;
 
     virtual Light *AsLight() noexcept = 0;

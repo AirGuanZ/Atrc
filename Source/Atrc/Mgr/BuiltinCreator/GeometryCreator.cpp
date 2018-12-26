@@ -50,12 +50,6 @@ Geometry *TriangleCreator::Create(const ConfigGroup &group, [[maybe_unused]] Con
 
 namespace
 {
-    Str8 GetCacheFilename(const Str8 &filename)
-    {
-        return AGZ::FileSys::Path8("./.agz.cache/").Append(
-            AGZ::FileSys::Path8(filename).ToRelative()).ToStr();
-    }
-
     TriangleBVHCore *RecreateTriangleMesh(const Str8 &filename, const Str8 &cacheFilename, Arena &arena)
     {
         AGZ::Model::WavefrontObj<Real> obj;
@@ -89,24 +83,21 @@ namespace
 
         AGZ::BinaryOStreamSerializer serializer(fout);
         if(!serializer.Serialize(*oriFileTime) || !serializer.Serialize(*ret))
-            throw MgrErr("Failed to serialize to triangle mesh cache file: " + cacheFilename);
-
-        if(!serializer.Serialize(*ret))
-            throw MgrErr("Failed to serialize triangle BVH mesh to " + cacheFilename);
+            throw MgrErr("Failed to serialize into triangle mesh cache file: " + cacheFilename);
 
         return ret;
     }
 
     TriangleBVHCore *LoadTriangleMesh(const Str8 &filename, Arena &arena)
     {
-        auto oriFileTime = AGZ::FileSys::File::GetLastWriteTime(filename);
-        if(!oriFileTime)
-            throw MgrErr("Failed to load last write time of " + filename);
-
         auto cacheFilename = GetCacheFilename(filename);
         std::ifstream fin(cacheFilename.ToPlatformString(), std::ifstream::binary | std::ifstream::in);
         if(!fin)
             return RecreateTriangleMesh(filename, cacheFilename, arena);
+
+        auto oriFileTime = AGZ::FileSys::File::GetLastWriteTime(filename);
+        if(!oriFileTime)
+            throw MgrErr("Failed to load last write time of " + filename);
 
         AGZ::BinaryIStreamDeserializer deserializer(fin);
         auto cacheTime = deserializer.DeserializeFromScratch<AGZ::FileSys::FileTime>();

@@ -170,7 +170,7 @@ void SceneProjector::Eval(
             break;
         }
 
-        ShadingPoint shd = inct.entity->GetMaterial(inct)->GetShadingPoint(inct, arena);
+        ShadingPoint shd = inct.material->GetShadingPoint(inct, arena);
 
         if(depth == 1)
         {

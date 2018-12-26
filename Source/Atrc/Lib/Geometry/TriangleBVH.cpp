@@ -636,7 +636,6 @@ bool TriangleBVHCore::FindIntersection(Ray r, GeometryIntersection *inct) const 
     inct->wr       = -r.d;
     inct->uv       = rc.uv;
     inct->coordSys = primInfo.coordSys;
-    inct->flag0    = flag0;
     inct->usr.uv   = primInfo.tA + rc.uv.u * primInfo.tB_tA + rc.uv.v * primInfo.tC_tA;
 
     Vec3 usrZ = (primInfo.nA + rc.uv.u * primInfo.nB_nA + rc.uv.v * primInfo.nC_nA).Normalize();

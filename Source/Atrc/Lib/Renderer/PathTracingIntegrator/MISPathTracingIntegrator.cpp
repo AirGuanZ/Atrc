@@ -70,8 +70,7 @@ Spectrum MISPathTracingIntegrator::Eval(
 
         // BSDF
 
-        ShadingPoint shd = inct.entity->GetMaterial(inct)
-                                      ->GetShadingPoint(inct, arena);
+        ShadingPoint shd = inct.material->GetShadingPoint(inct, arena);
 
         // Sample direct illumination with MIS
 

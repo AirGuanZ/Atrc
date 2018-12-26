@@ -21,8 +21,6 @@ public:
 
     AABB GetWorldBound() const override;
 
-    const Material *GetMaterial(const Intersection &inct) const noexcept override;
-
     const Light *AsLight() const noexcept override;
 
     Light *AsLight() noexcept override;

@@ -56,4 +56,10 @@ public:
             ::Atrc::Mgr::MgrErr("An unknown error occurred"), (MSG)); \
     }
 
+inline Str8 GetCacheFilename(const Str8 &filename)
+{
+    return AGZ::FileSys::Path8("./.agz.cache/").Append(
+        AGZ::FileSys::Path8(filename).ToRelative()).ToStr();
+}
+
 } // namespace Atrc::Mgr

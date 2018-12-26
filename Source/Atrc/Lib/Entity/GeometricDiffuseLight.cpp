@@ -21,6 +21,7 @@ bool GeometricDiffuseLight::FindIntersection(const Ray &r, Intersection *inct) c
     if(geometry_->FindIntersection(r, inct))
     {
         inct->entity = this;
+        inct->material = &STATIC_IDEAL_BLACK;
         return true;
     }
     return false;
@@ -29,11 +30,6 @@ bool GeometricDiffuseLight::FindIntersection(const Ray &r, Intersection *inct) c
 AABB GeometricDiffuseLight::GetWorldBound() const
 {
     return geometry_->GetWorldBound();
-}
-
-const Material *GeometricDiffuseLight::GetMaterial([[maybe_unused]] const Intersection &inct) const noexcept
-{
-    return &STATIC_IDEAL_BLACK;
 }
 
 const Light *GeometricDiffuseLight::AsLight() const noexcept

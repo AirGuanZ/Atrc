@@ -17,7 +17,6 @@ struct GeometryIntersection
     Vec3 wr;              // 相交射线的反方向
     Vec2 uv;              // 交点在几何体上的参数坐标
     CoordSystem coordSys; // 交点所在曲面的局部坐标系
-    uint32_t flag0 = 0;   // 由实体设置的辅助标记，含义由其自行定义
 
     struct
     {
@@ -29,7 +28,8 @@ struct GeometryIntersection
 // 射线与实体求交的结果
 struct Intersection : GeometryIntersection
 {
-    const Entity *entity; // 实体指针
+    const Entity *entity;    // 实体指针
+    const Material *material;
     MediumInterface mediumInterface;
 };
 

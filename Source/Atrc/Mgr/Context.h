@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include <map>
 #include <typeinfo>
 #include <tuple>
 #include <unordered_map>
@@ -20,6 +21,8 @@ namespace Atrc::Mgr
 {
 
 class Context;
+
+using Name2Geometry = std::map<Str8, Geometry*>;
 
 template<typename T>
 class Creator
@@ -63,6 +66,7 @@ class Context
         Light,
         Material,
         Medium,
+        Name2Geometry,
         PathTracingIntegrator,
         PostProcessor,
         Renderer,

@@ -8,7 +8,7 @@ Spectrum ShadingNormalIntegrator::Eval(const Scene &scene, const Ray &r, [[maybe
     Intersection inct;
     if(!scene.FindIntersection(r, &inct))
         return Spectrum();
-    ShadingPoint shd = inct.entity->GetMaterial(inct)->GetShadingPoint(inct, arena);
+    ShadingPoint shd = inct.material->GetShadingPoint(inct, arena);
     return shd.coordSys.ez.Map(
         [](Real c){ return Saturate(c / 2 + Real(0.5)); });
 }
