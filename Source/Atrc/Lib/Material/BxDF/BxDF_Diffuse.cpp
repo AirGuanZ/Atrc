@@ -20,14 +20,14 @@ Spectrum BxDF_Diffuse::GetAlbedo() const noexcept
     return albedo_;
 }
 
-Spectrum BxDF_Diffuse::Eval(const CoordSystem &geoInShd, const Vec3 &wi, const Vec3 &wo) const noexcept
+Spectrum BxDF_Diffuse::Eval(const CoordSystem &geoInShd, const Vec3 &wi, const Vec3 &wo, [[maybe_unused]] bool star) const noexcept
 {
     if(wi.z <= 0 || /*wo.z <= 0 ||*/ !geoInShd.InPositiveHemisphere(wi) || !geoInShd.InPositiveHemisphere(wo))
         return Spectrum();
     return albedo_ / PI;
 }
 
-Option<BxDF::SampleWiResult> BxDF_Diffuse::SampleWi(const CoordSystem &geoInShd, const Vec3 &wo, const Vec2 &sample) const noexcept
+Option<BxDF::SampleWiResult> BxDF_Diffuse::SampleWi(const CoordSystem &geoInShd, const Vec3 &wo, [[maybe_unused]] bool star, const Vec2 &sample) const noexcept
 {
     if(!geoInShd.InPositiveHemisphere(wo))
         return None;
@@ -51,7 +51,7 @@ Option<BxDF::SampleWiResult> BxDF_Diffuse::SampleWi(const CoordSystem &geoInShd,
     return ret;
 }
 
-Real BxDF_Diffuse::SampleWiPDF(const CoordSystem &geoInShd, const Vec3 &wi, const Vec3 &wo) const noexcept
+Real BxDF_Diffuse::SampleWiPDF(const CoordSystem &geoInShd, const Vec3 &wi, const Vec3 &wo, [[maybe_unused]] bool star) const noexcept
 {
     if(wi.z <= 0 || /*wo.z <= 0 || */!geoInShd.InPositiveHemisphere(wi) || !geoInShd.InPositiveHemisphere(wo))
         return 0;

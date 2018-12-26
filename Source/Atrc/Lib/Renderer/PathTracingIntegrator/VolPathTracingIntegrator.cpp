@@ -28,7 +28,7 @@ namespace
         if(scene.HasIntersection(shadowRay))
             return Spectrum();
 
-        auto f = shd.bsdf->Eval(shd.coordSys, inct.coordSys, lightSample.wi, inct.wr, BSDF_ALL);
+        auto f = shd.bsdf->Eval(shd.coordSys, inct.coordSys, lightSample.wi, inct.wr, BSDF_ALL, false);
         if(!f)
             return Spectrum();
 
@@ -42,7 +42,7 @@ namespace
 
         constexpr auto bsdfType = BSDFType(BSDF_ALL & ~BSDF_SPECULAR);
 
-        Real bpdf = shd.bsdf->SampleWiPDF(shd.coordSys, inct.coordSys, lightSample.wi, inct.wr, bsdfType);
+        Real bpdf = shd.bsdf->SampleWiPDF(shd.coordSys, inct.coordSys, lightSample.wi, inct.wr, bsdfType, false);
         return f / (lightSample.pdf + bpdf);
     }
 
@@ -186,9 +186,11 @@ Spectrum VolPathTracingIntegrator::Eval(const Scene &scene, const Ray &_r, Sampl
         bool isNDirDelta = false;
         Real nDirPDF;
 
+        Vec2 nSam = sampler->GetReal2();
+
         if(sampleMed)
         {
-            auto phSample = mshd.ph->SampleWi(sampler->GetReal2());
+            auto phSample = mshd.ph->SampleWi(nSam);
             nDir    = phSample.wi.Normalize();
             nCoef   = Spectrum(phSample.coef);
             nDirPDF = phSample.coef;
@@ -196,7 +198,7 @@ Spectrum VolPathTracingIntegrator::Eval(const Scene &scene, const Ray &_r, Sampl
         else
         {
             auto bsdfSample = shd.bsdf->SampleWi(
-                shd.coordSys, inct.coordSys, inct.wr, BSDF_ALL, sampler->GetReal2());
+                shd.coordSys, inct.coordSys, inct.wr, BSDF_ALL, false, nSam);
             if(!bsdfSample)
                 break;
             nDir        = bsdfSample->wi.Normalize();
@@ -209,6 +211,8 @@ Spectrum VolPathTracingIntegrator::Eval(const Scene &scene, const Ray &_r, Sampl
 
         // 求nR与场景的交点，以计算MIS下的直接光照
         // 并更新r与inct
+
+        Real selectLightSample = sampler->GetReal();
 
         Intersection nInct;
         if(scene.FindIntersection(nR, &nInct))
@@ -267,7 +271,7 @@ Spectrum VolPathTracingIntegrator::Eval(const Scene &scene, const Ray &_r, Sampl
                         }
                     }
                 }
-                else if(auto lht = scene.SampleLight(sampler->GetReal()))
+                else if(auto lht = scene.SampleLight(selectLightSample))
                 {
                     auto le = lht->light->NonAreaLe(nR);
                     if(!!le)

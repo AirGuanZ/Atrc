@@ -16,7 +16,7 @@ public:
 
     Spectrum GetAlbedo() const noexcept override;
 
-    Spectrum Eval(const CoordSystem &geoInShd, const Vec3 &wi, const Vec3 &wo) const noexcept override;
+    Spectrum Eval(const CoordSystem &geoInShd, const Vec3 &wi, const Vec3 &wo, bool star) const noexcept override;
 };
 
 } // namespace Atrc

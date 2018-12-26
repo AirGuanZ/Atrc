@@ -25,11 +25,11 @@ public:
 
     virtual Spectrum GetAlbedo() const noexcept = 0;
 
-    virtual Spectrum Eval(const CoordSystem &geoInShd, const Vec3 &wi, const Vec3 &wo) const noexcept = 0;
+    virtual Spectrum Eval(const CoordSystem &geoInShd, const Vec3 &wi, const Vec3 &wo, bool star) const noexcept = 0;
 
-    virtual Option<SampleWiResult> SampleWi(const CoordSystem &geoInShd, const Vec3 &wo, const Vec2 &sample) const noexcept;
+    virtual Option<SampleWiResult> SampleWi(const CoordSystem &geoInShd, const Vec3 &wo, bool star, const Vec2 &sample) const noexcept;
 
-    virtual Real SampleWiPDF(const CoordSystem &geoInShd, const Vec3 &wi, const Vec3 &wo) const noexcept;
+    virtual Real SampleWiPDF(const CoordSystem &geoInShd, const Vec3 &wi, const Vec3 &wo, bool star) const noexcept;
 };
 
 // ================================= Implementation
@@ -50,7 +50,7 @@ inline bool BxDF::MatchType(BSDFType type) const noexcept
     return Contains(type, GetType());
 }
 
-inline Option<BxDF::SampleWiResult> BxDF::SampleWi(const CoordSystem &geoInShd, const Vec3 &wo, const Vec2 &sample) const noexcept
+inline Option<BxDF::SampleWiResult> BxDF::SampleWi(const CoordSystem &geoInShd, const Vec3 &wo, bool star, const Vec2 &sample) const noexcept
 {
     if(wo.z <= 0 || !geoInShd.InPositiveHemisphere(wo))
         return None;
@@ -61,7 +61,7 @@ inline Option<BxDF::SampleWiResult> BxDF::SampleWi(const CoordSystem &geoInShd, 
         return None;
 
     SampleWiResult ret;
-    ret.coef    = Eval(geoInShd, sam, wo);
+    ret.coef    = Eval(geoInShd, sam, wo, star);
     ret.pdf     = pdf;
     ret.type    = type_;
     ret.wi      = sam;
@@ -69,7 +69,7 @@ inline Option<BxDF::SampleWiResult> BxDF::SampleWi(const CoordSystem &geoInShd, 
     return ret;
 }
 
-inline Real BxDF::SampleWiPDF(const CoordSystem &geoInShd, const Vec3 &wi, const Vec3 &wo) const noexcept
+inline Real BxDF::SampleWiPDF(const CoordSystem &geoInShd, const Vec3 &wi, const Vec3 &wo, [[maybe_unused]] bool star) const noexcept
 {
     if(wi.z <= 0 || wo.z <= 0 || !geoInShd.InPositiveHemisphere(wi) || !geoInShd.InPositiveHemisphere(wo))
         return 0;

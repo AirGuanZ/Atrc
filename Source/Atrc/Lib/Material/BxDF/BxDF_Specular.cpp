@@ -33,13 +33,14 @@ Spectrum BxDF_Specular::GetAlbedo() const noexcept
 Spectrum BxDF_Specular::Eval(
     [[maybe_unused]] const CoordSystem &geoInShd,
     [[maybe_unused]] const Vec3 &wi,
-    [[maybe_unused]] const Vec3 &wo) const noexcept
+    [[maybe_unused]] const Vec3 &wo,
+    [[maybe_unused]] bool star) const noexcept
 {
     return Spectrum();
 }
 
 Option<BxDF_Specular::SampleWiResult> BxDF_Specular::SampleWi(
-    [[maybe_unused]] const CoordSystem &geoInShd, const Vec3 &wo, const Vec2 &sample) const noexcept
+    [[maybe_unused]] const CoordSystem &geoInShd, const Vec3 &wo, bool star, const Vec2 &sample) const noexcept
 {
     Vec3 nor = wo.z > 0 ? Vec3::UNIT_Z() : -Vec3::UNIT_Z();
     Vec3 nWo = wo.Normalize();
@@ -84,7 +85,7 @@ Option<BxDF_Specular::SampleWiResult> BxDF_Specular::SampleWi(
     {
         ret.wi   = wi->Normalize();
         ret.pdf  = 1 - Fr.r;
-        ret.coef = eta * eta * rc_ * (Spectrum(1.0f) - Fr) / Abs(ret.wi.z);
+        ret.coef = (star ? Real(1) : eta * eta) * rc_ * (Spectrum(1.0f) - Fr) / Abs(ret.wi.z);
         ret.type = BSDFType(BSDF_SPECULAR | BSDF_TRANSMISSION);
         ret.isDelta = true;
     }
@@ -101,7 +102,8 @@ Option<BxDF_Specular::SampleWiResult> BxDF_Specular::SampleWi(
 Real BxDF_Specular::SampleWiPDF(
     [[maybe_unused]] const CoordSystem &geoInShd,
     [[maybe_unused]] const Vec3 &wi,
-    [[maybe_unused]] const Vec3 &wo) const noexcept
+    [[maybe_unused]] const Vec3 &wo,
+    [[maybe_unused]] bool star) const noexcept
 {
     return 0;
 }

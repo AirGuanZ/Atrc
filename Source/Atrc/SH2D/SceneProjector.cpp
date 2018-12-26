@@ -180,7 +180,7 @@ void SceneProjector::Eval(
         }
 
         auto bsdfSample = shd.bsdf->SampleWi(
-            shd.coordSys, inct.coordSys, inct.wr, BSDF_ALL, sampler->GetReal2());
+            shd.coordSys, inct.coordSys, inct.wr, BSDF_ALL, false, sampler->GetReal2());
         if(!bsdfSample)
             break;
         

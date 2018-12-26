@@ -15,7 +15,7 @@ Spectrum MISPathTracingIntegrator::MISSampleLight(
     if(scene.HasIntersection(shadowRay))
         return Spectrum();
                 
-    auto f = shd.bsdf->Eval(shd.coordSys, inct.coordSys, lightSample.wi, inct.wr, BSDF_ALL);
+    auto f = shd.bsdf->Eval(shd.coordSys, inct.coordSys, lightSample.wi, inct.wr, BSDF_ALL, false);
     if(!f)
         return Spectrum();
     f *= Abs(Cos(lightSample.wi, shd.coordSys.ez));
@@ -25,7 +25,7 @@ Spectrum MISPathTracingIntegrator::MISSampleLight(
 
     constexpr BSDFType bsdfType = BSDFType(BSDF_ALL & ~BSDF_SPECULAR);
 
-    Real bpdf = shd.bsdf->SampleWiPDF(shd.coordSys, inct.coordSys, lightSample.wi, inct.wr, bsdfType);
+    Real bpdf = shd.bsdf->SampleWiPDF(shd.coordSys, inct.coordSys, lightSample.wi, inct.wr, bsdfType, false);
     return f * lightSample.radiance / (lightSample.pdf + bpdf);
 }
 
@@ -91,7 +91,7 @@ Spectrum MISPathTracingIntegrator::Eval(
         }
 
         auto bsdfSample = shd.bsdf->SampleWi(
-            shd.coordSys, inct.coordSys, inct.wr, BSDF_ALL, sampler->GetReal2());
+            shd.coordSys, inct.coordSys, inct.wr, BSDF_ALL, false, sampler->GetReal2());
         if(bsdfSample && !!bsdfSample->coef)
         {
             Spectrum f = bsdfSample->coef * Abs(Cos(bsdfSample->wi, shd.coordSys.ez));

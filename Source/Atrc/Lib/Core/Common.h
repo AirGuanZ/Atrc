@@ -136,6 +136,8 @@ class Reporter;
 class Sampler;
 class Texture;
 
+struct Intersection;
+
 template<typename> class TFilm;
 using Film = TFilm<Spectrum>;
 

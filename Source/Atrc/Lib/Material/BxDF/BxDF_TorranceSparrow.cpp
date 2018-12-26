@@ -14,7 +14,7 @@ Spectrum BxDF_TorranceSparrow::GetAlbedo() const noexcept
     return rc_;
 }
 
-Spectrum BxDF_TorranceSparrow::Eval(const CoordSystem &geoInShd, const Vec3 &wi, const Vec3 &wo) const noexcept
+Spectrum BxDF_TorranceSparrow::Eval(const CoordSystem &geoInShd, const Vec3 &wi, const Vec3 &wo, [[maybe_unused]] bool star) const noexcept
 {
     if(wi.z <= 0 || wo.z <= 0 || !geoInShd.InPositiveHemisphere(wi) || !geoInShd.InPositiveHemisphere(wo))
         return Spectrum();
@@ -28,7 +28,7 @@ Spectrum BxDF_TorranceSparrow::Eval(const CoordSystem &geoInShd, const Vec3 &wi,
     return rc_ * fr * md_->D(H) * G / (4 * nWi.z * nWo.z);
 }
 
-Option<BxDF::SampleWiResult> BxDF_TorranceSparrow::SampleWi(const CoordSystem &geoInShd, const Vec3 &wo, const Vec2 &sample) const noexcept
+Option<BxDF::SampleWiResult> BxDF_TorranceSparrow::SampleWi(const CoordSystem &geoInShd, const Vec3 &wo, bool star, const Vec2 &sample) const noexcept
 {
     Vec3 nWo = wo.Normalize();
     auto mdSample = md_->SampleWi(geoInShd, nWo, sample);
@@ -36,7 +36,7 @@ Option<BxDF::SampleWiResult> BxDF_TorranceSparrow::SampleWi(const CoordSystem &g
         return None;
 
     SampleWiResult ret;
-    ret.coef = Eval(geoInShd, mdSample->wi, wo);
+    ret.coef = Eval(geoInShd, mdSample->wi, wo, star);
     if(!ret.coef)
         return None;
     ret.wi      = mdSample->wi;
@@ -47,7 +47,7 @@ Option<BxDF::SampleWiResult> BxDF_TorranceSparrow::SampleWi(const CoordSystem &g
     return ret;
 }
 
-Real BxDF_TorranceSparrow::SampleWiPDF(const CoordSystem &geoInShd, const Vec3 &wi, const Vec3 &wo) const noexcept
+Real BxDF_TorranceSparrow::SampleWiPDF(const CoordSystem &geoInShd, const Vec3 &wi, const Vec3 &wo, [[maybe_unused]] bool star) const noexcept
 {
     if(wi.z <= 0 || wo.z <= 0 || !geoInShd.InPositiveHemisphere(wi) || !geoInShd.InPositiveHemisphere(wo))
         return 0;

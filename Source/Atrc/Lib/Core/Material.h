@@ -42,15 +42,15 @@ public:
 
     virtual Spectrum Eval(
         const CoordSystem &shd, const CoordSystem &geo,
-        const Vec3 &wi, const Vec3 &wo, BSDFType type) const noexcept = 0;
+        const Vec3 &wi, const Vec3 &wo, BSDFType type, bool star) const noexcept = 0;
 
     virtual Option<SampleWiResult> SampleWi(
         const CoordSystem &shd, const CoordSystem &geo,
-        const Vec3 &wo, BSDFType type, const Vec2 &sample) const noexcept = 0;
+        const Vec3 &wo, BSDFType type, bool star, const Vec2 &sample) const noexcept = 0;
 
     virtual Real SampleWiPDF(
         const CoordSystem &shd, const CoordSystem &geo,
-        const Vec3 &wi, const Vec3 &wo, BSDFType type) const noexcept = 0;
+        const Vec3 &wi, const Vec3 &wo, BSDFType type, bool star) const noexcept = 0;
 };
 
 class Material

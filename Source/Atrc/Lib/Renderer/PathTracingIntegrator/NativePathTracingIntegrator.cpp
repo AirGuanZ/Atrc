@@ -50,7 +50,7 @@ Spectrum NativePathTracingIntegrator::Eval(
 
         ShadingPoint shd = inct.entity->GetMaterial(inct)->GetShadingPoint(inct, arena);
         auto bsdfSample = shd.bsdf->SampleWi(
-            shd.coordSys, inct.coordSys, inct.wr, BSDF_ALL, sampler->GetReal2());
+            shd.coordSys, inct.coordSys, inct.wr, BSDF_ALL, false, sampler->GetReal2());
         if(!bsdfSample || !bsdfSample->coef)
             break;
         

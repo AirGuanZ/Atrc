@@ -25,16 +25,16 @@ namespace
 
         Spectrum Eval(
             const CoordSystem &shd, const CoordSystem &geo,
-            const Vec3 &wi, const Vec3 &wo, BSDFType type) const noexcept override
+            const Vec3 &wi, const Vec3 &wo, BSDFType type, bool star) const noexcept override
         {
-            return scale_ * internal_->Eval(shd, geo, wi, wo, type);
+            return scale_ * internal_->Eval(shd, geo, wi, wo, type, star);
         }
 
         Option<SampleWiResult> SampleWi(
             const CoordSystem &shd, const CoordSystem &geo,
-            const Vec3 &wo, BSDFType type, const Vec2 &sample) const noexcept override
+            const Vec3 &wo, BSDFType type, bool star, const Vec2 &sample) const noexcept override
         {
-            auto ret = internal_->SampleWi(shd, geo, wo, type, sample);
+            auto ret = internal_->SampleWi(shd, geo, wo, type, star, sample);
             if(ret)
                 ret->coef *= scale_;
             return ret;
@@ -42,9 +42,9 @@ namespace
 
         Real SampleWiPDF(
             const CoordSystem &shd, const CoordSystem &geo,
-            const Vec3 &wi, const Vec3 &wo, BSDFType type) const noexcept override
+            const Vec3 &wi, const Vec3 &wo, BSDFType type, bool star) const noexcept override
         {
-            return internal_->SampleWiPDF(shd, geo, wi, wo, type);
+            return internal_->SampleWiPDF(shd, geo, wi, wo, type, star);
         }
     };
 }
