@@ -113,5 +113,8 @@
     <ClCompile Include="..\..\..\..\Source\Atrc\Mgr\SceneBuilder.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\Mgr\Context.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

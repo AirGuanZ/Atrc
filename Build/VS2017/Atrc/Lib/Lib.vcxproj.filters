@@ -252,6 +252,15 @@
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\IdealScaler.h">
       <Filter>Source\Material</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Light\EnvironmentLight.h">
+      <Filter>Source\Light</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Light\InfiniteLight.h">
+      <Filter>Source\Light</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Texture\TextureMultiplier.h">
+      <Filter>Source\Texture</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Core\Common.cpp">
@@ -385,6 +394,15 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\IdealScaler.cpp">
       <Filter>Source\Material</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Light\EnvironmentLight.cpp">
+      <Filter>Source\Light</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Light\InfiniteLight.cpp">
+      <Filter>Source\Light</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Texture\TextureMultiplier.cpp">
+      <Filter>Source\Texture</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
