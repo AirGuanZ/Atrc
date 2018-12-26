@@ -261,6 +261,9 @@
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Texture\TextureMultiplier.h">
       <Filter>Source\Texture</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Entity\GeometryGroupEntity.h">
+      <Filter>Source\Entity</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Core\Common.cpp">
@@ -344,9 +347,6 @@
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\ONMatte.cpp">
       <Filter>Source\Material</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\BxDF\BxDF_PerfectSpecular.cpp">
-      <Filter>Source\Material\BxDF</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\IdealMirror.cpp">
       <Filter>Source\Material</Filter>
     </ClCompile>
@@ -403,6 +403,12 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Texture\TextureMultiplier.cpp">
       <Filter>Source\Texture</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Entity\GeometryGroupEntity.cpp">
+      <Filter>Source\Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\BxDF\BxDF_SpecularReflection.cpp">
+      <Filter>Source\Material\BxDF</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

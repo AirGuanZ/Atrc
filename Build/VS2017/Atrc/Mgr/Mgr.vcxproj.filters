@@ -63,6 +63,9 @@
     <ClInclude Include="..\..\..\..\Source\Atrc\Mgr\SceneBuilder.h">
       <Filter>Source</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Mgr\BuiltinCreator\Name2GeometryCreator.h">
+      <Filter>Source\BuiltinCreator</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\Source\Atrc\Mgr\BuiltinCreatorRegister.cpp">
@@ -115,6 +118,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\Source\Atrc\Mgr\Context.cpp">
       <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\Mgr\BuiltinCreator\Name2GeometryCreator.cpp">
+      <Filter>Source\BuiltinCreator</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

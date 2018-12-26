@@ -163,6 +163,7 @@
     <ClInclude Include="..\..\..\..\Source\Atrc\Mgr\BuiltinCreator\LightCreator.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Mgr\BuiltinCreator\MaterialCreator.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Mgr\BuiltinCreator\MediumCreator.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Mgr\BuiltinCreator\Name2GeometryCreator.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Mgr\BuiltinCreator\PathTracingIntegratorCreator.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Mgr\BuiltinCreator\PostProcessorCreator.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Mgr\BuiltinCreator\RendererCreator.h" />
@@ -183,6 +184,7 @@
     <ClCompile Include="..\..\..\..\Source\Atrc\Mgr\BuiltinCreator\LightCreator.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Mgr\BuiltinCreator\MaterialCreator.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Mgr\BuiltinCreator\MediumCreator.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Atrc\Mgr\BuiltinCreator\Name2GeometryCreator.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Mgr\BuiltinCreator\PathTracingIntegratorCreator.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Mgr\BuiltinCreator\PostProcessorCreator.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Mgr\BuiltinCreator\RendererCreator.cpp" />

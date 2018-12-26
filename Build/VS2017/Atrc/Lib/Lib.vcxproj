@@ -185,6 +185,7 @@
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\Transform.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Entity\GeometricDiffuseLight.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Entity\GeometricEntity.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Entity\GeometryGroupEntity.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\FilmFilter\BoxFilter.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Geometry\Sphere.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Geometry\Triangle.h" />
@@ -240,6 +241,7 @@
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Core\Scene.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Entity\GeometricDiffuseLight.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Entity\GeometricEntity.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Entity\GeometryGroupEntity.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\FilmFilter\BoxFilter.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Geometry\Sphere.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Geometry\Triangle.cpp" />
@@ -251,8 +253,8 @@
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\BxDF\BxDF_Black.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\BxDF\BxDF_Diffuse.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\BxDF\BxDF_OrenNayar.cpp" />
-    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\BxDF\BxDF_PerfectSpecular.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\BxDF\BxDF_Specular.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\BxDF\BxDF_SpecularReflection.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\BxDF\BxDF_TorranceSparrow.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\BxDF\BxDF_Void.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\IdealBlack.cpp" />
