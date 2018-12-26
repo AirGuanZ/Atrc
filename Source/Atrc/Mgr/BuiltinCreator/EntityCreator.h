@@ -38,10 +38,12 @@ public:
 };
 
 /*
-    type     = GeometryGroup
-    geometry = Name2GeometryDefinition
-    material = { MaterialAssignment }
-    medium   = { MediumAssignment }
+    type               = GeometryGroup
+    
+    geometryGroup      = Name2GeometryDefinition
+    materialAssignment = { MaterialAssignment }
+    mediumAssignment   = { MediumAssignment }
+    transform          = Transform
 */
 class GeometryGroupEntityCreator : public Creator<Entity>
 {

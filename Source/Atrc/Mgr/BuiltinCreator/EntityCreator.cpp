@@ -63,11 +63,11 @@ Entity *GeometryGroupEntityCreator::Create(const ConfigGroup &group, Context &co
 {
     ATRC_MGR_TRY
     {
-        auto name2Geometry = context.Create<Name2Geometry>(group["geometry"]);
-        auto &matAssignment = group["material"].AsGroup();
+        auto name2Geometry = context.Create<Name2Geometry>(group["geometryGroup"]);
+        auto &matAssignment = group["materialAssignment"].AsGroup();
         
         const ConfigGroup *medAssignment = nullptr;
-        if(auto node = group.Find("medium"))
+        if(auto node = group.Find("mediumAssignment"))
             medAssignment = &node->AsGroup();
 
         auto geometry = arena.Create<std::vector<const Geometry*>>(name2Geometry->size());
@@ -82,6 +82,7 @@ Entity *GeometryGroupEntityCreator::Create(const ConfigGroup &group, Context &co
             
             static MediumInterface EMPTY_MEDIUM_INTERFACE;
             medium->at(idx) = &EMPTY_MEDIUM_INTERFACE;
+
             if(medAssignment)
             {
                 if(auto node = medAssignment->Find(pair.first))

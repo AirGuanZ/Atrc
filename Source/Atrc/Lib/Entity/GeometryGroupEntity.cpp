@@ -32,7 +32,7 @@ bool GeometryGroupEntity::FindIntersection(const Ray &_r, Intersection *inct) co
     
     GeometryIntersection tInct, bestInct;
     bestInct.t = RealT::Infinity();
-    int bestInctGeoIndex = 0;
+    int bestInctGeoIndex = -1;
     for(int i = 0; i < count_; ++i)
     {
         if(geometry_[i]->FindIntersection(r, &tInct) && tInct.t < bestInct.t)
@@ -42,14 +42,16 @@ bool GeometryGroupEntity::FindIntersection(const Ray &_r, Intersection *inct) co
         }
     }
 
-    if(RealT(bestInct.t).IsInfinity())
+    if(bestInctGeoIndex < 0)
         return false;
     
     inct->t               = bestInct.t;
     inct->pos             = local2World_.ApplyToPoint(bestInct.pos);
     inct->wr              = -_r.d;
-    inct->coordSys        = local2World_.ApplyToCoordSystem(inct->coordSys);
-    inct->usr.coordSys    = local2World_.ApplyToCoordSystem(inct->usr.coordSys);
+    inct->uv              = bestInct.uv;
+    inct->coordSys        = local2World_.ApplyToCoordSystem(bestInct.coordSys);
+    inct->usr.uv          = bestInct.usr.uv;
+    inct->usr.coordSys    = local2World_.ApplyToCoordSystem(bestInct.usr.coordSys);
     inct->entity          = this;
     inct->material        = material_[bestInctGeoIndex];
     inct->mediumInterface = *mediumInterface_[bestInctGeoIndex];

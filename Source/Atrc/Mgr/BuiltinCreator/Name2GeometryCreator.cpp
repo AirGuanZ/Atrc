@@ -55,7 +55,7 @@ namespace
                 TriangleBVHCore::Vertex ret;
                 ret.pos = v.pos;
                 ret.nor = v.nor.Normalize();
-                ret.uv = v.tex.xy();
+                ret.uv  = v.tex.xy();
                 return ret;
             }) | AGZ::Collect<std::vector<TriangleBVHCore::Vertex>>();
 
@@ -77,7 +77,7 @@ namespace
 
     Name2Geometry LoadName2Geometry(const Str8 &filename, Arena &arena)
     {
-        auto cacheFilename = GetCacheFilename(filename);
+        auto cacheFilename = GetCacheFilename(filename) + ".geometry-group";
         std::ifstream fin(cacheFilename.ToPlatformString(), std::ifstream::binary | std::ifstream::in);
         if(!fin)
             return RecreateName2Geometry(filename, cacheFilename, arena);
@@ -120,7 +120,7 @@ Name2Geometry *WavefrontOBJName2GeometryCreator::Create(
 {
     ATRC_MGR_TRY
     {
-        auto filename = group["filename"].AsValue();
+        auto filename = context.GetPathInWorkspace(group["filename"].AsValue());
 
         auto it = path2rt_.find(filename);
         if(it != path2rt_.end())
