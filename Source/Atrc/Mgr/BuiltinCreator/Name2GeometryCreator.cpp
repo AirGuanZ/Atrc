@@ -1,4 +1,6 @@
-#include <Utils/Model.h>
+#include <numeric>
+
+#include <Utils/Mesh.h>
 
 #include <Atrc/Lib/Geometry/TriangleBVH.h>
 #include <Atrc/Mgr/BuiltinCreator/Name2GeometryCreator.h>
@@ -19,8 +21,8 @@ namespace
 
         // 加载原obj文件
 
-        AGZ::Model::WavefrontObj<Real> obj;
-        if(!AGZ::Model::WavefrontObjFile<Real>::LoadFromObjFile(filename, &obj))
+        AGZ::Mesh::WavefrontObj<Real> obj;
+        if(!obj.LoadFromFile(filename))
             throw MgrErr("Failed to load obj file from " + filename);
         auto meshGroup = obj.ToGeometryMeshGroup();
         obj.Clear();
@@ -40,10 +42,16 @@ namespace
         AGZ::BinaryOStreamSerializer serializer(fout);
 
         if(!serializer.Serialize(*oriFileTime))
+        {
+            AGZ::FileSys::File::DeleteRegularFile(cacheFilename);
             throw MgrErr("Failed to serialize filetime into cache file: " + cacheFilename);
+        }
 
         if(!serializer.Serialize(uint32_t(meshGroup.submeshes.size())))
+        {
+            AGZ::FileSys::File::DeleteRegularFile(cacheFilename);
             throw MgrErr("Failed to serialize submesh count into cache file: " + cacheFilename);
+        }
 
         // 按字典序逐个处理submesh
 
@@ -64,10 +72,16 @@ namespace
             auto triBVH = arena.Create<TriangleBVHCore>(vertices.data(), uint32_t(vertices.size() / 3));
 
             if(!serializer.Serialize(pair.first))
+            {
+                AGZ::FileSys::File::DeleteRegularFile(cacheFilename);
                 throw MgrErr("Failed to serialize mesh name into cache file: " + pair.first);
+            }
 
             if(!serializer.Serialize(*triBVH))
+            {
+                AGZ::FileSys::File::DeleteRegularFile(cacheFilename);
                 throw MgrErr("Failed to serialize triangle BVH data infor cache file for submesh: " + pair.first);
+            }
             
             ret[pair.first] = arena.Create<TriangleBVH>(Transform(), *triBVH);
         }

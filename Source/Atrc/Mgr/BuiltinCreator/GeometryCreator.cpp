@@ -1,4 +1,4 @@
-#include <Utils/Model.h>
+#include <Utils/Mesh.h>
 #include <Utils/Range.h>
 
 #include <vector>
@@ -52,8 +52,11 @@ namespace
 {
     TriangleBVHCore *RecreateTriangleMesh(const Str8 &filename, const Str8 &cacheFilename, Arena &arena)
     {
-        AGZ::Model::WavefrontObj<Real> obj;
+        /*AGZ::Model::WavefrontObj<Real> obj;
         if(!AGZ::Model::WavefrontObjFile<Real>::LoadFromObjFile(filename, &obj))
+            throw MgrErr("Failed to load obj file from " + filename);*/
+        AGZ::Mesh::WavefrontObj<Real> obj;
+        if(!obj.LoadFromFile(filename))
             throw MgrErr("Failed to load obj file from " + filename);
         auto mesh = obj.ToGeometryMeshGroup().MergeAllSubmeshes();
         obj.Clear();
@@ -83,7 +86,10 @@ namespace
 
         AGZ::BinaryOStreamSerializer serializer(fout);
         if(!serializer.Serialize(*oriFileTime) || !serializer.Serialize(*ret))
+        {
+            AGZ::FileSys::File::DeleteRegularFile(cacheFilename);
             throw MgrErr("Failed to serialize into triangle mesh cache file: " + cacheFilename);
+        }
 
         return ret;
     }
