@@ -16,17 +16,23 @@ Scene SceneBuilder::Build(const ConfigGroup &root, Context &context)
 
         ATRC_MGR_TRY
         {
-            auto &entArr = root["entities"].AsArray();
-            for(auto ent : entArr)
-                entities.push_back(context.Create<Entity>(*ent));
+            if(auto entN = root.Find("entities"))
+            {
+                auto &entArr = entN->AsArray();
+                for(auto ent : entArr)
+                    entities.push_back(context.Create<Entity>(*ent));
+            }
         }
         ATRC_MGR_CATCH_AND_RETHROW("In creating entities")
 
         ATRC_MGR_TRY
         {
-            auto &lhtArr = root["lights"].AsArray();
-            for(auto lht : lhtArr)
-                lights.push_back(context.Create<Light>(*lht));
+            if(auto lhtN = root.Find("lights"))
+            {
+                auto &lhtArr = lhtN->AsArray();
+                for(auto lht : lhtArr)
+                    lights.push_back(context.Create<Light>(*lht));
+            }
         }
         ATRC_MGR_CATCH_AND_RETHROW("In creating lights")
 

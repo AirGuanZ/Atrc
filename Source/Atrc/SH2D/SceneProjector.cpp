@@ -17,7 +17,7 @@ SceneProjector::SceneProjector(
       minDepth_(minDepth), maxDepth_(maxDepth), contProb_(contProb)
 {
     AGZ_ASSERT(taskGridSize > 0);
-    AGZ_ASSERT(0 < SHOrder && SHOrder <= 4);
+    AGZ_ASSERT(0 < SHOrder && SHOrder <= 5);
     AGZ_ASSERT(1 <= minDepth && minDepth <= maxDepth);
     AGZ_ASSERT(0 < contProb && contProb <= 1);
 }
@@ -28,7 +28,7 @@ void SceneProjector::Project(const Scene &scene, Sampler *sampler, ProjectResult
 
     auto resolution = result->albedoMap->GetResolution();
     std::queue<Grid> tasks = GridDivider<int32_t>::Divide(
-        { { 0, 0 }, { resolution.x, resolution.y } }, taskGridSize_, taskGridSize_);
+        { { 0, 0 }, resolution }, taskGridSize_, taskGridSize_);
 
     size_t totalTaskCount = tasks.size();
     std::atomic<size_t> finishedTaskCount = 0;
@@ -99,7 +99,7 @@ void SceneProjector::ProjectGrid(
 
     for(int32_t py = rect.low.y; py < rect.high.y; ++py)
     {
-        for(int32_t px = rect.low.x; px < rect.low.x; ++px)
+        for(int32_t px = rect.low.x; px < rect.high.x; ++px)
         {
             sampler->StartPixel({ px, py });
             do {
@@ -128,9 +128,9 @@ void SceneProjector::ProjectGrid(
 
 namespace
 {
-    void ClearPixel(int SHOrder, SceneProjector::ProjectResultPixel *pixel)
+    void ClearPixel(int SHC, SceneProjector::ProjectResultPixel *pixel)
     {
-        for(int i = 0; i < SHOrder; ++i)
+        for(int i = 0; i < SHC; ++i)
             pixel->coefs[i] = Spectrum();
         pixel->binary = 0;
         pixel->albedo = Spectrum();
@@ -162,11 +162,8 @@ void SceneProjector::Eval(
         Intersection inct;
         if(!scene.FindIntersection(r, &inct))
         {
-            if(depth > 1)
-            {
-                for(int i = 0; i < SHC_; ++i)
-                    output->coefs[i] = coef * Spectrum(SHTable[i](r.d.Normalize()));
-            }
+            for(int i = 0; i < SHC_; ++i)
+                output->coefs[i] = coef * Spectrum(SHTable[i](r.d.Normalize()));
             break;
         }
 

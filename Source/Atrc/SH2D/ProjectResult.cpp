@@ -24,22 +24,31 @@ void LightProjectResult::Rotate(const Mat3 &rotateMat)
             channels[c][s] = coefs[s][c];
     }
 
-    using RotateFunc = void(*)(const Mat3&, Real*);
-    RotateFunc rotateFunc;
-
-    switch(SHC)
+    if(SHC >= 1)
     {
-    case 0: rotateFunc = AGZ::Math::RotateSH_L0<Real>; break;
-    case 1: rotateFunc = AGZ::Math::RotateSH_L1<Real>; break;
-    case 2: rotateFunc = AGZ::Math::RotateSH_L2<Real>; break;
-    case 3: rotateFunc = AGZ::Math::RotateSH_L3<Real>; break;
-    case 4: rotateFunc = AGZ::Math::RotateSH_L4<Real>; break;
-    default:
-        throw Atrc::Exception("Invalid SHC value: " + Str8::From(SHC));
+        for(int i = 0; i < SPECTRUM_CHANNEL_COUNT; ++i)
+            AGZ::Math::RotateSH_L0<Real>(rotateMat, channels[i].data());
     }
-
-    for(int i = 0; i < SPECTRUM_CHANNEL_COUNT; ++i)
-        rotateFunc(rotateMat, channels[i].data());
+    if(SHC >= 4)
+    {
+        for(int i = 0; i < SPECTRUM_CHANNEL_COUNT; ++i)
+            AGZ::Math::RotateSH_L1<Real>(rotateMat, channels[i].data() + 1);
+    }
+    if(SHC >= 9)
+    {
+        for(int i = 0; i < SPECTRUM_CHANNEL_COUNT; ++i)
+            AGZ::Math::RotateSH_L1<Real>(rotateMat, channels[i].data() + 4);
+    }
+    if(SHC >= 16)
+    {
+        for(int i = 0; i < SPECTRUM_CHANNEL_COUNT; ++i)
+            AGZ::Math::RotateSH_L1<Real>(rotateMat, channels[i].data() + 9);
+    }
+    if(SHC >= 25)
+    {
+        for(int i = 0; i < SPECTRUM_CHANNEL_COUNT; ++i)
+            AGZ::Math::RotateSH_L1<Real>(rotateMat, channels[i].data() + 16);
+    }
     
     for(int c = 0; c < SPECTRUM_CHANNEL_COUNT; ++c)
     {

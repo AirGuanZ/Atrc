@@ -45,7 +45,7 @@ void ProjectScene(const AGZ::Config &config, const Str8 &configFilename)
     ATRC_MGR_CATCH_AND_RETHROW("In creating film")
 
     int SHOrder = root["SHOrder"].Parse<int>();
-    if(SHOrder <= 0 || SHOrder > 4)
+    if(SHOrder <= 0 || SHOrder > 5)
         throw Mgr::MgrErr("Invalid SHOrder value");
     int SHC = SHOrder * SHOrder;
 
@@ -134,7 +134,7 @@ void ProjectLight(const AGZ::Config &config, const Str8 &configFilename)
     auto light = context.Create<Light>(root["light"]);
 
     int SHOrder = root["SHOrder"].Parse<int>();
-    if(SHOrder <= 0 || SHOrder > 4)
+    if(SHOrder <= 0 || SHOrder > 5)
         throw Mgr::MgrErr("Invalid SHOrder value");
     int SHC = SHOrder * SHOrder;
 
@@ -192,7 +192,7 @@ void ReconstructImage(const AGZ::Config &config, const Str8 &configFilename)
         if(!fin)
             throw Mgr::MgrErr("Failed to open light SH file: " + lightFilename);
         AGZ::BinaryIStreamDeserializer deserializer(fin);
-        if(!deserializer.Deserialize(scene))
+        if(!deserializer.Deserialize(light))
             throw Mgr::MgrErr("Failed to deserialize light SH coefs");
     }
 

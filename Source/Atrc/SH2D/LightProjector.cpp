@@ -1,3 +1,4 @@
+#include <Atrc/Lib/Core/Light.h>
 #include <Atrc/SH2D/LightProjector.h>
 
 namespace Atrc::SH2D
@@ -6,7 +7,7 @@ namespace Atrc::SH2D
 LightProjector::LightProjector(int SHOrder) noexcept
     : SHC_(SHOrder * SHOrder)
 {
-    AGZ_ASSERT(0 < SHOrder && SHOrder <= 4);
+    AGZ_ASSERT(0 < SHOrder && SHOrder <= 5);
 }
 
 void LightProjector::Project(const Light *light, int sampleCount, Spectrum *coefs) const
@@ -26,7 +27,7 @@ void LightProjector::Project(const Light *light, int sampleCount, Spectrum *coef
             ::UniformOnUnitSphere<Real>::Transform({ u, v });
         
         for(int i = 0; i < SHC_; ++i)
-            coefs[i] += SHTable[i](dir) / pdf;
+            coefs[i] += light->NonAreaLe(Ray(Vec3(), dir, EPS)) * SHTable[i](dir) / pdf;
     }
 
     if(sampleCount > 0)

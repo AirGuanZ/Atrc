@@ -12,8 +12,10 @@ void RegisterBuiltinTextureCreators(Context &context)
 {
     static const ConstantTextureCreator constantTextureCreator;
     static const ConstantTexture1Creator constantTextureCreator1;
+    static const TextureMultiplierCreator textureMultiplierCreator;
     context.AddCreator(&constantTextureCreator);
     context.AddCreator(&constantTextureCreator1);
+    context.AddCreator(&textureMultiplierCreator);
     context.AddCreator(context.CreateWithInteriorArena<HDRTextureCreator>());
     context.AddCreator(context.CreateWithInteriorArena<ImageTextureCreator>());
 }
