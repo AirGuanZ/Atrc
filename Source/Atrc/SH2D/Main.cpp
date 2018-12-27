@@ -171,10 +171,14 @@ void ReconstructImage(const AGZ::Config &config, const Str8 &configFilename)
     Mgr::Context context(root, configFilename);
     Mgr::RegisterBuiltinCreators(context);
 
+    // 参数提取
+
     auto sceneFilename = context.GetPathInWorkspace(root["scene"].AsValue());
     auto lightFilename = context.GetPathInWorkspace(root["light"].AsValue());
     auto outputFilename = context.GetPathInWorkspace(root["outputFilename"].AsValue());
     auto rotateMat = Mgr::Parser::ParseRotateMat(root["rotation"]);
+
+    // 数据加载
 
     SH2D::SceneProjectResult scene;
     {
@@ -196,10 +200,16 @@ void ReconstructImage(const AGZ::Config &config, const Str8 &configFilename)
             throw Mgr::MgrErr("Failed to deserialize light SH coefs");
     }
 
+    // 旋转光源
+
     light.Rotate(rotateMat);
+
+    // 重建图像
 
     auto SHC = Min(scene.SHC, light.SHC);
     auto image = SH2D::ReconstructFromSH(SHC, scene.coefs.data(), light.coefs.data());
+
+    // 保存到文件
 
     AGZ::TextureFile::WriteRGBToPNG(outputFilename, image.Map(
     [](const Spectrum &c)

@@ -14,7 +14,7 @@ void LightProjector::Project(const Light *light, int sampleCount, Spectrum *coef
 {
     AGZ_ASSERT(light && coefs && sampleCount > 0);
 
-    auto SHTable = AGZ::Math::GetSHTable<Real>();
+    auto SHTable = AGZ::Math::SH::GetSHTable<Real>();
 
     for(int i = 0; i < SHC_; ++i)
         coefs[i] = Spectrum();

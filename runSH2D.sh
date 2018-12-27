@@ -6,5 +6,5 @@
     scene = "Output/bressant.scene"; 
     light = "Output/StudioSmall4K.light";
     outputFilename = "$Output.png";
-    rotation = ();
+    rotation = (RotateZ(Deg(0)));
     '

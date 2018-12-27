@@ -146,7 +146,7 @@ void SceneProjector::Eval(
     ClearPixel(SHC_, output);
     Ray r = _r;
 
-    auto SHTable = AGZ::Math::GetSHTable<Real>();
+    auto SHTable = AGZ::Math::SH::GetSHTable<Real>();
 
     for(int depth = 1; depth <= maxDepth_; ++depth)
     {

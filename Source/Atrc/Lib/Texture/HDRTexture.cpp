@@ -9,7 +9,7 @@ namespace
     Spectrum NearestSampleStrategy(const AGZ::Texture2D<Color3f> &tex, const Vec2 &uv)
     {
         return AGZ::NearestSampler::Sample(tex, uv,
-            [](const Spectrum &c)
+            [](const Color3f &c)
             {
                 return c.Map(AGZ::TypeOpr::StaticCaster<Real, float>);
             });
@@ -18,7 +18,7 @@ namespace
     Spectrum LinearSampleStrategy(const AGZ::Texture2D<Color3f> &tex, const Vec2 &uv)
     {
         return AGZ::LinearSampler::Sample(tex, uv,
-            [](const Spectrum &c)
+            [](const Color3f &c)
             {
                 return c.Map(AGZ::TypeOpr::StaticCaster<Real, float>);
             });

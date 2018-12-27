@@ -27,27 +27,27 @@ void LightProjectResult::Rotate(const Mat3 &rotateMat)
     if(SHC >= 1)
     {
         for(int i = 0; i < SPECTRUM_CHANNEL_COUNT; ++i)
-            AGZ::Math::RotateSH_L0<Real>(rotateMat, channels[i].data());
+            AGZ::Math::SH::RotateSH_L0<Real>(rotateMat, &channels[i][0]);
     }
     if(SHC >= 4)
     {
         for(int i = 0; i < SPECTRUM_CHANNEL_COUNT; ++i)
-            AGZ::Math::RotateSH_L1<Real>(rotateMat, channels[i].data() + 1);
+            AGZ::Math::SH::RotateSH_L1<Real>(rotateMat, &channels[i][1]);
     }
     if(SHC >= 9)
     {
         for(int i = 0; i < SPECTRUM_CHANNEL_COUNT; ++i)
-            AGZ::Math::RotateSH_L1<Real>(rotateMat, channels[i].data() + 4);
+            AGZ::Math::SH::RotateSH_L2<Real>(rotateMat, &channels[i][4]);
     }
     if(SHC >= 16)
     {
         for(int i = 0; i < SPECTRUM_CHANNEL_COUNT; ++i)
-            AGZ::Math::RotateSH_L1<Real>(rotateMat, channels[i].data() + 9);
+            AGZ::Math::SH::RotateSH_L3<Real>(rotateMat, &channels[i][9]);
     }
     if(SHC >= 25)
     {
         for(int i = 0; i < SPECTRUM_CHANNEL_COUNT; ++i)
-            AGZ::Math::RotateSH_L1<Real>(rotateMat, channels[i].data() + 16);
+            AGZ::Math::SH::RotateSH_L4<Real>(rotateMat, &channels[i][16]);
     }
     
     for(int c = 0; c < SPECTRUM_CHANNEL_COUNT; ++c)
