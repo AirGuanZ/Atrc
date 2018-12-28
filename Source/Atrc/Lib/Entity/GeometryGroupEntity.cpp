@@ -7,7 +7,7 @@ namespace Atrc
 GeometryGroupEntity::GeometryGroupEntity(
         const Geometry **geometry,
         const Material **material,
-        const MediumInterface **mediumInterface,
+        const MediumInterface *mediumInterface,
         int count, const Transform local2World) noexcept
     : geometry_(geometry), material_(material), mediumInterface_(mediumInterface), count_(count),
       local2World_(local2World)
@@ -54,7 +54,7 @@ bool GeometryGroupEntity::FindIntersection(const Ray &_r, Intersection *inct) co
     inct->usr.coordSys    = local2World_.ApplyToCoordSystem(bestInct.usr.coordSys);
     inct->entity          = this;
     inct->material        = material_[bestInctGeoIndex];
-    inct->mediumInterface = *mediumInterface_[bestInctGeoIndex];
+    inct->mediumInterface = mediumInterface_[bestInctGeoIndex];
 
     return true;
 }

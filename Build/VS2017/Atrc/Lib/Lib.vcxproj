@@ -239,6 +239,7 @@
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Core\CoordSystem.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Core\Light.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Core\PostProcessor.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Core\Sampler.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Core\Scene.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Entity\GeometricDiffuseLight.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Entity\GeometricEntity.cpp" />

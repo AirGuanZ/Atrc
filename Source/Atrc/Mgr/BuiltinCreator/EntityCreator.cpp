@@ -70,29 +70,26 @@ Entity *GeometryGroupEntityCreator::Create(const ConfigGroup &group, Context &co
         if(auto node = group.Find("mediumAssignment"))
             medAssignment = &node->AsGroup();
 
-        auto geometry = arena.Create<std::vector<const Geometry*>>(name2Geometry->size());
-        auto material = arena.Create<std::vector<const Material*>>(name2Geometry->size());
-        auto medium   = arena.Create<std::vector<const MediumInterface*>>(name2Geometry->size());
+        auto geometry = arena.CreateArray<const Geometry*>(name2Geometry->size());
+        auto material = arena.CreateArray<const Material*>(name2Geometry->size());
+        auto medium   = arena.CreateArray<MediumInterface>(name2Geometry->size());
 
         size_t idx = 0;
         for(auto &pair : *name2Geometry)
         {
-            geometry->at(idx) = pair.second;
-            material->at(idx) = context.Create<Material>(matAssignment[pair.first]);
-            
-            static MediumInterface EMPTY_MEDIUM_INTERFACE;
-            medium->at(idx) = &EMPTY_MEDIUM_INTERFACE;
+            geometry[idx] = pair.second;
+            material[idx] = context.Create<Material>(matAssignment[pair.first]);
 
             if(medAssignment)
             {
                 if(auto node = medAssignment->Find(pair.first))
                 {
-                    auto medInterface = arena.Create<MediumInterface>();
-                    if(auto in = node->AsGroup().Find("in"))
-                        medInterface->in = context.Create<Medium>(*in);
-                    if(auto out = node->AsGroup().Find("out"))
-                        medInterface->out = context.Create<Medium>(*out);
-                    medium->at(idx) = medInterface;
+                    const Medium *in = nullptr, *out = nullptr;
+                    if(auto inN = node->AsGroup().Find("in"))
+                        in = context.Create<Medium>(*inN);
+                    if(auto outN = node->AsGroup().Find("out"))
+                        out = context.Create<Medium>(*outN);
+                    medium[idx] = MediumInterface{ in, out };
                 }
             }
 
@@ -102,7 +99,7 @@ Entity *GeometryGroupEntityCreator::Create(const ConfigGroup &group, Context &co
         auto transform = Parser::ParseTransform(group["transform"]);
 
         return arena.Create<GeometryGroupEntity>(
-            geometry->data(), material->data(), medium->data(), int(name2Geometry->size()),
+            geometry, material, medium, int(name2Geometry->size()),
             transform);
     }
     ATRC_MGR_CATCH_AND_RETHROW("In creating geometry group entity: " + group.ToString())

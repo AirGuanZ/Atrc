@@ -416,5 +416,8 @@
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\FilmFilter\GaussianFilter.cpp">
       <Filter>Source\FilmFilter</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Core\Sampler.cpp">
+      <Filter>Source\Core</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

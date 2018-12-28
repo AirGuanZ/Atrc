@@ -39,16 +39,4 @@ Real NativeSampler::GetReal()
     return dis_(rng_);
 }
 
-Vec2 NativeSampler::GetReal2()
-{
-    Real x = dis_(rng_), y = dis_(rng_);
-    return { x, y };
-}
-
-Vec3 NativeSampler::GetReal3()
-{
-    Real x = dis_(rng_), y = dis_(rng_), z = dis_(rng_);
-    return { x, y, z };
-}
-
 }
