@@ -8,6 +8,7 @@ namespace Atrc
 {
 
 class BSDF;
+class BSSRDF;
 class Entity;
 
 struct GeometryIntersection

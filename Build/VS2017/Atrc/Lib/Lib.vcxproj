@@ -165,6 +165,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Camera\PinholeCamera.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\AABB.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\BSSRDF.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\Camera.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\Common.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\CoordSystem.h" />

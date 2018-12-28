@@ -134,6 +134,7 @@ class Ray;
 class Renderer;
 class Reporter;
 class Sampler;
+class Scene;
 class Texture;
 
 struct Intersection;

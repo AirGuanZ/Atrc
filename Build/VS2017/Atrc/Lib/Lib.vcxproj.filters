@@ -267,6 +267,9 @@
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\FilmFilter\GaussianFilter.h">
       <Filter>Source\FilmFilter</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\BSSRDF.h">
+      <Filter>Source\Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Core\Common.cpp">
