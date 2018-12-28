@@ -21,4 +21,13 @@ public:
     FilmFilter *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
 };
 
+class GaussianFilterCreator : public Creator<FilmFilter>
+{
+public:
+
+    Str8 GetTypeName() const override { return "Gaussian"; }
+
+    FilmFilter *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
+};
+
 } // namespace Atrc::Mgr

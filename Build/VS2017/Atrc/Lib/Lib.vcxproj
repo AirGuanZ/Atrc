@@ -187,6 +187,7 @@
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Entity\GeometricEntity.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Entity\GeometryGroupEntity.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\FilmFilter\BoxFilter.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\FilmFilter\GaussianFilter.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Geometry\Sphere.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Geometry\Triangle.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Geometry\TriangleBVH.h" />
@@ -243,6 +244,7 @@
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Entity\GeometricEntity.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Entity\GeometryGroupEntity.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\FilmFilter\BoxFilter.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\FilmFilter\GaussianFilter.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Geometry\Sphere.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Geometry\Triangle.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Geometry\TriangleBVH.cpp" />

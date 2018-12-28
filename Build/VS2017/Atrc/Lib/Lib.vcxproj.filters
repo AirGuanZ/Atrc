@@ -264,6 +264,9 @@
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Entity\GeometryGroupEntity.h">
       <Filter>Source\Entity</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\FilmFilter\GaussianFilter.h">
+      <Filter>Source\FilmFilter</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Core\Common.cpp">
@@ -409,6 +412,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\BxDF\BxDF_SpecularReflection.cpp">
       <Filter>Source\Material\BxDF</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\FilmFilter\GaussianFilter.cpp">
+      <Filter>Source\FilmFilter</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
