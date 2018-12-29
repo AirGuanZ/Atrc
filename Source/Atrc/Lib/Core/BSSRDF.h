@@ -19,16 +19,16 @@ public:
 
     virtual Spectrum Eval(const Intersection &pi, bool star) const noexcept = 0;
 
-    struct SamplePiWiResult
+    struct SamplePiResult
     {
         Intersection pi;
         Spectrum coef;
         Real pdf;
     };
 
-    virtual SamplePiWiResult SamplePiWi(const Scene &scene, const Vec4 &sample, bool star) const noexcept = 0;
+    virtual SamplePiResult SamplePi(const Scene &scene, bool star, const Vec4 &sample) const noexcept = 0;
 
-    virtual Real SamplePiWiPDF(const Scene &scene, const Intersection &pi, bool star) const noexcept = 0;
+    virtual Real SamplePiPDF(const Scene &scene, const Intersection &pi, bool star) const noexcept = 0;
 };
 
 } // namespace Atrc

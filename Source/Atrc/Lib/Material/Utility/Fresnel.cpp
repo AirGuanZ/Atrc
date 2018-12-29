@@ -2,6 +2,27 @@
 
 namespace Atrc
 {
+
+Real ComputeFresnelDielectric(Real etaI, Real etaT, Real cosThetaI) noexcept
+{
+    if(cosThetaI < 0)
+    {
+        std::swap(etaI, etaT);
+        cosThetaI = -cosThetaI;
+    }
+
+    Real sinThetaI = Sqrt(Max(Real(0), 1 - cosThetaI * cosThetaI));
+    Real sinThetaT = etaI / etaT * sinThetaI;
+
+    if(sinThetaT >= 1)
+        return 1;
+
+    Real cosThetaT = Sqrt(Max(Real(0), 1 - sinThetaT * sinThetaT));
+    Real para = (etaT * cosThetaI - etaI * cosThetaT) / (etaT * cosThetaI + etaI * cosThetaT);
+    Real perp = (etaI * cosThetaI - etaT * cosThetaT) / (etaI * cosThetaI + etaT * cosThetaT);
+
+    return Real(0.5) * (para * para + perp * perp);
+}
     
 FresnelConductor::FresnelConductor(const Spectrum &etaI, const Spectrum &etaT, const Spectrum &k) noexcept
     : etaI(etaI), etaT(etaT), k(k)
@@ -37,27 +58,6 @@ Dielectric::Dielectric(Real etaI, Real etaT) noexcept
 
 namespace
 {
-    Real ComputeFresnelDielectric(Real etaI, Real etaT, Real cosThetaI) noexcept
-    {
-        if(cosThetaI < 0)
-        {
-            std::swap(etaI, etaT);
-            cosThetaI = -cosThetaI;
-        }
-
-        Real sinThetaI = Sqrt(Max(Real(0), 1 - cosThetaI * cosThetaI));
-        Real sinThetaT = etaI / etaT * sinThetaI;
-
-        if(sinThetaT >= 1)
-            return 1;
-
-        Real cosThetaT = Sqrt(Max(Real(0), 1 - sinThetaT * sinThetaT));
-        Real para = (etaT * cosThetaI - etaI * cosThetaT) / (etaT * cosThetaI + etaI * cosThetaT);
-        Real perp = (etaI * cosThetaI - etaT * cosThetaT) / (etaI * cosThetaI + etaT * cosThetaT);
-
-        return Real(0.5) * (para * para + perp * perp);
-    }
-
     Real ComputeSchlickApproximation(Real etaI, Real etaT, Real cosThetaI)
     {
         if(cosThetaI < 0)

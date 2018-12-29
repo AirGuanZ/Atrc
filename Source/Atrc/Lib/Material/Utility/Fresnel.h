@@ -4,6 +4,8 @@
 
 namespace Atrc
 {
+
+Real ComputeFresnelDielectric(Real etaI, Real etaT, Real cosThetaI) noexcept;
     
 // Fresnel项
 class Fresnel
