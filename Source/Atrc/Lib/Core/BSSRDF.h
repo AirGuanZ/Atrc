@@ -26,7 +26,7 @@ public:
         Real pdf;
     };
 
-    virtual SamplePiResult SamplePi(const Scene &scene, bool star, const Vec4 &sample) const noexcept = 0;
+    virtual Option<SamplePiResult> SamplePi(const Scene &scene, bool star, const Vec4 &sample, Arena &arena) const noexcept = 0;
 
     virtual Real SamplePiPDF(const Scene &scene, const Intersection &pi, bool star) const noexcept = 0;
 };

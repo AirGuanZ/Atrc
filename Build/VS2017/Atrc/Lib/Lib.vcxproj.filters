@@ -58,6 +58,9 @@
     <Filter Include="Source\Medium">
       <UniqueIdentifier>{b3f4b308-8cbf-4f5a-8fd8-57bbe11acbf9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\Material\BSSRDF">
+      <UniqueIdentifier>{11e07aff-4f4c-43c9-974d-0c293f1bdbad}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\AABB.h">
@@ -270,6 +273,9 @@
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Core\BSSRDF.h">
       <Filter>Source\Core</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\BSSRDF\SeparableBSSRDF.h">
+      <Filter>Source\Material\BSSRDF</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Core\Common.cpp">
@@ -421,6 +427,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Core\Sampler.cpp">
       <Filter>Source\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\BSSRDF\SeparableBSSRDF.cpp">
+      <Filter>Source\Material\BSSRDF</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
