@@ -196,6 +196,7 @@
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Light\EnvironmentLight.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Light\InfiniteLight.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Light\SkyLight.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\BSSRDF\NormalizedDiffusionBSSRDF.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\BSSRDF\SeparableBSSRDF.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\BxDF\BxDF_Black.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\BxDF\BxDF_Diffuse.h" />
@@ -221,6 +222,7 @@
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\Utility\NormalMapper.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Medium\HomogeneousMedium.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\PostProcessor\FlipImage.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\DirectLighting.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\MISPathTracingIntegrator.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\NativePathTracingIntegrator.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\ShadingNormalIntegrator.h" />
@@ -255,6 +257,7 @@
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Light\EnvironmentLight.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Light\InfiniteLight.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Light\SkyLight.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\BSSRDF\NormalizedDiffusionBSSRDF.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\BSSRDF\SeparableBSSRDF.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\BxDF\BxDF_Black.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\BxDF\BxDF_Diffuse.cpp" />
@@ -276,6 +279,7 @@
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\Utility\NormalMapper.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Medium\HomogeneousMedium.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\PostProcessor\FlipImage.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\DirectLighting.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\MISPathTracingIntegrator.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\NativePathTracingIntegrator.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\ShadingNormalIntegrator.cpp" />

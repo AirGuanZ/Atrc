@@ -1,6 +1,6 @@
-﻿#include <Atrc/Lib/Core/Material.h>
+﻿#include <Atrc/Lib/Core/Entity.h>
+#include <Atrc/Lib/Core/Material.h>
 #include <Atrc/Lib/Core/Ray.h>
-#include <Atrc/Lib/Core/Scene.h>
 #include <Atrc/Lib/Material/BSSRDF/SeparableBSSRDF.h>
 #include <Atrc/Lib/Material/Utility/Fresnel.h>
 
@@ -225,6 +225,9 @@ Option<BSSRDF::SamplePiResult> SeparableBSSRDF::SamplePi(bool star, const Vec3 &
         AGZ_ASSERT(inctListEntry);
     }
 
+    if(inctListEntry->inct.material != po_.material)
+        return None;
+
     Real pdf = SamplePiPDF(inctListEntry->inct, star) / inctListLength;
 
     SamplePiResult ret;
@@ -237,7 +240,7 @@ Option<BSSRDF::SamplePiResult> SeparableBSSRDF::SamplePi(bool star, const Vec3 &
     return ret;
 }
 
-Real SeparableBSSRDF::SamplePiPDF(const Intersection &pi, bool star) const noexcept
+Real SeparableBSSRDF::SamplePiPDF(const Intersection &pi, [[maybe_unused]] bool star) const noexcept
 {
     Vec3 ld = po_.coordSys.World2Local(po_.pos - pi.pos);
     Vec3 lni = po_.coordSys.World2Local(pi.coordSys.ez);

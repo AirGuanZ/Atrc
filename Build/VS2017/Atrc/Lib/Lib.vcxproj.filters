@@ -276,6 +276,12 @@
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\BSSRDF\SeparableBSSRDF.h">
       <Filter>Source\Material\BSSRDF</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\BSSRDF\NormalizedDiffusionBSSRDF.h">
+      <Filter>Source\Material\BSSRDF</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\DirectLighting.h">
+      <Filter>Source\Renderer\PathTracingIntegrator</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Core\Common.cpp">
@@ -430,6 +436,12 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\BSSRDF\SeparableBSSRDF.cpp">
       <Filter>Source\Material\BSSRDF</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\BSSRDF\NormalizedDiffusionBSSRDF.cpp">
+      <Filter>Source\Material\BSSRDF</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\DirectLighting.cpp">
+      <Filter>Source\Renderer\PathTracingIntegrator</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
