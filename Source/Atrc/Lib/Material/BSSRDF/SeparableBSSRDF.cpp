@@ -1,4 +1,5 @@
-﻿#include <Atrc/Lib/Core/Ray.h>
+﻿#include <Atrc/Lib/Core/Material.h>
+#include <Atrc/Lib/Core/Ray.h>
 #include <Atrc/Lib/Core/Scene.h>
 #include <Atrc/Lib/Material/BSSRDF/SeparableBSSRDF.h>
 #include <Atrc/Lib/Material/Utility/Fresnel.h>
@@ -8,7 +9,8 @@ namespace Atrc
 
 namespace
 {
-    Real FresnelMoment(Real eta) {
+    Real FresnelMoment(Real eta)
+    {
         Real eta2 = eta * eta, eta3 = eta2 * eta, eta4 = eta2 * eta2, eta5 = eta2 * eta3;
         if(eta < 1)
         {
@@ -26,6 +28,90 @@ namespace
              - Real(1.27198) * eta4
              + Real(0.12746) * eta5;
     }
+
+    class SeparableBSSRDF_BSDF : public BSDF
+    {
+        Intersection pi_;
+        const BSSRDF *bssrdf_;
+
+    public:
+
+        SeparableBSSRDF_BSDF(const Intersection &pi, const BSSRDF *bssrdf) noexcept
+            : pi_(pi), bssrdf_(bssrdf)
+        {
+            AGZ_ASSERT(bssrdf);
+        }
+
+        Spectrum GetAlbedo([[maybe_unused]] BSDFType type) const noexcept override
+        {
+            return Spectrum();
+        }
+
+        Spectrum Eval(
+            [[maybe_unused]] const CoordSystem &shd, [[maybe_unused]] const CoordSystem &geo,
+            [[maybe_unused]] const Vec3 &wi, [[maybe_unused]] const Vec3 &wo,
+            BSDFType type, bool star) const noexcept override
+        {
+            if(!((type & BSDF_TRANSMISSION) && (type & (BSDF_DIFFUSE | BSDF_GLOSSY))))
+                return Spectrum();
+            return bssrdf_->Eval(pi_, star);
+        }
+
+        Option<SampleWiResult> SampleWi(
+            const CoordSystem &shd, const CoordSystem &geo,
+            const Vec3 &wo, BSDFType type, bool star, const Vec2 &sample) const noexcept override
+        {
+            if(!((type & BSDF_TRANSMISSION) && (type & (BSDF_DIFFUSE | BSDF_GLOSSY))))
+                return None;
+
+            auto[sam, pdf] = AGZ::Math::DistributionTransform
+                ::ZWeightedOnUnitHemisphere<Real>::Transform(sample);
+            if(!pdf)
+                return None;
+
+            SampleWiResult ret;
+            ret.coef    = Eval(shd, geo, sam, wo, BSDF_ALL, star);
+            ret.pdf     = pdf;
+            ret.type    = BSDFType(BSDF_TRANSMISSION | BSDF_GLOSSY);
+            ret.wi      = sam;
+            ret.isDelta = false;
+
+            return ret;
+        }
+
+        Real SampleWiPDF(
+            [[maybe_unused]] const CoordSystem &shd, [[maybe_unused]] const CoordSystem &geo,
+            const Vec3 &wi, const Vec3 &wo, BSDFType type, [[maybe_unused]] bool star) const noexcept override
+        {
+            if(!((type & BSDF_TRANSMISSION) && (type & (BSDF_DIFFUSE | BSDF_GLOSSY))))
+                return 0;
+            if(wi.z <= 0 || wo.z <= 0)
+                return 0;
+            return AGZ::Math::DistributionTransform::ZWeightedOnUnitHemisphere<Real>::PDF(wi.Normalize());
+        }
+    };
+
+    class SeparableBSSRDF_BSDFMaterial : public Material
+    {
+        SeparableBSSRDF_BSDF bsdf_;
+
+    public:
+
+        SeparableBSSRDF_BSDFMaterial(const Intersection &pi, const BSSRDF *bssrdf) noexcept
+            : bsdf_(pi, bssrdf)
+        {
+            
+        }
+
+        ShadingPoint GetShadingPoint(const Intersection &inct, [[maybe_unused]] Arena &arena) const override
+        {
+            ShadingPoint shd;
+            shd.coordSys = inct.coordSys;
+            shd.uv       = inct.uv;
+            shd.bsdf     = &bsdf_;
+            return shd;
+        }
+    };
 }
     
 SeparableBSSRDF::SeparableBSSRDF(const Intersection &po, Real eta) noexcept
@@ -44,14 +130,16 @@ Spectrum SeparableBSSRDF::Eval(const Intersection &pi, bool star) const noexcept
     Real cI = 1 - 2 * FresnelMoment(eta_);
     Real cO = 1 - 2 * FresnelMoment(1 / eta_);
 
-    return Sr((pi.pos - po_.pos).Length()) * 
-           (1 - ComputeFresnelDielectric(1, eta_, cosThetaI)) *
-           (1 - ComputeFresnelDielectric(1, eta_, cosThetaO)) *
-           InvPI2 / (cI * cO);
+    auto ret =  Sr((pi.pos - po_.pos).Length()) * 
+                (1 - ComputeFresnelDielectric(1, eta_, cosThetaI)) *
+                (1 - ComputeFresnelDielectric(1, eta_, cosThetaO)) *
+                InvPI2 / (cI * cO);
+    if(!star)
+        ret *= eta_ * eta_;
+    return ret;
 }
 
-Option<BSSRDF::SamplePiResult> SeparableBSSRDF::SamplePi(
-    const Scene &scene, bool star, const Vec4 &sample, Arena &arena) const noexcept
+Option<BSSRDF::SamplePiResult> SeparableBSSRDF::SamplePi(bool star, const Vec3 &sample, Arena &arena) const noexcept
 {
     // 选择投影轴和采样通道
 
@@ -59,7 +147,6 @@ Option<BSSRDF::SamplePiResult> SeparableBSSRDF::SamplePi(
         ::SampleExtractor<Real>::ExtractInteger<int>(sample.x, 0, SPECTRUM_CHANNEL_COUNT);
     auto[projAxis, sampleX] = AGZ::Math::DistributionTransform
         ::SampleExtractor<Real>::ExtractInteger<int>(sXT, 0, 3);
-    Real channelPDF = Real(1) / SPECTRUM_CHANNEL_COUNT;
 
     // 极座标采样
 
@@ -138,7 +225,35 @@ Option<BSSRDF::SamplePiResult> SeparableBSSRDF::SamplePi(
         AGZ_ASSERT(inctListEntry);
     }
 
+    Real pdf = SamplePiPDF(inctListEntry->inct, star) / inctListLength;
 
+    SamplePiResult ret;
+    ret.pi          = inctListEntry->inct;
+    ret.pi.wr       = ret.pi.coordSys.ez;
+    ret.pi.material = arena.Create<SeparableBSSRDF_BSDFMaterial>(ret.pi, this);
+    ret.coef        = Spectrum(1);
+    ret.pdf         = pdf;
+
+    return ret;
+}
+
+Real SeparableBSSRDF::SamplePiPDF(const Intersection &pi, bool star) const noexcept
+{
+    Vec3 ld = po_.coordSys.World2Local(po_.pos - pi.pos);
+    Vec3 lni = po_.coordSys.World2Local(pi.coordSys.ez);
+    Real rProj[] = { ld.yz().Length(), ld.zx().Length(), ld.xy().Length() };
+
+    constexpr Real AXIS_PDF = Real(1) / 3;
+    constexpr Real CHANNEL_PDF = Real(1) / SPECTRUM_CHANNEL_COUNT;
+
+    Real ret = 0;
+    for(int axisIdx = 0; axisIdx < 3; ++axisIdx)
+    {
+        for(int chIdx = 0; chIdx < SPECTRUM_CHANNEL_COUNT; ++chIdx)
+            ret += Abs(lni[axisIdx]) * SampleSrPDF(chIdx, rProj[axisIdx]) * AXIS_PDF * CHANNEL_PDF;
+    }
+
+    return ret;
 }
 
 } // namespace Atrc
