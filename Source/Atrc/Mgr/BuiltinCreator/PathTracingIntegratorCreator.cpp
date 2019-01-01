@@ -39,7 +39,7 @@ PathTracingIntegrator *FullPathTracingIntegratorCreator::Create(
         return arena.Create<FullPathTracingIntegrator>(
             minDepth, maxDepth, contProb, sampleAllLights);
     }
-        ATRC_MGR_CATCH_AND_RETHROW("In creating MIS path tracing integrator: " + group.ToString())
+        ATRC_MGR_CATCH_AND_RETHROW("In creating full path tracing integrator: " + group.ToString())
 }
 
 PathTracingIntegrator *MISPathTracingIntegratorCreator::Create(
