@@ -18,11 +18,11 @@ namespace
         explicit HenyeyGreenstein(const Vec3 &wo, Real g)
             : wo(wo.Normalize()), g(g) { }
 
-        Spectrum Eval(const Vec3& wi, const Vec3& wo) const override
+        Real Eval(const Vec3& wi, const Vec3& wo) const override
         {
             Real cos = Cos(wi, wo);
             Real dem = 1 + g * g + 2 * g * cos;
-            return Spectrum(1 / (4 * PI) * (1 - g * g) / (dem * Sqrt(dem)));
+            return 1 / (4 * PI) * (1 - g * g) / (dem * Sqrt(dem));
         }
 
         SampleWiResult SampleWi(const Vec2 &sample) const override

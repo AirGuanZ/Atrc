@@ -46,7 +46,7 @@ Spectrum MISPathTracingIntegrator::Eval(
 
         auto shd = inct.material->GetShadingPoint(inct, arena);
 
-        auto [directLighting, bsdfSample] = ComputeDirectLighting(scene, inct, shd, sampleAllLights_, true, false, sampler);
+        auto [directLighting, bsdfSample, nInct] = ComputeDirectLighting(scene, inct, shd, sampleAllLights_, false, sampler);
 
         ret += coef * directLighting;
 

@@ -4,18 +4,17 @@
 
 namespace Atrc
 {
-
-class VolPathTracingIntegrator : public PathTracingIntegrator
+    
+class FullPathTracingIntegrator : public PathTracingIntegrator
 {
     int minDepth_, maxDepth_;
     Real contProb_;
 
     bool sampleAllLights_;
-    bool lightInMedium_;
 
 public:
 
-    VolPathTracingIntegrator(int minDepth, int maxDepth, Real contProb, bool sampleAllLights, bool lightInMedium) noexcept;
+    FullPathTracingIntegrator(int minDepth, int maxDepth, Real contProb, bool sampleAllLights) noexcept;
 
     Spectrum Eval(const Scene &scene, const Ray &_r, Sampler *sampler, Arena &arena) const override;
 };

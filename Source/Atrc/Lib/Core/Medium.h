@@ -55,7 +55,7 @@ public:
         Vec3 wi;
     };
 
-    virtual Spectrum Eval(const Vec3 &wi, const Vec3 &wo) const = 0;
+    virtual Real Eval(const Vec3 &wi, const Vec3 &wo) const = 0;
 
     virtual SampleWiResult SampleWi(const Vec2 &sample) const = 0;
 };

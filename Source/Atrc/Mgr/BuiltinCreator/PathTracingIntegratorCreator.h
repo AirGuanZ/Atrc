@@ -8,7 +8,24 @@ namespace Atrc::Mgr
 void RegisterBuiltinPathTracingIntegratorCreators(Context &context);
 
 /*
-    type = MISPathTracing
+    type = Full
+
+    minDepth       = int
+    maxDepth       = int
+    contProb       = Real
+    sampleAllLight = True | False
+*/
+class FullPathTracingIntegratorCreator : public Creator<PathTracingIntegrator>
+{
+public:
+
+    Str8 GetTypeName() const override { return "Full"; }
+
+    PathTracingIntegrator *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
+};
+
+/*
+    type = MIS
 
     minDepth       = int
     maxDepth       = int
@@ -25,7 +42,7 @@ public:
 };
 
 /*
-    type = NativePathTracing
+    type = Native
 
     minDepth = int
     maxDepth = int
@@ -48,24 +65,6 @@ class ShadingNormalIntegratorCreator: public Creator<PathTracingIntegrator>
 public:
 
     Str8 GetTypeName() const override { return "ShadingNormal"; }
-
-    PathTracingIntegrator *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
-};
-
-/*
-    type = Vol
-
-    minDepth       = int
-    maxDepth       = int
-    contProb       = Real
-    sampleAllLight = True | False
-    lightInMedium  = True | False | null(True)
-*/
-class VolPathTracingIntegratorCreator : public Creator<PathTracingIntegrator>
-{
-public:
-
-    Str8 GetTypeName() const override { return "Vol"; }
 
     PathTracingIntegrator *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
 };

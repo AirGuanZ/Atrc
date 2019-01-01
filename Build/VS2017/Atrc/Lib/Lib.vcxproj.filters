@@ -249,9 +249,6 @@
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\ShadingNormalIntegrator.h">
       <Filter>Source\Renderer\PathTracingIntegrator</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\VolPathTracingIntegrator.h">
-      <Filter>Source\Renderer\PathTracingIntegrator</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\IdealScaler.h">
       <Filter>Source\Material</Filter>
     </ClInclude>
@@ -280,6 +277,9 @@
       <Filter>Source\Material\BSSRDF</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\DirectLighting.h">
+      <Filter>Source\Renderer\PathTracingIntegrator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\FullPathTracingIntegrator.h">
       <Filter>Source\Renderer\PathTracingIntegrator</Filter>
     </ClInclude>
   </ItemGroup>
@@ -407,9 +407,6 @@
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\ShadingNormalIntegrator.cpp">
       <Filter>Source\Renderer\PathTracingIntegrator</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\VolPathTracingIntegrator.cpp">
-      <Filter>Source\Renderer\PathTracingIntegrator</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\IdealScaler.cpp">
       <Filter>Source\Material</Filter>
     </ClCompile>
@@ -441,6 +438,9 @@
       <Filter>Source\Material\BSSRDF</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\DirectLighting.cpp">
+      <Filter>Source\Renderer\PathTracingIntegrator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\FullPathTracingIntegrator.cpp">
       <Filter>Source\Renderer\PathTracingIntegrator</Filter>
     </ClCompile>
   </ItemGroup>

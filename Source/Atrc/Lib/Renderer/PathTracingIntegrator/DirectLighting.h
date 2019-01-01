@@ -1,13 +1,19 @@
 #pragma once
 
+#include <tuple>
+
 #include <Atrc/Lib/Core/Scene.h>
 #include <Atrc/Lib/Core/SurfacePoint.h>
 
 namespace Atrc
 {
     
-std::pair<Spectrum, Option<BSDF::SampleWiResult>> ComputeDirectLighting(
+std::tuple<Spectrum, Option<BSDF::SampleWiResult>, Option<Intersection>> ComputeDirectLighting(
     const Scene &scene, const Intersection &inct, const ShadingPoint &shd,
-    bool sampleAllLights, bool useMIS, bool considerMedium, Sampler *sampler);
+    bool sampleAllLights, bool considerMedium, Sampler *sampler);
+
+std::tuple<Spectrum, PhaseFunction::SampleWiResult, Option<Intersection>> ComputeDirectLighting(
+    const Scene &scene, const MediumPoint &mpnt, const MediumShadingPoint &mshd,
+    bool sampleAllLights, Sampler *sampler);
 
 } // namespace Atrc
