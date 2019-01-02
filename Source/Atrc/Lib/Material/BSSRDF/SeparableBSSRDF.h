@@ -33,6 +33,8 @@ public:
     Option<SamplePiResult> SamplePi(bool star, const Vec3 &sample, Arena &arena) const noexcept override;
 
     Real SamplePiPDF(const Intersection &pi, bool star) const noexcept override;
+
+    Real GetEta() const noexcept { return eta_; }
 };
 
 } // namespace Atrc

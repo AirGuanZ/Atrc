@@ -5,13 +5,16 @@
 namespace Atrc
 {
     
+// See http://graphics.pixar.com/library/ApproxBSSRDF/paper.pdf
 class NormalizedDiffusionBSSRDF : public SeparableBSSRDF
 {
-    Spectrum d_;
+    Spectrum A_;
+    Spectrum s_;
+    Real l_;
 
 protected:
 
-    NormalizedDiffusionBSSRDF(const Intersection &inct, Real eta, const Spectrum &mfp) noexcept;
+    NormalizedDiffusionBSSRDF(const Intersection &inct, Real eta, const Spectrum &A, Real mfp) noexcept;
 
     Spectrum Sr(Real distance) const noexcept override;
 

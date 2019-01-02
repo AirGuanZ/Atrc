@@ -32,11 +32,11 @@ namespace
     class SeparableBSSRDF_BSDF : public BSDF
     {
         Intersection pi_;
-        const BSSRDF *bssrdf_;
+        const SeparableBSSRDF *bssrdf_;
 
     public:
 
-        SeparableBSSRDF_BSDF(const Intersection &pi, const BSSRDF *bssrdf) noexcept
+        SeparableBSSRDF_BSDF(const Intersection &pi, const SeparableBSSRDF *bssrdf) noexcept
             : pi_(pi), bssrdf_(bssrdf)
         {
             AGZ_ASSERT(bssrdf);
@@ -54,7 +54,10 @@ namespace
         {
             if(!((type & BSDF_TRANSMISSION) && (type & (BSDF_DIFFUSE | BSDF_GLOSSY))))
                 return Spectrum();
-            return bssrdf_->Eval(pi_, star);
+            auto ret = bssrdf_->Eval(pi_, star);
+            if(!star)
+                ret *= bssrdf_->GetEta() * bssrdf_->GetEta();
+            return ret;
         }
 
         Option<SampleWiResult> SampleWi(
@@ -97,7 +100,7 @@ namespace
 
     public:
 
-        SeparableBSSRDF_BSDFMaterial(const Intersection &pi, const BSSRDF *bssrdf) noexcept
+        SeparableBSSRDF_BSDFMaterial(const Intersection &pi, const SeparableBSSRDF *bssrdf) noexcept
             : bsdf_(pi, bssrdf)
         {
             
@@ -113,14 +116,14 @@ namespace
         }
     };
 }
-    
+
 SeparableBSSRDF::SeparableBSSRDF(const Intersection &po, Real eta) noexcept
     : BSSRDF(po), eta_(eta)
 {
     
 }
 
-Spectrum SeparableBSSRDF::Eval(const Intersection &pi, bool star) const noexcept
+Spectrum SeparableBSSRDF::Eval(const Intersection &pi, [[maybe_unused]] bool star) const noexcept
 {
     constexpr Real InvPI2 = 1 / (PI * PI);
 
@@ -134,8 +137,6 @@ Spectrum SeparableBSSRDF::Eval(const Intersection &pi, bool star) const noexcept
                 (1 - ComputeFresnelDielectric(1, eta_, cosThetaI)) *
                 (1 - ComputeFresnelDielectric(1, eta_, cosThetaO)) *
                 InvPI2 / (cI * cO);
-    if(!star)
-        ret *= eta_ * eta_;
     return ret;
 }
 
@@ -148,7 +149,7 @@ Option<BSSRDF::SamplePiResult> SeparableBSSRDF::SamplePi(bool star, const Vec3 &
     auto[projAxis, sampleX] = AGZ::Math::DistributionTransform
         ::SampleExtractor<Real>::ExtractInteger<int>(sXT, 0, 3);
 
-    // 极座标采样
+    // 极坐标采样
 
     auto sr = SampleSr(channel, sampleX);
     Real rMax = SampleSr(channel, Real(0.999)).radius;
