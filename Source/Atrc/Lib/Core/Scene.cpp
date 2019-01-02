@@ -22,9 +22,10 @@ Scene::Scene(Scene &&moveFrom) noexcept
     : entities_(std::move(moveFrom.entities_)),
       lights_(std::move(moveFrom.lights_)),
       camera_(moveFrom.camera_),
+      globalMedium_(moveFrom.globalMedium_),
       worldBound_(moveFrom.worldBound_)
 {
-
+    
 }
 
 const Camera *Scene::GetCamera() const noexcept

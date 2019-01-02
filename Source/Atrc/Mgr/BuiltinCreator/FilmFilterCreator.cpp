@@ -25,7 +25,7 @@ FilmFilter *BoxFilterCreator::Create(const ConfigGroup &group, [[maybe_unused]] 
     ATRC_MGR_CATCH_AND_RETHROW("In creating box filter: " + group.ToString())
 }
 
-FilmFilter *GaussianFilterCreator::Create(const ConfigGroup &group, Context &context, Arena &arena) const
+FilmFilter *GaussianFilterCreator::Create(const ConfigGroup &group, [[maybe_unused]] Context &context, Arena &arena) const
 {
     ATRC_MGR_TRY
     {
