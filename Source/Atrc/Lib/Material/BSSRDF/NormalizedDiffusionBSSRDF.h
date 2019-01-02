@@ -10,11 +10,11 @@ class NormalizedDiffusionBSSRDF : public SeparableBSSRDF
 {
     Spectrum A_;
     Spectrum s_;
-    Real l_;
+    Spectrum l_;
 
 protected:
 
-    NormalizedDiffusionBSSRDF(const Intersection &inct, Real eta, const Spectrum &A, Real mfp) noexcept;
+    NormalizedDiffusionBSSRDF(const Intersection &inct, Real eta, const Spectrum &A, const Spectrum &mfp) noexcept;
 
     Spectrum Sr(Real distance) const noexcept override;
 

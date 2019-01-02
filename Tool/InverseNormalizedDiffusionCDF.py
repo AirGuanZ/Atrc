@@ -1,7 +1,7 @@
 from math import exp
 from scipy.optimize import fsolve
 
-def InverseCDF(intervalCount = 1024):
+def InverseCDF(intervalCount = 2048):
     ret = []
     dem = 1.0 / (intervalCount - 1)
     for i in range(0, intervalCount):
@@ -11,4 +11,9 @@ def InverseCDF(intervalCount = 1024):
         ret.append(fsolve(equ, 0)[0])
     return ret
 
-print(InverseCDF())
+i = 0
+for x in InverseCDF():
+    print("%f, " % x, end = "")
+    i += 1
+    if i % 8 == 0:
+        print()
