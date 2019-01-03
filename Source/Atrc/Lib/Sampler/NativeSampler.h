@@ -23,7 +23,7 @@ class NativeSampler : public Sampler
 public:
 
     NativeSampler(int seed, int spp)
-        noexcept(noexcept(std::minstd_rand0(std::declval<int>())));
+        noexcept(noexcept(std::default_random_engine(std::declval<int>())));
     
     std::unique_ptr<Sampler> Clone(int seed) const override;
 

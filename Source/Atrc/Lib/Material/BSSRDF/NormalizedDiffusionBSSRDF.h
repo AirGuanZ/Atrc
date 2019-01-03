@@ -13,7 +13,7 @@ class NormalizedDiffusionBSSRDF : public SeparableBSSRDF
     Spectrum l_;
     Spectrum d_;
 
-protected:
+public:
 
     NormalizedDiffusionBSSRDF(const Intersection &inct, Real eta, const Spectrum &A, const Spectrum &mfp) noexcept;
 

@@ -40,6 +40,7 @@ struct ShadingPoint
     CoordSystem coordSys; // 用于着色计算的局部坐标系
     Vec2 uv;
     const BSDF *bsdf;
+    const BSSRDF *bssrdf = nullptr;
 };
 
 } // namespace Atrc

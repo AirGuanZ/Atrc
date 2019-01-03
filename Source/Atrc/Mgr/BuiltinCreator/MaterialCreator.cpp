@@ -1,6 +1,7 @@
 #include <Utils/FileSys.h>
 #include <Utils/Serialize.h>
 
+#include <Atrc/Lib/Material/BSSRDFSurface.h>
 #include <Atrc/Lib/Material/IdealBlack.h>
 #include <Atrc/Lib/Material/IdealDiffuse.h>
 #include <Atrc/Lib/Material/IdealMirror.h>
@@ -76,6 +77,7 @@ namespace
 
 void RegisterBuiltinMaterialCreators(Context &context)
 {
+    static const BSSRDFSurfaceCreator iBSSRDFSurfaceCreator;
     static const IdealBlackCreator idealBlackCreator;
     static const IdealDiffuseCreator idealDiffuseCreator;
     static const IdealMirrorCreator idealMirrorCreator;
@@ -84,6 +86,7 @@ void RegisterBuiltinMaterialCreators(Context &context)
     static const InvisibleSurfaceCreator invisibleSurfaceCreator;
     static const ONMatteCreator oNMatteCreator;
     static const TSMetalCreator tSMetalCreator;
+    context.AddCreator(&iBSSRDFSurfaceCreator);
     context.AddCreator(&idealBlackCreator);
     context.AddCreator(&idealDiffuseCreator);
     context.AddCreator(&idealMirrorCreator);
@@ -118,6 +121,20 @@ namespace
         }
         ATRC_MGR_CATCH_AND_RETHROW("In creating normal mapper: " + group.ToString())
     }
+}
+
+Material *BSSRDFSurfaceCreator::Create(const ConfigGroup &group, Context &context, Arena &arena) const
+{
+    ATRC_MGR_TRY
+    {
+        auto surface = context.Create<Material>(group["surface"]);
+        auto AMap    = context.Create<Texture>(group["A"]);
+        auto mfpMap  = context.Create<Texture>(group["mfp"]);
+        Real eta     = group["eta"].Parse<Real>();
+
+        return arena.Create<BSSRDFSurface>(surface, AMap, mfpMap, eta);
+    }
+    ATRC_MGR_CATCH_AND_RETHROW("In creating bssrdf surface material")
 }
 
 Material *IdealBlackCreator::Create(

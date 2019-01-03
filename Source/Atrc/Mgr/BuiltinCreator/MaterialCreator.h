@@ -8,6 +8,23 @@ namespace Atrc::Mgr
 void RegisterBuiltinMaterialCreators(Context &context);
 
 /*
+    type = BSSRDF
+
+    surface = Material
+    A       = Texture
+    mfp     = Texture
+    eta     = Real
+*/
+class BSSRDFSurfaceCreator : public Creator<Material>
+{
+public:
+
+    Str8 GetTypeName() const override { return "BSSRDF"; }
+
+    Material *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
+};
+
+/*
     type = IdealBlack
 */
 class IdealBlackCreator : public Creator<Material>

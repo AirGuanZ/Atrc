@@ -49,14 +49,14 @@ namespace
 
         Spectrum Eval(
             [[maybe_unused]] const CoordSystem &shd, [[maybe_unused]] const CoordSystem &geo,
-            [[maybe_unused]] const Vec3 &wi, [[maybe_unused]] const Vec3 &wo,
+            const Vec3 &wi, [[maybe_unused]] const Vec3 &wo,
             BSDFType type, bool star) const noexcept override
         {
             if(!((type & BSDF_TRANSMISSION) && (type & (BSDF_DIFFUSE | BSDF_GLOSSY))))
                 return Spectrum();
-            auto ret = bssrdf_->Eval(pi_, star);
-            if(!star)
-                ret *= bssrdf_->GetEta() * bssrdf_->GetEta();
+            auto tpi = pi_;
+            tpi.wr = wi;
+            auto ret = bssrdf_->Eval(tpi, star);
             return ret;
         }
 
@@ -67,10 +67,11 @@ namespace
             if(!((type & BSDF_TRANSMISSION) && (type & (BSDF_DIFFUSE | BSDF_GLOSSY))))
                 return None;
 
-            auto[sam, pdf] = AGZ::Math::DistributionTransform
+            auto [sam, pdf] = AGZ::Math::DistributionTransform
                 ::ZWeightedOnUnitHemisphere<Real>::Transform(sample);
             if(!pdf)
                 return None;
+            sam = shd.Local2World(sam);
 
             SampleWiResult ret;
             ret.coef    = Eval(shd, geo, sam, wo, BSDF_ALL, star);
@@ -83,14 +84,15 @@ namespace
         }
 
         Real SampleWiPDF(
-            [[maybe_unused]] const CoordSystem &shd, [[maybe_unused]] const CoordSystem &geo,
+            const CoordSystem &shd, [[maybe_unused]] const CoordSystem &geo,
             const Vec3 &wi, const Vec3 &wo, BSDFType type, [[maybe_unused]] bool star) const noexcept override
         {
             if(!((type & BSDF_TRANSMISSION) && (type & (BSDF_DIFFUSE | BSDF_GLOSSY))))
                 return 0;
-            if(wi.z <= 0 || wo.z <= 0)
+            auto lwi = shd.World2Local(wi), lwo = shd.World2Local(wo);
+            if(lwi.z <= 0 || lwo.z <= 0)
                 return 0;
-            return AGZ::Math::DistributionTransform::ZWeightedOnUnitHemisphere<Real>::PDF(wi.Normalize());
+            return AGZ::Math::DistributionTransform::ZWeightedOnUnitHemisphere<Real>::PDF(lwi.Normalize());
         }
     };
 
@@ -125,18 +127,16 @@ SeparableBSSRDF::SeparableBSSRDF(const Intersection &po, Real eta) noexcept
 
 Spectrum SeparableBSSRDF::Eval(const Intersection &pi, [[maybe_unused]] bool star) const noexcept
 {
-    constexpr Real InvPI2 = 1 / (PI * PI);
-
     Real cosThetaI = Cos(pi.wr, pi.coordSys.ez);
     Real cosThetaO = Cos(po_.wr, po_.coordSys.ez);
 
     Real cI = 1 - 2 * FresnelMoment(eta_);
-    Real cO = 1 - 2 * FresnelMoment(1 / eta_);
 
-    auto ret =  Sr((pi.pos - po_.pos).Length()) * 
+    auto dis = (pi.pos - po_.pos).Length();
+    auto ret =  dis * Sr(dis) * 
                 (1 - ComputeFresnelDielectric(1, eta_, cosThetaI)) *
-                (1 - ComputeFresnelDielectric(1, eta_, cosThetaO)) *
-                InvPI2 / (cI * cO);
+                (1 - ComputeFresnelDielectric(1, eta_, cosThetaO)) / (cI * PI);
+                
     return ret;
 }
 
@@ -144,48 +144,48 @@ Option<BSSRDF::SamplePiResult> SeparableBSSRDF::SamplePi(bool star, const Vec3 &
 {
     // 选择投影轴和采样通道
 
-    auto [channel, sXT] = AGZ::Math::DistributionTransform
+    auto [channel, sampleX] = AGZ::Math::DistributionTransform
         ::SampleExtractor<Real>::ExtractInteger<int>(sample.x, 0, SPECTRUM_CHANNEL_COUNT);
-    auto[projAxis, sampleX] = AGZ::Math::DistributionTransform
-        ::SampleExtractor<Real>::ExtractInteger<int>(sXT, 0, 3);
-
-    // 极坐标采样
-
-    auto sr = SampleSr(channel, sampleX);
-    Real rMax = SampleSr(channel, Real(0.999)).radius;
-    if(sr.radius < 0 || sr.radius > rMax)
-        return None;
-    Real phi = 2 * PI * sample.y;
 
     // 构造投影坐标系
 
     CoordSystem projCoord;
-    switch(projAxis)
+
+    Real sampleY;
+    if(sample.y < 0.5)
     {
-    case 0:
         projCoord = po_.coordSys;
-        break;
-    case 1:
-        projCoord = CoordSystem(po_.coordSys.ey, po_.coordSys.ez, po_.coordSys.ex);
-        break;
-    case 2:
-        projCoord = CoordSystem(po_.coordSys.ez, po_.coordSys.ex, po_.coordSys.ey);
-        break;
-    default:
-        AGZ::Unreachable();
+        sampleY = 2 * sample.y;
     }
+    else if(sample.y < 0.75)
+    {
+        projCoord = CoordSystem(po_.coordSys.ey, po_.coordSys.ez, po_.coordSys.ex);
+        sampleY = 4 * (sample.y - Real(0.5));
+    }
+    else
+    {
+        projCoord = CoordSystem(po_.coordSys.ez, po_.coordSys.ex, po_.coordSys.ey);
+        sampleY = 4 * (sample.y - Real(0.75));
+    }
+
+    // 极坐标采样
+
+    auto sr = SampleSr(channel, sampleX);
+    Real rMax = SampleSr(channel, Real(0.996)).radius;
+    if(sr.radius <= 0 || sr.radius > rMax)
+        return None;
+    Real phi = 2 * PI * sampleY;
 
     // 构造采样射线
 
     Real hl = Sqrt(Max(Real(0), rMax * rMax - sr.radius * sr.radius));
     Vec3 inctRayOri(sr.radius * Cos(phi), sr.radius * Sin(phi), hl);
-    Vec3 inctRayDir = -Vec3::UNIT_Z();
     Real inctRayLength = 2 * hl;
 
     Ray inctRay(
         po_.pos + projCoord.Local2World(inctRayOri),
-        projCoord.Local2World(inctRayDir).Normalize(),
-        EPS, inctRayLength);
+        -projCoord.ez,
+        EPS, Max(EPS, inctRayLength));
 
     // 求采样射线与本物体的所有交点
 
@@ -201,12 +201,14 @@ Option<BSSRDF::SamplePiResult> SeparableBSSRDF::SamplePi(bool star, const Vec3 &
         Intersection nInct;
         if(!po_.entity->FindIntersection(inctRay, &nInct))
             break;
-        auto nNode = arena.Create<InctListNode>();
-        nNode->inct = nInct;
-        nNode->next = inctListEntry;
-        inctListEntry = nNode;
-        ++inctListLength;
-
+        if(nInct.material == po_.material)
+        {
+            auto nNode = arena.Create<InctListNode>();
+            nNode->inct = nInct;
+            nNode->next = inctListEntry;
+            inctListEntry = nNode;
+            ++inctListLength;
+        }
         inctRay.t0 = nInct.t + EPS;
         if(inctRay.t0 >= inctRay.t1)
             break;
@@ -235,8 +237,10 @@ Option<BSSRDF::SamplePiResult> SeparableBSSRDF::SamplePi(bool star, const Vec3 &
     ret.pi          = inctListEntry->inct;
     ret.pi.wr       = ret.pi.coordSys.ez;
     ret.pi.material = arena.Create<SeparableBSSRDF_BSDFMaterial>(ret.pi, this);
-    ret.coef        = Spectrum(1);
+    ret.coef        = Spectrum(Real(1));
     ret.pdf         = pdf;
+
+    AGZ_ASSERT((ret.pi.pos - po_.pos).Length() + EPS > sr.radius);
 
     return ret;
 }
@@ -247,17 +251,17 @@ Real SeparableBSSRDF::SamplePiPDF(const Intersection &pi, [[maybe_unused]] bool 
     Vec3 lni = po_.coordSys.World2Local(pi.coordSys.ez);
     Real rProj[] = { ld.yz().Length(), ld.zx().Length(), ld.xy().Length() };
 
-    constexpr Real AXIS_PDF = Real(1) / 3;
+    constexpr Real AXIS_PDF[] = { Real(0.25), Real(0.25), Real(0.5) };
     constexpr Real CHANNEL_PDF = Real(1) / SPECTRUM_CHANNEL_COUNT;
 
     Real ret = 0;
     for(int axisIdx = 0; axisIdx < 3; ++axisIdx)
     {
         for(int chIdx = 0; chIdx < SPECTRUM_CHANNEL_COUNT; ++chIdx)
-            ret += Abs(lni[axisIdx]) * SampleSrPDF(chIdx, rProj[axisIdx]) * AXIS_PDF * CHANNEL_PDF;
+            ret += Abs(lni[axisIdx]) * SampleSrPDF(chIdx, rProj[axisIdx]) * AXIS_PDF[axisIdx];
     }
 
-    return ret;
+    return ret * CHANNEL_PDF / (2 * PI);
 }
 
 } // namespace Atrc
