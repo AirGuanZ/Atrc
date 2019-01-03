@@ -3,21 +3,6 @@
 namespace Atrc
 {
 
-NormalizedDiffusionBSSRDF::NormalizedDiffusionBSSRDF(
-    const Intersection &inct, Real eta, const Spectrum &A, const Spectrum &mfp) noexcept
-    : SeparableBSSRDF(inct, eta), A_(A), l_(mfp)
-{
-    s_ = -A + Real(1.9) + Real(3.5) * (A - Real(0.8)).Map([](Real c) { return c * c; });
-}
-
-Spectrum NormalizedDiffusionBSSRDF::Sr(Real distance) const noexcept
-{
-    Spectrum dis = Spectrum(distance) / l_;
-    Spectrum a = (-s_ * dis).Map(Exp<Real>) + (-s_ * dis / 3).Map(Exp<Real>);
-    Spectrum b(8 * PI * dis);
-    return A_ * s_ * a / b;
-}
-
 namespace
 {
     const Real INV_CDF_TAB[] =
@@ -365,8 +350,51 @@ namespace
         Real(16.17163588130669182874), Real(16.63408240545098593088), Real(17.18104240896904499891), Real(17.85046924454210071076), Real(18.71351249203735989113), Real(19.92990569502376985156),
         Real(22.00934596389777908598), Real(111.68667351342936910896),
     };
+}
 
-    constexpr size_t SIZE_OF_INV_CDF_TAB = AGZ::ArraySize(INV_CDF_TAB);
+NormalizedDiffusionBSSRDF::NormalizedDiffusionBSSRDF(
+    const Intersection &inct, Real eta, const Spectrum &A, const Spectrum &mfp) noexcept
+    : SeparableBSSRDF(inct, eta), A_(A), l_(mfp)
+{
+    s_ = -A + Real(1.9) + Real(3.5) * (A - Real(0.8)).Map([](Real c) { return c * c; });
+    d_ = l_ / s_;
+}
+
+Spectrum NormalizedDiffusionBSSRDF::Sr(Real distance) const noexcept
+{
+    Spectrum dis = Spectrum(distance) / l_;
+#ifdef AGZ_CC_GCC
+    Spectrum a = (-s_ * dis).Map<decltype(&Exp<Real>)>(&Exp<Real>)
+               + (-s_ * dis / 3).Map<decltype(&Exp<Real>)>(&Exp<Real>);
+#else
+    Spectrum a = (-s_ * dis).Map(&Exp<Real>) + (-s_ * dis / 3).Map(&Exp<Real>);
+#endif
+    Spectrum b(8 * PI * dis);
+    return A_ * s_ * a / b;
+}
+
+SeparableBSSRDF::SampleSrResult NormalizedDiffusionBSSRDF::SampleSr(int channel, Real sample) const noexcept
+{
+    AGZ_ASSERT(0 <= channel && channel < SPECTRUM_CHANNEL_COUNT);
+
+    auto r = AGZ::Math::DistributionTransform::TableSampler<Real>::Sample(
+        sample, INV_CDF_TAB, AGZ::ArraySize(INV_CDF_TAB));
+    r *= d_[channel];
+
+    SampleSrResult ret;
+    ret.coef   = Sr(r);
+    ret.radius = r;
+    ret.pdf    = SampleSrPDF(channel, r);
+
+    return ret;
+}
+
+Real NormalizedDiffusionBSSRDF::SampleSrPDF(int channel, Real distance) const noexcept
+{
+    AGZ_ASSERT(0 <= channel && channel < SPECTRUM_CHANNEL_COUNT);
+    auto d_ = l_ / s_;
+    Real r = distance / d_[channel];
+    return 1 - 0.25 * Exp(-r) - 0.75 * Exp(-r / 3);
 }
 
 } // namespace Atrc

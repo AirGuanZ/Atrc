@@ -11,6 +11,7 @@ class NormalizedDiffusionBSSRDF : public SeparableBSSRDF
     Spectrum A_;
     Spectrum s_;
     Spectrum l_;
+    Spectrum d_;
 
 protected:
 
