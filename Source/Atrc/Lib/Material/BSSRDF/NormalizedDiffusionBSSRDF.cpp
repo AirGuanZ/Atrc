@@ -356,8 +356,7 @@ NormalizedDiffusionBSSRDF::NormalizedDiffusionBSSRDF(
     const Intersection &inct, Real eta, const Spectrum &A, const Spectrum &mfp) noexcept
     : SeparableBSSRDF(inct, eta), A_(A), l_(mfp)
 {
-    s_ = //A.Map([](Real c){ Real t = c - Real(0.33); return Real(3.5) + 100 * t * t * t * t; });
-        -A + Real(1.9) + Real(3.5) * (A - Real(0.8)).Map([](Real c) { return c * c; });
+    s_ = -A + Real(1.9) + Real(3.5) * (A - Real(0.8)).Map([](Real c) { return c * c; });
     d_ = l_ / s_;
 }
 

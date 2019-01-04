@@ -196,6 +196,7 @@
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Light\EnvironmentLight.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Light\InfiniteLight.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Light\SkyLight.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\BSSRDFSurface.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\BSSRDF\NormalizedDiffusionBSSRDF.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\BSSRDF\SeparableBSSRDF.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\BxDF\BxDF_Black.h" />
@@ -257,6 +258,7 @@
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Light\EnvironmentLight.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Light\InfiniteLight.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Light\SkyLight.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\BSSRDFSurface.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\BSSRDF\NormalizedDiffusionBSSRDF.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\BSSRDF\SeparableBSSRDF.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\BxDF\BxDF_Black.cpp" />

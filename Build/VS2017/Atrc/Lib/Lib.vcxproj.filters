@@ -282,6 +282,9 @@
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\FullPathTracingIntegrator.h">
       <Filter>Source\Renderer\PathTracingIntegrator</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\BSSRDFSurface.h">
+      <Filter>Source\Material</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Core\Common.cpp">
@@ -442,6 +445,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\FullPathTracingIntegrator.cpp">
       <Filter>Source\Renderer\PathTracingIntegrator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\BSSRDFSurface.cpp">
+      <Filter>Source\Material</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
