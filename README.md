@@ -92,7 +92,7 @@ entities = (
     geometry = {
         type = TriangleBVH;         # A triangle BVH tree created from a Wavefront OBJ file
         filename = "Apple.obj";     # OBJ filename relative to workspace
-        transform = (               # Transforms are apply to the object from bottom to top
+        transform = (               # Transforms are applied from bottom to top
             Translate(0, 0, -0.95), # Translate 0.95 units along the negative Z direction
             RotateZ(Deg(250)),      # Rotate 250 degrees around Z axis
             Scale(2.5),             # Scale the object 2.5 times
