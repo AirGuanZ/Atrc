@@ -363,9 +363,15 @@ NormalizedDiffusionBSSRDF::NormalizedDiffusionBSSRDF(
 
 Spectrum NormalizedDiffusionBSSRDF::Sr(Real distance) const noexcept
 {
+#ifdef AGZ_CC_GCC
+    return A_ * ((-Spectrum(distance) / d_).Map<decltype(&Exp<Real>)>(Exp<Real>) +
+                 (-Spectrum(distance) / (3 * d_)).Map<decltype(&Exp<Real>)>(Exp<Real>))
+              / (8 * PI * d_);
+#else
     return A_ * ((-Spectrum(distance) / d_).Map(Exp<Real>) +
                  (-Spectrum(distance) / (3 * d_)).Map(Exp<Real>))
               / (8 * PI * d_);
+#endif
 }
 
 SeparableBSSRDF::SampleSrResult NormalizedDiffusionBSSRDF::SampleSr(int channel, Real sample) const noexcept
