@@ -64,7 +64,11 @@ Spectrum MISPathTracingIntegrator::Eval(
             auto piSample = shd.bssrdf->SamplePi(false, sampler->GetReal3(), arena);
             if(!piSample)
                 break;
-            coef *= piSample->coef / piSample->pdf;
+
+            auto deltaCoef = piSample->coef / piSample->pdf;
+            coef *= deltaCoef;
+
+            AGZ_ASSERT(!piSample->coef.HasInf());
 
             auto pishd = piSample->pi.material->GetShadingPoint(piSample->pi, arena);
             AGZ_ASSERT(!pishd.bssrdf);
@@ -73,11 +77,17 @@ Spectrum MISPathTracingIntegrator::Eval(
                 scene, piSample->pi, pishd, sampleAllLights_, false, sampler);
             ret += coef * piDirL;
 
+            AGZ_ASSERT(!coef.HasInf());
+            AGZ_ASSERT(!piDirL.HasInf());
+            AGZ_ASSERT(!ret.HasInf());
+
             if(!piBsdfSample)
                 break;
 
+            deltaCoef = piBsdfSample->coef / piBsdfSample->pdf* Abs(Cos(piBsdfSample->wi, pishd.coordSys.ez));
+
             AGZ_ASSERT(Dot(piBsdfSample->wi, pishd.coordSys.ez) >= 0);
-            coef *= piBsdfSample->coef * Abs(Cos(piBsdfSample->wi, pishd.coordSys.ez)) / piBsdfSample->pdf;
+            coef *= deltaCoef;
             ray = Ray(piSample->pi.pos, piBsdfSample->wi.Normalize(), EPS);
             nInct = piNInct;
         }

@@ -9,7 +9,7 @@ namespace Atrc
 
 namespace
 {
-    Real FresnelMoment(Real eta)
+    [[maybe_unused]] Real FresnelMoment(Real eta)
     {
         Real eta2 = eta * eta, eta3 = eta2 * eta, eta4 = eta2 * eta2, eta5 = eta2 * eta3;
         if(eta < 1)
@@ -90,7 +90,7 @@ namespace
             if(!((type & BSDF_TRANSMISSION) && (type & (BSDF_DIFFUSE | BSDF_GLOSSY))))
                 return 0;
             auto lwi = shd.World2Local(wi), lwo = shd.World2Local(wo);
-            if(lwi.z <= 0 || lwo.z <= 0)
+            if(lwi.z <= 0 || lwo.z <= 0 || !geo.InPositiveHemisphere(wi))
                 return 0;
             return AGZ::Math::DistributionTransform::ZWeightedOnUnitHemisphere<Real>::PDF(lwi.Normalize());
         }
@@ -128,15 +128,13 @@ SeparableBSSRDF::SeparableBSSRDF(const Intersection &po, Real eta) noexcept
 Spectrum SeparableBSSRDF::Eval(const Intersection &pi, [[maybe_unused]] bool star) const noexcept
 {
     Real cosThetaI = Cos(pi.wr, pi.coordSys.ez);
-    Real cosThetaO = Cos(po_.wr, po_.coordSys.ez);
+    //Real cosThetaO = Cos(po_.wr, po_.coordSys.ez);
 
     Real cI = 1 - 2 * FresnelMoment(eta_);
 
-    auto dis = (pi.pos - po_.pos).Length();
-    auto ret =  dis * Sr(dis) * 
-                (1 - ComputeFresnelDielectric(1, eta_, cosThetaI)) *
-                (1 - ComputeFresnelDielectric(1, eta_, cosThetaO)) / (cI * PI);
-                
+    auto ret =  Spectrum(1 - ComputeFresnelDielectric(1, eta_, cosThetaI)) /*
+                Spectrum(1 - ComputeFresnelDielectric(1, eta_, cosThetaO))*/ / (cI * PI);
+    
     return ret;
 }
 
@@ -231,15 +229,17 @@ Option<BSSRDF::SamplePiResult> SeparableBSSRDF::SamplePi(bool star, const Vec3 &
     if(inctListEntry->inct.material != po_.material)
         return None;
 
-    Real pdf = SamplePiPDF(inctListEntry->inct, star) / inctListLength;
+    Real pdfRadius = SamplePiPDF(inctListEntry->inct, star);
 
     SamplePiResult ret;
     ret.pi          = inctListEntry->inct;
     ret.pi.wr       = ret.pi.coordSys.ez;
     ret.pi.material = arena.Create<SeparableBSSRDF_BSDFMaterial>(ret.pi, this);
-    ret.coef        = Spectrum(Real(1));
-    ret.pdf         = pdf;
+    ret.coef        = Sr((ret.pi.pos - po_.pos).Length());
+    ret.pdf         = pdfRadius / (2 * PI) / inctListLength;
 
+    AGZ_ASSERT(sr.radius > 0);
+    AGZ_ASSERT(ret.pdf > 0);
     AGZ_ASSERT((ret.pi.pos - po_.pos).Length() + EPS > sr.radius);
 
     return ret;
@@ -248,7 +248,6 @@ Option<BSSRDF::SamplePiResult> SeparableBSSRDF::SamplePi(bool star, const Vec3 &
 Real SeparableBSSRDF::SamplePiPDF(const Intersection &pi, [[maybe_unused]] bool star) const noexcept
 {
     Vec3 ld = po_.coordSys.World2Local(po_.pos - pi.pos);
-    Vec3 lni = po_.coordSys.World2Local(pi.coordSys.ez);
     Real rProj[] = { ld.yz().Length(), ld.zx().Length(), ld.xy().Length() };
 
     constexpr Real AXIS_PDF[] = { Real(0.25), Real(0.25), Real(0.5) };
@@ -258,10 +257,10 @@ Real SeparableBSSRDF::SamplePiPDF(const Intersection &pi, [[maybe_unused]] bool 
     for(int axisIdx = 0; axisIdx < 3; ++axisIdx)
     {
         for(int chIdx = 0; chIdx < SPECTRUM_CHANNEL_COUNT; ++chIdx)
-            ret += Abs(lni[axisIdx]) * SampleSrPDF(chIdx, rProj[axisIdx]) * AXIS_PDF[axisIdx];
+            ret += SampleSrPDF(chIdx, rProj[axisIdx]) * AXIS_PDF[axisIdx];
     }
 
-    return ret * CHANNEL_PDF / (2 * PI);
+    return ret * CHANNEL_PDF;
 }
 
 } // namespace Atrc

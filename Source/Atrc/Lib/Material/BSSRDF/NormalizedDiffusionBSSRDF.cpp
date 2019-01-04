@@ -353,11 +353,11 @@ namespace
 }
 
 NormalizedDiffusionBSSRDF::NormalizedDiffusionBSSRDF(
-    const Intersection &inct, Real eta, const Spectrum &A, const Spectrum &mfp) noexcept
-    : SeparableBSSRDF(inct, eta), A_(A), l_(mfp)
+    const Intersection &inct, Real eta, const Spectrum &A, const Spectrum &dmfp) noexcept
+    : SeparableBSSRDF(inct, eta), A_(A), l_(dmfp)
 {
-    s_ = //A.Map([](Real c){ Real t = c - Real(0.33); return Real(3.5) + 100 * t * t * t * t; });
-        -A + Real(1.9) + Real(3.5) * (A - Real(0.8)).Map([](Real c) { return c * c; });
+    s_ = A.Map([](Real c){ Real t = c - Real(0.33); return Real(3.5) + 100 * t * t * t * t; });
+        //-A + Real(1.9) + Real(3.5) * (A - Real(0.8)).Map([](Real c) { return c * c; }); // used when gived mfp
     d_ = l_ / s_;
 }
 
@@ -365,7 +365,7 @@ Spectrum NormalizedDiffusionBSSRDF::Sr(Real distance) const noexcept
 {
     return A_ * ((-Spectrum(distance) / d_).Map(Exp<Real>) +
                  (-Spectrum(distance) / (3 * d_)).Map(Exp<Real>))
-              / (8 * PI * d_ * distance);
+              / (8 * PI * d_);
 }
 
 SeparableBSSRDF::SampleSrResult NormalizedDiffusionBSSRDF::SampleSr(int channel, Real sample) const noexcept
@@ -389,7 +389,7 @@ Real NormalizedDiffusionBSSRDF::SampleSrPDF(int channel, Real distance) const no
 {
     AGZ_ASSERT(0 <= channel && channel < SPECTRUM_CHANNEL_COUNT);
     distance /= d_[channel];
-    return Real(0.25) * (Exp(-distance) + Exp(-distance / 3));
+    return Real(0.25) * (Exp(-distance) + Exp(-distance / 3)) / d_[channel];
 }
 
 } // namespace Atrc
