@@ -285,6 +285,9 @@
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\BSSRDFSurface.h">
       <Filter>Source\Material</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\PostProcessor\GammaCorrection.h">
+      <Filter>Source\PostProcessor</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Core\Common.cpp">
@@ -448,6 +451,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\BSSRDFSurface.cpp">
       <Filter>Source\Material</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\PostProcessor\GammaCorrection.cpp">
+      <Filter>Source\PostProcessor</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

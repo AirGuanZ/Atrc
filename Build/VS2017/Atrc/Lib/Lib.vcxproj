@@ -223,6 +223,7 @@
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Material\Utility\NormalMapper.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Medium\HomogeneousMedium.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\PostProcessor\FlipImage.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\PostProcessor\GammaCorrection.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\DirectLighting.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\FullPathTracingIntegrator.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\MISPathTracingIntegrator.h" />
@@ -281,6 +282,7 @@
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Material\Utility\NormalMapper.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Medium\HomogeneousMedium.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\PostProcessor\FlipImage.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\PostProcessor\GammaCorrection.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\DirectLighting.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\FullPathTracingIntegrator.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\MISPathTracingIntegrator.cpp" />

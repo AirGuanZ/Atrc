@@ -19,4 +19,18 @@ public:
     PostProcessor *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
 };
 
+/*
+    type = GammaCorrection
+
+    gamma = Real
+*/
+class GammaCorrectionCreator : public Creator<PostProcessor>
+{
+public:
+
+    Str8 GetTypeName() const override { return "GammaCorrection"; }
+
+    PostProcessor *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
+};
+
 } // namespace Atrc::Mgr

@@ -1,4 +1,5 @@
 #include <Atrc/Lib/PostProcessor/FlipImage.h>
+#include <Atrc/Lib/PostProcessor/GammaCorrection.h>
 #include <Atrc/Mgr/BuiltinCreator/PostProcessorCreator.h>
 
 namespace Atrc::Mgr
@@ -17,6 +18,16 @@ PostProcessor *FlipImageCreator::Create([[maybe_unused]] const ConfigGroup &grou
         return arena.Create<FlipImage>();
     }
     ATRC_MGR_CATCH_AND_RETHROW("In creating post processor (flip image)")
+}
+
+PostProcessor *GammaCorrectionCreator::Create(const ConfigGroup &group, Context &context, Arena &arena) const
+{
+    ATRC_MGR_TRY
+    {
+        Real gamma = group["gamma"].Parse<Real>();
+        return arena.Create<GammaCorrection>(gamma);
+    }
+    ATRC_MGR_CATCH_AND_RETHROW("In creating post processor (gamma correction)")
 }
 
 } // namespace Atrc::Mgr
