@@ -14,10 +14,13 @@ BSSRDFSurface::BSSRDFSurface(
 ShadingPoint BSSRDFSurface::GetShadingPoint(const Intersection &inct, Arena &arena) const noexcept
 {
     auto shd   = surface_->GetShadingPoint(inct, arena);
-    
-    auto A     = AMap_->Sample(shd.uv);
-    auto mfp   = mfpMap_->Sample(shd.uv);
-    shd.bssrdf = arena.Create<NormalizedDiffusionBSSRDF>(inct, eta_, A, mfp);
+
+    if(inct.coordSys.InPositiveHemisphere(inct.wr))
+    {
+        auto A     = AMap_->Sample(shd.uv);
+        auto mfp   = mfpMap_->Sample(shd.uv);
+        shd.bssrdf = arena.Create<NormalizedDiffusionBSSRDF>(inct, eta_, A, mfp);
+    }
 
     return shd;
 }

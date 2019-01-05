@@ -1,3 +1,4 @@
+#include <Atrc/Lib/Core/BSSRDF.h>
 #include <Atrc/Lib/Renderer/PathTracingIntegrator/DirectLighting.h>
 #include <Atrc/Lib/Renderer/PathTracingIntegrator/FullPathTracingIntegrator.h>
 
@@ -88,35 +89,66 @@ Spectrum FullPathTracingIntegrator::Eval(const Scene &scene, const Ray &_r, Samp
             coef *= (med ? med->Tr(r.o, inct.pos) : Spectrum(Real(1))) / sampleInctPDF;
         }
 
+        Option<Intersection> nInct;
+
         if(sampleMed)
         {
-            auto [dL, phSample, nInct] = ComputeDirectLighting(scene, mpnt, mshd, sampleAllLights_, sampler);
+            auto [dL, phSample, phNInct] = ComputeDirectLighting(scene, mpnt, mshd, sampleAllLights_, sampler);
             ret += coef * dL;
             r = Ray(mpnt.pos, phSample.wi.Normalize(), EPS);
-            if(nInct)
-            {
-                hasInct = true;
-                inct = *nInct;
-            }
-            else
-                hasInct = false;
+            nInct = phNInct;
         }
         else
         {
-            auto [dL, bsdfSample, nInct] = ComputeDirectLighting(scene, inct, shd, sampleAllLights_, true, sampler);
+            auto [dL, bsdfSample, bsdfNInct] = ComputeDirectLighting(scene, inct, shd, sampleAllLights_, true, sampler);
             ret += coef * dL;
             if(!bsdfSample)
                 break;
             coef *= bsdfSample->coef * Abs(Cos(bsdfSample->wi, shd.coordSys.ez)) / bsdfSample->pdf;
             r = Ray(inct.pos, bsdfSample->wi.Normalize(), EPS);
-            if(nInct)
+            nInct = bsdfNInct;
+
+            if(shd.bssrdf && bsdfSample->type & BSDF_TRANSMISSION)
             {
-                hasInct = true;
-                inct = *nInct;
+                auto piSample = shd.bssrdf->SamplePi(false, sampler->GetReal3(), arena);
+                if(!piSample)
+                    break;
+
+                auto deltaCoef = piSample->coef / piSample->pdf;
+                coef *= deltaCoef;
+
+                AGZ_ASSERT(!piSample->coef.HasInf());
+
+                auto pishd = piSample->pi.material->GetShadingPoint(piSample->pi, arena);
+                AGZ_ASSERT(!pishd.bssrdf);
+
+                auto [piDirL, piBsdfSample, piNInct] = ComputeDirectLighting(
+                    scene, piSample->pi, pishd, sampleAllLights_, false, sampler);
+                ret += coef * piDirL;
+
+                AGZ_ASSERT(!coef.HasInf());
+                AGZ_ASSERT(!piDirL.HasInf());
+                AGZ_ASSERT(!ret.HasInf());;
+
+                if(!piBsdfSample)
+                    break;
+
+                deltaCoef = piBsdfSample->coef / piBsdfSample->pdf* Abs(Cos(piBsdfSample->wi, pishd.coordSys.ez));
+
+                AGZ_ASSERT(Dot(piBsdfSample->wi, pishd.coordSys.ez) >= 0);
+                coef *= deltaCoef;
+                r = Ray(piSample->pi.pos, piBsdfSample->wi.Normalize(), EPS);
+                nInct = piNInct;
             }
-            else
-                hasInct = false;
         }
+
+        if(nInct)
+        {
+            hasInct = true;
+            inct = *nInct;
+        }
+        else
+            hasInct = false;
     }
 
     return ret;
