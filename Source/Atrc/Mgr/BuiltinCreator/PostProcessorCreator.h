@@ -8,6 +8,18 @@ namespace Atrc::Mgr
 void RegisterBuiltinPostProcessorCreators(Context &context);
 
 /*
+    type = ACESFilm
+*/
+class ACESFilmCreator : public Creator<PostProcessor>
+{
+public:
+
+    Str8 GetTypeName() const override { return "ACESFilm"; }
+
+    PostProcessor *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
+};
+
+/*
     type = FlipImage
 */
 class FlipImageCreator : public Creator<PostProcessor>
