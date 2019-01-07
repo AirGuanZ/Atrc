@@ -294,6 +294,9 @@
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\PostProcessor\NativeToneMapping.h">
       <Filter>Source\PostProcessor</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\PostProcessor\SaveAsHDR.h">
+      <Filter>Source\PostProcessor</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Core\Common.cpp">
@@ -465,6 +468,9 @@
       <Filter>Source\PostProcessor</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\PostProcessor\NativeToneMapping.cpp">
+      <Filter>Source\PostProcessor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\PostProcessor\SaveAsHDR.cpp">
       <Filter>Source\PostProcessor</Filter>
     </ClCompile>
   </ItemGroup>

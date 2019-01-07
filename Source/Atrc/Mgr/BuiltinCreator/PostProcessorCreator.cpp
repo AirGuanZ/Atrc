@@ -2,6 +2,7 @@
 #include <Atrc/Lib/PostProcessor/FlipImage.h>
 #include <Atrc/Lib/PostProcessor/GammaCorrection.h>
 #include <Atrc/Lib/PostProcessor/NativeToneMapping.h>
+#include <Atrc/Lib/PostProcessor/SaveAsHDR.h>
 #include <Atrc/Mgr/Parser.h>
 #include <Atrc/Mgr/BuiltinCreator/PostProcessorCreator.h>
 
@@ -14,10 +15,12 @@ void RegisterBuiltinPostProcessorCreators(Context& context)
     static const FlipImageCreator flipImageCreator;
     static const GammaCorrectionCreator gammaCorrectionCreator;
     static const NativeToneMappingCreator nativeToneMappingCreator;
+    static const SaveAsHDRCreator saveAsHdr;
     context.AddCreator(&iAcesFilmCreator);
     context.AddCreator(&flipImageCreator);
     context.AddCreator(&gammaCorrectionCreator);
     context.AddCreator(&nativeToneMappingCreator);
+    context.AddCreator(&saveAsHdr);
 }
 
 PostProcessor *ACESFilmCreator::Create(const ConfigGroup &group, Context &context, Arena &arena) const
@@ -56,6 +59,16 @@ PostProcessor* NativeToneMappingCreator::Create(const ConfigGroup &group, Contex
         return arena.Create<NativeToneMapping>(LWhite);
     }
     ATRC_MGR_CATCH_AND_RETHROW("In creating post processor (native tone mapping)")
+}
+
+PostProcessor *SaveAsHDRCreator::Create(const ConfigGroup &group, Context &context, Arena &arena) const
+{
+    ATRC_MGR_TRY
+    {
+        Str8 filename = context.GetPathInWorkspace(group["filename"].AsValue());
+        return arena.Create<SaveAsHDR>(filename);
+    }
+    ATRC_MGR_CATCH_AND_RETHROW("In creating post processor (save as hdr)")
 }
 
 } // namespace Atrc::Mgr

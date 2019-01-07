@@ -45,11 +45,23 @@ public:
     PostProcessor *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
 };
 
+/*
+    type = NativeToneMapping
+*/
 class NativeToneMappingCreator : public Creator<PostProcessor>
 {
 public:
 
     Str8 GetTypeName() const override { return "NativeToneMapping"; }
+
+    PostProcessor *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
+};
+
+class SaveAsHDRCreator : public Creator<PostProcessor>
+{
+public:
+
+    Str8 GetTypeName() const override { return "SaveAsHDR"; }
 
     PostProcessor *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
 };
