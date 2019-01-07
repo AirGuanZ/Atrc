@@ -291,6 +291,9 @@
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\PostProcessor\ACESFilm.h">
       <Filter>Source\PostProcessor</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\PostProcessor\NativeToneMapping.h">
+      <Filter>Source\PostProcessor</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Core\Common.cpp">
@@ -459,6 +462,9 @@
       <Filter>Source\PostProcessor</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\PostProcessor\ACESFilm.cpp">
+      <Filter>Source\PostProcessor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\PostProcessor\NativeToneMapping.cpp">
       <Filter>Source\PostProcessor</Filter>
     </ClCompile>
   </ItemGroup>

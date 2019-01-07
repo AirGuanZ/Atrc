@@ -45,4 +45,13 @@ public:
     PostProcessor *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
 };
 
+class NativeToneMappingCreator : public Creator<PostProcessor>
+{
+public:
+
+    Str8 GetTypeName() const override { return "NativeToneMapping"; }
+
+    PostProcessor *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
+};
+
 } // namespace Atrc::Mgr

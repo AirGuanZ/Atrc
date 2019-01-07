@@ -225,6 +225,7 @@
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\PostProcessor\ACESFilm.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\PostProcessor\FlipImage.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\PostProcessor\GammaCorrection.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\Lib\PostProcessor\NativeToneMapping.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\DirectLighting.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\FullPathTracingIntegrator.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\MISPathTracingIntegrator.h" />
@@ -285,6 +286,7 @@
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\PostProcessor\ACESFilm.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\PostProcessor\FlipImage.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\PostProcessor\GammaCorrection.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Atrc\Lib\PostProcessor\NativeToneMapping.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\DirectLighting.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\FullPathTracingIntegrator.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\Lib\Renderer\PathTracingIntegrator\MISPathTracingIntegrator.cpp" />
