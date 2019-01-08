@@ -23,7 +23,7 @@ void RegisterBuiltinPostProcessorCreators(Context& context)
     context.AddCreator(&saveAsHdr);
 }
 
-PostProcessor *ACESFilmCreator::Create(const ConfigGroup &group, Context &context, Arena &arena) const
+PostProcessor *ACESFilmCreator::Create([[maybe_unused]] const ConfigGroup &group, [[maybe_unused]] Context &context, Arena &arena) const
 {
     ATRC_MGR_TRY
     {
@@ -41,7 +41,7 @@ PostProcessor *FlipImageCreator::Create([[maybe_unused]] const ConfigGroup &grou
     ATRC_MGR_CATCH_AND_RETHROW("In creating post processor (flip image)")
 }
 
-PostProcessor *GammaCorrectionCreator::Create(const ConfigGroup &group, Context &context, Arena &arena) const
+PostProcessor *GammaCorrectionCreator::Create(const ConfigGroup &group, [[maybe_unused]] Context &context, Arena &arena) const
 {
     ATRC_MGR_TRY
     {
@@ -51,7 +51,7 @@ PostProcessor *GammaCorrectionCreator::Create(const ConfigGroup &group, Context 
     ATRC_MGR_CATCH_AND_RETHROW("In creating post processor (gamma correction)")
 }
 
-PostProcessor* NativeToneMappingCreator::Create(const ConfigGroup &group, Context &context, Arena &arena) const
+PostProcessor* NativeToneMappingCreator::Create(const ConfigGroup &group, [[maybe_unused]] Context &context, Arena &arena) const
 {
     ATRC_MGR_TRY
     {

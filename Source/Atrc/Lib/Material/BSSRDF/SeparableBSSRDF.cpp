@@ -128,12 +128,12 @@ SeparableBSSRDF::SeparableBSSRDF(const Intersection &po, Real eta) noexcept
 Spectrum SeparableBSSRDF::Eval(const Intersection &pi, [[maybe_unused]] bool star) const noexcept
 {
     Real cosThetaI = Cos(pi.wr, pi.coordSys.ez);
-    //Real cosThetaO = Cos(po_.wr, po_.coordSys.ez);
+    Real cosThetaO = Cos(po_.wr, po_.coordSys.ez);
 
     Real cI = 1 - 2 * FresnelMoment(eta_);
 
-    auto ret =  Spectrum(1 - ComputeFresnelDielectric(1, eta_, cosThetaI)) /*
-                Spectrum(1 - ComputeFresnelDielectric(1, eta_, cosThetaO))*/ / (cI * PI);
+    auto ret =  Spectrum(1 - ComputeFresnelDielectric(1, eta_, cosThetaI)) *
+                Spectrum(1 - ComputeFresnelDielectric(1, eta_, cosThetaO)) / (cI * PI);
     
     return ret;
 }
