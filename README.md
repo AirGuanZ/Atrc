@@ -7,7 +7,17 @@ Atrc是[Zhuang Guan](https://github.com/AirGuanZ)的离线渲染实验室，主�
 - [x] Launcher 渲染器启动器
 - [x] SH2D 将场景、灯光投影到1~5阶球谐函数系数，以及旋转球谐系数、根据球谐系数重建图像的工具
 
-下图展示了Lib实现的部分特性，模型主要来自[3D Scans](http://threedscans.com/)和[The Stanford 3D Scanning Repository
+Lib已/将实现以下特性：
+
+- [x] Volumatric Path Tracing
+- [x] Torrance-Sparrow Reflection Model & Oren-Nayar Reflection Model
+- [x] Normalized Diffusion BSSRDF
+- [ ] Torrance-Sparrow Transmission Model
+- [ ] Disney BRDF
+- [ ] Progressive Photon Mapping
+- [ ] Bidirectional Path Tracing
+
+下图展示了部分渲染结果，模型主要来自[3D Scans](http://threedscans.com/)和[The Stanford 3D Scanning Repository
 ](http://graphics.stanford.edu/data/3Dscanrep/)，所有场景和渲染参数均通过配置文件指定：
 
 ![SS0](./Diary/Misc/2018_12_25_ShowTime.png)
