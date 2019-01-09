@@ -4,7 +4,7 @@ namespace Atrc
 {
     
 NativeSampler::NativeSampler(int seed, int spp)
-        noexcept(noexcept(std::default_random_engine(std::declval<int>())))
+        noexcept(noexcept(StdRNG(std::declval<int>())))
     : dis_(0, 1), rng_(seed), initSeed_(seed), spp_(spp), remainSpp_(0)
 {
     AGZ_ASSERT(spp >= 1);

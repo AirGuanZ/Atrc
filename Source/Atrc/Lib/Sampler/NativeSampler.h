@@ -10,8 +10,10 @@ namespace Atrc
 
 class NativeSampler : public Sampler
 {
+    using StdRNG = std::default_random_engine;
+
     std::uniform_real_distribution<Real> dis_;
-    std::default_random_engine rng_;
+    StdRNG rng_;
 
     int initSeed_;
 
@@ -23,7 +25,7 @@ class NativeSampler : public Sampler
 public:
 
     NativeSampler(int seed, int spp)
-        noexcept(noexcept(std::default_random_engine(std::declval<int>())));
+        noexcept(noexcept(StdRNG(std::declval<int>())));
     
     std::unique_ptr<Sampler> Clone(int seed) const override;
 

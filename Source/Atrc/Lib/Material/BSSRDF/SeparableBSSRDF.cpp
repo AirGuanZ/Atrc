@@ -74,11 +74,14 @@ namespace
             sam = shd.Local2World(sam);
 
             SampleWiResult ret;
-            ret.coef    = Eval(shd, geo, sam, wo, BSDF_ALL, star);
+            ret.coef    = Eval(shd, geo, sam, wo, type, star);
             ret.pdf     = pdf;
             ret.type    = BSDFType(BSDF_TRANSMISSION | BSDF_GLOSSY);
             ret.wi      = sam;
             ret.isDelta = false;
+
+            if(!ret.coef || !ret.pdf)
+                return None;
 
             return ret;
         }
@@ -196,9 +199,13 @@ Option<BSSRDF::SamplePiResult> SeparableBSSRDF::SamplePi(bool star, const Vec3 &
 
     for(;;)
     {
+        if(inctRay.t0 >= inctRay.t1)
+            break;
+
         Intersection nInct;
         if(!po_.entity->FindIntersection(inctRay, &nInct))
             break;
+        AGZ_ASSERT((nInct.pos - inctRay.o).Length() <= 2 * hl + EPS);
         if(nInct.material == po_.material)
         {
             auto nNode = arena.Create<InctListNode>();
@@ -207,9 +214,8 @@ Option<BSSRDF::SamplePiResult> SeparableBSSRDF::SamplePi(bool star, const Vec3 &
             inctListEntry = nNode;
             ++inctListLength;
         }
-        inctRay.t0 = nInct.t + EPS;
-        if(inctRay.t0 >= inctRay.t1)
-            break;
+        inctRay.o = inctRay.At(nInct.t + EPS);
+        inctRay.t1 -= nInct.t + EPS;
     }
 
     if(!inctListLength)
@@ -238,6 +244,9 @@ Option<BSSRDF::SamplePiResult> SeparableBSSRDF::SamplePi(bool star, const Vec3 &
     ret.coef        = Sr((ret.pi.pos - po_.pos).Length());
     ret.pdf         = pdfRadius / (2 * PI) / inctListLength;
 
+    if(ret.pdf < 0.01)
+        return None;
+
     AGZ_ASSERT(sr.radius > 0);
     AGZ_ASSERT(ret.pdf > 0);
     AGZ_ASSERT((ret.pi.pos - po_.pos).Length() + EPS > sr.radius);
@@ -248,6 +257,7 @@ Option<BSSRDF::SamplePiResult> SeparableBSSRDF::SamplePi(bool star, const Vec3 &
 Real SeparableBSSRDF::SamplePiPDF(const Intersection &pi, [[maybe_unused]] bool star) const noexcept
 {
     Vec3 ld = po_.coordSys.World2Local(po_.pos - pi.pos);
+    Vec3 ln = po_.coordSys.World2Local(pi.coordSys.ez);
     Real rProj[] = { ld.yz().Length(), ld.zx().Length(), ld.xy().Length() };
 
     constexpr Real AXIS_PDF[] = { Real(0.25), Real(0.25), Real(0.5) };
@@ -257,7 +267,7 @@ Real SeparableBSSRDF::SamplePiPDF(const Intersection &pi, [[maybe_unused]] bool 
     for(int axisIdx = 0; axisIdx < 3; ++axisIdx)
     {
         for(int chIdx = 0; chIdx < SPECTRUM_CHANNEL_COUNT; ++chIdx)
-            ret += SampleSrPDF(chIdx, rProj[axisIdx]) * AXIS_PDF[axisIdx];
+            ret += Abs(ln[axisIdx]) * SampleSrPDF(chIdx, rProj[axisIdx]) * AXIS_PDF[axisIdx];
     }
 
     return ret * CHANNEL_PDF;

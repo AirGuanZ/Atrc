@@ -84,7 +84,7 @@ Spectrum MISPathTracingIntegrator::Eval(
             if(!piBsdfSample)
                 break;
 
-            deltaCoef = piBsdfSample->coef / piBsdfSample->pdf* Abs(Cos(piBsdfSample->wi, pishd.coordSys.ez));
+            deltaCoef = piBsdfSample->coef * Abs(Cos(piBsdfSample->wi, pishd.coordSys.ez)) / piBsdfSample->pdf;
 
             AGZ_ASSERT(Dot(piBsdfSample->wi, pishd.coordSys.ez) >= 0);
             coef *= deltaCoef;
