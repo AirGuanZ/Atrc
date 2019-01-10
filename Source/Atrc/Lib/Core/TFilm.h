@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include <Utils/Texture.h>
+#include <AGZUtils/Utils/Texture.h>
 
 #include <Atrc/Lib/Core/Common.h>
 

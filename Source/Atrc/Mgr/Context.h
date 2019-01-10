@@ -5,9 +5,9 @@
 #include <tuple>
 #include <unordered_map>
 
-#include <Utils/FileSys.h>
-#include <Utils/Misc.h>
-#include <Utils/Config.h>
+#include <AGZUtils/Utils/FileSys.h>
+#include <AGZUtils/Utils/Misc.h>
+#include <AGZUtils/Utils/Config.h>
 
 #include <Atrc/Mgr/Common.h>
 

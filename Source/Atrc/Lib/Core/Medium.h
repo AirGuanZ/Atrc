@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include <Utils/Misc.h>
+#include <AGZUtils/Utils/Misc.h>
 
 #include <Atrc/Lib/Core/Common.h>
 

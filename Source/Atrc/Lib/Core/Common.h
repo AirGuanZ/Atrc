@@ -2,9 +2,9 @@
 
 #include <cstdint>
 
-#include <Utils/Alloc.h>
-#include <Utils/Math.h>
-#include <Utils/String.h>
+#include <AGZUtils/Utils/Alloc.h>
+#include <AGZUtils/Utils/Math.h>
+#include <AGZUtils/Utils/String.h>
 
 namespace AGZ
 {

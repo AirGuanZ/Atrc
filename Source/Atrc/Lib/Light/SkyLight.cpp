@@ -1,6 +1,5 @@
 ﻿#include <Atrc/Lib/Core/Scene.h>
 #include <Atrc/Lib/Light/SkyLight.h>
-#include <Texture/SphereMap.h>
 
 namespace Atrc
 {

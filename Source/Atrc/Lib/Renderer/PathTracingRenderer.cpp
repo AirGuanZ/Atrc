@@ -1,6 +1,7 @@
 ﻿#include <atomic>
 #include <mutex>
-#include <Utils/Thread.h>
+
+#include <AGZUtils/Utils/Thread.h>
 
 #include <Atrc/Lib/Renderer/PathTracingRenderer.h>
 
