@@ -1,7 +1,7 @@
 ﻿#include <queue>
 #include <stack>
 
-#include <Utils/Serialize.h>
+#include <AGZUtils/Utils/Serialize.h>
 
 #include <Atrc/Lib/Geometry/TriangleBVH.h>
 #include <Atrc/Lib/Utility/TriangleAux.h>

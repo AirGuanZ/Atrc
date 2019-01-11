@@ -1,6 +1,6 @@
 #include <numeric>
 
-#include <Utils/Mesh.h>
+#include <AGZUtils/Utils/Mesh.h>
 
 #include <Atrc/Lib/Geometry/TriangleBVH.h>
 #include <Atrc/Mgr/BuiltinCreator/Name2GeometryCreator.h>

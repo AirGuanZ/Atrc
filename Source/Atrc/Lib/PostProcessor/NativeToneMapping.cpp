@@ -1,4 +1,4 @@
-#include <Utils/Texture.h>
+#include <AGZUtils/Utils/Texture.h>
 #include <Atrc/Lib/PostProcessor/NativeToneMapping.h>
 
 namespace Atrc

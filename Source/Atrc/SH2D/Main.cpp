@@ -1,7 +1,7 @@
 ﻿#include <fstream>
 #include <iostream>
 
-#include <Utils/Config.h>
+#include <AGZUtils/Utils/Config.h>
 
 #include <Atrc/Lib/Core/PostProcessor.h>
 

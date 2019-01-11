@@ -1,8 +1,8 @@
 #include <atomic>
 #include <iostream>
 
-#include <Utils/Thread.h>
-#include <Utils/Time.h>
+#include <AGZUtils/Utils/Thread.h>
+#include <AGZUtils/Utils/Time.h>
 
 #include <Atrc/Lib/Core/TFilm.h>
 #include <Atrc/SH2D/SceneProjector.h>
