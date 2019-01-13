@@ -63,7 +63,7 @@ Spectrum FullPathTracingIntegrator::Eval(const Scene &scene, const Ray &_r, Samp
 
         if(med)
         {
-            Real sampleMedT1 = hasInct ? (inct.t - EPS) : RealT::Infinity().Value();
+            Real sampleMedT1 = hasInct ? (inct.t - EPS) : AGZ::Math::Inf<Real>;
             Ray sampleMedRay(r.o, r.d, EPS, Max(EPS, sampleMedT1));
             auto samplePnt = sampler->GetReal3();
             auto tMedSample = med->SampleLs(sampleMedRay, samplePnt);

@@ -14,7 +14,7 @@ public:
 
     Ray(
         const Vec3 &o, const Vec3 &d,
-        Real minT = EPS, Real maxT = RealT::Infinity()) noexcept;
+        Real minT = EPS, Real maxT = AGZ::Math::Inf<Real>) noexcept;
     
     Vec3 At(Real t) const noexcept;
 

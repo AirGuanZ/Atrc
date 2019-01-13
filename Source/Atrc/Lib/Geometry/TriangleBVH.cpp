@@ -575,7 +575,7 @@ bool TriangleBVHCore::FindIntersection(Ray r, GeometryIntersection *inct) const 
         return false;
 
     TriangleIntersectionRecoed rc, trc;
-    rc.t = RealT::Infinity();
+    rc.t = AGZ::Math::Inf<Real>;
 
     uint32_t flag0 = 0;
 

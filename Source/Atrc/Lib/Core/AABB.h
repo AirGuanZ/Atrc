@@ -9,8 +9,8 @@ class AABB
 {
 public:
 
-    Vec3 low  = Vec3(RealT::Max());
-    Vec3 high = Vec3(RealT::Min());
+    Vec3 low  = Vec3(-AGZ::Math::Inf<Real>);
+    Vec3 high = Vec3(AGZ::Math::Inf<Real>);
 
     Real SurfaceArea() const noexcept;
 
@@ -74,4 +74,4 @@ inline AABB &AABB::operator|=(const AABB &other) noexcept
     return *this;
 }
 
-}
+} // namespace Atrc

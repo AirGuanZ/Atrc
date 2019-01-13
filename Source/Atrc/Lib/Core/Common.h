@@ -52,8 +52,8 @@ using Rect  = AGZ::Math::Rect<Real>;
 using Rectu = AGZ::Math::Rect<uint32_t>;
 using Recti = AGZ::Math::Rect<int32_t>;
 
-using Mat3 = AGZ::Math::Mat3<Real>;
-using Mat4 = AGZ::Math::Mat4<Real>;
+using Mat3 = AGZ::Math::RM_Mat3<Real>;
+using Mat4 = AGZ::Math::RM_Mat4<Real>;
 
 using Rad = AGZ::Math::Rad<Real>;
 using Deg = AGZ::Math::Deg<Real>;

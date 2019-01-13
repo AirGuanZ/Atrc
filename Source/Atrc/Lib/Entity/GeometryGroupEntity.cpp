@@ -31,7 +31,7 @@ bool GeometryGroupEntity::FindIntersection(const Ray &_r, Intersection *inct) co
     Ray r = local2World_.ApplyInverseToRay(_r);
     
     GeometryIntersection tInct, bestInct;
-    bestInct.t = RealT::Infinity();
+    bestInct.t = AGZ::Math::Inf<Real>;
     int bestInctGeoIndex = -1;
     for(int i = 0; i < count_; ++i)
     {
