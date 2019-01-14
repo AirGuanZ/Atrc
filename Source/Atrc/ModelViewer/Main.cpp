@@ -1,6 +1,8 @@
-#include <iostream>
+﻿#include <iostream>
 
 #define AGZ_ALL_IMPL
+#define AGZ_USE_GLFW
+#define AGZ_USE_OPENGL
 
 #include <AGZUtils/Utils/Texture.h>
 
@@ -15,14 +17,17 @@ using namespace std;
 const char VS_SRC[] =
 R"___(
 #version 450 core
-uniform mat4 WVP;
-in vec2 pos;
+layout(std140) uniform WVPBlock
+{
+    mat4 WVP;
+};
+in vec2 iPos;
 in vec2 iTexCoord;
 out vec2 mTexCoord;
 void main(void)
 {
     mTexCoord = iTexCoord;
-    gl_Position = WVP * vec4(pos, 0.0, 1.0);
+    gl_Position = WVP * vec4(iPos, 0.0, 1.0);
 }
 )___";
 
@@ -38,7 +43,147 @@ void main(void)
 }
 )___";
 
-int Run()
+int Run(GLFWwindow *window)
+{
+    glfwSwapInterval(1);
+    
+    using namespace AGZ::GL;
+    using namespace AGZ::Input;
+
+    AGZ::ObjArena<> arena;
+
+    // 注册键盘事件
+
+    KeyboardManager<GLFWKeyboardCapturer> keyboardMgr;
+    keyboardMgr.GetCapturer().Initialize(window);
+    auto &keyboard = keyboardMgr.GetKeyboard();
+    keyboard.AttachHandler(arena.Create<KeyDownHandler>(
+        [&](const KeyDown &param)
+    {
+        if(param.key == KEY_ESCAPE)
+            glfwSetWindowShouldClose(window, GLFW_TRUE);
+    }));
+
+    // 注册鼠标事件
+
+    MouseManager<GLFWMouseCapturer> mouseMgr;
+    mouseMgr.GetCapturer().Initialize(window);
+    auto &mouse = mouseMgr.GetMouse();
+    mouse.AttachHandler(arena.Create<MouseButtonDownHandler>(
+        [&](const MouseButtonDown &param)
+    {
+        cout << "Mouse button down: " << param.button << endl;
+    }));
+    mouse.AttachHandler(arena.Create<CursorMoveHandler>(
+        [&](const CursorMove &param)
+    {
+        cout << "Moving cursor: (" << param.absX << ", " << param.absY << ")" << endl;
+    }));
+    mouse.AttachHandler(arena.Create<WheelScrollHandler>(
+        [&](const WheelScroll &param)
+    {
+        cout << "Scolling: " << param.offset << endl;
+    }));
+
+    Immediate imm;
+    imm.Initialize({ 600.0f, 600.0f });
+
+    // 编译和链接Shader
+
+    Program program = ProgramBuilder::BuildOnce(
+        VertexShader::FromMemory(VS_SRC),
+        FragmentShader::FromMemory(FS_SRC));
+
+    // 准备Vertex Buffer
+
+    struct Vertex
+    {
+        Vec2f pos;
+        Vec2f texCoord;
+    };
+    Vertex vtxData[] =
+    {
+        { { -0.5f, -0.5f }, { 0.0f, 0.0f } },
+        { { -0.5f,  0.5f }, { 0.0f, 1.0f } },
+        { {  0.5f,  0.5f }, { 1.0f, 1.0f } },
+        { { -0.5f, -0.5f }, { 0.0f, 0.0f } },
+        { {  0.5f,  0.5f }, { 1.0f, 1.0f } },
+        { {  0.5f, -0.5f }, { 1.0f, 0.0f } }
+    };
+    VertexBuffer<Vertex> vtxBuf(vtxData, uint32_t(AGZ::ArraySize(vtxData)), GL_STATIC_DRAW);
+
+    // 准备Vertex Array Object
+
+    VertexArray vao(true);
+    auto pos      = program.GetAttribVariable<Vec2f>("iPos");
+    auto texCoord = program.GetAttribVariable<Vec2f>("iTexCoord");
+    vao.EnableAttrib(pos);
+    vao.EnableAttrib(texCoord);
+    vao.BindVertexBufferToAttrib(pos, vtxBuf, &Vertex::pos, 0);
+    vao.BindVertexBufferToAttrib(texCoord, vtxBuf, &Vertex::texCoord, 1);
+
+    // 设置Uniform变量值
+
+    struct WVPBlockType
+    {
+        Mat4f WVP;
+    };
+    WVPBlockType blockValue =
+    {
+        Mat4f::Perspective(Deg(70), 1.0f, 0.1f, 100.0f) *
+        Mat4f::LookAt(
+            { -0.5f, 0.5f, -1.0f },
+            { 0.0f, 0.0f, 0.0f },
+            { 0.0f, 1.0f, 0.0f })
+    };
+    Std140UniformBlockBuffer<WVPBlockType> blockBuffer(&blockValue, GL_STATIC_DRAW);
+
+    UniformVariableAssignment uniforms;
+    auto tex = program.GetUniformVariable<Texture2DUnit>("tex");
+    auto WVPBlock = program.GetStd140UniformBlock<WVPBlockType>("WVPBlock");
+    uniforms.SetValue(tex, Texture2DUnit{ 0 });
+    uniforms.SetValue(WVPBlock, &blockBuffer, 0);
+
+    // 准备纹理
+
+    Texture2D texObj;
+    texObj.InitializeHandle();
+    auto texData = AGZ::TextureFile::LoadRGBFromFile("./Asset/tex.png", true);
+    texObj.InitializeFormatAndData(1, GL_RGB8, texData);
+    texObj.SetParameter(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    texObj.SetParameter(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    texObj.Bind(0);
+
+    glClearColor(0.0f, 1.0f, 1.0f, 0.0f);
+
+    while(!glfwWindowShouldClose(window))
+    {
+        glfwPollEvents();
+        keyboardMgr.Capture();
+        mouseMgr.Capture();
+
+        RenderContext::ClearColorAndDepth();
+
+        program.Bind();
+        vao.Bind();
+        uniforms.Bind();
+
+        RenderContext::DrawVertices(GL_TRIANGLES, 0, vtxBuf.GetVertexCount());
+
+        vao.Unbind();
+        program.Unbind();
+
+        RenderContext::SetFillMode(GL_LINE);
+        imm.DrawQuad({ -0.2f, -0.2f }, { 0.2f, 0.2f }, { 0.4f, 0.4f, 0.4f, 1.0f });
+        RenderContext::SetFillMode(GL_FILL);
+
+        glfwSwapBuffers(window);
+    }
+
+    return 0;
+}
+
+int main()
 {
     if(!glfwInit())
     {
@@ -63,127 +208,9 @@ int Run()
         return -1;
     }
 
-    glfwSwapInterval(1);
-    
-    {
-        using namespace AGZ::GL;
-        using namespace AGZ::Input;
-
-        AGZ::ObjArena<> arena;
-
-        KeyboardManager<GLFWKeyboardCapturer> keyboardMgr;
-        keyboardMgr.GetCapturer().Initialize(window);
-        keyboardMgr.GetKeyboard().AttachHandler(arena.Create<KeyDownHandler>(
-            [&](const KeyDown &param)
-        {
-            if(param.key == KEY_ESCAPE)
-                glfwSetWindowShouldClose(window, GLFW_TRUE);
-        }));
-
-        MouseManager<GLFWMouseCapturer> mouseMgr;
-        mouseMgr.GetCapturer().Initialize(window);
-        mouseMgr.GetMouse().AttachHandler(arena.Create<MouseButtonDownHandler>(
-            [&](const MouseButtonDown &param)
-        {
-            if(param.button == MOUSE_LEFT)
-                cout << "Left button down!" << endl;
-        }));
-
-        VertexShader vs;
-        FragmentShader fs;
-
-        if(!vs.LoadFromMemory(VS_SRC))
-        {
-            cout << vs.GetErrMsg().ToStdString() << endl;
-            return -1;
-        }
-
-        if(!fs.LoadFromMemory(FS_SRC))
-        {
-            cout << fs.GetErrMsg().ToStdString() << endl;
-            return -1;
-        }
-
-        ProgramBuilder programBuilder(vs, fs);
-        Program program = programBuilder.Build();
-
-        struct Vertex
-        {
-            Vec2f pos;
-            Vec2f texCoord;
-        };
-        Vertex vtxData[] =
-        {
-            { { -0.5f, -0.5f }, { 0.0f, 0.0f } },
-            { { -0.5f,  0.5f }, { 0.0f, 1.0f } },
-            { {  0.5f,  0.5f }, { 1.0f, 1.0f } },
-            { { -0.5f, -0.5f }, { 0.0f, 0.0f } },
-            { {  0.5f,  0.5f }, { 1.0f, 1.0f } },
-            { {  0.5f, -0.5f }, { 1.0f, 0.0f } }
-        };
-        VertexBuffer<Vertex> vtxBuf(vtxData, AGZ::ArraySize(vtxData), GL_STATIC_DRAW);
-
-        VertexArrayObject vao(true);
-
-        AttribVariable<Vec2f> pos = program.GetAttribVariable<Vec2f>("pos");
-        AttribVariable<Vec2f> texCoord = program.GetAttribVariable<Vec2f>("iTexCoord");
-        vao.EnableAttrib(pos);
-        vao.EnableAttrib(texCoord);
-        vao.BindVertexBufferToAttrib(pos, vtxBuf, &Vertex::pos, 0);
-        vao.BindVertexBufferToAttrib(texCoord, vtxBuf, &Vertex::texCoord, 1);
-
-        UniformVariable<Texture2DUnit> tex = program.GetUniformVariable<Texture2DUnit>("tex");
-        UniformVariable<Mat4f> WVP = program.GetUniformVariable<Mat4f>("WVP");
-        UniformVariableAssignment uniforms;
-        uniforms.SetValue(tex, Texture2DUnit{ 0 });
-        uniforms.SetValue(WVP, Mat4f::Perspective(Deg(70), 1.0f, 0.1f, 100.0f) *
-                               Mat4f::LookAt(
-                                   { -0.5f, 0.5f, -1.0f },
-                                   { 0.0f, 0.0f, 0.0f },
-                                   { 0.0f, 1.0f, 0.0f }));
-
-        Texture2D texObj;
-        texObj.InitializeHandle();
-        auto texData = AGZ::TextureFile::LoadRGBFromFile("./Asset/tex.png", true);
-        texObj.InitializeFormatAndData(1, GL_RGB8, texData);
-        texObj.SetParameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        texObj.SetParameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        texObj.SetParameter(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        texObj.SetParameter(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        texObj.Bind(0);
-
-        glClearColor(0.0f, 1.0f, 1.0f, 0.0f);
-
-        while(!glfwWindowShouldClose(window))
-        {
-            glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-
-            program.Bind();
-            vao.Bind();
-            uniforms.Bind();
-            glDrawArrays(GL_TRIANGLES, 0, static_cast<GLsizei>(vtxBuf.GetVertexCount()));
-            vao.Unbind();
-            program.Unbind();
-
-            glfwSwapBuffers(window);
-            glfwPollEvents();
-
-            keyboardMgr.Capture();
-            mouseMgr.Capture();
-        }
-    }
-
-    glfwDestroyWindow(window);
-    glfwTerminate();
-
-    return 0;
-}
-
-int main()
-{
     try
     {
-        return Run();
+        return Run(window);
     }
     catch(const AGZ::Exception &err)
     {
@@ -197,4 +224,7 @@ int main()
     {
         cout << "???" << endl;
     }
+
+    glfwDestroyWindow(window);
+    glfwTerminate();
 }
