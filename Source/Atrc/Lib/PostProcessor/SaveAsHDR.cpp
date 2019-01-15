@@ -18,9 +18,15 @@ void SaveAsHDR::Process(Image *image) const noexcept
         AGZ::TextureFile::WriteRGBToHDR(filename_, *image);
     else
     {
+#ifdef AGZ_CC_GCC
+        AGZ::TextureFile::WriteRGBToHDR(
+            filename_, image->Map([](const Spectrum &c)->AGZ::Math::Vec3<float>
+        { return c.Map([](Real v)->float { return float(v); }); }));
+#else
         AGZ::TextureFile::WriteRGBToHDR(
             filename_, image->Map([](const Spectrum &c)
         { return c.Map(AGZ::TypeOpr::StaticCaster<float, Real>); }));
+#endif
     }
 }
 

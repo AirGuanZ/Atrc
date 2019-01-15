@@ -132,7 +132,7 @@ int Run(GLFWwindow *window)
     {
         Mat4f::Perspective(Deg(70), 1.0f, 0.1f, 100.0f) *
         Mat4f::LookAt(
-            { -0.5f, 0.5f, -1.0f },
+            { 0.0f, 0.0f, -1.0f },
             { 0.0f, 0.0f, 0.0f },
             { 0.0f, 1.0f, 0.0f })
     };
@@ -146,13 +146,17 @@ int Run(GLFWwindow *window)
 
     // 准备纹理
 
-    Texture2D texObj;
-    texObj.InitializeHandle();
+    Texture2D texObj(true);
     auto texData = AGZ::TextureFile::LoadRGBFromFile("./Asset/tex.png", true);
     texObj.InitializeFormatAndData(1, GL_RGB8, texData);
-    texObj.SetParameter(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    texObj.SetParameter(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     texObj.Bind(0);
+
+    Sampler samObj(true);
+    samObj.SetParameter(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    samObj.SetParameter(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    samObj.SetParameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    samObj.SetParameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    samObj.Bind(0);
 
     glClearColor(0.0f, 1.0f, 1.0f, 0.0f);
 
@@ -174,7 +178,7 @@ int Run(GLFWwindow *window)
         program.Unbind();
 
         RenderContext::SetFillMode(GL_LINE);
-        imm.DrawQuad({ -0.2f, -0.2f }, { 0.2f, 0.2f }, { 0.4f, 0.4f, 0.4f, 1.0f });
+        imm.DrawQuad({ -0.8f, -0.8f }, { 0.8f, 0.8f }, { 0.4f, 0.4f, 0.4f, 1.0f }, false);
         RenderContext::SetFillMode(GL_FILL);
 
         glfwSwapBuffers(window);

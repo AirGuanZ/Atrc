@@ -3,6 +3,7 @@ CPPC_INCLUDE_FLAGS = -I ./Source/ -I $(AGZ_UTILS_HOME)
 CPPC_FLAGS = $(CPPC_INCLUDE_FLAGS) -stdlib=libc++ -std=c++17 -Wall -Wextra -O2
 LD_FLAGS = -pthread
 
+EMPTY =
 TARGETS =
 
 CPP_FILES = $(shell find ./Source/Atrc/Lib/ -name "*.cpp")
@@ -22,6 +23,12 @@ ALL_DPP_FILES = $(DPP_FILES)
 $(LIB) : $(OPP_FILES)
 	ar -r $@ $^
 
+# 1: target name
+# 2: target filename
+# 3: source directory
+# 4: additional cc flags
+# 5: additional link flags
+# 6: additional link deps
 define add_target
 
 $(2) = ./Build/$(1)
@@ -38,16 +45,16 @@ $(2)$(CPP_SUFFIX) = $$(shell find ./Source/Atrc/$(3)/ -name "*.cpp")
 $(2)$(O_SUFFIX) = $$(patsubst %.cpp, %.o, $$($(2)$(CPP_SUFFIX)))
 $(2)$(D_SUFFIX) = $$(patsubst %.cpp, %.d, $$($(2)$(CPP_SUFFIX)))
 
-$$($(2)) :$$($(2)$(O_SUFFIX)) $$(LIB) 
-	$$(CPPC) $(CPPC_FLAGS) $(LD_FLAGS) $$^ -o $$@
+$$($(2)) : $$($(2)$(O_SUFFIX)) $$($(6))
+	$$(CPPC) $(CPPC_FLAGS) $(LD_FLAGS) $$($(2)$(O_SUFFIX)) $$($(5)) -o $$@
 
 $$($(2)$(O_SUFFIX)) : %.o : %.cpp
-	$$(CPPC) $$(CPPC_FLAGS) -c $$< -o $$@
+	$$(CPPC) $$(CPPC_FLAGS) $$($(4)) -c $$< -o $$@
 
 $$($(2)$(D_SUFFIX)) : %.d : %.cpp
 	@set -e; \
 	rm -f $$@; \
-	$$(CPPC) -MM $$(CPPC_FLAGS) $$< $$(CPPC_INCLUDE_FLAGS) > $$@.$$$$$$$$.dtmp; \
+	$$(CPPC) -MM $$(CPPC_FLAGS) $$($(4)) $$< $$(CPPC_INCLUDE_FLAGS) > $$@.$$$$$$$$.dtmp; \
 	sed 's,\(.*\)\.o\:,$$*\.o $$*\.d\:,g' < $$@.$$$$$$$$.dtmp > $$@; \
 	rm -f $$@.$$$$$$$$.dtmp
 
@@ -73,8 +80,12 @@ $(DPP_FILES) : %.d : %.cpp
 -include $(DPP_FILES)
 
 # The main renderer launcher
-$(eval $(call add_target,Launcher,LAUNCHER_TARGET,Launcher))
-$(eval $(call add_target,SH2D,SH2D_TARGET,SH2D))
+$(eval $(call add_target,Launcher,LAUNCHER_TARGET,Launcher,EMPTY,LIB,LIB))
+$(eval $(call add_target,SH2D,SH2D_TARGET,SH2D,EMPTY,LIB,LIB))
+
+MODEL_VIEWER_CC_FLAGS = -I ./Library/Include
+MODEL_VIEWER_LD_FLAGS = $(shell pkg-config --static --libs glew glfw3)
+$(eval $(call add_target,ModelViewer,MODEL_VIEWER,ModelViewer,MODEL_VIEWER_CC_FLAGS,MODEL_VIEWER_LD_FLAGS))
 
 .PHONT : all
 all :
