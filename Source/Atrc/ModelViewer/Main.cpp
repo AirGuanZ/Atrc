@@ -96,6 +96,8 @@ int Run(GLFWwindow *window)
         glViewport(0, 0, param.w, param.h);
     }));
 
+    // Immediate Painter
+
     Immediate imm;
     imm.Initialize({ 600.0f, 600.0f });
 
@@ -126,12 +128,14 @@ int Run(GLFWwindow *window)
     // 准备Vertex Array Object
 
     VertexArray vao(true);
-    auto pos      = program.GetAttribVariable<Vec2f>("iPos");
-    auto texCoord = program.GetAttribVariable<Vec2f>("iTexCoord");
-    vao.EnableAttrib(pos);
-    vao.EnableAttrib(texCoord);
-    vao.BindVertexBufferToAttrib(pos, vtxBuf, &Vertex::pos, 0);
-    vao.BindVertexBufferToAttrib(texCoord, vtxBuf, &Vertex::texCoord, 1);
+    {
+        auto pos      = program.GetAttribVariable<Vec2f>("iPos");
+        auto texCoord = program.GetAttribVariable<Vec2f>("iTexCoord");
+        vao.EnableAttrib(pos);
+        vao.EnableAttrib(texCoord);
+        vao.BindVertexBufferToAttrib(pos, vtxBuf, &Vertex::pos, 0);
+        vao.BindVertexBufferToAttrib(texCoord, vtxBuf, &Vertex::texCoord, 1);
+    }
 
     // 设置Uniform变量值
 
@@ -150,10 +154,12 @@ int Run(GLFWwindow *window)
     Std140UniformBlockBuffer<WVPBlockType> blockBuffer(&blockValue, GL_STATIC_DRAW);
 
     UniformVariableAssignment uniforms;
-    auto tex = program.GetUniformVariable<Texture2DUnit>("tex");
-    auto WVPBlock = program.GetStd140UniformBlock<WVPBlockType>("WVPBlock");
-    uniforms.SetValue(tex, Texture2DUnit{ 0 });
-    uniforms.SetValue(WVPBlock, &blockBuffer, 0);
+    {
+        auto tex = program.GetUniformVariable<Texture2DUnit>("tex");
+        auto WVPBlock = program.GetStd140UniformBlock<WVPBlockType>("WVPBlock");
+        uniforms.SetValue(tex, Texture2DUnit{ 0 });
+        uniforms.SetValue(WVPBlock, &blockBuffer, 0);
+    }
 
     // 准备纹理
 
@@ -170,8 +176,6 @@ int Run(GLFWwindow *window)
     samObj.SetParameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     samObj.SetParameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     samObj.Bind(0);
-
-    RenderContext::SetClearColor({ 0.0f, 1.0f, 1.0f, 0.0f });
 
     while(!glfwWindowShouldClose(window))
     {
@@ -191,9 +195,7 @@ int Run(GLFWwindow *window)
         vao.Unbind();
         program.Unbind();
 
-        RenderContext::SetFillMode(GL_LINE);
         imm.DrawQuad({ -0.8f, -0.8f }, { 0.8f, 0.8f }, { 0.4f, 0.4f, 0.4f, 1.0f }, false);
-        RenderContext::SetFillMode(GL_FILL);
 
         glfwSwapBuffers(window);
     }

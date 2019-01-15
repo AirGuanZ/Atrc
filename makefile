@@ -30,8 +30,8 @@ $(LIB) : $(OPP_FILES)
 # 2: target filename
 # 3: source directory
 # 4: additional cc flags
-# 5: additional link flags
-# 6: additional link deps
+# 5: additional linking flags
+# 6: additional linking deps
 define add_target
 
 $(2) = ./Build/$(1)
@@ -83,12 +83,12 @@ $(DPP_FILES) : %.d : %.cpp
 -include $(DPP_FILES)
 
 # The main renderer launcher
-$(eval $(call add_target,Launcher,LAUNCHER_TARGET,Launcher,EMPTY,LIB,LIB))
+$(eval $(call add_target,Launcher,LAUNCHER_TARGET,Launcher,,LIB,LIB))
 
 # SH projection and reconstruction
-$(eval $(call add_target,SH2D,SH2D_TARGET,SH2D,EMPTY,LIB,LIB))
+$(eval $(call add_target,SH2D,SH2D_TARGET,SH2D,,LIB,LIB))
 
-# Sample model viewer
+# Simple model viewer
 MODEL_VIEWER_CC_FLAGS = -I ./Library/Include
 MODEL_VIEWER_LD_FLAGS = $(shell pkg-config --static --libs glew glfw3)
 $(eval $(call add_target,ModelViewer,MODEL_VIEWER,ModelViewer,MODEL_VIEWER_CC_FLAGS,MODEL_VIEWER_LD_FLAGS))
