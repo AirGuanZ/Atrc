@@ -1,6 +1,9 @@
 CPPC = clang++
 CPPC_INCLUDE_FLAGS = -I ./Source/ -I $(AGZ_UTILS_HOME)
-CPPC_FLAGS = $(CPPC_INCLUDE_FLAGS) -stdlib=libc++ -std=c++17 -Wall -Wextra -O2
+CPPC_FLAGS = $(CPPC_INCLUDE_FLAGS) -std=c++17 -Wall -Wextra -O2
+ifeq ($(CPPC),clang++)
+	CPPC_FLAGS += -stdlib=libc++
+endif
 LD_FLAGS = -pthread
 
 EMPTY =
@@ -81,8 +84,11 @@ $(DPP_FILES) : %.d : %.cpp
 
 # The main renderer launcher
 $(eval $(call add_target,Launcher,LAUNCHER_TARGET,Launcher,EMPTY,LIB,LIB))
+
+# SH projection and reconstruction
 $(eval $(call add_target,SH2D,SH2D_TARGET,SH2D,EMPTY,LIB,LIB))
 
+# Sample model viewer
 MODEL_VIEWER_CC_FLAGS = -I ./Library/Include
 MODEL_VIEWER_LD_FLAGS = $(shell pkg-config --static --libs glew glfw3)
 $(eval $(call add_target,ModelViewer,MODEL_VIEWER,ModelViewer,MODEL_VIEWER_CC_FLAGS,MODEL_VIEWER_LD_FLAGS))

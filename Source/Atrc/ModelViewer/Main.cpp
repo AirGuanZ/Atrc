@@ -85,6 +85,17 @@ int Run(GLFWwindow *window)
         cout << "Scolling: " << param.offset << endl;
     }));
 
+    // 注册窗口事件
+
+    WindowManager<GLFWWindowCapturer> winMgr;
+    winMgr.GetCapturer().Initialize(window);
+    auto &win = winMgr.GetWindow();
+    win.AttachHandler(arena.Create<FramebufferSizeHandler>(
+        [&](const FramebufferSize &param)
+    {
+        glViewport(0, 0, param.w, param.h);
+    }));
+
     Immediate imm;
     imm.Initialize({ 600.0f, 600.0f });
 
@@ -151,6 +162,8 @@ int Run(GLFWwindow *window)
     texObj.InitializeFormatAndData(1, GL_RGB8, texData);
     texObj.Bind(0);
 
+    // 准备采样器
+
     Sampler samObj(true);
     samObj.SetParameter(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     samObj.SetParameter(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -158,13 +171,14 @@ int Run(GLFWwindow *window)
     samObj.SetParameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     samObj.Bind(0);
 
-    glClearColor(0.0f, 1.0f, 1.0f, 0.0f);
+    RenderContext::SetClearColor({ 0.0f, 1.0f, 1.0f, 0.0f });
 
     while(!glfwWindowShouldClose(window))
     {
         glfwPollEvents();
         keyboardMgr.Capture();
         mouseMgr.Capture();
+        winMgr.Capture();
 
         RenderContext::ClearColorAndDepth();
 
@@ -205,6 +219,7 @@ int main()
     }
 
     glfwMakeContextCurrent(window);
+    glfwSetWindowAspectRatio(window, 1, 1);
 
     if(glewInit() != GLEW_OK)
     {
