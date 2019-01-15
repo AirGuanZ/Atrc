@@ -9,8 +9,8 @@ class AABB
 {
 public:
 
-    Vec3 low  = Vec3(-AGZ::Math::Inf<Real>);
-    Vec3 high = Vec3(AGZ::Math::Inf<Real>);
+    Vec3 low  = Vec3(std::numeric_limits<Real>::max());
+    Vec3 high = Vec3(std::numeric_limits<Real>::lowest());
 
     Real SurfaceArea() const noexcept;
 
