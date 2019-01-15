@@ -82,7 +82,7 @@ int Run(GLFWwindow *window)
     mouse.AttachHandler(arena.Create<WheelScrollHandler>(
         [&](const WheelScroll &param)
     {
-        cout << "Scolling: " << param.offset << endl;
+        cout << "Scrolling: " << param.offset << endl;
     }));
 
     // 注册窗口事件
