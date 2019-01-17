@@ -4,10 +4,48 @@
     <Filter Include="Source">
       <UniqueIdentifier>{62c9d983-19c6-47a1-acf0-4fde6675f33a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\GUI">
+      <UniqueIdentifier>{44d7709b-fb64-4dc7-a740-18233e672108}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\GUI\imgui">
+      <UniqueIdentifier>{56edfd00-bc70-47e4-9a89-8554ea022cb3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\Source\Atrc\ModelViewer\Main.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\ModelViewer\GUI\imgui\imgui.cpp">
+      <Filter>Source\GUI\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\ModelViewer\GUI\imgui\imgui_draw.cpp">
+      <Filter>Source\GUI\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\ModelViewer\GUI\imgui_impl_glfw.cpp">
+      <Filter>Source\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\ModelViewer\GUI\imgui_impl_opengl3.cpp">
+      <Filter>Source\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\ModelViewer\GUI\imgui\imgui_widgets.cpp">
+      <Filter>Source\GUI\imgui</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\Source\Atrc\ModelViewer\GUI\imgui\imconfig.h">
+      <Filter>Source\GUI\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\ModelViewer\GUI\imgui\imgui.h">
+      <Filter>Source\GUI\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\ModelViewer\GUI\imgui\imgui_internal.h">
+      <Filter>Source\GUI\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\ModelViewer\GUI\imgui_impl_glfw.h">
+      <Filter>Source\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\ModelViewer\GUI\imgui_impl_opengl3.h">
+      <Filter>Source\GUI</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

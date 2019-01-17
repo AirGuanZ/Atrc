@@ -1,6 +1,6 @@
 # Atrc
 
-Atrc是[Zhuang Guan](https://github.com/AirGuanZ)的离线渲染实验室，主要以C++编写，仅依赖于辅助库[Utils](https://github.com/AirGuanZ/Utils)。Atrc（将会）包含以下组件：
+Atrc是[Zhuang Guan](https://github.com/AirGuanZ)的渲染实验室，主要以C++编写，仅依赖于辅助库[Utils](https://github.com/AirGuanZ/Utils)。Atrc（将会）包含以下组件：
 
 - [x] Lib 离线渲染核心组件库，包含各种实体、材质模型和常见渲染算法，会随着我的学习不断扩展/重构
 - [x] Mgr 用于管理核心组件的辅助库，根据配置字符串创建各种类型的核心组件中的对象（如模型、摄像机、灯光等）

@@ -12,6 +12,11 @@
 #include <AGZUtils/Input/GLFWCapturer.h>
 #include <AGZUtils/Utils/GL.h>
 
+#include "GUI/imgui/imgui.h"
+
+#include "GUI/imgui_impl_glfw.h"
+#include "GUI/imgui_impl_opengl3.h"
+
 using namespace std;
 
 const char VS_SRC[] =
@@ -47,16 +52,28 @@ int Run(GLFWwindow *window)
 {
     glfwSwapInterval(1);
     
-    using namespace AGZ::GL;
+    using namespace AGZ::GraphicsAPI::GL;
+    using namespace AGZ::GraphicsAPI;
     using namespace AGZ::Input;
 
     AGZ::ObjArena<> arena;
 
-    // 注册键盘事件
+    // 准备输入category
 
     KeyboardManager<GLFWKeyboardCapturer> keyboardMgr;
     keyboardMgr.GetCapturer().Initialize(window);
     auto &keyboard = keyboardMgr.GetKeyboard();
+
+    MouseManager<GLFWMouseCapturer> mouseMgr;
+    mouseMgr.GetCapturer().Initialize(window);
+    auto &mouse = mouseMgr.GetMouse();
+
+    WindowManager<GLFWWindowCapturer> winMgr;
+    winMgr.GetCapturer().Initialize(window);
+    auto &win = winMgr.GetWindow();
+
+    // 注册键盘事件
+
     keyboard.AttachHandler(arena.Create<KeyDownHandler>(
         [&](const KeyDown &param)
     {
@@ -66,9 +83,6 @@ int Run(GLFWwindow *window)
 
     // 注册鼠标事件
 
-    MouseManager<GLFWMouseCapturer> mouseMgr;
-    mouseMgr.GetCapturer().Initialize(window);
-    auto &mouse = mouseMgr.GetMouse();
     mouse.AttachHandler(arena.Create<MouseButtonDownHandler>(
         [&](const MouseButtonDown &param)
     {
@@ -87,14 +101,18 @@ int Run(GLFWwindow *window)
 
     // 注册窗口事件
 
-    WindowManager<GLFWWindowCapturer> winMgr;
-    winMgr.GetCapturer().Initialize(window);
-    auto &win = winMgr.GetWindow();
     win.AttachHandler(arena.Create<FramebufferSizeHandler>(
         [&](const FramebufferSize &param)
     {
         glViewport(0, 0, param.w, param.h);
     }));
+
+    // 初始化IMGUI，这会接管一些之前向glfw注册的事件回调，因此放在几个Input category初始化之后完成
+
+    ImGui::CreateContext();
+    ImGuiIO& imguiIO = ImGui::GetIO();
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplOpenGL3_Init();
 
     // Immediate Painter
 
@@ -177,6 +195,8 @@ int Run(GLFWwindow *window)
     samObj.SetParameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     samObj.Bind(0);
 
+    ImVec4 clearColor = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+
     while(!glfwWindowShouldClose(window))
     {
         glfwPollEvents();
@@ -184,6 +204,11 @@ int Run(GLFWwindow *window)
         mouseMgr.Capture();
         winMgr.Capture();
 
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+
+        RenderContext::SetClearColor({ clearColor.x, clearColor.y, clearColor.z, clearColor.w });
         RenderContext::ClearColorAndDepth();
 
         program.Bind();
@@ -196,6 +221,28 @@ int Run(GLFWwindow *window)
         program.Unbind();
 
         imm.DrawQuad({ -0.8f, -0.8f }, { 0.8f, 0.8f }, { 0.4f, 0.4f, 0.4f, 1.0f }, false);
+        imm.DrawCircle({ 0.0f, 0.0f }, { 0.9f, 0.9f }, { 0.4f, 0.4f, 0.4f, 1.0f }, false);
+
+        {
+            static float f = 0.0f;
+            static int counter = 0;
+
+            ImGui::Begin("Hello, GUI!");                          // Create a window called "Hello, world!" and append into it.
+
+            ImGui::Text("Model Viewer");               // Display some text (you can use a format strings too)
+
+            ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
+            ImGui::ColorEdit3("clear color", (float*)&clearColor); // Edit 3 floats representing a color
+
+            if(ImGui::Button("Quit"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
+                glfwSetWindowShouldClose(window, GLFW_TRUE);
+
+            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+            ImGui::End();
+        }
+
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         glfwSwapBuffers(window);
     }
