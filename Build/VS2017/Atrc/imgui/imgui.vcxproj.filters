@@ -1,0 +1,54 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source">
+      <UniqueIdentifier>{38e50d60-7164-4ea0-b093-92a9167b2b34}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\imgui">
+      <UniqueIdentifier>{833d95dd-8496-4ef9-9a4e-808f8a0f5100}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\Source\Lib\imgui\imgui_impl_glfw.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Lib\imgui\imgui_impl_opengl3.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Lib\imgui\imgui\imconfig.h">
+      <Filter>Source\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Lib\imgui\imgui\imgui.h">
+      <Filter>Source\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Lib\imgui\imgui\imgui_internal.h">
+      <Filter>Source\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Lib\imgui\imgui\imstb_rectpack.h">
+      <Filter>Source\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Lib\imgui\imgui\imstb_textedit.h">
+      <Filter>Source\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Lib\imgui\imgui\imstb_truetype.h">
+      <Filter>Source\imgui</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\Source\Lib\imgui\imgui_impl_glfw.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Lib\imgui\imgui_impl_opengl3.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Lib\imgui\imgui\imgui.cpp">
+      <Filter>Source\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Lib\imgui\imgui\imgui_draw.cpp">
+      <Filter>Source\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Lib\imgui\imgui\imgui_widgets.cpp">
+      <Filter>Source\imgui</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
