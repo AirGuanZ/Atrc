@@ -3318,29 +3318,6 @@ void ImGui::NewFrame()
     if (g.IO.ConfigWindowsResizeFromEdges && !(g.IO.BackendFlags & ImGuiBackendFlags_HasMouseCursors))
         g.IO.ConfigWindowsResizeFromEdges = false;
 
-    // Load settings on first frame (if not explicitly loaded manually before)
-    if (!g.SettingsLoaded)
-    {
-        IM_ASSERT(g.SettingsWindows.empty());
-        if (g.IO.IniFilename)
-            LoadIniSettingsFromDisk(g.IO.IniFilename);
-        g.SettingsLoaded = true;
-    }
-
-    // Save settings (with a delay after the last modification, so we don't spam disk too much)
-    if (g.SettingsDirtyTimer > 0.0f)
-    {
-        g.SettingsDirtyTimer -= g.IO.DeltaTime;
-        if (g.SettingsDirtyTimer <= 0.0f)
-        {
-            if (g.IO.IniFilename != NULL)
-                SaveIniSettingsToDisk(g.IO.IniFilename);
-            else
-                g.IO.WantSaveIniSettings = true;  // Let user know they can call SaveIniSettingsToMemory(). user will need to clear io.WantSaveIniSettings themselves.
-            g.SettingsDirtyTimer = 0.0f;
-        }
-    }
-
     g.Time += g.IO.DeltaTime;
     g.FrameScopeActive = true;
     g.FrameCount += 1;
@@ -3512,7 +3489,7 @@ void ImGui::Shutdown(ImGuiContext* context)
     {
         ImGuiContext* backup_context = GImGui;
         SetCurrentContext(context);
-        SaveIniSettingsToDisk(g.IO.IniFilename);
+        //SaveIniSettingsToDisk(g.IO.IniFilename);
         SetCurrentContext(backup_context);
     }
 
@@ -8819,16 +8796,6 @@ ImGuiWindowSettings* ImGui::FindWindowSettings(ImGuiID id)
     return NULL;
 }
 
-void ImGui::LoadIniSettingsFromDisk(const char* ini_filename)
-{
-    size_t file_data_size = 0;
-    char* file_data = (char*)ImFileLoadToMemory(ini_filename, "rb", &file_data_size);
-    if (!file_data)
-        return;
-    LoadIniSettingsFromMemory(file_data, (size_t)file_data_size);
-    ImGui::MemFree(file_data);
-}
-
 ImGuiSettingsHandler* ImGui::FindSettingsHandler(const char* type_name)
 {
     ImGuiContext& g = *GImGui;
@@ -8837,101 +8804,6 @@ ImGuiSettingsHandler* ImGui::FindSettingsHandler(const char* type_name)
         if (g.SettingsHandlers[handler_n].TypeHash == type_hash)
             return &g.SettingsHandlers[handler_n];
     return NULL;
-}
-
-// Zero-tolerance, no error reporting, cheap .ini parsing
-void ImGui::LoadIniSettingsFromMemory(const char* ini_data, size_t ini_size)
-{
-    ImGuiContext& g = *GImGui;
-    IM_ASSERT(g.Initialized);
-    IM_ASSERT(g.SettingsLoaded == false && g.FrameCount == 0);
-
-    // For user convenience, we allow passing a non zero-terminated string (hence the ini_size parameter).
-    // For our convenience and to make the code simpler, we'll also write zero-terminators within the buffer. So let's create a writable copy..
-    if (ini_size == 0)
-        ini_size = strlen(ini_data);
-    char* buf = (char*)ImGui::MemAlloc(ini_size + 1);
-    char* buf_end = buf + ini_size;
-    memcpy(buf, ini_data, ini_size);
-    buf[ini_size] = 0;
-
-    void* entry_data = NULL;
-    ImGuiSettingsHandler* entry_handler = NULL;
-
-    char* line_end = NULL;
-    for (char* line = buf; line < buf_end; line = line_end + 1)
-    {
-        // Skip new lines markers, then find end of the line
-        while (*line == '\n' || *line == '\r')
-            line++;
-        line_end = line;
-        while (line_end < buf_end && *line_end != '\n' && *line_end != '\r')
-            line_end++;
-        line_end[0] = 0;
-        if (line[0] == ';')
-            continue;
-        if (line[0] == '[' && line_end > line && line_end[-1] == ']')
-        {
-            // Parse "[Type][Name]". Note that 'Name' can itself contains [] characters, which is acceptable with the current format and parsing code.
-            line_end[-1] = 0;
-            const char* name_end = line_end - 1;
-            const char* type_start = line + 1;
-            char* type_end = (char*)(intptr_t)ImStrchrRange(type_start, name_end, ']');
-            const char* name_start = type_end ? ImStrchrRange(type_end + 1, name_end, '[') : NULL;
-            if (!type_end || !name_start)
-            {
-                name_start = type_start; // Import legacy entries that have no type
-                type_start = "Window";
-            }
-            else
-            {
-                *type_end = 0; // Overwrite first ']'
-                name_start++;  // Skip second '['
-            }
-            entry_handler = FindSettingsHandler(type_start);
-            entry_data = entry_handler ? entry_handler->ReadOpenFn(&g, entry_handler, name_start) : NULL;
-        }
-        else if (entry_handler != NULL && entry_data != NULL)
-        {
-            // Let type handler parse the line
-            entry_handler->ReadLineFn(&g, entry_handler, entry_data, line);
-        }
-    }
-    ImGui::MemFree(buf);
-    g.SettingsLoaded = true;
-}
-
-void ImGui::SaveIniSettingsToDisk(const char* ini_filename)
-{
-    ImGuiContext& g = *GImGui;
-    g.SettingsDirtyTimer = 0.0f;
-    if (!ini_filename)
-        return;
-
-    size_t ini_data_size = 0;
-    const char* ini_data = SaveIniSettingsToMemory(&ini_data_size);
-    FILE* f = ImFileOpen(ini_filename, "wt");
-    if (!f)
-        return;
-    fwrite(ini_data, sizeof(char), ini_data_size, f);
-    fclose(f);
-}
-
-// Call registered handlers (e.g. SettingsHandlerWindow_WriteAll() + custom handlers) to write their stuff into a text buffer
-const char* ImGui::SaveIniSettingsToMemory(size_t* out_size)
-{
-    ImGuiContext& g = *GImGui;
-    g.SettingsDirtyTimer = 0.0f;
-    g.SettingsIniData.Buf.resize(0);
-    g.SettingsIniData.Buf.push_back(0);
-    for (int handler_n = 0; handler_n < g.SettingsHandlers.Size; handler_n++)
-    {
-        ImGuiSettingsHandler* handler = &g.SettingsHandlers[handler_n];
-        handler->WriteAllFn(&g, handler, &g.SettingsIniData);
-    }
-    if (out_size)
-        *out_size = (size_t)g.SettingsIniData.size();
-    return g.SettingsIniData.c_str();
 }
 
 static void* SettingsHandlerWindow_ReadOpen(ImGuiContext*, ImGuiSettingsHandler*, const char* name)

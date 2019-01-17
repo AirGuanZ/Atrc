@@ -58,6 +58,12 @@ int Run(GLFWwindow *window)
 
     AGZ::ObjArena<> arena;
 
+    // 初始化IMGUI
+
+    ImGui::CreateContext();
+    ImGui_ImplGlfw_InitForOpenGL(window);
+    ImGui_ImplOpenGL3_Init();
+
     // 准备输入category
 
     KeyboardManager<GLFWKeyboardCapturer> keyboardMgr;
@@ -80,6 +86,16 @@ int Run(GLFWwindow *window)
         if(param.key == KEY_ESCAPE)
             glfwSetWindowShouldClose(window, GLFW_TRUE);
     }));
+    keyboard.AttachHandler(arena.Create<KeyDownHandler>(
+        [&](const KeyDown &param)
+    {
+        ImGui_ImplGlfw_KeyDown(window, param.key);
+    }));
+    keyboard.AttachHandler(arena.Create<KeyUpHandler>(
+        [&](const KeyUp &param)
+    {
+        ImGui_ImplGlfw_KeyUp(window, param.key);
+    }));
 
     // 注册鼠标事件
 
@@ -98,6 +114,16 @@ int Run(GLFWwindow *window)
     {
         cout << "Scrolling: " << param.offset << endl;
     }));
+    mouse.AttachHandler(arena.Create<MouseButtonDownHandler>(
+        [&](const MouseButtonDown &param)
+    {
+        ImGui_ImplGlfw_MouseButtonDown(window, param.button);
+    }));
+    mouse.AttachHandler(arena.Create<WheelScrollHandler>(
+        [&](const WheelScroll &param)
+    {
+        ImGui_ImplGlfw_WheelScroll(window, param.offset);
+    }));
 
     // 注册窗口事件
 
@@ -106,13 +132,6 @@ int Run(GLFWwindow *window)
     {
         glViewport(0, 0, param.w, param.h);
     }));
-
-    // 初始化IMGUI，这会接管一些之前向glfw注册的事件回调，因此放在几个Input category初始化之后完成
-
-    ImGui::CreateContext();
-    ImGuiIO& imguiIO = ImGui::GetIO();
-    ImGui_ImplGlfw_InitForOpenGL(window, true);
-    ImGui_ImplOpenGL3_Init();
 
     // Immediate Painter
 
@@ -225,19 +244,19 @@ int Run(GLFWwindow *window)
 
         {
             static float f = 0.0f;
-            static int counter = 0;
 
-            ImGui::Begin("Hello, GUI!");                          // Create a window called "Hello, world!" and append into it.
+            ImGui::Begin("Hello, GUI!");
 
-            ImGui::Text("Model Viewer");               // Display some text (you can use a format strings too)
+            ImGui::Text("Model Viewer");
 
-            ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-            ImGui::ColorEdit3("clear color", (float*)&clearColor); // Edit 3 floats representing a color
+            ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
+            ImGui::ColorEdit3("clear color", (float*)&clearColor);
 
-            if(ImGui::Button("Quit"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
+            if(ImGui::Button("Quit"))
                 glfwSetWindowShouldClose(window, GLFW_TRUE);
+            ImGui::SameLine();
 
-            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+            ImGui::Text("FPS: %.1f", ImGui::GetIO().Framerate);
             ImGui::End();
         }
 
