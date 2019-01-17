@@ -1,52 +1,23 @@
 ﻿#include <iostream>
 
-#define AGZ_ALL_IMPL
-#define AGZ_USE_GLFW
-#define AGZ_USE_OPENGL
-
+#include <AGZUtils/Utils/Mesh.h>
 #include <AGZUtils/Utils/Texture.h>
 
-#include <GL/glew.h>
-#include <GL/glfw3.h>
-
-#include <AGZUtils/Input/GLFWCapturer.h>
-#include <AGZUtils/Utils/GL.h>
-
-#include "GUI/imgui/imgui.h"
-
-#include "GUI/imgui_impl_glfw.h"
-#include "GUI/imgui_impl_opengl3.h"
+#include "GL.h"
+#include "ModelRenderer.h"
 
 using namespace std;
 
-const char VS_SRC[] =
-R"___(
-#version 450 core
-layout(std140) uniform WVPBlock
+bool showLoadWindow = false;
+void ShowLoadWindow()
 {
-    mat4 WVP;
-};
-in vec2 iPos;
-in vec2 iTexCoord;
-out vec2 mTexCoord;
-void main(void)
-{
-    mTexCoord = iTexCoord;
-    gl_Position = WVP * vec4(iPos, 0.0, 1.0);
-}
-)___";
+    if(ImGui::Begin("Model loading", &showLoadWindow))
+    {
+        ImGui::Text("Test text");
 
-const char FS_SRC[] =
-R"___(
-#version 450 core
-uniform sampler2D tex;
-in vec2 mTexCoord;
-out vec4 fragColor;
-void main(void)
-{
-    fragColor = texture(tex, mTexCoord);
+        ImGui::End();
+    }
 }
-)___";
 
 int Run(GLFWwindow *window)
 {
@@ -89,12 +60,12 @@ int Run(GLFWwindow *window)
     keyboard.AttachHandler(arena.Create<KeyDownHandler>(
         [&](const KeyDown &param)
     {
-        ImGui_ImplGlfw_KeyDown(window, param.key);
+        ImGui_ImplGlfw_KeyDown(param.key);
     }));
     keyboard.AttachHandler(arena.Create<KeyUpHandler>(
         [&](const KeyUp &param)
     {
-        ImGui_ImplGlfw_KeyUp(window, param.key);
+        ImGui_ImplGlfw_KeyUp(param.key);
     }));
 
     // 注册鼠标事件
@@ -102,27 +73,12 @@ int Run(GLFWwindow *window)
     mouse.AttachHandler(arena.Create<MouseButtonDownHandler>(
         [&](const MouseButtonDown &param)
     {
-        cout << "Mouse button down: " << param.button << endl;
-    }));
-    mouse.AttachHandler(arena.Create<CursorMoveHandler>(
-        [&](const CursorMove &param)
-    {
-        cout << "Moving cursor: (" << param.absX << ", " << param.absY << ")" << endl;
+        ImGui_ImplGlfw_MouseButtonDown(param.button);
     }));
     mouse.AttachHandler(arena.Create<WheelScrollHandler>(
         [&](const WheelScroll &param)
     {
-        cout << "Scrolling: " << param.offset << endl;
-    }));
-    mouse.AttachHandler(arena.Create<MouseButtonDownHandler>(
-        [&](const MouseButtonDown &param)
-    {
-        ImGui_ImplGlfw_MouseButtonDown(window, param.button);
-    }));
-    mouse.AttachHandler(arena.Create<WheelScrollHandler>(
-        [&](const WheelScroll &param)
-    {
-        ImGui_ImplGlfw_WheelScroll(window, param.offset);
+        ImGui_ImplGlfw_WheelScroll(param.offset);
     }));
 
     // 注册窗口事件
@@ -138,83 +94,69 @@ int Run(GLFWwindow *window)
     Immediate imm;
     imm.Initialize({ 600.0f, 600.0f });
 
-    // 编译和链接Shader
+    // Model Renderer
 
-    Program program = ProgramBuilder::BuildOnce(
-        VertexShader::FromMemory(VS_SRC),
-        FragmentShader::FromMemory(FS_SRC));
-
-    // 准备Vertex Buffer
-
-    struct Vertex
+    std::vector<ModelRenderer::Vertex> modelVtxData;
+    std::vector<uint32_t> modelElemData;
     {
-        Vec2f pos;
-        Vec2f texCoord;
-    };
-    Vertex vtxData[] =
-    {
-        { { -0.5f, -0.5f }, { 0.0f, 0.0f } },
-        { { -0.5f,  0.5f }, { 0.0f, 1.0f } },
-        { {  0.5f,  0.5f }, { 1.0f, 1.0f } },
-        { { -0.5f, -0.5f }, { 0.0f, 0.0f } },
-        { {  0.5f,  0.5f }, { 1.0f, 1.0f } },
-        { {  0.5f, -0.5f }, { 1.0f, 0.0f } }
-    };
-    VertexBuffer<Vertex> vtxBuf(vtxData, uint32_t(AGZ::ArraySize(vtxData)), GL_STATIC_DRAW);
+        AGZ::Mesh::WavefrontObj<float> obj;
+        if(!obj.LoadFromFile("Scene/Asset/Test/Mitsuba.obj"))
+        {
+            cout << "Failed to load model data..." << endl;
+            return -1;
+        }
+        auto meshGrp = obj.ToGeometryMeshGroup();
+        obj.Clear();
 
-    // 准备Vertex Array Object
-
-    VertexArray vao(true);
-    {
-        auto pos      = program.GetAttribVariable<Vec2f>("iPos");
-        auto texCoord = program.GetAttribVariable<Vec2f>("iTexCoord");
-        vao.EnableAttrib(pos);
-        vao.EnableAttrib(texCoord);
-        vao.BindVertexBufferToAttrib(pos, vtxBuf, &Vertex::pos, 0);
-        vao.BindVertexBufferToAttrib(texCoord, vtxBuf, &Vertex::texCoord, 1);
+        for(auto &it : meshGrp.submeshes)
+        {
+            for(auto &v : it.second.vertices)
+            {
+                ModelRenderer::Vertex nv;
+                nv.pos = v.pos;
+                nv.nor = v.nor;
+                nv.tex = v.tex.uv();
+                modelVtxData.push_back(nv);
+                modelElemData.push_back(uint32_t(modelElemData.size()));
+            }
+        }
     }
 
-    // 设置Uniform变量值
+    Texture2D modelTex(true);
 
-    struct WVPBlockType
-    {
-        Mat4f WVP;
-    };
-    WVPBlockType blockValue =
-    {
-        Mat4f::Perspective(Deg(70), 1.0f, 0.1f, 100.0f) *
-        Mat4f::LookAt(
-            { 0.0f, 0.0f, -1.0f },
-            { 0.0f, 0.0f, 0.0f },
-            { 0.0f, 1.0f, 0.0f })
-    };
-    Std140UniformBlockBuffer<WVPBlockType> blockBuffer(&blockValue, GL_STATIC_DRAW);
+    ModelRenderer model;
+    model.Initialize();
+    model.SetModelData(modelVtxData.data(), uint32_t(modelVtxData.size()), modelElemData.data(), uint32_t(modelElemData.size()));
+    model.SetTexture(&modelTex);
+    model.SetWorld(Mat4f::Translate({ 0.0f, -0.82f, 0.0f }) * Mat4f::RotateY(Deg(-90)));
+    model.SetView(Mat4f::LookAt({ -4.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }));
+    model.SetProj(Mat4f::Perspective(Deg(60.0f), 1.0f, 0.1f, 1000.0f));
 
-    UniformVariableAssignment uniforms;
+    // 准备FBO
+
+    FrameBuffer fbo(true);
+    RenderBuffer rbo(true);
+    Texture2D fbTex(true);
+    fbTex.InitializeFormat(1, 300, 300, GL_RGBA8);
+    rbo.SetFormat(300, 300, GL_DEPTH_COMPONENT);
+
+    fbo.Attach(GL_COLOR_ATTACHMENT0, fbTex);
+    fbo.Attach(GL_DEPTH_ATTACHMENT, rbo);
     {
-        auto tex = program.GetUniformVariable<Texture2DUnit>("tex");
-        auto WVPBlock = program.GetStd140UniformBlock<WVPBlockType>("WVPBlock");
-        uniforms.SetValue(tex, Texture2DUnit{ 0 });
-        uniforms.SetValue(WVPBlock, &blockBuffer, 0);
+        fbo.Bind();
+        glViewport(0, 0, 300, 300);
+
+        RenderContext::ClearColorAndDepth();
+
+        imm.DrawQuad({ -0.8f, -0.8f }, { 0.8f, 0.8f }, { 0.4f, 0.4f, 0.4f, 1.0f }, false);
+        imm.DrawCircle({ 0.0f, 0.0f }, { 0.9f, 0.9f }, { 0.4f, 0.4f, 0.4f, 1.0f }, false);
+
+        RenderContext::EnableDepthTest();
+        model.Render();
+
+        fbo.Unbind();
+        glViewport(0, 0, 640, 640);
     }
-
-    // 准备纹理
-
-    Texture2D texObj(true);
-    auto texData = AGZ::TextureFile::LoadRGBFromFile("./Asset/tex.png", true);
-    texObj.InitializeFormatAndData(1, GL_RGB8, texData);
-    texObj.Bind(0);
-
-    // 准备采样器
-
-    Sampler samObj(true);
-    samObj.SetParameter(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    samObj.SetParameter(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    samObj.SetParameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    samObj.SetParameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    samObj.Bind(0);
-
-    ImVec4 clearColor = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
     while(!glfwWindowShouldClose(window))
     {
@@ -227,36 +169,32 @@ int Run(GLFWwindow *window)
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        RenderContext::SetClearColor({ clearColor.x, clearColor.y, clearColor.z, clearColor.w });
+        RenderContext::SetClearColor(Vec4f(Vec3f(0.4f), 0.0f));
         RenderContext::ClearColorAndDepth();
 
-        program.Bind();
-        vao.Bind();
-        uniforms.Bind();
-
-        RenderContext::DrawVertices(GL_TRIANGLES, 0, vtxBuf.GetVertexCount());
-
-        vao.Unbind();
-        program.Unbind();
-
-        imm.DrawQuad({ -0.8f, -0.8f }, { 0.8f, 0.8f }, { 0.4f, 0.4f, 0.4f, 1.0f }, false);
-        imm.DrawCircle({ 0.0f, 0.0f }, { 0.9f, 0.9f }, { 0.4f, 0.4f, 0.4f, 1.0f }, false);
-
+        if(ImGui::BeginMainMenuBar())
         {
-            static float f = 0.0f;
+            if(ImGui::BeginMenu("File"))
+            {
+                if(ImGui::MenuItem("Load"))
+                    showLoadWindow = true;
+                if(ImGui::MenuItem("Exit"))
+                    glfwSetWindowShouldClose(window, GLFW_TRUE);
+                ImGui::EndMenu();
+            }
 
-            ImGui::Begin("Hello, GUI!");
+            ImGui::EndMainMenuBar();
+        }
 
-            ImGui::Text("Model Viewer");
+        if(showLoadWindow)
+            ShowLoadWindow();
 
-            ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
-            ImGui::ColorEdit3("clear color", (float*)&clearColor);
+        char viewerTitle[80];
+        sprintf_s(viewerTitle, 80, "Viewer FPS %.1f###Viewer", ImGui::GetIO().Framerate);
+        if(ImGui::Begin(viewerTitle, nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+        {
+            ImGui::Image((ImTextureID)(size_t)(fbTex.GetHandle()), ImVec2(300, 300), { 0, 1 }, { 1, 0 });
 
-            if(ImGui::Button("Quit"))
-                glfwSetWindowShouldClose(window, GLFW_TRUE);
-            ImGui::SameLine();
-
-            ImGui::Text("FPS: %.1f", ImGui::GetIO().Framerate);
             ImGui::End();
         }
 
@@ -265,6 +203,9 @@ int Run(GLFWwindow *window)
 
         glfwSwapBuffers(window);
     }
+
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
 
     return 0;
 }

@@ -30,6 +30,12 @@
     <ClCompile Include="..\..\..\..\Source\Atrc\ModelViewer\GUI\imgui\imgui_widgets.cpp">
       <Filter>Source\GUI\imgui</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\ModelViewer\AGZUtils.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\ModelViewer\ModelRenderer.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\Source\Atrc\ModelViewer\GUI\imgui\imconfig.h">
@@ -46,6 +52,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\Source\Atrc\ModelViewer\GUI\imgui_impl_opengl3.h">
       <Filter>Source\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\ModelViewer\ModelRenderer.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\ModelViewer\GL.h">
+      <Filter>Source</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -35,7 +35,7 @@ IMGUI_IMPL_API void     ImGui_ImplGlfw_NewFrame();
 //IMGUI_IMPL_API void     ImGui_ImplGlfw_KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 //IMGUI_IMPL_API void     ImGui_ImplGlfw_CharCallback(GLFWwindow* window, unsigned int c);
 
-IMGUI_IMPL_API void ImGui_ImplGlfw_MouseButtonDown(GLFWwindow *window, AGZ::Input::MouseButton button);
-IMGUI_IMPL_API void ImGui_ImplGlfw_WheelScroll    (GLFWwindow *window, double offset);
-IMGUI_IMPL_API void ImGui_ImplGlfw_KeyDown        (GLFWwindow *window, AGZ::Input::Key key);
-IMGUI_IMPL_API void ImGui_ImplGlfw_KeyUp          (GLFWwindow *window, AGZ::Input::Key key);
+IMGUI_IMPL_API void ImGui_ImplGlfw_MouseButtonDown(AGZ::Input::MouseButton button);
+IMGUI_IMPL_API void ImGui_ImplGlfw_WheelScroll    (double offset);
+IMGUI_IMPL_API void ImGui_ImplGlfw_KeyDown        (AGZ::Input::Key key);
+IMGUI_IMPL_API void ImGui_ImplGlfw_KeyUp          (AGZ::Input::Key key);

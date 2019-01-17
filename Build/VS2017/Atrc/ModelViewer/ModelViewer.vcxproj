@@ -175,19 +175,23 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\..\Source\Atrc\ModelViewer\AGZUtils.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\ModelViewer\GUI\imgui\imgui.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\ModelViewer\GUI\imgui\imgui_draw.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\ModelViewer\GUI\imgui\imgui_widgets.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\ModelViewer\GUI\imgui_impl_glfw.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\ModelViewer\GUI\imgui_impl_opengl3.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\ModelViewer\Main.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Atrc\ModelViewer\ModelRenderer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\..\Source\Atrc\ModelViewer\GL.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\ModelViewer\GUI\imgui\imconfig.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\ModelViewer\GUI\imgui\imgui.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\ModelViewer\GUI\imgui\imgui_internal.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\ModelViewer\GUI\imgui_impl_glfw.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\ModelViewer\GUI\imgui_impl_opengl3.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\ModelViewer\ModelRenderer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -35,11 +35,11 @@
 #include "imgui_impl_glfw.h"
 
 // GLFW
-#include <GL/glfw3.h>
+#include <GLLibs/glfw3.h>
 #ifdef _WIN32
 #undef APIENTRY
 #define GLFW_EXPOSE_NATIVE_WIN32
-#include <GL/glfw3native.h>   // for glfwGetWin32Window
+#include <GLLibs/glfw3native.h>   // for glfwGetWin32Window
 #endif
 #define GLFW_HAS_WINDOW_TOPMOST     (GLFW_VERSION_MAJOR * 1000 + GLFW_VERSION_MINOR * 100 >= 3200) // 3.2+ GLFW_FLOATING
 #define GLFW_HAS_WINDOW_HOVERED     (GLFW_VERSION_MAJOR * 1000 + GLFW_VERSION_MINOR * 100 >= 3300) // 3.3+ GLFW_HOVERED
@@ -117,7 +117,7 @@ void ImGui_ImplGlfw_CharCallback(GLFWwindow* window, unsigned int c)
         io.AddInputCharacter((unsigned short)c);
 }*/
 
-void ImGui_ImplGlfw_MouseButtonDown(GLFWwindow *window, AGZ::Input::MouseButton button)
+void ImGui_ImplGlfw_MouseButtonDown(AGZ::Input::MouseButton button)
 {
     switch(button)
     {
@@ -128,13 +128,13 @@ void ImGui_ImplGlfw_MouseButtonDown(GLFWwindow *window, AGZ::Input::MouseButton 
     }
 }
 
-void ImGui_ImplGlfw_WheelScroll(GLFWwindow *window, double offset)
+void ImGui_ImplGlfw_WheelScroll(double offset)
 {
     ImGuiIO& io = ImGui::GetIO();
     io.MouseWheel += (float)offset;
 }
 
-void ImGui_ImplGlfw_KeyDown(GLFWwindow *window, AGZ::Input::Key key)
+void ImGui_ImplGlfw_KeyDown(AGZ::Input::Key key)
 {
     ImGuiIO& io = ImGui::GetIO();
     io.KeysDown[key] = true;
@@ -144,7 +144,7 @@ void ImGui_ImplGlfw_KeyDown(GLFWwindow *window, AGZ::Input::Key key)
     io.KeySuper = io.KeysDown[GLFW_KEY_LEFT_SUPER]   || io.KeysDown[GLFW_KEY_RIGHT_SUPER];
 }
 
-void ImGui_ImplGlfw_KeyUp(GLFWwindow *window, AGZ::Input::Key key)
+void ImGui_ImplGlfw_KeyUp(AGZ::Input::Key key)
 {
     ImGuiIO& io = ImGui::GetIO();
     io.KeysDown[key] = false;
