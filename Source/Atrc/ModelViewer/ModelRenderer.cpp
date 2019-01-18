@@ -58,6 +58,7 @@ void ModelRenderer::SetModelData(const Vertex *vtx, uint32_t vtxCount, const uin
 {
     vtxBuf_.ReinitializeData(vtx, vtxCount, GL_STATIC_DRAW);
     elemBuf_.ReinitializeData(elem, elemCount, GL_STATIC_DRAW);
+    hasData_ = true;
 }
 
 void ModelRenderer::SetWorld(const Mat4f &world)
@@ -86,6 +87,9 @@ void ModelRenderer::SetProj(const Mat4f &proj)
 
 void ModelRenderer::Render() const
 {
+    if(!hasData_)
+        return;
+
     program_.Bind();
     vao_.Bind();
     uniforms_.Bind();

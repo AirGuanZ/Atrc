@@ -6,6 +6,7 @@
 #include "Console.h"
 #include "GL.h"
 #include "ModelRenderer.h"
+#include "TransformSequence.h"
 
 using namespace std;
 using AGZ::Str8;
@@ -15,41 +16,6 @@ constexpr int INIT_WIN_HEIGHT = 700;
 
 constexpr int MODEL_VIEW_WIDTH = 300;
 constexpr int MODEL_VIEW_HEIGHT = 300;
-
-struct ModelTransform
-{
-    Vec3f translate;
-    Deg rotateZ = Deg(0);
-    Deg rotateY = Deg(0);
-    Deg rotateX = Deg(0);
-    float scale = 1;
-    Vec3f preTranslate;
-};
-
-// （在imgui窗口内调用）模型集合变换参数设置面板
-void SetModelTransform(Console &console, ModelTransform *trans)
-{
-    AGZ_ASSERT(trans);
-
-    if(ImGui::InputFloat3("Offset", &trans->preTranslate[0], 4, ImGuiInputTextFlags_EnterReturnsTrue))
-        console.AddText(ConsoleText::Normal, "Offset := " + AGZ::ToStr8(trans->preTranslate));
-
-    if(ImGui::InputFloat("Scale", &trans->scale, 0.01f, 1.0f, "%.4f", ImGuiInputTextFlags_EnterReturnsTrue))
-    {
-        trans->scale = std::max(trans->scale, 0.001f);
-        console.AddText(ConsoleText::Normal, "Scale := " + AGZ::ToStr8(trans->scale));
-    }
-
-    if(ImGui::InputFloat("RotateX", &trans->rotateX.value, 0.5f, 5.0f, "%.4f", ImGuiInputTextFlags_EnterReturnsTrue))
-        console.AddText(ConsoleText::Normal, "RotateX := " + AGZ::ToStr8(trans->rotateX.value));
-    if(ImGui::InputFloat("RotateZ", &trans->rotateZ.value, 0.5f, 5.0f, "%.4f", ImGuiInputTextFlags_EnterReturnsTrue))
-        console.AddText(ConsoleText::Normal, "RotateZ := " + AGZ::ToStr8(trans->rotateZ.value));
-    if(ImGui::InputFloat("RotateY", &trans->rotateY.value, 0.5f, 5.0f, "%.4f", ImGuiInputTextFlags_EnterReturnsTrue))
-        console.AddText(ConsoleText::Normal, "RotateY := " + AGZ::ToStr8(trans->rotateY.value));
-
-    if(ImGui::InputFloat3("Translate", &trans->translate[0], 4, ImGuiInputTextFlags_EnterReturnsTrue))
-        console.AddText(ConsoleText::Normal, "Translate := " + AGZ::ToStr8(trans->translate));
-}
 
 // 从指定路径加载模型数据
 bool ReloadModelData(const Str8 &filename, ModelRenderer *model)
@@ -87,6 +53,42 @@ bool ReloadModelData(const Str8 &filename, ModelRenderer *model)
     return true;
 }
 
+bool ShowModelLoadWindow(Console &console, ModelRenderer *model)
+{
+    AGZ_ASSERT(model);
+
+    if(!ImGui::BeginPopupModal("LoadModelData", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+        return false;
+
+    if(ImGui::GetIO().KeysDown[AGZ::Input::KEY_ESCAPE])
+    {
+        ImGui::CloseCurrentPopup();
+        ImGui::EndPopup();
+        return false;
+    }
+
+    bool ret = false;
+
+    static char buf[256] = "Scene/Asset/Test/Mitsuba.obj";
+    ImGui::InputText("", buf, 256);
+
+    ImGui::SameLine();
+    if(ImGui::Button("load") || ImGui::GetIO().KeysDown[AGZ::Input::KEY_ENTER])
+    {
+        if(ReloadModelData(buf, model))
+        {
+            console.AddText(ConsoleText::Normal, std::string("Model loaded from ") + buf);
+            ret = true;
+            ImGui::CloseCurrentPopup();
+        }
+        else
+            console.AddText(ConsoleText::Error, std::string("Failed to load model from ") + buf);
+    }
+    
+    ImGui::EndPopup();
+    return ret;
+}
+
 int Run(GLFWwindow *window)
 {
     using namespace AGZ::GraphicsAPI;
@@ -95,6 +97,7 @@ int Run(GLFWwindow *window)
     AGZ::ObjArena<> arena;
 
     Console console;
+    TransformSequence transSeq;
 
     // 初始化IMGUI
 
@@ -118,12 +121,6 @@ int Run(GLFWwindow *window)
 
     // 注册键盘事件
 
-    keyboard.AttachHandler(arena.Create<KeyDownHandler>(
-        [&](const KeyDown &param)
-    {
-        if(param.key == KEY_ESCAPE)
-            glfwSetWindowShouldClose(window, GLFW_TRUE);
-    }));
     keyboard.AttachHandler(arena.Create<KeyDownHandler>(
         [&](const KeyDown &param)
     {
@@ -171,13 +168,6 @@ int Run(GLFWwindow *window)
     ModelRenderer model;
     model.Initialize();
 
-    if(!ReloadModelData("Scene/Asset/Test/Mitsuba.obj", &model))
-    {
-        console.AddText(ConsoleText::Error, "Failed to load model data...");
-        cout << "Failed to load model data..." << endl;
-        return -1;
-    }
-
     GL::Texture2D modelTex(true);
     model.SetTexture(&modelTex);
 
@@ -195,7 +185,7 @@ int Run(GLFWwindow *window)
     fbo.Attach(GL_COLOR_ATTACHMENT0, fbTex);
     fbo.Attach(GL_DEPTH_ATTACHMENT, rbo);
 
-    ModelTransform trans;
+    bool showLoadModelData = false;
 
     while(!glfwWindowShouldClose(window))
     {
@@ -213,15 +203,36 @@ int Run(GLFWwindow *window)
 
         if(ImGui::BeginMainMenuBar())
         {
-            if(ImGui::BeginMenu("File"))
+            if(ImGui::BeginMenu("file"))
             {
-                if(ImGui::MenuItem("Exit"))
+                if(ImGui::MenuItem("load"))
+                    showLoadModelData = true;
+                if(ImGui::MenuItem("exit"))
                     glfwSetWindowShouldClose(window, GLFW_TRUE);
+                ImGui::EndMenu();
+            }
+
+            if(ImGui::BeginMenu("transform"))
+            {
+                if(ImGui::MenuItem("reset"))
+                {
+                    transSeq.Clear();
+                    console.AddText(ConsoleText::Normal, "Transform reset");
+                }
                 ImGui::EndMenu();
             }
 
             ImGui::EndMainMenuBar();
         }
+
+        if(showLoadModelData)
+        {
+            ImGui::OpenPopup("LoadModelData");
+            showLoadModelData = false;
+        }
+
+        if(ShowModelLoadWindow(console, &model))
+            transSeq.Clear();
 
         {
             fbo.Bind();
@@ -229,13 +240,6 @@ int Run(GLFWwindow *window)
 
             GL::RenderContext::ClearColorAndDepth();
 
-            model.SetWorld(
-                Mat4f::Translate(trans.translate) *
-                Mat4f::RotateX(trans.rotateX) *
-                Mat4f::RotateZ(trans.rotateZ) *
-                Mat4f::RotateY(trans.rotateY) *
-                Mat4f::Scale(Vec3f(trans.scale)) *
-                Mat4f::Translate(trans.preTranslate));
             model.Render();
 
             GL::RenderContext::DisableDepthTest();
@@ -252,14 +256,20 @@ int Run(GLFWwindow *window)
             glViewport(0, 0, wW, wH);
         }
 
+        if(ImGui::Begin("Transform", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+        {
+            transSeq.Display();
+            model.SetWorld(transSeq.GetFinalTransformMatrix());
+            ImGui::End();
+        }
+
         char viewerTitle[80];
         sprintf_s(viewerTitle, 80, "Viewer FPS %.1f###Viewer", ImGui::GetIO().Framerate);
         if(ImGui::Begin(viewerTitle, nullptr, ImGuiWindowFlags_AlwaysAutoResize))
         {
-            ImGui::Image((ImTextureID)(size_t)(fbTex.GetHandle()), ImVec2(MODEL_VIEW_WIDTH, MODEL_VIEW_HEIGHT), { 0, 1 }, { 1, 0 });
-
-            SetModelTransform(console, &trans);
-
+            ImGui::Image(
+                (ImTextureID)(size_t)(fbTex.GetHandle()), ImVec2(MODEL_VIEW_WIDTH, MODEL_VIEW_HEIGHT),
+                { 0, 1 }, { 1, 0 });
             ImGui::End();
         }
 

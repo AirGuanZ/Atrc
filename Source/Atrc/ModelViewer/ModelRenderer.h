@@ -31,6 +31,8 @@ public:
 
 private:
 
+    bool hasData_ = false;
+
     GL::VertexBuffer<Vertex> vtxBuf_;
     GL::ElementBuffer<uint32_t> elemBuf_;
     

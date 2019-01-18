@@ -18,6 +18,9 @@
     <ClCompile Include="..\..\..\..\Source\Atrc\ModelViewer\Console.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\ModelViewer\TransformSequence.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\Source\Atrc\ModelViewer\ModelRenderer.h">
@@ -27,6 +30,9 @@
       <Filter>Source</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\Source\Atrc\ModelViewer\Console.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\ModelViewer\TransformSequence.h">
       <Filter>Source</Filter>
     </ClInclude>
   </ItemGroup>
