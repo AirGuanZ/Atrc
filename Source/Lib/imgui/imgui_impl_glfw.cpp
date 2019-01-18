@@ -154,6 +154,13 @@ void ImGui_ImplGlfw_KeyUp(AGZ::Input::Key key)
     io.KeySuper = io.KeysDown[GLFW_KEY_LEFT_SUPER]   || io.KeysDown[GLFW_KEY_RIGHT_SUPER];
 }
 
+void ImGui_ImplGlfw_Char(uint32_t c)
+{
+    ImGuiIO& io = ImGui::GetIO();
+    if(c > 0 && c < 0x10000)
+        io.AddInputCharacter((unsigned short)c);
+}
+
 static bool ImGui_ImplGlfw_Init(GLFWwindow* window, GlfwClientApi client_api)
 {
     g_Window = window;

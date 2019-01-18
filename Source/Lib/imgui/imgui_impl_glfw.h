@@ -39,3 +39,4 @@ IMGUI_IMPL_API void ImGui_ImplGlfw_MouseButtonDown(AGZ::Input::MouseButton butto
 IMGUI_IMPL_API void ImGui_ImplGlfw_WheelScroll    (double offset);
 IMGUI_IMPL_API void ImGui_ImplGlfw_KeyDown        (AGZ::Input::Key key);
 IMGUI_IMPL_API void ImGui_ImplGlfw_KeyUp          (AGZ::Input::Key key);
+IMGUI_IMPL_API void ImGui_ImplGlfw_Char           (uint32_t c);

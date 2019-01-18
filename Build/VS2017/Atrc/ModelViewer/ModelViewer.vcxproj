@@ -176,10 +176,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\Source\Atrc\ModelViewer\AGZUtils.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Atrc\ModelViewer\Console.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\ModelViewer\Main.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\ModelViewer\ModelRenderer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\..\Source\Atrc\ModelViewer\Console.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\ModelViewer\GL.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\ModelViewer\ModelRenderer.h" />
   </ItemGroup>
