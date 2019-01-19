@@ -21,6 +21,12 @@
     <ClCompile Include="..\..\..\..\Source\Atrc\ModelViewer\TransformSequence.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\ModelViewer\ModelDataManager.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Atrc\ModelViewer\Camera.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\Source\Atrc\ModelViewer\ModelRenderer.h">
@@ -33,6 +39,21 @@
       <Filter>Source</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\Source\Atrc\ModelViewer\TransformSequence.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\ModelViewer\ModelDataManager.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\ModelViewer\SceneManager.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\ModelViewer\Model.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\ModelViewer\Camera.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Atrc\ModelViewer\Global.h">
       <Filter>Source</Filter>
     </ClInclude>
   </ItemGroup>

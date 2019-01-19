@@ -2,24 +2,56 @@
 
 #include "TransformSequence.h"
 
-Mat4f TransformSequence::Transform::GetMatrix() const noexcept
+TransformSequence::Transform::Transform(const Data &data)
+    : data_(data)
 {
-    return AGZ::TypeOpr::MatchVar(data,
-        [&](const Translate &param) { return Mat4f::Translate(param.offset); },
-        [&](const RotateX &param)   { return Mat4f::RotateX(param.angle); },
-        [&](const RotateY &param)   { return Mat4f::RotateY(param.angle); },
-        [&](const RotateZ &param)   { return Mat4f::RotateZ(param.angle); },
-        [&](const Scale &param)     { return Mat4f::Scale(Vec3f(param.scale)); });
+    UpdateTextAndMat();
 }
 
-std::string TransformSequence::Transform::Text() const
+const TransformSequence::Transform::Data &TransformSequence::Transform::GetData() const noexcept
 {
-    return AGZ::TypeOpr::MatchVar(data,
-        [&](const Translate &param) { return "translate " + AGZ::ToStr8(param.offset).ToStdString(); },
-        [&](const RotateX &param)   { return "rotateX " + std::to_string(param.angle.value); },
-        [&](const RotateY &param)   { return "rotateY " + std::to_string(param.angle.value); },
-        [&](const RotateZ &param)   { return "rotateZ " + std::to_string(param.angle.value); },
-        [&](const Scale &param)     { return "scale " + std::to_string(param.scale); });
+    return data_;
+}
+
+void TransformSequence::Transform::SetData(const Data &data)
+{
+    data_ = data;
+    UpdateTextAndMat();
+}
+
+const Mat4f &TransformSequence::Transform::GetMatrix() const noexcept
+{
+    return mat_;
+}
+
+const std::string &TransformSequence::Transform::GetText() const
+{
+    return text_;
+}
+
+void TransformSequence::Transform::UpdateTextAndMat()
+{
+    text_ = AGZ::TypeOpr::MatchVar(data_,
+        [&](const Translate &param) { return "[translate] " + AGZ::ToStr8(param.offset).ToStdString(); },
+        [&](const RotateX &param)   { return "[rotateX] "   + std::to_string(param.angle.value);       },
+        [&](const RotateY &param)   { return "[rotateY] "   + std::to_string(param.angle.value);       },
+        [&](const RotateZ &param)   { return "[rotateZ] "   + std::to_string(param.angle.value);       },
+        [&](const Scale &param)     { return "[scale] "     + std::to_string(param.scale);             },
+        [&](const Matrix &param)    { return "[matrix] "    + param.text;                              });
+    mat_ = AGZ::TypeOpr::MatchVar(data_,
+        [&](const Translate &param) { return Mat4f::Translate(param.offset);   },
+        [&](const RotateX &param)   { return Mat4f::RotateX(param.angle);      },
+        [&](const RotateY &param)   { return Mat4f::RotateY(param.angle);      },
+        [&](const RotateZ &param)   { return Mat4f::RotateZ(param.angle);      },
+        [&](const Scale &param)     { return Mat4f::Scale(Vec3f(param.scale)); },
+        [&](const Matrix &param)    { return param.mat;                        });
+}
+
+void TransformSequence::UpdateMat()
+{
+    mat_ = Mat4f();
+    for(auto &t : transforms_)
+        mat_ = mat_ * t.GetMatrix();
 }
 
 AGZ::Option<TransformSequence::Transform> TransformSequence::New(const char *title, bool newPopup) const
@@ -107,65 +139,89 @@ AGZ::Option<TransformSequence::Transform> TransformSequence::New(const char *tit
     return AGZ::None;
 }
 
-void TransformSequence::EditTransformParam(Transform &trans) const
+bool TransformSequence::EditTransformParam(Transform &trans) const
 {
-    AGZ::TypeOpr::MatchVar(trans.data,
-        [](Translate &param)
+    auto data = trans.GetData();
+    bool changed = false;
+    AGZ::TypeOpr::MatchVar(data,
+        [&changed](Translate &param)
     {
-        ImGui::InputFloat("x offset", &param.offset.x, 0.05f, 1.0f, "%.4f");
-        ImGui::InputFloat("y offset", &param.offset.y, 0.05f, 1.0f, "%.4f");
-        ImGui::InputFloat("z offset", &param.offset.z, 0.05f, 1.0f, "%.4f");
+        changed |= ImGui::InputFloat("x offset", &param.offset.x, 0.05f, 1.0f, "%.4f");
+        changed |= ImGui::InputFloat("y offset", &param.offset.y, 0.05f, 1.0f, "%.4f");
+        changed |= ImGui::InputFloat("z offset", &param.offset.z, 0.05f, 1.0f, "%.4f");
     },
-        [](RotateX &param)
+        [&changed](RotateX &param)
     {
-        ImGui::InputFloat("angle (degree)", &param.angle.value, 1.0f, 5.0f, "%.4f");
+        changed |= ImGui::InputFloat("angle (degree)", &param.angle.value, 1.0f, 5.0f, "%.4f");
     },
-        [](RotateY &param)
+        [&changed](RotateY &param)
     {
-        ImGui::InputFloat("angle (degree)", &param.angle.value, 1.0f, 5.0f, "%.4f");
+        changed |= ImGui::InputFloat("angle (degree)", &param.angle.value, 1.0f, 5.0f, "%.4f");
     },
-        [](RotateZ &param)
+        [&changed](RotateZ &param)
     {
-        ImGui::InputFloat("angle (degree)", &param.angle.value, 1.0f, 5.0f, "%.4f");
+        changed |= ImGui::InputFloat("angle (degree)", &param.angle.value, 1.0f, 5.0f, "%.4f");
     },
-        [](Scale &param)
+        [&changed](Scale &param)
     {
-        ImGui::InputFloat("scale value", &param.scale, 0.01f, 0.1f, "%.4f");
+        changed |= ImGui::InputFloat("scale value", &param.scale, 0.01f, 0.1f, "%.4f");
+    },
+        [](Matrix&)
+    {
+        ImGui::Text("matrix transform is read-only");
     });
+
+    if(changed)
+        trans.SetData(data);
+    return changed;
 }
 
-Mat4f TransformSequence::GetFinalTransformMatrix() const noexcept
+const Mat4f &TransformSequence::GetFinalTransformMatrix() const noexcept
 {
-    Mat4f ret;
-    for(auto &t : transforms_)
-        ret = ret * t.GetMatrix();
-    return ret;
+    return mat_;
+}
+
+void TransformSequence::AddMatrixToFront(std::string name, const Mat4f &mat)
+{
+    transforms_.emplace(transforms_.begin(), Matrix{ std::move(name), mat });
+    UpdateMat();
 }
 
 void TransformSequence::Display()
 {
+    if(!ImGui::CollapsingHeader("Transform"))
+        return;
+
+    bool changed = false;
+
     {
         bool newPopup = false;
-        if(ImGui::Button("new front###NewFront"))
+        if(ImGui::Button("front###NewFront"))
         {
             newPopup = true;
             ImGui::OpenPopup("New###NewTransformOnFront");
         }
         if(auto t = New("New###NewTransformOnFront", newPopup))
+        {
             transforms_.insert(transforms_.begin(), *t);
+            changed = true;
+        }
     }
 
     ImGui::SameLine();
 
     {
         bool newPopup = false;
-        if(ImGui::Button("new back###NewBack"))
+        if(ImGui::Button("back###NewBack"))
         {
             newPopup = true;
             ImGui::OpenPopup("New###NewTransformOnBack");
         }
         if(auto t = New("New###NewTransformOnBack", newPopup))
+        {
             transforms_.push_back(*t);
+            changed = true;
+        }
     }
 
     static int selectedIdx = -1;
@@ -179,6 +235,7 @@ void TransformSequence::Display()
         --count;
         if(selectedIdx >= count)
             --selectedIdx;
+        changed = true;
     }
 
     ImGui::SameLine();
@@ -187,6 +244,7 @@ void TransformSequence::Display()
     {
         std::swap(transforms_[selectedIdx], transforms_[selectedIdx - 1]);
         --selectedIdx;
+        changed = true;
     }
 
     ImGui::SameLine();
@@ -195,24 +253,32 @@ void TransformSequence::Display()
     {
         std::swap(transforms_[selectedIdx], transforms_[selectedIdx + 1]);
         ++selectedIdx;
+        changed = true;
     }
 
     ImGui::SameLine();
 
     if(ImGui::Button("template"))
     {
-        transforms_.push_back({ Translate { Vec3f()   } });
-        transforms_.push_back({ RotateY   { Deg(0.0f) } });
-        transforms_.push_back({ RotateZ   { Deg(0.0f) } });
-        transforms_.push_back({ RotateX   { Deg(0.0f) } });
-        transforms_.push_back({ Scale     { 1.0f      } });
+        transforms_.emplace_back(Translate { Vec3f()   });
+        transforms_.emplace_back(RotateY   { Deg(0.0f) });
+        transforms_.emplace_back(RotateZ   { Deg(0.0f) });
+        transforms_.emplace_back(RotateX   { Deg(0.0f) });
+        transforms_.emplace_back(Scale     { 1.0f      });
     }
+
+    ImGui::SameLine();
+
+    if(ImGui::Button("clear"))
+        Clear();
+
+    ImGui::Separator();
 
     for(int i = 0; i < count; ++i)
     {
         ImGui::PushID(i);
         bool selected = i == selectedIdx;
-        auto text = transforms_[i].Text();
+        auto &text = transforms_[i].GetText();
         if(ImGui::Selectable(text.c_str(), selected))
         {
             if(selected)
@@ -220,17 +286,22 @@ void TransformSequence::Display()
             else
                 selectedIdx = i;
         }
+
         ImGui::OpenPopupOnItemClick("edit");
         if(ImGui::BeginPopup("edit"))
         {
-            EditTransformParam(transforms_[i]);
+            changed |= EditTransformParam(transforms_[i]);
             ImGui::EndPopup();
         }
         ImGui::PopID();
     }
+
+    if(changed)
+        UpdateMat();
 }
 
 void TransformSequence::Clear()
 {
     transforms_.clear();
+    UpdateMat();
 }

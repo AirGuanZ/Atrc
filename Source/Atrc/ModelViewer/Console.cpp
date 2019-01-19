@@ -15,7 +15,7 @@ Console::Console(int inputBufSize, int maxTextCount)
 void Console::Display()
 {
     ImGui::SetNextWindowPos(ImVec2(400, 100), ImGuiCond_FirstUseEver);
-    ImGui::SetNextWindowSize(ImVec2(600, 300), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(450, 150), ImGuiCond_FirstUseEver);
 
     if(!ImGui::Begin("Console##ModelViewer"))
     {
@@ -61,7 +61,8 @@ void Console::Display()
     }
 
     ImGui::SameLine();
-    if(ImGui::Button("Clear"))
+
+    if(ImGui::Button("clear"))
         texts_.clear();
 
     ImGui::End();

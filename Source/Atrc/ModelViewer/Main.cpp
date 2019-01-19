@@ -3,46 +3,44 @@
 #include <AGZUtils/Utils/Mesh.h>
 #include <AGZUtils/Utils/Texture.h>
 
+#include "Camera.h"
 #include "Console.h"
 #include "GL.h"
+#include "Global.h"
+#include "ModelDataManager.h"
 #include "ModelRenderer.h"
 #include "TransformSequence.h"
 
 using namespace std;
 using AGZ::Str8;
 
-constexpr int INIT_WIN_WIDTH = 1200;
-constexpr int INIT_WIN_HEIGHT = 700;
+constexpr int INIT_WIN_WIDTH = 1400;
+constexpr int INIT_WIN_HEIGHT = 900;
 
-constexpr int MODEL_VIEW_WIDTH = 300;
-constexpr int MODEL_VIEW_HEIGHT = 300;
-
-// 从指定路径加载模型数据
-bool ReloadModelData(const Str8 &filename, ModelRenderer *model)
+bool CreateModelFromSelectedData(Console &console, const ModelDataManager &dataMgr, ModelRenderer *model)
 {
+    AGZ_ASSERT(model);
+
     std::vector<ModelRenderer::Vertex> modelVtxData;
     std::vector<uint32_t> modelElemData;
-    {
-        AGZ::Mesh::WavefrontObj<float> obj;
-        if(!obj.LoadFromFile(filename))
-        {
-            cout << "Failed to load model data..." << endl;
-            return false;
-        }
-        auto meshGrp = obj.ToGeometryMeshGroup();
-        obj.Clear();
 
-        for(auto &it : meshGrp.submeshes)
+    auto meshGrpData = dataMgr.GetSelectedMeshGroup();
+    if(!meshGrpData)
+    {
+        console.AddText(ConsoleText::Error, "No model data is selected");
+        return false;
+    }
+
+    for(auto &it : meshGrpData->meshGroup.submeshes)
+    {
+        for(auto &v : it.second.vertices)
         {
-            for(auto &v : it.second.vertices)
-            {
-                ModelRenderer::Vertex nv;
-                nv.pos = v.pos;
-                nv.nor = v.nor;
-                nv.tex = v.tex.uv();
-                modelVtxData.push_back(nv);
-                modelElemData.push_back(uint32_t(modelElemData.size()));
-            }
+            ModelRenderer::Vertex nv;
+            nv.pos = v.pos;
+            nv.nor = v.nor;
+            nv.tex = v.tex.uv();
+            modelVtxData.push_back(nv);
+            modelElemData.push_back(uint32_t(modelElemData.size()));
         }
     }
 
@@ -50,43 +48,8 @@ bool ReloadModelData(const Str8 &filename, ModelRenderer *model)
         modelVtxData.data(), uint32_t(modelVtxData.size()),
         modelElemData.data(), uint32_t(modelElemData.size()));
 
+    console.AddText(ConsoleText::Normal, "Using model data: " + meshGrpData->name);
     return true;
-}
-
-bool ShowModelLoadWindow(Console &console, ModelRenderer *model)
-{
-    AGZ_ASSERT(model);
-
-    if(!ImGui::BeginPopupModal("LoadModelData", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
-        return false;
-
-    if(ImGui::GetIO().KeysDown[AGZ::Input::KEY_ESCAPE])
-    {
-        ImGui::CloseCurrentPopup();
-        ImGui::EndPopup();
-        return false;
-    }
-
-    bool ret = false;
-
-    static char buf[256] = "Scene/Asset/Test/Mitsuba.obj";
-    ImGui::InputText("", buf, 256);
-
-    ImGui::SameLine();
-    if(ImGui::Button("load") || ImGui::GetIO().KeysDown[AGZ::Input::KEY_ENTER])
-    {
-        if(ReloadModelData(buf, model))
-        {
-            console.AddText(ConsoleText::Normal, std::string("Model loaded from ") + buf);
-            ret = true;
-            ImGui::CloseCurrentPopup();
-        }
-        else
-            console.AddText(ConsoleText::Error, std::string("Failed to load model from ") + buf);
-    }
-    
-    ImGui::EndPopup();
-    return ret;
 }
 
 int Run(GLFWwindow *window)
@@ -96,7 +59,9 @@ int Run(GLFWwindow *window)
 
     AGZ::ObjArena<> arena;
 
+    Camera camera("default");
     Console console;
+    ModelDataManager modelDataMgr;
     TransformSequence transSeq;
 
     // 初始化IMGUI
@@ -155,6 +120,9 @@ int Run(GLFWwindow *window)
     win.AttachHandler(arena.Create<FramebufferSizeHandler>(
         [&](const FramebufferSize &param)
     {
+        auto &global = Global::GetInstance();
+        global.framebufferWidth  = param.w;
+        global.framebufferHeight = param.h;
         glViewport(0, 0, param.w, param.h);
     }));
 
@@ -172,20 +140,7 @@ int Run(GLFWwindow *window)
     model.SetTexture(&modelTex);
 
     model.SetView(Mat4f::LookAt({ -4.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }));
-    model.SetProj(Mat4f::Perspective(Deg(60.0f), 1.0f, 0.1f, 1000.0f));
-
-    // 准备FBO
-
-    GL::FrameBuffer fbo(true);
-    GL::RenderBuffer rbo(true);
-    GL::Texture2D fbTex(true);
-    fbTex.InitializeFormat(1, MODEL_VIEW_WIDTH, MODEL_VIEW_HEIGHT, GL_RGBA8);
-    rbo.SetFormat(MODEL_VIEW_WIDTH, MODEL_VIEW_HEIGHT, GL_DEPTH_COMPONENT);
-
-    fbo.Attach(GL_COLOR_ATTACHMENT0, fbTex);
-    fbo.Attach(GL_DEPTH_ATTACHMENT, rbo);
-
-    bool showLoadModelData = false;
+    model.SetProj(Mat4f::Perspective(Deg(60.0f), float(INIT_WIN_WIDTH) / INIT_WIN_HEIGHT, 0.1f, 1000.0f));
 
     while(!glfwWindowShouldClose(window))
     {
@@ -198,8 +153,7 @@ int Run(GLFWwindow *window)
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        GL::RenderContext::SetClearColor(Vec4f(Vec3f(0.4f), 0.0f));
-        GL::RenderContext::ClearColorAndDepth();
+        bool showLoadModelData = false;
 
         if(ImGui::BeginMainMenuBar())
         {
@@ -212,68 +166,34 @@ int Run(GLFWwindow *window)
                 ImGui::EndMenu();
             }
 
-            if(ImGui::BeginMenu("transform"))
-            {
-                if(ImGui::MenuItem("reset"))
-                {
-                    transSeq.Clear();
-                    console.AddText(ConsoleText::Normal, "Transform reset");
-                }
-                ImGui::EndMenu();
-            }
-
             ImGui::EndMainMenuBar();
         }
 
         if(showLoadModelData)
         {
-            ImGui::OpenPopup("LoadModelData");
-            showLoadModelData = false;
+            if(CreateModelFromSelectedData(console, modelDataMgr, &model))
+                transSeq.Clear();
         }
 
-        if(ShowModelLoadWindow(console, &model))
-            transSeq.Clear();
-
+        if(ImGui::Begin("Scene Manager", nullptr, ImVec2(400, 700)))
         {
-            fbo.Bind();
-            glViewport(0, 0, MODEL_VIEW_WIDTH, MODEL_VIEW_HEIGHT);
-
-            GL::RenderContext::ClearColorAndDepth();
-
-            model.Render();
-
-            GL::RenderContext::DisableDepthTest();
-
-            imm.DrawQuad({ -0.8f, -0.8f }, { 0.8f, 0.8f }, { 0.4f, 0.4f, 0.4f, 1.0f }, false);
-            imm.DrawCircle({ 0.0f, 0.0f }, { 0.9f, 0.9f }, { 0.4f, 0.4f, 0.4f, 1.0f }, false);
-
-            GL::RenderContext::EnableDepthTest();
-
-            fbo.Unbind();
-
-            int wW, wH;
-            glfwGetFramebufferSize(window, &wW, &wH);
-            glViewport(0, 0, wW, wH);
-        }
-
-        if(ImGui::Begin("Transform", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
-        {
+            modelDataMgr.Display(console);
             transSeq.Display();
-            model.SetWorld(transSeq.GetFinalTransformMatrix());
-            ImGui::End();
-        }
+            camera.Display();
 
-        char viewerTitle[80];
-        sprintf_s(viewerTitle, 80, "Viewer FPS %.1f###Viewer", ImGui::GetIO().Framerate);
-        if(ImGui::Begin(viewerTitle, nullptr, ImGuiWindowFlags_AlwaysAutoResize))
-        {
-            ImGui::Image(
-                (ImTextureID)(size_t)(fbTex.GetHandle()), ImVec2(MODEL_VIEW_WIDTH, MODEL_VIEW_HEIGHT),
-                { 0, 1 }, { 1, 0 });
             ImGui::End();
         }
 
         console.Display();
+
+        GL::RenderContext::SetClearColor(Vec4f(Vec3f(0.4f), 0.0f));
+        GL::RenderContext::ClearColorAndDepth();
+        GL::RenderContext::EnableDepthTest();
+
+        model.SetView(camera.GetViewMatrix());
+        model.SetProj(camera.GetProjMatrix());
+        model.SetWorld(transSeq.GetFinalTransformMatrix());
+        model.Render();
 
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -314,6 +234,10 @@ int main()
     }
 
     glfwSwapInterval(1);
+
+    auto &global = Global::GetInstance();
+    global.framebufferWidth  = INIT_WIN_WIDTH;
+    global.framebufferHeight = INIT_WIN_HEIGHT;
 
     try
     {

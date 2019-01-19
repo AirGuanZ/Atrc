@@ -176,15 +176,22 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\Source\Atrc\ModelViewer\AGZUtils.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Atrc\ModelViewer\Camera.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\ModelViewer\Console.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\ModelViewer\Main.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Atrc\ModelViewer\ModelDataManager.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\ModelViewer\ModelRenderer.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\ModelViewer\TransformSequence.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\..\Source\Atrc\ModelViewer\Camera.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\ModelViewer\Console.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\ModelViewer\GL.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\ModelViewer\Global.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\ModelViewer\Model.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\ModelViewer\ModelDataManager.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\ModelViewer\ModelRenderer.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\ModelViewer\SceneManager.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\ModelViewer\TransformSequence.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -3,6 +3,8 @@
 #include <list>
 #include <queue>
 
+#include <AGZUtils/Utils/String.h>
+
 struct ConsoleText
 {
     enum Type
@@ -25,6 +27,8 @@ public:
     void SetMaxTextCount(int count);
 
     void AddText(ConsoleText::Type type, const std::string &text);
+    void AddText(ConsoleText::Type type, const AGZ::Str8 &text) { AddText(type, text.ToStdString()); }
+    void AddText(ConsoleText::Type type, const char *text)      { AddText(type, std::string(text)); }
 
     void ClearTexts();
     void ClearInputBox();
