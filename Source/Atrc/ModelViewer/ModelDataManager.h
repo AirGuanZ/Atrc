@@ -6,7 +6,7 @@
 
 #include "Console.h"
 
-class ModelDataManager : public agz::Uncopiable
+class ModelDataManager : public AGZ::Uncopiable
 {
 public:
 
@@ -28,9 +28,11 @@ private:
 
     bool Add(const AGZ::Str8 &name, MeshGroup &&meshGroup);
 
-    void LoadFromFile(Console &console);
+    void LoadFromFile(Console &console, bool newPopup);
 
     void SortData();
+
+    size_t defaultNameIndex_ = 0;
 
     bool sortDataByName_ = false;
     int selectedIdx_ = -1;

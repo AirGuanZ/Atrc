@@ -94,7 +94,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -116,7 +116,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -136,7 +136,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -158,7 +158,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -179,6 +179,7 @@
     <ClCompile Include="..\..\..\..\Source\Atrc\ModelViewer\Camera.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\ModelViewer\Console.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\ModelViewer\Main.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Atrc\ModelViewer\Model.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\ModelViewer\ModelDataManager.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\ModelViewer\ModelRenderer.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\ModelViewer\TransformSequence.cpp" />
@@ -190,6 +191,7 @@
     <ClInclude Include="..\..\..\..\Source\Atrc\ModelViewer\Global.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\ModelViewer\Model.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\ModelViewer\ModelDataManager.h" />
+    <ClInclude Include="..\..\..\..\Source\Atrc\ModelViewer\ModelManager.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\ModelViewer\ModelRenderer.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\ModelViewer\SceneManager.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\ModelViewer\TransformSequence.h" />

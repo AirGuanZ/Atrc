@@ -6,7 +6,7 @@
 
 #include "GL.h"
 
-class TransformSequence
+class TransformSequence : public AGZ::Uncopiable
 {
     struct Translate { Vec3f offset;                };
     struct RotateX   { Deg angle;                   };
@@ -50,6 +50,12 @@ class TransformSequence
     bool EditTransformParam(Transform &trans) const;
 
 public:
+
+    TransformSequence() = default;
+
+    TransformSequence(TransformSequence &&moveFrom) noexcept = default;
+
+    TransformSequence &operator=(TransformSequence &&moveFrom) noexcept = default;
 
     const Mat4f &GetFinalTransformMatrix() const noexcept;
 

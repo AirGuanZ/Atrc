@@ -7,9 +7,13 @@
 
 void ModelDataManager::Display(Console &console)
 {
+    bool newPopup = false;
     if(ImGui::Button("load"))
+    {
         ImGui::OpenPopup("Load From File");
-    LoadFromFile(console);
+        newPopup = true;
+    }
+    LoadFromFile(console, newPopup);
 
     ImGui::SameLine();
 
@@ -80,7 +84,15 @@ bool ModelDataManager::Add(const AGZ::Str8 &name, MeshGroup &&meshGroup)
     return true;
 }
 
-void ModelDataManager::LoadFromFile(Console &console)
+namespace
+{
+    std::string DefaultName(size_t idx)
+    {
+        return std::string("default-") + std::to_string(idx);
+    }
+}
+
+void ModelDataManager::LoadFromFile(Console &console, bool newPopup)
 {
     if(!ImGui::BeginPopup("Load From File", ImGuiWindowFlags_AlwaysAutoResize))
         return;
@@ -88,7 +100,9 @@ void ModelDataManager::LoadFromFile(Console &console)
 
     bool ok = false, cancel = false;
 
-    static char nameBuf[256] = "default-name";
+    static char nameBuf[256] = "";
+    if(newPopup)
+        std::strcpy(nameBuf, DefaultName(defaultNameIndex_).c_str());
     ImGui::InputText("name", nameBuf, 256);
 
     static char filenameBuf[256] = "Scene/Asset/Test/Mitsuba.obj";
@@ -116,6 +130,9 @@ void ModelDataManager::LoadFromFile(Console &console)
             ImGui::CloseCurrentPopup();
             return;
         }
+
+        if(std::string(nameBuf) == DefaultName(defaultNameIndex_))
+            ++defaultNameIndex_;
 
         console.AddText(ConsoleText::Normal, "Load WavefrontOBJ from " + std::string(filenameBuf));
         console.AddText(ConsoleText::Normal, "Add model data: " + std::string(nameBuf));
