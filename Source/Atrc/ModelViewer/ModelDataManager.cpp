@@ -7,9 +7,6 @@
 
 void ModelDataManager::Display(Console &console)
 {
-    if(!ImGui::CollapsingHeader("Model Data Manager"))
-        return;
-
     if(ImGui::Button("load"))
         ImGui::OpenPopup("Load From File");
     LoadFromFile(console);
@@ -85,7 +82,7 @@ bool ModelDataManager::Add(const AGZ::Str8 &name, MeshGroup &&meshGroup)
 
 void ModelDataManager::LoadFromFile(Console &console)
 {
-    if(!ImGui::BeginPopupModal("Load From File", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+    if(!ImGui::BeginPopup("Load From File", ImGuiWindowFlags_AlwaysAutoResize))
         return;
     AGZ::ScopeGuard popupExitGuard([]() { ImGui::EndPopup(); });
 

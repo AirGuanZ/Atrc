@@ -189,9 +189,6 @@ void TransformSequence::AddMatrixToFront(std::string name, const Mat4f &mat)
 
 void TransformSequence::Display()
 {
-    if(!ImGui::CollapsingHeader("Transform"))
-        return;
-
     bool changed = false;
 
     {

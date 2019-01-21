@@ -1,5 +1,6 @@
 #include "Console.h"
 #include "GL.h"
+#include "Global.h"
 
 Console::Console(int inputBufSize, int maxTextCount)
 {
@@ -14,7 +15,11 @@ Console::Console(int inputBufSize, int maxTextCount)
 
 void Console::Display()
 {
-    ImGui::SetNextWindowPos(ImVec2(400, 100), ImGuiCond_FirstUseEver);
+    float fbW = static_cast<float>(Global::GetInstance().framebufferWidth);
+    float fbH = static_cast<float>(Global::GetInstance().framebufferHeight);
+    float posX = fbW - 450 - 40;
+    float posY = fbH - 150 - (fbH / fbW) * 40;
+    ImGui::SetNextWindowPos(ImVec2(posX, posY), ImGuiCond_FirstUseEver);
     ImGui::SetNextWindowSize(ImVec2(450, 150), ImGuiCond_FirstUseEver);
 
     if(!ImGui::Begin("Console##ModelViewer"))
@@ -24,7 +29,7 @@ void Console::Display()
     }
 
     //留一个separator+一行text的空间给输入槽
-    const float reservedFooterHeight = ImGui::GetStyle().ItemSpacing.y + ImGui::GetFrameHeightWithSpacing();
+    const float reservedFooterHeight = ImGui::GetStyle().ItemSpacing.y + ImGui::GetItemsLineHeightWithSpacing();
     ImGui::BeginChild("ScrollingRegion", ImVec2(0, -reservedFooterHeight), false, ImGuiWindowFlags_HorizontalScrollbar);
 
     for(auto &t : texts_)
@@ -49,8 +54,7 @@ void Console::Display()
 
     ImGui::Separator();
 
-    bool inputTextEntered = ImGui::InputText("Input", inputBuf_.data(), inputBuf_.size(),
-        ImGuiInputTextFlags_EnterReturnsTrue);
+    bool inputTextEntered = ImGui::InputText("Input", inputBuf_.data(), inputBuf_.size(), ImGuiInputTextFlags_EnterReturnsTrue);
     ImGui::SameLine();
     inputTextEntered |= ImGui::Button("Enter");
 

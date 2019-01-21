@@ -175,12 +175,35 @@ int Run(GLFWwindow *window)
                 transSeq.Clear();
         }
 
+        {
+            float fbW = static_cast<float>(Global::GetInstance().framebufferWidth);
+            float fbH = static_cast<float>(Global::GetInstance().framebufferHeight);
+            float posX = 40;
+            float posY = ImGui::GetFrameHeight() + posX * (fbH / fbW);
+            ImGui::SetNextWindowPos(ImVec2(posX, posY), ImGuiCond_FirstUseEver);
+        }
         if(ImGui::Begin("Scene Manager", nullptr, ImVec2(400, 700)))
         {
-            modelDataMgr.Display(console);
-            transSeq.Display();
-            camera.Display();
-
+            if(ImGui::BeginTabBar("scene manager tab"))
+            {
+                if(ImGui::BeginTabItem("model"))
+                {
+                    modelDataMgr.Display(console);
+                    ImGui::EndTabItem();
+                }
+                if(ImGui::BeginTabItem("property"))
+                {
+                    if(ImGui::CollapsingHeader("transform"))
+                        transSeq.Display();
+                    ImGui::EndTabItem();
+                }
+                if(ImGui::BeginTabItem("camera"))
+                {
+                    camera.Display();
+                    ImGui::EndTabItem();
+                }
+                ImGui::EndTabBar();
+            }
             ImGui::End();
         }
 

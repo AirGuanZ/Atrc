@@ -35,6 +35,8 @@ public:
 
     void Display();
 
+    const char *GetTitle() const noexcept { return title_.c_str(); }
+
 private:
 
     void UpdateViewData();

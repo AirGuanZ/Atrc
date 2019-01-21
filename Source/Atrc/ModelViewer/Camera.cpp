@@ -35,9 +35,6 @@ Camera::Camera(AGZ::Str8 name) noexcept
 
 void Camera::Display()
 {
-    if(!ImGui::CollapsingHeader(title_.c_str()))
-        return;
-
     ImGui::PushID(this);
     AGZ::ScopeGuard cameraIDGuard([]() { ImGui::PopID(); });
 
