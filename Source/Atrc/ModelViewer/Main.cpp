@@ -240,6 +240,7 @@ int main()
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
+    glfwWindowHint(GLFW_MAXIMIZED, GL_TRUE);
     GLFWwindow *window = glfwCreateWindow(INIT_WIN_WIDTH, INIT_WIN_HEIGHT, "Model Viewer", nullptr, nullptr);
     if(!window)
     {
@@ -258,9 +259,10 @@ int main()
 
     glfwSwapInterval(1);
 
-    auto &global = Global::GetInstance();
-    global.framebufferWidth  = INIT_WIN_WIDTH;
-    global.framebufferHeight = INIT_WIN_HEIGHT;
+    {
+        auto &global = Global::GetInstance();
+        glfwGetFramebufferSize(window, &global.framebufferWidth, &global.framebufferHeight);
+    }
 
     try
     {

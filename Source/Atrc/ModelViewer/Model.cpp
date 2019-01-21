@@ -65,8 +65,8 @@ void Model::EndRendering()
     prog.Unbind();
 }
 
-Model::Model() noexcept
-    : displayColorWith255_(false)
+Model::Model(std::string name) noexcept
+    : name_(std::move(name)), displayColorWith255_(false)
 {
     
 }

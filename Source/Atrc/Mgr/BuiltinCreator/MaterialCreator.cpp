@@ -1,5 +1,4 @@
 #include <AGZUtils/Utils/FileSys.h>
-#include <AGZUtils/Utils/Serialize.h>
 
 #include <Atrc/Lib/Material/BSSRDFSurface.h>
 #include <Atrc/Lib/Material/IdealBlack.h>
@@ -129,10 +128,10 @@ Material *BSSRDFSurfaceCreator::Create(const ConfigGroup &group, Context &contex
     {
         auto surface = context.Create<Material>(group["surface"]);
         auto AMap    = context.Create<Texture>(group["A"]);
-        auto mfpMap  = context.Create<Texture>(group["mfp"]);
+        auto dmfpMap = context.Create<Texture>(group["dmfp"]);
         Real eta     = group["eta"].Parse<Real>();
 
-        return arena.Create<BSSRDFSurface>(surface, AMap, mfpMap, eta);
+        return arena.Create<BSSRDFSurface>(surface, AMap, dmfpMap, eta);
     }
     ATRC_MGR_CATCH_AND_RETHROW("In creating bssrdf surface material")
 }

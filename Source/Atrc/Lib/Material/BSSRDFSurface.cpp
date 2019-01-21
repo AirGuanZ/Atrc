@@ -5,8 +5,8 @@ namespace Atrc
 {
 
 BSSRDFSurface::BSSRDFSurface(
-    const Material *surface, const Texture *AMap, const Texture *mfpMap, Real eta) noexcept
-    : surface_(surface), AMap_(AMap), mfpMap_(mfpMap), eta_(eta)
+    const Material *surface, const Texture *AMap, const Texture *dmfpMap, Real eta) noexcept
+    : surface_(surface), AMap_(AMap), dmfpMap_(dmfpMap), eta_(eta)
 {
 
 }
@@ -18,8 +18,8 @@ ShadingPoint BSSRDFSurface::GetShadingPoint(const Intersection &inct, Arena &are
     if(inct.coordSys.InPositiveHemisphere(inct.wr))
     {
         auto A     = AMap_->Sample(shd.uv);
-        auto mfp   = mfpMap_->Sample(shd.uv);
-        shd.bssrdf = arena.Create<NormalizedDiffusionBSSRDF>(inct, eta_, A, mfp);
+        auto dmfp  = dmfpMap_->Sample(shd.uv);
+        shd.bssrdf = arena.Create<NormalizedDiffusionBSSRDF>(inct, eta_, A, dmfp);
     }
 
     return shd;

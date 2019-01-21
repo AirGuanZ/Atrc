@@ -11,13 +11,13 @@ class BSSRDFSurface : public Material
     const Material *surface_;
 
     const Texture *AMap_;
-    const Texture *mfpMap_;
+    const Texture *dmfpMap_;
 
     Real eta_;
 
 public:
 
-    BSSRDFSurface(const Material *surface, const Texture *AMap, const Texture *mfpMap, Real eta) noexcept;
+    BSSRDFSurface(const Material *surface, const Texture *AMap, const Texture *dmfpMap, Real eta) noexcept;
 
     ShadingPoint GetShadingPoint(const Intersection &inct, Arena &arena) const noexcept;
 };

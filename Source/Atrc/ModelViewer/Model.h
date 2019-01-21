@@ -18,7 +18,7 @@ public:
 
     static void EndRendering();
 
-    Model() noexcept;
+    explicit Model(std::string name) noexcept;
 
     Model(Model &&moveFrom) noexcept = default;
 
@@ -33,6 +33,8 @@ public:
     void DisplayTransformSeq();
 
 private:
+
+    std::string name_;
 
     GL::VertexBuffer<Vertex> vtxBuf_;
     GL::VertexArray vao_;
