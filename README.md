@@ -10,7 +10,7 @@ Atrc是[Zhuang Guan](https://github.com/AirGuanZ)的渲染实验室，主要以C
 
 Lib已/将实现以下特性：
 
-- [x] Volumatric Path Tracing
+- [x] Volumetric Path Tracing
 - [x] Torrance-Sparrow Reflection Model & Oren-Nayar Reflection Model
 - [x] Normalized Diffusion BSSRDF
 - [ ] Torrance-Sparrow Transmission Model
