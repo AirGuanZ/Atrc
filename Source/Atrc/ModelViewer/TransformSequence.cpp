@@ -31,14 +31,14 @@ const std::string &TransformSequence::Transform::GetText() const
 
 void TransformSequence::Transform::UpdateTextAndMat()
 {
-    text_ = AGZ::TypeOpr::MatchVar(data_,
+    text_ = AGZ::MatchVariant(data_,
         [&](const Translate &param) { return "[translate] " + AGZ::ToStr8(param.offset).ToStdString(); },
         [&](const RotateX &param)   { return "[rotateX] "   + std::to_string(param.angle.value);       },
         [&](const RotateY &param)   { return "[rotateY] "   + std::to_string(param.angle.value);       },
         [&](const RotateZ &param)   { return "[rotateZ] "   + std::to_string(param.angle.value);       },
         [&](const Scale &param)     { return "[scale] "     + std::to_string(param.scale);             },
         [&](const Matrix &param)    { return "[matrix] "    + param.text;                              });
-    mat_ = AGZ::TypeOpr::MatchVar(data_,
+    mat_ = AGZ::MatchVariant(data_,
         [&](const Translate &param) { return Mat4f::Translate(param.offset);   },
         [&](const RotateX &param)   { return Mat4f::RotateX(param.angle);      },
         [&](const RotateY &param)   { return Mat4f::RotateY(param.angle);      },
@@ -143,7 +143,7 @@ bool TransformSequence::EditTransformParam(Transform &trans) const
 {
     auto data = trans.GetData();
     bool changed = false;
-    AGZ::TypeOpr::MatchVar(data,
+    AGZ::MatchVariant(data,
         [&changed](Translate &param)
     {
         changed |= ImGui::InputFloat("x offset", &param.offset.x, 0.05f, 1.0f, "%.4f");

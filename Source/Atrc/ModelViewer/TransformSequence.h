@@ -19,7 +19,7 @@ class TransformSequence : public AGZ::Uncopiable
     {
     public:
 
-        using Data = AGZ::TypeOpr::Variant<Translate, RotateX, RotateY, RotateZ, Scale, Matrix>;
+        using Data = std::variant<Translate, RotateX, RotateY, RotateZ, Scale, Matrix>;
 
         explicit Transform(const Data &data);
 

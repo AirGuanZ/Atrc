@@ -35,11 +35,6 @@ using AGZ::None;
 
 using AGZ::Str8;
 
-// ================================= Variant
-
-using AGZ::TypeOpr::Variant;
-using AGZ::TypeOpr::MatchVar;
-
 // ================================= Math
 
 using Vec2  = AGZ::Math::Vec2<Real>;

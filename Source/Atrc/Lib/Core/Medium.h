@@ -35,7 +35,7 @@ public:
     struct MediumLsSample { MediumPoint pnt; Real pdf; };
 
     // MediumLsSample为介质中的采样点，Real为采样到终点（非介质）时的概率密度函数值
-    using SampleLsResult = Variant<MediumLsSample, Real>;
+    using SampleLsResult = std::variant<MediumLsSample, Real>;
 
     // assert r is normalized
     virtual  SampleLsResult SampleLs(const Ray &r, const Vec3 &sample) const = 0;

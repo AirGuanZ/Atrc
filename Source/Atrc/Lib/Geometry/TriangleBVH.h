@@ -35,7 +35,7 @@ public:
 
     bool Serialize(AGZ::BinarySerializer &serializer) const;
 
-    static Option<TriangleBVHCore> DeserializeFromScratch(AGZ::BinaryDeserializer &deserializer);
+    static std::optional<TriangleBVHCore> Deserialize(AGZ::BinaryDeserializer &ds);
 
     AABB GetLocalBound() const noexcept;
 

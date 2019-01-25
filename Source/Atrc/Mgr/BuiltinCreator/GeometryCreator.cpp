@@ -106,7 +106,7 @@ namespace
             throw MgrErr("Failed to load last write time of " + filename);
 
         AGZ::BinaryIStreamDeserializer deserializer(fin);
-        auto cacheTime = deserializer.DeserializeFromScratch<AGZ::FileSys::FileTime>();
+        auto cacheTime = deserializer.Deserialize<AGZ::FileSys::FileTime>();
 
         if(!cacheTime || *cacheTime != *oriFileTime)
         {
@@ -114,7 +114,7 @@ namespace
             return RecreateTriangleMesh(filename, cacheFilename, arena);
         }
 
-        auto mesh = deserializer.DeserializeFromScratch<TriangleBVHCore>();
+        auto mesh = deserializer.Deserialize<TriangleBVHCore>();
         if(!mesh)
         {
             fin.close();

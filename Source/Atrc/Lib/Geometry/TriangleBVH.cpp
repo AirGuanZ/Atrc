@@ -19,8 +19,8 @@ struct TriangleBVHCorePrimitive
 {
     Vec3 A, B_A, C_A;
 
-    IMPL_MEMCPY_SERIALIZE
-    IMPL_MEMCPY_DESERIALIZE
+    IMPL_SERIALIZE_WITH_MEMCPY
+    IMPL_DESERIALIZE_WITH_MEMCPY
 };
 
 struct TriangleBVHCorePrimitiveInfo
@@ -29,8 +29,8 @@ struct TriangleBVHCorePrimitiveInfo
     Vec2 tA, tB_tA, tC_tA;
     CoordSystem coordSys;
 
-    IMPL_MEMCPY_SERIALIZE
-    IMPL_MEMCPY_DESERIALIZE
+    IMPL_SERIALIZE_WITH_MEMCPY
+    IMPL_DESERIALIZE_WITH_MEMCPY
 };
 
 namespace
@@ -448,13 +448,13 @@ bool TriangleBVHCore::Serialize(AGZ::BinarySerializer &serializer) const
     return true;
 }
 
-Option<TriangleBVHCore> TriangleBVHCore::DeserializeFromScratch(AGZ::BinaryDeserializer &deserializer)
+std::optional<TriangleBVHCore> TriangleBVHCore::Deserialize(AGZ::BinaryDeserializer &deserializer)
 {
-    auto OAreaPrefixSum = deserializer.DeserializeFromScratch<std::vector<Real>>();
+    auto OAreaPrefixSum = deserializer.Deserialize<std::vector<Real>>();
     if(!OAreaPrefixSum)
         return None;
 
-    auto ONodeCount = deserializer.DeserializeFromScratch<uint32_t>();
+    auto ONodeCount = deserializer.Deserialize<uint32_t>();
     if(!ONodeCount)
         return None;
 

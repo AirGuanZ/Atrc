@@ -101,7 +101,7 @@ namespace
             throw MgrErr("Failed to load last write time of " + filename);
 
         AGZ::BinaryIStreamDeserializer deserializer(fin);
-        auto cacheTime = deserializer.DeserializeFromScratch<AGZ::FileSys::FileTime>();
+        auto cacheTime = deserializer.Deserialize<AGZ::FileSys::FileTime>();
         if(!cacheTime || *cacheTime != *oriFileTime)
         {
             fin.close();
@@ -115,8 +115,8 @@ namespace
         Name2Geometry ret;
         for(uint32_t i = 0; i < submeshCount; ++i)
         {
-            auto name = deserializer.DeserializeFromScratch<Str8>();
-            auto core = deserializer.DeserializeFromScratch<TriangleBVHCore>();
+            auto name = deserializer.Deserialize<Str8>();
+            auto core = deserializer.Deserialize<TriangleBVHCore>();
 
             if(!name || !core)
                 throw MgrErr("Failed to deserialize submesh from " + cacheFilename);
