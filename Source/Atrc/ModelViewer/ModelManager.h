@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "Camera.h"
+#include "Console.h"
 #include "Model.h"
 #include "ModelDataManager.h"
 
@@ -19,9 +20,11 @@ public:
 
     void Render(const Camera &camera) const;
 
-    void Display();
+    void Display(Console &console);
 
 private:
+
+    void NewModelFromData(Console &console, bool clickNew);
 
     static constexpr size_t INDEX_NONE = std::numeric_limits<size_t>::max();
 

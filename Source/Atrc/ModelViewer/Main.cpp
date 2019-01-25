@@ -8,6 +8,7 @@
 #include "GL.h"
 #include "Global.h"
 #include "ModelDataManager.h"
+#include "ModelManager.h"
 #include "ModelRenderer.h"
 #include "TransformSequence.h"
 
@@ -62,6 +63,7 @@ int Run(GLFWwindow *window)
     Camera camera("default");
     Console console;
     ModelDataManager modelDataMgr;
+    ModelManager modelMgr;
     TransformSequence transSeq;
 
     // 初始化IMGUI
@@ -188,7 +190,8 @@ int Run(GLFWwindow *window)
             {
                 if(ImGui::BeginTabItem("model"))
                 {
-                    modelDataMgr.Display(console);
+                    //modelDataMgr.Display(console);
+                    modelMgr.Display(console);
                     ImGui::EndTabItem();
                 }
                 if(ImGui::BeginTabItem("property"))

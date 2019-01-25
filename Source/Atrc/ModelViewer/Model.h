@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 #include "Camera.h"
 #include "GL.h"
 #include "TransformSequence.h"
@@ -24,7 +26,7 @@ public:
 
     Model &operator=(Model &&moveFrom) noexcept = default;
 
-    void Initialize(const Vertex *vtxData, uint32_t vtxCount, const Vec3f &renderColor);
+    void Initialize(std::shared_ptr<GL::VertexBuffer<Vertex>> vtxBuf, const Vec3f &renderColor);
 
     void Render(const Camera &camera) const;
 
@@ -32,11 +34,13 @@ public:
 
     void DisplayTransformSeq();
 
+    const std::string &GetName() const noexcept { return name_; }
+
 private:
 
     std::string name_;
 
-    GL::VertexBuffer<Vertex> vtxBuf_;
+    std::shared_ptr<GL::VertexBuffer<Vertex>> vtxBuf_;
     GL::VertexArray vao_;
 
     Vec3f renderColor_;

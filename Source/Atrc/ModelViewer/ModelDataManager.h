@@ -1,10 +1,13 @@
 #pragma once
 
-#include <unordered_map>
+#include <memory>
+#include <vector>
 
 #include <AGZUtils/Utils/Mesh.h>
 
 #include "Console.h"
+#include "GL.h"
+#include "Model.h"
 
 class ModelDataManager : public AGZ::Uncopiable
 {
@@ -18,6 +21,7 @@ public:
         std::string nameText;
         MeshGroup meshGroup;
         AGZ::Mesh::BoundingBox<float> bounding;
+        std::shared_ptr<GL::VertexBuffer<Model::Vertex>> vtxBuf;
     };
 
     void Display(Console &console);

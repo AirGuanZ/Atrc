@@ -71,19 +71,18 @@ Model::Model(std::string name) noexcept
     
 }
 
-void Model::Initialize(const Vertex *vtxData, uint32_t vtxCount, const Vec3f &renderColor)
+void Model::Initialize(std::shared_ptr<GL::VertexBuffer<Vertex>> vtxBuf, const Vec3f &renderColor)
 {
     AGZ_ASSERT(vtxData && vtxCount);
     CheckRendererInitialization();
 
-    vtxBuf_.InitializeHandle();
-    vtxBuf_.ReinitializeData(vtxData, vtxCount, GL_STATIC_DRAW);
+    vtxBuf_ = std::move(vtxBuf);
 
     vao_.InitializeHandle();
     vao_.EnableAttrib(attribLPos);
     vao_.EnableAttrib(attribLNor);
-    vao_.BindVertexBufferToAttrib(attribLPos, vtxBuf_, &Vertex::pos, 0);
-    vao_.BindVertexBufferToAttrib(attribLNor, vtxBuf_, &Vertex::nor, 1);
+    vao_.BindVertexBufferToAttrib(attribLPos, *vtxBuf_, &Vertex::pos, 0);
+    vao_.BindVertexBufferToAttrib(attribLNor, *vtxBuf_, &Vertex::nor, 1);
 
     AGZ_ASSERT(!displayColorWith255_);
     renderColor_ = renderColor;
@@ -99,7 +98,7 @@ void Model::Render(const Camera &camera) const
     uniformWORLD.BindValue(transSeq_.GetFinalTransformMatrix());
     uniformCOLOR.BindValue(renderColor_);
 
-    GL::RenderContext::DrawVertices(GL_TRIANGLES, 0, vtxBuf_.GetVertexCount());
+    GL::RenderContext::DrawVertices(GL_TRIANGLES, 0, vtxBuf_->GetVertexCount());
 
     vao_.Unbind();
 }
