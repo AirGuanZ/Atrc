@@ -1,9 +1,35 @@
 ﻿#include <algorithm>
+#include <cstdint>
 
 #include <AGZUtils/Utils/Misc.h>
 
 #include "GL.h"
 #include "ModelDataManager.h"
+
+std::shared_ptr<const GL::VertexBuffer<Model::Vertex>> ModelDataManager::MeshGroupData::GetVertexBuffer() const
+{
+    if(vtxBuf)
+        return vtxBuf;
+
+    std::shared_ptr<GL::VertexBuffer<Model::Vertex>> buf = std::make_shared<GL::VertexBuffer<Model::Vertex>>();
+    std::vector<Model::Vertex> vtxData;
+
+    for(auto &it : meshGroup.submeshes)
+    {
+        for(auto &v : it.second.vertices)
+        {
+            Model::Vertex nv;
+            nv.pos = v.pos;
+            nv.nor = v.nor;
+            vtxData.push_back(nv);
+        }
+    }
+
+    buf->ReinitializeData(vtxData.data(), static_cast<uint32_t>(vtxData.size()), GL_STATIC_DRAW);
+    vtxBuf = std::move(buf);
+
+    return vtxBuf;
+}
 
 void ModelDataManager::Display(Console &console)
 {
@@ -64,8 +90,12 @@ bool ModelDataManager::Add(const AGZ::Str8 &name, MeshGroup &&meshGroup)
 
     // 新元素插入
 
-    auto bb = meshGroup.GetBoundingBox();
-    data_.push_back({ name, name.ToStdString(), std::move(meshGroup), bb });
+	MeshGroupData grpData;
+    grpData.bounding  = meshGroup.GetBoundingBox();
+    grpData.meshGroup = std::move(meshGroup);
+    grpData.name      = name;
+    grpData.nameText  = name.ToStdString();
+    data_.push_back(std::move(grpData));
 
     if(sortDataByName_)
         SortData();

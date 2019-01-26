@@ -71,13 +71,12 @@ Model::Model(std::string name) noexcept
     
 }
 
-void Model::Initialize(std::shared_ptr<GL::VertexBuffer<Vertex>> vtxBuf, const Vec3f &renderColor)
+void Model::Initialize(std::shared_ptr<const GL::VertexBuffer<Vertex>> vtxBuf, const Vec3f &renderColor)
 {
     CheckRendererInitialization();
 
     vtxBuf_ = std::move(vtxBuf);
 
-    vao_.InitializeHandle();
     vao_.EnableAttrib(attribLPos);
     vao_.EnableAttrib(attribLNor);
     vao_.BindVertexBufferToAttrib(attribLPos, *vtxBuf_, &Vertex::pos, 0);

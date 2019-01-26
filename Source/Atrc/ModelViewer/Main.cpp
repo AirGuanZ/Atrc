@@ -7,10 +7,7 @@
 #include "Console.h"
 #include "GL.h"
 #include "Global.h"
-#include "ModelDataManager.h"
 #include "ModelManager.h"
-#include "ModelRenderer.h"
-#include "TransformSequence.h"
 
 using namespace std;
 using AGZ::Str8;
@@ -18,53 +15,12 @@ using AGZ::Str8;
 constexpr int INIT_WIN_WIDTH = 1400;
 constexpr int INIT_WIN_HEIGHT = 900;
 
-bool CreateModelFromSelectedData(Console &console, const ModelDataManager &dataMgr, ModelRenderer *model)
-{
-    AGZ_ASSERT(model);
-
-    std::vector<ModelRenderer::Vertex> modelVtxData;
-    std::vector<uint32_t> modelElemData;
-
-    auto meshGrpData = dataMgr.GetSelectedMeshGroup();
-    if(!meshGrpData)
-    {
-        console.AddText(ConsoleText::Error, "No model data is selected");
-        return false;
-    }
-
-    for(auto &it : meshGrpData->meshGroup.submeshes)
-    {
-        for(auto &v : it.second.vertices)
-        {
-            ModelRenderer::Vertex nv;
-            nv.pos = v.pos;
-            nv.nor = v.nor;
-            nv.tex = v.tex.uv();
-            modelVtxData.push_back(nv);
-            modelElemData.push_back(uint32_t(modelElemData.size()));
-        }
-    }
-
-    model->SetModelData(
-        modelVtxData.data(), uint32_t(modelVtxData.size()),
-        modelElemData.data(), uint32_t(modelElemData.size()));
-
-    console.AddText(ConsoleText::Normal, "Using model data: " + meshGrpData->name);
-    return true;
-}
-
 int Run(GLFWwindow *window)
 {
     using namespace AGZ::GraphicsAPI;
     using namespace AGZ::Input;
 
     AGZ::ObjArena<> arena;
-
-    Camera camera("default");
-    Console console;
-    ModelDataManager modelDataMgr;
-    ModelManager modelMgr;
-    TransformSequence transSeq;
 
     // 初始化IMGUI
 
@@ -133,16 +89,11 @@ int Run(GLFWwindow *window)
     GL::Immediate imm;
     imm.Initialize({ 600.0f, 600.0f });
 
-    // Model Renderer
+    // Model Manager
 
-    ModelRenderer model;
-    model.Initialize();
-
-    GL::Texture2D modelTex(true);
-    model.SetTexture(&modelTex);
-
-    model.SetView(Mat4f::LookAt({ -4.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }));
-    model.SetProj(Mat4f::Perspective(Deg(60.0f), float(INIT_WIN_WIDTH) / INIT_WIN_HEIGHT, 0.1f, 1000.0f));
+	Camera camera("default");
+	Console console;
+	ModelManager modelMgr;
 
     while(!glfwWindowShouldClose(window))
     {
@@ -155,26 +106,16 @@ int Run(GLFWwindow *window)
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        bool showLoadModelData = false;
-
         if(ImGui::BeginMainMenuBar())
         {
             if(ImGui::BeginMenu("file"))
             {
-                if(ImGui::MenuItem("load"))
-                    showLoadModelData = true;
                 if(ImGui::MenuItem("exit"))
                     glfwSetWindowShouldClose(window, GLFW_TRUE);
                 ImGui::EndMenu();
             }
 
             ImGui::EndMainMenuBar();
-        }
-
-        if(showLoadModelData)
-        {
-            if(CreateModelFromSelectedData(console, modelDataMgr, &model))
-                transSeq.Clear();
         }
 
         {
@@ -194,12 +135,6 @@ int Run(GLFWwindow *window)
                     modelMgr.Display(console);
                     ImGui::EndTabItem();
                 }
-                if(ImGui::BeginTabItem("property"))
-                {
-                    if(ImGui::CollapsingHeader("transform"))
-                        transSeq.Display();
-                    ImGui::EndTabItem();
-                }
                 if(ImGui::BeginTabItem("camera"))
                 {
                     camera.Display();
@@ -216,10 +151,7 @@ int Run(GLFWwindow *window)
         GL::RenderContext::ClearColorAndDepth();
         GL::RenderContext::EnableDepthTest();
 
-        model.SetView(camera.GetViewMatrix());
-        model.SetProj(camera.GetProjMatrix());
-        model.SetWorld(transSeq.GetFinalTransformMatrix());
-        model.Render();
+        modelMgr.Render(camera);
 
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

@@ -9,19 +9,30 @@
 #include "GL.h"
 #include "Model.h"
 
-class ModelDataManager : public AGZ::Uncopiable
+class ModelDataManager
 {
 public:
 
     using MeshGroup = AGZ::Mesh::GeometryMeshGroup<float>;
 
-    struct MeshGroupData
+    class MeshGroupData
     {
+		mutable std::shared_ptr<const GL::VertexBuffer<Model::Vertex>> vtxBuf;
+
+    public:
+
+		MeshGroupData()                                    = default;
+		MeshGroupData(MeshGroupData&&) noexcept            = default;
+		MeshGroupData &operator=(MeshGroupData&&) noexcept = default;
+        MeshGroupData(const MeshGroupData&)                = default;
+        MeshGroupData &operator=(const MeshGroupData&)     = default;
+
         AGZ::Str8 name;
         std::string nameText;
         MeshGroup meshGroup;
         AGZ::Mesh::BoundingBox<float> bounding;
-        std::shared_ptr<GL::VertexBuffer<Model::Vertex>> vtxBuf;
+
+		std::shared_ptr<const GL::VertexBuffer<Model::Vertex>> GetVertexBuffer() const;
     };
 
     void Display(Console &console);

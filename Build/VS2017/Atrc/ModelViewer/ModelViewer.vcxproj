@@ -181,7 +181,6 @@
     <ClCompile Include="..\..\..\..\Source\Atrc\ModelViewer\Model.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\ModelViewer\ModelDataManager.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\ModelViewer\ModelManager.cpp" />
-    <ClCompile Include="..\..\..\..\Source\Atrc\ModelViewer\ModelRenderer.cpp" />
     <ClCompile Include="..\..\..\..\Source\Atrc\ModelViewer\TransformSequence.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -192,7 +191,6 @@
     <ClInclude Include="..\..\..\..\Source\Atrc\ModelViewer\Model.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\ModelViewer\ModelDataManager.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\ModelViewer\ModelManager.h" />
-    <ClInclude Include="..\..\..\..\Source\Atrc\ModelViewer\ModelRenderer.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\ModelViewer\SceneManager.h" />
     <ClInclude Include="..\..\..\..\Source\Atrc\ModelViewer\TransformSequence.h" />
   </ItemGroup>

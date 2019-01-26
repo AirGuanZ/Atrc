@@ -26,7 +26,7 @@ public:
 
     Model &operator=(Model &&moveFrom) noexcept = default;
 
-    void Initialize(std::shared_ptr<GL::VertexBuffer<Vertex>> vtxBuf, const Vec3f &renderColor);
+    void Initialize(std::shared_ptr<const GL::VertexBuffer<Vertex>> vtxBuf, const Vec3f &renderColor);
 
     void Render(const Camera &camera) const;
 
@@ -40,7 +40,7 @@ private:
 
     std::string name_;
 
-    std::shared_ptr<GL::VertexBuffer<Vertex>> vtxBuf_;
+    std::shared_ptr<const GL::VertexBuffer<Vertex>> vtxBuf_;
     GL::VertexArray vao_;
 
     Vec3f renderColor_;

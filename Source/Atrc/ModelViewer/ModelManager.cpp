@@ -1,3 +1,4 @@
+#include "Model.h"
 #include "ModelManager.h"
 
 ModelManager::ModelManager()
@@ -32,6 +33,20 @@ void ModelManager::Display(Console &console)
     }
 
     NewModelFromData(console, clickNew);
+
+    for(size_t i = 0; i < models_.size(); ++i)
+    {
+        ImGui::PushID(int(i));
+
+        if(ImGui::TreeNode(models_[i].GetName().c_str()))
+        {
+            models_[i].DisplayProperty();
+            models_[i].DisplayTransformSeq();
+            ImGui::TreePop();
+        }
+
+        ImGui::PopID();
+    }
 }
 
 void ModelManager::NewModelFromData(Console &console, bool clickNew)
@@ -50,16 +65,32 @@ void ModelManager::NewModelFromData(Console &console, bool clickNew)
 
     if(ImGui::Button("ok"))
     {
+        AGZ::ScopeGuard closePopupGuard([]() { ImGui::CloseCurrentPopup(); });
+
+        std::string name = nameBuf;
+        for(auto &m : models_)
+        {
+            if(m.GetName() == name)
+            {
+                console.AddText(ConsoleText::Error, "Name already used");
+                return;
+            }
+        }
+
         auto data = dataMgr_.GetSelectedMeshGroup();
         if(!data)
         {
             console.AddText(ConsoleText::Error, "No model data is selected");
-            ImGui::CloseCurrentPopup();
             return;
         }
+        auto vtxBuf = data->GetVertexBuffer();
+        AGZ_ASSERT(vtxBuf);
 
-        // TODO
+        Model newModel(std::move(name));
+        newModel.Initialize(vtxBuf, Vec3f(0.5f));
+        models_.push_back(std::move(newModel));
+        selectedIdx_ = models_.size() - 1;
+
         console.AddText(ConsoleText::Normal, "Model created: " + std::string(nameBuf));
-        ImGui::CloseCurrentPopup();
     }
 }
