@@ -27,10 +27,10 @@ Spectrum BxDF_Diffuse::Eval(const CoordSystem &geoInShd, const Vec3 &wi, const V
     return albedo_ / PI;
 }
 
-Option<BxDF::SampleWiResult> BxDF_Diffuse::SampleWi(const CoordSystem &geoInShd, const Vec3 &wo, [[maybe_unused]] bool star, const Vec2 &sample) const noexcept
+std::optional<BxDF::SampleWiResult> BxDF_Diffuse::SampleWi(const CoordSystem &geoInShd, const Vec3 &wo, [[maybe_unused]] bool star, const Vec2 &sample) const noexcept
 {
     if(!geoInShd.InPositiveHemisphere(wo))
-        return None;
+        return std::nullopt;
 
     auto [sam, pdf] = AGZ::Math::DistributionTransform
         ::ZWeightedOnUnitHemisphere<Real>::Transform(sample);
@@ -40,7 +40,7 @@ Option<BxDF::SampleWiResult> BxDF_Diffuse::SampleWi(const CoordSystem &geoInShd,
         2. pdf在理论上不可能为0，但因为数值原因在MSVC上使用float时有微小的概率为0，因此将其滤除
     */
     if(!geoInShd.InPositiveHemisphere(sam) || !pdf)
-        return None;
+        return std::nullopt;
 
     SampleWiResult ret;
     ret.coef    = albedo_ / PI;

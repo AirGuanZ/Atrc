@@ -452,11 +452,11 @@ std::optional<TriangleBVHCore> TriangleBVHCore::Deserialize(AGZ::BinaryDeseriali
 {
     auto OAreaPrefixSum = deserializer.Deserialize<std::vector<Real>>();
     if(!OAreaPrefixSum)
-        return None;
+        return std::nullopt;
 
     auto ONodeCount = deserializer.Deserialize<uint32_t>();
     if(!ONodeCount)
-        return None;
+        return std::nullopt;
 
     TriangleBVHCoreNode *nodes = nullptr;
     TriangleBVHCorePrimitive *prims = nullptr;
@@ -489,7 +489,7 @@ std::optional<TriangleBVHCore> TriangleBVHCore::Deserialize(AGZ::BinaryDeseriali
             AGZ::CRTAllocator::Free(prims);
         if(primsInfo)
             AGZ::CRTAllocator::Free(primsInfo);
-        return None;
+        return std::nullopt;
     }
 
     TriangleBVHCore core;
@@ -500,7 +500,7 @@ std::optional<TriangleBVHCore> TriangleBVHCore::Deserialize(AGZ::BinaryDeseriali
     core.prims_         = prims;
     core.primsInfo_     = primsInfo;
 
-    return Some(std::move(core));
+    return std::make_optional(std::move(core));
 }
 
 AABB TriangleBVHCore::GetLocalBound() const noexcept

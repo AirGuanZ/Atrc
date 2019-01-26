@@ -60,17 +60,17 @@ namespace
             return ret;
         }
 
-        Option<SampleWiResult> SampleWi(
+        std::optional<SampleWiResult> SampleWi(
             const CoordSystem &shd, const CoordSystem &geo,
             const Vec3 &wo, BSDFType type, bool star, const Vec2 &sample) const noexcept override
         {
             if(!((type & BSDF_TRANSMISSION) && (type & (BSDF_DIFFUSE | BSDF_GLOSSY))))
-                return None;
+                return std::nullopt;
 
             auto [sam, pdf] = AGZ::Math::DistributionTransform
                 ::ZWeightedOnUnitHemisphere<Real>::Transform(sample);
             if(!pdf)
-                return None;
+                return std::nullopt;
             sam = shd.Local2World(sam);
 
             SampleWiResult ret;
@@ -81,7 +81,7 @@ namespace
             ret.isDelta = false;
 
             if(!ret.coef || !ret.pdf)
-                return None;
+                return std::nullopt;
 
             return ret;
         }
@@ -141,7 +141,7 @@ Spectrum SeparableBSSRDF::Eval(const Intersection &pi, [[maybe_unused]] bool sta
     return ret;
 }
 
-Option<BSSRDF::SamplePiResult> SeparableBSSRDF::SamplePi(bool star, const Vec3 &sample, Arena &arena) const noexcept
+std::optional<BSSRDF::SamplePiResult> SeparableBSSRDF::SamplePi(bool star, const Vec3 &sample, Arena &arena) const noexcept
 {
     // 选择投影轴和采样通道
 
@@ -174,7 +174,7 @@ Option<BSSRDF::SamplePiResult> SeparableBSSRDF::SamplePi(bool star, const Vec3 &
     auto sr = SampleSr(channel, sampleX);
     Real rMax = SampleSr(channel, Real(0.996)).radius;
     if(sr.radius <= 0 || sr.radius > rMax)
-        return None;
+        return std::nullopt;
     Real phi = 2 * PI * sampleY;
 
     // 构造采样射线
@@ -219,7 +219,7 @@ Option<BSSRDF::SamplePiResult> SeparableBSSRDF::SamplePi(bool star, const Vec3 &
     }
 
     if(!inctListLength)
-        return None;
+        return std::nullopt;
 
     // 从交点中选取一个
 
@@ -233,7 +233,7 @@ Option<BSSRDF::SamplePiResult> SeparableBSSRDF::SamplePi(bool star, const Vec3 &
     }
 
     if(inctListEntry->inct.material != po_.material)
-        return None;
+        return std::nullopt;
 
     Real pdfRadius = SamplePiPDF(inctListEntry->inct, star);
 
@@ -245,7 +245,7 @@ Option<BSSRDF::SamplePiResult> SeparableBSSRDF::SamplePi(bool star, const Vec3 &
     ret.pdf         = pdfRadius / (2 * PI) / inctListLength;
 
     if(ret.pdf < 0.01)
-        return None;
+        return std::nullopt;
 
     AGZ_ASSERT(sr.radius > 0);
     AGZ_ASSERT(ret.pdf > 0);

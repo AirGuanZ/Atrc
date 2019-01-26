@@ -44,7 +44,7 @@ public:
         const CoordSystem &shd, const CoordSystem &geo,
         const Vec3 &wi, const Vec3 &wo, BSDFType type, bool star) const noexcept = 0;
 
-    virtual Option<SampleWiResult> SampleWi(
+    virtual std::optional<SampleWiResult> SampleWi(
         const CoordSystem &shd, const CoordSystem &geo,
         const Vec3 &wo, BSDFType type, bool star, const Vec2 &sample) const noexcept = 0;
 

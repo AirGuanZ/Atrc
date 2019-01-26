@@ -2,7 +2,8 @@
 
 #include <Atrc/Lib/Core/Camera.h>
 
-AGZ_NS_BEG(Atrc)
+namespace Atrc
+{
 
 class PinholeCamera : public Camera
 {
@@ -22,4 +23,4 @@ public:
     GenerateRayResult GenerateRay(const CameraSample &sample) const noexcept override;
 };
 
-AGZ_NS_END(Atrc)
+} // namespace Atrc

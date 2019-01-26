@@ -22,12 +22,12 @@ Spectrum BxDF_Black::Eval(
     return Spectrum();
 }
 
-Option<BxDF::SampleWiResult> BxDF_Black::SampleWi(
+std::optional<BxDF::SampleWiResult> BxDF_Black::SampleWi(
     [[maybe_unused]] const CoordSystem &geoInShd,
     [[maybe_unused]] const Vec3 &wo, [[maybe_unused]] bool star,
     [[maybe_unused]] const Vec2 &sample) const noexcept
 {
-    return None;
+    return std::nullopt;
 }
 
 Real BxDF_Black::SampleWiPDF(

@@ -89,7 +89,7 @@ Spectrum FullPathTracingIntegrator::Eval(const Scene &scene, const Ray &_r, Samp
             coef *= (med ? med->Tr(r.o, inct.pos) : Spectrum(Real(1))) / sampleInctPDF;
         }
 
-        Option<Intersection> nInct;
+        std::optional<Intersection> nInct;
 
         if(sampleMed)
         {

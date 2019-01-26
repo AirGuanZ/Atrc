@@ -15,7 +15,7 @@ public:
 
     virtual void End() = 0;
 
-    virtual void Report(const Film &film, Option<Real> percent) = 0;
+    virtual void Report(const Film &film, std::optional<Real> percent) = 0;
 
     virtual void Message(const Str8 &msg) = 0;
 };

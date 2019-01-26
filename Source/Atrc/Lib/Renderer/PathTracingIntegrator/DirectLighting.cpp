@@ -83,7 +83,7 @@ namespace
     }
 }
     
-std::tuple<Spectrum, Option<BSDF::SampleWiResult>, Option<Intersection>> ComputeDirectLighting(
+std::tuple<Spectrum, std::optional<BSDF::SampleWiResult>, std::optional<Intersection>> ComputeDirectLighting(
     const Scene &scene, const Intersection &inct, const ShadingPoint &shd,
     bool sampleAllLights, bool considerMedium, Sampler *sampler)
 {
@@ -102,7 +102,7 @@ std::tuple<Spectrum, Option<BSDF::SampleWiResult>, Option<Intersection>> Compute
 
     auto bsdfSample = shd.bsdf->SampleWi(shd.coordSys, inct.coordSys, inct.wr, BSDF_ALL, false, sampler->GetReal2());
     if(!bsdfSample || !bsdfSample->coef)
-        return { ret, None, None };
+        return { ret, std::nullopt, std::nullopt };
 
     Ray nR(inct.pos, bsdfSample->wi.Normalize(), EPS);
 
@@ -179,10 +179,10 @@ std::tuple<Spectrum, Option<BSDF::SampleWiResult>, Option<Intersection>> Compute
 
     if(hasInct)
         return { ret, bsdfSample, nInct };
-    return { ret, bsdfSample, None };
+    return { ret, bsdfSample, std::nullopt };
 }
 
-std::tuple<Spectrum, PhaseFunction::SampleWiResult, Option<Intersection>> ComputeDirectLighting(
+std::tuple<Spectrum, PhaseFunction::SampleWiResult, std::optional<Intersection>> ComputeDirectLighting(
     const Scene &scene, const MediumPoint &mpnt, const MediumShadingPoint &mshd,
     bool sampleAllLights, Sampler *sampler)
 {
@@ -249,7 +249,7 @@ std::tuple<Spectrum, PhaseFunction::SampleWiResult, Option<Intersection>> Comput
 
     if(hasInct)
         return { ret, phSample, nInct };
-    return { ret, phSample, None };
+    return { ret, phSample, std::nullopt };
 }
 
 } // namespace Atrc

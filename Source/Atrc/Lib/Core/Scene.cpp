@@ -53,10 +53,10 @@ const AABB &Scene::GetWorldBound() const noexcept
     return worldBound_;
 }
 
-Option<Scene::SampleLightResult> Scene::SampleLight(Real sample) const noexcept
+std::optional<Scene::SampleLightResult> Scene::SampleLight(Real sample) const noexcept
 {
     if(lights_.empty())
-        return None;
+        return std::nullopt;
     size_t index = Min(size_t(sample * lights_.size()), lights_.size() - 1);
     return SampleLightResult {
         lights_[index],

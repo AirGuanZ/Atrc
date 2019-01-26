@@ -35,7 +35,7 @@ namespace
         if(!fout)
             throw MgrErr("Failed to create new cache file: " + cacheFilename);
 
-        auto oriFileTime = AGZ::FileSys::File::GetLastWriteTime(filename);
+        auto oriFileTime = AGZ::FileSys::File::GetLastWriteTime(filename.ToStdString());
         if(!oriFileTime)
             throw MgrErr("Failed to load last write time of " + filename);
 
@@ -96,7 +96,7 @@ namespace
         if(!fin)
             return RecreateName2Geometry(filename, cacheFilename, arena);
         
-        auto oriFileTime = AGZ::FileSys::File::GetLastWriteTime(filename);
+        auto oriFileTime = AGZ::FileSys::File::GetLastWriteTime(filename.ToStdString());
         if(!oriFileTime)
             throw MgrErr("Failed to load last write time of " + filename);
 

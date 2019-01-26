@@ -27,7 +27,7 @@ public:
         const CoordSystem &shd, const CoordSystem &geo,
         const Vec3 &wi, const Vec3 &wo, BSDFType type, bool star) const noexcept override;
     
-    Option<SampleWiResult> SampleWi(
+    std::optional<SampleWiResult> SampleWi(
         const CoordSystem &shd, const CoordSystem &geo,
         const Vec3 &wo, BSDFType type, bool star, const Vec2 &sample) const noexcept override;
 
@@ -82,7 +82,7 @@ Spectrum BxDFAggregate<MAX_BXDF_CNT>::Eval(
 }
 
 template<uint8_t MAX_BXDF_CNT>
-Option<typename BxDFAggregate<MAX_BXDF_CNT>::SampleWiResult>
+std::optional<typename BxDFAggregate<MAX_BXDF_CNT>::SampleWiResult>
 BxDFAggregate<MAX_BXDF_CNT>::SampleWi(
     const CoordSystem &shd, [[maybe_unused]] const CoordSystem &geo,
     const Vec3 &wo, BSDFType type, bool star, const Vec2 &sample) const noexcept
@@ -93,7 +93,7 @@ BxDFAggregate<MAX_BXDF_CNT>::SampleWi(
     for(uint8_t i = 0; i < bxdfCnt_; ++i)
         nMatched += bxdfs_[i]->MatchType(type);
     if(!nMatched)
-        return None;
+        return std::nullopt;
     
     // 从sample中抽取一个整数用来选择bxdf
     
@@ -118,7 +118,7 @@ BxDFAggregate<MAX_BXDF_CNT>::SampleWi(
     Vec3 lwo = shd.World2Local(wo);
     auto ret = bxdf->SampleWi(geoInShd_, lwo, star, newSample);
     if(!ret)
-        return None;
+        return std::nullopt;
     
     // 如果是delta，那么不需要计入别的bxdf
 

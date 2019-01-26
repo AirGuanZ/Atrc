@@ -21,11 +21,11 @@ Spectrum BxDF_SpecularReflection::Eval(
     return Spectrum();
 }
 
-Option<BxDF::SampleWiResult> BxDF_SpecularReflection::SampleWi(
+std::optional<BxDF::SampleWiResult> BxDF_SpecularReflection::SampleWi(
     const CoordSystem &geoInShd, const Vec3 &wo, [[maybe_unused]] bool star, [[maybe_unused]] const Vec2 &sample) const noexcept
 {
     if(wo.z <= 0 || !geoInShd.InPositiveHemisphere(wo))
-        return None;
+        return std::nullopt;
 
     Vec3 nWo = wo.Normalize();
     SampleWiResult ret;

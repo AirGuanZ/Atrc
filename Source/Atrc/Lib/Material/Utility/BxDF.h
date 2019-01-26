@@ -27,7 +27,7 @@ public:
 
     virtual Spectrum Eval(const CoordSystem &geoInShd, const Vec3 &wi, const Vec3 &wo, bool star) const noexcept = 0;
 
-    virtual Option<SampleWiResult> SampleWi(const CoordSystem &geoInShd, const Vec3 &wo, bool star, const Vec2 &sample) const noexcept;
+    virtual std::optional<SampleWiResult> SampleWi(const CoordSystem &geoInShd, const Vec3 &wo, bool star, const Vec2 &sample) const noexcept;
 
     virtual Real SampleWiPDF(const CoordSystem &geoInShd, const Vec3 &wi, const Vec3 &wo, bool star) const noexcept;
 };
@@ -50,15 +50,15 @@ inline bool BxDF::MatchType(BSDFType type) const noexcept
     return Contains(type, GetType());
 }
 
-inline Option<BxDF::SampleWiResult> BxDF::SampleWi(const CoordSystem &geoInShd, const Vec3 &wo, bool star, const Vec2 &sample) const noexcept
+inline std::optional<BxDF::SampleWiResult> BxDF::SampleWi(const CoordSystem &geoInShd, const Vec3 &wo, bool star, const Vec2 &sample) const noexcept
 {
     if(wo.z <= 0 || !geoInShd.InPositiveHemisphere(wo))
-        return None;
+        return std::nullopt;
 
     auto[sam, pdf] = AGZ::Math::DistributionTransform
         ::ZWeightedOnUnitHemisphere<Real>::Transform(sample);
     if(!geoInShd.InPositiveHemisphere(sam) || !pdf)
-        return None;
+        return std::nullopt;
 
     SampleWiResult ret;
     ret.coef    = Eval(geoInShd, sam, wo, star);

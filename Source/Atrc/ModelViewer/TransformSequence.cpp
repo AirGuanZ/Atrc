@@ -269,8 +269,6 @@ void TransformSequence::Display()
     if(ImGui::Button("clear"))
         Clear();
 
-    ImGui::Separator();
-
     for(int i = 0; i < count; ++i)
     {
         ImGui::PushID(i);

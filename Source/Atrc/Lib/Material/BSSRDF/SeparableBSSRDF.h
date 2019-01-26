@@ -30,7 +30,7 @@ public:
 
     Spectrum Eval(const Intersection &pi, bool star) const noexcept override;
 
-    Option<SamplePiResult> SamplePi(bool star, const Vec3 &sample, Arena &arena) const noexcept override;
+    std::optional<SamplePiResult> SamplePi(bool star, const Vec3 &sample, Arena &arena) const noexcept override;
 
     Real SamplePiPDF(const Intersection &pi, bool star) const noexcept override;
 

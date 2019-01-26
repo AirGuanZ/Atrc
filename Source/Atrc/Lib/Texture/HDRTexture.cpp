@@ -2,7 +2,8 @@
 
 #include <Atrc/Lib/Texture/HDRTexture.h>
 
-AGZ_NS_BEG(Atrc)
+namespace Atrc
+{
 
 namespace
 {
@@ -63,4 +64,4 @@ Spectrum HDRTexture::Sample(const Vec2 &uv) const noexcept
     return sampler_(tex_, (reverseV_ ? Vec2(uv.u, 1 - uv.v) : uv).Map(texCoordWrapper_));
 }
 
-AGZ_NS_END(Atrc)
+} // namespace Atrc

@@ -17,7 +17,7 @@ void DefaultReporter::End()
               << clock_.Milliseconds() / 1000.0 << "s" << std::endl;
 }
 
-void DefaultReporter::Report([[maybe_unused]] const Film &film, Option<Real> percent)
+void DefaultReporter::Report([[maybe_unused]] const Film &film, std::optional<Real> percent)
 {
     if(percent)
         std::cout << "Progress: " << *percent << std::endl;

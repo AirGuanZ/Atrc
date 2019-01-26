@@ -17,7 +17,7 @@ public:
 
     void End() override;
 
-    void Report(const Film &film, Option<Real> percent) override;
+    void Report(const Film &film, std::optional<Real> percent) override;
 
     void Message(const Str8& msg) override;
 };

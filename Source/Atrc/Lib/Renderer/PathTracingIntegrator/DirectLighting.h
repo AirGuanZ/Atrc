@@ -8,11 +8,11 @@
 namespace Atrc
 {
     
-std::tuple<Spectrum, Option<BSDF::SampleWiResult>, Option<Intersection>> ComputeDirectLighting(
+std::tuple<Spectrum, std::optional<BSDF::SampleWiResult>, std::optional<Intersection>> ComputeDirectLighting(
     const Scene &scene, const Intersection &inct, const ShadingPoint &shd,
     bool sampleAllLights, bool considerMedium, Sampler *sampler);
 
-std::tuple<Spectrum, PhaseFunction::SampleWiResult, Option<Intersection>> ComputeDirectLighting(
+std::tuple<Spectrum, PhaseFunction::SampleWiResult, std::optional<Intersection>> ComputeDirectLighting(
     const Scene &scene, const MediumPoint &mpnt, const MediumShadingPoint &mshd,
     bool sampleAllLights, Sampler *sampler);
 

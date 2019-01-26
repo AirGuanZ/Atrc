@@ -18,7 +18,7 @@ public:
 
     Real G(const Vec3 &H, const Vec3 &wi, const Vec3 &wo) const noexcept override;
 
-    Option<SampleWiResult> SampleWi(const CoordSystem &geoInShd, const Vec3 &wo, const Vec2 &sample) const noexcept override;
+    std::optional<SampleWiResult> SampleWi(const CoordSystem &geoInShd, const Vec3 &wo, const Vec2 &sample) const noexcept override;
 
     // wi和wo必须在geo coord、shd coord中均处于正半平面
     Real SampleWiPDF(const CoordSystem &geoInShd, const Vec3 &wi, const Vec3 &wo) const noexcept override;

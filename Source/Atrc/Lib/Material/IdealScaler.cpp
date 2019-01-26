@@ -30,7 +30,7 @@ namespace
             return scale_ * internal_->Eval(shd, geo, wi, wo, type, star);
         }
 
-        Option<SampleWiResult> SampleWi(
+        std::optional<SampleWiResult> SampleWi(
             const CoordSystem &shd, const CoordSystem &geo,
             const Vec3 &wo, BSDFType type, bool star, const Vec2 &sample) const noexcept override
         {

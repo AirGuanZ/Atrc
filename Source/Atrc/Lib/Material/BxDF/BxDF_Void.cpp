@@ -22,7 +22,7 @@ Spectrum BxDF_Void::Eval(
     return Spectrum();
 }
 
-Option<BxDF::SampleWiResult> BxDF_Void::SampleWi(
+std::optional<BxDF::SampleWiResult> BxDF_Void::SampleWi(
     [[maybe_unused]] const CoordSystem &geoInShd,
     const Vec3 &wo, [[maybe_unused]] bool star,
     [[maybe_unused]] const Vec2 &sample) const noexcept

@@ -28,17 +28,17 @@ Spectrum BxDF_TorranceSparrow::Eval(const CoordSystem &geoInShd, const Vec3 &wi,
     return rc_ * fr * md_->D(H) * G / (4 * nWi.z * nWo.z);
 }
 
-Option<BxDF::SampleWiResult> BxDF_TorranceSparrow::SampleWi(const CoordSystem &geoInShd, const Vec3 &wo, bool star, const Vec2 &sample) const noexcept
+std::optional<BxDF::SampleWiResult> BxDF_TorranceSparrow::SampleWi(const CoordSystem &geoInShd, const Vec3 &wo, bool star, const Vec2 &sample) const noexcept
 {
     Vec3 nWo = wo.Normalize();
     auto mdSample = md_->SampleWi(geoInShd, nWo, sample);
     if(!mdSample)
-        return None;
+        return std::nullopt;
 
     SampleWiResult ret;
     ret.coef = Eval(geoInShd, mdSample->wi, wo, star);
     if(!ret.coef)
-        return None;
+        return std::nullopt;
     ret.wi      = mdSample->wi;
     ret.pdf     = mdSample->pdf;
     ret.type    = type_;

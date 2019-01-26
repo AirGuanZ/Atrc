@@ -4,7 +4,8 @@
 
 #include <Atrc/Lib/Core/Texture.h>
 
-AGZ_NS_BEG(Atrc)
+namespace Atrc
+{
 
 class HDRTexture : public Texture
 {
@@ -39,4 +40,4 @@ public:
     Spectrum Sample(const Vec2 &uv) const noexcept override;
 };
 
-AGZ_NS_END(Atrc)
+} // namespace Atrc

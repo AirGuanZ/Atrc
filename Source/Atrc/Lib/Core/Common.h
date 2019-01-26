@@ -25,12 +25,6 @@ using RealT = AGZ::Math::FP<Real>;
 
 extern const Real EPS;
 
-// ================================= Option
-
-using AGZ::Option;
-using AGZ::Some;
-using AGZ::None;
-
 // ================================= String
 
 using AGZ::Str8;

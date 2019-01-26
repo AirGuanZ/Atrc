@@ -25,10 +25,10 @@ Real BlinnPhong::G(const Vec3 &H, const Vec3 &wi, const Vec3 &wo) const noexcept
                    2 * Abs(NdH * NdWi / WodH)));
 }
 
-Option<BlinnPhong::SampleWiResult> BlinnPhong::SampleWi(const CoordSystem &geoInShd, const Vec3 &wo, const Vec2 &sample) const noexcept
+std::optional<BlinnPhong::SampleWiResult> BlinnPhong::SampleWi(const CoordSystem &geoInShd, const Vec3 &wo, const Vec2 &sample) const noexcept
 {
     if(wo.z <= 0 || !geoInShd.InPositiveHemisphere(wo))
-        return None;
+        return std::nullopt;
 
     Real cosTheta = Pow(sample.x, 1 / (e_ + 1));
     Real sinTheta = Sqrt(Max(Real(0), 1 - cosTheta * cosTheta));
@@ -36,12 +36,12 @@ Option<BlinnPhong::SampleWiResult> BlinnPhong::SampleWi(const CoordSystem &geoIn
 
     Vec3 H(sinTheta * Cos(phi), sinTheta * Sin(phi), cosTheta);
     if(H.z <= 0)
-        return None;
+        return std::nullopt;
 
     SampleWiResult ret;
     ret.wi = 2 * Dot(wo, H) * H - wo;
     if(ret.wi.z <= 0 || !geoInShd.InPositiveHemisphere(ret.wi))
-        return None;
+        return std::nullopt;
     ret.pdf = (e_ + 1) * Pow(cosTheta, e_) / (2 * PI * 4 * Dot(wo, H));
 
     return ret;

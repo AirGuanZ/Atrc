@@ -5,14 +5,14 @@ namespace Atrc
 
 namespace
 {
-    // 计算折射方向向量，发生全反射时返回None
-    Option<Vec3> GetRefractDirection(const Vec3 &wo, const Vec3 &nor, Real eta)
+    // 计算折射方向向量，发生全反射时返回std::nullopt
+    std::optional<Vec3> GetRefractDirection(const Vec3 &wo, const Vec3 &nor, Real eta)
     {
         Real cosThetaI = Abs(wo.z);
         Real sinThetaI2 = Max(Real(0), 1 - cosThetaI * cosThetaI);
         Real sinThetaT2 = eta * eta * sinThetaI2;
         if(sinThetaT2 >= 1)
-            return None;
+            return std::nullopt;
         Real cosThetaT = Sqrt(1 - sinThetaT2);
         return (eta * cosThetaI - cosThetaT) * nor - eta * wo;
     }
@@ -39,7 +39,7 @@ Spectrum BxDF_Specular::Eval(
     return Spectrum();
 }
 
-Option<BxDF_Specular::SampleWiResult> BxDF_Specular::SampleWi(
+std::optional<BxDF_Specular::SampleWiResult> BxDF_Specular::SampleWi(
     [[maybe_unused]] const CoordSystem &geoInShd, const Vec3 &wo, bool star, const Vec2 &sample) const noexcept
 {
     Vec3 nor = wo.z > 0 ? Vec3::UNIT_Z() : -Vec3::UNIT_Z();

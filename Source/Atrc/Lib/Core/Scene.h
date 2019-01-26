@@ -50,7 +50,7 @@ public:
         Real pdf;
     };
 
-    Option<SampleLightResult> SampleLight(Real sample) const noexcept;
+    std::optional<SampleLightResult> SampleLight(Real sample) const noexcept;
 
     Real SampleLightPDF(const Light *light) const noexcept;
 
