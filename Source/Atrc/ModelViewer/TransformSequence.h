@@ -45,7 +45,7 @@ class TransformSequence : public AGZ::Uncopiable
 
     void UpdateMat();
 
-    AGZ::Option<Transform> New(const char *title, bool newPopup) const;
+    std::optional<Transform> New(const char *title, bool newPopup) const;
 
     bool EditTransformParam(Transform &trans) const;
 

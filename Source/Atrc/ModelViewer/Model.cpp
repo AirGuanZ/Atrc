@@ -73,7 +73,6 @@ Model::Model(std::string name) noexcept
 
 void Model::Initialize(std::shared_ptr<GL::VertexBuffer<Vertex>> vtxBuf, const Vec3f &renderColor)
 {
-    AGZ_ASSERT(vtxData && vtxCount);
     CheckRendererInitialization();
 
     vtxBuf_ = std::move(vtxBuf);

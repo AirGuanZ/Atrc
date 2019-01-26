@@ -54,10 +54,10 @@ void TransformSequence::UpdateMat()
         mat_ = mat_ * t.GetMatrix();
 }
 
-AGZ::Option<TransformSequence::Transform> TransformSequence::New(const char *title, bool newPopup) const
+std::optional<TransformSequence::Transform> TransformSequence::New(const char *title, bool newPopup) const
 {
     if(!ImGui::BeginPopup(title, ImGuiWindowFlags_AlwaysAutoResize))
-        return AGZ::None;
+        return std::nullopt;
 
     static int selectedType = 0;
 
@@ -132,11 +132,11 @@ AGZ::Option<TransformSequence::Transform> TransformSequence::New(const char *tit
     {
         ImGui::CloseCurrentPopup();
         ImGui::EndPopup();
-        return AGZ::None;
+        return std::nullopt;
     }
 
     ImGui::EndPopup();
-    return AGZ::None;
+    return std::nullopt;
 }
 
 bool TransformSequence::EditTransformParam(Transform &trans) const

@@ -38,6 +38,7 @@ void ModelManager::NewModelFromData(Console &console, bool clickNew)
 {
     if(!ImGui::BeginPopup("new model from data", ImGuiWindowFlags_AlwaysAutoResize))
         return;
+	AGZ::ScopeGuard popupGuard([]() { ImGui::EndPopup(); });
 
     static char nameBuf[256] = "";
     if(clickNew)

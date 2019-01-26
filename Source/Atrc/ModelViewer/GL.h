@@ -2,8 +2,8 @@
 
 #define GLEW_STATIC
 
-#include <GLLibs/glew.h>
-#include <GLLibs/glfw3.h>
+#include <Lib/glew/glew.h>
+#include <Lib/glfw/glfw3.h>
 
 #define AGZ_USE_GLFW
 #define AGZ_USE_OPENGL
