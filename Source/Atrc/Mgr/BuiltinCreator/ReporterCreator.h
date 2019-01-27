@@ -11,7 +11,7 @@ class DefaultReporterCreator : public Creator<Reporter>
 {
 public:
 
-    Str8 GetTypeName() const override { return "Default"; }
+    std::string GetTypeName() const override { return "Default"; }
 
     Reporter *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
 };

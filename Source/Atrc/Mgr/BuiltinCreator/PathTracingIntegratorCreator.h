@@ -19,7 +19,7 @@ class FullPathTracingIntegratorCreator : public Creator<PathTracingIntegrator>
 {
 public:
 
-    Str8 GetTypeName() const override { return "Full"; }
+    std::string GetTypeName() const override { return "Full"; }
 
     PathTracingIntegrator *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
 };
@@ -36,7 +36,7 @@ class MISPathTracingIntegratorCreator : public Creator<PathTracingIntegrator>
 {
 public:
 
-    Str8 GetTypeName() const override { return "MIS"; }
+    std::string GetTypeName() const override { return "MIS"; }
 
     PathTracingIntegrator *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
 };
@@ -52,7 +52,7 @@ class NativePathTracingIntegratorCreator : public Creator<PathTracingIntegrator>
 {
 public:
 
-    Str8 GetTypeName() const override { return "Native"; }
+    std::string GetTypeName() const override { return "Native"; }
 
     PathTracingIntegrator *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
 };
@@ -64,7 +64,7 @@ class ShadingNormalIntegratorCreator: public Creator<PathTracingIntegrator>
 {
 public:
 
-    Str8 GetTypeName() const override { return "ShadingNormal"; }
+    std::string GetTypeName() const override { return "ShadingNormal"; }
 
     PathTracingIntegrator *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
 };

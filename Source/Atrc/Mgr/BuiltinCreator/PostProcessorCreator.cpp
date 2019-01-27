@@ -65,7 +65,7 @@ PostProcessor *SaveAsHDRCreator::Create(const ConfigGroup &group, Context &conte
 {
     ATRC_MGR_TRY
     {
-        Str8 filename = context.GetPathInWorkspace(group["filename"].AsValue());
+        std::string filename = context.GetPathInWorkspace(group["filename"].AsValue());
         return arena.Create<SaveAsHDR>(filename);
     }
     ATRC_MGR_CATCH_AND_RETHROW("In creating post processor (save as hdr)")

@@ -12,7 +12,7 @@
 
 using namespace Atrc;
 
-int Run(const AGZ::Config &config, const Str8 &configFilename)
+int Run(const AGZ::Config &config, std::string_view configFilename)
 {
     auto &root = config.Root();
 
@@ -86,7 +86,7 @@ int main(int argc, char *argv[])
     try
     {
         AGZ::Config config;
-        Str8 configFilename;
+        std::string configFilename;
         
         if(argc == 1)
         {
@@ -96,7 +96,7 @@ int main(int argc, char *argv[])
         }
         else if(argc == 2)
         {
-            if(Str8(argv[1]) == "-h" || Str8(argv[1]) == "--help")
+            if(std::string(argv[1]) == "-h" || std::string(argv[1]) == "--help")
             {
                 std::cout << USAGE_MSG;
                 return 0;
@@ -106,7 +106,7 @@ int main(int argc, char *argv[])
             if(!config.LoadFromFile(configFilename))
                 throw Mgr::MgrErr("Failed to load configuration file from " + configFilename);
         }
-        else if(Str8(argv[1]) == "-m" && argc == 4)
+        else if(std::string(argv[1]) == "-m" && argc == 4)
         {
             configFilename = argv[2];
             if(!config.LoadFromMemory(argv[3]))
@@ -124,7 +124,7 @@ int main(int argc, char *argv[])
     {
         for(auto pErr = &err; pErr; pErr = pErr->TryGetInterior())
         {
-            std::cout << pErr->GetMsg().ToStdString() << std::endl;
+            std::cout << pErr->GetMsg() << std::endl;
             if(pErr->TryGetLeaf())
             {
                 std::cout << pErr->TryGetLeaf()->what() << std::endl;

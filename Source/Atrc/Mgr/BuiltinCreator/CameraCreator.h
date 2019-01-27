@@ -22,7 +22,7 @@ class PinholeCameraCreator : public Creator<Camera>
 {
 public:
 
-    Str8 GetTypeName() const override { return "Pinhole"; }
+    std::string GetTypeName() const override { return "Pinhole"; }
 
     Camera *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
 };

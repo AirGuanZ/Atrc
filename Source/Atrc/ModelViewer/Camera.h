@@ -23,7 +23,7 @@ public:
         float far  = 1000.0f;;
     };
 
-    explicit Camera(AGZ::Str8 name) noexcept;
+    explicit Camera(std::string name) noexcept;
 
     const ViewData &GetViewData() const noexcept { return viewData_; }
     const ProjData &GetProjData() const noexcept { return projData_; }
@@ -35,7 +35,7 @@ public:
 
     void Display();
 
-    const char *GetTitle() const noexcept { return title_.c_str(); }
+    const char *GetTitle() const noexcept { return name_.c_str(); }
 
 private:
 
@@ -43,8 +43,7 @@ private:
     void UpdateViewMatrix();
     void UpdateProjMatrix();
 
-    AGZ::Str8 name_;
-    std::string title_;
+    std::string name_;
 
     bool useLookAt_;
 

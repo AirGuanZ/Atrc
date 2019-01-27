@@ -17,7 +17,7 @@ class GeometricDiffuseLightCreator : public Creator<Entity>
 {
 public:
 
-    Str8 GetTypeName() const override { return "GeometricDiffuse"; }
+    std::string GetTypeName() const override { return "GeometricDiffuse"; }
 
     Entity *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
 };
@@ -32,7 +32,7 @@ class GeometricEntityCreator : public Creator<Entity>
 {
 public:
 
-    Str8 GetTypeName() const override { return "Geometric"; }
+    std::string GetTypeName() const override { return "Geometric"; }
 
     Entity *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
 };
@@ -49,7 +49,7 @@ class GeometryGroupEntityCreator : public Creator<Entity>
 {
 public:
 
-    Str8 GetTypeName() const override { return "GeometryGroup"; }
+    std::string GetTypeName() const override { return "GeometryGroup"; }
 
     Entity *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
 };

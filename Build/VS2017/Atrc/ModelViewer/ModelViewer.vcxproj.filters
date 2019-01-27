@@ -44,9 +44,6 @@
     <ClInclude Include="..\..\..\..\Source\Atrc\ModelViewer\ModelDataManager.h">
       <Filter>Source</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\Source\Atrc\ModelViewer\SceneManager.h">
-      <Filter>Source</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\Source\Atrc\ModelViewer\Model.h">
       <Filter>Source</Filter>
     </ClInclude>

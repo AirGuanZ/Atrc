@@ -21,7 +21,7 @@ namespace
     }
 }
 
-Camera::Camera(AGZ::Str8 name) noexcept
+Camera::Camera(std::string name) noexcept
     : name_(std::move(name)), useLookAt_(false)
 {
     auto &global = Global::GetInstance();
@@ -30,7 +30,6 @@ Camera::Camera(AGZ::Str8 name) noexcept
     UpdateViewData();
     UpdateViewMatrix();
     UpdateProjMatrix();
-    title_ = Fmt8("Camera \"{}\"", name_);
 }
 
 void Camera::Display()

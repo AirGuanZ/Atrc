@@ -19,7 +19,7 @@ class BSSRDFSurfaceCreator : public Creator<Material>
 {
 public:
 
-    Str8 GetTypeName() const override { return "BSSRDF"; }
+    std::string GetTypeName() const override { return "BSSRDF"; }
 
     Material *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
 };
@@ -31,7 +31,7 @@ class IdealBlackCreator : public Creator<Material>
 {
 public:
 
-    Str8 GetTypeName() const override { return "IdealBlack"; }
+    std::string GetTypeName() const override { return "IdealBlack"; }
 
     Material *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
 };
@@ -47,7 +47,7 @@ class IdealDiffuseCreator : public Creator<Material>
 {
 public:
 
-    Str8 GetTypeName() const override { return "IdealDiffuse"; }
+    std::string GetTypeName() const override { return "IdealDiffuse"; }
 
     Material *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
 };
@@ -62,7 +62,7 @@ class IdealMirrorCreator : public Creator<Material>
 {
 public:
 
-    Str8 GetTypeName() const override { return "IdealMirror"; }
+    std::string GetTypeName() const override { return "IdealMirror"; }
 
     Material *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
 };
@@ -77,7 +77,7 @@ class IdealScalerCreator : public Creator<Material>
 {
 public:
 
-    Str8 GetTypeName() const override { return "IdealScaler"; }
+    std::string GetTypeName() const override { return "IdealScaler"; }
 
     Material *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
 };
@@ -92,7 +92,7 @@ class IdealSpecularCreator : public Creator<Material>
 {
 public:
 
-    Str8 GetTypeName() const override { return "IdealSpecular"; }
+    std::string GetTypeName() const override { return "IdealSpecular"; }
 
     Material *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
 };
@@ -104,7 +104,7 @@ class InvisibleSurfaceCreator : public Creator<Material>
 {
 public:
 
-    Str8 GetTypeName() const override { return "Invisible"; }
+    std::string GetTypeName() const override { return "Invisible"; }
 
     Material *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
 };
@@ -121,7 +121,7 @@ class ONMatteCreator : public Creator<Material>
 {
 public:
 
-    Str8 GetTypeName() const override { return "ONMatte"; }
+    std::string GetTypeName() const override { return "ONMatte"; }
 
     Material *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
 };
@@ -139,7 +139,7 @@ class TSMetalCreator : public Creator<Material>
 {
 public:
 
-    Str8 GetTypeName() const override { return "TSMetal"; }
+    std::string GetTypeName() const override { return "TSMetal"; }
 
     Material *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
 };

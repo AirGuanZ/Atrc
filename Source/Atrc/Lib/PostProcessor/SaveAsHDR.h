@@ -7,11 +7,11 @@ namespace Atrc
     
 class SaveAsHDR : public PostProcessor
 {
-    Str8 filename_;
+    std::string filename_;
 
 public:
 
-    explicit SaveAsHDR(Str8 filename) noexcept;
+    explicit SaveAsHDR(std::string filename) noexcept;
 
     void Process(Image *image) const noexcept override;
 };

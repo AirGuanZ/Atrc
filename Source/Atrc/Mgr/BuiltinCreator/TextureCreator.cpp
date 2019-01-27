@@ -46,7 +46,7 @@ Texture *HDRTextureCreator::Create(const ConfigGroup &group, Context &context, A
     {
         const AGZ::Texture2D<Color3f> *tex;
 
-        const Str8 filename = context.GetPathInWorkspace(group["filename"].AsValue());
+        const std::string filename = context.GetPathInWorkspace(group["filename"].AsValue());
         auto it = path2Tex_.find(filename);
         if(it != path2Tex_.end())
             tex = it->second;
@@ -62,7 +62,7 @@ Texture *HDRTextureCreator::Create(const ConfigGroup &group, Context &context, A
 
         if(auto samplerNode = group.Find("sampler"))
         {
-            const Str8 &sampler = samplerNode->AsValue();
+            const std::string &sampler = samplerNode->AsValue();
             if(sampler == "Nearest")
                 samplingStrategy = HDRTexture::Nearest;
             else if(sampler == "Linear")
@@ -73,7 +73,7 @@ Texture *HDRTextureCreator::Create(const ConfigGroup &group, Context &context, A
 
         if(auto wrapperNode = group.Find("wrapper"))
         {
-            const Str8 &wrapper = wrapperNode->AsValue();
+            const std::string &wrapper = wrapperNode->AsValue();
             if(wrapper == "Clamp")
                 wrappingStrategy = HDRTexture::Clamp;
             else
@@ -95,7 +95,7 @@ Texture *ImageTextureCreator::Create(const ConfigGroup &group, Context &context,
     {
         const AGZ::Texture2D<Color3b> *tex;
 
-        const Str8 filename = context.GetPathInWorkspace(group["filename"].AsValue());
+        const std::string filename = context.GetPathInWorkspace(group["filename"].AsValue());
         auto it = path2Tex_.find(filename);
         if(it != path2Tex_.end())
             tex = it->second;
@@ -115,7 +115,7 @@ Texture *ImageTextureCreator::Create(const ConfigGroup &group, Context &context,
 
         if(auto samplerNode = group.Find("sampler"))
         {
-            const Str8 &sampler = samplerNode->AsValue();
+            const std::string &sampler = samplerNode->AsValue();
             if(sampler == "Nearest")
                 samplingStrategy = ImageTexture::Nearest;
             else if(sampler == "Linear")
@@ -126,7 +126,7 @@ Texture *ImageTextureCreator::Create(const ConfigGroup &group, Context &context,
 
         if(auto wrapperNode = group.Find("wrapper"))
         {
-            const Str8 &wrapper = wrapperNode->AsValue();
+            const std::string &wrapper = wrapperNode->AsValue();
             if(wrapper == "Clamp")
                 wrappingStrategy = ImageTexture::Clamp;
             else

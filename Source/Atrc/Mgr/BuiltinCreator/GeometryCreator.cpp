@@ -1,7 +1,9 @@
+#include <filesystem>
+#include <vector>
+
+#include <AGZUtils/String/StdStr.h>
 #include <AGZUtils/Utils/Mesh.h>
 #include <AGZUtils/Utils/Range.h>
-
-#include <vector>
 
 #include <Atrc/Lib/Geometry/Sphere.h>
 #include <Atrc/Lib/Geometry/Triangle.h>
@@ -50,14 +52,11 @@ Geometry *TriangleCreator::Create(const ConfigGroup &group, [[maybe_unused]] Con
 
 namespace
 {
-    TriangleBVHCore *RecreateTriangleMesh(const Str8 &filename, const Str8 &cacheFilename, Arena &arena)
+    TriangleBVHCore *RecreateTriangleMesh(std::string_view filename, std::string_view cacheFilename, Arena &arena)
     {
-        /*AGZ::Model::WavefrontObj<Real> obj;
-        if(!AGZ::Model::WavefrontObjFile<Real>::LoadFromObjFile(filename, &obj))
-            throw MgrErr("Failed to load obj file from " + filename);*/
         AGZ::Mesh::WavefrontObj<Real> obj;
         if(!obj.LoadFromFile(filename))
-            throw MgrErr("Failed to load obj file from " + filename);
+            throw MgrErr("Failed to load obj file from " + std::string(filename));
         auto mesh = obj.ToGeometryMeshGroup().MergeAllSubmeshes();
         obj.Clear();
 
@@ -74,36 +73,36 @@ namespace
 
         auto ret = arena.Create<TriangleBVHCore>(vertices.data(), uint32_t(vertices.size() / 3));
 
-        AGZ::FileSys::File::CreateDirectoryRecursively(AGZ::FileSys::Path8(cacheFilename).ToDirectory().ToStr());
+        AGZ::FileSys::File::CreateDirectoryRecursively(std::filesystem::path(WIDEN(cacheFilename)).parent_path().string());
 
-        std::ofstream fout(cacheFilename.ToPlatformString(), std::ofstream::trunc | std::ofstream::binary);
+        std::ofstream fout(WIDEN(cacheFilename), std::ofstream::trunc | std::ofstream::binary);
         if(!fout)
-            throw MgrErr("Failed to create new triangle mesh cache file: " + cacheFilename);
+            throw MgrErr("Failed to create new triangle mesh cache file: " + std::string(cacheFilename));
 
-        auto oriFileTime = AGZ::FileSys::File::GetLastWriteTime(filename.ToStdString());
+        auto oriFileTime = AGZ::FileSys::File::GetLastWriteTime(filename);
         if(!oriFileTime)
-            throw MgrErr("Failed to load last write time of " + filename);
+            throw MgrErr("Failed to load last write time of " + std::string(filename));
 
         AGZ::BinaryOStreamSerializer serializer(fout);
         if(!serializer.Serialize(*oriFileTime) || !serializer.Serialize(*ret))
         {
-            AGZ::FileSys::File::DeleteRegularFile(cacheFilename.ToStdString());
-            throw MgrErr("Failed to serialize into triangle mesh cache file: " + cacheFilename);
+            AGZ::FileSys::File::DeleteRegularFile(cacheFilename);
+            throw MgrErr("Failed to serialize into triangle mesh cache file: " + std::string(cacheFilename));
         }
 
         return ret;
     }
 
-    TriangleBVHCore *LoadTriangleMesh(const Str8 &filename, Arena &arena)
+    TriangleBVHCore *LoadTriangleMesh(std::string_view filename, Arena &arena)
     {
         auto cacheFilename = GetCacheFilename(filename);
-        std::ifstream fin(cacheFilename.ToPlatformString(), std::ifstream::binary | std::ifstream::in);
+        std::ifstream fin(WIDEN(cacheFilename), std::ifstream::binary | std::ifstream::in);
         if(!fin)
             return RecreateTriangleMesh(filename, cacheFilename, arena);
 
-        auto oriFileTime = AGZ::FileSys::File::GetLastWriteTime(filename.ToStdString());
+        auto oriFileTime = AGZ::FileSys::File::GetLastWriteTime(filename);
         if(!oriFileTime)
-            throw MgrErr("Failed to load last write time of " + filename);
+            throw MgrErr("Failed to load last write time of " + std::string(filename));
 
         AGZ::BinaryIStreamDeserializer deserializer(fin);
         auto cacheTime = deserializer.Deserialize<AGZ::FileSys::FileTime>();
@@ -131,7 +130,7 @@ Geometry *TriangleBVHCreator::Create(const ConfigGroup &group, Context &context,
     {
         auto transform = Parser::ParseTransform(group["transform"]);
 
-        const Str8 filename = context.GetPathInWorkspace(group["filename"].AsValue());
+        const std::string filename = context.GetPathInWorkspace(group["filename"].AsValue());
         const TriangleBVHCore *core;
 
         auto it = path2Core_.find(filename);

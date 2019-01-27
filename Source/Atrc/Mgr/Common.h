@@ -1,5 +1,7 @@
 #pragma once
 
+#include <filesystem>
+
 #include <AGZUtils/Utils/Config.h>
 #include <AGZUtils/Utils/FileSys.h>
 
@@ -13,26 +15,24 @@ using AGZ::ConfigArray;
 using AGZ::ConfigGroup;
 using AGZ::ConfigNode;
 using AGZ::ConfigValue;
-using AGZ::FileSys::Path8;
-using AGZ::Str8;
 
 class MgrErr
 {
     std::shared_ptr<std::exception> leaf_;
     std::shared_ptr<MgrErr> interior_;
-    Str8 msg_;
+    std::string msg_;
 
 public:
 
-    MgrErr(const MgrErr &interior, Str8 msg)
+    MgrErr(const MgrErr &interior, std::string msg)
         : interior_(std::make_shared<MgrErr>(interior)), msg_(std::move(msg)) { }
 
-    MgrErr(const std::exception &leaf, Str8 msg)
+    MgrErr(const std::exception &leaf, std::string msg)
         : leaf_(std::make_shared<std::runtime_error>(leaf.what())), msg_(std::move(msg)) { }
 
-    explicit MgrErr(Str8 msg) : msg_(std::move(msg)) { }
+    explicit MgrErr(std::string msg) : msg_(std::move(msg)) { }
 
-    const Str8 &GetMsg() const noexcept { return msg_; }
+    const std::string &GetMsg() const noexcept { return msg_; }
 
     const MgrErr *TryGetInterior() const noexcept { return interior_.get(); }
 
@@ -56,10 +56,11 @@ public:
             ::Atrc::Mgr::MgrErr("An unknown error occurred"), (MSG)); \
     }
 
-inline Str8 GetCacheFilename(const Str8 &filename)
+inline std::string GetCacheFilename(std::string_view filename)
 {
-    return AGZ::FileSys::Path8("./.agz.cache/").Append(
-        AGZ::FileSys::Path8(filename).ToRelative()).ToStr();
+    std::filesystem::path parent("./.agz.cache/");
+    parent.append(filename);
+    return parent.relative_path().string();
 }
 
 } // namespace Atrc::Mgr

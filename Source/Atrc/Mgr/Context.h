@@ -22,7 +22,7 @@ namespace Atrc::Mgr
 
 class Context;
 
-using Name2Geometry = std::map<Str8, Geometry*>;
+using Name2Geometry = std::map<std::string, Geometry*>;
 
 template<typename T>
 class Creator
@@ -31,7 +31,7 @@ public:
 
     virtual ~Creator() = default;
 
-    virtual Str8 GetTypeName() const = 0;
+    virtual std::string GetTypeName() const = 0;
 
     virtual T *Create(const ConfigGroup &group, Context &context, Arena &arena) const = 0;
 };
@@ -39,8 +39,8 @@ public:
 template<typename T>
 class Factory
 {
-    std::unordered_map<Str8, const Creator<T>*> creators_;
-    std::unordered_map<Str8, T*> pubObjs_;
+    std::unordered_map<std::string, const Creator<T>*> creators_;
+    std::unordered_map<std::string, T*> pubObjs_;
 
 public:
 
@@ -78,12 +78,12 @@ class Context
     const ConfigGroup &root_;
     Arena arena_;
 
-    Path8 workspace_;
-    Path8 configPath_;
+    std::filesystem::path workspace_;
+    std::filesystem::path configPath_;
 
 public:
 
-    explicit Context(const ConfigGroup &root, const Str8 &configFilename);
+    explicit Context(const ConfigGroup &root, std::string_view configFilename);
 
     const ConfigGroup &Root() const noexcept { return root_; }
 
@@ -96,7 +96,7 @@ public:
     template<typename T, typename...Args>
     T *CreateWithInteriorArena(Args&&...args);
 
-    Str8 GetPathInWorkspace(const Str8 &subFilename) const;
+    std::string GetPathInWorkspace(std::string_view subFilename) const;
 };
 
 // ================================= Implementation
@@ -156,7 +156,7 @@ T *Context::Create(const ConfigNode &definition)
         return ret;
     }
     ATRC_MGR_CATCH_AND_RETHROW(
-        "In creating : " + Str8(typeid(T).name()) + " with " + definition.ToString())
+        "In creating : " + std::string(typeid(T).name()) + " with " + definition.ToString())
 }
 
 template<typename T, typename...Args>

@@ -3,32 +3,31 @@
 namespace Atrc::Mgr
 {
 
-Context::Context(const ConfigGroup &root, const Str8 &configFilename)
-    : root_(root), configPath_(Path8(configFilename, true).ToDirectory())
+Context::Context(const ConfigGroup &root, std::string_view configFilename)
+    : root_(root), configPath_(std::filesystem::path(configFilename).parent_path())
 {
     if(auto pNode = root.Find("workspace"))
     {
         auto &ws = pNode->AsValue();
-        if(ws.StartsWith("@"))
-            workspace_ = configPath_ + Path8(ws.Slice(1), false);
+        if(AGZ::StartsWith(ws, "@"))
+            workspace_ = configPath_ / std::filesystem::path(ws.substr(1));
         else
-            workspace_ = Path8(pNode->AsValue(), false);
-        //throw MgrErr(Str8(ws.Slice(1)));
+            workspace_ = std::filesystem::path(pNode->AsValue());
     }
-    if(workspace_.HasFilename())
-        throw MgrErr("Invalid workspace directory");
+    else
+        throw MgrErr("'workspace' is undefined");
 }
 
-Str8 Context::GetPathInWorkspace(const Str8 &subFilename) const
+std::string Context::GetPathInWorkspace(std::string_view subFilename) const
 {
-    if(subFilename.StartsWith("$"))
-        return subFilename.Slice(1);
-    if(subFilename.StartsWith("@"))
-        return (configPath_ + Path8(subFilename.Slice(1), true)).ToStr();
-    Path8 p(subFilename, true);
-    if(p.IsAbsolute())
-        return subFilename;
-    return (workspace_ + p).ToStr();
+    if(AGZ::StartsWith(subFilename, "$"))
+        return std::string(subFilename.substr(1));
+    if(AGZ::StartsWith(subFilename, "@"))
+        return (configPath_ / std::filesystem::path(subFilename.substr(1))).string();
+    std::filesystem::path p(subFilename);
+    if(p.is_absolute())
+        return std::string(subFilename);
+    return (workspace_ / p).string();
 }
 
 } // namespace Atrc::Mgr

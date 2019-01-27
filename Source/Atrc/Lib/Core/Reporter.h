@@ -17,7 +17,7 @@ public:
 
     virtual void Report(const Film &film, std::optional<Real> percent) = 0;
 
-    virtual void Message(const Str8 &msg) = 0;
+    virtual void Message(std::string_view msg) = 0;
 };
 
 } // namespace Atrc

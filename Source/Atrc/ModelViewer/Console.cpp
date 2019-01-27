@@ -79,9 +79,9 @@ void Console::SetMaxTextCount(int count)
     DeleteRedundantTexts();
 }
 
-void Console::AddText(ConsoleText::Type type, const std::string &text)
+void Console::AddText(ConsoleText::Type type, std::string text)
 {
-    texts_.push_back({ type, text });
+    texts_.push_back({ type, std::move(text) });
     DeleteRedundantTexts();
     scrollToBottom_ = true;
 }

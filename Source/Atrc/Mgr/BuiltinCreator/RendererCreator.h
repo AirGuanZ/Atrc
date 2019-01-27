@@ -18,7 +18,7 @@ class PathTracingRendererCreator : public Creator<Renderer>
 {
 public:
 
-    Str8 GetTypeName() const override { return "PathTracing"; }
+    std::string GetTypeName() const override { return "PathTracing"; }
 
     Renderer *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
 };

@@ -17,7 +17,7 @@ class NativeSamplerCreator : public Creator<Sampler>
 {
 public:
 
-    Str8 GetTypeName() const override { return "Native"; }
+    std::string GetTypeName() const override { return "Native"; }
 
     Sampler *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
 };

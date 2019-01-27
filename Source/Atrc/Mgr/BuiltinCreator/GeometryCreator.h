@@ -25,7 +25,7 @@ class SphereCreator : public Creator<Geometry>
 {
 public:
 
-    Str8 GetTypeName() const override { return "Sphere"; }
+    std::string GetTypeName() const override { return "Sphere"; }
 
     Geometry *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
 };
@@ -45,7 +45,7 @@ class TriangleCreator : public Creator<Geometry>
 {
 public:
 
-    Str8 GetTypeName() const override { return "Triangle"; }
+    std::string GetTypeName() const override { return "Triangle"; }
 
     Geometry *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
 };
@@ -58,11 +58,11 @@ public:
 */
 class TriangleBVHCreator : public Creator<Geometry>
 {
-    mutable std::unordered_map<Str8, const TriangleBVHCore*> path2Core_;
+    mutable std::unordered_map<std::string, const TriangleBVHCore*> path2Core_;
 
 public:
 
-    Str8 GetTypeName() const override { return "TriangleBVH"; }
+    std::string GetTypeName() const override { return "TriangleBVH"; }
 
     Geometry *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
 };

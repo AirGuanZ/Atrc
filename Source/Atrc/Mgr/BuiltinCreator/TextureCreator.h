@@ -18,7 +18,7 @@ class ConstantTextureCreator : public Creator<Texture>
 {
 public:
 
-    Str8 GetTypeName() const override { return "Constant"; }
+    std::string GetTypeName() const override { return "Constant"; }
 
     Texture *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
 };
@@ -32,7 +32,7 @@ class ConstantTexture1Creator : public Creator<Texture>
 {
 public:
 
-    Str8 GetTypeName() const override { return "Constant1"; }
+    std::string GetTypeName() const override { return "Constant1"; }
 
     Texture *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
 };
@@ -47,11 +47,11 @@ public:
 */
 class HDRTextureCreator : public Creator<Texture>
 {
-    mutable std::unordered_map<Str8, const AGZ::Texture2D<Color3f>*> path2Tex_;
+    mutable std::unordered_map<std::string, const AGZ::Texture2D<Color3f>*> path2Tex_;
 
 public:
 
-    Str8 GetTypeName() const override { return "HDR"; }
+    std::string GetTypeName() const override { return "HDR"; }
 
     Texture *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
 };
@@ -66,11 +66,11 @@ public:
 */
 class ImageTextureCreator : public Creator<Texture>
 {
-    mutable std::unordered_map<Str8, const AGZ::Texture2D<Color3b>*> path2Tex_;
+    mutable std::unordered_map<std::string, const AGZ::Texture2D<Color3b>*> path2Tex_;
 
 public:
 
-    Str8 GetTypeName() const override { return "Image"; }
+    std::string GetTypeName() const override { return "Image"; }
 
     Texture *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
 };
@@ -85,7 +85,7 @@ class TextureMultiplierCreator : public Creator<Texture>
 {
 public:
 
-    Str8 GetTypeName() const override { return "Mul"; }
+    std::string GetTypeName() const override { return "Mul"; }
 
     Texture *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
 };

@@ -12,20 +12,20 @@ Spectrum ParseSpectrum(const ConfigNode &node)
             if(arr->GetTag() == "b")
             {
                 if(arr->Size() == 1)
-                    return Spectrum((*arr)[0].AsValue().Parse<Real>() / 255);
+                    return Spectrum((*arr)[0].Parse<Real>() / 255);
                 if(arr->Size() == 3)
-                    return Spectrum((*arr)[0].AsValue().Parse<Real>() / 255,
-                                    (*arr)[1].AsValue().Parse<Real>() / 255,
-                                    (*arr)[2].AsValue().Parse<Real>() / 255);
+                    return Spectrum((*arr)[0].Parse<Real>() / 255,
+                                    (*arr)[1].Parse<Real>() / 255,
+                                    (*arr)[2].Parse<Real>() / 255);
             }
-            else if(arr->GetTag().Empty())
+            else if(arr->GetTag().empty())
             {
                 if(arr->Size() == 1)
-                    return Spectrum((*arr)[0].AsValue().Parse<Real>());
+                    return Spectrum((*arr)[0].Parse<Real>());
                 if(arr->Size() == 3)
-                    return Spectrum((*arr)[0].AsValue().Parse<Real>(),
-                                    (*arr)[1].AsValue().Parse<Real>(),
-                                    (*arr)[2].AsValue().Parse<Real>());
+                    return Spectrum((*arr)[0].Parse<Real>(),
+                                    (*arr)[1].Parse<Real>(),
+                                    (*arr)[2].Parse<Real>());
             }
         }
 
@@ -41,10 +41,10 @@ Vec2i ParseVec2i(const ConfigNode &node)
         if(auto arr = node.TryAsArray())
         {
             if(arr->Size() == 1)
-                return Vec2i((*arr)[0].AsValue().Parse<int32_t>());
+                return Vec2i((*arr)[0].Parse<int32_t>());
             if(arr->Size() == 2)
-                return Vec2i((*arr)[0].AsValue().Parse<int32_t>(),
-                             (*arr)[1].AsValue().Parse<int32_t>());
+                return Vec2i((*arr)[0].Parse<int32_t>(),
+                             (*arr)[1].Parse<int32_t>());
         }
         throw MgrErr("Invalid vec2i form");
     }
@@ -58,10 +58,10 @@ Vec2 ParseVec2(const ConfigNode &node)
         if(auto arr = node.TryAsArray())
         {
             if(arr->Size() == 1)
-                return Vec2((*arr)[0].AsValue().Parse<Real>());
+                return Vec2((*arr)[0].Parse<Real>());
             if(arr->Size() == 2)
-                return Vec2((*arr)[0].AsValue().Parse<Real>(),
-                            (*arr)[1].AsValue().Parse<Real>());
+                return Vec2((*arr)[0].Parse<Real>(),
+                            (*arr)[1].Parse<Real>());
         }
         throw MgrErr("Invalid vec2 form");
     }
@@ -75,11 +75,11 @@ Vec3 ParseVec3(const ConfigNode &node)
         if(auto arr = node.TryAsArray())
         {
             if(arr->Size() == 1)
-                return Vec3((*arr)[0].AsValue().Parse<Real>());
+                return Vec3((*arr)[0].Parse<Real>());
             if(arr->Size() == 3)
-                return Vec3((*arr)[0].AsValue().Parse<Real>(),
-                            (*arr)[1].AsValue().Parse<Real>(),
-                            (*arr)[2].AsValue().Parse<Real>());
+                return Vec3((*arr)[0].Parse<Real>(),
+                            (*arr)[1].Parse<Real>(),
+                            (*arr)[2].Parse<Real>());
         }
         throw MgrErr("Invalid vec3 form");
     }
@@ -95,9 +95,9 @@ Rad ParseAngle(const ConfigNode &node)
             if(arr->Size() != 1)
                 throw MgrErr("Array is too long");
             if(arr->GetTag() == "Deg")
-                return Deg((*arr)[0].AsValue().Parse<Real>());
+                return Deg((*arr)[0].Parse<Real>());
             else if(arr->GetTag() == "Rad")
-                return Rad((*arr)[0].AsValue().Parse<Real>());
+                return Rad((*arr)[0].Parse<Real>());
         }
         throw MgrErr("Invalid angle form");
     }
@@ -126,9 +126,9 @@ Transform ParseTransform(const ConfigNode &node)
                     if(unit.Size() != 3)
                         throw MgrErr("Translate size must be 3");
                     ret = ret * Transform::Translate(Vec3(
-                        unit[0].AsValue().Parse<Real>(),
-                        unit[1].AsValue().Parse<Real>(),
-                        unit[2].AsValue().Parse<Real>()));
+                        unit[0].Parse<Real>(),
+                        unit[1].Parse<Real>(),
+                        unit[2].Parse<Real>()));
                 }
                 else if(unit.GetTag() == "Rotate")
                 {
@@ -159,7 +159,7 @@ Transform ParseTransform(const ConfigNode &node)
                 {
                     if(unit.Size() != 1)
                         throw MgrErr("Scale size must be 1");
-                    ret = ret * Transform::Scale(unit[0].AsValue().Parse<Real>());
+                    ret = ret * Transform::Scale(unit[0].Parse<Real>());
                 }
                 else
                     throw MgrErr("Unknown transform unit type");

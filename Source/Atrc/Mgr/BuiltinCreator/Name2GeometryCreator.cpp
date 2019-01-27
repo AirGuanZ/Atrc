@@ -1,4 +1,4 @@
-#include <numeric>
+#include <filesystem>
 
 #include <AGZUtils/Utils/Mesh.h>
 
@@ -15,7 +15,7 @@ void RegisterBuiltinName2GeometryCreators(Context &context)
 
 namespace
 {
-    Name2Geometry RecreateName2Geometry(const Str8 &filename, const Str8 &cacheFilename, Arena &arena)
+    Name2Geometry RecreateName2Geometry(std::string_view filename, std::string_view cacheFilename, Arena &arena)
     {
         Name2Geometry ret;
 
@@ -23,34 +23,34 @@ namespace
 
         AGZ::Mesh::WavefrontObj<Real> obj;
         if(!obj.LoadFromFile(filename))
-            throw MgrErr("Failed to load obj file from " + filename);
+            throw MgrErr("Failed to load obj file from " + std::string(filename));
         auto meshGroup = obj.ToGeometryMeshGroup();
         obj.Clear();
 
         // 准备目标为cache file的serializer
 
-        AGZ::FileSys::File::CreateDirectoryRecursively(AGZ::FileSys::Path8(cacheFilename).ToDirectory().ToStr());
+        AGZ::FileSys::File::CreateDirectoryRecursively(std::filesystem::path(WIDEN(cacheFilename)).parent_path().string());
 
-        std::ofstream fout(cacheFilename.ToPlatformString(), std::ofstream::trunc | std::ofstream::binary);
+        std::ofstream fout(WIDEN(cacheFilename), std::ofstream::trunc | std::ofstream::binary);
         if(!fout)
-            throw MgrErr("Failed to create new cache file: " + cacheFilename);
+            throw MgrErr("Failed to create new cache file: " + std::string(cacheFilename));
 
-        auto oriFileTime = AGZ::FileSys::File::GetLastWriteTime(filename.ToStdString());
+        auto oriFileTime = AGZ::FileSys::File::GetLastWriteTime(filename);
         if(!oriFileTime)
-            throw MgrErr("Failed to load last write time of " + filename);
+            throw MgrErr("Failed to load last write time of " + std::string(filename));
 
         AGZ::BinaryOStreamSerializer serializer(fout);
 
         if(!serializer.Serialize(*oriFileTime))
         {
-            AGZ::FileSys::File::DeleteRegularFile(cacheFilename.ToStdString());
-            throw MgrErr("Failed to serialize filetime into cache file: " + cacheFilename);
+            AGZ::FileSys::File::DeleteRegularFile(cacheFilename);
+            throw MgrErr("Failed to serialize filetime into cache file: " + std::string(cacheFilename));
         }
 
         if(!serializer.Serialize(uint32_t(meshGroup.submeshes.size())))
         {
-            AGZ::FileSys::File::DeleteRegularFile(cacheFilename.ToStdString());
-            throw MgrErr("Failed to serialize submesh count into cache file: " + cacheFilename);
+            AGZ::FileSys::File::DeleteRegularFile(cacheFilename);
+            throw MgrErr("Failed to serialize submesh count into cache file: " + std::string(cacheFilename));
         }
 
         // 按字典序逐个处理submesh
@@ -73,13 +73,13 @@ namespace
 
             if(!serializer.Serialize(pair.first))
             {
-                AGZ::FileSys::File::DeleteRegularFile(cacheFilename.ToStdString());
+                AGZ::FileSys::File::DeleteRegularFile(cacheFilename);
                 throw MgrErr("Failed to serialize mesh name into cache file: " + pair.first);
             }
 
             if(!serializer.Serialize(*triBVH))
             {
-                AGZ::FileSys::File::DeleteRegularFile(cacheFilename.ToStdString());
+                AGZ::FileSys::File::DeleteRegularFile(cacheFilename);
                 throw MgrErr("Failed to serialize triangle BVH data infor cache file for submesh: " + pair.first);
             }
             
@@ -89,16 +89,16 @@ namespace
         return ret;
     }
 
-    Name2Geometry LoadName2Geometry(const Str8 &filename, Arena &arena)
+    Name2Geometry LoadName2Geometry(std::string_view filename, Arena &arena)
     {
         auto cacheFilename = GetCacheFilename(filename) + ".geometry-group";
-        std::ifstream fin(cacheFilename.ToPlatformString(), std::ifstream::binary | std::ifstream::in);
+        std::ifstream fin(WIDEN(cacheFilename), std::ifstream::binary | std::ifstream::in);
         if(!fin)
             return RecreateName2Geometry(filename, cacheFilename, arena);
         
-        auto oriFileTime = AGZ::FileSys::File::GetLastWriteTime(filename.ToStdString());
+        auto oriFileTime = AGZ::FileSys::File::GetLastWriteTime(filename);
         if(!oriFileTime)
-            throw MgrErr("Failed to load last write time of " + filename);
+            throw MgrErr("Failed to load last write time of " + std::string(filename));
 
         AGZ::BinaryIStreamDeserializer deserializer(fin);
         auto cacheTime = deserializer.Deserialize<AGZ::FileSys::FileTime>();
@@ -115,7 +115,7 @@ namespace
         Name2Geometry ret;
         for(uint32_t i = 0; i < submeshCount; ++i)
         {
-            auto name = deserializer.Deserialize<Str8>();
+            auto name = deserializer.Deserialize<std::string>();
             auto core = deserializer.Deserialize<TriangleBVHCore>();
 
             if(!name || !core)

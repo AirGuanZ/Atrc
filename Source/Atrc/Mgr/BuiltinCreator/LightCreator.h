@@ -18,7 +18,7 @@ class CubeEnvironmentLightCreator : public Creator<Light>
 {
 public:
 
-    Str8 GetTypeName() const override { return "CubeEnvironment"; }
+    std::string GetTypeName() const override { return "CubeEnvironment"; }
 
     Light *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
 };
@@ -32,7 +32,7 @@ class EnvironmentLightCreator : public Creator<Light>
 {
 public:
 
-    Str8 GetTypeName() const override { return "Environment"; }
+    std::string GetTypeName() const override { return "Environment"; }
 
     Light *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
 };
@@ -47,7 +47,7 @@ class SkyLightCreator : public Creator<Light>
 {
 public:
 
-    Str8 GetTypeName() const override { return "Sky"; }
+    std::string GetTypeName() const override { return "Sky"; }
 
     Light *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
 };

@@ -25,10 +25,6 @@ using RealT = AGZ::Math::FP<Real>;
 
 extern const Real EPS;
 
-// ================================= String
-
-using AGZ::Str8;
-
 // ================================= Math
 
 using Vec2  = AGZ::Math::Vec2<Real>;
@@ -138,20 +134,20 @@ using FilmGrid = TFilmGrid<Spectrum>;
 
 class Exception
 {
-    Str8 msg_;
+    std::string msg_;
 
 public:
 
-    explicit Exception(Str8 msg) noexcept : msg_(std::move(msg)) { }
+    explicit Exception(std::string msg) noexcept : msg_(std::move(msg)) { }
 
-    const Str8 &What() const noexcept { return msg_; }
+    const std::string &What() const noexcept { return msg_; }
 };
 
 #define DEFINE_ATRC_EXCEPTION(NAME) \
     class NAME : public ::Atrc::Exception \
     { \
     public: \
-        explicit NAME(Str8 err) : Exception(std::move(err)) noexcept { } \
+        explicit NAME(std::string err) : Exception(std::move(err)) noexcept { } \
     }
 
 } // namespace Atrc

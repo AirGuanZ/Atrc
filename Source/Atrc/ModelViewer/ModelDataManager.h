@@ -27,8 +27,7 @@ public:
         MeshGroupData(const MeshGroupData&)                = default;
         MeshGroupData &operator=(const MeshGroupData&)     = default;
 
-        AGZ::Str8 name;
-        std::string nameText;
+        std::string name;
         MeshGroup meshGroup;
         AGZ::Mesh::BoundingBox<float> bounding;
 
@@ -41,7 +40,7 @@ public:
 
 private:
 
-    bool Add(const AGZ::Str8 &name, MeshGroup &&meshGroup);
+    bool Add(const std::string &name, MeshGroup &&meshGroup);
 
     void LoadFromFile(Console &console, bool newPopup);
 

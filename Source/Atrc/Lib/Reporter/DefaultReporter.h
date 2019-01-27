@@ -19,7 +19,7 @@ public:
 
     void Report(const Film &film, std::optional<Real> percent) override;
 
-    void Message(const Str8& msg) override;
+    void Message(std::string_view msg) override;
 };
 
 } // namespace Atrc

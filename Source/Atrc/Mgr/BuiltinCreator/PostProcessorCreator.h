@@ -14,7 +14,7 @@ class ACESFilmCreator : public Creator<PostProcessor>
 {
 public:
 
-    Str8 GetTypeName() const override { return "ACESFilm"; }
+    std::string GetTypeName() const override { return "ACESFilm"; }
 
     PostProcessor *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
 };
@@ -26,7 +26,7 @@ class FlipImageCreator : public Creator<PostProcessor>
 {
 public:
 
-    Str8 GetTypeName() const override { return "FlipImage"; }
+    std::string GetTypeName() const override { return "FlipImage"; }
 
     PostProcessor *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
 };
@@ -40,7 +40,7 @@ class GammaCorrectionCreator : public Creator<PostProcessor>
 {
 public:
 
-    Str8 GetTypeName() const override { return "GammaCorrection"; }
+    std::string GetTypeName() const override { return "GammaCorrection"; }
 
     PostProcessor *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
 };
@@ -52,7 +52,7 @@ class NativeToneMappingCreator : public Creator<PostProcessor>
 {
 public:
 
-    Str8 GetTypeName() const override { return "NativeToneMapping"; }
+    std::string GetTypeName() const override { return "NativeToneMapping"; }
 
     PostProcessor *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
 };
@@ -61,7 +61,7 @@ class SaveAsHDRCreator : public Creator<PostProcessor>
 {
 public:
 
-    Str8 GetTypeName() const override { return "SaveAsHDR"; }
+    std::string GetTypeName() const override { return "SaveAsHDR"; }
 
     PostProcessor *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
 };

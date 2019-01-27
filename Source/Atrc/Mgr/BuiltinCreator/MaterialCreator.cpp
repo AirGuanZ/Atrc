@@ -22,7 +22,7 @@ namespace
     {
     public:
 
-        Str8 GetTypeName() const override { return "Conductor"; }
+        std::string GetTypeName() const override { return "Conductor"; }
 
         Fresnel *Create(const ConfigGroup &group, [[maybe_unused]] Context &context, Arena &arena) const override
         {
@@ -41,7 +41,7 @@ namespace
     {
     public:
 
-        Str8 GetTypeName() const override { return "Dielectric"; }
+        std::string GetTypeName() const override { return "Dielectric"; }
 
         Fresnel *Create(const ConfigGroup &group, [[maybe_unused]] Context &context, Arena &arena) const override
         {
@@ -59,7 +59,7 @@ namespace
     {
     public:
 
-        Str8 GetTypeName() const override { return "Schlick"; }
+        std::string GetTypeName() const override { return "Schlick"; }
 
         Fresnel *Create(const ConfigGroup &group, [[maybe_unused]] Context &context, Arena &arena) const override
         {

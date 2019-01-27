@@ -63,7 +63,7 @@ void ModelDataManager::Display(Console &console)
     {
         ImGui::PushID(i);
         bool selected = selectedIdx_ == i;
-        if(ImGui::Selectable(data_[i].nameText.c_str(), selected))
+        if(ImGui::Selectable(data_[i].name.c_str(), selected))
         {
             if(selected)
                 selectedIdx_ = -1;
@@ -79,7 +79,7 @@ const ModelDataManager::MeshGroupData *ModelDataManager::GetSelectedMeshGroup() 
     return selectedIdx_ >= 0 ? &data_[selectedIdx_] : nullptr;
 }
 
-bool ModelDataManager::Add(const AGZ::Str8 &name, MeshGroup &&meshGroup)
+bool ModelDataManager::Add(const std::string &name, MeshGroup &&meshGroup)
 {
     // 禁止名字重复
 
@@ -95,7 +95,6 @@ bool ModelDataManager::Add(const AGZ::Str8 &name, MeshGroup &&meshGroup)
     grpData.bounding  = meshGroup.GetBoundingBox();
     grpData.meshGroup = std::move(meshGroup);
     grpData.name      = name;
-    grpData.nameText  = name.ToStdString();
     data_.push_back(std::move(grpData));
 
     if(sortDataByName_)

@@ -20,7 +20,7 @@
 
 using namespace Atrc;
 
-void ProjectScene(const AGZ::Config &config, const Str8 &configFilename)
+void ProjectScene(const AGZ::Config &config, std::string_view configFilename)
 {
     auto &root = config.Root();
 
@@ -114,8 +114,7 @@ void ProjectScene(const AGZ::Config &config, const Str8 &configFilename)
 
     // 保存到文件
 
-    std::ofstream fout(outputFilename.ToPlatformString(),
-                       std::ofstream::trunc | std::ofstream::binary);
+    std::ofstream fout(WIDEN(outputFilename), std::ofstream::trunc | std::ofstream::binary);
     if(!fout)
         throw Mgr::MgrErr("Failed to open output file: " + outputFilename);
     AGZ::BinaryOStreamSerializer serializer(fout);
@@ -124,7 +123,7 @@ void ProjectScene(const AGZ::Config &config, const Str8 &configFilename)
         throw Mgr::MgrErr("Failed to serialize projected result");
 }
 
-void ProjectLight(const AGZ::Config &config, const Str8 &configFilename)
+void ProjectLight(const AGZ::Config &config, std::string_view configFilename)
 {
     auto &root = config.Root();
 
@@ -154,8 +153,7 @@ void ProjectLight(const AGZ::Config &config, const Str8 &configFilename)
 
     // 保存到文件
 
-    std::ofstream fout(outputFilename.ToPlatformString(),
-                       std::ofstream::trunc | std::ofstream::binary);
+    std::ofstream fout(WIDEN(outputFilename), std::ofstream::trunc | std::ofstream::binary);
     if(!fout)
         throw Mgr::MgrErr("Failed to open output file: " + outputFilename);
     AGZ::BinaryOStreamSerializer serializer(fout);
@@ -164,7 +162,7 @@ void ProjectLight(const AGZ::Config &config, const Str8 &configFilename)
         throw Mgr::MgrErr("Failed to serialize projected result");
 }
 
-void ReconstructImage(const AGZ::Config &config, const Str8 &configFilename)
+void ReconstructImage(const AGZ::Config &config, std::string_view configFilename)
 {
     auto &root = config.Root();
 
@@ -182,7 +180,7 @@ void ReconstructImage(const AGZ::Config &config, const Str8 &configFilename)
 
     SH2D::SceneProjectResult scene;
     {
-        std::ifstream fin(sceneFilename.ToPlatformString(), std::ifstream::binary);
+        std::ifstream fin(WIDEN(sceneFilename), std::ifstream::binary);
         if(!fin)
             throw Mgr::MgrErr("Failed to open scene SH file: " + sceneFilename);
         AGZ::BinaryIStreamDeserializer deserializer(fin);
@@ -192,7 +190,7 @@ void ReconstructImage(const AGZ::Config &config, const Str8 &configFilename)
 
     SH2D::LightProjectResult light;
     {
-        std::ifstream fin(lightFilename.ToPlatformString(), std::ifstream::binary);
+        std::ifstream fin(WIDEN(lightFilename), std::ifstream::binary);
         if(!fin)
             throw Mgr::MgrErr("Failed to open light SH file: " + lightFilename);
         AGZ::BinaryIStreamDeserializer deserializer(fin);
@@ -244,11 +242,11 @@ int main(int argc, char *argv[])
             return 0;
         }
         
-        Str8 funcName(argv[1]);
+        std::string funcName(argv[1]);
 
         if(funcName == "ps" || funcName == "project_scene")
         {
-            Str8 configFilename;
+            std::string configFilename;
             AGZ::Config config;
 
             if(argc == 3)
@@ -257,7 +255,7 @@ int main(int argc, char *argv[])
                 if(!config.LoadFromFile(configFilename))
                     throw Mgr::MgrErr("Failed to load configuration file from " + configFilename);
             }
-            else if(argc == 5 && Str8(argv[2]) == "-m")
+            else if(argc == 5 && std::string(argv[2]) == "-m")
             {
                 configFilename = argv[3];
                 if(!config.LoadFromMemory(argv[4]))
@@ -275,7 +273,7 @@ int main(int argc, char *argv[])
 
         if(funcName == "pl" || funcName == "project_light")
         {
-            Str8 configFilename;
+            std::string configFilename;
             AGZ::Config config;
 
             if(argc == 3)
@@ -284,7 +282,7 @@ int main(int argc, char *argv[])
                 if(!config.LoadFromFile(configFilename))
                     throw Mgr::MgrErr("Failed to load configuration file from " + configFilename);
             }
-            else if(argc == 5 && Str8(argv[2]) == "-m")
+            else if(argc == 5 && std::string(argv[2]) == "-m")
             {
                 configFilename = argv[3];
                 if(!config.LoadFromMemory(argv[4]))
@@ -302,7 +300,7 @@ int main(int argc, char *argv[])
 
         if(funcName == "rc" || funcName == "reconstruct")
         {
-            Str8 configFilename;
+            std::string configFilename;
             AGZ::Config config;
 
             if(argc == 3)
@@ -311,7 +309,7 @@ int main(int argc, char *argv[])
                 if(!config.LoadFromFile(configFilename))
                     throw Mgr::MgrErr("Failed to load configuration file from " + configFilename);
             }
-            else if(argc == 5 && Str8(argv[2]) == "-m")
+            else if(argc == 5 && std::string(argv[2]) == "-m")
             {
                 configFilename = argv[3];
                 if(!config.LoadFromMemory(argv[4]))
@@ -334,7 +332,7 @@ int main(int argc, char *argv[])
     {
         for(auto pErr = &err; pErr; pErr = pErr->TryGetInterior())
         {
-            std::cout << pErr->GetMsg().ToStdString() << std::endl;
+            std::cout << pErr->GetMsg() << std::endl;
             if(pErr->TryGetLeaf())
             {
                 std::cout << pErr->TryGetLeaf()->what() << std::endl;

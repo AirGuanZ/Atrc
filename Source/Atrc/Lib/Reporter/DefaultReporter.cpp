@@ -23,9 +23,9 @@ void DefaultReporter::Report([[maybe_unused]] const Film &film, std::optional<Re
         std::cout << "Progress: " << *percent << std::endl;
 }
 
-void DefaultReporter::Message(const Str8 &msg)
+void DefaultReporter::Message(std::string_view msg)
 {
-    std::cout << msg.ToStdString() << std::endl;
+    std::cout << msg << std::endl;
 }
 
 } // namespace Atrc

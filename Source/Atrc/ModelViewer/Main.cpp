@@ -10,7 +10,6 @@
 #include "ModelManager.h"
 
 using namespace std;
-using AGZ::Str8;
 
 constexpr int INIT_WIN_WIDTH = 1400;
 constexpr int INIT_WIN_HEIGHT = 900;

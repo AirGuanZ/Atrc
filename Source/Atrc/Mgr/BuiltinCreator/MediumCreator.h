@@ -17,7 +17,7 @@ class HomogeneousMediumCreator : public Creator<Medium>
 {
 public:
 
-    Str8 GetTypeName() const override { return "Homogeneous"; }
+    std::string GetTypeName() const override { return "Homogeneous"; }
 
     Medium *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
 };

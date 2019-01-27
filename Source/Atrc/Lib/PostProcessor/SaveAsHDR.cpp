@@ -5,7 +5,7 @@
 namespace Atrc
 {
     
-SaveAsHDR::SaveAsHDR(Str8 filename) noexcept
+SaveAsHDR::SaveAsHDR(std::string filename) noexcept
     : filename_(std::move(filename))
 {
     

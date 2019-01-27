@@ -11,11 +11,11 @@ void RegisterBuiltinName2GeometryCreators(Context &context);
 */
 class WavefrontOBJName2GeometryCreator : public Creator<Name2Geometry>
 {
-    mutable std::unordered_map<Str8, Name2Geometry*> path2rt_;
+    mutable std::unordered_map<std::string, Name2Geometry*> path2rt_;
 
 public:
 
-    Str8 GetTypeName() const override { return "WavefrontOBJ"; }
+    std::string GetTypeName() const override { return "WavefrontOBJ"; }
 
     Name2Geometry *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
 };
