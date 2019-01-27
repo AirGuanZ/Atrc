@@ -1,5 +1,7 @@
 #pragma once
 
+#include <AGZUtils/Utils/Input.h>
+
 #include "GL.h"
 
 class Camera
@@ -8,16 +10,17 @@ public:
 
     struct ViewData
     {
-        Vec3f pos;
-        Deg hori = Deg(0);
-        Deg vert = Deg(0);
-        Vec3f lookAt;
-        Deg up   = Deg(0);
+        Vec3f pos    = Vec3f(10.0f);
+        Deg hori     = Deg(0);
+        Deg vert     = Deg(0);
+        Vec3f lookAt = Vec3f(0.0f);;
+        Deg up       = Deg(0);
     };
 
     struct ProjData
     {
-        float w, h;
+        float w    = 1000.0f;
+        float h    = 1000.0f;
         Deg FOVy   = Deg(60);
         float near = 0.1f;
         float far  = 1000.0f;;
@@ -34,12 +37,15 @@ public:
     const Mat4f &GetProjMatrix() const noexcept { return projMat_; }
 
     void Display();
+    void UpdatePositionAndDirection(const AGZ::Input::Keyboard &kb, const AGZ::Input::Mouse &m);
 
-    const char *GetTitle() const noexcept { return name_.c_str(); }
+    const std::string &GetName() const noexcept { return name_; }
 
 private:
 
+    Vec3f GetDirection() const;
     void UpdateViewData();
+
     void UpdateViewMatrix();
     void UpdateProjMatrix();
 

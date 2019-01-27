@@ -81,6 +81,65 @@ void Camera::Display()
         UpdateProjMatrix();
 }
 
+namespace
+{
+    Vec3f WASDDirection(const AGZ::Input::Keyboard &kb, const Vec3f &dir)
+    {
+        Vec3f moveDir;
+        Vec3f horiDir = Vec3f(dir.x, 0, dir.z);
+        if(horiDir.Length())
+            horiDir = horiDir.Normalize();
+
+        if(kb.IsKeyPressed('W'))
+            moveDir += horiDir;
+        if(kb.IsKeyPressed('A'))
+            moveDir += Vec3f(-dir.z, 0, dir.x);
+        if(kb.IsKeyPressed('S'))
+            moveDir -= horiDir;
+        if(kb.IsKeyPressed('D'))
+            moveDir += Vec3f(dir.z, 0, -dir.x);
+
+        moveDir *= 1.25f;
+
+        if(kb.IsKeyPressed(AGZ::Input::KEY_SPACE))
+            moveDir.y += 1;
+        if(kb.IsKeyPressed(AGZ::Input::KEY_LSHIFT))
+            moveDir.y -= 1;
+
+        return moveDir;
+    }
+}
+
+void Camera::UpdatePositionAndDirection(const AGZ::Input::Keyboard &kb, const AGZ::Input::Mouse &m)
+{
+    // wasd进行移动，space上升，shift下降
+    // 如果开启了lookAt模式，就在平时移动摄像机，按住鼠标中键时移动lookAtPos
+    // 否则，按住鼠标中键时直接按鼠标的移动来改变摄像机角度
+
+    constexpr float MOVE_SPEED = 0.05f;
+
+    Vec3f dir = GetDirection();
+
+    if(!useLookAt_ || !m.IsMouseButtonPressed(AGZ::Input::MOUSE_MIDDLE))
+        viewData_.pos += MOVE_SPEED * WASDDirection(kb, dir);
+
+    if(useLookAt_ && m.IsMouseButtonPressed(AGZ::Input::MOUSE_MIDDLE))
+        viewData_.lookAt += MOVE_SPEED * WASDDirection(kb, dir);
+
+    if(!useLookAt_ && m.IsMouseButtonPressed(AGZ::Input::MOUSE_MIDDLE))
+    {
+        viewData_.hori.value -= 0.15f * static_cast<float>(m.GetRelativeCursorPositionX());
+        viewData_.vert.value -= 0.15f * static_cast<float>(m.GetRelativeCursorPositionY());
+
+        viewData_.vert.value = AGZ::Math::Clamp(
+            viewData_.vert.value,
+            -Deg(0.5f * 0.98f * AGZ::Math::PI<Rad>).value,
+            Deg(0.5f * 0.98f * AGZ::Math::PI<Rad>).value);
+    }
+
+    UpdateViewMatrix();
+}
+
 void Camera::UpdateViewData()
 {
     if(useLookAt_)
@@ -96,21 +155,27 @@ void Camera::UpdateViewData()
     }
 }
 
-void Camera::UpdateViewMatrix()
+Vec3f Camera::GetDirection() const
 {
-    Vec3f dir;
+    Vec3f ret;
+
     if(useLookAt_)
     {
         if(ApproxEq(viewData_.lookAt, viewData_.pos, 1e-3f))
-            dir = Vec3f(1, 0, 0);
+            ret = Vec3f(1, 0, 0);
         else
-            dir = viewData_.lookAt - viewData_.pos;
+            ret = viewData_.lookAt - viewData_.pos;
     }
     else
-    {
-        dir = Angle2Dir(viewData_.hori, viewData_.vert);
-    }
-    Vec3f up = !dir.x && !dir.z ? Vec3f::UNIT_X() : Vec3f::UNIT_Y();
+        ret = Angle2Dir(viewData_.hori, viewData_.vert);
+
+    return ret.Normalize();
+}
+
+void Camera::UpdateViewMatrix()
+{
+    Vec3f dir = GetDirection();
+    Vec3f up = (dir.x == 0.0f && dir.z == 0.0f) ? Vec3f::UNIT_X() : Vec3f::UNIT_Y();
     viewMat_ = Mat4f::LookAt(viewData_.pos, viewData_.pos + dir, up);
 }
 

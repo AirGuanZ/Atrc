@@ -24,8 +24,8 @@ namespace
     out vec4 fragColor;
     void main(void)
     {
-        float lightFactor = max(0, dot(normalize(vec3(1, 1, 1)), normalize(wNor)));
-        fragColor = vec4(lightFactor * COLOR, 1);
+        float lightFactor = max(0, dot(normalize(vec3(1, 1, 1)), normalize(wNor))) + 0.1;
+        fragColor = vec4(min(lightFactor, 1) * COLOR, 1);
     }
     )____";
 
@@ -66,7 +66,7 @@ void Model::EndRendering()
 }
 
 Model::Model(std::string name) noexcept
-    : name_(std::move(name)), displayColorWith255_(false)
+    : name_(std::move(name))
 {
     
 }
@@ -83,9 +83,7 @@ void Model::Initialize(std::shared_ptr<const GL::VertexBuffer<Vertex>> vtxBuf, c
     vao_.BindVertexBufferToAttrib(attribLPos, *vtxBuf_, &Vertex::pos, 0);
     vao_.BindVertexBufferToAttrib(attribLNor, *vtxBuf_, &Vertex::nor, 1);
 
-    AGZ_ASSERT(!displayColorWith255_);
     renderColor_ = renderColor;
-    displayColor_ = renderColor;
 }
 
 void Model::Render(const Camera &camera) const
@@ -104,13 +102,7 @@ void Model::Render(const Camera &camera) const
 
 void Model::DisplayProperty()
 {
-    if(ImGui::InputFloat3("color", &displayColor_[0]) || ImGui::Checkbox("0..255", &displayColorWith255_))
-    {
-        if(displayColorWith255_)
-            renderColor_ = displayColor_ / 255;
-        else
-            renderColor_ = displayColor_;
-    }
+    ImGui::ColorEdit3("color", &renderColor_[0], ImGuiColorEditFlags_HDR);
 }
 
 void Model::DisplayTransformSeq()

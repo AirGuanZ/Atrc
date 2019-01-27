@@ -44,8 +44,6 @@ private:
     GL::VertexArray vao_;
 
     Vec3f renderColor_;
-    Vec3f displayColor_;
-    bool displayColorWith255_;
 
     TransformSequence transSeq_;
 };

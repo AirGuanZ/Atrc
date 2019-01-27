@@ -91,6 +91,7 @@ int Run(GLFWwindow *window)
     // Model Manager
 
 	Camera camera("default");
+
 	Console console;
 	ModelManager modelMgr;
 
@@ -145,6 +146,9 @@ int Run(GLFWwindow *window)
         }
 
         console.Display();
+
+        if(!ImGui::IsAnyWindowFocused())
+            camera.UpdatePositionAndDirection(keyboard, mouse);
 
         GL::RenderContext::SetClearColor(Vec4f(Vec3f(0.4f), 0.0f));
         GL::RenderContext::ClearColorAndDepth();
