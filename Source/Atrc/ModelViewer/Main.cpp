@@ -20,7 +20,7 @@ int Run(GLFWwindow *window)
     using namespace AGZ::Input;
 
     AGZ::ObjArena<> arena;
-
+    
     // 初始化IMGUI
 
     ImGui::CreateContext();

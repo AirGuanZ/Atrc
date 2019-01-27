@@ -137,6 +137,7 @@ void Camera::UpdatePositionAndDirection(const AGZ::Input::Keyboard &kb, const AG
             Deg(0.5f * 0.98f * AGZ::Math::PI<Rad>).value);
     }
 
+    UpdateViewData();
     UpdateViewMatrix();
 }
 
