@@ -43,13 +43,13 @@ namespace
 
         if(!serializer.Serialize(*oriFileTime))
         {
-            AGZ::FileSys::File::DeleteRegularFile(cacheFilename);
+            AGZ::FileSys::File::DeleteRegularFile(cacheFilename.ToStdString());
             throw MgrErr("Failed to serialize filetime into cache file: " + cacheFilename);
         }
 
         if(!serializer.Serialize(uint32_t(meshGroup.submeshes.size())))
         {
-            AGZ::FileSys::File::DeleteRegularFile(cacheFilename);
+            AGZ::FileSys::File::DeleteRegularFile(cacheFilename.ToStdString());
             throw MgrErr("Failed to serialize submesh count into cache file: " + cacheFilename);
         }
 
@@ -73,13 +73,13 @@ namespace
 
             if(!serializer.Serialize(pair.first))
             {
-                AGZ::FileSys::File::DeleteRegularFile(cacheFilename);
+                AGZ::FileSys::File::DeleteRegularFile(cacheFilename.ToStdString());
                 throw MgrErr("Failed to serialize mesh name into cache file: " + pair.first);
             }
 
             if(!serializer.Serialize(*triBVH))
             {
-                AGZ::FileSys::File::DeleteRegularFile(cacheFilename);
+                AGZ::FileSys::File::DeleteRegularFile(cacheFilename.ToStdString());
                 throw MgrErr("Failed to serialize triangle BVH data infor cache file for submesh: " + pair.first);
             }
             

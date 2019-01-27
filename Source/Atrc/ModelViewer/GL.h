@@ -1,9 +1,7 @@
 #pragma once
 
-#define GLEW_STATIC
-
-#include <Lib/glew/glew.h>
-#include <Lib/glfw/glfw3.h>
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
 
 #define AGZ_USE_GLFW
 #define AGZ_USE_OPENGL

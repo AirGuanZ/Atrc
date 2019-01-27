@@ -77,6 +77,7 @@ void Model::Initialize(std::shared_ptr<const GL::VertexBuffer<Vertex>> vtxBuf, c
 
     vtxBuf_ = std::move(vtxBuf);
 
+    vao_.InitializeHandle();
     vao_.EnableAttrib(attribLPos);
     vao_.EnableAttrib(attribLNor);
     vao_.BindVertexBufferToAttrib(attribLPos, *vtxBuf_, &Vertex::pos, 0);

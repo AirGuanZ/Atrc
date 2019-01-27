@@ -87,7 +87,7 @@ namespace
         AGZ::BinaryOStreamSerializer serializer(fout);
         if(!serializer.Serialize(*oriFileTime) || !serializer.Serialize(*ret))
         {
-            AGZ::FileSys::File::DeleteRegularFile(cacheFilename);
+            AGZ::FileSys::File::DeleteRegularFile(cacheFilename.ToStdString());
             throw MgrErr("Failed to serialize into triangle mesh cache file: " + cacheFilename);
         }
 

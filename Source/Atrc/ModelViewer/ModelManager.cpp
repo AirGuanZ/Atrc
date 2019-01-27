@@ -9,6 +9,9 @@ ModelManager::ModelManager()
 
 void ModelManager::Render(const Camera &camera) const
 {
+    if(models_.empty())
+        return;
+
     Model::BeginRendering();
 
     for(auto &model : models_)

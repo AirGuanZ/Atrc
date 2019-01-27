@@ -25,6 +25,7 @@ std::shared_ptr<const GL::VertexBuffer<Model::Vertex>> ModelDataManager::MeshGro
         }
     }
 
+    buf->InitializeHandle();
     buf->ReinitializeData(vtxData.data(), static_cast<uint32_t>(vtxData.size()), GL_STATIC_DRAW);
     vtxBuf = std::move(buf);
 
