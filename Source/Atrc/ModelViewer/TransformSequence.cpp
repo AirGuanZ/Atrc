@@ -253,8 +253,6 @@ void TransformSequence::Display()
         changed = true;
     }
 
-    ImGui::SameLine();
-
     if(ImGui::Button("template"))
     {
         transforms_.emplace_back(Translate { Vec3f()   });

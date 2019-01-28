@@ -186,7 +186,5 @@ void ModelDataManager::LoadObj(Console &console, std::string_view filename, std:
 
 void ModelDataManager::SortData()
 {
-    std::sort(
-        data_.begin(), data_.end(),
-        [](auto &L, auto &R) { return L.name < R.name; });
+    std::sort(data_.begin(), data_.end(), [](auto &L, auto &R) { return L.name < R.name; });
 }

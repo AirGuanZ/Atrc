@@ -31,6 +31,7 @@ FILE(GLOB_RECURSE LIB_SRC_POST_PROCESSOR "Source/Atrc/Lib/PostProcessor/*.cpp" "
 FILE(GLOB_RECURSE LIB_SRC_RENDERER		 "Source/Atrc/Lib/Renderer/*.cpp"      "Source/Atrc/Lib/Renderer/*.h")
 FILE(GLOB_RECURSE LIB_SRC_REPORTER		 "Source/Atrc/Lib/Reporter/*.cpp"      "Source/Atrc/Lib/Reporter/*.h")
 FILE(GLOB_RECURSE LIB_SRC_SAMPLER		 "Source/Atrc/Lib/Sampler/*.cpp"       "Source/Atrc/Lib/Sampler/*.h")
+FILE(GLOB_RECURSE LIB_SRC_TEXTURE		 "Source/Atrc/Lib/Texture/*.cpp"       "Source/Atrc/Lib/Texture/*.h")
 FILE(GLOB_RECURSE LIB_SRC_UTILITY		 "Source/Atrc/Lib/Utility/*.cpp"       "Source/Atrc/Lib/Utility/*.h")
 ADD_LIBRARY(
 	Lib STATIC
@@ -46,6 +47,7 @@ ADD_LIBRARY(
 	${LIB_SRC_RENDERER}
 	${LIB_SRC_REPORTER}
 	${LIB_SRC_SAMPLER}
+	${LIB_SRC_TEXTURE}
 	${LIB_SRC_UTILITY})
 SOURCE_GROUP("Camera"        FILES ${LIB_SRC_CAMERA})
 SOURCE_GROUP("Core"          FILES ${LIB_SRC_CORE})
@@ -59,6 +61,7 @@ SOURCE_GROUP("PostProcessor" FILES ${LIB_SRC_POST_PROCESSOR})
 SOURCE_GROUP("Renderer"      FILES ${LIB_SRC_RENDERER})
 SOURCE_GROUP("Reporter"      FILES ${LIB_SRC_REPORTER})
 SOURCE_GROUP("Sampler"       FILES ${LIB_SRC_SAMPLER})
+SOURCE_GROUP("Texture"       FILES ${LIB_SRC_TEXTURE})
 SOURCE_GROUP("Utility"       FILES ${LIB_SRC_UTILITY})
 
 FILE(GLOB MGR_SRC_OUTER			  "Source/Atrc/Mgr/*.cpp"				 "Source/Atrc/Mgr/*.h")

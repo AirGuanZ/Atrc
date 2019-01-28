@@ -13,12 +13,12 @@ namespace
         return Abs(deltaPhi * (Sin(theta1) - Sin(theta0)));
     }
 
-    Option<std::pair<Real, Real>> IntersectSegment(const std::pair<Real, Real> &a, const std::pair<Real, Real> &b) noexcept
+    std::optional<std::pair<Real, Real>> IntersectSegment(const std::pair<Real, Real> &a, const std::pair<Real, Real> &b) noexcept
     {
         AGZ_ASSERT(a.first <= a.second && b.first <= b.second);
         auto p = std::make_pair(Max(a.first, b.first), Min(a.second, b.second));
         if(p.first > p.second)
-            return None;
+            return std::nullopt;
         return p;
     }
 }
