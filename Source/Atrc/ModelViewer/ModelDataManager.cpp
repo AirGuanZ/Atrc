@@ -44,6 +44,18 @@ void ModelDataManager::Display(Console &console)
 
     ImGui::SameLine();
 
+    if(ImGui::Button("files"))
+    {
+        ImGui::OpenPopup("file browser");
+        fileBrowser_.SetLabel("file browser");
+        fileBrowser_.SetTarget(false);
+        fileBrowser_.SetCurrentDirectory();
+    }
+
+    fileBrowser_.Display();
+
+    ImGui::SameLine();
+
     if(ImGui::Button("delete") && selectedIdx_ >= 0)
     {
         data_.erase(data_.begin() + selectedIdx_);

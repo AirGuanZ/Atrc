@@ -6,6 +6,7 @@
 #include <AGZUtils/Utils/Mesh.h>
 
 #include "Console.h"
+#include "FileBrowser.h"
 #include "GL.h"
 #include "Model.h"
 
@@ -51,4 +52,6 @@ private:
     bool sortDataByName_ = false;
     int selectedIdx_ = -1;
     std::vector<MeshGroupData> data_;
+
+    FileBrowser fileBrowser_;
 };
