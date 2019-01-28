@@ -23,21 +23,23 @@ Lib已/将实现以下特性：
 
 ![SS0](./Diary/Misc/2018_12_25_ShowTime.png)
 
-ModelViewer目前还在早期施工中，截图如下：
+ModelViewer还在前期施工中，截图如下：
 
 ![SS0](./Diary/Misc/2019_01_26_ModelViewer.png)
 
 ## Build
 
-ModelViewer依赖于[glfw](https://www.glfw.org/)、[glew](http://glew.sourceforge.net/)以及[dear imgui](https://github.com/ocornut/imgui)，此外所有组件均依赖于工具库[AGZ Utils](https://github.com/AirGuanZ/Utils)。
+Atrc依赖于[glfw](https://www.glfw.org/)、[glew](http://glew.sourceforge.net/)、[dear imgui](https://github.com/ocornut/imgui)以及[AGZ Utils](https://github.com/AirGuanZ/Utils)。其中[glfw](https://www.glfw.org/)和[glew](http://glew.sourceforge.net/)需要提前安装，[dear imgui](https://github.com/ocornut/imgui)已包含在源代码中，[AGZ Utils](https://github.com/AirGuanZ/Utils)则是head-only的，将环境变量`AGZ_UTILS_HOME`设置为其中的`Src`目录即可。
 
-Atrc使用了大量C++17特性，因此只能用版本较新的编译器构建。`./Build/VS2017/Atrc`中包含了可以用VS2017打开的解决方案；在*nix下可使用clang/gcc编译，输入命令`make all`即可。我所使用的测试环境为：
+Atrc使用了大量C++17特性，因此只能用版本较新的编译器构建。以产生MSVC x64 Solution为例，首先移动到项目根目录下，在`Powershell`中输入：
 
+```powershell
+mkdir Build64
+cd Build64
+cmake -G "Visual Studio 15 2017 Win64" ..
 ```
-VisualStudioVersion = 15.0.28010.2048
-g++ 8.2.0
-clang 8.0.0
-```
+
+即可。
 
 ## Configuration Script
 
