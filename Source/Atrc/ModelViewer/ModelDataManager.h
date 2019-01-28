@@ -41,9 +41,11 @@ public:
 
 private:
 
-    bool Add(const std::string &name, MeshGroup &&meshGroup);
+    bool Add(std::string_view name, MeshGroup &&meshGroup);
 
-    void LoadFromFile(Console &console, bool newPopup);
+    void DisplayNewData(Console &console, bool newPopup);
+
+    void LoadObj(Console &console, std::string_view filename, std::string_view dataName);
 
     void SortData();
 

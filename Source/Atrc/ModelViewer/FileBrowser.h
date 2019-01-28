@@ -17,7 +17,7 @@ public:
 
     const std::string &GetLabel() const noexcept;
 
-    std::string GetResult() const;
+    std::string GetResult(bool relative = true) const;
 
 private:
 

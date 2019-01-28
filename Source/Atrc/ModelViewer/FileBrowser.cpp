@@ -26,21 +26,44 @@ bool FileBrowser::Display()
         return false;
     AGZ::ScopeGuard popupGuard([] { ImGui::EndPopup(); });
 
+    const std::string *enterDir = nullptr;
+
+    auto pwdStr = INV_WIDEN(pwd_.wstring());
+    ImGui::Text("%s", pwdStr.c_str());
+
+    ImGui::BeginChild("files", ImVec2(640, 300));
     for(auto &u : curUnits_)
     {
         bool selected = u.name == selectedName_;
         std::string displayName = (u.isDir ? "[d] " : "[f] ") + u.name;
-        if(ImGui::Selectable(displayName.c_str(), selected, ImGuiSelectableFlags_DontClosePopups))
+        if(ImGui::Selectable(displayName.c_str(), selected, ImGuiSelectableFlags_DontClosePopups) && (u.isDir == selectDirectory_))
             selectedName_ = u.name;
+        if(ImGui::IsItemClicked(1) && u.isDir)
+            enterDir = &u.name;
     }
+    ImGui::EndChild();
+
+    if(enterDir)
+    {
+        if(*enterDir == "..")
+            SetCurrentDirectory(pwd_.parent_path().string());
+        else
+            SetCurrentDirectory((pwd_ / *enterDir).string());
+    }
+
+    if(ImGui::Button("ok") && !selectedName_.empty())
+    {
+        ImGui::CloseCurrentPopup();
+        return true;
+    }
+
+    ImGui::SameLine();
 
     if(ImGui::Button("cancel"))
     {
         ImGui::CloseCurrentPopup();
         return false;
     }
-
-    // TODO
 
     return false;
 }
@@ -50,9 +73,11 @@ const std::string& FileBrowser::GetLabel() const noexcept
     return label_;
 }
 
-std::string FileBrowser::GetResult() const
+std::string FileBrowser::GetResult(bool relative) const
 {
-    return (pwd_ / selectedName_).string();
+    auto p = pwd_ / selectedName_;
+    return (relative ?  std::filesystem::relative(p) : std::filesystem::absolute(p)).string();
+    //return (pwd_ / selectedName_).string();
 }
 
 void FileBrowser::UpdateCurrentUnits()
@@ -62,7 +87,8 @@ void FileBrowser::UpdateCurrentUnits()
     if(!is_directory(pwd_))
         return;
 
-    std::vector<std::string> names;
+    curUnits_.push_back({ true, ".." });
+
     for(auto &p : std::filesystem::directory_iterator(pwd_))
     {
         Unit unit;
@@ -76,6 +102,9 @@ void FileBrowser::UpdateCurrentUnits()
         else if(p.is_directory())
             unit.isDir = true;
         else
+            continue;
+
+        if(AGZ::StartsWith(unit.name, "$"))
             continue;
 
         curUnits_.push_back(std::move(unit));

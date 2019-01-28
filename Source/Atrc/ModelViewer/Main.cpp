@@ -88,6 +88,12 @@ int Run(GLFWwindow *window)
     GL::Immediate imm;
     imm.Initialize({ 600.0f, 600.0f });
 
+    // ImGui Font Size
+
+    ImFontConfig defaultFontConfig;
+    defaultFontConfig.SizePixels = 16.0f;
+    ImGui::GetIO().Fonts->AddFontDefault(&defaultFontConfig);
+    
     // Model Manager
 
 	Camera camera("default");
@@ -131,7 +137,6 @@ int Run(GLFWwindow *window)
             {
                 if(ImGui::BeginTabItem("model"))
                 {
-                    //modelDataMgr.Display(console);
                     modelMgr.Display(console);
                     ImGui::EndTabItem();
                 }

@@ -37,14 +37,15 @@ void ModelDataManager::Display(Console &console)
     bool newPopup = false;
     if(ImGui::Button("load"))
     {
-        ImGui::OpenPopup("Load From File");
+        ImGui::OpenPopup("new data from .obj");
         newPopup = true;
     }
-    LoadFromFile(console, newPopup);
+    //LoadFromFile(console, newPopup);
+    DisplayNewData(console, newPopup);
 
     ImGui::SameLine();
 
-    if(ImGui::Button("files"))
+    /*if(ImGui::Button("files"))
     {
         ImGui::OpenPopup("file browser");
         fileBrowser_.SetLabel("file browser");
@@ -52,9 +53,12 @@ void ModelDataManager::Display(Console &console)
         fileBrowser_.SetCurrentDirectory();
     }
 
-    fileBrowser_.Display();
+    if(fileBrowser_.Display())
+    {
+        // TODO
+    }
 
-    ImGui::SameLine();
+    ImGui::SameLine();*/
 
     if(ImGui::Button("delete") && selectedIdx_ >= 0)
     {
@@ -91,7 +95,7 @@ const ModelDataManager::MeshGroupData *ModelDataManager::GetSelectedMeshGroup() 
     return selectedIdx_ >= 0 ? &data_[selectedIdx_] : nullptr;
 }
 
-bool ModelDataManager::Add(const std::string &name, MeshGroup &&meshGroup)
+bool ModelDataManager::Add(std::string_view name, MeshGroup &&meshGroup)
 {
     // 禁止名字重复
 
@@ -134,56 +138,66 @@ namespace
     }
 }
 
-void ModelDataManager::LoadFromFile(Console &console, bool newPopup)
+void ModelDataManager::DisplayNewData(Console &console, bool newPopup)
 {
-    if(!ImGui::BeginPopup("Load From File", ImGuiWindowFlags_AlwaysAutoResize))
+    if(!ImGui::BeginPopup("new data from .obj", ImGuiWindowFlags_AlwaysAutoResize))
         return;
-    AGZ::ScopeGuard popupExitGuard([]() { ImGui::EndPopup(); });
+    AGZ::ScopeGuard popupExitGuard([] { ImGui::EndPopup(); });
 
-    bool ok = false, cancel = false;
-
-    static char nameBuf[256] = "";
+    static char nameBuf[512] = "";
     if(newPopup)
-        std::strcpy(nameBuf, DefaultName(defaultNameIndex_).c_str());
-    ImGui::InputText("name", nameBuf, 256);
-
-    static char filenameBuf[256] = "Scene/Asset/Test/Mitsuba.obj";
-    ImGui::InputText("filename", filenameBuf, 256);
-
-    ok |= ImGui::Button("load"); ImGui::SameLine();
-    cancel |= ImGui::Button("cancel");
-
-    if(ok)
     {
-        AGZ::Mesh::WavefrontObj<float> obj;
-        if(!obj.LoadFromFile(filenameBuf))
-        {
-            console.AddText(ConsoleText::Error, "Failed to load obj data from " + std::string(filenameBuf));
-            ImGui::CloseCurrentPopup();
-            return;
-        }
+        fileBrowser_.SetLabel("file browser");
+        fileBrowser_.SetTarget(false);
+        fileBrowser_.SetCurrentDirectory();
+        std::strcpy(nameBuf, DefaultName(defaultNameIndex_).c_str());
+    }
 
-        MeshGroup meshGrp = obj.ToGeometryMeshGroup();
-        obj.Clear();
+    ImGui::InputText("name", nameBuf, 512);
+    ImGui::Text("%s", fileBrowser_.GetResult().c_str());
 
-        if(!Add(nameBuf, std::move(meshGrp)))
-        {
-            console.AddText(ConsoleText::Error, "Failed to add new model data: " + std::string(nameBuf));
-            ImGui::CloseCurrentPopup();
-            return;
-        }
+    ImGui::SameLine();
 
-        if(std::string(nameBuf) == DefaultName(defaultNameIndex_))
-            ++defaultNameIndex_;
+    if(ImGui::Button("browse"))
+        ImGui::OpenPopup("file browser");
+    fileBrowser_.Display();
 
-        console.AddText(ConsoleText::Normal, "Load WavefrontOBJ from " + std::string(filenameBuf));
-        console.AddText(ConsoleText::Normal, "Add model data: " + std::string(nameBuf));
+    if(ImGui::Button("ok"))
+    {
+        LoadObj(console, fileBrowser_.GetResult(), nameBuf);
         ImGui::CloseCurrentPopup();
         return;
     }
 
-    if(cancel)
+    ImGui::SameLine();
+
+    if(ImGui::Button("cancel"))
         ImGui::CloseCurrentPopup();
+}
+
+void ModelDataManager::LoadObj(Console &console, std::string_view filename, std::string_view dataName)
+{
+    AGZ::Mesh::WavefrontObj<float> obj;
+    if(!obj.LoadFromFile(filename))
+    {
+        console.AddText(ConsoleText::Error, "Failed to load obj data from " + std::string(filename));
+        return;
+    }
+
+    MeshGroup meshGrp = obj.ToGeometryMeshGroup();
+    obj.Clear();
+
+    if(!Add(dataName, std::move(meshGrp)))
+    {
+        console.AddText(ConsoleText::Error, "Failed to add new model data: " + std::string(dataName));
+        return;
+    }
+
+    if(dataName == DefaultName(defaultNameIndex_))
+        ++defaultNameIndex_;
+
+    console.AddText(ConsoleText::Normal, "Load WavefrontOBJ from " + std::string(filename));
+    console.AddText(ConsoleText::Normal, "Add model data: " + std::string(dataName));
 }
 
 void ModelDataManager::SortData()
