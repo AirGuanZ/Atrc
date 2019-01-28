@@ -11,6 +11,9 @@
 Asset/*
 Scene/*
 Library/*
+Build/
+Build32/
+Build64/
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
