@@ -19,7 +19,7 @@ std::shared_ptr<const GL::VertexBuffer<Model::Vertex>> ModelDataManager::MeshGro
         for(auto &v : it.second.vertices)
         {
             Model::Vertex nv;
-            nv.pos = v.pos;
+            nv.pos = v.pos.xzy();
             nv.nor = v.nor;
             vtxData.push_back(nv);
         }
@@ -40,25 +40,9 @@ void ModelDataManager::Display(Console &console)
         ImGui::OpenPopup("new data from .obj");
         newPopup = true;
     }
-    //LoadFromFile(console, newPopup);
     DisplayNewData(console, newPopup);
 
     ImGui::SameLine();
-
-    /*if(ImGui::Button("files"))
-    {
-        ImGui::OpenPopup("file browser");
-        fileBrowser_.SetLabel("file browser");
-        fileBrowser_.SetTarget(false);
-        fileBrowser_.SetCurrentDirectory();
-    }
-
-    if(fileBrowser_.Display())
-    {
-        // TODO
-    }
-
-    ImGui::SameLine();*/
 
     if(ImGui::Button("delete") && selectedIdx_ >= 0)
     {

@@ -76,8 +76,7 @@ const std::string& FileBrowser::GetLabel() const noexcept
 std::string FileBrowser::GetResult(bool relative) const
 {
     auto p = pwd_ / selectedName_;
-    return (relative ?  std::filesystem::relative(p) : std::filesystem::absolute(p)).string();
-    //return (pwd_ / selectedName_).string();
+    return (relative ?  std::filesystem::relative(p) : absolute(p)).string();
 }
 
 void FileBrowser::UpdateCurrentUnits()
