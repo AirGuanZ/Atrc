@@ -75,7 +75,7 @@ void ModelManager::NewModelFromData(Console &console, bool clickNew)
         {
             if(m.GetName() == name)
             {
-                console.AddText(ConsoleText::Error, "Name already used");
+                console.AddError("Name already used");
                 return;
             }
         }
@@ -83,7 +83,7 @@ void ModelManager::NewModelFromData(Console &console, bool clickNew)
         auto data = dataMgr_.GetSelectedMeshGroup();
         if(!data)
         {
-            console.AddText(ConsoleText::Error, "No model data is selected");
+            console.AddError("No model data is selected");
             return;
         }
         auto vtxBuf = data->GetVertexBuffer();
@@ -94,6 +94,6 @@ void ModelManager::NewModelFromData(Console &console, bool clickNew)
         models_.push_back(std::move(newModel));
         selectedIdx_ = models_.size() - 1;
 
-        console.AddText(ConsoleText::Normal, "Model created: " + std::string(nameBuf));
+        console.AddMessage("Model created: " + std::string(nameBuf));
     }
 }

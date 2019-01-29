@@ -14,6 +14,23 @@ using namespace std;
 constexpr int INIT_WIN_WIDTH = 1400;
 constexpr int INIT_WIN_HEIGHT = 900;
 
+void ShowGlobalHelpWindow(bool open, const AGZ::Input::Keyboard &kb)
+{
+    if(open)
+        ImGui::OpenPopup("global help");
+    ImGui::SetNextWindowSize(ImVec2(640, 640), ImGuiCond_Always);
+    if(!ImGui::BeginPopupModal("global help", nullptr, ImGuiWindowFlags_NoResize))
+        return;
+    AGZ::ScopeGuard windowExitGuard([] { ImGui::EndPopup(); });
+
+    static const char *MSG =
+u8R"____(Hold mouse middle button to adjust camera direction when there is no focused window.)____";
+    ImGui::TextWrapped("%s", MSG);
+
+    if(kb.IsKeyPressed(AGZ::Input::KEY_ESCAPE))
+        ImGui::CloseCurrentPopup();
+}
+
 int Run(GLFWwindow *window)
 {
     using namespace AGZ::GraphicsAPI;
@@ -112,12 +129,21 @@ int Run(GLFWwindow *window)
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
+        bool openGlobalHelpWindow = false;
+
         if(ImGui::BeginMainMenuBar())
         {
             if(ImGui::BeginMenu("file"))
             {
                 if(ImGui::MenuItem("exit"))
                     glfwSetWindowShouldClose(window, GLFW_TRUE);
+                ImGui::EndMenu();
+            }
+
+            if(ImGui::BeginMenu("help"))
+            {
+                if(ImGui::MenuItem("global"))
+                    openGlobalHelpWindow = true;
                 ImGui::EndMenu();
             }
 
@@ -131,6 +157,7 @@ int Run(GLFWwindow *window)
             float posY = ImGui::GetFrameHeight() + posX * (fbH / fbW);
             ImGui::SetNextWindowPos(ImVec2(posX, posY), ImGuiCond_FirstUseEver);
         }
+
         if(ImGui::Begin("Scene Manager", nullptr, ImVec2(400, 700)))
         {
             if(ImGui::BeginTabBar("scene manager tab"))
@@ -147,10 +174,13 @@ int Run(GLFWwindow *window)
                 }
                 ImGui::EndTabBar();
             }
+
             ImGui::End();
         }
 
         console.Display();
+
+        ShowGlobalHelpWindow(openGlobalHelpWindow, keyboard);
 
         if(!ImGui::IsAnyWindowFocused())
             camera.UpdatePositionAndDirection(keyboard, mouse);

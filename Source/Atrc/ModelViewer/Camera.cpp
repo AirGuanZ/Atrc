@@ -22,7 +22,7 @@ namespace
 }
 
 Camera::Camera(std::string name) noexcept
-    : name_(std::move(name)), useLookAt_(false)
+    : name_(std::move(name))
 {
     auto &global = Global::GetInstance();
     projData_.w = static_cast<float>(global.framebufferWidth);
@@ -50,13 +50,14 @@ void Camera::Display()
 
     ImGui::SameLine();
 
-    if(ImGui::Checkbox("lookat", &useLookAt_))
-        UpdateViewData();
+    ImGui::Checkbox("lookat", &viewData_.useLookAt);
+    UpdateViewData();
+
     ImGui::ShowTooltipForLastItem("use lookat instead hori/vert angle to specify camera direction");
 
     viewChanged |= ImGui::InputFloat3("position", &viewData_.pos[0]);
 
-    if(useLookAt_)
+    if(viewData_.useLookAt)
     {
         viewChanged |= ImGui::InputFloat3("lookat pos", &viewData_.lookAt[0]);
     }
@@ -120,13 +121,13 @@ void Camera::UpdatePositionAndDirection(const AGZ::Input::Keyboard &kb, const AG
 
     Vec3f dir = GetDirection();
 
-    if(!useLookAt_ || !m.IsMouseButtonPressed(AGZ::Input::MOUSE_MIDDLE))
+    if(!viewData_.useLookAt || !m.IsMouseButtonPressed(AGZ::Input::MOUSE_MIDDLE))
         viewData_.pos += MOVE_SPEED * WASDDirection(kb, dir);
 
-    if(useLookAt_ && m.IsMouseButtonPressed(AGZ::Input::MOUSE_MIDDLE))
+    if(viewData_.useLookAt && m.IsMouseButtonPressed(AGZ::Input::MOUSE_MIDDLE))
         viewData_.lookAt += MOVE_SPEED * WASDDirection(kb, dir);
 
-    if(!useLookAt_ && m.IsMouseButtonPressed(AGZ::Input::MOUSE_MIDDLE))
+    if(!viewData_.useLookAt && m.IsMouseButtonPressed(AGZ::Input::MOUSE_MIDDLE))
     {
         viewData_.hori.value -= 0.15f * static_cast<float>(m.GetRelativeCursorPositionX());
         viewData_.vert.value -= 0.15f * static_cast<float>(m.GetRelativeCursorPositionY());
@@ -143,7 +144,7 @@ void Camera::UpdatePositionAndDirection(const AGZ::Input::Keyboard &kb, const AG
 
 void Camera::UpdateViewData()
 {
-    if(useLookAt_)
+    if(viewData_.useLookAt)
     {
         auto angle = Dir2Angle(viewData_.lookAt - viewData_.pos);
         viewData_.hori = angle.first;
@@ -160,7 +161,7 @@ Vec3f Camera::GetDirection() const
 {
     Vec3f ret;
 
-    if(useLookAt_)
+    if(viewData_.useLookAt)
     {
         if(ApproxEq(viewData_.lookAt, viewData_.pos, 1e-3f))
             ret = Vec3f(1, 0, 0);

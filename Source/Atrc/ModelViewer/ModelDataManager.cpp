@@ -164,7 +164,7 @@ void ModelDataManager::LoadObj(Console &console, std::string_view filename, std:
     AGZ::Mesh::WavefrontObj<float> obj;
     if(!obj.LoadFromFile(filename))
     {
-        console.AddText(ConsoleText::Error, "Failed to load obj data from " + std::string(filename));
+        console.AddError("Failed to load obj data from " + std::string(filename));
         return;
     }
 
@@ -173,15 +173,15 @@ void ModelDataManager::LoadObj(Console &console, std::string_view filename, std:
 
     if(!Add(dataName, std::move(meshGrp)))
     {
-        console.AddText(ConsoleText::Error, "Failed to add new model data: " + std::string(dataName));
+        console.AddError("Failed to add new model data: " + std::string(dataName));
         return;
     }
 
     if(dataName == DefaultName(defaultNameIndex_))
         ++defaultNameIndex_;
 
-    console.AddText(ConsoleText::Normal, "Load WavefrontOBJ from " + std::string(filename));
-    console.AddText(ConsoleText::Normal, "Add model data: " + std::string(dataName));
+    console.AddMessage("Load WavefrontOBJ from " + std::string(filename));
+    console.AddMessage("Add model data: " + std::string(dataName));
 }
 
 void ModelDataManager::SortData()

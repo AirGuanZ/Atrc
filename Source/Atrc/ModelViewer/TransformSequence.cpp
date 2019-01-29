@@ -221,35 +221,33 @@ void TransformSequence::Display()
         }
     }
 
-    static int selectedIdx = -1;
-
     ImGui::SameLine();
 
     auto count = static_cast<int>(transforms_.size());
-    if(ImGui::Button("delete") && selectedIdx >= 0)
+    if(ImGui::Button("delete") && selectedIdx_ >= 0)
     {
-        transforms_.erase(transforms_.begin() + selectedIdx);
+        transforms_.erase(transforms_.begin() + selectedIdx_);
         --count;
-        if(selectedIdx >= count)
-            --selectedIdx;
+        if(selectedIdx_ >= count)
+            --selectedIdx_;
         changed = true;
     }
 
     ImGui::SameLine();
 
-    if(ImGui::Button("up") && selectedIdx >= 1)
+    if(ImGui::Button("up") && selectedIdx_ >= 1)
     {
-        std::swap(transforms_[selectedIdx], transforms_[selectedIdx - 1]);
-        --selectedIdx;
+        std::swap(transforms_[selectedIdx_], transforms_[selectedIdx_ - 1]);
+        --selectedIdx_;
         changed = true;
     }
 
     ImGui::SameLine();
 
-    if(ImGui::Button("down") && 0 <= selectedIdx && selectedIdx < count - 1)
+    if(ImGui::Button("down") && 0 <= selectedIdx_ && selectedIdx_ < count - 1)
     {
-        std::swap(transforms_[selectedIdx], transforms_[selectedIdx + 1]);
-        ++selectedIdx;
+        std::swap(transforms_[selectedIdx_], transforms_[selectedIdx_ + 1]);
+        ++selectedIdx_;
         changed = true;
     }
 
@@ -270,14 +268,14 @@ void TransformSequence::Display()
     for(int i = 0; i < count; ++i)
     {
         ImGui::PushID(i);
-        bool selected = i == selectedIdx;
+        bool selected = i == selectedIdx_;
         auto &text = transforms_[i].GetText();
         if(ImGui::Selectable(text.c_str(), selected))
         {
             if(selected)
-                selectedIdx = -1;
+                selectedIdx_ = -1;
             else
-                selectedIdx = i;
+                selectedIdx_ = i;
         }
 
         ImGui::OpenPopupOnItemClick("edit");

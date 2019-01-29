@@ -28,6 +28,9 @@ public:
 
     void AddText(ConsoleText::Type type, std::string text);
 
+    void AddMessage(std::string text) { AddText(ConsoleText::Normal, std::move(text)); }
+    void AddError(std::string text)   { AddText(ConsoleText::Error,  std::move(text)); }
+
     void ClearTexts();
     void ClearInputBox();
     void ClearInputQueue();

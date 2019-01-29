@@ -1,22 +1,25 @@
 #pragma once
 
-#include <AGZUtils/Utils/Input.h>
-
 #include "GL.h"
 
 class Camera
 {
 public:
 
+    // 和View Matrix相关的数据
+    // hori + vert与lookAt都是用来管理摄像机视角的，具体在display界面显示哪个由useLookAt决定。
+    // 随时保证两者是一致的。
     struct ViewData
     {
-        Vec3f pos    = Vec3f(10.0f);
-        Deg hori     = Deg(0);
-        Deg vert     = Deg(0);
-        Vec3f lookAt = Vec3f(0.0f);;
-        Deg up       = Deg(0);
+        Vec3f pos      = Vec3f(10.0f);
+        Deg hori       = Deg(0);
+        Deg vert       = Deg(0);
+        Vec3f lookAt   = Vec3f(0.0f);;
+        bool useLookAt = false;
+        Deg up         = Deg(0);
     };
 
+    // 和Projection Matrix相关的数据
     struct ProjData
     {
         float w    = 1000.0f;
@@ -50,8 +53,6 @@ private:
     void UpdateProjMatrix();
 
     std::string name_;
-
-    bool useLookAt_;
 
     ViewData viewData_;
     ProjData projData_;

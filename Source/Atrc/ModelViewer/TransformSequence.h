@@ -40,6 +40,7 @@ class TransformSequence : public AGZ::Uncopiable
         Mat4f mat_;
     };
 
+    int selectedIdx_ = -1;
     std::vector<Transform> transforms_;
     Mat4f mat_;
 
