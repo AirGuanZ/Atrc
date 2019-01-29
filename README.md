@@ -45,7 +45,7 @@ cmake -G "Visual Studio 15 2017 Win64" ..
 
 ## Configuration Script
 
-Atrc::Mgr用[Utils::Config](https://github.com/AirGuanZ/Utils/blob/master/Src/Config/Config.h)来解析配置文件中的字符串。以下是一个可供`Launcher`使用的配置文件示例，它使用路径追踪算法渲染一个翡翠质感的苹果模型（包含内部的介质散射和吸收）：
+Atrc::Mgr用[Utils::Config](https://github.com/AirGuanZ/Utils/blob/master/Src/AGZUtils/Config/Config.h)来解析配置文件中的字符串。以下是一个可供`Launcher`使用的配置文件示例，它使用路径追踪算法渲染一个翡翠质感的苹果模型（包含内部的介质散射和吸收）：
 
 ```
 # Lines starting with character '#' are comments
