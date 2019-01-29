@@ -17,10 +17,10 @@ void Console::Display()
 {
     float fbW = static_cast<float>(Global::GetInstance().framebufferWidth);
     float fbH = static_cast<float>(Global::GetInstance().framebufferHeight);
-    float posX = fbW - 450 - 40;
+    float posX = fbW - 550 - 40;
     float posY = fbH - 150 - (fbH / fbW) * 40;
     ImGui::SetNextWindowPos(ImVec2(posX, posY), ImGuiCond_FirstUseEver);
-    ImGui::SetNextWindowSize(ImVec2(450, 150), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(550, 150), ImGuiCond_FirstUseEver);
 
     if(!ImGui::Begin("Console##ModelViewer"))
     {

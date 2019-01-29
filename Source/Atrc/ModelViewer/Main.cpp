@@ -90,21 +90,46 @@ int Run(GLFWwindow *window)
         ImGui_ImplGlfw_WheelScroll(param.offset);
     }));
 
+    // Immediate Painter
+
+    GL::Immediate imm;
+    imm.Initialize({ 600.0f, 600.0f });
+
+    // Screen2D Framebuffer
+
+    GL::FrameBuffer screen2DFramebuffer(true);
+    GL::RenderBuffer screen2DDepthBuffer(true);
+    GL::Texture2D screen2DRenderTexture(true);
+
+    auto ReinitializeScreen2DFramebuffer = [&]
+    {
+        auto &global = Global::GetInstance();
+
+        screen2DFramebuffer = GL::FrameBuffer(true);
+        screen2DDepthBuffer = GL::RenderBuffer(true);
+        screen2DRenderTexture = GL::Texture2D(true);
+
+        screen2DDepthBuffer.SetFormat(global.framebufferWidth, global.framebufferHeight, GL_DEPTH_COMPONENT);
+        screen2DRenderTexture.InitializeFormat(1, global.framebufferWidth, global.framebufferHeight, GL_RGBA8);
+        screen2DFramebuffer.Attach(GL_COLOR_ATTACHMENT0, screen2DRenderTexture);
+        screen2DFramebuffer.Attach(GL_DEPTH_ATTACHMENT, screen2DDepthBuffer);
+
+        AGZ_ASSERT(screen2DFramebuffer.IsComplete());
+    };
+    ReinitializeScreen2DFramebuffer();
+
     // 注册窗口事件
 
     win.AttachHandler(arena.Create<FramebufferSizeHandler>(
         [&](const FramebufferSize &param)
     {
         auto &global = Global::GetInstance();
-        global.framebufferWidth  = param.w;
+        global.framebufferWidth = param.w;
         global.framebufferHeight = param.h;
         glViewport(0, 0, param.w, param.h);
+        imm.Resize({ static_cast<float>(param.w), static_cast<float>(param.h) });
+        ReinitializeScreen2DFramebuffer();
     }));
-
-    // Immediate Painter
-
-    GL::Immediate imm;
-    imm.Initialize({ 600.0f, 600.0f });
 
     // ImGui Font Size
 
@@ -186,6 +211,18 @@ int Run(GLFWwindow *window)
         if(!ImGui::IsAnyWindowFocused())
             camera.UpdatePositionAndDirection(keyboard, mouse);
 
+        screen2DFramebuffer.Bind();
+        GL::RenderContext::ClearColorAndDepth();
+
+        glLineWidth(3);
+        ScreenAxis().Display(camera, imm);
+        glLineWidth(1);
+
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+        screen2DFramebuffer.Unbind();
+
         GL::RenderContext::SetClearColor(Vec4f(Vec3f(0.4f), 0.0f));
         GL::RenderContext::ClearColorAndDepth();
 
@@ -193,13 +230,20 @@ int Run(GLFWwindow *window)
 
         modelMgr.Render(camera);
 
-        GL::RenderContext::DisableDepthTest();
-        glLineWidth(3);
-        ScreenAxis().Display(camera, imm);
-        glLineWidth(1);
+        static const GL::Immediate::TexturedVertex scrQuadVtx[] =
+        {
+            { { -1.0f, -1.0f }, { 0.0f, 0.0f } },
+            { { -1.0f, 1.0f },  { 0.0f, 1.0f } },
+            { { 1.0f, 1.0f },   { 1.0f, 1.0f } },
+            { { -1.0f, -1.0f }, { 0.0f, 0.0f } },
+            { { 1.0f, 1.0f },   { 1.0f, 1.0f } },
+            { { 1.0f, -1.0f },  { 1.0f, 0.0f } }
+        };
 
-        ImGui::Render();
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        imm.DrawTexturedTriangles(scrQuadVtx, 6, screen2DRenderTexture);
+        glDisable(GL_BLEND);
 
         glfwSwapBuffers(window);
     }

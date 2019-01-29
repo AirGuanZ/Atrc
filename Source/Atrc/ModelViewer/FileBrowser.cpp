@@ -38,7 +38,7 @@ bool FileBrowser::Display()
         std::string displayName = (u.isDir ? "[d] " : "[f] ") + u.name;
         if(ImGui::Selectable(displayName.c_str(), selected, ImGuiSelectableFlags_DontClosePopups) && (u.isDir == selectDirectory_))
             selectedName_ = u.name;
-        if(ImGui::IsItemClicked(1) && u.isDir)
+        if(ImGui::IsItemClicked(0) && ImGui::IsMouseDoubleClicked(0) && u.isDir)
             enterDir = &u.name;
     }
     ImGui::EndChild();

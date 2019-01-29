@@ -19,7 +19,8 @@ namespace
         float cos = Cos(vert);
         return Vec3f(cos * Cos(hori), Sin(vert), cos * Sin(hori));
     }
-}
+
+} // namespace null
 
 Camera::Camera(std::string name) noexcept
     : name_(std::move(name))
@@ -27,6 +28,7 @@ Camera::Camera(std::string name) noexcept
     auto &global = Global::GetInstance();
     projData_.w = static_cast<float>(global.framebufferWidth);
     projData_.h = static_cast<float>(global.framebufferHeight);
+
     UpdateViewData();
     UpdateViewMatrix();
     UpdateProjMatrix();
@@ -69,11 +71,11 @@ void Camera::Display()
 
     viewChanged |= ImGui::InputFloat("up angle", &viewData_.up.value);
 
-    projChanged |= ImGui::InputFloat("width", &projData_.w);
+    projChanged |= ImGui::InputFloat("width",  &projData_.w);
     projChanged |= ImGui::InputFloat("height", &projData_.h);
-    projChanged |= ImGui::InputFloat("FOVy", &projData_.FOVy.value);
-    projChanged |= ImGui::InputFloat("near", &projData_.near);
-    projChanged |= ImGui::InputFloat("far", &projData_.far);
+    projChanged |= ImGui::InputFloat("FOVy",   &projData_.FOVy.value);
+    projChanged |= ImGui::InputFloat("near",   &projData_.near);
+    projChanged |= ImGui::InputFloat("far",    &projData_.far);
 
     if(viewChanged)
         UpdateViewMatrix();
@@ -88,7 +90,7 @@ namespace
     {
         Vec3f moveDir;
         Vec3f horiDir = Vec3f(dir.x, 0, dir.z);
-        if(horiDir.Length())
+        if(horiDir.Length() > 1e-4f)
             horiDir = horiDir.Normalize();
 
         if(kb.IsKeyPressed('W'))

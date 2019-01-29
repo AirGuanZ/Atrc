@@ -20,7 +20,7 @@ std::shared_ptr<const GL::VertexBuffer<Model::Vertex>> ModelDataManager::MeshGro
         {
             Model::Vertex nv;
             nv.pos = v.pos.xzy();
-            nv.nor = v.nor;
+            nv.nor = v.nor.xzy();
             vtxData.push_back(nv);
         }
     }
