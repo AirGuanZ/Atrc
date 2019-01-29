@@ -39,7 +39,7 @@ void ModelManager::Display(Console &console)
 
     for(size_t i = 0; i < models_.size(); ++i)
     {
-        ImGui::PushID(int(i));
+        ImGui::PushID(static_cast<int>(i));
 
         if(ImGui::TreeNode(models_[i].GetName().c_str()))
         {

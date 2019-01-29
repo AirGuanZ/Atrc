@@ -8,6 +8,7 @@
 #include "GL.h"
 #include "Global.h"
 #include "ModelManager.h"
+#include "ScreenAxis.h"
 
 using namespace std;
 
@@ -187,9 +188,15 @@ int Run(GLFWwindow *window)
 
         GL::RenderContext::SetClearColor(Vec4f(Vec3f(0.4f), 0.0f));
         GL::RenderContext::ClearColorAndDepth();
+
         GL::RenderContext::EnableDepthTest();
 
         modelMgr.Render(camera);
+
+        GL::RenderContext::DisableDepthTest();
+        glLineWidth(3);
+        ScreenAxis().Display(camera, imm);
+        glLineWidth(1);
 
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
