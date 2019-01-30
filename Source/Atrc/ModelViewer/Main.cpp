@@ -25,7 +25,8 @@ void ShowGlobalHelpWindow(bool open, const AGZ::Input::Keyboard &kb)
     AGZ::ScopeGuard windowExitGuard([] { ImGui::EndPopup(); });
 
     static const char *MSG =
-u8R"____(Hold mouse middle button to adjust camera direction when there is no focused window.)____";
+u8R"____(Hold mouse middle button to adjust camera direction when there is no focused window.
+Press ESC to close this help window.)____";
     ImGui::TextWrapped("%s", MSG);
 
     if(kb.IsKeyPressed(AGZ::Input::KEY_ESCAPE))
@@ -105,8 +106,8 @@ int Run(GLFWwindow *window)
     {
         auto &global = Global::GetInstance();
 
-        screen2DFramebuffer = GL::FrameBuffer(true);
-        screen2DDepthBuffer = GL::RenderBuffer(true);
+        screen2DFramebuffer   = GL::FrameBuffer(true);
+        screen2DDepthBuffer   = GL::RenderBuffer(true);
         screen2DRenderTexture = GL::Texture2D(true);
 
         screen2DDepthBuffer.SetFormat(global.framebufferWidth, global.framebufferHeight, GL_DEPTH_COMPONENT);

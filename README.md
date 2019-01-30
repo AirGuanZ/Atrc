@@ -6,7 +6,7 @@ Atrc是[Zhuang Guan](https://github.com/AirGuanZ)的渲染实验室，主要以C
 - [x] Mgr 用于管理核心组件的辅助库，根据配置字符串创建各种类型的核心组件中的对象（如模型、摄像机、灯光等）
 - [x] Launcher 渲染器启动器
 - [x] SH2D 将场景、灯光投影到1~5阶球谐函数系数，以及旋转球谐系数、根据球谐系数重建图像的工具
-- [ ] ModelViewer 模型查看器，可能进化为Launcher前端。（施工中）
+- [ ] ModelViewer 模型查看器，拟进化为Launcher前端。（施工中）
 
 Lib已/将实现以下特性：
 
@@ -25,7 +25,7 @@ Lib已/将实现以下特性：
 
 ModelViewer还在前期施工中，截图如下：
 
-![SS0](./Diary/Misc/2019_01_28_ModelViewer.png)
+![SS0](./Diary/Misc/2019_01_30_ModelViewer.png)
 
 ## Build
 

@@ -58,10 +58,9 @@ void ModelManager::NewModelFromData(Console &console, bool clickNew)
         return;
 	AGZ::ScopeGuard popupGuard([]() { ImGui::EndPopup(); });
 
-    static char nameBuf[256] = "";
+    static char nameBuf[256];
     if(clickNew)
         nameBuf[0] = '\0';
-
     ImGui::InputText("name", nameBuf, 256);
 
     ImGui::SameLine();

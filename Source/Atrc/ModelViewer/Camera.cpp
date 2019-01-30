@@ -111,7 +111,8 @@ namespace
 
         return moveDir;
     }
-}
+
+} // namespace null
 
 void Camera::UpdatePositionAndDirection(const AGZ::Input::Keyboard &kb, const AGZ::Input::Mouse &m)
 {
