@@ -45,6 +45,13 @@ int Run(GLFWwindow *window)
     ImGui::CreateContext();
     ImGui_ImplGlfw_InitForOpenGL(window);
     ImGui_ImplOpenGL3_Init();
+    ImGui::StyleColorsLight();
+
+    ImGui::GetStyle().PopupRounding   = 12;
+    ImGui::GetStyle().WindowRounding  = 12;
+    ImGui::GetStyle().GrabRounding    = 12;
+    ImGui::GetStyle().FrameRounding   = 12;
+    ImGui::GetStyle().FrameBorderSize = 1;
 
     // 准备输入category
 

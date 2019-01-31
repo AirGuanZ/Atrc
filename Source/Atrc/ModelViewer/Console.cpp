@@ -36,7 +36,7 @@ void Console::Display()
     {
         static const ImVec4 TEXT_COLOR[] =
         {
-            { 1.0f, 1.0f, 1.0f, 1.0f }, //Normal
+            { 0.0f, 0.0f, 0.0f, 1.0f }, //Normal
             { 1.0f, 0.4f, 0.4f, 1.0f }, //Error
         };
         ImGui::PushStyleColor(ImGuiCol_Text, TEXT_COLOR[static_cast<int>(t.type)]);
