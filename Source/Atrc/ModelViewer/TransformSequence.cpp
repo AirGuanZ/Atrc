@@ -1,4 +1,4 @@
-#include <AGZUtils/Utils/Input.h>
+﻿#include <AGZUtils/Utils/Input.h>
 
 #include "TransformSequence.h"
 

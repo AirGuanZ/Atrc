@@ -10,7 +10,7 @@ namespace
 
 } // namespace null
 
-void ScreenAxis::Display(const Camera &camera, const GL::Immediate &imm)
+void ScreenAxis::Display(const Camera &camera, const GL::Immediate2D &imm)
 {
     auto &global = Global::GetInstance();
     const float SCREEN_WIDTH = static_cast<float>(global.framebufferWidth);

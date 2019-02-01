@@ -100,7 +100,7 @@ int Run(GLFWwindow *window)
 
     // Immediate Painter
 
-    GL::Immediate imm;
+    GL::Immediate2D imm;
     imm.Initialize({ 600.0f, 600.0f });
 
     // Screen2D Framebuffer
@@ -238,7 +238,7 @@ int Run(GLFWwindow *window)
 
         modelMgr.Render(camera);
 
-        static const GL::Immediate::TexturedVertex scrQuadVtx[] =
+        static const GL::Immediate2D::TexturedVertex scrQuadVtx[] =
         {
             { { -1.0f, -1.0f }, { 0.0f, 0.0f } },
             { { -1.0f, 1.0f },  { 0.0f, 1.0f } },
