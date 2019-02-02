@@ -1,101 +1,79 @@
-﻿#include "TransformController.h"
-#include "ModelDataManager.h"
+﻿#include <Lib/imgui/imgui/ImGuizmo.h>
+#include "TransformController.h"
 
-TransformController::TransformController() noexcept
-    : transOffset_(nullptr), rotDegree_(nullptr), scaleSize_(nullptr),
-      dragOriginP_(0.0f), isDragging_{false, false, false}
+void TransformController::BeginFrame()
 {
-    
+    ImGuizmo::BeginFrame();
 }
 
-void TransformController::BindTranslation(Vec3f *transOffset) noexcept
+void TransformController::EnableController()
 {
-    AGZ_ASSERT(transOffset);
-    Unbind();
-    transOffset_ = transOffset;
+    ImGuizmo::Enable(true);
 }
 
-void TransformController::BindRotation(Vec3f *rotDegree) noexcept
+void TransformController::DisableController()
 {
-    AGZ_ASSERT(rotDegree);
-    Unbind();
-    rotDegree_ = rotDegree;
+    ImGuizmo::Enable(false);
 }
 
-void TransformController::BindScale(float *scaleSize) noexcept
+void TransformController::SetCurrentMode(Mode mode) noexcept
 {
-    AGZ_ASSERT(scaleSize);
-    Unbind();
-    scaleSize_ = scaleSize;
+    mode_ = mode;
 }
 
-void TransformController::Unbind() noexcept
+TransformController::Mode TransformController::GetCurrentMode(Mode mode) const noexcept
 {
-    ResetBindingData();
-    ResetDraggingData();
+    return mode_;
 }
 
-void TransformController::Display(const Camera &camera, const Mat4f &preTransform)
+void TransformController::UseLocal(bool local) noexcept
 {
-    if(transOffset_)
-        DisplayTranslate(camera, preTransform);
-    else if(rotDegree_)
-        DisplayRotate(camera, preTransform);
-    else if(scaleSize_)
-        DisplayScale(camera, preTransform);
+    local_ = local;
 }
 
-void TransformController::Update(const AGZ::Input::Mouse &mouse, const Camera &camera, const Mat4f &preTransform)
+void TransformController::Display(const Camera &camera, Vec3f *translate, Vec3f *rotate, float *scale) const
 {
-    if(transOffset_)
-        UpdateTranslate(mouse, camera, preTransform);
-    else if(rotDegree_)
-        UpdateRotate(mouse, camera, preTransform);
-    else if(scaleSize_)
-        UpdateScale(mouse, camera, preTransform);
-}
+    // 设置imguizmo参数
 
-void TransformController::ResetBindingData() noexcept
-{
-    transOffset_ = nullptr;
-    rotDegree_   = nullptr;
-    scaleSize_   = nullptr;
-}
+    ImGuizmo::OPERATION guizmoOperation;
+    switch(mode_)
+    {
+    case Translate: guizmoOperation = ImGuizmo::TRANSLATE; break;
+    case Rotate:    guizmoOperation = ImGuizmo::ROTATE;    break;
+    case Scale:     guizmoOperation = ImGuizmo::SCALE;     break;
+    default:
+        return;
+    }
 
-void TransformController::ResetDraggingData() noexcept
-{
-    dragOriginP_ = Vec2f();
+    ImGuizmo::MODE guizmoMode = local_ ? ImGuizmo::LOCAL : ImGuizmo::WORLD;
+
+    // 构造model matrix，绘制controller并分解各变换分量
+
+    const Mat4f &view = camera.GetViewMatrix();
+    const Mat4f &proj = camera.GetProjMatrix();
+
+    float worldMat[16];
+    float scaleVec3[3] = { *scale, *scale, *scale };
+    ImGuizmo::RecomposeMatrixFromComponents(&translate->x, &rotate->x, scaleVec3, worldMat);
+
+    ImGuiIO &io = ImGui::GetIO();
+    ImGuizmo::SetRect(0, 0, io.DisplaySize.x, io.DisplaySize.y);
+    ImGuizmo::Manipulate(&view.m[0][0], &proj.m[0][0], guizmoOperation, guizmoMode, worldMat);
+
+    ImGuizmo::DecomposeMatrixToComponents(worldMat, &translate->x, &rotate->x, scaleVec3);
+
+    // 更新*scale
+
+    int maxDeltaScaleIndex = -1;
+    float maxDeltaScale = -1;
     for(int i = 0; i < 3; ++i)
-        isDragging_[i] = false;
-}
-
-void TransformController::DisplayTranslate(const Camera &camera, const Mat4f &preTransform)
-{
-    AGZ_ASSERT(transOffset_);
-    // TODO
-}
-
-void TransformController::DisplayRotate(const Camera &camera, const Mat4f &preTransform)
-{
-    
-}
-
-void TransformController::DisplayScale(const Camera &camera, const Mat4f &preTransform)
-{
-    
-}
-
-void TransformController::UpdateTranslate(const AGZ::Input::Mouse &mouse, const Camera &camera, const Mat4f& preTransform)
-{
-    
-}
-
-void TransformController::UpdateRotate(const AGZ::Input::Mouse &mouse, const Camera &camera, const Mat4f& preTransform)
-{
-
-}
-
-void TransformController::UpdateScale(const AGZ::Input::Mouse &mouse, const Camera &camera, const Mat4f& preTransform)
-{
-
+    {
+        float deltaScale = std::abs(scaleVec3[i] - *scale);
+        if(deltaScale > maxDeltaScale)
+        {
+            maxDeltaScale = deltaScale;
+            maxDeltaScaleIndex = i;
+        }
+    }
+    *scale = scaleVec3[maxDeltaScaleIndex];
 }
