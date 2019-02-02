@@ -9,10 +9,10 @@ public:
 
     enum Mode
     {
-        Translate,
-        Rotate,
-        Scale,
-        None,
+        None      = 0,
+        Translate = 1,
+        Rotate    = 2,
+        Scale     = 3,
     };
 
     static void BeginFrame();
@@ -27,10 +27,12 @@ public:
 
     void UseLocal(bool local) noexcept;
 
-    void Display(const Camera &camera, Vec3f *translate, Vec3f *rotate, float *scale) const;
+    void Render(const Camera &camera, Vec3f *translate, Vec3f *rotate, float *scale) const;
+
+    void Display();
 
 private:
 
-    Mode mode_  = None;
+    Mode mode_  = Translate;
     bool local_ = true;
 };

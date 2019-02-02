@@ -1,5 +1,8 @@
+#include <Lib/imgui/imgui/ImGuizmo.h>
+
 #include "GL.h"
 #include "Model.h"
+#include "TransformController.h"
 
 namespace
 {
@@ -86,13 +89,26 @@ void Model::Initialize(std::shared_ptr<const GL::VertexBuffer<Vertex>> vtxBuf, c
     renderColor_ = renderColor;
 }
 
+namespace
+{
+    Mat4f GetFinalMatrix(const Vec3f &translate, const Vec3f &rotate, float scale)
+    {
+        float scaleVec[3] = { scale, scale, scale };
+        Mat4f ret;
+        ImGuizmo::RecomposeMatrixFromComponents(&translate[0], &rotate[0], scaleVec, &ret.m[0][0]);
+        return ret;
+    }
+}
+
 void Model::Render(const Camera &camera) const
 {
     vao_.Bind();
 
-    Mat4f WVP = camera.GetProjMatrix() * camera.GetViewMatrix() * transSeq_.GetFinalTransformMatrix();
+    Mat4f world = GetFinalMatrix(transform_.translate, transform_.rotate, transform_.scale);
+    Mat4f WVP = camera.GetProjMatrix() * camera.GetViewMatrix() * world;
+
     uniformWVP.BindValue(WVP);
-    uniformWORLD.BindValue(transSeq_.GetFinalTransformMatrix());
+    uniformWORLD.BindValue(world);
     uniformCOLOR.BindValue(renderColor_);
 
     GL::RenderContext::DrawVertices(GL_TRIANGLES, 0, vtxBuf_->GetVertexCount());
@@ -105,7 +121,8 @@ void Model::DisplayProperty()
     ImGui::ColorEdit3("color", &renderColor_[0], ImGuiColorEditFlags_HDR);
 }
 
-void Model::DisplayTransformSeq()
+void Model::DisplayTransform(const Camera &camera)
 {
-    transSeq_.Display();
+    transformController_.Render(camera, &transform_.translate, &transform_.rotate, &transform_.scale);
+    transformController_.Display();
 }

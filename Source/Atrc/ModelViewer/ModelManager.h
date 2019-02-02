@@ -20,7 +20,7 @@ public:
 
     void Render(const Camera &camera) const;
 
-    void Display(Console &console);
+    void Display(Console &console, const Camera &camera);
 
 private:
 

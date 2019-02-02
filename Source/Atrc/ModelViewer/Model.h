@@ -4,7 +4,14 @@
 
 #include "Camera.h"
 #include "GL.h"
-#include "TransformSequence.h"
+#include "TransformController.h"
+
+struct ModelTransform
+{
+    Vec3f translate;
+    Vec3f rotate;
+    float scale = 1;
+};
 
 class Model : public AGZ::Uncopiable
 {
@@ -32,7 +39,7 @@ public:
 
     void DisplayProperty();
 
-    void DisplayTransformSeq();
+    void DisplayTransform(const Camera &camera);
 
     const std::string &GetName() const noexcept { return name_; }
 
@@ -45,5 +52,6 @@ private:
 
     Vec3f renderColor_;
 
-    TransformSequence transSeq_;
+    ModelTransform transform_;
+    TransformController transformController_;
 };

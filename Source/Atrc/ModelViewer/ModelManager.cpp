@@ -20,7 +20,7 @@ void ModelManager::Render(const Camera &camera) const
     Model::EndRendering();
 }
 
-void ModelManager::Display(Console &console)
+void ModelManager::Display(Console &console, const Camera &camera)
 {
     if(ImGui::CollapsingHeader("data"))
         dataMgr_.Display(console);
@@ -29,7 +29,7 @@ void ModelManager::Display(Console &console)
         return;
 
     bool clickNew = false;
-    if(ImGui::Button("new"))
+    if(ImGui::Button("new##new_model_from_data"))
     {
         ImGui::OpenPopup("new model from data");
         clickNew = true;
@@ -37,18 +37,40 @@ void ModelManager::Display(Console &console)
 
     NewModelFromData(console, clickNew);
 
+    ImGui::SameLine();
+
+    if(ImGui::Button("delete##delete_model") && selectedIdx_ != INDEX_NONE)
+    {
+        models_.erase(models_.begin() + selectedIdx_);
+        if(selectedIdx_ >= models_.size())
+        {
+            if(models_.empty())
+                selectedIdx_ = INDEX_NONE;
+            else
+                --selectedIdx_;
+        }
+    }
+
     for(size_t i = 0; i < models_.size(); ++i)
     {
         ImGui::PushID(static_cast<int>(i));
 
-        if(ImGui::TreeNode(models_[i].GetName().c_str()))
+        bool selected = i == selectedIdx_;
+        if(ImGui::Selectable(models_[i].GetName().c_str(), selected))
         {
-            models_[i].DisplayProperty();
-            models_[i].DisplayTransformSeq();
-            ImGui::TreePop();
+            if(selected)
+                selectedIdx_ = INDEX_NONE;
+            else
+                selectedIdx_ = i;
         }
 
         ImGui::PopID();
+    }
+
+    if(selectedIdx_ != INDEX_NONE)
+    {
+        models_[selectedIdx_].DisplayProperty();
+        models_[selectedIdx_].DisplayTransform(camera);
     }
 }
 
@@ -69,6 +91,8 @@ void ModelManager::NewModelFromData(Console &console, bool clickNew)
     {
         AGZ::ScopeGuard closePopupGuard([]() { ImGui::CloseCurrentPopup(); });
 
+        // 名字不能有重复
+
         std::string name = nameBuf;
         for(auto &m : models_)
         {
@@ -78,6 +102,8 @@ void ModelManager::NewModelFromData(Console &console, bool clickNew)
                 return;
             }
         }
+
+        // 必须已经选中了一项模型数据
 
         auto data = dataMgr_.GetSelectedMeshGroup();
         if(!data)

@@ -9,6 +9,7 @@
 #include "Global.h"
 #include "ModelManager.h"
 #include "ScreenAxis.h"
+#include "TransformController.h"
 
 using namespace std;
 
@@ -162,6 +163,7 @@ int Run(GLFWwindow *window)
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
+        TransformController::BeginFrame();
 
         bool openGlobalHelpWindow = false;
 
@@ -198,7 +200,7 @@ int Run(GLFWwindow *window)
             {
                 if(ImGui::BeginTabItem("model"))
                 {
-                    modelMgr.Display(console);
+                    modelMgr.Display(console, camera);
                     ImGui::EndTabItem();
                 }
                 if(ImGui::BeginTabItem("camera"))

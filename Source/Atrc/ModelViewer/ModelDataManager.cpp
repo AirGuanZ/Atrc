@@ -35,7 +35,7 @@ std::shared_ptr<const GL::VertexBuffer<Model::Vertex>> ModelDataManager::MeshGro
 void ModelDataManager::Display(Console &console)
 {
     bool newPopup = false;
-    if(ImGui::Button("load"))
+    if(ImGui::Button("load##load_data_from_disk"))
     {
         ImGui::OpenPopup("new data from .obj");
         newPopup = true;
@@ -44,7 +44,7 @@ void ModelDataManager::Display(Console &console)
 
     ImGui::SameLine();
 
-    if(ImGui::Button("delete") && selectedIdx_ >= 0)
+    if(ImGui::Button("delete##delete_model_data") && selectedIdx_ >= 0)
     {
         data_.erase(data_.begin() + selectedIdx_);
         if(selectedIdx_ >= static_cast<int>(data_.size()))

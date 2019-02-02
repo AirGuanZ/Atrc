@@ -1688,7 +1688,9 @@ namespace ImGuizmo
             vec_t baseVector = gContext.mTranslationPlanOrigin - gContext.mModel.v.position;
             float ratio = Dot(axisValue, baseVector + delta) / Dot(axisValue, baseVector);
 
-            gContext.mScale[axisIndex] = max(ratio, 0.001f);
+            gContext.mScale[0] = max(ratio, 0.001f);
+            gContext.mScale[1] = max(ratio, 0.001f);
+            gContext.mScale[2] = max(ratio, 0.001f);
          }
          else
          {

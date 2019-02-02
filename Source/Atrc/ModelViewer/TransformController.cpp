@@ -31,7 +31,7 @@ void TransformController::UseLocal(bool local) noexcept
     local_ = local;
 }
 
-void TransformController::Display(const Camera &camera, Vec3f *translate, Vec3f *rotate, float *scale) const
+void TransformController::Render(const Camera &camera, Vec3f *translate, Vec3f *rotate, float *scale) const
 {
     // 设置imguizmo参数
 
@@ -64,16 +64,19 @@ void TransformController::Display(const Camera &camera, Vec3f *translate, Vec3f 
 
     // 更新*scale
 
-    int maxDeltaScaleIndex = -1;
-    float maxDeltaScale = -1;
-    for(int i = 0; i < 3; ++i)
-    {
-        float deltaScale = std::abs(scaleVec3[i] - *scale);
-        if(deltaScale > maxDeltaScale)
-        {
-            maxDeltaScale = deltaScale;
-            maxDeltaScaleIndex = i;
-        }
-    }
-    *scale = scaleVec3[maxDeltaScaleIndex];
+    *scale = scaleVec3[0];
+}
+
+void TransformController::Display()
+{
+    int mode = static_cast<int>(mode_);
+
+    ImGui::RadioButton("none",      &mode, static_cast<int>(None));      ImGui::SameLine();
+    ImGui::RadioButton("translate", &mode, static_cast<int>(Translate)); ImGui::SameLine();
+    ImGui::RadioButton("rotate",    &mode, static_cast<int>(Rotate));    ImGui::SameLine();
+    ImGui::RadioButton("scale",     &mode, static_cast<int>(Scale));
+
+    SetCurrentMode(static_cast<Mode>(mode));
+
+    ImGui::Checkbox("local##use_local_transform_controller", &local_);
 }
