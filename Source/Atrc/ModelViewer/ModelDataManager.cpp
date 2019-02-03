@@ -53,7 +53,7 @@ void ModelDataManager::Display(Console &console)
 
     ImGui::SameLine();
 
-    if(ImGui::Checkbox("sort by name", &sortDataByName_) && sortDataByName_)
+    if(ImGui::Checkbox("sort by name##sort_model_data_by_name", &sortDataByName_) && sortDataByName_)
         SortData();
 
     ImGui::Separator();

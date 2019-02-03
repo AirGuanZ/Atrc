@@ -26,10 +26,13 @@ private:
 
     void NewModelFromData(Console &console, bool clickNew);
 
+    void SortModelByName();
+
     static constexpr size_t INDEX_NONE = std::numeric_limits<size_t>::max();
 
     ModelDataManager dataMgr_;
 
+    bool sortByName_;
     size_t selectedIdx_;
     std::vector<Model> models_;
 };

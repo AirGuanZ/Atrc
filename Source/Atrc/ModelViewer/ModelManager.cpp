@@ -1,8 +1,10 @@
+#include <algorithm>
+
 #include "Model.h"
 #include "ModelManager.h"
 
 ModelManager::ModelManager()
-    : selectedIdx_(INDEX_NONE)
+    : sortByName_(false), selectedIdx_(INDEX_NONE)
 {
     
 }
@@ -50,6 +52,11 @@ void ModelManager::Display(Console &console, const Camera &camera)
                 --selectedIdx_;
         }
     }
+
+    ImGui::SameLine();
+
+    if(ImGui::Checkbox("sort by name##sort_model_by_name", &sortByName_) && sortByName_)
+        SortModelByName();
 
     for(size_t i = 0; i < models_.size(); ++i)
     {
@@ -119,6 +126,29 @@ void ModelManager::NewModelFromData(Console &console, bool clickNew)
         models_.push_back(std::move(newModel));
         selectedIdx_ = models_.size() - 1;
 
+        if(sortByName_)
+            SortModelByName();
+
         console.AddMessage("Model created: " + std::string(nameBuf));
+    }
+}
+
+void ModelManager::SortModelByName()
+{
+    std::string selectedName;
+    if(selectedIdx_ != INDEX_NONE)
+        selectedName = models_[selectedIdx_].GetName();
+
+    std::sort(begin(models_), end(models_), [](const auto &L, const auto &R)
+    {
+        return L.GetName() < R.GetName();
+    });
+
+    if(!selectedName.empty())
+    {
+        auto it = std::find_if(begin(models_), end(models_), 
+            [&](const auto &m) { return m.GetName() == selectedName; });
+        AGZ_ASSERT(it != models_.end());
+        selectedIdx_ = it - models_.begin();
     }
 }
