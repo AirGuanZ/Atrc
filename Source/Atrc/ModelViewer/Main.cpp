@@ -194,7 +194,7 @@ int Run(GLFWwindow *window)
             ImGui::SetNextWindowPos(ImVec2(posX, posY), ImGuiCond_FirstUseEver);
         }
 
-        if(ImGui::Begin("Scene Manager", nullptr, ImVec2(400, 700)))
+        if(ImGui::Begin("Scene Manager", nullptr, ImVec2(400, 600)))
         {
             if(ImGui::BeginTabBar("scene manager tab"))
             {
@@ -217,6 +217,17 @@ int Run(GLFWwindow *window)
         console.Display();
 
         ShowGlobalHelpWindow(openGlobalHelpWindow, keyboard);
+
+        if(auto *model = modelMgr.GetSelectedModel())
+        {
+            ImGui::SetNextWindowPos(ImVec2(600, 100), ImGuiCond_FirstUseEver);
+            if(ImGui::Begin("model property", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+            {
+                model->DisplayProperty();
+                model->DisplayTransform(camera);
+                ImGui::End();
+            }
+        }
 
         if(!ImGui::IsAnyWindowFocused())
             camera.UpdatePositionAndDirection(keyboard, mouse);

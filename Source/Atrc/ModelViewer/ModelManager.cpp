@@ -58,6 +58,8 @@ void ModelManager::Display(Console &console, const Camera &camera)
     if(ImGui::Checkbox("sort by name##sort_model_by_name", &sortByName_) && sortByName_)
         SortModelByName();
 
+    ImGui::BeginChild("model list", ImVec2(0, 0), true);
+
     for(size_t i = 0; i < models_.size(); ++i)
     {
         ImGui::PushID(static_cast<int>(i));
@@ -74,11 +76,17 @@ void ModelManager::Display(Console &console, const Camera &camera)
         ImGui::PopID();
     }
 
-    if(selectedIdx_ != INDEX_NONE)
-    {
-        models_[selectedIdx_].DisplayProperty();
-        models_[selectedIdx_].DisplayTransform(camera);
-    }
+    ImGui::EndChild();
+}
+
+Model *ModelManager::GetSelectedModel() noexcept
+{
+    return selectedIdx_ != INDEX_NONE ? &models_[selectedIdx_] : nullptr;
+}
+
+const Model *ModelManager::GetSelectedModel() const noexcept
+{
+    return selectedIdx_ != INDEX_NONE ? &models_[selectedIdx_] : nullptr;
 }
 
 void ModelManager::NewModelFromData(Console &console, bool clickNew)

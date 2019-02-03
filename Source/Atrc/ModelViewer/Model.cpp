@@ -125,4 +125,8 @@ void Model::DisplayTransform(const Camera &camera)
 {
     transformController_.Render(camera, &transform_.translate, &transform_.rotate, &transform_.scale);
     transformController_.Display();
+
+    ImGui::InputFloat3("translate##input_translate", &transform_.translate[0]);
+    ImGui::InputFloat3("rotate##input_rotate",       &transform_.rotate[0]);
+    ImGui::InputFloat("scale##input_scale",          &transform_.scale);
 }

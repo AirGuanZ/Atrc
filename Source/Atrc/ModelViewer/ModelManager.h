@@ -22,6 +22,10 @@ public:
 
     void Display(Console &console, const Camera &camera);
 
+    Model *GetSelectedModel() noexcept;
+
+    const Model *GetSelectedModel() const noexcept;
+
 private:
 
     void NewModelFromData(Console &console, bool clickNew);
