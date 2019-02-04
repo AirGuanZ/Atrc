@@ -10,38 +10,39 @@
 #include "GL.h"
 #include "Model.h"
 
+class MeshGroupData
+{
+    mutable std::shared_ptr<const GL::VertexBuffer<Model::Vertex>> vtxBuf;
+
+public:
+
+    MeshGroupData() = default;
+    MeshGroupData(MeshGroupData&&) noexcept = default;
+    MeshGroupData &operator=(MeshGroupData&&) noexcept = default;
+    MeshGroupData(const MeshGroupData&) = default;
+    MeshGroupData &operator=(const MeshGroupData&) = default;
+
+    std::string name;
+    AGZ::Mesh::GeometryMeshGroup<float> meshGroup;
+    AGZ::Mesh::BoundingBox<float> bounding;
+    std::vector<std::string> objNames;
+
+    std::shared_ptr<const GL::VertexBuffer<Model::Vertex>> GetVertexBuffer() const;
+};
+
 class ModelDataManager
 {
 public:
 
-    using MeshGroup = AGZ::Mesh::GeometryMeshGroup<float>;
-
-    class MeshGroupData
-    {
-		mutable std::shared_ptr<const GL::VertexBuffer<Model::Vertex>> vtxBuf;
-
-    public:
-
-		MeshGroupData()                                    = default;
-		MeshGroupData(MeshGroupData&&) noexcept            = default;
-		MeshGroupData &operator=(MeshGroupData&&) noexcept = default;
-        MeshGroupData(const MeshGroupData&)                = default;
-        MeshGroupData &operator=(const MeshGroupData&)     = default;
-
-        std::string name;
-        MeshGroup meshGroup;
-        AGZ::Mesh::BoundingBox<float> bounding;
-
-		std::shared_ptr<const GL::VertexBuffer<Model::Vertex>> GetVertexBuffer() const;
-    };
+    //using MeshGroup = AGZ::Mesh::GeometryMeshGroup<float>;
 
     void Display(Console &console);
 
-    const MeshGroupData *GetSelectedMeshGroup() const;
+    std::shared_ptr<const MeshGroupData> GetSelectedMeshGroup() const;
 
 private:
 
-    bool Add(std::string_view name, MeshGroup &&meshGroup);
+    bool Add(std::string_view name, AGZ::Mesh::GeometryMeshGroup<float> &&meshGroup);
 
     void DisplayNewData(Console &console, bool newPopup);
 
@@ -53,7 +54,7 @@ private:
 
     bool sortDataByName_ = false;
     int selectedIdx_ = -1;
-    std::vector<MeshGroupData> data_;
+    std::vector<std::shared_ptr<MeshGroupData>> data_;
 
     FileBrowser fileBrowser_;
 };

@@ -126,11 +126,9 @@ void ModelManager::NewModelFromData(Console &console, bool clickNew)
             console.AddError("No model data is selected");
             return;
         }
-        auto vtxBuf = data->GetVertexBuffer();
-        AGZ_ASSERT(vtxBuf);
 
         Model newModel(std::move(name));
-        newModel.Initialize(vtxBuf, Vec3f(0.5f));
+        newModel.Initialize(data, Vec3f(0.5f));
         models_.push_back(std::move(newModel));
         selectedIdx_ = models_.size() - 1;
 

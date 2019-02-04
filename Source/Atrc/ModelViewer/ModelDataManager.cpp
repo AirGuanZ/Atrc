@@ -6,7 +6,7 @@
 #include "GL.h"
 #include "ModelDataManager.h"
 
-std::shared_ptr<const GL::VertexBuffer<Model::Vertex>> ModelDataManager::MeshGroupData::GetVertexBuffer() const
+std::shared_ptr<const GL::VertexBuffer<Model::Vertex>> MeshGroupData::GetVertexBuffer() const
 {
     if(vtxBuf)
         return vtxBuf;
@@ -63,7 +63,7 @@ void ModelDataManager::Display(Console &console)
     {
         ImGui::PushID(i);
         bool selected = selectedIdx_ == i;
-        if(ImGui::Selectable(data_[i].name.c_str(), selected))
+        if(ImGui::Selectable(data_[i]->name.c_str(), selected))
         {
             if(selected)
                 selectedIdx_ = -1;
@@ -74,27 +74,29 @@ void ModelDataManager::Display(Console &console)
     }
 }
 
-const ModelDataManager::MeshGroupData *ModelDataManager::GetSelectedMeshGroup() const
+std::shared_ptr<const MeshGroupData> ModelDataManager::GetSelectedMeshGroup() const
 {
-    return selectedIdx_ >= 0 ? &data_[selectedIdx_] : nullptr;
+    return selectedIdx_ >= 0 ? data_[selectedIdx_] : std::shared_ptr<const MeshGroupData>();
 }
 
-bool ModelDataManager::Add(std::string_view name, MeshGroup &&meshGroup)
+bool ModelDataManager::Add(std::string_view name, AGZ::Mesh::GeometryMeshGroup<float> &&meshGroup)
 {
     // 禁止名字重复
 
     for(auto &d : data_)
     {
-        if(d.name == name)
+        if(d->name == name)
             return false;
     }
 
     // 新元素插入
 
-	MeshGroupData grpData;
-    grpData.bounding  = meshGroup.GetBoundingBox();
-    grpData.meshGroup = std::move(meshGroup);
-    grpData.name      = name;
+	auto grpData = std::make_shared<MeshGroupData>();
+    grpData->bounding  = meshGroup.GetBoundingBox();
+    grpData->meshGroup = std::move(meshGroup);
+    grpData->name      = name;
+    for(auto &s : grpData->meshGroup.submeshes)
+        grpData->objNames.push_back(s.first);
     data_.push_back(std::move(grpData));
 
     if(sortDataByName_)
@@ -104,7 +106,7 @@ bool ModelDataManager::Add(std::string_view name, MeshGroup &&meshGroup)
 
     for(size_t i = 0; i < data_.size(); ++i)
     {
-        if(data_[i].name == name)
+        if(data_[i]->name == name)
         {
             selectedIdx_ = static_cast<int>(i);
             break;
@@ -168,7 +170,7 @@ void ModelDataManager::LoadObj(Console &console, std::string_view filename, std:
         return;
     }
 
-    MeshGroup meshGrp = obj.ToGeometryMeshGroup();
+    AGZ::Mesh::GeometryMeshGroup<float> meshGrp = obj.ToGeometryMeshGroup();
     obj.Clear();
 
     if(!Add(dataName, std::move(meshGrp)))
@@ -186,5 +188,5 @@ void ModelDataManager::LoadObj(Console &console, std::string_view filename, std:
 
 void ModelDataManager::SortData()
 {
-    std::sort(data_.begin(), data_.end(), [](auto &L, auto &R) { return L.name < R.name; });
+    std::sort(data_.begin(), data_.end(), [](auto &L, auto &R) { return L->name < R->name; });
 }

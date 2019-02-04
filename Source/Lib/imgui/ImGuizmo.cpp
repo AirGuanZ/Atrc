@@ -1445,6 +1445,7 @@ namespace ImGuizmo
          bool belowAxisLimit, belowPlaneLimit;
          ComputeTripodAxisAndVisibility(i, dirAxis, dirPlaneX, dirPlaneY, belowAxisLimit, belowPlaneLimit);
 
+       dirAxis.TransformVector(gContext.mModel);
        const float len = IntersectRayPlane(gContext.mRayOrigin, gContext.mRayVector, BuildPlan(gContext.mModel.v.position, dirAxis));
        vec_t posOnPlan = gContext.mRayOrigin + gContext.mRayVector * len;
 
@@ -1713,8 +1714,15 @@ namespace ImGuizmo
          matrix_t deltaMatrixScale;
          deltaMatrixScale.Scale(gContext.mScale * gContext.mScaleValueOrigin);
 
-         matrix_t res = deltaMatrixScale * gContext.mModel;
-         *(matrix_t*)matrix = res;
+         {
+             float trans[3], rot[3], scale[3];
+             DecomposeMatrixToComponents(gContext.mModelSource, trans, rot, scale);
+             matrix_t rotMat[3];
+             for(int i = 0; i < 3; ++i)
+                 rotMat[i].RotationAxis(directionUnary[i], rot[i] * DEG2RAD);
+             *(matrix_t*)matrix = rotMat[0] * rotMat[1] * rotMat[2] * deltaMatrixScale;
+             ((matrix_t*)matrix)->v.position = gContext.mModelSource.v.position;
+         }
 
          if (deltaMatrix)
          {

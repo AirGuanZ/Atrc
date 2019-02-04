@@ -2,6 +2,7 @@
 
 #include "GL.h"
 #include "Model.h"
+#include "ModelDataManager.h"
 #include "TransformController.h"
 
 namespace
@@ -56,6 +57,7 @@ namespace
         attribLPos = prog.GetAttribVariable<Vec3f>("lPos");
         attribLNor = prog.GetAttribVariable<Vec3f>("lNor");
     }
+
 } // namespace null
 
 void Model::BeginRendering()
@@ -74,11 +76,12 @@ Model::Model(std::string name) noexcept
     
 }
 
-void Model::Initialize(std::shared_ptr<const GL::VertexBuffer<Vertex>> vtxBuf, const Vec3f &renderColor)
+void Model::Initialize(std::shared_ptr<const MeshGroupData> grpData, const Vec3f &renderColor)
 {
     CheckRendererInitialization();
 
-    vtxBuf_ = std::move(vtxBuf);
+    vtxBuf_ = grpData->GetVertexBuffer();
+    grpData_ = grpData;
 
     vao_.InitializeHandle();
     vao_.EnableAttrib(attribLPos);
@@ -98,7 +101,8 @@ namespace
         ImGuizmo::RecomposeMatrixFromComponents(&translate[0], &rotate[0], scaleVec, &ret.m[0][0]);
         return ret;
     }
-}
+
+} // namespace null
 
 void Model::Render(const Camera &camera) const
 {
