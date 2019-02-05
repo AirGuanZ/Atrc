@@ -2,9 +2,9 @@
 
 #include <memory>
 
-#include "Camera.h"
-#include "GL.h"
-#include "TransformController.h"
+#include <Atrc/ModelViewer/Camera.h>
+#include <Atrc/ModelViewer/GL.h>
+#include <Atrc/ModelViewer/TransformController.h>
 
 struct ModelTransform
 {

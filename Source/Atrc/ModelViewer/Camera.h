@@ -1,6 +1,6 @@
 #pragma once
 
-#include "GL.h"
+#include <Atrc/ModelViewer/GL.h>
 
 class Camera
 {

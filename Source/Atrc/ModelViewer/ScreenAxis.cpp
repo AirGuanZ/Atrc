@@ -1,5 +1,5 @@
-#include "Global.h"
-#include "ScreenAxis.h"
+#include <Atrc/ModelViewer/Global.h>
+#include <Atrc/ModelViewer/ScreenAxis.h>
 
 namespace
 {

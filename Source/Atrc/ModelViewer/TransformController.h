@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Camera.h"
-#include "GL.h"
+#include <Atrc/ModelViewer/Camera.h>
+#include <Atrc/ModelViewer/GL.h>
 
 class TransformController
 {

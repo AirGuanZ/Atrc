@@ -1,7 +1,7 @@
 #include <algorithm>
 
-#include "Model.h"
-#include "ModelManager.h"
+#include <Atrc/ModelViewer/Model.h>
+#include <Atrc/ModelViewer/ModelManager.h>
 
 ModelManager::ModelManager()
     : sortByName_(false), selectedIdx_(INDEX_NONE)

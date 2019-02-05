@@ -1,9 +1,9 @@
 #include <Lib/imgui/imgui/ImGuizmo.h>
 
-#include "GL.h"
-#include "Model.h"
-#include "ModelDataManager.h"
-#include "TransformController.h"
+#include <Atrc/ModelViewer/GL.h>
+#include <Atrc/ModelViewer/Model.h>
+#include <Atrc/ModelViewer/ModelDataManager.h>
+#include <Atrc/ModelViewer/TransformController.h>
 
 namespace
 {

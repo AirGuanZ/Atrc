@@ -2,7 +2,7 @@
 
 #include <filesystem>
 
-#include "GL.h"
+#include <Atrc/ModelViewer/GL.h>
 
 class FileBrowser
 {

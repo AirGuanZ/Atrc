@@ -3,10 +3,10 @@
 #include <limits>
 #include <vector>
 
-#include "Camera.h"
-#include "Console.h"
-#include "Model.h"
-#include "ModelDataManager.h"
+#include <Atrc/ModelViewer/Camera.h>
+#include <Atrc/ModelViewer/Console.h>
+#include <Atrc/ModelViewer/Model.h>
+#include <Atrc/ModelViewer/ModelDataManager.h>
 
 class ModelManager : public AGZ::Uncopiable
 {

@@ -3,6 +3,7 @@
 #include <AGZUtils/Utils/Mesh.h>
 #include <AGZUtils/Utils/Texture.h>
 
+#include <Atrc/ModelViewer/ObjectManagement/ObjectManager.h>
 #include <Atrc/ModelViewer/Camera.h>
 #include <Atrc/ModelViewer/Console.h>
 #include <Atrc/ModelViewer/GL.h>
@@ -10,7 +11,6 @@
 #include <Atrc/ModelViewer/ModelManager.h>
 #include <Atrc/ModelViewer/ScreenAxis.h>
 #include <Atrc/ModelViewer/TransformController.h>
-#include "ObjectManagement/ObjectManager.h"
 
 using namespace std;
 
@@ -124,7 +124,7 @@ int Run(GLFWwindow *window)
         screen2DFramebuffer.Attach(GL_COLOR_ATTACHMENT0, screen2DRenderTexture);
         screen2DFramebuffer.Attach(GL_DEPTH_ATTACHMENT, screen2DDepthBuffer);
 
-        AGZ_ASSERT(screen2DFramebuffer.IsComplete());
+        //AGZ_ASSERT(screen2DFramebuffer.IsComplete());
     };
     ReinitializeScreen2DFramebuffer();
 
@@ -157,6 +157,7 @@ int Run(GLFWwindow *window)
     // Object Manager
 
     ObjectManager objMgr;
+    RegisterObjectCreators(objMgr);
 
     while(!glfwWindowShouldClose(window))
     {
@@ -200,7 +201,7 @@ int Run(GLFWwindow *window)
         // 计算场景管理器的位置和大小
 
         float sceneManagerPosX, sceneManagerPosY;
-        constexpr float sceneManagerSizeX = 400, sceneManagerSizeY = 600;
+        constexpr float sceneManagerSizeX = 400, sceneManagerSizeY = 400;
 
         {
             float fbW = static_cast<float>(Global::GetInstance().framebufferWidth);
@@ -235,13 +236,16 @@ int Run(GLFWwindow *window)
         // 材质、纹理等对象管理器
 
         ImGui::SetNextWindowPos(ImVec2(sceneManagerPosX, sceneManagerPosY + sceneManagerSizeY + 20), ImGuiCond_FirstUseEver);
-        if(ImGui::Begin("object", nullptr, ImVec2(sceneManagerSizeX, 200), -1, ImGuiWindowFlags_NoTitleBar))
+        if(ImGui::Begin("object", nullptr, ImVec2(sceneManagerSizeX, 0), -1, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysAutoResize))
         {
             if(ImGui::BeginTabBar("object tab"))
             {
                 if(ImGui::BeginTabItem("material"))
                 {
-                    objMgr.GetPool<MaterialInstance>().Display();
+                    auto &pool = objMgr.GetPool<MaterialInstance>();
+                    pool.Display();
+                    if(auto mat = pool.GetSelectedInstance())
+                        mat->Display();
                     ImGui::EndTabItem();
                 }
                 ImGui::EndTabBar();

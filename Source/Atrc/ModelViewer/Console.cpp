@@ -1,6 +1,6 @@
-#include "Console.h"
-#include "GL.h"
-#include "Global.h"
+#include <Atrc/ModelViewer/Console.h>
+#include <Atrc/ModelViewer/GL.h>
+#include <Atrc/ModelViewer/Global.h>
 
 Console::Console(int inputBufSize, int maxTextCount)
 {

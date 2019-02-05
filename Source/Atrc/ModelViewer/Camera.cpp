@@ -1,6 +1,6 @@
-#include "Camera.h"
-#include "GL.h"
-#include "Global.h"
+#include <Atrc/ModelViewer/Camera.h>
+#include <Atrc/ModelViewer/GL.h>
+#include <Atrc/ModelViewer/Global.h>
 
 namespace
 {

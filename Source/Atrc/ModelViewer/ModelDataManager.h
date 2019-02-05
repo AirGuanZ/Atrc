@@ -5,10 +5,10 @@
 
 #include <AGZUtils/Utils/Mesh.h>
 
-#include "Console.h"
-#include "FileBrowser.h"
-#include "GL.h"
-#include "Model.h"
+#include <Atrc/ModelViewer/Console.h>
+#include <Atrc/ModelViewer/FileBrowser.h>
+#include <Atrc/ModelViewer/GL.h>
+#include <Atrc/ModelViewer/Model.h>
 
 class MeshGroupData
 {

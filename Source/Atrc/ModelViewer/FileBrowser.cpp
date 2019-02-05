@@ -1,4 +1,4 @@
-#include "FileBrowser.h"
+#include <Atrc/ModelViewer/FileBrowser.h>
 
 void FileBrowser::SetLabel(std::string label)
 {

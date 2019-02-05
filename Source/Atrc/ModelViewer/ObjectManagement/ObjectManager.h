@@ -191,7 +191,7 @@ public:
             auto it = std::find(begin(instances_), end(instances_), selectedInstance_);
             AGZ_ASSERT(it != instances_.end());
 
-            size_t idx = it - instances_.end();
+            size_t idx = it - instances_.begin();
             instances_.erase(it);
             selectedInstance_ = nullptr;
 
@@ -209,6 +209,8 @@ public:
         if(ImGui::Checkbox("sort by name", &sortInstanceByName_) && sortInstanceByName_)
             SortInstanceByName();
 
+        ImGui::BeginChild("elems", ImVec2(0, 200), true);
+
         for(size_t i = 0; i < instances_.size(); ++i)
         {
             ImGui::PushID(static_cast<int>(i));
@@ -223,6 +225,8 @@ public:
             }
             ImGui::PopID();
         }
+
+        ImGui::EndChild();
     }
 };
 
@@ -259,7 +263,7 @@ public:
     }
 
     template<typename TInstance>
-    void AddCreator(const TInstance *creator)
+    void AddCreator(const TInstanceCreator<TInstance> *creator)
     {
         _creatorMgr<TInstance>().AddCreator(std::move(creator));
     }
@@ -284,5 +288,8 @@ public:
 };
 
 class MaterialInstance : public InstanceInterface { public: using InstanceInterface::InstanceInterface; };
+using MaterialCreator = TInstanceCreator<MaterialInstance>;
 
 using ObjectManager = TObjectManager<TInstanceRegister<MaterialInstance, true>>;
+
+void RegisterObjectCreators(ObjectManager &objMgr);

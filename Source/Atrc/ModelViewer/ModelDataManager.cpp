@@ -3,8 +3,8 @@
 
 #include <AGZUtils/Utils/Misc.h>
 
-#include "GL.h"
-#include "ModelDataManager.h"
+#include <Atrc/ModelViewer/GL.h>
+#include <Atrc/ModelViewer/ModelDataManager.h>
 
 std::shared_ptr<const GL::VertexBuffer<Model::Vertex>> MeshGroupData::GetVertexBuffer() const
 {
