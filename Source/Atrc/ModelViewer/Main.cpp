@@ -3,13 +3,14 @@
 #include <AGZUtils/Utils/Mesh.h>
 #include <AGZUtils/Utils/Texture.h>
 
-#include "Camera.h"
-#include "Console.h"
-#include "GL.h"
-#include "Global.h"
-#include "ModelManager.h"
-#include "ScreenAxis.h"
-#include "TransformController.h"
+#include <Atrc/ModelViewer/Camera.h>
+#include <Atrc/ModelViewer/Console.h>
+#include <Atrc/ModelViewer/GL.h>
+#include <Atrc/ModelViewer/Global.h>
+#include <Atrc/ModelViewer/ModelManager.h>
+#include <Atrc/ModelViewer/ScreenAxis.h>
+#include <Atrc/ModelViewer/TransformController.h>
+#include "ObjectManagement/ObjectManager.h"
 
 using namespace std;
 
@@ -153,6 +154,10 @@ int Run(GLFWwindow *window)
 	Console console;
 	ModelManager modelMgr;
 
+    // Object Manager
+
+    ObjectManager objMgr;
+
     while(!glfwWindowShouldClose(window))
     {
         glfwPollEvents();
@@ -194,7 +199,7 @@ int Run(GLFWwindow *window)
             ImGui::SetNextWindowPos(ImVec2(posX, posY), ImGuiCond_FirstUseEver);
         }
 
-        if(ImGui::Begin("Scene Manager", nullptr, ImVec2(400, 600)))
+        if(ImGui::Begin("scene manager", nullptr, ImVec2(400, 600)))
         {
             if(ImGui::BeginTabBar("scene manager tab"))
             {
@@ -227,6 +232,21 @@ int Run(GLFWwindow *window)
                 model->DisplayTransform(camera);
                 ImGui::End();
             }
+        }
+
+        ImGui::SetNextWindowPos(ImVec2(800, 100), ImGuiCond_FirstUseEver);
+        if(ImGui::Begin("object", nullptr, ImVec2(400, 200), -1, ImGuiWindowFlags_NoTitleBar))
+        {
+            if(ImGui::BeginTabBar("object tab"))
+            {
+                if(ImGui::BeginTabItem("material"))
+                {
+                    objMgr.GetPool<MaterialInstance>().Display();
+                    ImGui::EndTabItem();
+                }
+                ImGui::EndTabBar();
+            }
+            ImGui::End();
         }
 
         if(!ImGui::IsAnyWindowFocused())

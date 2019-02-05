@@ -22,7 +22,7 @@ void Console::Display()
     ImGui::SetNextWindowPos(ImVec2(posX, posY), ImGuiCond_FirstUseEver);
     ImGui::SetNextWindowSize(ImVec2(550, 150), ImGuiCond_FirstUseEver);
 
-    if(!ImGui::Begin("Console##ModelViewer"))
+    if(!ImGui::Begin("console##model_viewer_console"))
     {
         ImGui::End();
         return;

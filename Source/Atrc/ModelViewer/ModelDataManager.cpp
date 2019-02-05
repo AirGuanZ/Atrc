@@ -35,7 +35,7 @@ std::shared_ptr<const GL::VertexBuffer<Model::Vertex>> MeshGroupData::GetVertexB
 void ModelDataManager::Display(Console &console)
 {
     bool newPopup = false;
-    if(ImGui::Button("load##load_data_from_disk"))
+    if(ImGui::Button("new##load_data_from_disk"))
     {
         ImGui::OpenPopup("new data from .obj");
         newPopup = true;
