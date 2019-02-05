@@ -24,10 +24,10 @@ void ModelManager::Render(const Camera &camera) const
 
 void ModelManager::Display(Console &console, const Camera &camera)
 {
-    if(ImGui::CollapsingHeader("data"))
+    if(ImGui::CollapsingHeader("data", ImGuiTreeNodeFlags_DefaultOpen))
         dataMgr_.Display(console);
 
-    if(!ImGui::CollapsingHeader("model"))
+    if(!ImGui::CollapsingHeader("model", ImGuiTreeNodeFlags_DefaultOpen))
         return;
 
     bool clickNew = false;

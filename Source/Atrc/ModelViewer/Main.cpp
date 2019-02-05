@@ -160,6 +160,8 @@ int Run(GLFWwindow *window)
 
     while(!glfwWindowShouldClose(window))
     {
+        // 各种事件捕获与传递
+
         glfwPollEvents();
         keyboardMgr.Capture();
         mouseMgr.Capture();
@@ -169,6 +171,8 @@ int Run(GLFWwindow *window)
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
         TransformController::BeginFrame();
+
+        // 全局菜单栏
 
         bool openGlobalHelpWindow = false;
 
@@ -191,15 +195,24 @@ int Run(GLFWwindow *window)
             ImGui::EndMainMenuBar();
         }
 
+        ShowGlobalHelpWindow(openGlobalHelpWindow, keyboard);
+
+        // 计算场景管理器的位置和大小
+
+        float sceneManagerPosX, sceneManagerPosY;
+        constexpr float sceneManagerSizeX = 400, sceneManagerSizeY = 600;
+
         {
             float fbW = static_cast<float>(Global::GetInstance().framebufferWidth);
             float fbH = static_cast<float>(Global::GetInstance().framebufferHeight);
-            float posX = 40;
-            float posY = ImGui::GetFrameHeight() + posX * (fbH / fbW);
-            ImGui::SetNextWindowPos(ImVec2(posX, posY), ImGuiCond_FirstUseEver);
+            sceneManagerPosX = 40;
+            sceneManagerPosY = ImGui::GetFrameHeight() + sceneManagerPosX * (fbH / fbW);
+            ImGui::SetNextWindowPos(ImVec2(sceneManagerPosX, sceneManagerPosY), ImGuiCond_FirstUseEver);
         }
 
-        if(ImGui::Begin("scene manager", nullptr, ImVec2(400, 600)))
+        // 场景管理器
+
+        if(ImGui::Begin("scene manager", nullptr, ImVec2(sceneManagerSizeX, sceneManagerSizeY)))
         {
             if(ImGui::BeginTabBar("scene manager tab"))
             {
@@ -219,23 +232,10 @@ int Run(GLFWwindow *window)
             ImGui::End();
         }
 
-        console.Display();
+        // 材质、纹理等对象管理器
 
-        ShowGlobalHelpWindow(openGlobalHelpWindow, keyboard);
-
-        if(auto *model = modelMgr.GetSelectedModel())
-        {
-            ImGui::SetNextWindowPos(ImVec2(600, 100), ImGuiCond_FirstUseEver);
-            if(ImGui::Begin("model property", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
-            {
-                model->DisplayProperty();
-                model->DisplayTransform(camera);
-                ImGui::End();
-            }
-        }
-
-        ImGui::SetNextWindowPos(ImVec2(800, 100), ImGuiCond_FirstUseEver);
-        if(ImGui::Begin("object", nullptr, ImVec2(400, 200), -1, ImGuiWindowFlags_NoTitleBar))
+        ImGui::SetNextWindowPos(ImVec2(sceneManagerPosX, sceneManagerPosY + sceneManagerSizeY + 20), ImGuiCond_FirstUseEver);
+        if(ImGui::Begin("object", nullptr, ImVec2(sceneManagerSizeX, 200), -1, ImGuiWindowFlags_NoTitleBar))
         {
             if(ImGui::BeginTabBar("object tab"))
             {
@@ -249,8 +249,29 @@ int Run(GLFWwindow *window)
             ImGui::End();
         }
 
+        // 控制台
+
+        console.Display();
+
+        // 物体属性编辑
+
+        if(auto *model = modelMgr.GetSelectedModel())
+        {
+            ImGui::SetNextWindowPos(ImVec2(600, 100), ImGuiCond_FirstUseEver);
+            if(ImGui::Begin("model property", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+            {
+                model->DisplayProperty();
+                model->DisplayTransform(camera);
+                ImGui::End();
+            }
+        }
+
+        // 更新摄像机状态
+
         if(!ImGui::IsAnyWindowFocused())
             camera.UpdatePositionAndDirection(keyboard, mouse);
+
+        // 屏幕上二维对象的绘制
 
         screen2DFramebuffer.Bind();
         GL::RenderContext::ClearColorAndDepth();
@@ -269,7 +290,11 @@ int Run(GLFWwindow *window)
 
         GL::RenderContext::EnableDepthTest();
 
+        // 场景绘制
+
         modelMgr.Render(camera);
+
+        // 把屏幕上的二维内容叠加到screen buffer上
 
         static const GL::Immediate2D::TexturedVertex scrQuadVtx[] =
         {
