@@ -143,7 +143,7 @@ entities = (
 });
 
 # Lights in the rendered scene
-lights = {
+lights = ({
     type = Environment;
     tex = {
         type     = HDR;         # Use HDR texture for environmental mapping
