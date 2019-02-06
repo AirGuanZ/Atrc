@@ -8,7 +8,7 @@ class IdealDiffuseCreator : public MaterialCreator
 {
 public:
 
-    IdealDiffuseCreator() : MaterialCreator("ideal diffuse") { }
+    IdealDiffuseCreator() : MaterialCreator("diffuse") { }
 
     std::shared_ptr<MaterialInstance> Create(std::string name) const override;
 };

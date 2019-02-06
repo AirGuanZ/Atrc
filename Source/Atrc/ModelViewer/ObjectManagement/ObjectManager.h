@@ -17,6 +17,8 @@
  * InstancePool持有一组Instance
  */
 
+class ObjectManager;
+
 class InstanceInterface : public AGZ::Uncopiable
 {
     std::string instanceName_;
@@ -36,7 +38,7 @@ public:
         return instanceName_;
     }
 
-    virtual void Display() = 0;
+    virtual void Display(ObjectManager &objMgr) = 0;
 };
 
 template<typename TInstance>
@@ -115,7 +117,8 @@ public:
 
     void Display(const char *label)
     {
-        if(!ImGui::BeginCombo(label, selectedCreator_ ? selectedCreator_->GetName().c_str() : nullptr))
+        const char *previewedValue = selectedCreator_ ? selectedCreator_->GetName().c_str() : nullptr;
+        if(!ImGui::BeginCombo(label, previewedValue))
             return;
         AGZ::ScopeGuard comboExitGuard([] { ImGui::EndCombo(); });
 
@@ -179,7 +182,8 @@ public:
             auto it = std::find_if(begin(instances_), end(instances_), [&](auto &c) { return c->GetName() == nameBuf; });
             if(it == instances_.end() && nameBuf[0])
             {
-                instances_.push_back(creatorSelector_.GetSelectedCreator()->Create(nameBuf));
+                instances_.push_back(creatorSelector_.GetSelectedCreator()->Create(
+                    "[" + creatorSelector_.GetSelectedCreator()->GetName() + "] " + nameBuf));
                 nameBuf[0] = '\0';
                 if(sortInstanceByName_)
                     SortInstanceByName();
@@ -297,9 +301,14 @@ class TextureInstance : public InstanceInterface { public: using InstanceInterfa
 using TextureCreator = TInstanceCreator<TextureInstance>;
 using TextureCreatorSelector = TInstanceCreatorSelector<TextureInstance>;
 
-using ObjectManager = TObjectManager<
+class ObjectManager : public TObjectManager<
     TInstanceRegister<MaterialInstance, true>,
-    TInstanceRegister<TextureInstance, true>>;
+    TInstanceRegister<TextureInstance, true>>
+{
+public:
+
+    using TObjectManager::TObjectManager;
+};
 
 template<typename TInstance>
 class TInstanceSlot
@@ -326,7 +335,7 @@ class TInstanceSlot
         if(ImGui::Button("ok") && selector->GetSelectedCreator())
         {
             ImGui::CloseCurrentPopup();
-            return selector->GetSelectedCreator()->Create("anonymous");
+            return selector->GetSelectedCreator()->Create("[" + selector->GetSelectedCreator()->GetName() + "] anonymous");
         }
 
         ImGui::SameLine();
@@ -359,7 +368,7 @@ public:
             instance_ = std::move(anonymousInstance);
 
         if(instance_)
-            instance_->Display();
+            instance_->Display(objMgr);
     }
 };
 

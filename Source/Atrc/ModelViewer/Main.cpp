@@ -245,7 +245,7 @@ int Run(GLFWwindow *window)
                     auto &pool = objMgr.GetPool<MaterialInstance>();
                     pool.Display();
                     if(auto mat = pool.GetSelectedInstance())
-                        mat->Display();
+                        mat->Display(objMgr);
                     ImGui::EndTabItem();
                 }
                 if(ImGui::BeginTabItem("texture"))
@@ -253,7 +253,7 @@ int Run(GLFWwindow *window)
                     auto &pool = objMgr.GetPool<TextureInstance>();
                     pool.Display();
                     if(auto tex = pool.GetSelectedInstance())
-                        tex->Display();
+                        tex->Display(objMgr);
                     ImGui::EndTabItem();
                 }
                 ImGui::EndTabBar();

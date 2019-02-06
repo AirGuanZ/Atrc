@@ -4,15 +4,19 @@ namespace
 {
     class IdealDiffuseInstance : public MaterialInstance
     {
-        Vec3f albedo_;
+        TextureSlot albedo_;
 
     public:
 
         using MaterialInstance::MaterialInstance;
 
-        void Display() override
+        void Display(ObjectManager &objMgr) override
         {
-            ImGui::ColorEdit3("albedo", &albedo_[0]);
+            if(ImGui::TreeNode("albedo"))
+            {
+                albedo_.Display(objMgr);
+                ImGui::TreePop();
+            }
         }
     };
 }

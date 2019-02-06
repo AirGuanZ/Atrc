@@ -12,3 +12,12 @@ public:
 
     std::shared_ptr<TextureInstance> Create(std::string name) const override;
 };
+
+class ImageTextureCreator : public TextureCreator
+{
+public:
+
+    ImageTextureCreator() : TextureCreator("image") { }
+
+    std::shared_ptr<TextureInstance> Create(std::string name) const override;
+};
