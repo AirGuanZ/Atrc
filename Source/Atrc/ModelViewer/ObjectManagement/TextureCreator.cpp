@@ -30,8 +30,13 @@ namespace
             static FileBrowser fileBrowser;
 
             if(!filename_.empty())
+            {
+                ImGui::BeginChild("", ImVec2(0, ImGui::GetItemsLineHeightWithSpacing()));
                 ImGui::Text("%s", filename_.c_str());
-
+                ImGui::ShowTooltipForLastItem(filename_.c_str());
+                ImGui::EndChild();
+            }
+            
             if(ImGui::Button("browse"))
             {
                 ImGui::OpenPopup("browse image texture");
