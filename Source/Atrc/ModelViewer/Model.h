@@ -4,6 +4,7 @@
 
 #include <Atrc/ModelViewer/Camera.h>
 #include <Atrc/ModelViewer/GL.h>
+#include <Atrc/ModelViewer/MaterialMapping.h>
 #include <Atrc/ModelViewer/TransformController.h>
 
 struct ModelTransform
@@ -41,6 +42,8 @@ public:
 
     void DisplayProperty();
 
+    void DisplayMaterial(ObjectManager &objMgr);
+
     void DisplayTransform(const Camera &camera);
 
     const std::string &GetName() const noexcept { return name_; }
@@ -57,4 +60,6 @@ private:
 
     ModelTransform transform_;
     TransformController transformController_;
+
+    MaterialMappingSelector materialMappingSelector_;
 };

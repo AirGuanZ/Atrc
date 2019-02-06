@@ -149,7 +149,8 @@ class TInstancePool
     {
         std::sort(begin(instances_), end(instances_), [](auto &L, auto &R)
         {
-            return L->GetName() < R->GetName();
+            auto lL = AGZ::ToLower(L->GetName()), lR = AGZ::ToLower(R->GetName());
+            return  lL < lR || (lL == lR && L->GetName() < R->GetName());
         });
     }
 
@@ -179,6 +180,7 @@ public:
             if(it == instances_.end() && nameBuf[0])
             {
                 instances_.push_back(creatorSelector_.GetSelectedCreator()->Create(nameBuf));
+                nameBuf[0] = '\0';
                 if(sortInstanceByName_)
                     SortInstanceByName();
             }
@@ -289,6 +291,7 @@ public:
 
 class MaterialInstance : public InstanceInterface { public: using InstanceInterface::InstanceInterface; };
 using MaterialCreator = TInstanceCreator<MaterialInstance>;
+using MaterialCreatorSelector = TInstanceCreatorSelector<MaterialInstance>;
 
 using ObjectManager = TObjectManager<TInstanceRegister<MaterialInstance, true>>;
 

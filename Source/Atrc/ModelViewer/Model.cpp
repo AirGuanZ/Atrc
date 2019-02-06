@@ -125,6 +125,11 @@ void Model::DisplayProperty()
     ImGui::ColorEdit3("color", &renderColor_[0], ImGuiColorEditFlags_HDR);
 }
 
+void Model::DisplayMaterial(ObjectManager &objMgr)
+{
+    materialMappingSelector_.Display(objMgr);
+}
+
 void Model::DisplayTransform(const Camera &camera)
 {
     transformController_.Render(camera, &transform_.translate, &transform_.rotate, &transform_.scale);

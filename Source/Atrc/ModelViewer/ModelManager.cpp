@@ -147,7 +147,8 @@ void ModelManager::SortModelByName()
 
     std::sort(begin(models_), end(models_), [](const auto &L, const auto &R)
     {
-        return L.GetName() < R.GetName();
+        auto lL = AGZ::ToLower(L.GetName()), lR = AGZ::ToLower(R.GetName());
+        return  lL < lR || (lL == lR && L.GetName() < R.GetName());
     });
 
     if(!selectedName.empty())

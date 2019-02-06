@@ -261,11 +261,21 @@ int Run(GLFWwindow *window)
 
         if(auto *model = modelMgr.GetSelectedModel())
         {
-            ImGui::SetNextWindowPos(ImVec2(600, 100), ImGuiCond_FirstUseEver);
-            if(ImGui::Begin("model property", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+            ImGui::SetNextWindowPos(ImVec2(sceneManagerPosX + sceneManagerSizeX + 20, sceneManagerPosY), ImGuiCond_FirstUseEver);
+            if(ImGui::Begin("model", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
             {
-                model->DisplayProperty();
-                model->DisplayTransform(camera);
+                ImGui::PushID(0);
+                if(ImGui::CollapsingHeader("property", ImGuiTreeNodeFlags_DefaultOpen))
+                    model->DisplayProperty();
+                ImGui::PopID();
+                ImGui::PushID(1);
+                if(ImGui::CollapsingHeader("material", ImGuiTreeNodeFlags_DefaultOpen))
+                    model->DisplayMaterial(objMgr);
+                ImGui::PopID();
+                ImGui::PushID(1);
+                if(ImGui::CollapsingHeader("transform", ImGuiTreeNodeFlags_DefaultOpen))
+                    model->DisplayTransform(camera);
+                ImGui::PopID();
                 ImGui::End();
             }
         }
