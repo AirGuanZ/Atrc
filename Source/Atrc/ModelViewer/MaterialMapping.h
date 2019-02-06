@@ -23,7 +23,7 @@ public:
 
 class SingleMaterialMapping : public MaterialMapping
 {
-    std::shared_ptr<MaterialInstance> material_;
+    MaterialSlot slot_;
 
 public:
 

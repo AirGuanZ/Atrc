@@ -49,10 +49,10 @@ int Run(GLFWwindow *window)
     ImGui_ImplOpenGL3_Init();
     ImGui::StyleColorsLight();
 
-    ImGui::GetStyle().PopupRounding   = 12;
-    ImGui::GetStyle().WindowRounding  = 12;
-    ImGui::GetStyle().GrabRounding    = 12;
-    ImGui::GetStyle().FrameRounding   = 12;
+    ImGui::GetStyle().PopupRounding   = 7;
+    ImGui::GetStyle().WindowRounding  = 7;
+    ImGui::GetStyle().GrabRounding    = 7;
+    ImGui::GetStyle().FrameRounding   = 7;
     ImGui::GetStyle().FrameBorderSize = 1;
 
     // 准备输入category
@@ -246,6 +246,14 @@ int Run(GLFWwindow *window)
                     pool.Display();
                     if(auto mat = pool.GetSelectedInstance())
                         mat->Display();
+                    ImGui::EndTabItem();
+                }
+                if(ImGui::BeginTabItem("texture"))
+                {
+                    auto &pool = objMgr.GetPool<TextureInstance>();
+                    pool.Display();
+                    if(auto tex = pool.GetSelectedInstance())
+                        tex->Display();
                     ImGui::EndTabItem();
                 }
                 ImGui::EndTabBar();

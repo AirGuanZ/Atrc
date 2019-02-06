@@ -293,6 +293,77 @@ class MaterialInstance : public InstanceInterface { public: using InstanceInterf
 using MaterialCreator = TInstanceCreator<MaterialInstance>;
 using MaterialCreatorSelector = TInstanceCreatorSelector<MaterialInstance>;
 
-using ObjectManager = TObjectManager<TInstanceRegister<MaterialInstance, true>>;
+class TextureInstance : public InstanceInterface { public: using InstanceInterface::InstanceInterface; };
+using TextureCreator = TInstanceCreator<TextureInstance>;
+using TextureCreatorSelector = TInstanceCreatorSelector<TextureInstance>;
+
+using ObjectManager = TObjectManager<
+    TInstanceRegister<MaterialInstance, true>,
+    TInstanceRegister<TextureInstance, true>>;
+
+template<typename TInstance>
+class TInstanceSlot
+{
+    std::shared_ptr<TInstance> instance_;
+
+    TInstanceCreatorSelector<TInstance> *GetSelector(ObjectManager &objMgr)
+    {
+        static std::unique_ptr<TInstanceCreatorSelector<TInstance>> anonymousSelector;
+        if(!anonymousSelector)
+            anonymousSelector = std::make_unique<TInstanceCreatorSelector<TInstance>>(objMgr.GetCreatorManager<TInstance>());
+        return anonymousSelector.get();
+    }
+
+    std::shared_ptr<TInstance> ShowNewAnonymousInstanceWindow(ObjectManager &objMgr)
+    {
+        if(!ImGui::BeginPopup("new anonymous instance", ImGuiWindowFlags_AlwaysAutoResize))
+            return nullptr;
+        AGZ::ScopeGuard popupExitGuard([] { ImGui::EndPopup(); });
+
+        auto *selector = GetSelector(objMgr);
+        selector->Display("type");
+
+        if(ImGui::Button("ok") && selector->GetSelectedCreator())
+        {
+            ImGui::CloseCurrentPopup();
+            return selector->GetSelectedCreator()->Create("anonymous");
+        }
+
+        ImGui::SameLine();
+
+        if(ImGui::Button("cancel"))
+        {
+            ImGui::CloseCurrentPopup();
+            return nullptr;
+        }
+
+        return nullptr;
+    }
+
+public:
+
+    void Display(ObjectManager &objMgr)
+    {
+        ImGui::Text("current: %s", instance_ ? instance_->GetName().c_str() : "null");
+
+        auto &pool = objMgr.GetPool<TInstance>();
+        if(ImGui::Button("set##set_instance_as_selected_one") && pool.GetSelectedInstance())
+            instance_ = pool.GetSelectedInstance();
+
+        ImGui::SameLine();
+
+        if(ImGui::Button("new##create_new_anonymous_instance"))
+            ImGui::OpenPopup("new anonymous instance");
+
+        if(auto anonymousInstance = ShowNewAnonymousInstanceWindow(objMgr))
+            instance_ = std::move(anonymousInstance);
+
+        if(instance_)
+            instance_->Display();
+    }
+};
+
+using MaterialSlot = TInstanceSlot<MaterialInstance>;
+using TextureSlot  = TInstanceSlot<TextureInstance>;
 
 void RegisterObjectCreators(ObjectManager &objMgr);
