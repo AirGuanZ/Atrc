@@ -293,6 +293,10 @@ public:
     }
 };
 
+class FresnelInstance : public InstanceInterface { public: using InstanceInterface::InstanceInterface; };
+using FresnelCreator = TInstanceCreator<FresnelInstance>;
+using FresnelCreatorSelector = TInstanceCreatorSelector<FresnelInstance>;
+
 class MaterialInstance : public InstanceInterface { public: using InstanceInterface::InstanceInterface; };
 using MaterialCreator = TInstanceCreator<MaterialInstance>;
 using MaterialCreatorSelector = TInstanceCreatorSelector<MaterialInstance>;
@@ -302,6 +306,7 @@ using TextureCreator = TInstanceCreator<TextureInstance>;
 using TextureCreatorSelector = TInstanceCreatorSelector<TextureInstance>;
 
 class ObjectManager : public TObjectManager<
+    TInstanceRegister<FresnelInstance, false>,
     TInstanceRegister<MaterialInstance, true>,
     TInstanceRegister<TextureInstance, true>>
 {
@@ -310,7 +315,7 @@ public:
     using TObjectManager::TObjectManager;
 };
 
-template<typename TInstance>
+template<typename TInstance, bool THasPool = true>
 class TInstanceSlot
 {
     std::shared_ptr<TInstance> instance_;
@@ -355,11 +360,13 @@ public:
     {
         ImGui::Text("current: %s", instance_ ? instance_->GetName().c_str() : "null");
 
-        auto &pool = objMgr.GetPool<TInstance>();
-        if(ImGui::Button("set##set_instance_as_selected_one") && pool.GetSelectedInstance())
-            instance_ = pool.GetSelectedInstance();
-
-        ImGui::SameLine();
+        if constexpr(THasPool)
+        {
+            auto &pool = objMgr.GetPool<TInstance>();
+            if(ImGui::Button("set##set_instance_as_selected_one") && pool.GetSelectedInstance())
+                instance_ = pool.GetSelectedInstance();
+            ImGui::SameLine();
+        }
 
         if(ImGui::Button("new##create_new_anonymous_instance"))
             ImGui::OpenPopup("new anonymous instance");
@@ -372,6 +379,7 @@ public:
     }
 };
 
+using FresnelSlot  = TInstanceSlot<FresnelInstance, false>;
 using MaterialSlot = TInstanceSlot<MaterialInstance>;
 using TextureSlot  = TInstanceSlot<TextureInstance>;
 
