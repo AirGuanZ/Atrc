@@ -56,8 +56,7 @@ void ModelDataManager::Display(Console &console)
     if(ImGui::Checkbox("sort by name##sort_model_data_by_name", &sortDataByName_) && sortDataByName_)
         SortData();
 
-    ImGui::Separator();
-
+    ImGui::BeginChild("model data list", ImVec2(0, 150), true);
     int count = static_cast<int>(data_.size());
     for(int i = 0; i < count; ++i)
     {
@@ -72,6 +71,7 @@ void ModelDataManager::Display(Console &console)
         }
         ImGui::PopID();
     }
+    ImGui::EndChild();
 }
 
 std::shared_ptr<const MeshGroupData> ModelDataManager::GetSelectedMeshGroup() const

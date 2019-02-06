@@ -2,8 +2,8 @@
 
 #include <algorithm>
 #include <limits>
+#include <map>
 #include <string>
-#include <unordered_map>
 
 #include <AGZUtils/Utils/Misc.h>
 
@@ -67,7 +67,7 @@ public:
 template<typename TInstance>
 class TInstanceCreatorManager
 {
-    std::unordered_map<std::string, const TInstanceCreator<TInstance>*> name2Creator_;
+    std::map<std::string, const TInstanceCreator<TInstance>*> name2Creator_;
 
 public:
 
@@ -215,7 +215,7 @@ public:
         if(ImGui::Checkbox("sort by name", &sortInstanceByName_) && sortInstanceByName_)
             SortInstanceByName();
 
-        ImGui::BeginChild("elems", ImVec2(0, 200), true);
+        ImGui::BeginChild("elems", ImVec2(0, 150), true);
 
         for(size_t i = 0; i < instances_.size(); ++i)
         {
@@ -358,8 +358,6 @@ public:
 
     void Display(ObjectManager &objMgr)
     {
-        ImGui::Text("current: %s", instance_ ? instance_->GetName().c_str() : "null");
-
         if constexpr(THasPool)
         {
             auto &pool = objMgr.GetPool<TInstance>();
@@ -370,6 +368,13 @@ public:
 
         if(ImGui::Button("new##create_new_anonymous_instance"))
             ImGui::OpenPopup("new anonymous instance");
+
+        ImGui::SameLine();
+
+        {
+            auto text = instance_ ? instance_->GetName().c_str() : "null";
+            ImGui::TextWrapped("current: %s", text);
+        }
 
         if(auto anonymousInstance = ShowNewAnonymousInstanceWindow(objMgr))
             instance_ = std::move(anonymousInstance);

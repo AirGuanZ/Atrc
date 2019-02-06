@@ -30,3 +30,57 @@ public:
 
     std::shared_ptr<MaterialInstance> Create(std::string name) const override;
 };
+
+class IdealScalerCreator : public MaterialCreator
+{
+public:
+
+    IdealScalerCreator() : MaterialCreator("scaler") { }
+
+    std::shared_ptr<MaterialInstance> Create(std::string name) const override;
+};
+
+class IdealSpecularCreator : public MaterialCreator
+{
+public:
+
+    IdealSpecularCreator() : MaterialCreator("specular") { }
+
+    std::shared_ptr<MaterialInstance> Create(std::string name) const override;
+};
+
+class InvisibleSurfaceCreator : public MaterialCreator
+{
+public:
+
+    InvisibleSurfaceCreator() : MaterialCreator("invisible") { }
+
+    std::shared_ptr<MaterialInstance> Create(std::string name) const override;
+};
+
+class NormalizedDiffusionBSSRDFCreator : public MaterialCreator
+{
+public:
+
+    NormalizedDiffusionBSSRDFCreator() : MaterialCreator("nd-bssrdf") { }
+
+    std::shared_ptr<MaterialInstance> Create(std::string name) const override;
+};
+
+class ONMatteCreator : public MaterialCreator
+{
+public:
+
+    ONMatteCreator() : MaterialCreator("on-matte") { }
+
+    std::shared_ptr<MaterialInstance> Create(std::string name) const override;
+};
+
+class TSMetalCreator : public MaterialCreator
+{
+public:
+
+    TSMetalCreator() : MaterialCreator("ts-metal") { }
+
+    std::shared_ptr<MaterialInstance> Create(std::string name) const override;
+};

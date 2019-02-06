@@ -201,7 +201,7 @@ int Run(GLFWwindow *window)
         // 计算场景管理器的位置和大小
 
         float sceneManagerPosX, sceneManagerPosY;
-        constexpr float sceneManagerSizeX = 400, sceneManagerSizeY = 400;
+        constexpr float sceneManagerSizeX = 400, sceneManagerSizeY = 500;
 
         {
             float fbW = static_cast<float>(Global::GetInstance().framebufferWidth);
@@ -353,7 +353,7 @@ int main()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
     glfwWindowHint(GLFW_MAXIMIZED, GL_TRUE);
-    GLFWwindow *window = glfwCreateWindow(INIT_WIN_WIDTH, INIT_WIN_HEIGHT, "Model Viewer", nullptr, nullptr);
+    GLFWwindow *window = glfwCreateWindow(INIT_WIN_WIDTH, INIT_WIN_HEIGHT, "ModelViewer", nullptr, nullptr);
     if(!window)
     {
         glfwTerminate();

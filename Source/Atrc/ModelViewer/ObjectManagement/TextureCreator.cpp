@@ -28,14 +28,6 @@ namespace
         void Display([[maybe_unused]] ObjectManager &objMgr) override
         {
             static FileBrowser fileBrowser;
-
-            if(!filename_.empty())
-            {
-                ImGui::BeginChild("", ImVec2(0, ImGui::GetItemsLineHeightWithSpacing()));
-                ImGui::Text("%s", filename_.c_str());
-                ImGui::ShowTooltipForLastItem(filename_.c_str());
-                ImGui::EndChild();
-            }
             
             if(ImGui::Button("browse"))
             {
@@ -44,6 +36,13 @@ namespace
                 fileBrowser.SetCurrentDirectory();
                 fileBrowser.SetTarget(false);
             }
+
+            ImGui::SameLine();
+
+            ImGui::BeginChild("", ImVec2(0, ImGui::GetTextLineHeight()));
+            ImGui::Text("%s", filename_.c_str());
+            ImGui::ShowTooltipForLastItem(filename_.c_str());
+            ImGui::EndChild();
 
             if(fileBrowser.Display())
                 filename_ = fileBrowser.GetResult();

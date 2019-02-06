@@ -1,4 +1,4 @@
-#include <Atrc/ModelViewer/FileBrowser.h>
+﻿#include <Atrc/ModelViewer/FileBrowser.h>
 
 void FileBrowser::SetLabel(std::string label)
 {
@@ -81,39 +81,47 @@ std::string FileBrowser::GetResult(bool relative) const
 
 void FileBrowser::UpdateCurrentUnits()
 {
-    curUnits_.clear();
-
-    if(!is_directory(pwd_))
-        return;
-
-    curUnits_.push_back({ true, ".." });
-
-    for(auto &p : std::filesystem::directory_iterator(pwd_))
+    try
     {
-        Unit unit;
+        curUnits_.clear();
+
+        if(!is_directory(pwd_))
+            return;
+
+        curUnits_.push_back({ true, ".." });
+
+        for(auto &p : std::filesystem::directory_iterator(pwd_))
+        {
+            Unit unit;
 #ifdef AGZ_OS_WIN32
-        unit.name = INV_WIDEN(p.path().filename().wstring());
+            unit.name = INV_WIDEN(p.path().filename().wstring());
 #else
-        unit.name = p.path().filename().string();
+            unit.name = p.path().filename().string();
 #endif
-        if(p.is_regular_file())
-            unit.isDir = false;
-        else if(p.is_directory())
-            unit.isDir = true;
-        else
-            continue;
+            if(p.is_regular_file())
+                unit.isDir = false;
+            else if(p.is_directory())
+                unit.isDir = true;
+            else
+                continue;
 
-        if(AGZ::StartsWith(unit.name, "$"))
-            continue;
+            if(AGZ::StartsWith(unit.name, "$"))
+                continue;
 
-        curUnits_.push_back(std::move(unit));
+            curUnits_.push_back(std::move(unit));
+        }
+
+        std::sort(begin(curUnits_), end(curUnits_),
+            [](auto &L, auto &R)
+        {
+            if(L.isDir ^ R.isDir)
+                return L.isDir;
+            return L.name < R.name;
+        });
     }
-
-    std::sort(begin(curUnits_), end(curUnits_), 
-        [](auto &L, auto &R)
+    catch(...)
     {
-        if(L.isDir ^ R.isDir)
-            return L.isDir;
-        return L.name < R.name;
-    });
+        // 如果拒绝访问，自动切换到程序运行目录
+        SetCurrentDirectory();
+    }
 }
