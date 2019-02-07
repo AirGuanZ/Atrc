@@ -8,6 +8,15 @@ void BeginEntityRendering();
 
 void EndEntityRendering();
 
+class GeometricDiffuseLightCreator : public EntityCreator
+{
+public:
+
+    GeometricDiffuseLightCreator() : EntityCreator("diffuse") { }
+
+    std::shared_ptr<EntityInstance> Create(std::string name) const override;
+};
+
 class GeometricEntityCreator : public EntityCreator
 {
 public:

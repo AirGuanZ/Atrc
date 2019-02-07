@@ -1,6 +1,7 @@
 #include <AGZUtils/Utils/Mesh.h>
 #include <Atrc/ModelViewer/ResourceManagement/GeometryCreator.h>
 #include <Atrc/ModelViewer/FileBrowser.h>
+#include <Atrc/ModelViewer/FilenameSlot.h>
 
 namespace
 {
@@ -8,7 +9,7 @@ namespace
     {
         std::shared_ptr<GL::VertexBuffer<Vertex>> vtxBuf_;
         AGZ::Mesh::GeometryMeshGroup<float> meshGroup_;
-        std::string filename_;
+        TFilenameSlot<true> filename_;
 
         void BuildVertexBufferFromMeshGroup()
         {
@@ -35,25 +36,27 @@ namespace
         {
             vtxBuf_ = nullptr;
             meshGroup_.submeshes.clear();
-            filename_ = "";
         }
 
         void LoadWavefrontOBJ(std::string filename)
         {
             Clear();
-
-            AGZ::Mesh::WavefrontObj<float> obj;
-            if(!obj.LoadFromFile(filename))
+            AGZ::ScopeGuard clearGuard([&]
             {
                 Clear();
+                filename_.Clear();
+            });
+
+            AGZ::Mesh::WavefrontObj<float> obj;
+            if(!obj.LoadFromFile(filename) || obj.name2Obj.empty())
                 return;
-            }
 
             meshGroup_ = obj.ToGeometryMeshGroup();
+            if(!meshGroup_.submeshes.size())
+                return;
             obj.Clear();
-
-            filename_ = std::move(filename);
             BuildVertexBufferFromMeshGroup();
+            clearGuard.Dismiss();
         }
 
     public:
@@ -67,42 +70,19 @@ namespace
 
         void Display(ResourceManager&) override
         {
-            ImGui::TextWrapped("filename: %s", filename_.c_str());
+            static FileBrowser fileBrowser;
+            static bool setFileBrowser = true;
 
-            bool clickLoadPopup = false;
-            if(ImGui::Button("load##load_data_from_file"))
-                clickLoadPopup = true;
-
-            if(clickLoadPopup)
-                ImGui::OpenPopup("load data from .obj");
-            if(ImGui::BeginPopup("load data from .obj", ImGuiWindowFlags_AlwaysAutoResize))
+            if(setFileBrowser)
             {
-                AGZ::ScopeGuard popupExitGuard([] { ImGui::EndPopup(); });
-                
-                static FileBrowser fileBrowser;
-                if(clickLoadPopup)
-                {
-                    fileBrowser.SetLabel("file browser");
-                    fileBrowser.SetTarget(false);
-                    fileBrowser.SetCurrentDirectory();
-                }
-
-                ImGui::Text("%s", fileBrowser.GetResult().c_str());
-
-                ImGui::SameLine();
-
-                if(ImGui::Button("browse"))
-                    ImGui::OpenPopup("file browser");
-                fileBrowser.Display();
-
-                if(ImGui::Button("ok"))
-                {
-                    LoadWavefrontOBJ(fileBrowser.GetResult());
-                    ImGui::CloseCurrentPopup();
-                }
-                else if(ImGui::SameLine(); ImGui::Button("cancel"))
-                    ImGui::CloseCurrentPopup();
+                fileBrowser.SetLabel("file browser");
+                fileBrowser.SetTarget(false);
+                fileBrowser.SetCurrentDirectory();
+                setFileBrowser = false;
             }
+
+            if(filename_.Display(fileBrowser))
+                LoadWavefrontOBJ(fileBrowser.GetResult());
         }
 
         std::vector<std::string> GetSubmeshNames() const override

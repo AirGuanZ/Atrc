@@ -41,6 +41,8 @@ namespace
     GL::AttribVariable<Vec3f> attribLPos;
     GL::AttribVariable<Vec3f> attribLNor;
 
+    GL::VertexArray vao;
+
     void CheckRendererInitialization()
     {
         if(prog.GetHandle())
@@ -55,6 +57,10 @@ namespace
 
         attribLPos = prog.GetAttribVariable<Vec3f>("lPos");
         attribLNor = prog.GetAttribVariable<Vec3f>("lNor");
+
+        vao.InitializeHandle();
+        vao.EnableAttrib(attribLPos);
+        vao.EnableAttrib(attribLNor);
     }
 
     Mat4f GetFinalMatrix(const Vec3f &translate, const Vec3f &rotate, float scale)
@@ -65,41 +71,30 @@ namespace
         return ret;
     }
 
-    class GeometricEntityInstance : public EntityInstance
+    class TransformedGeometricEntityBase : public EntityInstance
     {
         Vec3f renderColor_ = Vec3f(0.5f);
-
         GeometrySlot geometry_;
-        MaterialMappingSelector material_;
         Transform transform_;
 
-        GL::VertexArray vao_;
+    protected:
+
+        void DisplayRenderProperty()
+        {
+            ImGui::ColorEdit3("render color", &renderColor_[0]);
+        }
 
     public:
 
-        explicit GeometricEntityInstance(std::string name)
+        explicit TransformedGeometricEntityBase(std::string name)
             : EntityInstance(std::move(name))
         {
             CheckRendererInitialization();
-
-            vao_.InitializeHandle();
-            vao_.EnableAttrib(attribLPos);
-            vao_.EnableAttrib(attribLNor);
         }
 
         void Display(ResourceManager &rscMgr) override
         {
-            ImGui::ColorEdit3("color", &renderColor_[0]);
-            if(ImGui::TreeNode("geometry"))
-            {
-                geometry_.Display(rscMgr);
-                ImGui::TreePop();
-            }
-            if(ImGui::TreeNode("material"))
-            {
-                material_.Display(rscMgr);
-                ImGui::TreePop();
-            }
+            geometry_.Display(rscMgr);
         }
 
         void Render(const Camera &camera) override
@@ -111,11 +106,11 @@ namespace
             if(!vtxBuf)
                 return;
 
-            vao_.BindVertexBufferToAttrib(attribLPos, *vtxBuf, &GeometryInstance::Vertex::pos, 0);
-            vao_.BindVertexBufferToAttrib(attribLNor, *vtxBuf, &GeometryInstance::Vertex::nor, 1);
+            vao.BindVertexBufferToAttrib(attribLPos, *vtxBuf, &GeometryInstance::Vertex::pos, 0);
+            vao.BindVertexBufferToAttrib(attribLNor, *vtxBuf, &GeometryInstance::Vertex::nor, 1);
 
-            vao_.Bind();
-            
+            vao.Bind();
+
             Mat4f world = GetFinalMatrix(transform_.GetTranslate(), transform_.GetRotate(), transform_.GetScale());
             Mat4f WVP = camera.GetProjMatrix() * camera.GetViewMatrix() * world;
 
@@ -125,7 +120,7 @@ namespace
 
             GL::RenderContext::DrawVertices(GL_TRIANGLES, 0, vtxBuf->GetVertexCount());
 
-            vao_.Unbind();
+            vao.Unbind();
         }
 
         void DisplayTransform(const Camera &camera) override
@@ -133,22 +128,79 @@ namespace
             transform_.Display(camera);
         }
     };
+
+    class GeometricDiffuseLightInstance : public TransformedGeometricEntityBase
+    {
+        Vec3f radiance_ = Vec3f(1);
+
+    public:
+
+        using TransformedGeometricEntityBase::TransformedGeometricEntityBase;
+
+        void Display(ResourceManager &rscMgr) override
+        {
+            DisplayRenderProperty();
+            if(ImGui::TreeNode("geometry"))
+            {
+                TransformedGeometricEntityBase::Display(rscMgr);
+                ImGui::TreePop();
+            }
+            if(ImGui::TreeNode("radiance"))
+            {
+                ImGui::ColorEdit3("radiance", &radiance_[0], ImGuiColorEditFlags_HDR);
+                ImGui::TreePop();
+            }
+        }
+    };
+
+    class GeometricEntityInstance : public TransformedGeometricEntityBase
+    {
+        MaterialMappingSelector material_;
+
+    public:
+
+        using TransformedGeometricEntityBase::TransformedGeometricEntityBase;
+
+        void Display(ResourceManager &rscMgr) override
+        {
+            DisplayRenderProperty();
+            if(ImGui::TreeNode("geometry"))
+            {
+                TransformedGeometricEntityBase::Display(rscMgr);
+                ImGui::TreePop();
+            }
+            if(ImGui::TreeNode("material"))
+            {
+                material_.Display(rscMgr);
+                ImGui::TreePop();
+            }
+        }
+    };
 }
 
 void BeginEntityRendering()
 {
-    prog.Bind();
+    if(prog.GetHandle())
+        prog.Bind();
 }
 
 void EndEntityRendering()
 {
-    prog.Unbind();
+    if(prog.GetHandle())
+        prog.Unbind();
 }
 
 void RegisterEntityCreators(ResourceManager &rscMgr)
 {
+    static const GeometricDiffuseLightCreator iGeometricDiffuseLightCreator;
     static const GeometricEntityCreator iGeometricEntityCreator;
+    rscMgr.AddCreator(&iGeometricDiffuseLightCreator);
     rscMgr.AddCreator(&iGeometricEntityCreator);
+}
+
+std::shared_ptr<EntityInstance> GeometricDiffuseLightCreator::Create(std::string name) const
+{
+    return std::make_shared<GeometricDiffuseLightInstance>(std::move(name));
 }
 
 std::shared_ptr<EntityInstance> GeometricEntityCreator::Create(std::string name) const

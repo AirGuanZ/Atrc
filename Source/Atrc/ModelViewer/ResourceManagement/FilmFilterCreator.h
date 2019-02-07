@@ -4,11 +4,20 @@
 
 void RegisterFilmFilterCreators(ResourceManager &rscMgr);
 
-class BoxFilmterCreator : public FilmFilterCreator
+class BoxFilterCreator : public FilmFilterCreator
 {
 public:
 
-    BoxFilmterCreator() : FilmFilterCreator("box") { }
+    BoxFilterCreator() : FilmFilterCreator("box") { }
+
+    std::shared_ptr<FilmFilterInstance> Create(std::string name) const override;
+};
+
+class GaussianFilterCreator : public FilmFilterCreator
+{
+public:
+
+    GaussianFilterCreator() : FilmFilterCreator("gaussian") { }
 
     std::shared_ptr<FilmFilterInstance> Create(std::string name) const override;
 };

@@ -28,6 +28,11 @@ bool FileBrowser::Display()
 
     const std::string *enterDir = nullptr;
 
+    if(ImGui::Button("x"))
+        SetCurrentDirectory();
+
+    ImGui::SameLine();
+
     auto pwdStr = INV_WIDEN(pwd_.wstring());
     ImGui::Text("%s", pwdStr.c_str());
 

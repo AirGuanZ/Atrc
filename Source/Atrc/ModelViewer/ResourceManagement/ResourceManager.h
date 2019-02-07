@@ -341,6 +341,10 @@ class MaterialInstance : public IResource { public: using IResource::IResource; 
 using MaterialCreator = TResourceCreator<MaterialInstance>;
 using MaterialCreatorSelector = TResourceCreatorSelector<MaterialInstance>;
 
+class SamplerInstance : public IResource { public: using IResource::IResource; };
+using SamplerCreator = TResourceCreator<SamplerInstance>;
+using SamplerCreatorSelector = TResourceCreatorSelector<SamplerInstance>;
+
 class TextureInstance : public IResource { public: using IResource::IResource; };
 using TextureCreator = TResourceCreator<TextureInstance>;
 using TextureCreatorSelector = TResourceCreatorSelector<TextureInstance>;
@@ -351,6 +355,7 @@ class ResourceManager : public TResourceManager<
     TResourceRegister<FresnelInstance, false>,
     TResourceRegister<MaterialInstance, true>,
     TResourceRegister<GeometryInstance, true>,
+    TResourceRegister<SamplerInstance, false>,
     TResourceRegister<TextureInstance, true>>
 {
 public:
@@ -358,7 +363,7 @@ public:
     using TResourceManager::TResourceManager;
 };
 
-template<typename TResource, bool THasPool = true, bool TAllowAnonymous = true>
+template<typename TResource, bool THasPool, bool TAllowAnonymous>
 class TResourceSlot
 {
     std::shared_ptr<TResource> instance_;
@@ -409,7 +414,7 @@ public:
         if constexpr(THasPool)
         {
             auto &pool = rscMgr.GetPool<TResource>();
-            if(ImGui::Button("set##set_instance_as_selected_one") && pool.GetSelectedInstance())
+            if(ImGui::SmallButton("&##set_instance_as_selected_one") && pool.GetSelectedInstance())
             {
                 instance_ = pool.GetSelectedInstance();
             }
@@ -418,7 +423,7 @@ public:
 
         if constexpr(TAllowAnonymous)
         {
-            if(ImGui::Button("new##create_new_anonymous_instance"))
+            if(ImGui::SmallButton("?##create_new_anonymous_instance"))
                 ImGui::OpenPopup("new anonymous instance");
             ImGui::SameLine();
         }
@@ -441,11 +446,12 @@ public:
     }
 };
 
-using EntitySlot     = TResourceSlot<EntityInstance, true, false>;
+using EntitySlot     = TResourceSlot<EntityInstance,     true,  false>;
 using FilmFilterSlot = TResourceSlot<FilmFilterInstance, false, true>;
-using FresnelSlot    = TResourceSlot<FresnelInstance, false>;
-using GeometrySlot   = TResourceSlot<GeometryInstance>;
-using MaterialSlot   = TResourceSlot<MaterialInstance>;
-using TextureSlot    = TResourceSlot<TextureInstance>;
+using FresnelSlot    = TResourceSlot<FresnelInstance,    false, true>;
+using GeometrySlot   = TResourceSlot<GeometryInstance,   true,  true>;
+using MaterialSlot   = TResourceSlot<MaterialInstance,   true,  true>;
+using SamplerSlot = TResourceSlot<SamplerInstance,       false, true>;
+using TextureSlot    = TResourceSlot<TextureInstance,    true,  true>;
 
 void RegisterResourceCreators(ResourceManager &rscMgr);

@@ -3,6 +3,7 @@
 #include <Atrc/ModelViewer/ResourceManagement/FresnelCreator.h>
 #include <Atrc/ModelViewer/ResourceManagement/MaterialCreator.h>
 #include <Atrc/ModelViewer/ResourceManagement/GeometryCreator.h>
+#include <Atrc/ModelViewer/ResourceManagement/SamplerCreator.h>
 #include <Atrc/ModelViewer/ResourceManagement/TextureCreator.h>
 
 void RegisterResourceCreators(ResourceManager &rscMgr)
@@ -12,5 +13,6 @@ void RegisterResourceCreators(ResourceManager &rscMgr)
     RegisterFresnelCreators(rscMgr);
     RegisterMaterialCreators(rscMgr);
     RegisterGeometryCreators(rscMgr);
+    RegisterSamplerCreators(rscMgr);
     RegisterTextureCreators(rscMgr);
 }

@@ -21,8 +21,8 @@ void ShowGlobalHelpWindow(bool open, const AGZ::Input::Keyboard &kb)
 {
     if(open)
         ImGui::OpenPopup("global help");
-    ImGui::SetNextWindowSize(ImVec2(640, 640), ImGuiCond_Always);
-    if(!ImGui::BeginPopupModal("global help", nullptr, ImGuiWindowFlags_NoResize))
+    ImGui::SetNextWindowSize(ImVec2(640, 640), ImGuiCond_FirstUseEver);
+    if(!ImGui::BeginPopupModal("global help", nullptr))
         return;
     AGZ::ScopeGuard windowExitGuard([] { ImGui::EndPopup(); });
 
@@ -49,6 +49,7 @@ int Run(GLFWwindow *window)
     ImGui::CreateContext();
     ImGui_ImplGlfw_InitForOpenGL(window);
     ImGui_ImplOpenGL3_Init();
+
     ImGui::StyleColorsLight();
 
     ImGui::GetStyle().PopupRounding   = 7;
@@ -56,6 +57,10 @@ int Run(GLFWwindow *window)
     ImGui::GetStyle().GrabRounding    = 7;
     ImGui::GetStyle().FrameRounding   = 7;
     ImGui::GetStyle().FrameBorderSize = 1;
+
+    ImFontConfig defaultFontConfig;
+    defaultFontConfig.SizePixels = 16.0f;
+    ImGui::GetIO().Fonts->AddFontDefault(&defaultFontConfig);
 
     // 准备输入category
 
@@ -142,12 +147,6 @@ int Run(GLFWwindow *window)
         imm.Resize({ static_cast<float>(param.w), static_cast<float>(param.h) });
         ReinitializeScreen2DFramebuffer();
     }));
-
-    // ImGui Font Size
-
-    ImFontConfig defaultFontConfig;
-    defaultFontConfig.SizePixels = 16.0f;
-    ImGui::GetIO().Fonts->AddFontDefault(&defaultFontConfig);
     
     // Model Manager
 
@@ -163,7 +162,9 @@ int Run(GLFWwindow *window)
 
     // global setting
 
+    Vec2f filmSize = { 640, 480 };
     FilmFilterSlot filmFilterSlot;
+    SamplerSlot samplerSlot;
 
     while(!glfwWindowShouldClose(window))
     {
@@ -213,9 +214,19 @@ int Run(GLFWwindow *window)
         {
             AGZ::ScopeGuard popupExitGuard([] { ImGui::EndPopup(); });
 
+            ImGui::InputFloat2("film size", &filmSize[0]);
+
+            ImGui::SetNextTreeNodeOpen(true, ImGuiCond_FirstUseEver);
             if(ImGui::TreeNode("film filter"))
             {
                 filmFilterSlot.Display(rscMgr);
+                ImGui::TreePop();
+            }
+
+            ImGui::SetNextTreeNodeOpen(true, ImGuiCond_FirstUseEver);
+            if(ImGui::TreeNode("sampler"))
+            {
+                samplerSlot.Display(rscMgr);
                 ImGui::TreePop();
             }
 
@@ -236,8 +247,6 @@ int Run(GLFWwindow *window)
         }
 
         // 场景管理器
-
-        std::shared_ptr<EntityInstance> selectedEntity = rscMgr.GetPool<EntityInstance>().GetSelectedInstance();
 
         if(ImGui::Begin("scene manager", nullptr, ImVec2(0, 0), -1,
             ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoTitleBar))
@@ -304,7 +313,7 @@ int Run(GLFWwindow *window)
 
         // 物体属性编辑
 
-        if(selectedEntity)
+        if(auto selectedEntity = rscMgr.GetPool<EntityInstance>().GetSelectedInstance())
         {
             ImGui::SetNextWindowPos(ImVec2(sceneManagerPosX + 420, sceneManagerPosY), ImGuiCond_FirstUseEver);
             if(ImGui::Begin("model", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
