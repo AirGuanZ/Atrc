@@ -310,13 +310,13 @@ public:
 using EntityCreator = TResourceCreator<EntityInstance>;
 using EntityCreatorSelector = TResourceCreatorSelector<EntityInstance>;
 
+class FilmFilterInstance : public IResource { using IResource::IResource; };
+using FilmFilterCreator = TResourceCreator<FilmFilterInstance>;
+using FilmFilterCreatorSelector = TResourceCreatorSelector<FilmFilterInstance>;
+
 class FresnelInstance : public IResource { public: using IResource::IResource; };
 using FresnelCreator = TResourceCreator<FresnelInstance>;
 using FresnelCreatorSelector = TResourceCreatorSelector<FresnelInstance>;
-
-class MaterialInstance : public IResource { public: using IResource::IResource; };
-using MaterialCreator = TResourceCreator<MaterialInstance>;
-using MaterialCreatorSelector = TResourceCreatorSelector<MaterialInstance>;
 
 class GeometryInstance : public IResource
 {
@@ -337,12 +337,17 @@ public:
 using GeometryCreator = TResourceCreator<GeometryInstance>;
 using GeometryCreatorSelector = TResourceCreatorSelector<GeometryInstance>;
 
+class MaterialInstance : public IResource { public: using IResource::IResource; };
+using MaterialCreator = TResourceCreator<MaterialInstance>;
+using MaterialCreatorSelector = TResourceCreatorSelector<MaterialInstance>;
+
 class TextureInstance : public IResource { public: using IResource::IResource; };
 using TextureCreator = TResourceCreator<TextureInstance>;
 using TextureCreatorSelector = TResourceCreatorSelector<TextureInstance>;
 
 class ResourceManager : public TResourceManager<
     TResourceRegister<EntityInstance, true>,
+    TResourceRegister<FilmFilterInstance, false>,
     TResourceRegister<FresnelInstance, false>,
     TResourceRegister<MaterialInstance, true>,
     TResourceRegister<GeometryInstance, true>,
@@ -436,10 +441,11 @@ public:
     }
 };
 
-using EntitySlot   = TResourceSlot<EntityInstance, true, false>;
-using FresnelSlot  = TResourceSlot<FresnelInstance, false>;
-using MaterialSlot = TResourceSlot<MaterialInstance>;
-using GeometrySlot = TResourceSlot<GeometryInstance>;
-using TextureSlot  = TResourceSlot<TextureInstance>;
+using EntitySlot     = TResourceSlot<EntityInstance, true, false>;
+using FilmFilterSlot = TResourceSlot<FilmFilterInstance, false, true>;
+using FresnelSlot    = TResourceSlot<FresnelInstance, false>;
+using GeometrySlot   = TResourceSlot<GeometryInstance>;
+using MaterialSlot   = TResourceSlot<MaterialInstance>;
+using TextureSlot    = TResourceSlot<TextureInstance>;
 
 void RegisterResourceCreators(ResourceManager &rscMgr);

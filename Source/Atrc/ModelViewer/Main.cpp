@@ -3,6 +3,7 @@
 #include <AGZUtils/Utils/Mesh.h>
 #include <AGZUtils/Utils/Texture.h>
 
+#include <Atrc/ModelViewer/ResourceManagement/EntityCreator.h>
 #include <Atrc/ModelViewer/ResourceManagement/ResourceManager.h>
 #include <Atrc/ModelViewer/Camera.h>
 #include <Atrc/ModelViewer/Console.h>
@@ -10,7 +11,6 @@
 #include <Atrc/ModelViewer/Global.h>
 #include <Atrc/ModelViewer/ScreenAxis.h>
 #include <Atrc/ModelViewer/TransformController.h>
-#include "ResourceManagement/EntityCreator.h"
 
 using namespace std;
 
@@ -26,10 +26,12 @@ void ShowGlobalHelpWindow(bool open, const AGZ::Input::Keyboard &kb)
         return;
     AGZ::ScopeGuard windowExitGuard([] { ImGui::EndPopup(); });
 
-    static const char *MSG =
-u8R"____(Hold mouse middle button to adjust camera direction when there is no focused window.
-Press ESC to close this help window.)____";
-    ImGui::TextWrapped("%s", MSG);
+    static const auto MSG =
+AGZ::Trim(u8R"____(
+Hold mouse middle button to adjust camera direction when there is no focused window.
+Press ESC to close this help window.
+)____");
+    ImGui::TextWrapped("%s", MSG.c_str());
 
     if(kb.IsKeyPressed(AGZ::Input::KEY_ESCAPE))
         ImGui::CloseCurrentPopup();
@@ -152,11 +154,16 @@ int Run(GLFWwindow *window)
 	Camera camera("default");
 
 	Console console;
+    Global::GetInstance().console = &console;
 
     // Object Manager
 
     ResourceManager rscMgr;
     RegisterResourceCreators(rscMgr);
+
+    // global setting
+
+    FilmFilterSlot filmFilterSlot;
 
     while(!glfwWindowShouldClose(window))
     {
@@ -175,6 +182,7 @@ int Run(GLFWwindow *window)
         // 全局菜单栏
 
         bool openGlobalHelpWindow = false;
+        bool openGlobalSettingWindow = false;
 
         if(ImGui::BeginMainMenuBar())
         {
@@ -185,22 +193,39 @@ int Run(GLFWwindow *window)
                 ImGui::EndMenu();
             }
 
-            if(ImGui::BeginMenu("help"))
-            {
-                if(ImGui::MenuItem("global"))
-                    openGlobalHelpWindow = true;
-                ImGui::EndMenu();
-            }
+            if(ImGui::MenuItem("global"))
+                openGlobalSettingWindow = true;
+
+            if(ImGui::MenuItem("help"))
+                openGlobalHelpWindow = true;
 
             ImGui::EndMainMenuBar();
         }
 
         ShowGlobalHelpWindow(openGlobalHelpWindow, keyboard);
 
+        if(openGlobalSettingWindow)
+        {
+            ImGui::OpenPopup("global setting");
+            ImGui::SetNextWindowSize(ImVec2(600, 400), ImGuiCond_FirstUseEver);
+        }
+        if(ImGui::BeginPopupModal("global setting", nullptr))
+        {
+            AGZ::ScopeGuard popupExitGuard([] { ImGui::EndPopup(); });
+
+            if(ImGui::TreeNode("film filter"))
+            {
+                filmFilterSlot.Display(rscMgr);
+                ImGui::TreePop();
+            }
+
+            if(keyboard.IsKeyPressed(AGZ::Input::KEY_ESCAPE))
+                ImGui::CloseCurrentPopup();
+        }
+
         // 计算场景管理器的位置和大小
 
         float sceneManagerPosX, sceneManagerPosY;
-        constexpr float sceneManagerSizeX = 400, sceneManagerSizeY = 500;
 
         {
             float fbW = static_cast<float>(Global::GetInstance().framebufferWidth);
@@ -212,8 +237,9 @@ int Run(GLFWwindow *window)
 
         // 场景管理器
 
-        std::shared_ptr<EntityInstance> selectedEntity;
-        if(ImGui::Begin("scene manager", nullptr, ImVec2(sceneManagerSizeX, 0), -1,
+        std::shared_ptr<EntityInstance> selectedEntity = rscMgr.GetPool<EntityInstance>().GetSelectedInstance();
+
+        if(ImGui::Begin("scene manager", nullptr, ImVec2(0, 0), -1,
             ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoTitleBar))
         {
             if(ImGui::BeginTabBar("scene manager tab"))
@@ -222,7 +248,6 @@ int Run(GLFWwindow *window)
                 {
                     auto &pool = rscMgr.GetPool<EntityInstance>();
                     pool.Display();
-                    selectedEntity = pool.GetSelectedInstance();
                     ImGui::EndTabItem();
                 }
                 if(ImGui::BeginTabItem("camera"))
@@ -238,8 +263,8 @@ int Run(GLFWwindow *window)
 
         // 材质、纹理等对象管理器
 
-        ImGui::SetNextWindowPos(ImVec2(sceneManagerPosX, sceneManagerPosY + sceneManagerSizeY + 20), ImGuiCond_FirstUseEver);
-        if(ImGui::Begin("resource", nullptr, ImVec2(sceneManagerSizeX, 0), -1, 
+        ImGui::SetNextWindowPos(ImVec2(sceneManagerPosX, sceneManagerPosY + 320), ImGuiCond_FirstUseEver);
+        if(ImGui::Begin("resource", nullptr, ImVec2(0, 0), -1, 
             ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysAutoResize))
         {
             if(ImGui::BeginTabBar("object tab"))
@@ -281,7 +306,7 @@ int Run(GLFWwindow *window)
 
         if(selectedEntity)
         {
-            ImGui::SetNextWindowPos(ImVec2(sceneManagerPosX + sceneManagerSizeX + 20, sceneManagerPosY), ImGuiCond_FirstUseEver);
+            ImGui::SetNextWindowPos(ImVec2(sceneManagerPosX + 420, sceneManagerPosY), ImGuiCond_FirstUseEver);
             if(ImGui::Begin("model", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
             {
                 selectedEntity->Display(rscMgr);
@@ -340,6 +365,8 @@ int Run(GLFWwindow *window)
 
         glfwSwapBuffers(window);
     }
+
+    Global::GetInstance().console = nullptr;
 
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
