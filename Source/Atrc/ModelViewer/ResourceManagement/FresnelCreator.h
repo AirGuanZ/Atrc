@@ -1,7 +1,8 @@
 #pragma once
-#include "ObjectManager.h"
 
-void RegisterFresnelCreators(ObjectManager &objMgr);
+#include <Atrc/ModelViewer/ResourceManagement/ResourceManager.h>
+
+void RegisterFresnelCreators(ResourceManager &rscMgr);
 
 class FresnelConductorCreator : public FresnelCreator
 {

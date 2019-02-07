@@ -1,4 +1,4 @@
-#include <Atrc/ModelViewer/ObjectManagement/FresnelCreator.h>
+#include <Atrc/ModelViewer/ResourceManagement/FresnelCreator.h>
 
 namespace
 {
@@ -10,7 +10,7 @@ namespace
 
         using FresnelInstance::FresnelInstance;
 
-        void Display(ObjectManager&) override
+        void Display(ResourceManager&) override
         {
             ImGui::InputFloat3("etaI", &etaI_[0]);
             ImGui::InputFloat3("etaT", &etaT_[0]);
@@ -26,7 +26,7 @@ namespace
 
         using FresnelInstance::FresnelInstance;
 
-        void Display(ObjectManager&) override
+        void Display(ResourceManager&) override
         {
             ImGui::InputFloat("etaI", &etaI_);
             ImGui::InputFloat("etaT", &etaT_);
@@ -41,14 +41,14 @@ namespace
     };
 }
 
-void RegisterFresnelCreators(ObjectManager &objMgr)
+void RegisterFresnelCreators(ResourceManager &rscMgr)
 {
     static const FresnelConductorCreator iFresnelConductorCreator;
     static const FresnelDielectricCreator iFresnelDielectricCreator;
     static const FresnelSchlickCreator iFresnelSchlickCreator;
-    objMgr.AddCreator(&iFresnelConductorCreator);
-    objMgr.AddCreator(&iFresnelDielectricCreator);
-    objMgr.AddCreator(&iFresnelSchlickCreator);
+    rscMgr.AddCreator(&iFresnelConductorCreator);
+    rscMgr.AddCreator(&iFresnelDielectricCreator);
+    rscMgr.AddCreator(&iFresnelSchlickCreator);
 }
 
 std::shared_ptr<FresnelInstance> FresnelConductorCreator::Create(std::string name) const

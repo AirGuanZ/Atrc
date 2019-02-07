@@ -36,3 +36,27 @@ private:
     Mode mode_  = Translate;
     bool local_ = true;
 };
+
+class Transform
+{
+    Vec3f trans_;
+    Vec3f rotate_;
+    float scale_ = 1;
+    TransformController controller_;
+
+public:
+
+    void Display(const Camera &camera)
+    {
+        controller_.Display();
+        controller_.Render(camera, &trans_, &rotate_, &scale_);
+
+        ImGui::InputFloat3("translate##input_translate", &trans_[0]);
+        ImGui::InputFloat3("rotate##input_rotate", &rotate_[0]);
+        ImGui::InputFloat("scale##input_scale", &scale_);
+    }
+
+    const Vec3f &GetTranslate() const noexcept { return trans_; }
+    const Vec3f &GetRotate() const noexcept { return rotate_; }
+    float GetScale() const noexcept { return scale_; }
+};

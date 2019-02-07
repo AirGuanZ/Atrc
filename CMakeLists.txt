@@ -79,12 +79,18 @@ FILE(GLOB_RECURSE LAUNCHER_SRC "Source/Atrc/Launcher/*.cpp" "Source/Atrc/Launche
 ADD_EXECUTABLE(Launcher ${LAUNCHER_SRC})
 TARGET_LINK_LIBRARIES(Launcher Lib Mgr)
 
-FILE(GLOB MODELVIEWER_SRC_OUTER			    "Source/Atrc/ModelViewer/*.cpp"					 "Source/Atrc/ModelViewer/*.h")
-FILE(GLOB MODELVIEWER_SRC_OBJECT_MANAGEMENT "Source/Atrc/ModelViewer/ObjectManagement/*.cpp" "Source/Atrc/ModelViewer/ObjectManagement/*.h")
-FILE(GLOB_RECURSE MODELVIEWER_SRC_MATERIAL  "Source/Atrc/ModelViewer/Material/*.cpp"		 "Source/Atrc/ModelViewer/Material/*.h")
-ADD_EXECUTABLE(ModelViewer ${MODELVIEWER_SRC_OUTER} ${MODELVIEWER_SRC_MATERIAL} ${MODELVIEWER_SRC_OBJECT_MANAGEMENT})
+FILE(GLOB MODELVIEWER_SRC_OUTER			      "Source/Atrc/ModelViewer/*.cpp"					 "Source/Atrc/ModelViewer/*.h")
+FILE(GLOB MODELVIEWER_SRC_RESOURCE_MANAGEMENT "Source/Atrc/ModelViewer/ResourceManagement/*.cpp" "Source/Atrc/ModelViewer/ResourceManagement/*.h")
+FILE(GLOB MODELVIEWER_SRC_SCENE_MANAGEMENT    "Source/Atrc/ModelViewer/SceneManagement/*.cpp"    "Source/Atrc/ModelViewer/SceneManagement/*.h")
+FILE(GLOB_RECURSE MODELVIEWER_SRC_MATERIAL    "Source/Atrc/ModelViewer/Material/*.cpp"		     "Source/Atrc/ModelViewer/Material/*.h")
+ADD_EXECUTABLE(ModelViewer
+	${MODELVIEWER_SRC_OUTER}
+	${MODELVIEWER_SRC_MATERIAL}
+	${MODELVIEWER_SRC_RESOURCE_MANAGEMENT}
+	${MODELVIEWER_SRC_SCENE_MANAGEMENT})
 SOURCE_GROUP("Material"         FILES ${MODELVIEWER_SRC_MATERIAL})
-SOURCE_GROUP("ObjectManagement" FILES ${MODELVIEWER_SRC_OBJECT_MANAGEMENT})
+SOURCE_GROUP("ResourceManagement" FILES ${MODELVIEWER_SRC_RESOURCE_MANAGEMENT})
+SOURCE_GROUP("SceneManagement"  FILES ${MODELVIEWER_SRC_SCENE_MANAGEMENT})
 SOURCE_GROUP(""					FILES ${MODELVIEWER_SRC_OUTER})
 
 TARGET_INCLUDE_DIRECTORIES(ModelViewer PRIVATE ${GLEW_INCLUDE_DIRS})

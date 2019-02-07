@@ -1,4 +1,4 @@
-#include <Atrc/ModelViewer/ObjectManagement/MaterialCreator.h>
+#include <Atrc/ModelViewer/ResourceManagement/MaterialCreator.h>
 
 namespace
 {
@@ -8,7 +8,7 @@ namespace
 
         using MaterialInstance::MaterialInstance;
 
-        void Display(ObjectManager&) override { }
+        void Display(ResourceManager&) override { }
     };
 
     class IdealDiffuseInstance : public MaterialInstance
@@ -19,11 +19,11 @@ namespace
 
         using MaterialInstance::MaterialInstance;
 
-        void Display(ObjectManager &objMgr) override
+        void Display(ResourceManager &rscMgr) override
         {
             if(ImGui::TreeNode("albedo"))
             {
-                albedo_.Display(objMgr);
+                albedo_.Display(rscMgr);
                 ImGui::TreePop();
             }
         }
@@ -38,16 +38,16 @@ namespace
 
         using MaterialInstance::MaterialInstance;
 
-        void Display(ObjectManager &objMgr) override
+        void Display(ResourceManager &rscMgr) override
         {
             if(ImGui::TreeNode("rc"))
             {
-                rc_.Display(objMgr);
+                rc_.Display(rscMgr);
                 ImGui::TreePop();
             }
             if(ImGui::TreeNode("fresnel"))
             {
-                fresnel_.Display(objMgr);
+                fresnel_.Display(rscMgr);
                 ImGui::TreePop();
             }
         }
@@ -62,16 +62,16 @@ namespace
 
         using MaterialInstance::MaterialInstance;
 
-        void Display(ObjectManager &objMgr) override
+        void Display(ResourceManager &rscMgr) override
         {
             if(ImGui::TreeNode("scale"))
             {
-                scale_.Display(objMgr);
+                scale_.Display(rscMgr);
                 ImGui::TreePop();
             }
             if(ImGui::TreeNode("internal"))
             {
-                internal_.Display(objMgr);
+                internal_.Display(rscMgr);
                 ImGui::TreePop();
             }
         }
@@ -86,16 +86,16 @@ namespace
 
         using MaterialInstance::MaterialInstance;
 
-        void Display(ObjectManager &objMgr) override
+        void Display(ResourceManager &rscMgr) override
         {
             if(ImGui::TreeNode("rc"))
             {
-                rc_.Display(objMgr);
+                rc_.Display(rscMgr);
                 ImGui::TreePop();
             }
             if(ImGui::TreeNode("dielectric"))
             {
-                dielectric_.Display(objMgr);
+                dielectric_.Display(rscMgr);
                 ImGui::TreePop();
             }
         }
@@ -107,7 +107,7 @@ namespace
 
         using MaterialInstance::MaterialInstance;
 
-        void Display(ObjectManager&) override { }
+        void Display(ResourceManager&) override { }
     };
 
     class NormalizedDiffusionBSSRDFInstance : public MaterialInstance
@@ -121,22 +121,22 @@ namespace
 
         using MaterialInstance::MaterialInstance;
 
-        void Display(ObjectManager &objMgr) override
+        void Display(ResourceManager &rscMgr) override
         {
             ImGui::InputFloat("eta", &eta_);
             if(ImGui::TreeNode("surface"))
             {
-                surface_.Display(objMgr);
+                surface_.Display(rscMgr);
                 ImGui::TreePop();
             }
             if(ImGui::TreeNode("A"))
             {
-                A_.Display(objMgr);
+                A_.Display(rscMgr);
                 ImGui::TreePop();
             }
             if(ImGui::TreeNode("dmfp"))
             {
-                dmfp_.Display(objMgr);
+                dmfp_.Display(rscMgr);
                 ImGui::TreePop();
             }
         }
@@ -151,16 +151,16 @@ namespace
 
         using MaterialInstance::MaterialInstance;
 
-        void Display(ObjectManager &objMgr) override
+        void Display(ResourceManager &rscMgr) override
         {
             if(ImGui::TreeNode("albedo"))
             {
-                albedo_.Display(objMgr);
+                albedo_.Display(rscMgr);
                 ImGui::TreePop();
             }
             if(ImGui::TreeNode("sigma"))
             {
-                sigma_.Display(objMgr);
+                sigma_.Display(rscMgr);
                 ImGui::TreePop();
             }
         }
@@ -176,28 +176,28 @@ namespace
 
         using MaterialInstance::MaterialInstance;
 
-        void Display(ObjectManager &objMgr) override
+        void Display(ResourceManager &rscMgr) override
         {
             if(ImGui::TreeNode("rc"))
             {
-                rc_.Display(objMgr);
+                rc_.Display(rscMgr);
                 ImGui::TreePop();
             }
             if(ImGui::TreeNode("roughness"))
             {
-                roughness_.Display(objMgr);
+                roughness_.Display(rscMgr);
                 ImGui::TreePop();
             }
             if(ImGui::TreeNode("fresnel"))
             {
-                fresnel_.Display(objMgr);
+                fresnel_.Display(rscMgr);
                 ImGui::TreePop();
             }
         }
     };
 }
 
-void RegisterMaterialCreators(ObjectManager &objMgr)
+void RegisterMaterialCreators(ResourceManager &rscMgr)
 {
     static const IdealBlackCreator iIdealBlackCreator;
     static const IdealDiffuseCreator iIdealDiffuseCreator;
@@ -208,15 +208,15 @@ void RegisterMaterialCreators(ObjectManager &objMgr)
     static const NormalizedDiffusionBSSRDFCreator iNormalizedDiffusionBSSRDFCreator;
     static const ONMatteCreator iONMatteCreator;
     static const TSMetalCreator iTSMetalCreator;
-    objMgr.AddCreator(&iIdealBlackCreator);
-    objMgr.AddCreator(&iIdealDiffuseCreator);
-    objMgr.AddCreator(&iIdealMirrorCreator);
-    objMgr.AddCreator(&iIdealScalerCreator);
-    objMgr.AddCreator(&iIdealSpecularCreator);
-    objMgr.AddCreator(&iInvisibleSurfaceCreator);
-    objMgr.AddCreator(&iNormalizedDiffusionBSSRDFCreator);
-    objMgr.AddCreator(&iONMatteCreator);
-    objMgr.AddCreator(&iTSMetalCreator);
+    rscMgr.AddCreator(&iIdealBlackCreator);
+    rscMgr.AddCreator(&iIdealDiffuseCreator);
+    rscMgr.AddCreator(&iIdealMirrorCreator);
+    rscMgr.AddCreator(&iIdealScalerCreator);
+    rscMgr.AddCreator(&iIdealSpecularCreator);
+    rscMgr.AddCreator(&iInvisibleSurfaceCreator);
+    rscMgr.AddCreator(&iNormalizedDiffusionBSSRDFCreator);
+    rscMgr.AddCreator(&iONMatteCreator);
+    rscMgr.AddCreator(&iTSMetalCreator);
 }
 
 std::shared_ptr<MaterialInstance> IdealBlackCreator::Create(std::string name) const

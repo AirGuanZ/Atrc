@@ -1,8 +1,8 @@
 #pragma once
 
-#include <Atrc/ModelViewer/ObjectManagement/ObjectManager.h>
+#include <Atrc/ModelViewer/ResourceManagement/ResourceManager.h>
 
-void RegisterTextureCreators(ObjectManager &objMgr);
+void RegisterTextureCreators(ResourceManager &rscMgr);
 
 class ConstantTextureCreator : public TextureCreator
 {

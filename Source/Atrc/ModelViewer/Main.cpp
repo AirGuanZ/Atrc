@@ -3,14 +3,14 @@
 #include <AGZUtils/Utils/Mesh.h>
 #include <AGZUtils/Utils/Texture.h>
 
-#include <Atrc/ModelViewer/ObjectManagement/ObjectManager.h>
+#include <Atrc/ModelViewer/ResourceManagement/ResourceManager.h>
 #include <Atrc/ModelViewer/Camera.h>
 #include <Atrc/ModelViewer/Console.h>
 #include <Atrc/ModelViewer/GL.h>
 #include <Atrc/ModelViewer/Global.h>
-#include <Atrc/ModelViewer/ModelManager.h>
 #include <Atrc/ModelViewer/ScreenAxis.h>
 #include <Atrc/ModelViewer/TransformController.h>
+#include "ResourceManagement/EntityCreator.h"
 
 using namespace std;
 
@@ -152,12 +152,11 @@ int Run(GLFWwindow *window)
 	Camera camera("default");
 
 	Console console;
-	ModelManager modelMgr;
 
     // Object Manager
 
-    ObjectManager objMgr;
-    RegisterObjectCreators(objMgr);
+    ResourceManager rscMgr;
+    RegisterResourceCreators(rscMgr);
 
     while(!glfwWindowShouldClose(window))
     {
@@ -213,13 +212,17 @@ int Run(GLFWwindow *window)
 
         // 场景管理器
 
-        if(ImGui::Begin("scene manager", nullptr, ImVec2(sceneManagerSizeX, sceneManagerSizeY)))
+        std::shared_ptr<EntityInstance> selectedEntity;
+        if(ImGui::Begin("scene manager", nullptr, ImVec2(sceneManagerSizeX, 0), -1,
+            ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoTitleBar))
         {
             if(ImGui::BeginTabBar("scene manager tab"))
             {
-                if(ImGui::BeginTabItem("model"))
+                if(ImGui::BeginTabItem("entity"))
                 {
-                    modelMgr.Display(console, camera);
+                    auto &pool = rscMgr.GetPool<EntityInstance>();
+                    pool.Display();
+                    selectedEntity = pool.GetSelectedInstance();
                     ImGui::EndTabItem();
                 }
                 if(ImGui::BeginTabItem("camera"))
@@ -236,24 +239,33 @@ int Run(GLFWwindow *window)
         // 材质、纹理等对象管理器
 
         ImGui::SetNextWindowPos(ImVec2(sceneManagerPosX, sceneManagerPosY + sceneManagerSizeY + 20), ImGuiCond_FirstUseEver);
-        if(ImGui::Begin("object", nullptr, ImVec2(sceneManagerSizeX, 0), -1, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysAutoResize))
+        if(ImGui::Begin("resource", nullptr, ImVec2(sceneManagerSizeX, 0), -1, 
+            ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysAutoResize))
         {
             if(ImGui::BeginTabBar("object tab"))
             {
                 if(ImGui::BeginTabItem("material"))
                 {
-                    auto &pool = objMgr.GetPool<MaterialInstance>();
+                    auto &pool = rscMgr.GetPool<MaterialInstance>();
                     pool.Display();
                     if(auto mat = pool.GetSelectedInstance())
-                        mat->Display(objMgr);
+                        mat->Display(rscMgr);
                     ImGui::EndTabItem();
                 }
                 if(ImGui::BeginTabItem("texture"))
                 {
-                    auto &pool = objMgr.GetPool<TextureInstance>();
+                    auto &pool = rscMgr.GetPool<TextureInstance>();
                     pool.Display();
                     if(auto tex = pool.GetSelectedInstance())
-                        tex->Display(objMgr);
+                        tex->Display(rscMgr);
+                    ImGui::EndTabItem();
+                }
+                if(ImGui::BeginTabItem("geometry"))
+                {
+                    auto &pool = rscMgr.GetPool<GeometryInstance>();
+                    pool.Display();
+                    if(auto data = pool.GetSelectedInstance())
+                        data->Display(rscMgr);
                     ImGui::EndTabItem();
                 }
                 ImGui::EndTabBar();
@@ -267,23 +279,13 @@ int Run(GLFWwindow *window)
 
         // 物体属性编辑
 
-        if(auto *model = modelMgr.GetSelectedModel())
+        if(selectedEntity)
         {
             ImGui::SetNextWindowPos(ImVec2(sceneManagerPosX + sceneManagerSizeX + 20, sceneManagerPosY), ImGuiCond_FirstUseEver);
             if(ImGui::Begin("model", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
             {
-                ImGui::PushID(0);
-                if(ImGui::CollapsingHeader("property", ImGuiTreeNodeFlags_DefaultOpen))
-                    model->DisplayProperty();
-                ImGui::PopID();
-                ImGui::PushID(1);
-                if(ImGui::CollapsingHeader("material", ImGuiTreeNodeFlags_DefaultOpen))
-                    model->DisplayMaterial(objMgr);
-                ImGui::PopID();
-                ImGui::PushID(1);
-                if(ImGui::CollapsingHeader("transform", ImGuiTreeNodeFlags_DefaultOpen))
-                    model->DisplayTransform(camera);
-                ImGui::PopID();
+                selectedEntity->Display(rscMgr);
+                selectedEntity->DisplayTransform(camera);
                 ImGui::End();
             }
         }
@@ -314,7 +316,10 @@ int Run(GLFWwindow *window)
 
         // 场景绘制
 
-        modelMgr.Render(camera);
+        BeginEntityRendering();
+        for(auto &ent : rscMgr.GetPool<EntityInstance>())
+            ent->Render(camera);
+        EndEntityRendering();
 
         // 把屏幕上的二维内容叠加到screen buffer上
 

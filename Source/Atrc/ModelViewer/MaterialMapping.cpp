@@ -1,6 +1,6 @@
 #include <Atrc/ModelViewer/MaterialMapping.h>
 
-void MaterialMappingSelector::Display(ObjectManager &objMgr)
+void MaterialMappingSelector::Display(ResourceManager &rscMgr)
 {
     static const std::string MAPPING_TYPES[] =
     {
@@ -32,10 +32,10 @@ void MaterialMappingSelector::Display(ObjectManager &objMgr)
     }
 
     if(mapping_)
-        mapping_->Display(objMgr);
+        mapping_->Display(rscMgr);
 }
 
-void SingleMaterialMapping::Display(ObjectManager &objMgr)
+void SingleMaterialMapping::Display(ResourceManager &rscMgr)
 {
-    slot_.Display(objMgr);
+    slot_.Display(rscMgr);
 }

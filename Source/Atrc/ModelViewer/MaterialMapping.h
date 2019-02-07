@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Atrc/ModelViewer/ObjectManagement/ObjectManager.h>
+#include <Atrc/ModelViewer/ResourceManagement/ResourceManager.h>
 
 class MaterialMapping
 {
@@ -8,7 +8,7 @@ public:
 
     virtual ~MaterialMapping() = default;
 
-    virtual void Display(ObjectManager &objMgr) = 0;
+    virtual void Display(ResourceManager &rscMgr) = 0;
 };
 
 class MaterialMappingSelector
@@ -18,7 +18,7 @@ class MaterialMappingSelector
 
 public:
 
-    void Display(ObjectManager &objMgr);
+    void Display(ResourceManager &rscMgr);
 };
 
 class SingleMaterialMapping : public MaterialMapping
@@ -27,5 +27,5 @@ class SingleMaterialMapping : public MaterialMapping
 
 public:
 
-    void Display(ObjectManager &objMgr) override;
+    void Display(ResourceManager &rscMgr) override;
 };

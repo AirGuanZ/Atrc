@@ -1,8 +1,8 @@
 #pragma once
 
-#include <Atrc/ModelViewer/ObjectManagement/ObjectManager.h>
+#include <Atrc/ModelViewer/ResourceManagement/ResourceManager.h>
 
-void RegisterMaterialCreators(ObjectManager &objMgr);
+void RegisterMaterialCreators(ResourceManager &rscMgr);
 
 class IdealBlackCreator : public MaterialCreator
 {

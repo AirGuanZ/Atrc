@@ -1,4 +1,4 @@
-#include <Atrc/ModelViewer/ObjectManagement/TextureCreator.h>
+#include <Atrc/ModelViewer/ResourceManagement/TextureCreator.h>
 #include <Atrc/ModelViewer/FileBrowser.h>
 
 namespace
@@ -11,7 +11,7 @@ namespace
 
         using TextureInstance::TextureInstance;
 
-        void Display([[maybe_unused]] ObjectManager &objMgr) override
+        void Display([[maybe_unused]] ResourceManager &rscMgr) override
         {
             ImGui::ColorEdit3("texel", &texel_[0]);
         }
@@ -25,7 +25,7 @@ namespace
 
         using TextureInstance::TextureInstance;
 
-        void Display([[maybe_unused]] ObjectManager &objMgr) override
+        void Display([[maybe_unused]] ResourceManager &rscMgr) override
         {
             static FileBrowser fileBrowser;
             
@@ -50,12 +50,12 @@ namespace
     };
 }
 
-void RegisterTextureCreators(ObjectManager &objMgr)
+void RegisterTextureCreators(ResourceManager &rscMgr)
 {
     static const ConstantTextureCreator iConstantTextureCreator;
     static const ImageTextureCreator iImageTextureCreator;
-    objMgr.AddCreator(&iConstantTextureCreator);
-    objMgr.AddCreator(&iImageTextureCreator);
+    rscMgr.AddCreator(&iConstantTextureCreator);
+    rscMgr.AddCreator(&iImageTextureCreator);
 }
 
 std::shared_ptr<TextureInstance> ConstantTextureCreator::Create(std::string name) const
