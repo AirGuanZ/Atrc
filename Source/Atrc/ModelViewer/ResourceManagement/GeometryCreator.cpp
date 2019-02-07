@@ -70,17 +70,7 @@ namespace
 
         void Display(ResourceManager&) override
         {
-            static FileBrowser fileBrowser;
-            static bool setFileBrowser = true;
-
-            if(setFileBrowser)
-            {
-                fileBrowser.SetLabel("file browser");
-                fileBrowser.SetTarget(false);
-                fileBrowser.SetCurrentDirectory();
-                setFileBrowser = false;
-            }
-
+            static FileBrowser fileBrowser("browse .obj", false, "");
             if(filename_.Display(fileBrowser))
                 LoadWavefrontOBJ(fileBrowser.GetResult());
         }

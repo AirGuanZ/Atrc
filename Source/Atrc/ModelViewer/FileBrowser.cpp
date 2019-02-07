@@ -1,5 +1,12 @@
 ﻿#include <Atrc/ModelViewer/FileBrowser.h>
 
+FileBrowser::FileBrowser(std::string label, bool selectDirectory, std::string_view currentDirectory)
+{
+    SetLabel(std::move(label));
+    SetTarget(selectDirectory);
+    SetCurrentDirectory(currentDirectory);
+}
+
 void FileBrowser::SetLabel(std::string label)
 {
     label_ = std::move(label);

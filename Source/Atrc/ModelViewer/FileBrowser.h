@@ -8,6 +8,10 @@ class FileBrowser
 {
 public:
 
+    FileBrowser() = default;
+
+    FileBrowser(std::string label, bool selectDirectory, std::string_view currentDirectory);
+
     void SetLabel(std::string label);
 
     void SetTarget(bool selectDirectory);

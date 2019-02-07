@@ -1,5 +1,5 @@
 #include <Atrc/ModelViewer/ResourceManagement/TextureCreator.h>
-#include <Atrc/ModelViewer/FileBrowser.h>
+#include <Atrc/ModelViewer/FilenameSlot.h>
 
 namespace
 {
@@ -19,7 +19,7 @@ namespace
 
     class ImageTextureInstance : public TextureInstance
     {
-        std::string filename_;
+        TFilenameSlot<true> filenameSlot_;
         
     public:
 
@@ -27,25 +27,8 @@ namespace
 
         void Display([[maybe_unused]] ResourceManager &rscMgr) override
         {
-            static FileBrowser fileBrowser;
-            
-            if(ImGui::Button("browse"))
-            {
-                ImGui::OpenPopup("browse image texture");
-                fileBrowser.SetLabel("browse image texture");
-                fileBrowser.SetCurrentDirectory();
-                fileBrowser.SetTarget(false);
-            }
-
-            ImGui::SameLine();
-
-            ImGui::BeginChild("", ImVec2(0, ImGui::GetTextLineHeight()));
-            ImGui::Text("%s", filename_.c_str());
-            ImGui::ShowTooltipForLastItem(filename_.c_str());
-            ImGui::EndChild();
-
-            if(fileBrowser.Display())
-                filename_ = fileBrowser.GetResult();
+            static FileBrowser fileBrowser("browse image filename", false, "");
+            filenameSlot_.Display(fileBrowser);
         }
     };
 }
