@@ -16,10 +16,20 @@ namespace
             ImGui::InputFloat3("etaT", &etaT_[0]);
             ImGui::InputFloat3("k", &k_[0]);
         }
+
+        void Export(std::stringstream &sst, const ResourceManager &rscMgr, ExportingContext &ctx) const override
+        {
+            sst << ctx.Indent() << "type = Conductor;\n";
+            sst << ctx.Indent() << "etaI = " << AGZ::To<char>(etaI_) << ";\n";
+            sst << ctx.Indent() << "etaT = " << AGZ::To<char>(etaT_) << ";\n";
+            sst << ctx.Indent() << "k = " << AGZ::To<char>(k_) << ";\n";
+        }
     };
 
     class FresnelDielectricInstance : public FresnelInstance
     {
+    protected:
+
         float etaI_ = 0, etaT_ = 0;
 
     public:
@@ -31,6 +41,13 @@ namespace
             ImGui::InputFloat("etaI", &etaI_);
             ImGui::InputFloat("etaT", &etaT_);
         }
+
+        void Export(std::stringstream &sst, const ResourceManager &rscMgr, ExportingContext &ctx) const override
+        {
+            sst << ctx.Indent() << "type = Dielectric;\n";
+            sst << ctx.Indent() << "etaI = " << AGZ::To<char>(etaI_) << ";\n";
+            sst << ctx.Indent() << "etaT = " << AGZ::To<char>(etaT_) << ";\n";
+        }
     };
 
     class FresnelSchlickInstance : public FresnelDielectricInstance
@@ -38,6 +55,13 @@ namespace
     public:
 
         using FresnelDielectricInstance::FresnelDielectricInstance;
+
+        void Export(std::stringstream &sst, const ResourceManager &rscMgr, ExportingContext &ctx) const override
+        {
+            sst << ctx.Indent() << "type = Schlick;\n";
+            sst << ctx.Indent() << "etaI = " << AGZ::To<char>(etaI_) << ";\n";
+            sst << ctx.Indent() << "etaT = " << AGZ::To<char>(etaT_) << ";\n";
+        }
     };
 }
 

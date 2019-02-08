@@ -9,6 +9,11 @@ namespace
         using MaterialInstance::MaterialInstance;
 
         void Display(ResourceManager&) override { }
+
+        void Export(std::stringstream &sst, const ResourceManager&, ExportingContext &ctx) const override
+        {
+            sst << AGZ::TFormatter<char>("{}type = IdealBlack;\n").Arg(ctx.Indent());
+        }
     };
 
     class IdealDiffuseInstance : public MaterialInstance
@@ -26,6 +31,12 @@ namespace
                 albedo_.Display(rscMgr);
                 ImGui::TreePop();
             }
+        }
+
+        void Export(std::stringstream &sst, const ResourceManager &rscMgr, ExportingContext &ctx) const override
+        {
+            sst << ctx.Indent() << "type = IdealDiffuse;\n";
+            ExportSubResource("albedo", sst, rscMgr, ctx, albedo_);
         }
     };
 
@@ -51,6 +62,13 @@ namespace
                 ImGui::TreePop();
             }
         }
+
+        void Export(std::stringstream &sst, const ResourceManager &rscMgr, ExportingContext &ctx) const override
+        {
+            sst << ctx.Indent() << "type = IdealMirror;\n";
+            ExportSubResource("rc", sst, rscMgr, ctx, rc_);
+            ExportSubResource("fresnel", sst, rscMgr, ctx, fresnel_);
+        }
     };
 
     class IdealScalerInstance : public MaterialInstance
@@ -74,6 +92,13 @@ namespace
                 internal_.Display(rscMgr);
                 ImGui::TreePop();
             }
+        }
+
+        void Export(std::stringstream &sst, const ResourceManager &rscMgr, ExportingContext &ctx) const override
+        {
+            sst << ctx.Indent() << "type = IdealScaler;\n";
+            ExportSubResource("scale", sst, rscMgr, ctx, scale_);
+            ExportSubResource("internal", sst, rscMgr, ctx, internal_);
         }
     };
 
@@ -99,6 +124,13 @@ namespace
                 ImGui::TreePop();
             }
         }
+
+        void Export(std::stringstream &sst, const ResourceManager &rscMgr, ExportingContext &ctx) const override
+        {
+            sst << ctx.Indent() << "type = IdealSpecular;\n";
+            ExportSubResource("rc", sst, rscMgr, ctx, rc_);
+            ExportSubResource("fresnel", sst, rscMgr, ctx, dielectric_);
+        }
     };
 
     class InvisibleSurfaceInstance : public MaterialInstance
@@ -108,6 +140,11 @@ namespace
         using MaterialInstance::MaterialInstance;
 
         void Display(ResourceManager&) override { }
+
+        void Export(std::stringstream &sst, const ResourceManager &rscMgr, ExportingContext &ctx) const override
+        {
+            sst << ctx.Indent() << "type = Invisible;\n";
+        }
     };
 
     class NormalizedDiffusionBSSRDFInstance : public MaterialInstance
@@ -140,6 +177,15 @@ namespace
                 ImGui::TreePop();
             }
         }
+
+        void Export(std::stringstream &sst, const ResourceManager &rscMgr, ExportingContext &ctx) const override
+        {
+            sst << ctx.Indent() << "type = BSSRDF;\n";
+            ExportSubResource("surface", sst, rscMgr, ctx, surface_);
+            ExportSubResource("A", sst, rscMgr, ctx, A_);
+            ExportSubResource("dmfp", sst, rscMgr, ctx, dmfp_);
+            sst << ctx.Indent() << AGZ::TFormatter<char>("eta = {};\n").Arg(eta_);
+        }
     };
 
     class ONMatteInstance : public MaterialInstance
@@ -163,6 +209,13 @@ namespace
                 sigma_.Display(rscMgr);
                 ImGui::TreePop();
             }
+        }
+
+        void Export(std::stringstream &sst, const ResourceManager &rscMgr, ExportingContext &ctx) const override
+        {
+            sst << ctx.Indent() << "type = ONMatte;\n";
+            ExportSubResource("albedo", sst, rscMgr, ctx, albedo_);
+            ExportSubResource("sigma", sst, rscMgr, ctx, sigma_);
         }
     };
 
@@ -193,6 +246,14 @@ namespace
                 fresnel_.Display(rscMgr);
                 ImGui::TreePop();
             }
+        }
+
+        void Export(std::stringstream &sst, const ResourceManager &rscMgr, ExportingContext &ctx) const override
+        {
+            sst << ctx.Indent() << "type = TSMetal;\n";
+            ExportSubResource("rc", sst, rscMgr, ctx, rc_);
+            ExportSubResource("roughness", sst, rscMgr, ctx, roughness_);
+            ExportSubResource("fresnel", sst, rscMgr, ctx, fresnel_);
         }
     };
 }

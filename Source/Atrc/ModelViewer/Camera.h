@@ -44,6 +44,13 @@ public:
 
     const std::string &GetName() const noexcept { return name_; }
 
+    const Vec3f &GetPosition() const noexcept { return viewData_.pos; }
+    const Vec3f &GetLookAt() const noexcept { return viewData_.lookAt; }
+
+    float GetProjWidth() const noexcept { return projData_.w; }
+    float GetProjHeight() const noexcept { return projData_.h; }
+    Deg GetProjFOVy() const noexcept { return projData_.FOVy; }
+
 private:
 
     Vec3f GetDirection() const;

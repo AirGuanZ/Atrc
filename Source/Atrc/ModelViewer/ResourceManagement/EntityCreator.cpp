@@ -73,11 +73,11 @@ namespace
 
     class TransformedGeometricEntityBase : public EntityInstance
     {
+    protected:
+
         Vec3f renderColor_ = Vec3f(0.5f);
         GeometrySlot geometry_;
         Transform transform_;
-
-    protected:
 
         void DisplayRenderProperty()
         {
@@ -151,11 +151,20 @@ namespace
                 ImGui::TreePop();
             }
         }
+
+        void Export(std::stringstream &sst, const ResourceManager &rscMgr, ExportingContext &ctx) const override
+        {
+            sst << ctx.Indent() << "type = GeometricDiffuse;\n";
+            ctx.entityTransform = &transform_;
+            ExportSubResource("geometry", sst, rscMgr, ctx, geometry_);
+            ctx.entityTransform = nullptr;
+            sst << ctx.Indent() << "radiance = " << AGZ::To<char>(radiance_) << ";\n";
+        }
     };
 
     class GeometricEntityInstance : public TransformedGeometricEntityBase
     {
-        MaterialMappingSelector material_;
+        SingleMaterialMapping material_;
 
     public:
 
@@ -174,6 +183,15 @@ namespace
                 material_.Display(rscMgr);
                 ImGui::TreePop();
             }
+        }
+
+        void Export(std::stringstream &sst, const ResourceManager &rscMgr, ExportingContext &ctx) const override
+        {
+            sst << ctx.Indent() << "type = Geometric;\n";
+            ctx.entityTransform = &transform_;
+            ExportSubResource("geometry", sst, rscMgr, ctx, geometry_);
+            ctx.entityTransform = nullptr;
+            ExportSubResource("material", sst, rscMgr, ctx, material_);
         }
     };
 }

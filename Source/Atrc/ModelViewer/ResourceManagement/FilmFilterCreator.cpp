@@ -4,8 +4,7 @@ namespace
 {
     class BoxFilterInstance : public FilmFilterInstance
     {
-        float radiusX_ = 0.5f;
-        float radiusY_ = 0.5f;
+        float sidelen_ = 1;
 
     public:
 
@@ -13,15 +12,19 @@ namespace
 
         void Display(ResourceManager&) override
         {
-            ImGui::InputFloat("radius.x", &radiusX_);
-            ImGui::InputFloat("radius.y", &radiusY_);
+            ImGui::InputFloat("sidelen", &sidelen_);
+        }
+
+        void Export(std::stringstream &sst, const ResourceManager &rscMgr, ExportingContext &ctx) const override
+        {
+            sst << ctx.Indent() << "type = Box;\n";
+            sst << ctx.Indent() << "sidelen = " << std::to_string(sidelen_) << ";\n";
         }
     };
 
     class GaussianFilterInstance : public FilmFilterInstance
     {
-        float radiusX_ = 0.7f;
-        float radiusY_ = 0.7f;
+        float radius_ = 0.7f;
         float alpha_ = 2;
 
     public:
@@ -30,9 +33,15 @@ namespace
 
         void Display(ResourceManager&) override
         {
-            ImGui::InputFloat("radius.x", &radiusX_);
-            ImGui::InputFloat("radius.y", &radiusY_);
+            ImGui::InputFloat("radius.x", &radius_);
             ImGui::InputFloat("alpha", &alpha_);
+        }
+
+        void Export(std::stringstream &sst, const ResourceManager &rscMgr, ExportingContext &ctx) const override
+        {
+            sst << ctx.Indent() << "type = Box;\n";
+            sst << ctx.Indent() << "radius = " << std::to_string(radius_) << ";\n";
+            sst << ctx.Indent() << "alpha = " << std::to_string(alpha_) << ";\n";
         }
     };
 }

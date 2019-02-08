@@ -19,6 +19,14 @@ namespace
                 ImGui::InputInt("seed", &seed_);
             ImGui::InputInt("spp", &spp_);
         }
+
+        void Export(std::stringstream &sst, const ResourceManager &rscMgr, ExportingContext &ctx) const override
+        {
+            sst << AGZ::TFormatter<char>("{}type = Native;\n").Arg(ctx.Indent());
+            sst << AGZ::TFormatter<char>("{}spp = {};\n").Arg(spp_);
+            if(hasSeed_)
+                sst << AGZ::TFormatter<char>("{}seed = {};\n").Arg(seed_);
+        }
     };
 }
 

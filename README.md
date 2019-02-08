@@ -25,7 +25,7 @@ Lib已/将实现以下特性：
 
 ModelViewer还在前期施工中，截图如下：
 
-![SS0](./Diary/Misc/2019_02_06_ModelViewer.png)
+![SS0](./Diary/Misc/2019_02_08_ModelViewer.png)
 
 ## Build
 

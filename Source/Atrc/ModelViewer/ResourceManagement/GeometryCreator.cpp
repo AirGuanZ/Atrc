@@ -82,6 +82,22 @@ namespace
                 [](auto &it) { return it.first; });
             return ret;
         }
+
+        void Export(std::stringstream &sst, const ResourceManager &rscMgr, ExportingContext &ctx) const override
+        {
+            sst << ctx.Indent() << "type = TriangleBVH;\n";
+            sst << ctx.Indent() << "filename = " << filename_.GetExportedFilename(ctx) << ";\n";
+            AGZ_ASSERT(ctx.entityTransform);
+            sst << ctx.Indent() << "transform = (\n";
+            ++ctx.indent;
+            sst << ctx.Indent() << "Translate" << AGZ::To<char>(ctx.entityTransform->GetTranslate()) << ",\n";
+            sst << ctx.Indent() << "RotateX(Deg(" << std::to_string(ctx.entityTransform->GetRotate().x) << ")),\n";
+            sst << ctx.Indent() << "RotateY(Deg(" << std::to_string(ctx.entityTransform->GetRotate().y) << ")),\n";
+            sst << ctx.Indent() << "RotateZ(Deg(" << std::to_string(ctx.entityTransform->GetRotate().z) << ")),\n";
+            sst << ctx.Indent() << "Scale(" << std::to_string(ctx.entityTransform->GetScale()) << ")\n";
+            --ctx.indent;
+            sst << ctx.Indent() << ");\n";
+        }
     };
 }
 

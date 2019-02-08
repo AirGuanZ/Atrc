@@ -8,6 +8,7 @@
 #include <AGZUtils/Utils/Misc.h>
 
 #include <Atrc/ModelViewer/Camera.h>
+#include <Atrc/ModelViewer/ExportingContext.h>
 #include <Atrc/ModelViewer/GL.h>
 
 /**
@@ -18,11 +19,26 @@
  * InstancePool持有一组Instance
  */
 
+class ExportingContext;
 class ResourceManager;
 
 class IResource : public AGZ::Uncopiable
 {
     std::string instanceName_;
+
+protected:
+
+    template<typename TSubResource>
+    void ExportSubResource(
+        std::string_view left, std::stringstream &sst, const ResourceManager &rscMgr, ExportingContext &ctx,
+        const TSubResource &subrsc) const
+    {
+        sst << ctx.Indent() << left << " = {\n";
+        ++ctx.indent;
+        subrsc.Export(sst, rscMgr, ctx);
+        --ctx.indent;
+        sst << ctx.Indent() << "};\n";
+    }
 
 public:
 
@@ -40,6 +56,8 @@ public:
     }
 
     virtual void Display(ResourceManager &rscMgr) = 0;
+
+    virtual void Export(std::stringstream &sst, const ResourceManager &rscMgr, ExportingContext &ctx) const = 0;
 };
 
 template<typename TResource>
@@ -171,6 +189,11 @@ public:
         return selectedInstance_;
     }
 
+    bool Find(std::shared_ptr<TResource> rsc) const
+    {
+        return std::find(std::begin(instances_), std::end(instances_), rsc) != std::end(instances_);
+    }
+
     void Display()
     {
         creatorSelector_.Display("type");
@@ -295,7 +318,16 @@ public:
     {
         return _creatorMgr<TResource>();
     }
+
+    template<typename TResource>
+    bool FindInPool(std::shared_ptr<TResource> rsc) const
+    {
+        return _pool<TResource>().Find(rsc);
+    }
 };
+
+class CameraInstance : public IResource { public: using IResource::IResource; };
+using CameraCreator = TResourceCreator<CameraInstance>;
 
 class EntityInstance : public IResource
 {
@@ -308,15 +340,12 @@ public:
     virtual void DisplayTransform(const Camera &camera) = 0;
 };
 using EntityCreator = TResourceCreator<EntityInstance>;
-using EntityCreatorSelector = TResourceCreatorSelector<EntityInstance>;
 
 class FilmFilterInstance : public IResource { using IResource::IResource; };
 using FilmFilterCreator = TResourceCreator<FilmFilterInstance>;
-using FilmFilterCreatorSelector = TResourceCreatorSelector<FilmFilterInstance>;
 
 class FresnelInstance : public IResource { public: using IResource::IResource; };
 using FresnelCreator = TResourceCreator<FresnelInstance>;
-using FresnelCreatorSelector = TResourceCreatorSelector<FresnelInstance>;
 
 class GeometryInstance : public IResource
 {
@@ -335,26 +364,34 @@ public:
     virtual std::vector<std::string> GetSubmeshNames() const = 0;
 };
 using GeometryCreator = TResourceCreator<GeometryInstance>;
-using GeometryCreatorSelector = TResourceCreatorSelector<GeometryInstance>;
+
+class LightInstance : public IResource { public: using IResource::IResource; };
+using LightCreator = TResourceCreator<LightInstance>;
 
 class MaterialInstance : public IResource { public: using IResource::IResource; };
 using MaterialCreator = TResourceCreator<MaterialInstance>;
-using MaterialCreatorSelector = TResourceCreatorSelector<MaterialInstance>;
+
+class PathTracingIntegratorInstance : public IResource { public: using IResource::IResource; };
+using PathTracingIntegratorCreator = TResourceCreator<PathTracingIntegratorInstance>;
+
+class RendererInstance : public IResource { public: using IResource::IResource; };
+using RendererCreator = TResourceCreator<RendererInstance>;
 
 class SamplerInstance : public IResource { public: using IResource::IResource; };
 using SamplerCreator = TResourceCreator<SamplerInstance>;
-using SamplerCreatorSelector = TResourceCreatorSelector<SamplerInstance>;
 
 class TextureInstance : public IResource { public: using IResource::IResource; };
 using TextureCreator = TResourceCreator<TextureInstance>;
-using TextureCreatorSelector = TResourceCreatorSelector<TextureInstance>;
 
 class ResourceManager : public TResourceManager<
+    TResourceRegister<CameraInstance, false>,
     TResourceRegister<EntityInstance, true>,
     TResourceRegister<FilmFilterInstance, false>,
     TResourceRegister<FresnelInstance, false>,
     TResourceRegister<MaterialInstance, true>,
     TResourceRegister<GeometryInstance, true>,
+    TResourceRegister<PathTracingIntegratorInstance, false>,
+    TResourceRegister<RendererInstance, false>,
     TResourceRegister<SamplerInstance, false>,
     TResourceRegister<TextureInstance, true>>
 {
@@ -444,14 +481,24 @@ public:
         if(instance_)
             instance_->Display(rscMgr);
     }
+
+    void Export(std::stringstream &sst, const ResourceManager &rscMgr, ExportingContext &ctx) const
+    {
+        if(!instance_)
+            throw std::runtime_error("empty resource instance");
+        instance_->Export(sst, rscMgr, ctx);
+    }
 };
 
-using EntitySlot     = TResourceSlot<EntityInstance,     true,  false>;
-using FilmFilterSlot = TResourceSlot<FilmFilterInstance, false, true>;
-using FresnelSlot    = TResourceSlot<FresnelInstance,    false, true>;
-using GeometrySlot   = TResourceSlot<GeometryInstance,   true,  true>;
-using MaterialSlot   = TResourceSlot<MaterialInstance,   true,  true>;
-using SamplerSlot = TResourceSlot<SamplerInstance,       false, true>;
-using TextureSlot    = TResourceSlot<TextureInstance,    true,  true>;
+using CameraSlot                = TResourceSlot<CameraInstance,                false, true>;
+using EntitySlot                = TResourceSlot<EntityInstance,                true,  false>;
+using FilmFilterSlot            = TResourceSlot<FilmFilterInstance,            false, true>;
+using FresnelSlot               = TResourceSlot<FresnelInstance,               false, true>;
+using GeometrySlot              = TResourceSlot<GeometryInstance,              true,  true>;
+using MaterialSlot              = TResourceSlot<MaterialInstance,              true,  true>;
+using PathTracingIntegratorSlot = TResourceSlot<PathTracingIntegratorInstance, false, true>;
+using RendererSlot              = TResourceSlot<RendererInstance,              false, true>;
+using SamplerSlot               = TResourceSlot<SamplerInstance,               false, true>;
+using TextureSlot               = TResourceSlot<TextureInstance,               true,  true>;
 
 void RegisterResourceCreators(ResourceManager &rscMgr);

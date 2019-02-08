@@ -2,30 +2,19 @@
 
 #include <Atrc/ModelViewer/ResourceManagement/ResourceManager.h>
 
-class MaterialMapping
-{
-public:
-
-    virtual ~MaterialMapping() = default;
-
-    virtual void Display(ResourceManager &rscMgr) = 0;
-};
-
-class MaterialMappingSelector
-{
-    std::unique_ptr<MaterialMapping> mapping_;
-    const std::string *curMappingTypeName_ = nullptr;
-
-public:
-
-    void Display(ResourceManager &rscMgr);
-};
-
-class SingleMaterialMapping : public MaterialMapping
+class SingleMaterialMapping
 {
     MaterialSlot slot_;
 
 public:
 
-    void Display(ResourceManager &rscMgr) override;
+    void Display(ResourceManager &rscMgr)
+    {
+        slot_.Display(rscMgr);
+    }
+
+    void Export(std::stringstream &sst, const ResourceManager &rscMgr, ExportingContext &ctx) const
+    {
+        slot_.Export(sst, rscMgr, ctx);
+    }
 };

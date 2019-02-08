@@ -11,6 +11,7 @@
 #include <Atrc/ModelViewer/Global.h>
 #include <Atrc/ModelViewer/ScreenAxis.h>
 #include <Atrc/ModelViewer/TransformController.h>
+#include "FilenameSlot.h"
 
 using namespace std;
 
@@ -162,9 +163,19 @@ int Run(GLFWwindow *window)
 
     // global setting
 
-    Vec2f filmSize = { 640, 480 };
+    Vec2i filmSize = { 640, 480 };
     FilmFilterSlot filmFilterSlot;
     SamplerSlot samplerSlot;
+    RendererSlot rendererSlot;
+    CameraSlot cameraSlot;
+
+    char outputFilenameBuf[512] = "$Output.png";
+
+    TFilenameSlot<false, FilenameMode::Absolute> scriptSlot;
+    FileBrowser scriptBrowser("script", true, "");
+
+    TFilenameSlot<false, FilenameMode::RelativeToScript> workspaceSlot;
+    FileBrowser workspaceBrowser("workspace", true, "");
 
     while(!glfwWindowShouldClose(window))
     {
@@ -189,6 +200,18 @@ int Run(GLFWwindow *window)
         {
             if(ImGui::BeginMenu("file"))
             {
+                if(ImGui::MenuItem("export"))
+                {
+                    ExportingContext ctx;
+                    ctx.activeCamera = &camera;
+                    ctx.entityTransform = nullptr;
+                    ctx.indent = 0;
+                    ctx.scriptDirectory = scriptSlot.GetExportedFilename(ctx);
+                    ctx.workspaceDirectory = scriptSlot.GetExportedFilename(ctx);
+                    std::stringstream sst;
+                    rendererSlot.Export(sst, rscMgr, ctx);
+                    std::cout << sst.str();
+                }
                 if(ImGui::MenuItem("exit"))
                     glfwSetWindowShouldClose(window, GLFW_TRUE);
                 ImGui::EndMenu();
@@ -208,25 +231,43 @@ int Run(GLFWwindow *window)
         if(openGlobalSettingWindow)
         {
             ImGui::OpenPopup("global setting");
-            ImGui::SetNextWindowSize(ImVec2(600, 400), ImGuiCond_FirstUseEver);
+            ImGui::SetNextWindowSize(ImVec2(600, 800), ImGuiCond_FirstUseEver);
         }
         if(ImGui::BeginPopupModal("global setting", nullptr))
         {
             AGZ::ScopeGuard popupExitGuard([] { ImGui::EndPopup(); });
 
-            ImGui::InputFloat2("film size", &filmSize[0]);
+            ImGui::Text("script directory"); ImGui::SameLine();
+            scriptSlot.Display(scriptBrowser);
 
-            ImGui::SetNextTreeNodeOpen(true, ImGuiCond_FirstUseEver);
-            if(ImGui::TreeNode("film filter"))
+            ImGui::Text("workspace"); ImGui::SameLine();
+            workspaceSlot.Display(workspaceBrowser);
+
+            ImGui::InputText("output filename", outputFilenameBuf, AGZ::ArraySize(outputFilenameBuf));
+
+            ImGui::InputInt2("film size", &filmSize[0]);
+
+            if(ImGui::TreeNodeEx("film filter", ImGuiTreeNodeFlags_DefaultOpen))
             {
                 filmFilterSlot.Display(rscMgr);
                 ImGui::TreePop();
             }
 
-            ImGui::SetNextTreeNodeOpen(true, ImGuiCond_FirstUseEver);
-            if(ImGui::TreeNode("sampler"))
+            if(ImGui::TreeNodeEx("camera", ImGuiTreeNodeFlags_DefaultOpen))
+            {
+                cameraSlot.Display(rscMgr);
+                ImGui::TreePop();
+            }
+
+            if(ImGui::TreeNodeEx("sampler", ImGuiTreeNodeFlags_DefaultOpen))
             {
                 samplerSlot.Display(rscMgr);
+                ImGui::TreePop();
+            }
+
+            if(ImGui::TreeNodeEx("renderer", ImGuiTreeNodeFlags_DefaultOpen))
+            {
+                rendererSlot.Display(rscMgr);
                 ImGui::TreePop();
             }
 

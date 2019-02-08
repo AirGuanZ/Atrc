@@ -1,5 +1,8 @@
 #pragma once
 
+#include <filesystem>
+
+#include <Atrc/ModelViewer/ExportingContext.h>
 #include <Atrc/ModelViewer/FileBrowser.h>
 
 enum class FilenameMode
@@ -38,7 +41,7 @@ public:
     {
         bool ret = false;
 
-        ImGui::BeginChild("", ImVec2(0, ImGui::GetTextLineHeight()));
+        ImGui::BeginChild(fileBrowser.GetLabel().c_str(), ImVec2(0, ImGui::GetTextLineHeight()));
 
         auto curModeIcon = Mode2Icon(outputMode_);
 
@@ -107,5 +110,21 @@ public:
     const std::string &GetFilename() const noexcept
     {
         return filename_;
+    }
+
+    std::string GetExportedFilename(const ExportingContext &ctx) const
+    {
+        using std::filesystem::path;
+        switch(outputMode_)
+        {
+        case FilenameMode::RelativeToWorkspace:
+            return relative(path(filename_), path(ctx.workspaceDirectory)).string();
+        case FilenameMode::RelativeToScript:
+            return relative(path(filename_), path(ctx.scriptDirectory)).string();
+        case FilenameMode::RelativeToCurrentDirectory:
+            return relative(path(filename_)).string();
+        default:
+            return absolute(path(filename_)).string();
+        }
     }
 };
