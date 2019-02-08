@@ -152,7 +152,7 @@ namespace
             }
         }
 
-        void Export(const ResourceManager &rscMgr, ExportingContext &ctx) const override
+        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
         {
             ctx.AddLine("type = GeometricDiffuse;");
             ctx.entityTransform = &transform_;
@@ -185,7 +185,7 @@ namespace
             }
         }
 
-        void Export(const ResourceManager &rscMgr, ExportingContext &ctx) const override
+        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
         {
             ctx.AddLine("type = Geometric;");
             ctx.entityTransform = &transform_;

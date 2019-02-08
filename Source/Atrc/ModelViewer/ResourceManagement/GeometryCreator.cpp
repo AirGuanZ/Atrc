@@ -83,7 +83,7 @@ namespace
             return ret;
         }
 
-        void Export(const ResourceManager &rscMgr, ExportingContext &ctx) const override
+        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
         {
             ctx.AddLine("type = TriangleBVH;");
             ctx.AddLine("filename = ", filename_.GetExportedFilename(ctx), ";");

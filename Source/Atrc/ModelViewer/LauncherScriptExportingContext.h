@@ -5,12 +5,19 @@
 #include <Atrc/ModelViewer/Camera.h>
 #include <Atrc/ModelViewer/TransformController.h>
 
+class CameraInstance;
+class FilmFilterInstance;
+class RendererInstance;
+class SamplerInstance;
+
 class LauncherScriptExportingContext
 {
     size_t indent_;
     std::string indentStr_;
 
     std::stringstream sst_;
+
+    void AddLineAux() const { }
 
     template<typename TStr>
     void AddLineAux(TStr &&str)
@@ -28,14 +35,37 @@ class LauncherScriptExportingContext
 public:
 
     const Camera * const activeCamera;
+
+    const CameraInstance * const camera;
+    const FilmFilterInstance * const filmFilter;
+    const RendererInstance * const renderer;
+    const SamplerInstance * const sampler;
+
     const std::string workspaceDirectory;
     const std::string scriptDirectory;
+    const std::string outputFilename;
+
+    Vec2i outputFilmSize;
 
     const Transform *entityTransform;
 
-    LauncherScriptExportingContext(const Camera *activeCamera, std::string workspace, std::string scriptDir)
+    LauncherScriptExportingContext(
+        const Camera *activeCamera,
+        const CameraInstance *camera,
+        const FilmFilterInstance *filmFilter,
+        const RendererInstance *renderer,
+        const SamplerInstance *sampler,
+        std::string workspace, std::string scriptDir, std::string outputFilename,
+        const Vec2i &outputFilmSize)
         : indent_(0),
-          activeCamera(activeCamera), workspaceDirectory(std::move(workspace)), scriptDirectory(std::move(scriptDir)),
+          activeCamera(activeCamera),
+          camera(camera),
+          filmFilter(filmFilter),
+          renderer(renderer),
+          sampler(sampler),
+          workspaceDirectory(std::move(workspace)), scriptDirectory(std::move(scriptDir)),
+          outputFilename(std::move(outputFilename)),
+          outputFilmSize(outputFilmSize),
           entityTransform(nullptr)
     {
         AGZ_ASSERT(activeCamera);
@@ -62,5 +92,10 @@ public:
         sst_ << indentStr_;
         AddLineAux(std::forward<TStrs>(strs)...);
         sst_ << std::endl;
+    }
+
+    void ClearString()
+    {
+        sst_.str("");
     }
 };

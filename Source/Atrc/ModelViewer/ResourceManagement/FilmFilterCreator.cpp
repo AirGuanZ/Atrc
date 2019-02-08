@@ -15,7 +15,7 @@ namespace
             ImGui::InputFloat("sidelen", &sidelen_);
         }
 
-        void Export(const ResourceManager &rscMgr, ExportingContext &ctx) const override
+        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
         {
             ctx.AddLine("type = Box;");
             ctx.AddLine("sidelen = ", sidelen_, ";");
@@ -37,7 +37,7 @@ namespace
             ImGui::InputFloat("alpha", &alpha_);
         }
 
-        void Export(const ResourceManager &rscMgr, ExportingContext &ctx) const override
+        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
         {
             ctx.AddLine("type = Box;");
             ctx.AddLine("radius = ", std::to_string(radius_), ";");

@@ -14,8 +14,8 @@ namespace
 
         void Display(ResourceManager &rscMgr) override
         {
-            ImGui::InputInt("worker count", &workerCount_);
-            ImGui::InputInt("task size", &taskGridSize_);
+            ImGui::InputInt("worker count", &workerCount_, 0);
+            ImGui::InputInt("task size", &taskGridSize_, 0);
             if(ImGui::TreeNodeEx("integrator", ImGuiTreeNodeFlags_DefaultOpen))
             {
                 integratorSlot_.Display(rscMgr);
@@ -23,7 +23,7 @@ namespace
             }
         }
 
-        void Export(const ResourceManager &rscMgr, ExportingContext &ctx) const override
+        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
         {
             ctx.AddLine("type = PathTracing;");
             ExportSubResource("integrator", rscMgr, ctx, integratorSlot_);

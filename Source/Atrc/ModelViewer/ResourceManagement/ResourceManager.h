@@ -8,7 +8,7 @@
 #include <AGZUtils/Utils/Misc.h>
 
 #include <Atrc/ModelViewer/Camera.h>
-#include <Atrc/ModelViewer/ExportingContext.h>
+#include <Atrc/ModelViewer/LauncherScriptExportingContext.h>
 #include <Atrc/ModelViewer/GL.h>
 
 /**
@@ -19,19 +19,19 @@
  * InstancePool持有一组Instance
  */
 
-class ExportingContext;
+class LauncherScriptExportingContext;
 class ResourceManager;
 
 class IResource : public AGZ::Uncopiable
 {
     std::string instanceName_;
 
-protected:
+public:
 
     template<typename TSubResource>
-    void ExportSubResource(
-        std::string left, const ResourceManager &rscMgr, ExportingContext &ctx,
-        const TSubResource &subrsc) const
+    static void ExportSubResource(
+        std::string left, const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx,
+        const TSubResource &subrsc)
     {
         ctx.AddLine(std::move(left) + " = {");
         ctx.IncIndent();
@@ -39,8 +39,6 @@ protected:
         ctx.DecIndent();
         ctx.AddLine("};");
     }
-
-public:
 
     explicit IResource(std::string name) noexcept
         : instanceName_(std::move(name))
@@ -57,7 +55,7 @@ public:
 
     virtual void Display(ResourceManager &rscMgr) = 0;
 
-    virtual void Export(const ResourceManager &rscMgr, ExportingContext &ctx) const = 0;
+    virtual void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const = 0;
 };
 
 template<typename TResource>
@@ -482,7 +480,7 @@ public:
             instance_->Display(rscMgr);
     }
 
-    void Export(const ResourceManager &rscMgr, ExportingContext &ctx) const
+    void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const
     {
         if(!instance_)
             throw std::runtime_error("empty resource instance");

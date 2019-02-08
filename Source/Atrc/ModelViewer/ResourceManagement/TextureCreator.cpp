@@ -18,7 +18,7 @@ namespace
             ImGui::ColorEdit3("texel", &texel_[0]);
         }
 
-        void Export(const ResourceManager&, ExportingContext &ctx) const override
+        void Export(const ResourceManager&, LauncherScriptExportingContext &ctx) const override
         {
             ctx.AddLine("type = Constant;");
             ctx.AddLine("texel = ", AGZ::To<char>(texel_), ";");
@@ -39,7 +39,7 @@ namespace
             filenameSlot_.Display(fileBrowser);
         }
 
-        void Export(const ResourceManager &rscMgr, ExportingContext &ctx) const override
+        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
         {
             ctx.AddLine("type = Image;");
             ctx.AddLine("filename = ", filenameSlot_.GetExportedFilename(ctx), ";");

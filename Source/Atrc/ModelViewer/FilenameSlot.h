@@ -2,7 +2,7 @@
 
 #include <filesystem>
 
-#include <Atrc/ModelViewer/ExportingContext.h>
+#include <Atrc/ModelViewer/LauncherScriptExportingContext.h>
 #include <Atrc/ModelViewer/FileBrowser.h>
 
 enum class FilenameMode
@@ -118,7 +118,7 @@ public:
         switch(outputMode_)
         {
         case FilenameMode::RelativeToWorkspace:
-            return relative(path(filename_), path(workspaceDir)).string();
+            return relative(path(filename_), (path(scriptDir) / path(workspaceDir))).string();
         case FilenameMode::RelativeToScript:
             return relative(path(filename_), path(scriptDir)).string();
         case FilenameMode::RelativeToCurrentDirectory:
@@ -128,7 +128,7 @@ public:
         }
     }
 
-    std::string GetExportedFilename(const ExportingContext &ctx) const
+    std::string GetExportedFilename(const LauncherScriptExportingContext &ctx) const
     {
         return GetExportedFilename(ctx.workspaceDirectory, ctx.scriptDirectory);
     }

@@ -16,11 +16,11 @@ namespace
         {
             ImGui::Checkbox("with seed", &hasSeed_);
             if(hasSeed_)
-                ImGui::InputInt("seed", &seed_);
-            ImGui::InputInt("spp", &spp_);
+                ImGui::InputInt("seed", &seed_, 0);
+            ImGui::InputInt("spp", &spp_, 0);
         }
 
-        void Export(const ResourceManager &rscMgr, ExportingContext &ctx) const override
+        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
         {
             ctx.AddLine("type = Native;");
             ctx.AddLine("spp = ", spp_, ";");

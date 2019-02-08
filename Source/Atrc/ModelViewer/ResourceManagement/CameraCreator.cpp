@@ -15,7 +15,7 @@ namespace
             ImGui::InputFloat("sensor width", &sensorWidth_);
         }
 
-        void Export(const ResourceManager &rscMgr, ExportingContext &ctx) const override
+        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
         {
             auto cam = ctx.activeCamera;
             ctx.AddLine("type = Pinhole;");

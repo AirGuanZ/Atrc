@@ -7,11 +7,12 @@
 #include <Atrc/ModelViewer/ResourceManagement/ResourceManager.h>
 #include <Atrc/ModelViewer/Camera.h>
 #include <Atrc/ModelViewer/Console.h>
+#include <Atrc/ModelViewer/FilenameSlot.h>
 #include <Atrc/ModelViewer/GL.h>
 #include <Atrc/ModelViewer/Global.h>
+#include <Atrc/ModelViewer/LauncherScriptExporter.h>
 #include <Atrc/ModelViewer/ScreenAxis.h>
 #include <Atrc/ModelViewer/TransformController.h>
-#include "FilenameSlot.h"
 
 using namespace std;
 
@@ -204,9 +205,18 @@ int Run(GLFWwindow *window)
                 {
                     std::string scriptDir = scriptSlot.GetExportedFilename("", "");
                     std::string workspaceDir = workspaceSlot.GetExportedFilename("", scriptDir);
-                    ExportingContext ctx(&camera, workspaceDir, scriptDir);
-                    rendererSlot.Export(rscMgr, ctx);
-                    std::cout << ctx.GetString();
+                    LauncherScriptExportingContext ctx(
+                        &camera,
+                        cameraSlot.GetInstance().get(),
+                        filmFilterSlot.GetInstance().get(),
+                        rendererSlot.GetInstance().get(),
+                        samplerSlot.GetInstance().get(),
+                        workspaceDir,
+                        scriptDir,
+                        outputFilenameBuf,
+                        filmSize);
+                    LauncherScriptExporter exporter(rscMgr, ctx);
+                    std::cout << exporter.Export();
                 }
                 if(ImGui::MenuItem("exit"))
                     glfwSetWindowShouldClose(window, GLFW_TRUE);

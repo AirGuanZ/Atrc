@@ -10,7 +10,7 @@ namespace
 
         void Display(ResourceManager&) override { }
 
-        void Export(const ResourceManager&, ExportingContext &ctx) const override
+        void Export(const ResourceManager&, LauncherScriptExportingContext &ctx) const override
         {
             ctx.AddLine("type = IdealBlack;");
         }
@@ -33,7 +33,7 @@ namespace
             }
         }
 
-        void Export(const ResourceManager &rscMgr, ExportingContext &ctx) const override
+        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
         {
             ctx.AddLine("type = IdealDiffuse;");
             ExportSubResource("albedo", rscMgr, ctx, albedo_);
@@ -63,7 +63,7 @@ namespace
             }
         }
 
-        void Export(const ResourceManager &rscMgr, ExportingContext &ctx) const override
+        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
         {
             ctx.AddLine("type = IdealMirror;");
             ExportSubResource("rc", rscMgr, ctx, rc_);
@@ -94,7 +94,7 @@ namespace
             }
         }
 
-        void Export(const ResourceManager &rscMgr, ExportingContext &ctx) const override
+        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
         {
             ctx.AddLine("type = IdealScaler;");
             ExportSubResource("scale", rscMgr, ctx, scale_);
@@ -125,7 +125,7 @@ namespace
             }
         }
 
-        void Export(const ResourceManager &rscMgr, ExportingContext &ctx) const override
+        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
         {
             ctx.AddLine("type = IdealSpecular;");
             ExportSubResource("rc", rscMgr, ctx, rc_);
@@ -141,7 +141,7 @@ namespace
 
         void Display(ResourceManager&) override { }
 
-        void Export(const ResourceManager &rscMgr, ExportingContext &ctx) const override
+        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
         {
             ctx.AddLine("type = Invisible;");
         }
@@ -178,7 +178,7 @@ namespace
             }
         }
 
-        void Export(const ResourceManager &rscMgr, ExportingContext &ctx) const override
+        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
         {
             ctx.AddLine("type = BSSRDF;");
             ExportSubResource("surface", rscMgr, ctx, surface_);
@@ -211,7 +211,7 @@ namespace
             }
         }
 
-        void Export(const ResourceManager &rscMgr, ExportingContext &ctx) const override
+        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
         {
             ctx.AddLine("type = ONMatte;");
             ExportSubResource("albedo", rscMgr, ctx, albedo_);
@@ -248,7 +248,7 @@ namespace
             }
         }
 
-        void Export(const ResourceManager &rscMgr, ExportingContext &ctx) const override
+        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
         {
             ctx.AddLine("type = TSMetal;");
             ExportSubResource("rc", rscMgr, ctx, rc_);

@@ -15,13 +15,13 @@ namespace
 
         void Display(ResourceManager&) override
         {
-            ImGui::InputInt("min depth", &minDepth_);
-            ImGui::InputInt("max depth", &maxDepth_);
+            ImGui::InputInt("min depth", &minDepth_, 0);
+            ImGui::InputInt("max depth", &maxDepth_, 0);
             ImGui::InputFloat("cont prob", &contProb_);
             ImGui::Checkbox("sample all lights", &sampleAllLights_);
         }
 
-        void Export(const ResourceManager &rscMgr, ExportingContext &ctx) const override
+        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
         {
             ctx.AddLine("type = Full;");
             ctx.AddLine("minDepth = ", minDepth_, ";");

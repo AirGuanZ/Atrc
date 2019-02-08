@@ -17,7 +17,7 @@ namespace
             ImGui::InputFloat3("k", &k_[0]);
         }
 
-        void Export(const ResourceManager &rscMgr, ExportingContext &ctx) const override
+        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
         {
             ctx.AddLine("type = Conductor;");
             ctx.AddLine("etaI = ", AGZ::To<char>(etaI_), ";");
@@ -42,7 +42,7 @@ namespace
             ImGui::InputFloat("etaT", &etaT_);
         }
 
-        void Export(const ResourceManager &rscMgr, ExportingContext &ctx) const override
+        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
         {
             ctx.AddLine("type = Dielectric;");
             ctx.AddLine("etaI = ", std::to_string(etaI_), ";");
@@ -56,7 +56,7 @@ namespace
 
         using FresnelDielectricInstance::FresnelDielectricInstance;
 
-        void Export(const ResourceManager &rscMgr, ExportingContext &ctx) const override
+        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
         {
             ctx.AddLine("type = Schlick;");
             ctx.AddLine("etaI = ", std::to_string(etaI_), ";");

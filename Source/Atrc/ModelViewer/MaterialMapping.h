@@ -13,7 +13,7 @@ public:
         slot_.Display(rscMgr);
     }
 
-    void Export(const ResourceManager &rscMgr, ExportingContext &ctx) const
+    void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const
     {
         slot_.Export(rscMgr, ctx);
     }
