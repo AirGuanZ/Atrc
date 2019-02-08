@@ -21,13 +21,13 @@ namespace
             ImGui::Checkbox("sample all lights", &sampleAllLights_);
         }
 
-        void Export(std::stringstream &sst, const ResourceManager &rscMgr, ExportingContext &ctx) const override
+        void Export(const ResourceManager &rscMgr, ExportingContext &ctx) const override
         {
-            sst << AGZ::TFormatter<char>("{}type = Full;\n").Arg(ctx.Indent());
-            sst << AGZ::TFormatter<char>("{}minDepth = {};\n").Arg(ctx.Indent(), minDepth_);
-            sst << AGZ::TFormatter<char>("{}maxDepth = {};\n").Arg(ctx.Indent(), maxDepth_);
-            sst << AGZ::TFormatter<char>("{}contProb = {};\n").Arg(ctx.Indent(), contProb_);
-            sst << AGZ::TFormatter<char>("{}sampleAllLights = {};\n").Arg(ctx.Indent(), sampleAllLights_ ? "True" : "False");
+            ctx.AddLine("type = Full;");
+            ctx.AddLine("minDepth = ", minDepth_, ";");
+            ctx.AddLine("maxDepth = ", maxDepth_, ";");
+            ctx.AddLine("contProb = ", contProb_, ";");
+            ctx.AddLine("sampleAllLights = ", sampleAllLights_ ? "True" : "False", ";");
         }
     };
 }

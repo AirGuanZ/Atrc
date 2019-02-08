@@ -152,13 +152,13 @@ namespace
             }
         }
 
-        void Export(std::stringstream &sst, const ResourceManager &rscMgr, ExportingContext &ctx) const override
+        void Export(const ResourceManager &rscMgr, ExportingContext &ctx) const override
         {
-            sst << ctx.Indent() << "type = GeometricDiffuse;\n";
+            ctx.AddLine("type = GeometricDiffuse;");
             ctx.entityTransform = &transform_;
-            ExportSubResource("geometry", sst, rscMgr, ctx, geometry_);
+            ExportSubResource("geometry", rscMgr, ctx, geometry_);
             ctx.entityTransform = nullptr;
-            sst << ctx.Indent() << "radiance = " << AGZ::To<char>(radiance_) << ";\n";
+            ctx.AddLine("radiance = ", AGZ::To<char>(radiance_), ";");
         }
     };
 
@@ -185,13 +185,13 @@ namespace
             }
         }
 
-        void Export(std::stringstream &sst, const ResourceManager &rscMgr, ExportingContext &ctx) const override
+        void Export(const ResourceManager &rscMgr, ExportingContext &ctx) const override
         {
-            sst << ctx.Indent() << "type = Geometric;\n";
+            ctx.AddLine("type = Geometric;");
             ctx.entityTransform = &transform_;
-            ExportSubResource("geometry", sst, rscMgr, ctx, geometry_);
+            ExportSubResource("geometry", rscMgr, ctx, geometry_);
             ctx.entityTransform = nullptr;
-            ExportSubResource("material", sst, rscMgr, ctx, material_);
+            ExportSubResource("material", rscMgr, ctx, material_);
         }
     };
 }

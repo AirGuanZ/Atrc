@@ -10,9 +10,9 @@ namespace
 
         void Display(ResourceManager&) override { }
 
-        void Export(std::stringstream &sst, const ResourceManager&, ExportingContext &ctx) const override
+        void Export(const ResourceManager&, ExportingContext &ctx) const override
         {
-            sst << AGZ::TFormatter<char>("{}type = IdealBlack;\n").Arg(ctx.Indent());
+            ctx.AddLine("type = IdealBlack;");
         }
     };
 
@@ -33,10 +33,10 @@ namespace
             }
         }
 
-        void Export(std::stringstream &sst, const ResourceManager &rscMgr, ExportingContext &ctx) const override
+        void Export(const ResourceManager &rscMgr, ExportingContext &ctx) const override
         {
-            sst << ctx.Indent() << "type = IdealDiffuse;\n";
-            ExportSubResource("albedo", sst, rscMgr, ctx, albedo_);
+            ctx.AddLine("type = IdealDiffuse;");
+            ExportSubResource("albedo", rscMgr, ctx, albedo_);
         }
     };
 
@@ -63,11 +63,11 @@ namespace
             }
         }
 
-        void Export(std::stringstream &sst, const ResourceManager &rscMgr, ExportingContext &ctx) const override
+        void Export(const ResourceManager &rscMgr, ExportingContext &ctx) const override
         {
-            sst << ctx.Indent() << "type = IdealMirror;\n";
-            ExportSubResource("rc", sst, rscMgr, ctx, rc_);
-            ExportSubResource("fresnel", sst, rscMgr, ctx, fresnel_);
+            ctx.AddLine("type = IdealMirror;");
+            ExportSubResource("rc", rscMgr, ctx, rc_);
+            ExportSubResource("fresnel", rscMgr, ctx, fresnel_);
         }
     };
 
@@ -94,11 +94,11 @@ namespace
             }
         }
 
-        void Export(std::stringstream &sst, const ResourceManager &rscMgr, ExportingContext &ctx) const override
+        void Export(const ResourceManager &rscMgr, ExportingContext &ctx) const override
         {
-            sst << ctx.Indent() << "type = IdealScaler;\n";
-            ExportSubResource("scale", sst, rscMgr, ctx, scale_);
-            ExportSubResource("internal", sst, rscMgr, ctx, internal_);
+            ctx.AddLine("type = IdealScaler;");
+            ExportSubResource("scale", rscMgr, ctx, scale_);
+            ExportSubResource("internal", rscMgr, ctx, internal_);
         }
     };
 
@@ -125,11 +125,11 @@ namespace
             }
         }
 
-        void Export(std::stringstream &sst, const ResourceManager &rscMgr, ExportingContext &ctx) const override
+        void Export(const ResourceManager &rscMgr, ExportingContext &ctx) const override
         {
-            sst << ctx.Indent() << "type = IdealSpecular;\n";
-            ExportSubResource("rc", sst, rscMgr, ctx, rc_);
-            ExportSubResource("fresnel", sst, rscMgr, ctx, dielectric_);
+            ctx.AddLine("type = IdealSpecular;");
+            ExportSubResource("rc", rscMgr, ctx, rc_);
+            ExportSubResource("fresnel", rscMgr, ctx, dielectric_);
         }
     };
 
@@ -141,9 +141,9 @@ namespace
 
         void Display(ResourceManager&) override { }
 
-        void Export(std::stringstream &sst, const ResourceManager &rscMgr, ExportingContext &ctx) const override
+        void Export(const ResourceManager &rscMgr, ExportingContext &ctx) const override
         {
-            sst << ctx.Indent() << "type = Invisible;\n";
+            ctx.AddLine("type = Invisible;");
         }
     };
 
@@ -178,13 +178,13 @@ namespace
             }
         }
 
-        void Export(std::stringstream &sst, const ResourceManager &rscMgr, ExportingContext &ctx) const override
+        void Export(const ResourceManager &rscMgr, ExportingContext &ctx) const override
         {
-            sst << ctx.Indent() << "type = BSSRDF;\n";
-            ExportSubResource("surface", sst, rscMgr, ctx, surface_);
-            ExportSubResource("A", sst, rscMgr, ctx, A_);
-            ExportSubResource("dmfp", sst, rscMgr, ctx, dmfp_);
-            sst << ctx.Indent() << AGZ::TFormatter<char>("eta = {};\n").Arg(eta_);
+            ctx.AddLine("type = BSSRDF;");
+            ExportSubResource("surface", rscMgr, ctx, surface_);
+            ExportSubResource("A", rscMgr, ctx, A_);
+            ExportSubResource("dmfp", rscMgr, ctx, dmfp_);
+            ctx.AddLine("eta = ", std::to_string(eta_), ";");
         }
     };
 
@@ -211,11 +211,11 @@ namespace
             }
         }
 
-        void Export(std::stringstream &sst, const ResourceManager &rscMgr, ExportingContext &ctx) const override
+        void Export(const ResourceManager &rscMgr, ExportingContext &ctx) const override
         {
-            sst << ctx.Indent() << "type = ONMatte;\n";
-            ExportSubResource("albedo", sst, rscMgr, ctx, albedo_);
-            ExportSubResource("sigma", sst, rscMgr, ctx, sigma_);
+            ctx.AddLine("type = ONMatte;");
+            ExportSubResource("albedo", rscMgr, ctx, albedo_);
+            ExportSubResource("sigma", rscMgr, ctx, sigma_);
         }
     };
 
@@ -248,12 +248,12 @@ namespace
             }
         }
 
-        void Export(std::stringstream &sst, const ResourceManager &rscMgr, ExportingContext &ctx) const override
+        void Export(const ResourceManager &rscMgr, ExportingContext &ctx) const override
         {
-            sst << ctx.Indent() << "type = TSMetal;\n";
-            ExportSubResource("rc", sst, rscMgr, ctx, rc_);
-            ExportSubResource("roughness", sst, rscMgr, ctx, roughness_);
-            ExportSubResource("fresnel", sst, rscMgr, ctx, fresnel_);
+            ctx.AddLine("type = TSMetal;");
+            ExportSubResource("rc", rscMgr, ctx, rc_);
+            ExportSubResource("roughness", rscMgr, ctx, roughness_);
+            ExportSubResource("fresnel", rscMgr, ctx, fresnel_);
         }
     };
 }

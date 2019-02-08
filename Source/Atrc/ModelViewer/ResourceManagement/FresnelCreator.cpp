@@ -17,12 +17,12 @@ namespace
             ImGui::InputFloat3("k", &k_[0]);
         }
 
-        void Export(std::stringstream &sst, const ResourceManager &rscMgr, ExportingContext &ctx) const override
+        void Export(const ResourceManager &rscMgr, ExportingContext &ctx) const override
         {
-            sst << ctx.Indent() << "type = Conductor;\n";
-            sst << ctx.Indent() << "etaI = " << AGZ::To<char>(etaI_) << ";\n";
-            sst << ctx.Indent() << "etaT = " << AGZ::To<char>(etaT_) << ";\n";
-            sst << ctx.Indent() << "k = " << AGZ::To<char>(k_) << ";\n";
+            ctx.AddLine("type = Conductor;");
+            ctx.AddLine("etaI = ", AGZ::To<char>(etaI_), ";");
+            ctx.AddLine("etaT = ", AGZ::To<char>(etaT_), ";");
+            ctx.AddLine("k = ", AGZ::To<char>(k_), ";");
         }
     };
 
@@ -42,11 +42,11 @@ namespace
             ImGui::InputFloat("etaT", &etaT_);
         }
 
-        void Export(std::stringstream &sst, const ResourceManager &rscMgr, ExportingContext &ctx) const override
+        void Export(const ResourceManager &rscMgr, ExportingContext &ctx) const override
         {
-            sst << ctx.Indent() << "type = Dielectric;\n";
-            sst << ctx.Indent() << "etaI = " << AGZ::To<char>(etaI_) << ";\n";
-            sst << ctx.Indent() << "etaT = " << AGZ::To<char>(etaT_) << ";\n";
+            ctx.AddLine("type = Dielectric;");
+            ctx.AddLine("etaI = ", std::to_string(etaI_), ";");
+            ctx.AddLine("etaT = ", std::to_string(etaT_), ";");
         }
     };
 
@@ -56,11 +56,11 @@ namespace
 
         using FresnelDielectricInstance::FresnelDielectricInstance;
 
-        void Export(std::stringstream &sst, const ResourceManager &rscMgr, ExportingContext &ctx) const override
+        void Export(const ResourceManager &rscMgr, ExportingContext &ctx) const override
         {
-            sst << ctx.Indent() << "type = Schlick;\n";
-            sst << ctx.Indent() << "etaI = " << AGZ::To<char>(etaI_) << ";\n";
-            sst << ctx.Indent() << "etaT = " << AGZ::To<char>(etaT_) << ";\n";
+            ctx.AddLine("type = Schlick;");
+            ctx.AddLine("etaI = ", std::to_string(etaI_), ";");
+            ctx.AddLine("etaT = ", std::to_string(etaT_), ";");
         }
     };
 }

@@ -112,19 +112,24 @@ public:
         return filename_;
     }
 
-    std::string GetExportedFilename(const ExportingContext &ctx) const
+    std::string GetExportedFilename(std::string_view workspaceDir, std::string_view scriptDir) const
     {
         using std::filesystem::path;
         switch(outputMode_)
         {
         case FilenameMode::RelativeToWorkspace:
-            return relative(path(filename_), path(ctx.workspaceDirectory)).string();
+            return relative(path(filename_), path(workspaceDir)).string();
         case FilenameMode::RelativeToScript:
-            return relative(path(filename_), path(ctx.scriptDirectory)).string();
+            return relative(path(filename_), path(scriptDir)).string();
         case FilenameMode::RelativeToCurrentDirectory:
             return relative(path(filename_)).string();
         default:
             return absolute(path(filename_)).string();
         }
+    }
+
+    std::string GetExportedFilename(const ExportingContext &ctx) const
+    {
+        return GetExportedFilename(ctx.workspaceDirectory, ctx.scriptDirectory);
     }
 };

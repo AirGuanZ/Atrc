@@ -13,8 +13,8 @@ public:
         slot_.Display(rscMgr);
     }
 
-    void Export(std::stringstream &sst, const ResourceManager &rscMgr, ExportingContext &ctx) const
+    void Export(const ResourceManager &rscMgr, ExportingContext &ctx) const
     {
-        slot_.Export(sst, rscMgr, ctx);
+        slot_.Export(rscMgr, ctx);
     }
 };

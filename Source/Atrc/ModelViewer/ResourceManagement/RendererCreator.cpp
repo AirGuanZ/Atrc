@@ -23,12 +23,12 @@ namespace
             }
         }
 
-        void Export(std::stringstream &sst, const ResourceManager &rscMgr, ExportingContext &ctx) const override
+        void Export(const ResourceManager &rscMgr, ExportingContext &ctx) const override
         {
-            sst << ctx.Indent() << "type = PathTracing;\n";
-            ExportSubResource("integrator", sst, rscMgr, ctx, integratorSlot_);
-            sst << AGZ::TFormatter<char>("{}workerCount = {};\n").Arg(ctx.Indent(), workerCount_);
-            sst << AGZ::TFormatter<char>("{}taskGridSize = {};\n").Arg(ctx.Indent(), taskGridSize_);
+            ctx.AddLine("type = PathTracing;");
+            ExportSubResource("integrator", rscMgr, ctx, integratorSlot_);
+            ctx.AddLine("workerCount = ", workerCount_, ";");
+            ctx.AddLine("taskGridSize = ", taskGridSize_, ";");
         }
     };
 }

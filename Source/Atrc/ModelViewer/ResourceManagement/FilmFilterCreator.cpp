@@ -15,10 +15,10 @@ namespace
             ImGui::InputFloat("sidelen", &sidelen_);
         }
 
-        void Export(std::stringstream &sst, const ResourceManager &rscMgr, ExportingContext &ctx) const override
+        void Export(const ResourceManager &rscMgr, ExportingContext &ctx) const override
         {
-            sst << ctx.Indent() << "type = Box;\n";
-            sst << ctx.Indent() << "sidelen = " << std::to_string(sidelen_) << ";\n";
+            ctx.AddLine("type = Box;");
+            ctx.AddLine("sidelen = ", sidelen_, ";");
         }
     };
 
@@ -37,11 +37,11 @@ namespace
             ImGui::InputFloat("alpha", &alpha_);
         }
 
-        void Export(std::stringstream &sst, const ResourceManager &rscMgr, ExportingContext &ctx) const override
+        void Export(const ResourceManager &rscMgr, ExportingContext &ctx) const override
         {
-            sst << ctx.Indent() << "type = Box;\n";
-            sst << ctx.Indent() << "radius = " << std::to_string(radius_) << ";\n";
-            sst << ctx.Indent() << "alpha = " << std::to_string(alpha_) << ";\n";
+            ctx.AddLine("type = Box;");
+            ctx.AddLine("radius = ", std::to_string(radius_), ";");
+            ctx.AddLine("alpha = ", std::to_string(alpha_), ";");
         }
     };
 }

@@ -18,10 +18,10 @@ namespace
             ImGui::ColorEdit3("texel", &texel_[0]);
         }
 
-        void Export(std::stringstream &sst, const ResourceManager&, ExportingContext &ctx) const override
+        void Export(const ResourceManager&, ExportingContext &ctx) const override
         {
-            sst << ctx.Indent() << "type = Constant;" << std::endl;
-            sst << ctx.Indent() << "texel = " << AGZ::To<char>(texel_) << ";" << std::endl;
+            ctx.AddLine("type = Constant;");
+            ctx.AddLine("texel = ", AGZ::To<char>(texel_), ";");
         }
     };
 
@@ -39,10 +39,10 @@ namespace
             filenameSlot_.Display(fileBrowser);
         }
 
-        void Export(std::stringstream &sst, const ResourceManager &rscMgr, ExportingContext &ctx) const override
+        void Export(const ResourceManager &rscMgr, ExportingContext &ctx) const override
         {
-            sst << ctx.Indent() << "type = image;\n";
-            sst << AGZ::TFormatter<char>("{}filename = {};\n").Arg(ctx.Indent(), filenameSlot_.GetExportedFilename(ctx));
+            ctx.AddLine("type = Image;");
+            ctx.AddLine("filename = ", filenameSlot_.GetExportedFilename(ctx), ";");
         }
     };
 }

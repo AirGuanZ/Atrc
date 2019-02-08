@@ -30,14 +30,14 @@ protected:
 
     template<typename TSubResource>
     void ExportSubResource(
-        std::string_view left, std::stringstream &sst, const ResourceManager &rscMgr, ExportingContext &ctx,
+        std::string left, const ResourceManager &rscMgr, ExportingContext &ctx,
         const TSubResource &subrsc) const
     {
-        sst << ctx.Indent() << left << " = {\n";
-        ++ctx.indent;
-        subrsc.Export(sst, rscMgr, ctx);
-        --ctx.indent;
-        sst << ctx.Indent() << "};\n";
+        ctx.AddLine(std::move(left) + " = {");
+        ctx.IncIndent();
+        subrsc.Export(rscMgr, ctx);
+        ctx.DecIndent();
+        ctx.AddLine("};");
     }
 
 public:
@@ -57,7 +57,7 @@ public:
 
     virtual void Display(ResourceManager &rscMgr) = 0;
 
-    virtual void Export(std::stringstream &sst, const ResourceManager &rscMgr, ExportingContext &ctx) const = 0;
+    virtual void Export(const ResourceManager &rscMgr, ExportingContext &ctx) const = 0;
 };
 
 template<typename TResource>
@@ -482,11 +482,11 @@ public:
             instance_->Display(rscMgr);
     }
 
-    void Export(std::stringstream &sst, const ResourceManager &rscMgr, ExportingContext &ctx) const
+    void Export(const ResourceManager &rscMgr, ExportingContext &ctx) const
     {
         if(!instance_)
             throw std::runtime_error("empty resource instance");
-        instance_->Export(sst, rscMgr, ctx);
+        instance_->Export(rscMgr, ctx);
     }
 };
 

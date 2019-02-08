@@ -15,15 +15,16 @@ namespace
             ImGui::InputFloat("sensor width", &sensorWidth_);
         }
 
-        void Export(std::stringstream &sst, const ResourceManager &rscMgr, ExportingContext &ctx) const override
+        void Export(const ResourceManager &rscMgr, ExportingContext &ctx) const override
         {
             auto cam = ctx.activeCamera;
-            sst << ctx.Indent() << "type = Pinhole;\n";
-            sst << ctx.Indent() << "sensorWidth = " << sensorWidth_ << ";\n";
-            sst << ctx.Indent() << "sensorDistance = " << sensorWidth_ * cam->GetProjHeight() / cam->GetProjWidth() * Tan(cam->GetProjFOVy() * 0.5f) << ";\n";
-            sst << ctx.Indent() << "pos = " << AGZ::To<char>(cam->GetPosition()) << ";\n";
-            sst << ctx.Indent() << "lookAt = " << AGZ::To<char>(cam->GetLookAt()) << ";\n";
-            sst << ctx.Indent() << "up = (0, 0, 1);\n";
+            ctx.AddLine("type = Pinhole;");
+            ctx.AddLine("sensorWidth = ", std::to_string(sensorWidth_), ";");
+            ctx.AddLine("sensorDistance = ", 
+                std::to_string(sensorWidth_ * cam->GetProjHeight() / cam->GetProjWidth() * Tan(cam->GetProjFOVy() * 0.5f)), ";");
+            ctx.AddLine("pos = ", AGZ::To<char>(cam->GetPosition()), ";");
+            ctx.AddLine("lookAt = ", AGZ::To<char>(cam->GetLookAt()), ";");
+            ctx.AddLine("up = (0, 1, 0);");
         }
     };
 }

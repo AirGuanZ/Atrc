@@ -202,15 +202,11 @@ int Run(GLFWwindow *window)
             {
                 if(ImGui::MenuItem("export"))
                 {
-                    ExportingContext ctx;
-                    ctx.activeCamera = &camera;
-                    ctx.entityTransform = nullptr;
-                    ctx.indent = 0;
-                    ctx.scriptDirectory = scriptSlot.GetExportedFilename(ctx);
-                    ctx.workspaceDirectory = scriptSlot.GetExportedFilename(ctx);
-                    std::stringstream sst;
-                    rendererSlot.Export(sst, rscMgr, ctx);
-                    std::cout << sst.str();
+                    std::string scriptDir = scriptSlot.GetExportedFilename("", "");
+                    std::string workspaceDir = workspaceSlot.GetExportedFilename("", scriptDir);
+                    ExportingContext ctx(&camera, workspaceDir, scriptDir);
+                    rendererSlot.Export(rscMgr, ctx);
+                    std::cout << ctx.GetString();
                 }
                 if(ImGui::MenuItem("exit"))
                     glfwSetWindowShouldClose(window, GLFW_TRUE);

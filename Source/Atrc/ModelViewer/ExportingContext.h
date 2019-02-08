@@ -1,27 +1,66 @@
 #pragma once
 
+#include <sstream>
+
 #include <Atrc/ModelViewer/Camera.h>
 #include <Atrc/ModelViewer/TransformController.h>
 
 class ExportingContext
 {
-public:
+    size_t indent_;
+    std::string indentStr_;
 
-    const Camera *activeCamera = nullptr;
-    std::string workspaceDirectory;
-    std::string scriptDirectory;
+    std::stringstream sst_;
 
-    size_t indent = 0;
-
-    const Transform *entityTransform = nullptr;
-
-    std::string Indent() const
+    template<typename TStr>
+    void AddLineAux(TStr &&str)
     {
-        return std::string(4 * indent, ' ');
+        sst_ << std::forward<TStr>(str);
     }
 
-    bool IsComplete() const noexcept
+    template<typename TStr0, typename TStr1, typename...Others>
+    void AddLineAux(TStr0 &&str0, TStr1 &&str1, Others&&...others)
     {
-        return activeCamera;
+        AddLineAux(std::forward<TStr0>(str0));
+        AddLineAux(std::forward<TStr1>(str1), std::forward<Others>(others)...);
+    }
+
+public:
+
+    const Camera * const activeCamera;
+    const std::string workspaceDirectory;
+    const std::string scriptDirectory;
+
+    const Transform *entityTransform;
+
+    ExportingContext(const Camera *activeCamera, std::string workspace, std::string scriptDir)
+        : indent_(0),
+          activeCamera(activeCamera), workspaceDirectory(std::move(workspace)), scriptDirectory(std::move(scriptDir)),
+          entityTransform(nullptr)
+    {
+        AGZ_ASSERT(activeCamera);
+    }
+
+    void IncIndent()
+    {
+        indentStr_ = std::string(4 * ++indent_, ' ');
+    }
+
+    void DecIndent()
+    {
+        indentStr_ = std::string(4 * --indent_, ' ');
+    }
+
+    std::string GetString() const
+    {
+        return sst_.str();
+    }
+
+    template<typename...TStrs>
+    void AddLine(TStrs&&...strs)
+    {
+        sst_ << indentStr_;
+        AddLineAux(std::forward<TStrs>(strs)...);
+        sst_ << std::endl;
     }
 };

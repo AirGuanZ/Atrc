@@ -21,8 +21,8 @@ namespace
                 for(auto &v : it.second.vertices)
                 {
                     Vertex nv;
-                    nv.pos = v.pos.xzy();
-                    nv.nor = v.nor.xzy();
+                    nv.pos = v.pos;
+                    nv.nor = v.nor;
                     vtxData.push_back(nv);
                 }
             }
@@ -83,20 +83,20 @@ namespace
             return ret;
         }
 
-        void Export(std::stringstream &sst, const ResourceManager &rscMgr, ExportingContext &ctx) const override
+        void Export(const ResourceManager &rscMgr, ExportingContext &ctx) const override
         {
-            sst << ctx.Indent() << "type = TriangleBVH;\n";
-            sst << ctx.Indent() << "filename = " << filename_.GetExportedFilename(ctx) << ";\n";
+            ctx.AddLine("type = TriangleBVH;");
+            ctx.AddLine("filename = ", filename_.GetExportedFilename(ctx), ";");
             AGZ_ASSERT(ctx.entityTransform);
-            sst << ctx.Indent() << "transform = (\n";
-            ++ctx.indent;
-            sst << ctx.Indent() << "Translate" << AGZ::To<char>(ctx.entityTransform->GetTranslate()) << ",\n";
-            sst << ctx.Indent() << "RotateX(Deg(" << std::to_string(ctx.entityTransform->GetRotate().x) << ")),\n";
-            sst << ctx.Indent() << "RotateY(Deg(" << std::to_string(ctx.entityTransform->GetRotate().y) << ")),\n";
-            sst << ctx.Indent() << "RotateZ(Deg(" << std::to_string(ctx.entityTransform->GetRotate().z) << ")),\n";
-            sst << ctx.Indent() << "Scale(" << std::to_string(ctx.entityTransform->GetScale()) << ")\n";
-            --ctx.indent;
-            sst << ctx.Indent() << ");\n";
+            ctx.AddLine("transform = (");
+            ctx.IncIndent();
+            ctx.AddLine("Translate", AGZ::To<char>(ctx.entityTransform->GetTranslate()), ",");
+            ctx.AddLine("RotateZ(Deg(", std::to_string(ctx.entityTransform->GetRotate().z), ")),");
+            ctx.AddLine("RotateY(Deg(", std::to_string(ctx.entityTransform->GetRotate().y), ")),");
+            ctx.AddLine("RotateX(Deg(", std::to_string(ctx.entityTransform->GetRotate().x), ")),");
+            ctx.AddLine("Scale(", std::to_string(ctx.entityTransform->GetScale()), ")");
+            ctx.DecIndent();
+            ctx.AddLine(");");
         }
     };
 }

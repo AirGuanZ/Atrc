@@ -20,12 +20,12 @@ namespace
             ImGui::InputInt("spp", &spp_);
         }
 
-        void Export(std::stringstream &sst, const ResourceManager &rscMgr, ExportingContext &ctx) const override
+        void Export(const ResourceManager &rscMgr, ExportingContext &ctx) const override
         {
-            sst << AGZ::TFormatter<char>("{}type = Native;\n").Arg(ctx.Indent());
-            sst << AGZ::TFormatter<char>("{}spp = {};\n").Arg(spp_);
+            ctx.AddLine("type = Native;");
+            ctx.AddLine("spp = ", spp_, ";");
             if(hasSeed_)
-                sst << AGZ::TFormatter<char>("{}seed = {};\n").Arg(seed_);
+                ctx.AddLine("seed = ", seed_, ";");
         }
     };
 }
