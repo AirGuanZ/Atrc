@@ -19,7 +19,7 @@ std::string LauncherScriptExporter::Export() const
     ctx_.AddLine("film = {");
     ctx_.IncIndent();
     ctx_.AddLine("size = (", ctx_.outputFilmSize.x, ", ", ctx_.outputFilmSize.y, ");");
-    ctx_.filmFilter->Export(rscMgr_, ctx_);
+    IResource::ExportSubResource("filter", rscMgr_, ctx_, *ctx_.filmFilter);
     ctx_.DecIndent();
     ctx_.AddLine("};");
 
@@ -47,6 +47,17 @@ std::string LauncherScriptExporter::Export() const
 
     ctx_.AddLine("entities = (");
     for(auto &ent : rscMgr_.GetPool<EntityInstance>())
+    {
+        ctx_.AddLine("{");
+        ctx_.IncIndent();
+        ent->Export(rscMgr_, ctx_);
+        ctx_.DecIndent();
+        ctx_.AddLine("},");
+    }
+    ctx_.AddLine(");");
+
+    ctx_.AddLine("lights = (");
+    for(auto &ent : rscMgr_.GetPool<LightInstance>())
     {
         ctx_.AddLine("{");
         ctx_.IncIndent();

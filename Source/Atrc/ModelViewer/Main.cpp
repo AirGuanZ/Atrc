@@ -306,6 +306,12 @@ int Run(GLFWwindow *window)
                     pool.Display();
                     ImGui::EndTabItem();
                 }
+                if(ImGui::BeginTabItem("light"))
+                {
+                    auto &pool = rscMgr.GetPool<LightInstance>();
+                    pool.Display();
+                    ImGui::EndTabItem();
+                }
                 if(ImGui::BeginTabItem("camera"))
                 {
                     camera.Display();
@@ -363,10 +369,19 @@ int Run(GLFWwindow *window)
         if(auto selectedEntity = rscMgr.GetPool<EntityInstance>().GetSelectedInstance())
         {
             ImGui::SetNextWindowPos(ImVec2(sceneManagerPosX + 420, sceneManagerPosY), ImGuiCond_FirstUseEver);
-            if(ImGui::Begin("model", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+            if(ImGui::Begin("model/light", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
             {
                 selectedEntity->Display(rscMgr);
                 selectedEntity->DisplayTransform(camera);
+                ImGui::End();
+            }
+        }
+        else if(auto selectedLight = rscMgr.GetPool<LightInstance>().GetSelectedInstance())
+        {
+            ImGui::SetNextWindowPos(ImVec2(sceneManagerPosX + 420, sceneManagerPosY), ImGuiCond_FirstUseEver);
+            if(ImGui::Begin("model/light", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+            {
+                selectedLight->Display(rscMgr);
                 ImGui::End();
             }
         }

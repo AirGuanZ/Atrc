@@ -147,7 +147,7 @@ namespace
             }
             if(ImGui::TreeNode("radiance"))
             {
-                ImGui::ColorEdit3("radiance", &radiance_[0], ImGuiColorEditFlags_HDR);
+                ImGui::ColorEdit3("radiance", &radiance_[0], ImGuiColorEditFlags_HDR | ImGuiColorEditFlags_Float);
                 ImGui::TreePop();
             }
         }

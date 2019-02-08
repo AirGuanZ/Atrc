@@ -386,8 +386,9 @@ class ResourceManager : public TResourceManager<
     TResourceRegister<EntityInstance, true>,
     TResourceRegister<FilmFilterInstance, false>,
     TResourceRegister<FresnelInstance, false>,
-    TResourceRegister<MaterialInstance, true>,
     TResourceRegister<GeometryInstance, true>,
+    TResourceRegister<LightInstance, true>,
+    TResourceRegister<MaterialInstance, true>,
     TResourceRegister<PathTracingIntegratorInstance, false>,
     TResourceRegister<RendererInstance, false>,
     TResourceRegister<SamplerInstance, false>,
@@ -423,7 +424,10 @@ class TResourceSlot
         if(ImGui::Button("ok") && selector->GetSelectedCreator())
         {
             ImGui::CloseCurrentPopup();
-            return selector->GetSelectedCreator()->Create("[" + selector->GetSelectedCreator()->GetName() + "] anonymous");
+            if constexpr(THasPool)
+                return selector->GetSelectedCreator()->Create("[" + selector->GetSelectedCreator()->GetName() + "] anonymous");
+            else
+                return selector->GetSelectedCreator()->Create("[" + selector->GetSelectedCreator()->GetName() + "]");
         }
 
         ImGui::SameLine();
@@ -493,6 +497,7 @@ using EntitySlot                = TResourceSlot<EntityInstance,                t
 using FilmFilterSlot            = TResourceSlot<FilmFilterInstance,            false, true>;
 using FresnelSlot               = TResourceSlot<FresnelInstance,               false, true>;
 using GeometrySlot              = TResourceSlot<GeometryInstance,              true,  true>;
+using LightSlot                 = TResourceSlot<LightInstance, true, false>;
 using MaterialSlot              = TResourceSlot<MaterialInstance,              true,  true>;
 using PathTracingIntegratorSlot = TResourceSlot<PathTracingIntegratorInstance, false, true>;
 using RendererSlot              = TResourceSlot<RendererInstance,              false, true>;
