@@ -7,5 +7,5 @@ class ScreenAxis
 {
 public:
 
-    void Display(const Camera &camera, const GL::Immediate2D &imm);
+    void Display(const Mat4f &projViewMat, const GL::Immediate2D &imm);
 };

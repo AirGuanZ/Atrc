@@ -12,7 +12,7 @@ EnvironmentLight::EnvironmentLight(const Texture *tex, const Transform &local2Wo
 
 Spectrum EnvironmentLight::NonAreaLe(const Ray &r) const noexcept
 {
-    Vec3 d = local2World_.ApplyInverseToVector(r.d).Normalize();
+    Vec3 d = local2World_.ApplyInverseToVector(r.d).Normalize().xzy();
     Real u = Saturate(Phi(d) / (2 * PI));
     Real v = 1 - Saturate((Arcsin(Clamp<Real>(d.z, -1, 1)) + PI / 2) / PI);
     return tex_->Sample({ u, v });

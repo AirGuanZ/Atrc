@@ -2,7 +2,7 @@
 
 #include <Atrc/ModelViewer/GL.h>
 
-class Camera
+class DefaultRenderingCamera
 {
 public:
 
@@ -29,7 +29,7 @@ public:
         float far  = 1000.0f;;
     };
 
-    explicit Camera(std::string name) noexcept;
+    explicit DefaultRenderingCamera(std::string name) noexcept;
 
     const ViewData &GetViewData() const noexcept { return viewData_; }
     const ProjData &GetProjData() const noexcept { return projData_; }

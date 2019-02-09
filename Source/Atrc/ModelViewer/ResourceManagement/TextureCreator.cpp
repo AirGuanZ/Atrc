@@ -42,7 +42,7 @@ namespace
         void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
         {
             ctx.AddLine("type = Image;");
-            ctx.AddLine("filename = ", filenameSlot_.GetExportedFilename(ctx), ";");
+            ctx.AddLine("filename = \"", filenameSlot_.GetExportedFilename(ctx), "\";");
         }
     };
 }

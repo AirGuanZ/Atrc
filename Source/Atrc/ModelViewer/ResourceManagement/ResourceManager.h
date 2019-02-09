@@ -7,7 +7,6 @@
 
 #include <AGZUtils/Utils/Misc.h>
 
-#include <Atrc/ModelViewer/Camera.h>
 #include <Atrc/ModelViewer/LauncherScriptExportingContext.h>
 #include <Atrc/ModelViewer/GL.h>
 
@@ -25,6 +24,7 @@ class ResourceManager;
 class IResource : public AGZ::Uncopiable
 {
     std::string instanceName_;
+    bool isInPool_;
 
 public:
 
@@ -41,7 +41,7 @@ public:
     }
 
     explicit IResource(std::string name) noexcept
-        : instanceName_(std::move(name))
+        : instanceName_(std::move(name)), isInPool_(false)
     {
         
     }
@@ -51,6 +51,16 @@ public:
     const std::string &GetName() const noexcept
     {
         return instanceName_;
+    }
+
+    bool IsInPool() const noexcept
+    {
+        return isInPool_;
+    }
+
+    void PutIntoPool() noexcept
+    {
+        isInPool_ = true;
     }
 
     virtual void Display(ResourceManager &rscMgr) = 0;
@@ -204,8 +214,10 @@ public:
             auto it = std::find_if(std::begin(instances_), std::end(instances_), [&](auto &c) { return c->GetName() == nameBuf; });
             if(it == instances_.end() && nameBuf[0])
             {
-                instances_.push_back(creatorSelector_.GetSelectedCreator()->Create(
-                    "[" + creatorSelector_.GetSelectedCreator()->GetName() + "] " + nameBuf));
+                auto newInstance = creatorSelector_.GetSelectedCreator()->Create(
+                    "[" + creatorSelector_.GetSelectedCreator()->GetName() + "] " + nameBuf);
+                instances_.push_back(newInstance);
+                newInstance->PutIntoPool();
                 nameBuf[0] = '\0';
                 if(sortInstanceByName_)
                     SortInstanceByName();
@@ -333,9 +345,9 @@ public:
 
     using IResource::IResource;
 
-    virtual void Render(const Camera &camera) = 0;
+    virtual void Render(const Mat4f &projViewMat) = 0;
 
-    virtual void DisplayTransform(const Camera &camera) = 0;
+    virtual void DisplayTransform(const Mat4f &proj, const Mat4f &view) = 0;
 };
 using EntityCreator = TResourceCreator<EntityInstance>;
 

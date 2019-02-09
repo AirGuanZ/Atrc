@@ -152,7 +152,7 @@ int Run(GLFWwindow *window)
     
     // Model Manager
 
-	Camera camera("default");
+    DefaultRenderingCamera camera("default");
 
 	Console console;
     Global::GetInstance().console = &console;
@@ -295,6 +295,9 @@ int Run(GLFWwindow *window)
 
         // 场景管理器
 
+        bool isEntityPoolDisplayed = false;
+        bool isLightPoolDisplayed = false;
+
         if(ImGui::Begin("scene manager", nullptr, ImVec2(0, 0), -1,
             ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoTitleBar))
         {
@@ -304,12 +307,14 @@ int Run(GLFWwindow *window)
                 {
                     auto &pool = rscMgr.GetPool<EntityInstance>();
                     pool.Display();
+                    isEntityPoolDisplayed = true;
                     ImGui::EndTabItem();
                 }
                 if(ImGui::BeginTabItem("light"))
                 {
                     auto &pool = rscMgr.GetPool<LightInstance>();
                     pool.Display();
+                    isLightPoolDisplayed = true;
                     ImGui::EndTabItem();
                 }
                 if(ImGui::BeginTabItem("camera"))
@@ -366,17 +371,18 @@ int Run(GLFWwindow *window)
 
         // 物体属性编辑
 
-        if(auto selectedEntity = rscMgr.GetPool<EntityInstance>().GetSelectedInstance())
+        if(auto selectedEntity = rscMgr.GetPool<EntityInstance>().GetSelectedInstance(); selectedEntity && isEntityPoolDisplayed)
         {
             ImGui::SetNextWindowPos(ImVec2(sceneManagerPosX + 420, sceneManagerPosY), ImGuiCond_FirstUseEver);
             if(ImGui::Begin("model/light", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
             {
                 selectedEntity->Display(rscMgr);
-                selectedEntity->DisplayTransform(camera);
+                selectedEntity->DisplayTransform(camera.GetProjMatrix(), camera.GetViewMatrix());
                 ImGui::End();
             }
         }
-        else if(auto selectedLight = rscMgr.GetPool<LightInstance>().GetSelectedInstance())
+        
+        if(auto selectedLight = rscMgr.GetPool<LightInstance>().GetSelectedInstance(); selectedLight && isLightPoolDisplayed)
         {
             ImGui::SetNextWindowPos(ImVec2(sceneManagerPosX + 420, sceneManagerPosY), ImGuiCond_FirstUseEver);
             if(ImGui::Begin("model/light", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
@@ -393,17 +399,21 @@ int Run(GLFWwindow *window)
 
         // 屏幕上二维对象的绘制
 
-        screen2DFramebuffer.Bind();
-        GL::RenderContext::ClearColorAndDepth();
+        auto cameraProjViewMat = camera.GetProjMatrix() * camera.GetViewMatrix();
 
-        glLineWidth(3);
-        ScreenAxis().Display(camera, imm);
-        glLineWidth(1);
+        {
+            screen2DFramebuffer.Bind();
+            GL::RenderContext::ClearColorAndDepth();
 
-        ImGui::Render();
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+            glLineWidth(3);
+            ScreenAxis().Display(cameraProjViewMat, imm);
+            glLineWidth(1);
 
-        screen2DFramebuffer.Unbind();
+            ImGui::Render();
+            ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+            screen2DFramebuffer.Unbind();
+        }
 
         GL::RenderContext::SetClearColor(Vec4f(Vec3f(0.4f), 0.0f));
         GL::RenderContext::ClearColorAndDepth();
@@ -414,7 +424,7 @@ int Run(GLFWwindow *window)
 
         BeginEntityRendering();
         for(auto &ent : rscMgr.GetPool<EntityInstance>())
-            ent->Render(camera);
+            ent->Render(cameraProjViewMat);
         EndEntityRendering();
 
         // 把屏幕上的二维内容叠加到screen buffer上

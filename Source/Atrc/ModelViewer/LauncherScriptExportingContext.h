@@ -34,7 +34,7 @@ class LauncherScriptExportingContext
 
 public:
 
-    const Camera * const activeCamera;
+    const DefaultRenderingCamera * const activeCamera;
 
     const CameraInstance * const camera;
     const FilmFilterInstance * const filmFilter;
@@ -50,7 +50,7 @@ public:
     const Transform *entityTransform;
 
     LauncherScriptExportingContext(
-        const Camera *activeCamera,
+        const DefaultRenderingCamera *activeCamera,
         const CameraInstance *camera,
         const FilmFilterInstance *filmFilter,
         const RendererInstance *renderer,

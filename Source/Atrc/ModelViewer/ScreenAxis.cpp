@@ -10,7 +10,7 @@ namespace
 
 } // namespace null
 
-void ScreenAxis::Display(const Camera &camera, const GL::Immediate2D &imm)
+void ScreenAxis::Display(const Mat4f &projViewMat, const GL::Immediate2D &imm)
 {
     auto &global = Global::GetInstance();
     const float SCREEN_WIDTH = static_cast<float>(global.framebufferWidth);
@@ -19,7 +19,6 @@ void ScreenAxis::Display(const Camera &camera, const GL::Immediate2D &imm)
 
     constexpr float AXIS_WORLDSPACE_LENGTH = 0.08f;
 
-    auto projViewMat = camera.GetProjMatrix() * camera.GetViewMatrix();
     Vec3f x = (projViewMat * (AXIS_WORLDSPACE_LENGTH * Vec4f::UNIT_X())).xyz();
     Vec3f y = (projViewMat * (AXIS_WORLDSPACE_LENGTH * Vec4f::UNIT_Y())).xyz();
     Vec3f z = (projViewMat * (AXIS_WORLDSPACE_LENGTH * Vec4f::UNIT_Z())).xyz();

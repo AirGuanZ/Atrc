@@ -86,7 +86,7 @@ namespace
         void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
         {
             ctx.AddLine("type = TriangleBVH;");
-            ctx.AddLine("filename = ", filename_.GetExportedFilename(ctx), ";");
+            ctx.AddLine("filename = \"", filename_.GetExportedFilename(ctx), "\";");
             AGZ_ASSERT(ctx.entityTransform);
             ctx.AddLine("transform = (");
             ctx.IncIndent();

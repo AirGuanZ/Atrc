@@ -22,7 +22,7 @@ namespace
 
 } // namespace null
 
-Camera::Camera(std::string name) noexcept
+DefaultRenderingCamera::DefaultRenderingCamera(std::string name) noexcept
     : name_(std::move(name))
 {
     auto &global = Global::GetInstance();
@@ -34,54 +34,44 @@ Camera::Camera(std::string name) noexcept
     UpdateProjMatrix();
 }
 
-void Camera::Display()
+void DefaultRenderingCamera::Display()
 {
     ImGui::PushID(this);
     AGZ::ScopeGuard cameraIDGuard([]() { ImGui::PopID(); });
-
-    bool viewChanged = false, projChanged = false;
 
     if(ImGui::Button("autosize"))
     {
         auto &global = Global::GetInstance();
         projData_.w = static_cast<float>(global.framebufferWidth);
         projData_.h = static_cast<float>(global.framebufferHeight);
-        projChanged = true;
     }
     ImGui::ShowTooltipForLastItem("use global framebuffer size as camera width/height");
 
     ImGui::SameLine();
 
     ImGui::Checkbox("lookat", &viewData_.useLookAt);
-    UpdateViewData();
 
     ImGui::ShowTooltipForLastItem("use lookat instead hori/vert angle to specify camera direction");
 
-    viewChanged |= ImGui::InputFloat3("position", &viewData_.pos[0]);
+    ImGui::InputFloat3("pos", &viewData_.pos[0]);
 
     if(viewData_.useLookAt)
     {
-        viewChanged |= ImGui::InputFloat3("lookat pos", &viewData_.lookAt[0]);
+        ImGui::InputFloat3("dst", &viewData_.lookAt[0]);
     }
     else
     {
-        viewChanged |= ImGui::InputFloat("hori angle", &viewData_.hori.value);
-        viewChanged |= ImGui::InputFloat("vert angle", &viewData_.vert.value);
+        ImGui::InputFloat("hori", &viewData_.hori.value);
+        ImGui::InputFloat("vert", &viewData_.vert.value);
     }
 
-    viewChanged |= ImGui::InputFloat("up angle", &viewData_.up.value);
+    ImGui::InputFloat("up", &viewData_.up.value);
 
-    projChanged |= ImGui::InputFloat("width",  &projData_.w);
-    projChanged |= ImGui::InputFloat("height", &projData_.h);
-    projChanged |= ImGui::InputFloat("FOVy",   &projData_.FOVy.value);
-    projChanged |= ImGui::InputFloat("near",   &projData_.near);
-    projChanged |= ImGui::InputFloat("far",    &projData_.far);
-
-    if(viewChanged)
-        UpdateViewMatrix();
-
-    if(projChanged)
-        UpdateProjMatrix();
+    ImGui::InputFloat("W",  &projData_.w);
+    ImGui::InputFloat("H", &projData_.h);
+    ImGui::InputFloat("FOV",   &projData_.FOVy.value);
+    ImGui::InputFloat("near",   &projData_.near);
+    ImGui::InputFloat("far",    &projData_.far);
 }
 
 namespace
@@ -114,7 +104,7 @@ namespace
 
 } // namespace null
 
-void Camera::UpdatePositionAndDirection(const AGZ::Input::Keyboard &kb, const AGZ::Input::Mouse &m)
+void DefaultRenderingCamera::UpdatePositionAndDirection(const AGZ::Input::Keyboard &kb, const AGZ::Input::Mouse &m)
 {
     // wasd进行移动，space上升，shift下降
     // 如果开启了lookAt模式，就在平时移动摄像机，按住鼠标中键时移动lookAtPos
@@ -145,7 +135,7 @@ void Camera::UpdatePositionAndDirection(const AGZ::Input::Keyboard &kb, const AG
     UpdateViewMatrix();
 }
 
-void Camera::UpdateViewData()
+void DefaultRenderingCamera::UpdateViewData()
 {
     if(viewData_.useLookAt)
     {
@@ -160,7 +150,7 @@ void Camera::UpdateViewData()
     }
 }
 
-Vec3f Camera::GetDirection() const
+Vec3f DefaultRenderingCamera::GetDirection() const
 {
     Vec3f ret;
 
@@ -177,14 +167,14 @@ Vec3f Camera::GetDirection() const
     return ret.Normalize();
 }
 
-void Camera::UpdateViewMatrix()
+void DefaultRenderingCamera::UpdateViewMatrix()
 {
     Vec3f dir = GetDirection();
     Vec3f up = (dir.x == 0.0f && dir.z == 0.0f) ? Vec3f::UNIT_X() : Vec3f::UNIT_Y();
     viewMat_ = Mat4f::LookAt(viewData_.pos, viewData_.pos + dir, up);
 }
 
-void Camera::UpdateProjMatrix()
+void DefaultRenderingCamera::UpdateProjMatrix()
 {
     projMat_ = Mat4f::Perspective(projData_.FOVy, projData_.w / projData_.h, projData_.near, projData_.far);
 }

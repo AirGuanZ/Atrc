@@ -27,7 +27,7 @@ public:
 
     void UseLocal(bool local) noexcept;
 
-    void Render(const Camera &camera, Vec3f *translate, Vec3f *rotate, float *scale) const;
+    void Render(const Mat4f &proj, const Mat4f &view, Vec3f *translate, Vec3f *rotate, float *scale) const;
 
     void Display();
 
@@ -46,10 +46,10 @@ class Transform
 
 public:
 
-    void Display(const Camera &camera)
+    void Display(const Mat4f &proj, const Mat4f &view)
     {
         controller_.Display();
-        controller_.Render(camera, &trans_, &rotate_, &scale_);
+        controller_.Render(proj, view, &trans_, &rotate_, &scale_);
 
         ImGui::InputFloat3("translate##input_translate", &trans_[0]);
         ImGui::InputFloat3("rotate##input_rotate", &rotate_[0]);

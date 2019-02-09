@@ -32,7 +32,7 @@ void TransformController::UseLocal(bool local) noexcept
     local_ = local;
 }
 
-void TransformController::Render(const Camera &camera, Vec3f *translate, Vec3f *rotate, float *scale) const
+void TransformController::Render(const Mat4f &proj, const Mat4f &view, Vec3f *translate, Vec3f *rotate, float *scale) const
 {
     // 设置imguizmo参数
 
@@ -49,9 +49,6 @@ void TransformController::Render(const Camera &camera, Vec3f *translate, Vec3f *
     ImGuizmo::MODE guizmoMode = local_ ? ImGuizmo::LOCAL : ImGuizmo::WORLD;
 
     // 构造model matrix，绘制controller并分解各变换分量
-
-    const Mat4f &view = camera.GetViewMatrix();
-    const Mat4f &proj = camera.GetProjMatrix();
 
     float worldMat[16];
     float scaleVec3[3] = { *scale, *scale, *scale };

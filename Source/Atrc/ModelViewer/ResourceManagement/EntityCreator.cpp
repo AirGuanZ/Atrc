@@ -97,7 +97,7 @@ namespace
             geometry_.Display(rscMgr);
         }
 
-        void Render(const Camera &camera) override
+        void Render(const Mat4f &projViewMat) override
         {
             std::shared_ptr<const GL::VertexBuffer<GeometryInstance::Vertex>> vtxBuf;
             auto geo = geometry_.GetInstance();
@@ -112,7 +112,7 @@ namespace
             vao.Bind();
 
             Mat4f world = GetFinalMatrix(transform_.GetTranslate(), transform_.GetRotate(), transform_.GetScale());
-            Mat4f WVP = camera.GetProjMatrix() * camera.GetViewMatrix() * world;
+            Mat4f WVP = projViewMat * world;
 
             uniformWVP.BindValue(WVP);
             uniformWORLD.BindValue(world);
@@ -123,9 +123,9 @@ namespace
             vao.Unbind();
         }
 
-        void DisplayTransform(const Camera &camera) override
+        void DisplayTransform(const Mat4f &proj, const Mat4f &view) override
         {
-            transform_.Display(camera);
+            transform_.Display(proj, view);
         }
     };
 

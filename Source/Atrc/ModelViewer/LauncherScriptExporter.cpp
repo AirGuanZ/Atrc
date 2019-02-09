@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Atrc/ModelViewer/LauncherScriptExporter.h>
+#include "Global.h"
 
 LauncherScriptExporter::LauncherScriptExporter(ResourceManager &rscMgr, LauncherScriptExportingContext &ctx)
     : rscMgr_(rscMgr), ctx_(ctx)
@@ -12,32 +13,47 @@ std::string LauncherScriptExporter::Export() const
 {
     ctx_.ClearString();
 
-    ctx_.AddLine("workspace = @", ctx_.workspaceDirectory, ";");
+    ctx_.AddLine("workspace = \"@", ctx_.workspaceDirectory, "\";");
 
     ctx_.AddLine();
 
     ctx_.AddLine("film = {");
     ctx_.IncIndent();
     ctx_.AddLine("size = (", ctx_.outputFilmSize.x, ", ", ctx_.outputFilmSize.y, ");");
-    IResource::ExportSubResource("filter", rscMgr_, ctx_, *ctx_.filmFilter);
+    if(ctx_.filmFilter)
+        IResource::ExportSubResource("filter", rscMgr_, ctx_, *ctx_.filmFilter);
+    else
+        Global::ShowNormalMessage("film filter is unspecified");
     ctx_.DecIndent();
     ctx_.AddLine("};");
 
     ctx_.AddLine();
 
-    IResource::ExportSubResource("sampler", rscMgr_, ctx_, *ctx_.sampler);
+    if(ctx_.sampler)
+    {
+        IResource::ExportSubResource("sampler", rscMgr_, ctx_, *ctx_.sampler);
+        ctx_.AddLine();
+    }
+    else
+        Global::ShowNormalMessage("sampler is unspecified");
 
-    ctx_.AddLine();
+    if(ctx_.camera)
+    {
+        IResource::ExportSubResource("camera", rscMgr_, ctx_, *ctx_.camera);
+        ctx_.AddLine();
+    }
+    else
+        Global::ShowNormalMessage("camera is unspecified");
 
-    IResource::ExportSubResource("camera", rscMgr_, ctx_, *ctx_.camera);
+    if(ctx_.renderer)
+    {
+        IResource::ExportSubResource("renderer", rscMgr_, ctx_, *ctx_.renderer);
+        ctx_.AddLine();
+    }
+    else
+        Global::ShowNormalMessage("renderer is unspecified");
 
-    ctx_.AddLine();
-
-    IResource::ExportSubResource("renderer", rscMgr_, ctx_, *ctx_.renderer);
-
-    ctx_.AddLine();
-
-    ctx_.AddLine("outputFilename = ", ctx_.outputFilename, ";");
+    ctx_.AddLine("outputFilename = \"", ctx_.outputFilename, "\";");
 
     ctx_.AddLine();
 
@@ -66,6 +82,8 @@ std::string LauncherScriptExporter::Export() const
         ctx_.AddLine("},");
     }
     ctx_.AddLine(");");
+
+    ctx_.AddLine();
 
     return ctx_.GetString();
 }

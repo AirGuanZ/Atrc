@@ -19,7 +19,7 @@ CubeEnvironmentLight::CubeEnvironmentLight(const Texture **envTex, const Transfo
 
 Spectrum CubeEnvironmentLight::NonAreaLe(const Ray &r) const noexcept
 {
-    auto [face, uv] = AGZ::CubeMapper<Real>::Map(local2World_.ApplyInverseToVector(r.d).Normalize());
+    auto [face, uv] = AGZ::CubeMapper<Real>::Map(local2World_.ApplyInverseToVector(r.d).Normalize().xzy());
     return envTex_[int(face)]->Sample(uv);
 }
 
