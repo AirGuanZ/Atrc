@@ -8,7 +8,7 @@ class PathTracingRendererCreator : public RendererCreator
 {
 public:
 
-    PathTracingRendererCreator() : RendererCreator("pt") { }
+    PathTracingRendererCreator() : RendererCreator("path tracing") { }
 
     std::shared_ptr<RendererInstance> Create(std::string name) const override;
 };

@@ -29,4 +29,14 @@ struct Global : AGZ::Singleton<Global>
         if(global.console)
             global.console->AddError(std::move(text));
     }
+
+    static int GetFramebufferWidth()
+    {
+        return GetInstance().framebufferWidth;
+    }
+
+    static int GetFramebufferHeight()
+    {
+        return GetInstance().framebufferHeight;
+    }
 };

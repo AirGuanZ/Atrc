@@ -39,6 +39,17 @@ Press ESC to close this help window.
         ImGui::CloseCurrentPopup();
 }
 
+void SetFullViewport()
+{
+    glViewport(0, 0, Global::GetFramebufferWidth(), Global::GetFramebufferHeight());
+}
+
+void SetRenderingViewport()
+{
+    auto dh = ImGui::GetFrameHeight();
+    glViewport(0, 0, Global::GetFramebufferWidth(), Global::GetFramebufferHeight() - static_cast<GLsizei>(dh));
+}
+
 int Run(GLFWwindow *window)
 {
     using namespace AGZ::GraphicsAPI;
@@ -145,7 +156,6 @@ int Run(GLFWwindow *window)
         auto &global = Global::GetInstance();
         global.framebufferWidth = param.w;
         global.framebufferHeight = param.h;
-        glViewport(0, 0, param.w, param.h);
         imm.Resize({ static_cast<float>(param.w), static_cast<float>(param.h) });
         ReinitializeScreen2DFramebuffer();
     }));
@@ -415,10 +425,12 @@ int Run(GLFWwindow *window)
             screen2DFramebuffer.Unbind();
         }
 
-        GL::RenderContext::SetClearColor(Vec4f(Vec3f(0.4f), 0.0f));
+        GL::RenderContext::SetClearColor(Vec4f(Vec3f(0.2f), 0.0f));
         GL::RenderContext::ClearColorAndDepth();
 
         GL::RenderContext::EnableDepthTest();
+
+        SetRenderingViewport();
 
         // 场景绘制
 
@@ -441,6 +453,7 @@ int Run(GLFWwindow *window)
 
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        SetFullViewport();
         imm.DrawTexturedTriangles(scrQuadVtx, 6, screen2DRenderTexture);
         glDisable(GL_BLEND);
 

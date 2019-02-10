@@ -27,7 +27,7 @@ DefaultRenderingCamera::DefaultRenderingCamera(std::string name) noexcept
 {
     auto &global = Global::GetInstance();
     projData_.w = static_cast<float>(global.framebufferWidth);
-    projData_.h = static_cast<float>(global.framebufferHeight);
+    projData_.h = static_cast<float>(global.framebufferHeight - ImGui::GetFrameHeight());
 
     UpdateViewData();
     UpdateViewMatrix();
@@ -43,7 +43,7 @@ void DefaultRenderingCamera::Display()
     {
         auto &global = Global::GetInstance();
         projData_.w = static_cast<float>(global.framebufferWidth);
-        projData_.h = static_cast<float>(global.framebufferHeight);
+        projData_.h = static_cast<float>(global.framebufferHeight - ImGui::GetFrameHeight());
     }
     ImGui::ShowTooltipForLastItem("use global framebuffer size as camera width/height");
 
