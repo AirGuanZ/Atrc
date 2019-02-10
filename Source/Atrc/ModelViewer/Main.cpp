@@ -75,6 +75,8 @@ int Run(GLFWwindow *window)
     defaultFontConfig.SizePixels = 16.0f;
     ImGui::GetIO().Fonts->AddFontDefault(&defaultFontConfig);
 
+    Global::_setMenuBarHeight(static_cast<int>(ImGui::GetFrameHeight()));
+
     // 准备输入category
 
     KeyboardManager<GLFWKeyboardCapturer> keyboardMgr;
@@ -133,14 +135,12 @@ int Run(GLFWwindow *window)
 
     auto ReinitializeScreen2DFramebuffer = [&]
     {
-        auto &global = Global::GetInstance();
-
         screen2DFramebuffer   = GL::FrameBuffer(true);
         screen2DDepthBuffer   = GL::RenderBuffer(true);
         screen2DRenderTexture = GL::Texture2D(true);
 
-        screen2DDepthBuffer.SetFormat(global.framebufferWidth, global.framebufferHeight, GL_DEPTH_COMPONENT);
-        screen2DRenderTexture.InitializeFormat(1, global.framebufferWidth, global.framebufferHeight, GL_RGBA8);
+        screen2DDepthBuffer.SetFormat(Global::GetFramebufferWidth(), Global::GetFramebufferHeight(), GL_DEPTH_COMPONENT);
+        screen2DRenderTexture.InitializeFormat(1, Global::GetFramebufferWidth(), Global::GetFramebufferHeight(), GL_RGBA8);
         screen2DFramebuffer.Attach(GL_COLOR_ATTACHMENT0, screen2DRenderTexture);
         screen2DFramebuffer.Attach(GL_DEPTH_ATTACHMENT, screen2DDepthBuffer);
 
@@ -153,9 +153,8 @@ int Run(GLFWwindow *window)
     win.AttachHandler(arena.Create<FramebufferSizeHandler>(
         [&](const FramebufferSize &param)
     {
-        auto &global = Global::GetInstance();
-        global.framebufferWidth = param.w;
-        global.framebufferHeight = param.h;
+        Global::_setFramebufferWidth(param.w);
+        Global::_setFramebufferHeight(param.h);
         imm.Resize({ static_cast<float>(param.w), static_cast<float>(param.h) });
         ReinitializeScreen2DFramebuffer();
     }));
@@ -165,7 +164,7 @@ int Run(GLFWwindow *window)
     DefaultRenderingCamera camera("default");
 
 	Console console;
-    Global::GetInstance().console = &console;
+    Global::_setConsole(&console);
 
     // Object Manager
 
@@ -296,8 +295,8 @@ int Run(GLFWwindow *window)
         float sceneManagerPosX, sceneManagerPosY;
 
         {
-            float fbW = static_cast<float>(Global::GetInstance().framebufferWidth);
-            float fbH = static_cast<float>(Global::GetInstance().framebufferHeight);
+            float fbW = static_cast<float>(Global::GetFramebufferWidth());
+            float fbH = static_cast<float>(Global::GetFramebufferHeight());
             sceneManagerPosX = 40;
             sceneManagerPosY = ImGui::GetFrameHeight() + sceneManagerPosX * (fbH / fbW);
             ImGui::SetNextWindowPos(ImVec2(sceneManagerPosX, sceneManagerPosY), ImGuiCond_FirstUseEver);
@@ -410,13 +409,14 @@ int Run(GLFWwindow *window)
         // 屏幕上二维对象的绘制
 
         auto cameraProjViewMat = camera.GetProjMatrix() * camera.GetViewMatrix();
+        Mat4f screenProjMat = Mat4f::Perspective(Deg(60), Global::GetWindowAspectRatio(), 0.1f, 100.0f);
 
         {
             screen2DFramebuffer.Bind();
             GL::RenderContext::ClearColorAndDepth();
 
             glLineWidth(3);
-            ScreenAxis().Display(cameraProjViewMat, imm);
+            ScreenAxis().Display(screenProjMat * camera.GetViewMatrix(), imm);
             glLineWidth(1);
 
             ImGui::Render();
@@ -460,7 +460,7 @@ int Run(GLFWwindow *window)
         glfwSwapBuffers(window);
     }
 
-    Global::GetInstance().console = nullptr;
+    Global::_setConsole(nullptr);
 
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
@@ -498,8 +498,10 @@ int main()
     glfwSwapInterval(1);
 
     {
-        auto &global = Global::GetInstance();
-        glfwGetFramebufferSize(window, &global.framebufferWidth, &global.framebufferHeight);
+        int w, h;
+        glfwGetFramebufferSize(window, &w, &h);
+        Global::_setFramebufferWidth(w);
+        Global::_setFramebufferHeight(h);
     }
 
     try

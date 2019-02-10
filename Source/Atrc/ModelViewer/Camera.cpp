@@ -25,9 +25,8 @@ namespace
 DefaultRenderingCamera::DefaultRenderingCamera(std::string name) noexcept
     : name_(std::move(name))
 {
-    auto &global = Global::GetInstance();
-    projData_.w = static_cast<float>(global.framebufferWidth);
-    projData_.h = static_cast<float>(global.framebufferHeight - ImGui::GetFrameHeight());
+    projData_.w = Global::GetFramebufferWidth();
+    projData_.h = Global::GetRenderingViewportHeight();
 
     UpdateViewData();
     UpdateViewMatrix();
@@ -41,9 +40,8 @@ void DefaultRenderingCamera::Display()
 
     if(ImGui::Button("autosize"))
     {
-        auto &global = Global::GetInstance();
-        projData_.w = static_cast<float>(global.framebufferWidth);
-        projData_.h = static_cast<float>(global.framebufferHeight - ImGui::GetFrameHeight());
+        projData_.w = Global::GetFramebufferWidth();
+        projData_.h = Global::GetRenderingViewportHeight();
     }
     ImGui::ShowTooltipForLastItem("use global framebuffer size as camera width/height");
 
@@ -67,11 +65,15 @@ void DefaultRenderingCamera::Display()
 
     ImGui::InputFloat("up", &viewData_.up.value);
 
-    ImGui::InputFloat("W",  &projData_.w);
-    ImGui::InputFloat("H", &projData_.h);
+    ImGui::InputInt("W",  &projData_.w, 0);
+    ImGui::InputInt("H", &projData_.h, 0);
     ImGui::InputFloat("FOV",   &projData_.FOVy.value);
     ImGui::InputFloat("near",   &projData_.near);
     ImGui::InputFloat("far",    &projData_.far);
+
+    UpdateViewData();
+    UpdateViewMatrix();
+    UpdateProjMatrix();
 }
 
 namespace
@@ -176,5 +178,5 @@ void DefaultRenderingCamera::UpdateViewMatrix()
 
 void DefaultRenderingCamera::UpdateProjMatrix()
 {
-    projMat_ = Mat4f::Perspective(projData_.FOVy, projData_.w / projData_.h, projData_.near, projData_.far);
+    projMat_ = Mat4f::Perspective(projData_.FOVy, static_cast<float>(projData_.w) / projData_.h, projData_.near, projData_.far);
 }

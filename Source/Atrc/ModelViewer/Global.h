@@ -1,42 +1,81 @@
 #pragma once
 
-#include <AGZUtils/Utils/Misc.h>
+#include <algorithm>
 
 #include <Atrc/ModelViewer/Console.h>
 
-struct Global : AGZ::Singleton<Global>
+namespace Global
 {
-    int framebufferWidth;
-    int framebufferHeight;
-
-    Console *console = nullptr;
-
-    float GetWindowAspectRatio() const noexcept
+    struct GlobalContext
     {
-        return static_cast<float>(framebufferWidth) / framebufferHeight;
+        int framebufferWidth = 0;
+        int framebufferHeight = 0;
+        int menuBarHeight = 0;
+
+        int renderingViewportHeight = 0;
+
+        Console *console = nullptr;
+    };
+
+    inline GlobalContext gDefaultGlobalContext;
+    inline GlobalContext *curCtx = &gDefaultGlobalContext;
+
+    inline float GetWindowAspectRatio() noexcept
+    {
+        return static_cast<float>(curCtx->framebufferWidth) / curCtx->framebufferHeight;
     }
 
-    static void ShowNormalMessage(std::string text)
+    inline float GetRenderingViewportAspectRatio() noexcept
     {
-        auto &global = GetInstance();
-        if(global.console)
-            global.console->AddMessage(std::move(text));
+        return static_cast<float>(curCtx->framebufferWidth) / curCtx->renderingViewportHeight;
     }
 
-    static void ShowErrorMessage(std::string text)
+    inline void ShowNormalMessage(std::string msg)
     {
-        auto &global = GetInstance();
-        if(global.console)
-            global.console->AddError(std::move(text));
+        if(curCtx->console)
+            curCtx->console->AddMessage(std::move(msg));
     }
 
-    static int GetFramebufferWidth()
+    inline void ShowErrorMessage(std::string msg)
     {
-        return GetInstance().framebufferWidth;
+        if(curCtx->console)
+            curCtx->console->AddError(std::move(msg));
     }
 
-    static int GetFramebufferHeight()
+    inline void _setConsole(Console *console) noexcept
     {
-        return GetInstance().framebufferHeight;
+        curCtx->console = console;
     }
-};
+
+    inline int GetFramebufferWidth() noexcept
+    {
+        return curCtx->framebufferWidth;
+    }
+
+    inline int GetFramebufferHeight() noexcept
+    {
+        return curCtx->framebufferHeight;
+    }
+
+    inline void _setFramebufferWidth(int w) noexcept
+    {
+        curCtx->framebufferWidth = w;
+    }
+
+    inline void _setFramebufferHeight(int h) noexcept
+    {
+        curCtx->framebufferHeight = h;
+        curCtx->renderingViewportHeight = h - curCtx->menuBarHeight;
+    }
+
+    inline void _setMenuBarHeight(int h) noexcept
+    {
+        curCtx->menuBarHeight = h;
+        curCtx->renderingViewportHeight = curCtx->framebufferHeight - h;
+    }
+
+    inline int GetRenderingViewportHeight() noexcept
+    {
+        return (std::max)(1, curCtx->renderingViewportHeight);
+    }
+}

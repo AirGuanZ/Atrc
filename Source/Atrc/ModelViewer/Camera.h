@@ -22,8 +22,8 @@ public:
     // 和Projection Matrix相关的数据
     struct ProjData
     {
-        float w    = 1000.0f;
-        float h    = 1000.0f;
+        int w      = 1000;
+        int h      = 1000;
         Deg FOVy   = Deg(60);
         float near = 0.1f;
         float far  = 1000.0f;;
@@ -47,8 +47,8 @@ public:
     const Vec3f &GetPosition() const noexcept { return viewData_.pos; }
     const Vec3f &GetLookAt() const noexcept { return viewData_.lookAt; }
 
-    float GetProjWidth() const noexcept { return projData_.w; }
-    float GetProjHeight() const noexcept { return projData_.h; }
+    int GetProjWidth() const noexcept { return projData_.w; }
+    int GetProjHeight() const noexcept { return projData_.h; }
     Deg GetProjFOVy() const noexcept { return projData_.FOVy; }
 
 private:

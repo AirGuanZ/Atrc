@@ -30,7 +30,7 @@ namespace
             if(autoAspect_)
             {
                 ctx.AddLine("sensorDistance = ",
-                    std::to_string(sensorWidth_ * cam->GetProjHeight() / cam->GetProjWidth() * Tan(cam->GetProjFOVy() * 0.5f)), ";");
+                    std::to_string(sensorWidth_ * static_cast<float>(cam->GetProjHeight()) / cam->GetProjWidth() * Tan(cam->GetProjFOVy() * 0.5f)), ";");
             }
             else
             {

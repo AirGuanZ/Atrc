@@ -12,9 +12,8 @@ namespace
 
 void ScreenAxis::Display(const Mat4f &projViewMat, const GL::Immediate2D &imm)
 {
-    auto &global = Global::GetInstance();
-    const float SCREEN_WIDTH = static_cast<float>(global.framebufferWidth);
-    const float SCREEN_HEIGHT = static_cast<float>(global.framebufferHeight);
+    const float SCREEN_WIDTH = static_cast<float>(Global::GetFramebufferWidth());
+    const float SCREEN_HEIGHT = static_cast<float>(Global::GetFramebufferHeight());
     constexpr float SCREEN_AXIS_PIXEL_SIZE = 100;
 
     constexpr float AXIS_WORLDSPACE_LENGTH = 0.08f;
