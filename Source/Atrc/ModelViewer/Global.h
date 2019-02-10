@@ -10,9 +10,6 @@ namespace Global
     {
         int framebufferWidth = 0;
         int framebufferHeight = 0;
-        int menuBarHeight = 0;
-
-        int renderingViewportHeight = 0;
 
         Console *console = nullptr;
     };
@@ -23,11 +20,6 @@ namespace Global
     inline float GetWindowAspectRatio() noexcept
     {
         return static_cast<float>(curCtx->framebufferWidth) / curCtx->framebufferHeight;
-    }
-
-    inline float GetRenderingViewportAspectRatio() noexcept
-    {
-        return static_cast<float>(curCtx->framebufferWidth) / curCtx->renderingViewportHeight;
     }
 
     inline void ShowNormalMessage(std::string msg)
@@ -65,22 +57,5 @@ namespace Global
     inline void _setFramebufferHeight(int h) noexcept
     {
         curCtx->framebufferHeight = h;
-        curCtx->renderingViewportHeight = h - curCtx->menuBarHeight;
     }
-
-    inline void _setMenuBarHeight(int h) noexcept
-    {
-        curCtx->menuBarHeight = h;
-        curCtx->renderingViewportHeight = curCtx->framebufferHeight - h;
-    }
-
-    /*inline int GetRenderingViewportWidth() noexcept
-    {
-        return (std::max)(1, curCtx->framebufferWidth);
-    }
-
-    inline int GetRenderingViewportHeight() noexcept
-    {
-        return (std::max)(1, curCtx->renderingViewportHeight);
-    }*/
 }

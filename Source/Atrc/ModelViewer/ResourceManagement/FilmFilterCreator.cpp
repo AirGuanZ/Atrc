@@ -39,7 +39,7 @@ namespace
 
         void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
         {
-            ctx.AddLine("type = Box;");
+            ctx.AddLine("type = Gaussian;");
             ctx.AddLine("radius = ", std::to_string(radius_), ";");
             ctx.AddLine("alpha = ", std::to_string(alpha_), ";");
         }

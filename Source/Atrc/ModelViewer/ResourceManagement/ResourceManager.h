@@ -341,6 +341,15 @@ class CameraInstance : public IResource
 public:
     
     using IResource::IResource;
+
+    struct ProjData
+    {
+        float viewportWidth;
+        float viewportHeight;
+        Mat4f projMatrix;
+    };
+
+    virtual ProjData GetProjData(float dstAspectRatio) const = 0;
 };
 using CameraCreator = TResourceCreator<CameraInstance>;
 

@@ -69,8 +69,6 @@ int Run(GLFWwindow *window)
     defaultFontConfig.SizePixels = 16.0f;
     ImGui::GetIO().Fonts->AddFontDefault(&defaultFontConfig);
 
-    Global::_setMenuBarHeight(static_cast<int>(ImGui::GetFrameHeight()));
-
     // 准备输入category
 
     KeyboardManager<GLFWKeyboardCapturer> keyboardMgr;
@@ -119,7 +117,10 @@ int Run(GLFWwindow *window)
     // Immediate Painter
 
     GL::Immediate2D imm;
-    imm.Initialize({ 600.0f, 600.0f });
+    imm.Initialize({
+        static_cast<float>(Global::GetFramebufferWidth()),
+        static_cast<float>(Global::GetFramebufferHeight())
+    });
 
     // Camera
 
@@ -153,7 +154,6 @@ int Run(GLFWwindow *window)
     FilmFilterSlot filmFilterSlot;
     SamplerSlot samplerSlot;
     RendererSlot rendererSlot;
-    CameraSlot cameraSlot;
 
     char outputFilenameBuf[512] = "$Output.png";
 
@@ -199,7 +199,7 @@ int Run(GLFWwindow *window)
                     std::string workspaceDir = workspaceSlot.GetExportedFilename("", scriptDir);
                     LauncherScriptExportingContext ctx(
                         &camera,
-                        cameraSlot.GetInstance().get(),
+                        rscMgr.GetPool<CameraInstance>().GetSelectedInstance().get(),
                         filmFilterSlot.GetInstance().get(),
                         rendererSlot.GetInstance().get(),
                         samplerSlot.GetInstance().get(),
@@ -251,12 +251,6 @@ int Run(GLFWwindow *window)
                 ImGui::TreePop();
             }
 
-            if(ImGui::TreeNodeEx("camera", ImGuiTreeNodeFlags_DefaultOpen))
-            {
-                cameraSlot.Display(rscMgr);
-                ImGui::TreePop();
-            }
-
             if(ImGui::TreeNodeEx("sampler", ImGuiTreeNodeFlags_DefaultOpen))
             {
                 samplerSlot.Display(rscMgr);
@@ -276,10 +270,10 @@ int Run(GLFWwindow *window)
         // 计算场景管理器的位置和大小
 
         float sceneManagerPosX, sceneManagerPosY;
+        float fbW = static_cast<float>(Global::GetFramebufferWidth());
+        float fbH = static_cast<float>(Global::GetFramebufferHeight());
 
         {
-            float fbW = static_cast<float>(Global::GetFramebufferWidth());
-            float fbH = static_cast<float>(Global::GetFramebufferHeight());
             sceneManagerPosX = 40;
             sceneManagerPosY = ImGui::GetFrameHeight() + sceneManagerPosX * (fbH / fbW);
             ImGui::SetNextWindowPos(ImVec2(sceneManagerPosX, sceneManagerPosY), ImGuiCond_FirstUseEver);
@@ -387,13 +381,14 @@ int Run(GLFWwindow *window)
             }
         }
 
+        std::shared_ptr<CameraInstance> selectedCamera = rscMgr.GetPool<CameraInstance>().GetSelectedInstance();
         if(isCameraPoolDisplayed)
         {
             ImGui::SetNextWindowPos(ImVec2(sceneManagerPosX + 420, sceneManagerPosY), ImGuiCond_FirstUseEver);
             if(ImGui::Begin("property", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
             {
                 camera.Display();
-                if(auto selectedCamera = rscMgr.GetPool<CameraInstance>().GetSelectedInstance())
+                if(selectedCamera)
                     selectedCamera->Display(rscMgr);
                 ImGui::End();
             }
@@ -405,9 +400,7 @@ int Run(GLFWwindow *window)
             camera.UpdatePositionAndDirection(keyboard, mouse);
         camera.UpdateMatrix();
 
-        // 屏幕上二维对象的绘制
-
-        auto cameraProjViewMat = camera.GetProjMatrix() * camera.GetViewMatrix();
+        auto defaultCameraProjViewMat = camera.GetProjMatrix() * camera.GetViewMatrix();
 
         GL::RenderContext::SetClearColor(Vec4f(Vec3f(0.2f), 0.0f));
         GL::RenderContext::ClearColorAndDepth();
@@ -416,10 +409,34 @@ int Run(GLFWwindow *window)
 
         // 场景绘制
 
+        CameraInstance::ProjData selectedCameraProjData;
+
         BeginEntityRendering();
-        for(auto &ent : rscMgr.GetPool<EntityInstance>())
-            ent->Render(cameraProjViewMat);
+        if(selectedCamera)
+        {
+            float filmAspectRatio = static_cast<float>(filmSize.x) / filmSize.y;
+            selectedCameraProjData = selectedCamera->GetProjData(filmAspectRatio);
+
+            glViewport(
+                static_cast<GLint>(0.5f * fbW - 0.5f * selectedCameraProjData.viewportWidth),
+                static_cast<GLint>(0.5f * fbH - 0.5f * selectedCameraProjData.viewportHeight),
+                static_cast<GLsizei>(selectedCameraProjData.viewportWidth),
+                static_cast<GLsizei>(selectedCameraProjData.viewportHeight));
+
+            auto VP = selectedCameraProjData.projMatrix * camera.GetViewMatrix();
+            for(auto &ent : rscMgr.GetPool<EntityInstance>())
+                ent->Render(VP);
+
+            SetFullViewport();
+        }
+        else
+        {
+            for(auto &ent : rscMgr.GetPool<EntityInstance>())
+                ent->Render(defaultCameraProjViewMat);
+        }
         EndEntityRendering();
+
+        GL::RenderContext::DisableDepthTest();
 
         GL::RenderContext::ClearDepth();
 
@@ -427,7 +444,20 @@ int Run(GLFWwindow *window)
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         
         glLineWidth(3);
-        ScreenAxis().Display(cameraProjViewMat, imm);
+
+        if(selectedCamera)
+        {
+
+            float LTx = (std::max)(0.0f, 0.5f * fbW - 0.5f * selectedCameraProjData.viewportWidth);
+            float LTy = (std::min)(fbH, 0.5f * fbH - 0.5f * selectedCameraProjData.viewportHeight);
+            float RBx = (std::min)(fbW, 0.5f * fbW + 0.5f * selectedCameraProjData.viewportWidth);
+            float RBy = (std::max)(0.0f, 0.5f * fbH + 0.5f * selectedCameraProjData.viewportHeight);
+            imm.DrawQuadP(
+                { LTx, LTy }, { RBx, RBy },
+                { 1.0f, 1.0f, 1.0f, 0.3f }, false);
+        }
+        ScreenAxis().Display(defaultCameraProjViewMat, imm);
+
         glLineWidth(1);
 
         ImGui::Render();

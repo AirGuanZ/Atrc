@@ -84,7 +84,5 @@ std::string LauncherScriptExporter::Export() const
     }
     ctx_.AddLine(");");
 
-    ctx_.AddLine();
-
     return ctx_.GetString();
 }

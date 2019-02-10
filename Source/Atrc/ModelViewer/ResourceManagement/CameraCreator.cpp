@@ -1,4 +1,5 @@
 #include <Atrc/ModelViewer/ResourceManagement/CameraCreator.h>
+#include <Atrc/ModelViewer/Global.h>
 
 namespace
 {
@@ -29,18 +30,45 @@ namespace
             ctx.AddLine("sensorWidth = ", std::to_string(sensorWidth_), ";");
             if(autoAspect_)
             {
-                ctx.AddLine("sensorDistance = ",
-                    std::to_string(sensorWidth_ * static_cast<float>(cam->GetProjHeight()) / cam->GetProjWidth() * Tan(cam->GetProjFOVy() * 0.5f)), ";");
+                float ratio = static_cast<float>(ctx.outputFilmSize.y) / ctx.outputFilmSize.x * Cot(FOVy_ * 0.5f) * 0.5f;
+                ctx.AddLine("sensorDistance = ", sensorWidth_ * ratio, ";");
             }
             else
             {
                 ctx.AddLine("sensorHeight = ", sensorHeight_, ";");
                 ctx.AddLine("sensorDistance = ",
-                    std::to_string(sensorWidth_ * sensorHeight_ / sensorWidth_ * Tan(cam->GetProjFOVy() * 0.5f)), ";");
+                    sensorWidth_ * sensorHeight_ / sensorWidth_ * Cot(FOVy_ * 0.5f) * 0.5f, ";");
             }
             ctx.AddLine("pos = ", AGZ::To<char>(cam->GetPosition()), ";");
             ctx.AddLine("lookAt = ", AGZ::To<char>(cam->GetLookAt()), ";");
             ctx.AddLine("up = (0, 1, 0);");
+        }
+
+        ProjData GetProjData(float dstAspectRatio) const override
+        {
+            float fbW = static_cast<float>(Global::GetFramebufferWidth());
+            float fbH = static_cast<float>(Global::GetFramebufferHeight());
+            float fbAspectRatio = fbW / fbH;
+
+            if(!autoAspect_)
+                dstAspectRatio = sensorWidth_ / sensorHeight_;
+
+            ProjData ret;
+
+            if(dstAspectRatio > fbAspectRatio)
+            {
+                ret.viewportWidth = fbW - 100;
+                ret.viewportHeight = ret.viewportWidth / dstAspectRatio;
+            }
+            else
+            {
+                ret.viewportHeight = fbH - 100;
+                ret.viewportWidth = ret.viewportHeight * dstAspectRatio;
+            }
+
+            ret.projMatrix = Mat4f::Perspective(FOVy_, dstAspectRatio, 0.1f, 1000.0f);
+
+            return ret;
         }
     };
 }
