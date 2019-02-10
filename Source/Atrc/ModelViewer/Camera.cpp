@@ -26,11 +26,9 @@ DefaultRenderingCamera::DefaultRenderingCamera(std::string name) noexcept
     : name_(std::move(name))
 {
     projData_.w = Global::GetFramebufferWidth();
-    projData_.h = Global::GetRenderingViewportHeight();
+    projData_.h = Global::GetFramebufferHeight();
 
-    UpdateViewData();
-    UpdateViewMatrix();
-    UpdateProjMatrix();
+    UpdateMatrix();
 }
 
 void DefaultRenderingCamera::Display()
@@ -38,42 +36,38 @@ void DefaultRenderingCamera::Display()
     ImGui::PushID(this);
     AGZ::ScopeGuard cameraIDGuard([]() { ImGui::PopID(); });
 
-    if(ImGui::Button("autosize"))
+    if(ImGui::TreeNode("default proj"))
     {
-        projData_.w = Global::GetFramebufferWidth();
-        projData_.h = Global::GetRenderingViewportHeight();
-    }
-    ImGui::ShowTooltipForLastItem("use global framebuffer size as camera width/height");
+        //ImGui::InputFloat("up", &viewData_.up.value);
+        ImGui::InputInt("W", &projData_.w, 0);
+        ImGui::InputInt("H", &projData_.h, 0);
+        ImGui::InputFloat("FOV", &projData_.FOVy.value);
+        ImGui::InputFloat("near", &projData_.near);
+        ImGui::InputFloat("far", &projData_.far);
 
-    ImGui::SameLine();
-
-    ImGui::Checkbox("lookat", &viewData_.useLookAt);
-
-    ImGui::ShowTooltipForLastItem("use lookat instead hori/vert angle to specify camera direction");
-
-    ImGui::InputFloat3("pos", &viewData_.pos[0]);
-
-    if(viewData_.useLookAt)
-    {
-        ImGui::InputFloat3("dst", &viewData_.lookAt[0]);
-    }
-    else
-    {
-        ImGui::InputFloat("hori", &viewData_.hori.value);
-        ImGui::InputFloat("vert", &viewData_.vert.value);
+        ImGui::TreePop();
     }
 
-    ImGui::InputFloat("up", &viewData_.up.value);
+    if(ImGui::TreeNode("pos & dir"))
+    {
+        ImGui::Checkbox("lookat", &viewData_.useLookAt);
 
-    ImGui::InputInt("W",  &projData_.w, 0);
-    ImGui::InputInt("H", &projData_.h, 0);
-    ImGui::InputFloat("FOV",   &projData_.FOVy.value);
-    ImGui::InputFloat("near",   &projData_.near);
-    ImGui::InputFloat("far",    &projData_.far);
+        ImGui::ShowTooltipForLastItem("use lookat instead hori/vert angle to specify camera direction");
 
-    UpdateViewData();
-    UpdateViewMatrix();
-    UpdateProjMatrix();
+        ImGui::InputFloat3("pos", &viewData_.pos[0]);
+
+        if(viewData_.useLookAt)
+        {
+            ImGui::InputFloat3("dst", &viewData_.lookAt[0]);
+        }
+        else
+        {
+            ImGui::InputFloat("hori", &viewData_.hori.value);
+            ImGui::InputFloat("vert", &viewData_.vert.value);
+        }
+
+        ImGui::TreePop();
+    }
 }
 
 namespace
@@ -132,9 +126,12 @@ void DefaultRenderingCamera::UpdatePositionAndDirection(const AGZ::Input::Keyboa
             -Deg(0.5f * 0.98f * AGZ::Math::PI<Rad>).value,
             Deg(0.5f * 0.98f * AGZ::Math::PI<Rad>).value);
     }
+}
 
-    UpdateViewData();
-    UpdateViewMatrix();
+void DefaultRenderingCamera::AutoResizeProj()
+{
+    projData_.w = Global::GetFramebufferWidth();
+    projData_.h = Global::GetFramebufferHeight();
 }
 
 void DefaultRenderingCamera::UpdateViewData()

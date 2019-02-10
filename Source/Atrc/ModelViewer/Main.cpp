@@ -44,12 +44,6 @@ void SetFullViewport()
     glViewport(0, 0, Global::GetFramebufferWidth(), Global::GetFramebufferHeight());
 }
 
-void SetRenderingViewport()
-{
-    auto dh = ImGui::GetFrameHeight();
-    glViewport(0, 0, Global::GetFramebufferWidth(), Global::GetFramebufferHeight() - static_cast<GLsizei>(dh));
-}
-
 int Run(GLFWwindow *window)
 {
     using namespace AGZ::GraphicsAPI;
@@ -127,26 +121,9 @@ int Run(GLFWwindow *window)
     GL::Immediate2D imm;
     imm.Initialize({ 600.0f, 600.0f });
 
-    // Screen2D Framebuffer
+    // Camera
 
-    GL::FrameBuffer screen2DFramebuffer(true);
-    GL::RenderBuffer screen2DDepthBuffer(true);
-    GL::Texture2D screen2DRenderTexture(true);
-
-    auto ReinitializeScreen2DFramebuffer = [&]
-    {
-        screen2DFramebuffer   = GL::FrameBuffer(true);
-        screen2DDepthBuffer   = GL::RenderBuffer(true);
-        screen2DRenderTexture = GL::Texture2D(true);
-
-        screen2DDepthBuffer.SetFormat(Global::GetFramebufferWidth(), Global::GetFramebufferHeight(), GL_DEPTH_COMPONENT);
-        screen2DRenderTexture.InitializeFormat(1, Global::GetFramebufferWidth(), Global::GetFramebufferHeight(), GL_RGBA8);
-        screen2DFramebuffer.Attach(GL_COLOR_ATTACHMENT0, screen2DRenderTexture);
-        screen2DFramebuffer.Attach(GL_DEPTH_ATTACHMENT, screen2DDepthBuffer);
-
-        //AGZ_ASSERT(screen2DFramebuffer.IsComplete());
-    };
-    ReinitializeScreen2DFramebuffer();
+    DefaultRenderingCamera camera("default");
 
     // 注册窗口事件
 
@@ -155,13 +132,12 @@ int Run(GLFWwindow *window)
     {
         Global::_setFramebufferWidth(param.w);
         Global::_setFramebufferHeight(param.h);
+        camera.AutoResizeProj();
+        SetFullViewport();
         imm.Resize({ static_cast<float>(param.w), static_cast<float>(param.h) });
-        ReinitializeScreen2DFramebuffer();
     }));
     
     // Model Manager
-
-    DefaultRenderingCamera camera("default");
 
 	Console console;
     Global::_setConsole(&console);
@@ -187,6 +163,13 @@ int Run(GLFWwindow *window)
     TFilenameSlot<false, FilenameMode::RelativeToScript> workspaceSlot;
     FileBrowser workspaceBrowser("workspace", true, "");
 
+    bool showMenuBar = true;
+    keyboard.AttachHandler(arena.Create<KeyDownHandler>([&](const KeyDown &param)
+    {
+        if(param.key == KEY_F2)
+            showMenuBar = !showMenuBar;
+    }));
+
     while(!glfwWindowShouldClose(window))
     {
         // 各种事件捕获与传递
@@ -206,7 +189,7 @@ int Run(GLFWwindow *window)
         bool openGlobalHelpWindow = false;
         bool openGlobalSettingWindow = false;
 
-        if(ImGui::BeginMainMenuBar())
+        if(showMenuBar && ImGui::BeginMainMenuBar())
         {
             if(ImGui::BeginMenu("file"))
             {
@@ -306,6 +289,7 @@ int Run(GLFWwindow *window)
 
         bool isEntityPoolDisplayed = false;
         bool isLightPoolDisplayed = false;
+        bool isCameraPoolDisplayed = false;
 
         if(ImGui::Begin("scene manager", nullptr, ImVec2(0, 0), -1,
             ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoTitleBar))
@@ -328,7 +312,9 @@ int Run(GLFWwindow *window)
                 }
                 if(ImGui::BeginTabItem("camera"))
                 {
-                    camera.Display();
+                    auto &pool = rscMgr.GetPool<CameraInstance>();
+                    pool.Display();
+                    isCameraPoolDisplayed = true;
                     ImGui::EndTabItem();
                 }
                 ImGui::EndTabBar();
@@ -383,20 +369,32 @@ int Run(GLFWwindow *window)
         if(auto selectedEntity = rscMgr.GetPool<EntityInstance>().GetSelectedInstance(); selectedEntity && isEntityPoolDisplayed)
         {
             ImGui::SetNextWindowPos(ImVec2(sceneManagerPosX + 420, sceneManagerPosY), ImGuiCond_FirstUseEver);
-            if(ImGui::Begin("model/light", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+            if(ImGui::Begin("property", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
             {
                 selectedEntity->Display(rscMgr);
                 selectedEntity->DisplayTransform(camera.GetProjMatrix(), camera.GetViewMatrix());
                 ImGui::End();
             }
         }
-        
+
         if(auto selectedLight = rscMgr.GetPool<LightInstance>().GetSelectedInstance(); selectedLight && isLightPoolDisplayed)
         {
             ImGui::SetNextWindowPos(ImVec2(sceneManagerPosX + 420, sceneManagerPosY), ImGuiCond_FirstUseEver);
-            if(ImGui::Begin("model/light", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+            if(ImGui::Begin("property", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
             {
                 selectedLight->Display(rscMgr);
+                ImGui::End();
+            }
+        }
+
+        if(isCameraPoolDisplayed)
+        {
+            ImGui::SetNextWindowPos(ImVec2(sceneManagerPosX + 420, sceneManagerPosY), ImGuiCond_FirstUseEver);
+            if(ImGui::Begin("property", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+            {
+                camera.Display();
+                if(auto selectedCamera = rscMgr.GetPool<CameraInstance>().GetSelectedInstance())
+                    selectedCamera->Display(rscMgr);
                 ImGui::End();
             }
         }
@@ -405,32 +403,16 @@ int Run(GLFWwindow *window)
 
         if(!ImGui::IsAnyWindowFocused())
             camera.UpdatePositionAndDirection(keyboard, mouse);
+        camera.UpdateMatrix();
 
         // 屏幕上二维对象的绘制
 
         auto cameraProjViewMat = camera.GetProjMatrix() * camera.GetViewMatrix();
-        Mat4f screenProjMat = Mat4f::Perspective(Deg(60), Global::GetWindowAspectRatio(), 0.1f, 100.0f);
-
-        {
-            screen2DFramebuffer.Bind();
-            GL::RenderContext::ClearColorAndDepth();
-
-            glLineWidth(3);
-            ScreenAxis().Display(screenProjMat * camera.GetViewMatrix(), imm);
-            glLineWidth(1);
-
-            ImGui::Render();
-            ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-            screen2DFramebuffer.Unbind();
-        }
 
         GL::RenderContext::SetClearColor(Vec4f(Vec3f(0.2f), 0.0f));
         GL::RenderContext::ClearColorAndDepth();
 
         GL::RenderContext::EnableDepthTest();
-
-        SetRenderingViewport();
 
         // 场景绘制
 
@@ -439,22 +421,18 @@ int Run(GLFWwindow *window)
             ent->Render(cameraProjViewMat);
         EndEntityRendering();
 
-        // 把屏幕上的二维内容叠加到screen buffer上
-
-        static const GL::Immediate2D::TexturedVertex scrQuadVtx[] =
-        {
-            { { -1.0f, -1.0f }, { 0.0f, 0.0f } },
-            { { -1.0f, 1.0f },  { 0.0f, 1.0f } },
-            { { 1.0f, 1.0f },   { 1.0f, 1.0f } },
-            { { -1.0f, -1.0f }, { 0.0f, 0.0f } },
-            { { 1.0f, 1.0f },   { 1.0f, 1.0f } },
-            { { 1.0f, -1.0f },  { 1.0f, 0.0f } }
-        };
+        GL::RenderContext::ClearDepth();
 
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        SetFullViewport();
-        imm.DrawTexturedTriangles(scrQuadVtx, 6, screen2DRenderTexture);
+        
+        glLineWidth(3);
+        ScreenAxis().Display(cameraProjViewMat, imm);
+        glLineWidth(1);
+
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
         glDisable(GL_BLEND);
 
         glfwSwapBuffers(window);

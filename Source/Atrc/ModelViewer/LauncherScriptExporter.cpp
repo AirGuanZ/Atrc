@@ -71,6 +71,7 @@ std::string LauncherScriptExporter::Export() const
         ctx_.AddLine("},");
     }
     ctx_.AddLine(");");
+    ctx_.AddLine();
 
     ctx_.AddLine("lights = (");
     for(auto &ent : rscMgr_.GetPool<LightInstance>())

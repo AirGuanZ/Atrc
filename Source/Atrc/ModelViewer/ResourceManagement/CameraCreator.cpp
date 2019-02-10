@@ -5,7 +5,7 @@ namespace
     class PinholeCameraInstance : public CameraInstance
     {
         float sensorWidth_  = 0.2f;
-        bool autoAspect_    = false;
+        bool autoAspect_    = true;
         float sensorHeight_ = 0.2f; // 只在autoAspect为false的情况下有意义
         Deg FOVy_ = Deg(60);
 
@@ -17,7 +17,7 @@ namespace
         {
             ImGui::Checkbox("auto aspect", &autoAspect_);
             ImGui::InputFloat("sensor width", &sensorWidth_);
-            if(autoAspect_)
+            if(!autoAspect_)
                 ImGui::InputFloat("sensor height", &sensorHeight_);
             ImGui::InputFloat("FOV", &FOVy_.value);
         }

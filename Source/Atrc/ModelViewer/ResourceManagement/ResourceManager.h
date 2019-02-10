@@ -336,7 +336,12 @@ public:
     }
 };
 
-class CameraInstance : public IResource { public: using IResource::IResource; };
+class CameraInstance : public IResource
+{
+public:
+    
+    using IResource::IResource;
+};
 using CameraCreator = TResourceCreator<CameraInstance>;
 
 class EntityInstance : public IResource
@@ -394,7 +399,7 @@ class TextureInstance : public IResource { public: using IResource::IResource; }
 using TextureCreator = TResourceCreator<TextureInstance>;
 
 class ResourceManager : public TResourceManager<
-    TResourceRegister<CameraInstance, false>,
+    TResourceRegister<CameraInstance, true>,
     TResourceRegister<EntityInstance, true>,
     TResourceRegister<FilmFilterInstance, false>,
     TResourceRegister<FresnelInstance, false>,
@@ -504,7 +509,7 @@ public:
     }
 };
 
-using CameraSlot                = TResourceSlot<CameraInstance,                false, true>;
+using CameraSlot                = TResourceSlot<CameraInstance,                true,  false>;
 using EntitySlot                = TResourceSlot<EntityInstance,                true,  false>;
 using FilmFilterSlot            = TResourceSlot<FilmFilterInstance,            false, true>;
 using FresnelSlot               = TResourceSlot<FresnelInstance,               false, true>;

@@ -74,8 +74,13 @@ namespace Global
         curCtx->renderingViewportHeight = curCtx->framebufferHeight - h;
     }
 
+    /*inline int GetRenderingViewportWidth() noexcept
+    {
+        return (std::max)(1, curCtx->framebufferWidth);
+    }
+
     inline int GetRenderingViewportHeight() noexcept
     {
         return (std::max)(1, curCtx->renderingViewportHeight);
-    }
+    }*/
 }

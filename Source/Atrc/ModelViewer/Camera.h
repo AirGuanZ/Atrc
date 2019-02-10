@@ -51,6 +51,15 @@ public:
     int GetProjHeight() const noexcept { return projData_.h; }
     Deg GetProjFOVy() const noexcept { return projData_.FOVy; }
 
+    void AutoResizeProj();
+
+    void UpdateMatrix()
+    {
+        UpdateViewData();
+        UpdateViewMatrix();
+        UpdateProjMatrix();
+    }
+
 private:
 
     Vec3f GetDirection() const;
