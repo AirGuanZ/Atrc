@@ -27,7 +27,7 @@ namespace
     out vec4 fragColor;
     void main(void)
     {
-        float lightFactor = max(0, dot(normalize(vec3(1, 1, 1)), normalize(wNor))) + 0.1;
+        float lightFactor = 0.9 * max(0, dot(normalize(vec3(1, 1, 1)), normalize(wNor))) + 0.1;
         fragColor = vec4(min(lightFactor, 1) * COLOR, 1);
     }
     )____";

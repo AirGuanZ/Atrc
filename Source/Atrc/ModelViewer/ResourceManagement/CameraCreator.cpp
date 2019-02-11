@@ -66,7 +66,8 @@ namespace
                 ret.viewportWidth = ret.viewportHeight * dstAspectRatio;
             }
 
-            ret.projMatrix = Mat4f::Perspective(FOVy_, dstAspectRatio, 0.1f, 1000.0f);
+            Deg alpha = Rad2Deg(Rad(2 * AGZ::Math::Arctan(fbH / ret.viewportHeight * AGZ::Math::Tan(FOVy_ * 0.5f))));
+            ret.projMatrix = Mat4f::Perspective(alpha, fbAspectRatio, 0.1f, 1000.0f);
 
             return ret;
         }

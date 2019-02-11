@@ -283,7 +283,6 @@ int Run(GLFWwindow *window)
 
         bool isEntityPoolDisplayed = false;
         bool isLightPoolDisplayed = false;
-        bool isCameraPoolDisplayed = false;
 
         if(ImGui::Begin("scene manager", nullptr, ImVec2(0, 0), -1,
             ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoTitleBar))
@@ -308,7 +307,6 @@ int Run(GLFWwindow *window)
                 {
                     auto &pool = rscMgr.GetPool<CameraInstance>();
                     pool.Display();
-                    isCameraPoolDisplayed = true;
                     ImGui::EndTabItem();
                 }
                 ImGui::EndTabBar();
@@ -382,16 +380,13 @@ int Run(GLFWwindow *window)
         }
 
         std::shared_ptr<CameraInstance> selectedCamera = rscMgr.GetPool<CameraInstance>().GetSelectedInstance();
-        if(isCameraPoolDisplayed)
+        ImGui::SetNextWindowPos(ImVec2(sceneManagerPosX, sceneManagerPosY + 320 + 320), ImGuiCond_FirstUseEver);
+        if(ImGui::Begin("camera", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
         {
-            ImGui::SetNextWindowPos(ImVec2(sceneManagerPosX + 420, sceneManagerPosY), ImGuiCond_FirstUseEver);
-            if(ImGui::Begin("property", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
-            {
-                camera.Display();
-                if(selectedCamera)
-                    selectedCamera->Display(rscMgr);
-                ImGui::End();
-            }
+            camera.Display();
+            if(selectedCamera)
+                selectedCamera->Display(rscMgr);
+            ImGui::End();
         }
 
         // 更新摄像机状态
@@ -417,11 +412,11 @@ int Run(GLFWwindow *window)
             float filmAspectRatio = static_cast<float>(filmSize.x) / filmSize.y;
             selectedCameraProjData = selectedCamera->GetProjData(filmAspectRatio);
 
-            glViewport(
+            /*glViewport(
                 static_cast<GLint>(0.5f * fbW - 0.5f * selectedCameraProjData.viewportWidth),
                 static_cast<GLint>(0.5f * fbH - 0.5f * selectedCameraProjData.viewportHeight),
                 static_cast<GLsizei>(selectedCameraProjData.viewportWidth),
-                static_cast<GLsizei>(selectedCameraProjData.viewportHeight));
+                static_cast<GLsizei>(selectedCameraProjData.viewportHeight));*/
 
             auto VP = selectedCameraProjData.projMatrix * camera.GetViewMatrix();
             for(auto &ent : rscMgr.GetPool<EntityInstance>())

@@ -48,13 +48,13 @@ void DefaultRenderingCamera::Display()
         ImGui::TreePop();
     }
 
-    if(ImGui::TreeNode("pos & dir"))
+    if(ImGui::TreeNodeEx("pos & dir", ImGuiTreeNodeFlags_DefaultOpen))
     {
         ImGui::Checkbox("lookat", &viewData_.useLookAt);
 
         ImGui::ShowTooltipForLastItem("use lookat instead hori/vert angle to specify camera direction");
 
-        ImGui::InputFloat3("pos", &viewData_.pos[0]);
+        ImGui::InputFloat3("pos", &viewData_.pos[0], "%.2f");
 
         if(viewData_.useLookAt)
         {
@@ -62,8 +62,8 @@ void DefaultRenderingCamera::Display()
         }
         else
         {
-            ImGui::InputFloat("hori", &viewData_.hori.value);
-            ImGui::InputFloat("vert", &viewData_.vert.value);
+            ImGui::InputFloat("hor", &viewData_.hori.value);
+            ImGui::InputFloat("ver", &viewData_.vert.value);
         }
 
         ImGui::TreePop();
