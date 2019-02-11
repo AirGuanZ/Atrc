@@ -1,0 +1,20 @@
+#pragma once
+
+#include <Atrc/Editor/ResourceManagement/ResourceManager.h>
+
+class SingleMaterialMapping
+{
+    MaterialSlot slot_;
+
+public:
+
+    void Display(ResourceManager &rscMgr)
+    {
+        slot_.Display(rscMgr);
+    }
+
+    void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const
+    {
+        slot_.Export(rscMgr, ctx);
+    }
+};

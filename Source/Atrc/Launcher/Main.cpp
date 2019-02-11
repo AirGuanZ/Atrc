@@ -12,11 +12,11 @@
 
 using namespace Atrc;
 
-int Run(const AGZ::Config &config, std::string_view configFilename)
+int Run(const AGZ::Config &config, std::string_view configPath)
 {
     auto &root = config.Root();
 
-    Mgr::Context context(root, configFilename);
+    Mgr::Context context(root, configPath);
     Mgr::RegisterBuiltinCreators(context);
 
     auto renderer = context.Create<Renderer>  (root["renderer"]);
@@ -86,12 +86,12 @@ int main(int argc, char *argv[])
     try
     {
         AGZ::Config config;
-        std::string configFilename;
+        std::string configPath;
         
         if(argc == 1)
         {
-            configFilename = "./Scene.txt";
-            if(!config.LoadFromFile(configFilename))
+            configPath = ".";
+            if(!config.LoadFromFile("./Scene.txt"))
                 throw Mgr::MgrErr("Failed to load configuration file from ./scene.txt");
         }
         else if(argc == 2)
@@ -102,13 +102,13 @@ int main(int argc, char *argv[])
                 return 0;
             }
 
-            configFilename = argv[1];
-            if(!config.LoadFromFile(configFilename))
-                throw Mgr::MgrErr("Failed to load configuration file from " + configFilename);
+            configPath = std::filesystem::path(argv[1]).parent_path().string();
+            if(!config.LoadFromFile(argv[1]))
+                throw Mgr::MgrErr("Failed to load configuration file from " + std::string(argv[1]));
         }
         else if(std::string(argv[1]) == "-m" && argc == 4)
         {
-            configFilename = argv[2];
+            configPath = argv[2];
             if(!config.LoadFromMemory(argv[3]))
                 throw Mgr::MgrErr("Failed to load configuration from memory");
         }
@@ -118,7 +118,7 @@ int main(int argc, char *argv[])
             return 0;
         }
 
-        return Run(config, configFilename);
+        return Run(config, configPath);
     }
     catch(const Mgr::MgrErr &err)
     {

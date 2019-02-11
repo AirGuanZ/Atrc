@@ -3,8 +3,8 @@
 namespace Atrc::Mgr
 {
 
-Context::Context(const ConfigGroup &root, std::string_view configFilename)
-    : root_(root), configPath_(std::filesystem::path(configFilename).parent_path())
+Context::Context(const ConfigGroup &root, std::string_view configPath)
+    : root_(root), configPath_(std::filesystem::path(configPath))
 {
     if(auto pNode = root.Find("workspace"))
     {

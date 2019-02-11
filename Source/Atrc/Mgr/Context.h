@@ -83,7 +83,7 @@ class Context
 
 public:
 
-    explicit Context(const ConfigGroup &root, std::string_view configFilename);
+    explicit Context(const ConfigGroup &root, std::string_view configPath);
 
     const ConfigGroup &Root() const noexcept { return root_; }
 
