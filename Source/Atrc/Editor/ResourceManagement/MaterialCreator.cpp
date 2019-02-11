@@ -22,7 +22,11 @@ namespace
 
     public:
 
-        using MaterialInstance::MaterialInstance;
+        IdealDiffuseInstance(ResourceManager &rscMgr, std::string name)
+            : MaterialInstance(std::move(name))
+        {
+            albedo_.SetInstance(rscMgr.Create<TextureInstance>("constant", ""));
+        }
 
         void Display(ResourceManager &rscMgr) override
         {
@@ -280,47 +284,47 @@ void RegisterMaterialCreators(ResourceManager &rscMgr)
     rscMgr.AddCreator(&iTSMetalCreator);
 }
 
-std::shared_ptr<MaterialInstance> IdealBlackCreator::Create(std::string name) const
+std::shared_ptr<MaterialInstance> IdealBlackCreator::Create(ResourceManager &rscMgr, std::string name) const
 {
     return std::make_shared<IdealBlackInstance>(std::move(name));
 }
 
-std::shared_ptr<MaterialInstance> IdealDiffuseCreator::Create(std::string name) const
+std::shared_ptr<MaterialInstance> IdealDiffuseCreator::Create(ResourceManager &rscMgr, std::string name) const
 {
-    return std::make_shared<IdealDiffuseInstance>(std::move(name));
+    return std::make_shared<IdealDiffuseInstance>(rscMgr, std::move(name));
 }
 
-std::shared_ptr<MaterialInstance> IdealMirrorCreator::Create(std::string name) const
+std::shared_ptr<MaterialInstance> IdealMirrorCreator::Create(ResourceManager &rscMgr, std::string name) const
 {
     return std::make_shared<IdealMirrorInstance>(std::move(name));
 }
 
-std::shared_ptr<MaterialInstance> IdealScalerCreator::Create(std::string name) const
+std::shared_ptr<MaterialInstance> IdealScalerCreator::Create(ResourceManager &rscMgr, std::string name) const
 {
     return std::make_shared<IdealScalerInstance>(std::move(name));
 }
 
-std::shared_ptr<MaterialInstance> IdealSpecularCreator::Create(std::string name) const
+std::shared_ptr<MaterialInstance> IdealSpecularCreator::Create(ResourceManager &rscMgr, std::string name) const
 {
     return std::make_shared<IdealSpecularInstance>(std::move(name));
 }
 
-std::shared_ptr<MaterialInstance> InvisibleSurfaceCreator::Create(std::string name) const
+std::shared_ptr<MaterialInstance> InvisibleSurfaceCreator::Create(ResourceManager &rscMgr, std::string name) const
 {
     return std::make_shared<InvisibleSurfaceInstance>(std::move(name));
 }
 
-std::shared_ptr<MaterialInstance> NormalizedDiffusionBSSRDFCreator::Create(std::string name) const
+std::shared_ptr<MaterialInstance> NormalizedDiffusionBSSRDFCreator::Create(ResourceManager &rscMgr, std::string name) const
 {
     return std::make_shared<NormalizedDiffusionBSSRDFInstance>(std::move(name));
 }
 
-std::shared_ptr<MaterialInstance> ONMatteCreator::Create(std::string name) const
+std::shared_ptr<MaterialInstance> ONMatteCreator::Create(ResourceManager &rscMgr, std::string name) const
 {
     return std::make_shared<ONMatteInstance>(std::move(name));
 }
 
-std::shared_ptr<MaterialInstance> TSMetalCreator::Create(std::string name) const
+std::shared_ptr<MaterialInstance> TSMetalCreator::Create(ResourceManager &rscMgr, std::string name) const
 {
     return std::make_shared<TSMetalInstance>(std::move(name));
 }

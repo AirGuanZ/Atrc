@@ -54,12 +54,12 @@ void RegisterFilmFilterCreators(ResourceManager &rscMgr)
     rscMgr.AddCreator(&iGaussianFilterCreator);
 }
 
-std::shared_ptr<FilmFilterInstance> BoxFilterCreator::Create(std::string name) const
+std::shared_ptr<FilmFilterInstance> BoxFilterCreator::Create(ResourceManager &rscMgr, std::string name) const
 {
     return std::make_shared<BoxFilterInstance>(std::move(name));
 }
 
-std::shared_ptr<FilmFilterInstance> GaussianFilterCreator::Create(std::string name) const
+std::shared_ptr<FilmFilterInstance> GaussianFilterCreator::Create(ResourceManager &rscMgr, std::string name) const
 {
     return std::make_shared<GaussianFilterInstance>(std::move(name));
 }

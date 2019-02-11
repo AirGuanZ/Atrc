@@ -107,7 +107,7 @@ void RegisterGeometryCreators(ResourceManager &rscMgr)
     rscMgr.AddCreator(&iWavefrontOBJCreator);
 }
 
-std::shared_ptr<GeometryInstance> WavefrontOBJCreator::Create(std::string name) const
+std::shared_ptr<GeometryInstance> WavefrontOBJCreator::Create(ResourceManager &rscMgr, std::string name) const
 {
     return std::make_shared<WavefrontOBJInstance>(std::move(name));
 }

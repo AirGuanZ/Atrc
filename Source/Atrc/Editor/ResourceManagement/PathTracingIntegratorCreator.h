@@ -10,5 +10,5 @@ public:
 
     FullPathTracingIntegratorCreator() : PathTracingIntegratorCreator("full") { }
 
-    std::shared_ptr<PathTracingIntegratorInstance> Create(std::string name) const override;
+    std::shared_ptr<PathTracingIntegratorInstance> Create(ResourceManager &rscMgr, std::string name) const override;
 };

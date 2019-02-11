@@ -83,7 +83,7 @@ public:
 
     virtual ~TResourceCreator() = default;
 
-    virtual std::shared_ptr<TResource> Create(std::string name) const = 0;
+    virtual std::shared_ptr<TResource> Create(ResourceManager &rscMgr, std::string name) const = 0;
 
     const std::string &GetName() const noexcept
     {
@@ -98,10 +98,11 @@ class TResourceCreatorManager
 
 public:
 
-    std::shared_ptr<TResource> Create(const std::string &creatorName, std::string instanceName) const
+    std::shared_ptr<TResource> Create(ResourceManager &rscMgr, const std::string &creatorName, std::string instanceName) const
     {
-        AGZ_ASSERT(name2Creator_.find(creatorName) != name2Creator_.end());
-        return name2Creator_[creatorName]->Create(std::move(instanceName));
+        auto it = name2Creator_.find(creatorName);
+        AGZ_ASSERT(it != name2Creator_.end());
+        return it->second->Create(rscMgr, std::move(instanceName));
     }
 
     void AddCreator(const TResourceCreator<TResource> *creator)
@@ -202,7 +203,7 @@ public:
         return std::find(std::begin(instances_), std::end(instances_), rsc) != std::end(instances_);
     }
 
-    void Display()
+    void Display(ResourceManager &rscMgr)
     {
         creatorSelector_.Display("type");
 
@@ -215,7 +216,7 @@ public:
             if(it == instances_.end() && nameBuf[0])
             {
                 auto newInstance = creatorSelector_.GetSelectedCreator()->Create(
-                    "[" + creatorSelector_.GetSelectedCreator()->GetName() + "] " + nameBuf);
+                    rscMgr, "[" + creatorSelector_.GetSelectedCreator()->GetName() + "] " + nameBuf);
                 instances_.push_back(newInstance);
                 newInstance->PutIntoPool();
                 nameBuf[0] = '\0';
@@ -292,6 +293,12 @@ class TResourceManager
     }
 
     template<typename TResource>
+    const TResourceCreatorManager<TResource> &_creatorMgr() const noexcept
+    {
+        return std::get<TResourceCreatorManager<TResource>>(creatorMgrList_);
+    }
+
+    template<typename TResource>
     TResourcePool<TResource> &_pool() noexcept
     {
         return std::get<TResourcePool<TResource>>(poolList_);
@@ -305,6 +312,8 @@ public:
         
     }
 
+    virtual ~TResourceManager() = default;
+
     template<typename TResource>
     void AddCreator(const TResourceCreator<TResource> *creator)
     {
@@ -312,9 +321,10 @@ public:
     }
 
     template<typename TResource>
-    void Create(const std::string &creatorName, std::string instanceName) const
+    std::shared_ptr<TResource> Create(const std::string &creatorName, std::string instanceName)
     {
-        _creatorMgr<TResource>().Create(creatorName, std::move(instanceName));
+        return _creatorMgr<TResource>().Create(
+            AsRscMgr(), creatorName, "[" + creatorName + "]" + (instanceName.empty() ? "" : " ") + std::move(instanceName));
     }
 
     template<typename TResource>
@@ -334,6 +344,8 @@ public:
     {
         return _pool<TResource>().Find(rsc);
     }
+
+    virtual ResourceManager &AsRscMgr() = 0;
 };
 
 class CameraInstance : public IResource
@@ -344,8 +356,8 @@ public:
 
     struct ProjData
     {
-        float viewportWidth;
-        float viewportHeight;
+        float viewportWidth  = 1;
+        float viewportHeight = 1;
         Mat4f projMatrix;
     };
 
@@ -423,6 +435,8 @@ class ResourceManager : public TResourceManager<
 public:
 
     using TResourceManager::TResourceManager;
+
+    ResourceManager &AsRscMgr() override { return *this; }
 };
 
 template<typename TResource, bool THasPool, bool TAllowAnonymous>
@@ -451,9 +465,9 @@ class TResourceSlot
         {
             ImGui::CloseCurrentPopup();
             if constexpr(THasPool)
-                return selector->GetSelectedCreator()->Create("[" + selector->GetSelectedCreator()->GetName() + "] anonymous");
+                return selector->GetSelectedCreator()->Create(rscMgr, "[" + selector->GetSelectedCreator()->GetName() + "] anonymous");
             else
-                return selector->GetSelectedCreator()->Create("[" + selector->GetSelectedCreator()->GetName() + "]");
+                return selector->GetSelectedCreator()->Create(rscMgr, "[" + selector->GetSelectedCreator()->GetName() + "]");
         }
 
         ImGui::SameLine();
@@ -472,6 +486,11 @@ public:
     std::shared_ptr<TResource> GetInstance()
     {
         return instance_;
+    }
+
+    void SetInstance(std::shared_ptr<TResource> instance)
+    {
+        instance_ = std::move(instance);
     }
 
     void Display(ResourceManager &rscMgr)

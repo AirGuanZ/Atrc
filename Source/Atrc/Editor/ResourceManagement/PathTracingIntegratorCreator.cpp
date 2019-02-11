@@ -38,7 +38,7 @@ void RegisterPathTracingIntegratorCreators(ResourceManager &rscMgr)
     rscMgr.AddCreator(&iFullPathTracingIntegratorCreator);
 }
 
-std::shared_ptr<PathTracingIntegratorInstance> FullPathTracingIntegratorCreator::Create(std::string name) const
+std::shared_ptr<PathTracingIntegratorInstance> FullPathTracingIntegratorCreator::Create(ResourceManager &rscMgr, std::string name) const
 {
     return std::make_shared<FullPathTracingIntegratorInstance>(std::move(name));
 }

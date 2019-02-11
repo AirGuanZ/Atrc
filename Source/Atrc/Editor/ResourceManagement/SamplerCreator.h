@@ -10,5 +10,5 @@ public:
 
     NativeSamplerCreator() : SamplerCreator("native") { }
 
-    std::shared_ptr<SamplerInstance> Create(std::string name) const override;
+    std::shared_ptr<SamplerInstance> Create(ResourceManager &rscMgr, std::string name) const override;
 };

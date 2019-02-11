@@ -10,5 +10,5 @@ public:
 
     SkyLightCreator() : LightCreator("sky") { }
 
-    std::shared_ptr<LightInstance> Create(std::string name) const override;
+    std::shared_ptr<LightInstance> Create(ResourceManager &rscMgr, std::string name) const override;
 };

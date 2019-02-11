@@ -10,5 +10,5 @@ public:
 
     PathTracingRendererCreator() : RendererCreator("path tracing") { }
 
-    std::shared_ptr<RendererInstance> Create(std::string name) const override;
+    std::shared_ptr<RendererInstance> Create(ResourceManager &rscMgr, std::string name) const override;
 };

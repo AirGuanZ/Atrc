@@ -155,6 +155,10 @@ int Run(GLFWwindow *window)
     SamplerSlot samplerSlot;
     RendererSlot rendererSlot;
 
+    filmFilterSlot.SetInstance(rscMgr.Create<FilmFilterInstance>("box", ""));
+    samplerSlot.SetInstance(rscMgr.Create<SamplerInstance>("native", ""));
+    rendererSlot.SetInstance(rscMgr.Create<RendererInstance>("path tracing", ""));
+
     char outputFilenameBuf[512] = "$Output.png";
 
     TFilenameSlot<false, FilenameMode::Absolute> scriptSlot;
@@ -292,21 +296,21 @@ int Run(GLFWwindow *window)
                 if(ImGui::BeginTabItem("entity"))
                 {
                     auto &pool = rscMgr.GetPool<EntityInstance>();
-                    pool.Display();
+                    pool.Display(rscMgr);
                     isEntityPoolDisplayed = true;
                     ImGui::EndTabItem();
                 }
                 if(ImGui::BeginTabItem("light"))
                 {
                     auto &pool = rscMgr.GetPool<LightInstance>();
-                    pool.Display();
+                    pool.Display(rscMgr);
                     isLightPoolDisplayed = true;
                     ImGui::EndTabItem();
                 }
                 if(ImGui::BeginTabItem("camera"))
                 {
                     auto &pool = rscMgr.GetPool<CameraInstance>();
-                    pool.Display();
+                    pool.Display(rscMgr);
                     ImGui::EndTabItem();
                 }
                 ImGui::EndTabBar();
@@ -326,7 +330,7 @@ int Run(GLFWwindow *window)
                 if(ImGui::BeginTabItem("material"))
                 {
                     auto &pool = rscMgr.GetPool<MaterialInstance>();
-                    pool.Display();
+                    pool.Display(rscMgr);
                     if(auto mat = pool.GetSelectedInstance())
                         mat->Display(rscMgr);
                     ImGui::EndTabItem();
@@ -334,7 +338,7 @@ int Run(GLFWwindow *window)
                 if(ImGui::BeginTabItem("texture"))
                 {
                     auto &pool = rscMgr.GetPool<TextureInstance>();
-                    pool.Display();
+                    pool.Display(rscMgr);
                     if(auto tex = pool.GetSelectedInstance())
                         tex->Display(rscMgr);
                     ImGui::EndTabItem();
@@ -342,7 +346,7 @@ int Run(GLFWwindow *window)
                 if(ImGui::BeginTabItem("geometry"))
                 {
                     auto &pool = rscMgr.GetPool<GeometryInstance>();
-                    pool.Display();
+                    pool.Display(rscMgr);
                     if(auto data = pool.GetSelectedInstance())
                         data->Display(rscMgr);
                     ImGui::EndTabItem();

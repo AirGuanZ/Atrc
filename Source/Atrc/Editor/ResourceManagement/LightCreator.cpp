@@ -32,7 +32,7 @@ void RegisterLightCreators(ResourceManager &rscMgr)
     rscMgr.AddCreator(&iSkyLightCreator);
 }
 
-std::shared_ptr<LightInstance> SkyLightCreator::Create(std::string name) const
+std::shared_ptr<LightInstance> SkyLightCreator::Create(ResourceManager &rscMgr, std::string name) const
 {
     return std::make_shared<SkyLightInstance>(std::move(name));
 }

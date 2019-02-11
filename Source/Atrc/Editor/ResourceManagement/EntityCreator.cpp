@@ -86,10 +86,11 @@ namespace
 
     public:
 
-        explicit TransformedGeometricEntityBase(std::string name)
+        explicit TransformedGeometricEntityBase(ResourceManager &rscMgr, std::string name)
             : EntityInstance(std::move(name))
         {
             CheckRendererInitialization();
+            geometry_.SetInstance(rscMgr.Create<GeometryInstance>("wavefront", ""));
         }
 
         void Display(ResourceManager &rscMgr) override
@@ -216,12 +217,12 @@ void RegisterEntityCreators(ResourceManager &rscMgr)
     rscMgr.AddCreator(&iGeometricEntityCreator);
 }
 
-std::shared_ptr<EntityInstance> GeometricDiffuseLightCreator::Create(std::string name) const
+std::shared_ptr<EntityInstance> GeometricDiffuseLightCreator::Create(ResourceManager &rscMgr, std::string name) const
 {
-    return std::make_shared<GeometricDiffuseLightInstance>(std::move(name));
+    return std::make_shared<GeometricDiffuseLightInstance>(rscMgr, std::move(name));
 }
 
-std::shared_ptr<EntityInstance> GeometricEntityCreator::Create(std::string name) const
+std::shared_ptr<EntityInstance> GeometricEntityCreator::Create(ResourceManager &rscMgr, std::string name) const
 {
-    return std::make_shared<GeometricEntityInstance>(std::move(name));
+    return std::make_shared<GeometricEntityInstance>(rscMgr, std::move(name));
 }

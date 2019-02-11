@@ -10,5 +10,5 @@ public:
 
     WavefrontOBJCreator() : GeometryCreator("wavefront") { }
 
-    std::shared_ptr<GeometryInstance> Create(std::string name) const override;
+    std::shared_ptr<GeometryInstance> Create(ResourceManager &rscMgr, std::string name) const override;
 };

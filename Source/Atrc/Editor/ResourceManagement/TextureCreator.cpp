@@ -55,12 +55,12 @@ void RegisterTextureCreators(ResourceManager &rscMgr)
     rscMgr.AddCreator(&iImageTextureCreator);
 }
 
-std::shared_ptr<TextureInstance> ConstantTextureCreator::Create(std::string name) const
+std::shared_ptr<TextureInstance> ConstantTextureCreator::Create(ResourceManager &rscMgr, std::string name) const
 {
     return std::make_shared<ConstantTextureInstance>(std::move(name));
 }
 
-std::shared_ptr<TextureInstance> ImageTextureCreator::Create(std::string name) const
+std::shared_ptr<TextureInstance> ImageTextureCreator::Create(ResourceManager &rscMgr, std::string name) const
 {
     return std::make_shared<ImageTextureInstance>(std::move(name));
 }

@@ -10,7 +10,11 @@ namespace
 
     public:
 
-        using RendererInstance::RendererInstance;
+        PathTracingRendererInstance(ResourceManager &rscMgr, std::string name)
+            : RendererInstance(std::move(name)), workerCount_(-1), taskGridSize_(32)
+        {
+            integratorSlot_.SetInstance(rscMgr.Create<PathTracingIntegratorInstance>("full", ""));
+        }
 
         void Display(ResourceManager &rscMgr) override
         {
@@ -39,7 +43,7 @@ void RegisterRendererCreators(ResourceManager &rscMgr)
     rscMgr.AddCreator(&iPathTracingRendererCreator);
 }
 
-std::shared_ptr<RendererInstance> PathTracingRendererCreator::Create(std::string name) const
+std::shared_ptr<RendererInstance> PathTracingRendererCreator::Create(ResourceManager &rscMgr, std::string name) const
 {
-    return std::make_shared<PathTracingRendererInstance>(std::move(name));
+    return std::make_shared<PathTracingRendererInstance>(rscMgr, std::move(name));
 }
