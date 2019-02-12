@@ -8,11 +8,11 @@
 namespace Atrc
 {
 
-void PathTracingRenderer::RenderGrid(const Scene &scene, FilmGrid *filmGrid, Sampler *sampler) const
+void PathTracingRenderer::RenderGrid(const Scene *scene, FilmGrid *filmGrid, Sampler *sampler) const
 {
     Arena arena;
     
-    auto cam = scene.GetCamera();
+    auto cam = scene->GetCamera();
     auto rect = filmGrid->GetSamplingRect();
 
     for(int32_t py = rect.low.y; py < rect.high.y; ++py)
@@ -24,7 +24,7 @@ void PathTracingRenderer::RenderGrid(const Scene &scene, FilmGrid *filmGrid, Sam
                 auto camSam = sampler->GetCameraSample();
                 auto [r, w, pdf] = cam->GenerateRay(camSam);
 
-                Spectrum value = w * integrator_.Eval(scene, r, sampler, arena) / pdf;
+                Spectrum value = w * integrator_.Eval(*scene, r, sampler, arena) / pdf;
                 AGZ_ASSERT(!value.HasInf());
                 filmGrid->AddSample(camSam.film, value);
 
@@ -37,12 +37,12 @@ void PathTracingRenderer::RenderGrid(const Scene &scene, FilmGrid *filmGrid, Sam
 }
 
 PathTracingRenderer::PathTracingRenderer(int workerCount, int taskGridSize, const PathTracingIntegrator &integrator) noexcept
-    : workerCount_(workerCount), taskGridSize_(taskGridSize), integrator_(integrator)
+    : taskGridSize_(taskGridSize), dispatcher_(workerCount), integrator_(integrator)
 {
     AGZ_ASSERT(taskGridSize > 0);
 }
 
-void PathTracingRenderer::Render(const Scene &scene, Sampler *sampler, Film *film, Reporter *reporter) const
+void PathTracingRenderer::Render(const Scene *scene, Sampler *sampler, Film *film, Reporter *reporter)
 {
     AGZ_ASSERT(sampler && film && reporter);
 
@@ -50,39 +50,41 @@ void PathTracingRenderer::Render(const Scene &scene, Sampler *sampler, Film *fil
     std::queue<Grid> tasks = GridDivider<int32_t>::Divide(
         { { 0, 0 }, { resolution.x, resolution.y } }, taskGridSize_, taskGridSize_);
 
-    size_t totalTaskCount = tasks.size();
-    std::atomic<size_t> finishedTaskCount = 0;
-
-    std::mutex mergeMut;
-
-    auto func = [&](const Grid &task, AGZ::NoSharedParam_t)
+    auto func = [=](const Grid &task, AGZ::NoSharedParam_t)
     {
-        int32_t taskID = task.low.x * int32_t(tasks.size()) + task.low.y;
+        int32_t taskID = task.low.x * int32_t(totalCount_) + task.low.y;
         auto gridSampler = sampler->Clone(taskID);
 
         auto filmGrid = film->CreateFilmGrid(task);
         RenderGrid(scene, &filmGrid, gridSampler.get());
 
         // filmGrid间无任何overlap，故只需要对reporter加锁即可
-        std::lock_guard<std::mutex> lk(mergeMut);
+        std::lock_guard<std::mutex> lk(mergeMut_);
         
         film->MergeFilmGrid(filmGrid);
 
-        Real percent = Real(100) * ++finishedTaskCount / totalTaskCount;
+        Real percent = Real(100) * ++finishedCount_ / totalCount_;
         reporter->Report(*film, percent);
     };
 
-    AGZ::StaticTaskDispatcher<Grid, AGZ::NoSharedParam_t> dispatcher(workerCount_);
-
     reporter->Start();
-    
-    dispatcher.RunAsync(func, AGZ::NO_SHARED_PARAM, tasks);
-    bool ok = dispatcher.Join();
 
-    if(!ok)
+    totalCount_ = tasks.size();
+    finishedCount_ = 0;
+    dispatcher_.RunAsync(std::move(func), AGZ::NO_SHARED_PARAM, std::move(tasks));
+}
+
+bool PathTracingRenderer::IsCompleted() const
+{
+    return dispatcher_.IsCompleted();
+}
+
+void PathTracingRenderer::Join(Reporter *reporter)
+{
+    if(!dispatcher_.Join())
     {
         reporter->Message("Something was wrong...");
-        for(auto &err : dispatcher.GetExceptions())
+        for(auto &err : dispatcher_.GetExceptions())
             reporter->Message(err.what());
     }
     else

@@ -16,7 +16,11 @@ public:
 
     virtual ~Renderer() = default;
 
-    virtual void Render(const Scene &scene, Sampler *sampler, Film *film, Reporter *reporter) const = 0;
+    virtual void Render(const Scene *scene, Sampler *sampler, Film *film, Reporter *reporter) = 0;
+
+    virtual bool IsCompleted() const = 0;
+
+    virtual void Join(Reporter *reporter) = 0;
 };
 
 } // namespace Atrc

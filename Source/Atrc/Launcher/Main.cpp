@@ -50,7 +50,8 @@ int Run(const AGZ::Config &config, std::string_view configPath)
     ATRC_MGR_CATCH_AND_RETHROW("In creating post processors")
 
     Film film(filmSize, *filter);
-    renderer->Render(scene, sampler, &film, reporter);
+    renderer->Render(&scene, sampler, &film, reporter);
+    renderer->Join(reporter);
 
     auto image = film.GetImage();
     postProcessChain.Process(&image);

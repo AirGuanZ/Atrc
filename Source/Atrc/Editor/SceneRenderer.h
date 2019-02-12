@@ -2,9 +2,13 @@
 
 #include <memory>
 
-#include <Atrc/Editor/GL.h>
+#include <AGZUtils/Utils/Thread.h>
+
 #include <Atrc/Lib/Core/Scene.h>
 #include <Atrc/Mgr/Context.h>
+
+#include <Atrc/Editor/FilmRTReporter.h>
+#include <Atrc/Editor/GL.h>
 
 class SceneRenderer
 {
@@ -16,7 +20,7 @@ class SceneRenderer
 
     std::unique_ptr<Atrc::Scene> scene_;
 
-    Atrc::Reporter   *reporter_;
+    std::unique_ptr<FilmRTReporter> reporter_;
     std::unique_ptr<Atrc::Film> film_;
 
     Vec2i filmSize_;
@@ -25,7 +29,18 @@ public:
 
     SceneRenderer();
 
-    void StartRendering();
+    void Start(const AGZ::Config &config, std::string_view configPath);
 
-    void EndRendering();
+    void Stop();
+
+    bool IsCompleted() const;
+
+    void Join();
+
+    template<typename Func>
+    void ProcessImage(Func &&func)
+    {
+        if(reporter_)
+            reporter_->ProcessTexture(std::forward<Func>(func));
+    }
 };
