@@ -43,6 +43,8 @@ public:
     bool IsCompleted() const override;
 
     void Join(Reporter *reporter) override;
+	
+	void Stop() override;
 };
 
 } // namespace Atrc

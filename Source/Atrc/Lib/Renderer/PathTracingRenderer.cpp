@@ -91,4 +91,11 @@ void PathTracingRenderer::Join(Reporter *reporter)
         reporter->End();
 }
 
+void PathTracingRenderer::Stop()
+{
+	dispatcher_.Stop();
+	totalCount_ = 0;
+	finishedCount_ = 0;
+}
+
 } // namespace Atrc

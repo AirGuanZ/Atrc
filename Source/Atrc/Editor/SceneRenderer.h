@@ -9,7 +9,7 @@
 #include <Atrc/Editor/FilmRTReporter.h>
 #include <Atrc/Editor/GL.h>
 
-class SceneRenderer
+class SceneRenderer : public AGZ::Uncopiable
 {
     std::unique_ptr<Atrc::Mgr::Context> context_;
     
@@ -32,9 +32,13 @@ public:
 
     void Stop();
 
+    bool IsRendering() const;
+
     bool IsCompleted() const;
 
     void Join();
+	
+	void Clear();
 
     template<typename Func>
     void ProcessImage(Func &&func)

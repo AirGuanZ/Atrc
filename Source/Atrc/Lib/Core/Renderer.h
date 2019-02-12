@@ -10,6 +10,7 @@
 namespace Atrc
 {
 
+// 原则上一个Renderer只应用于一次渲染
 class Renderer
 {
 public:
@@ -21,6 +22,8 @@ public:
     virtual bool IsCompleted() const = 0;
 
     virtual void Join(Reporter *reporter) = 0;
+	
+	virtual void Stop() = 0;
 };
 
 } // namespace Atrc
