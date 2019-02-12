@@ -6,7 +6,7 @@
 FilmRTReporter::FilmRTReporter(size_t width, size_t height)
 {
     tex_.InitializeHandle();
-    tex_.InitializeFormat(1, width, height, GL_RGB8);
+    tex_.InitializeFormat(1, static_cast<GLsizei>(width), static_cast<GLsizei>(height), GL_RGB8);
     showImage_ = false;
 }
 

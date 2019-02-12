@@ -8,11 +8,10 @@ SceneRenderer::SceneRenderer()
 
 void SceneRenderer::Start(const AGZ::Config &config, std::string_view configPath)
 {
-    
+    // TODO
 }
 
 void SceneRenderer::Stop()
 {
-    
+    // TODO
 }
-

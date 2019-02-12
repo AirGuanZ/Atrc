@@ -2,9 +2,8 @@
 
 #include <memory>
 
-#include <AGZUtils/Utils/Thread.h>
-
 #include <Atrc/Lib/Core/Scene.h>
+#include <Atrc/Lib/Core/TFilm.h>
 #include <Atrc/Mgr/Context.h>
 
 #include <Atrc/Editor/FilmRTReporter.h>
