@@ -43,7 +43,7 @@ cmake -G "Visual Studio 15 2017 Win64" ..
 
 Atrc::Mgr用[Utils::Config](https://github.com/AirGuanZ/Utils/blob/master/Src/AGZUtils/Config/Config.h)来解析配置文件中的字符串，Atrc::Launcher利用Atrc::Mgr来从文件中读取完整的场景描述信息。由于配置文件的编写对使用者极不友好，Atrc::Editor作为一个简单易用的场景编辑工具，提供了导出场景描述脚本的功能，也可在编辑器中直接渲染图像。目前Atrc::Editor还在前期施工中，截图如下：
 
-![SS0](C:/Users/lenovo/Documents/Programming/Code/Atrc/Diary/Misc/2019_02_11_hahaha.png)
+![SS0](Diary/Misc/2019_02_11_hahaha.png)
 
 以下是一个可供`Launcher`使用的配置文件示例，它使用路径追踪算法渲染一个翡翠质感的苹果模型（包含内部的介质散射和吸收）：
 
