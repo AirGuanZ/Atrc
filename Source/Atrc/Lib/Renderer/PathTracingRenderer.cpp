@@ -62,11 +62,11 @@ void PathTracingRenderer::Render(const Scene &scene, Sampler *sampler, Film *fil
 
         auto filmGrid = film->CreateFilmGrid(task);
         RenderGrid(scene, &filmGrid, gridSampler.get());
-        
-        film->MergeFilmGrid(filmGrid);
 
         // filmGrid间无任何overlap，故只需要对reporter加锁即可
         std::lock_guard<std::mutex> lk(mergeMut);
+        
+        film->MergeFilmGrid(filmGrid);
 
         Real percent = Real(100) * ++finishedTaskCount / totalTaskCount;
         reporter->Report(*film, percent);
@@ -75,7 +75,9 @@ void PathTracingRenderer::Render(const Scene &scene, Sampler *sampler, Film *fil
     AGZ::StaticTaskDispatcher<Grid, AGZ::NoSharedParam_t> dispatcher(workerCount_);
 
     reporter->Start();
-    bool ok = dispatcher.Run(func, AGZ::NO_SHARED_PARAM, tasks);
+    
+    dispatcher.RunAsync(func, AGZ::NO_SHARED_PARAM, tasks);
+    bool ok = dispatcher.Join();
 
     if(!ok)
     {
