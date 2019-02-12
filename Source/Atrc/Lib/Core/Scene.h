@@ -34,6 +34,8 @@ public:
         const Camera *camera, const Medium *globalMedium);
 
     Scene(Scene &&moveFrom) noexcept;
+
+    Scene &operator=(Scene &&moveFrom) noexcept;
     
     const Camera *GetCamera() const noexcept;
 

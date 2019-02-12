@@ -34,6 +34,16 @@ Scene::Scene(Scene &&moveFrom) noexcept
     
 }
 
+Scene &Scene::operator=(Scene &&moveFrom) noexcept
+{
+    entities_     = std::move(moveFrom.entities_);
+    lights_       = std::move(moveFrom.lights_);
+    camera_       = moveFrom.camera_;       moveFrom.camera_       = nullptr;
+    globalMedium_ = moveFrom.globalMedium_; moveFrom.globalMedium_ = nullptr;
+    worldBound_   = moveFrom.worldBound_;   moveFrom.worldBound_   = AABB();
+    return *this;
+}
+
 const Camera *Scene::GetCamera() const noexcept
 {
     return camera_;
