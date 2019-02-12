@@ -1,3 +1,5 @@
+#include <Atrc/Lib/Core/Scene.h>
+#include <Atrc/Lib/Core/SurfacePoint.h>
 #include <Atrc/Lib/Renderer/PathTracingIntegrator/ShadingNormalIntegrator.h>
 
 namespace Atrc

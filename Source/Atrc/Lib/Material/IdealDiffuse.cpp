@@ -1,4 +1,3 @@
-#include <Atrc/Lib/Core/Entity.h>
 #include <Atrc/Lib/Material/BxDF/BxDF_Diffuse.h>
 #include <Atrc/Lib/Material/IdealDiffuse.h>
 #include <Atrc/Lib/Material/Utility/BxDFAggregate.h>

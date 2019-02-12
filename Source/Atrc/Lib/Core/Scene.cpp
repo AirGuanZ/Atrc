@@ -3,6 +3,12 @@
 namespace Atrc
 {
 
+Scene::Scene()
+    : camera_(nullptr), globalMedium_(nullptr)
+{
+
+}
+
 Scene::Scene(
     const Entity **entities, size_t entityCount,
     const Light **lights,    size_t lightCount,

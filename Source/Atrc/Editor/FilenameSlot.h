@@ -39,7 +39,7 @@ public:
 
     bool Display(FileBrowser &fileBrowser)
     {
-        bool ret = false;
+        bool ret;
 
         ImGui::BeginChild(fileBrowser.GetLabel().c_str(), ImVec2(0, ImGui::GetTextLineHeight()));
 
@@ -51,7 +51,7 @@ public:
             filename_ = fileBrowser.GetResult();
 
         ImGui::SameLine();
-        ImGui::Text(curModeIcon.c_str());
+        ImGui::Text("%s", curModeIcon.c_str());
 
         if constexpr(TCanSelectOutputMode)
         {
@@ -65,7 +65,7 @@ public:
                     struct Icon2Mode
                     {
                         std::string icon;
-                        FilenameMode mode;
+                        FilenameMode mode = FilenameMode::Absolute;
                     } MODES[] =
                     {
                         { "[ ]", FilenameMode::RelativeToWorkspace },

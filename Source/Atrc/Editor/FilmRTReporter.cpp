@@ -1,7 +1,6 @@
-#include <Atrc/Lib/Core/TFilm.h>
-
 #include <Atrc/Editor/FilmRTReporter.h>
 #include <Atrc/Editor/Global.h>
+#include <Atrc/Lib/Core/TFilm.h>
 
 FilmRTReporter::FilmRTReporter(size_t width, size_t height)
 {

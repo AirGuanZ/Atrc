@@ -1,5 +1,3 @@
-#include <sstream>
-
 #include <Atrc/Editor/ResourceManagement/TextureCreator.h>
 #include <Atrc/Editor/FilenameSlot.h>
 

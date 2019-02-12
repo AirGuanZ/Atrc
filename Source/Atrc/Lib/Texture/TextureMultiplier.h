@@ -1,3 +1,5 @@
+#pragma once
+
 #include <Atrc/Lib/Core/Texture.h>
 
 namespace Atrc

@@ -1,11 +1,6 @@
 #pragma once
 
-#include <AGZUtils/Utils/Texture.h>
-
-#include <Atrc/Lib/Core/Reporter.h>
-#include <Atrc/Lib/Core/Sampler.h>
-#include <Atrc/Lib/Core/Scene.h>
-#include <Atrc/Lib/Core/TFilm.h>
+#include <Atrc/Lib/Core/Common.h>
 
 namespace Atrc
 {

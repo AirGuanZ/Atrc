@@ -1,7 +1,9 @@
-#include <Atrc/Lib/Core/Renderer.h>
-
 #include <Atrc/Editor/FilmRTReporter.h>
 #include <Atrc/Editor/SceneRenderer.h>
+#include <Atrc/Lib/Core/Renderer.h>
+#include <Atrc/Mgr/BuiltinCreatorRegister.h>
+#include <Atrc/Mgr/Parser.h>
+#include <Atrc/Mgr/SceneBuilder.h>
 
 SceneRenderer::SceneRenderer()
     : renderer_(nullptr), sampler_(nullptr), filmFilter_(nullptr)
@@ -20,7 +22,7 @@ bool SceneRenderer::Start(const AGZ::Config &config, std::string_view configPath
 		context_ = std::make_unique<Atrc::Mgr::Context>(root, configPath);
 		Atrc::Mgr::RegisterBuiltinCreators(*context_);
 		
-		std::string outputFilename = context_->GetPathInWorkspace(root["outputFilename"].AsValue())
+        std::string outputFilename = context_->GetPathInWorkspace(root["outputFilename"].AsValue());
 		
 		renderer_   = context_->Create<Atrc::Renderer>(root["renderer"]);
 		sampler_    = context_->Create<Atrc::Sampler> (root["sampler"]);
@@ -29,11 +31,11 @@ bool SceneRenderer::Start(const AGZ::Config &config, std::string_view configPath
 		scene_ = std::make_unique<Atrc::Scene>();
 		*scene_ = Atrc::Mgr::SceneBuilder::Build(root, *context_);
 		
-		Vec2i filmSize = Mgr::Parser::ParseVec2i(root["film.size"]);
+		Vec2i filmSize = Atrc::Mgr::Parser::ParseVec2i(root["film.size"]);
 		film_ = std::make_unique<Atrc::Film>(filmSize, *filmFilter_);
 		reporter_ = std::make_unique<FilmRTReporter>(filmSize.x, filmSize.y);
 		
-		renderer_->Render(scene_.get(), sampler_.get(), film_.get(), reporter_.get());
+		renderer_->Render(scene_.get(), sampler_, film_.get(), reporter_.get());
 	}
 	catch(...)
 	{
@@ -46,7 +48,6 @@ bool SceneRenderer::Start(const AGZ::Config &config, std::string_view configPath
 
 void SceneRenderer::Stop()
 {
-    // TODOcffgfgf egg
 	AGZ_ASSERT(renderer_);
 	renderer_->Stop();
 }
@@ -68,7 +69,7 @@ void SceneRenderer::Join()
     renderer_->Join(reporter_.get());
 }
 
-void Clear()
+void SceneRenderer::Clear()
 {
 	context_    = nullptr;
 	renderer_   = nullptr;

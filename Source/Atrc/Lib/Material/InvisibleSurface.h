@@ -1,3 +1,5 @@
+#pragma once
+
 #include <Atrc/Lib/Core/Material.h>
 
 namespace Atrc

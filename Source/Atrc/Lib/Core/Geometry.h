@@ -1,7 +1,6 @@
 #pragma once
 
 #include <Atrc/Lib/Core/AABB.h>
-#include <Atrc/Lib/Core/Ray.h>
 #include <Atrc/Lib/Core/SurfacePoint.h>
 #include <Atrc/Lib/Core/Transform.h>
 

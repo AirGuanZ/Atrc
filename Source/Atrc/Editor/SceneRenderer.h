@@ -2,12 +2,11 @@
 
 #include <memory>
 
+#include <Atrc/Editor/FilmRTReporter.h>
+#include <Atrc/Editor/GL.h>
 #include <Atrc/Lib/Core/Scene.h>
 #include <Atrc/Lib/Core/TFilm.h>
 #include <Atrc/Mgr/Context.h>
-
-#include <Atrc/Editor/FilmRTReporter.h>
-#include <Atrc/Editor/GL.h>
 
 class SceneRenderer : public AGZ::Uncopiable
 {
@@ -28,7 +27,7 @@ public:
 
     SceneRenderer();
 
-    void Start(const AGZ::Config &config, std::string_view configPath);
+    bool Start(const AGZ::Config &config, std::string_view configPath);
 
     void Stop();
 

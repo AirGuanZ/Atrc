@@ -3,8 +3,6 @@
 #include <Atrc/Lib/Core/AABB.h>
 #include <Atrc/Lib/Core/Light.h>
 #include <Atrc/Lib/Core/Material.h>
-#include <Atrc/Lib/Core/Ray.h>
-#include <Atrc/Lib/Core/SurfacePoint.h>
 
 namespace Atrc
 {

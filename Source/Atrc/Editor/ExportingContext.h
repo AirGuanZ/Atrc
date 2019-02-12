@@ -27,13 +27,13 @@ class LauncherScriptExportingContext
 
 public:
 
-    const Camera * const activeCamera;
+    const DefaultRenderingCamera * const activeCamera;
     const std::string workspaceDirectory;
     const std::string scriptDirectory;
 
     const Transform *entityTransform;
 
-    LauncherScriptExportingContext(const Camera *activeCamera, std::string workspace, std::string scriptDir)
+    LauncherScriptExportingContext(const DefaultRenderingCamera *activeCamera, std::string workspace, std::string scriptDir)
         : indent_(0),
           activeCamera(activeCamera), workspaceDirectory(std::move(workspace)), scriptDirectory(std::move(scriptDir)),
           entityTransform(nullptr)

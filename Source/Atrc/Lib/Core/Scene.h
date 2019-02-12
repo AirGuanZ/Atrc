@@ -6,7 +6,6 @@
 #include <Atrc/Lib/Core/Camera.h>
 #include <Atrc/Lib/Core/Entity.h>
 #include <Atrc/Lib/Core/Light.h>
-#include <Atrc/Lib/Core/Ray.h>
 #include <Atrc/Lib/Core/SurfacePoint.h>
 
 namespace Atrc
@@ -26,6 +25,8 @@ class Scene
     AABB worldBound_;
 
 public:
+
+    Scene();
 
     Scene(
         const Entity **entities, size_t entityCount,

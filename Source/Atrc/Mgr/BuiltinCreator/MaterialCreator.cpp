@@ -1,5 +1,3 @@
-#include <AGZUtils/Utils/FileSys.h>
-
 #include <Atrc/Lib/Material/BSSRDFSurface.h>
 #include <Atrc/Lib/Material/IdealBlack.h>
 #include <Atrc/Lib/Material/IdealDiffuse.h>

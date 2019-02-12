@@ -1,4 +1,5 @@
 #include <Atrc/Lib/Core/BSSRDF.h>
+#include <Atrc/Lib/Core/Sampler.h>
 #include <Atrc/Lib/Renderer/PathTracingIntegrator/DirectLighting.h>
 #include <Atrc/Lib/Renderer/PathTracingIntegrator/FullPathTracingIntegrator.h>
 

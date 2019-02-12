@@ -1,6 +1,5 @@
-﻿#include <Lib/imgui/imgui/ImGuizmo.h>
-
-#include <Atrc/Editor/TransformController.h>
+﻿#include <Atrc/Editor/TransformController.h>
+#include <Lib/imgui/imgui/ImGuizmo.h>
 
 void TransformController::BeginFrame()
 {

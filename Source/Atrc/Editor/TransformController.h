@@ -1,6 +1,5 @@
 #pragma once
 
-#include <Atrc/Editor/Camera.h>
 #include <Atrc/Editor/GL.h>
 
 class TransformController

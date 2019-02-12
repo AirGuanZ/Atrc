@@ -12,10 +12,6 @@ class MISPathTracingIntegrator : public PathTracingIntegrator
 
     bool sampleAllLights_;
 
-    Spectrum MISSampleLight(
-        const Scene &scene, const Light *light,
-        const Intersection &inct, const ShadingPoint &shd, const Vec3 &sample) const;
-
 public:
 
     MISPathTracingIntegrator(int minDepth, int maxDepth, Real contProb, bool sampleAllLights) noexcept;

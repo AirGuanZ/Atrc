@@ -1,6 +1,5 @@
 #pragma once
 
-#include <Atrc/Lib/Core/Ray.h>
 #include <Atrc/Lib/Core/SurfacePoint.h>
 
 namespace Atrc

@@ -1,3 +1,5 @@
+#pragma once
+
 #include <Atrc/Mgr/Context.h>
 
 namespace Atrc::Mgr

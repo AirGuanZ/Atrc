@@ -1,3 +1,5 @@
+#pragma once
+
 #include <Atrc/Lib/Material/Utility/BxDF.h>
 #include <Atrc/Lib/Material/Utility/Fresnel.h>
 

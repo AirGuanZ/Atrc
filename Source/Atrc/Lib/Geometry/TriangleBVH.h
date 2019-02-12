@@ -49,7 +49,7 @@ public:
 
 private:
 
-    TriangleBVHCore() { }
+    TriangleBVHCore(): nodeCount_(0), nodes_(nullptr), prims_(nullptr), primsInfo_(nullptr) { }
 
     void InitBVH(const Vertex *vtx, uint32_t triangleCount);
 

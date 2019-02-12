@@ -1,3 +1,5 @@
+#pragma once
+
 #include <Atrc/Lib/Material/Utility/BxDF.h>
 
 namespace Atrc

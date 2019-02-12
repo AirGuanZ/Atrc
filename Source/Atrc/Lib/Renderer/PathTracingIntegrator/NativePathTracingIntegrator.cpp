@@ -1,3 +1,6 @@
+#include <Atrc/Lib/Core/Ray.h>
+#include <Atrc/Lib/Core/Sampler.h>
+#include <Atrc/Lib/Core/Scene.h>
 #include <Atrc/Lib/Renderer/PathTracingIntegrator/NativePathTracingIntegrator.h>
 
 namespace Atrc

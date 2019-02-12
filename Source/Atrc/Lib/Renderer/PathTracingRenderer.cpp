@@ -3,6 +3,10 @@
 
 #include <AGZUtils/Utils/Thread.h>
 
+#include <Atrc/Lib/Core/Reporter.h>
+#include <Atrc/Lib/Core/Sampler.h>
+#include <Atrc/Lib/Core/Scene.h>
+#include <Atrc/Lib/Core/TFilm.h>
 #include <Atrc/Lib/Renderer/PathTracingRenderer.h>
 
 namespace Atrc
@@ -37,7 +41,7 @@ void PathTracingRenderer::RenderGrid(const Scene *scene, FilmGrid *filmGrid, Sam
 }
 
 PathTracingRenderer::PathTracingRenderer(int workerCount, int taskGridSize, const PathTracingIntegrator &integrator) noexcept
-    : taskGridSize_(taskGridSize), dispatcher_(workerCount), integrator_(integrator)
+    : taskGridSize_(taskGridSize), dispatcher_(workerCount), totalCount_(0), finishedCount_(0), integrator_(integrator)
 {
     AGZ_ASSERT(taskGridSize > 0);
 }

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <Atrc/Lib/Core/Common.h>
-#include <Atrc/Lib/Core/Sampler.h>
 #include <Atrc/Lib/Core/SurfacePoint.h>
 
 namespace Atrc

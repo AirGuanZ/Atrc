@@ -1,4 +1,3 @@
-#include <Atrc/Lib/Core/Entity.h>
 #include <Atrc/Lib/Material/BxDF/BxDF_Black.h>
 #include <Atrc/Lib/Material/IdealBlack.h>
 #include <Atrc/Lib/Material/Utility/BxDFAggregate.h>
