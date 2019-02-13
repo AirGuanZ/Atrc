@@ -409,26 +409,7 @@ int Run(GLFWwindow *window)
 
         // 物体属性编辑
 
-        if(auto selectedEntity = rscMgr.GetPool<EntityInstance>().GetSelectedInstance(); selectedEntity && isEntityPoolDisplayed)
-        {
-            ImGui::SetNextWindowPos(ImVec2(sceneManagerPosX + 420, sceneManagerPosY), ImGuiCond_FirstUseEver);
-            if(ImGui::Begin("property", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
-            {
-                selectedEntity->Display(rscMgr);
-                selectedEntity->DisplayTransform(camera.GetProjMatrix(), camera.GetViewMatrix());
-                ImGui::End();
-            }
-        }
-
-        if(auto selectedLight = rscMgr.GetPool<LightInstance>().GetSelectedInstance(); selectedLight && isLightPoolDisplayed)
-        {
-            ImGui::SetNextWindowPos(ImVec2(sceneManagerPosX + 420, sceneManagerPosY), ImGuiCond_FirstUseEver);
-            if(ImGui::Begin("property", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
-            {
-                selectedLight->Display(rscMgr);
-                ImGui::End();
-            }
-        }
+        CameraInstance::ProjData selectedCameraProjData;
 
         std::shared_ptr<CameraInstance> selectedCamera = rscMgr.GetPool<CameraInstance>().GetSelectedInstance();
         ImGui::SetNextWindowPos(ImVec2(sceneManagerPosX, sceneManagerPosY + 320 + 320), ImGuiCond_FirstUseEver);
@@ -438,6 +419,36 @@ int Run(GLFWwindow *window)
             if(selectedCamera)
                 selectedCamera->Display(rscMgr);
             ImGui::End();
+        }
+
+        if(selectedCamera)
+        {
+            float filmAspectRatio = static_cast<float>(filmSize.x) / filmSize.y;
+            selectedCameraProjData = selectedCamera->GetProjData(filmAspectRatio);
+        }
+
+        if(auto selectedEntity = rscMgr.GetPool<EntityInstance>().GetSelectedInstance();
+            !sceneRenderer.IsRendering() && selectedEntity && isEntityPoolDisplayed)
+        {
+            ImGui::SetNextWindowPos(ImVec2(sceneManagerPosX + 420, sceneManagerPosY), ImGuiCond_FirstUseEver);
+            if(ImGui::Begin("property", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+            {
+                selectedEntity->Display(rscMgr);
+                selectedEntity->DisplayTransform(
+                    (selectedCamera ? selectedCameraProjData.projMatrix : camera.GetProjMatrix()), camera.GetViewMatrix());
+                ImGui::End();
+            }
+        }
+
+        if(auto selectedLight = rscMgr.GetPool<LightInstance>().GetSelectedInstance();
+            !sceneRenderer.IsRendering() && selectedLight && isLightPoolDisplayed)
+        {
+            ImGui::SetNextWindowPos(ImVec2(sceneManagerPosX + 420, sceneManagerPosY), ImGuiCond_FirstUseEver);
+            if(ImGui::Begin("property", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+            {
+                selectedLight->Display(rscMgr);
+                ImGui::End();
+            }
         }
 
         // 更新摄像机状态
@@ -455,14 +466,9 @@ int Run(GLFWwindow *window)
 
         // 场景绘制
 
-        CameraInstance::ProjData selectedCameraProjData;
-
         BeginEntityRendering();
         if(selectedCamera)
         {
-            float filmAspectRatio = static_cast<float>(filmSize.x) / filmSize.y;
-            selectedCameraProjData = selectedCamera->GetProjData(filmAspectRatio);
-
             auto VP = selectedCameraProjData.projMatrix * camera.GetViewMatrix();
             for(auto &ent : rscMgr.GetPool<EntityInstance>())
                 ent->Render(VP);
@@ -518,9 +524,11 @@ int Run(GLFWwindow *window)
             });
             float LTx = (std::max)(0.0f, 0.5f * fbW - 0.5f * selectedCameraProjData.viewportWidth);
             float LTy = (std::min)(fbH, 0.5f * fbH - 0.5f * selectedCameraProjData.viewportHeight);
-            float RBx = (std::min)(fbW, 0.5f * fbW + 0.5f * selectedCameraProjData.viewportWidth);
-            float RBy = (std::max)(0.0f, 0.5f * fbH + 0.5f * selectedCameraProjData.viewportHeight);
-            glViewport(LTx, LTy, selectedCameraProjData.viewportWidth, selectedCameraProjData.viewportHeight);
+            glViewport(
+                static_cast<int>(LTx),
+                static_cast<int>(LTy),
+                static_cast<GLsizei>(selectedCameraProjData.viewportWidth),
+                static_cast<GLsizei>(selectedCameraProjData.viewportHeight));
             imm.DrawTexturedQuad({ -1, -1 }, { 1, 1 }, sceneRendererTex);
             SetFullViewport();
         }

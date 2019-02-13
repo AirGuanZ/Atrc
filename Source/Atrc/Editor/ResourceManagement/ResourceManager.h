@@ -464,10 +464,7 @@ class TResourceSlot
         if(ImGui::Button("ok") && selector->GetSelectedCreator())
         {
             ImGui::CloseCurrentPopup();
-            if constexpr(THasPool)
-                return selector->GetSelectedCreator()->Create(rscMgr, "[" + selector->GetSelectedCreator()->GetName() + "] anonymous");
-            else
-                return selector->GetSelectedCreator()->Create(rscMgr, "[" + selector->GetSelectedCreator()->GetName() + "]");
+            return selector->GetSelectedCreator()->Create(rscMgr, "[" + selector->GetSelectedCreator()->GetName() + "]");
         }
 
         ImGui::SameLine();

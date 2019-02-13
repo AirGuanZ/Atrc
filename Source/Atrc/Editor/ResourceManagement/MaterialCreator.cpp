@@ -30,7 +30,7 @@ namespace
 
         void Display(ResourceManager &rscMgr) override
         {
-            if(ImGui::TreeNode("albedo"))
+            if(ImGui::TreeNodeEx("albedo", ImGuiTreeNodeFlags_DefaultOpen))
             {
                 albedo_.Display(rscMgr);
                 ImGui::TreePop();
