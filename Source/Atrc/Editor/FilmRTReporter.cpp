@@ -2,16 +2,15 @@
 #include <Atrc/Editor/Global.h>
 #include <Atrc/Lib/Core/TFilm.h>
 
-FilmRTReporter::FilmRTReporter(size_t width, size_t height)
+FilmRTReporter::FilmRTReporter()
+    : newData_(false)
 {
-    tex_.InitializeHandle();
-    tex_.InitializeFormat(1, static_cast<GLsizei>(width), static_cast<GLsizei>(height), GL_RGB8);
-    showImage_ = false;
+
 }
 
 void FilmRTReporter::Start()
 {
-    showImage_ = true;
+    newData_ = false;
 }
 
 void FilmRTReporter::End()
@@ -22,8 +21,10 @@ void FilmRTReporter::End()
 void FilmRTReporter::Report(const Atrc::Film &film, std::optional<Atrc::Real> percent)
 {
     std::lock_guard<std::mutex> lk(mut_);
-    auto img = film.GetImage();
-    tex_.ReinitializeData(img.GetWidth(), img.GetHeight(), img.RawData());
+    img_ = film.GetImage();
+    newData_ = true;
+    if(percent)
+        Global::ShowNormalMessage("percent: " + std::to_string(*percent));
 }
 
 void FilmRTReporter::Message(std::string_view msg)

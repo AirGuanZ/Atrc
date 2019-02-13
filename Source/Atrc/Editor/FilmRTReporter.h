@@ -10,7 +10,7 @@ class FilmRTReporter : public Atrc::Reporter, public AGZ::Uncopiable
 {
 public:
 
-    FilmRTReporter(size_t width, size_t height);
+    FilmRTReporter();
 
     void Start() override;
 
@@ -21,20 +21,18 @@ public:
     void Message(std::string_view msg) override;
 
     template<typename Func>
-    void ProcessTexture(Func &&func)
+    void ConsumeNewData(Func &&func)
     {
         std::lock_guard<std::mutex> lk(mut_);
-        func(tex_);
+        if(newData_)
+            func(img_);
+        newData_ = false;
     }
-
-    void StartShowImage() noexcept { showImage_ = true; }
-    void EndShowImage() noexcept { showImage_ = false; }
-    bool IsShowingImage() const noexcept { return showImage_; }
 
 private:
 
-    bool showImage_;
+    bool newData_;
 
-    GL::Texture2D tex_;
+    AGZ::Texture2D<Vec3f> img_;
     std::mutex mut_;
 };

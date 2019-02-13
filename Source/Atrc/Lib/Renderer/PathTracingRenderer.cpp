@@ -62,7 +62,6 @@ void PathTracingRenderer::Render(const Scene *scene, Sampler *sampler, Film *fil
         auto filmGrid = film->CreateFilmGrid(task);
         RenderGrid(scene, &filmGrid, gridSampler.get());
 
-        // filmGrid间无任何overlap，故只需要对reporter加锁即可
         std::lock_guard<std::mutex> lk(mergeMut_);
         
         film->MergeFilmGrid(filmGrid);

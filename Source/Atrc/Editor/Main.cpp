@@ -3,14 +3,15 @@
 #include <AGZUtils/Utils/Mesh.h>
 #include <AGZUtils/Utils/Texture.h>
 
-#include <Atrc/Editor/ResourceManagement/EntityCreator.h>
-#include <Atrc/Editor/ResourceManagement/ResourceManager.h>
 #include <Atrc/Editor/Camera.h>
 #include <Atrc/Editor/Console.h>
 #include <Atrc/Editor/FilenameSlot.h>
 #include <Atrc/Editor/GL.h>
 #include <Atrc/Editor/Global.h>
 #include <Atrc/Editor/LauncherScriptExporter.h>
+#include <Atrc/Editor/ResourceManagement/EntityCreator.h>
+#include <Atrc/Editor/ResourceManagement/ResourceManager.h>
+#include <Atrc/Editor/SceneRenderer.h>
 #include <Atrc/Editor/ScreenAxis.h>
 #include <Atrc/Editor/TransformController.h>
 
@@ -150,10 +151,25 @@ int Run(GLFWwindow *window)
 
     // global setting
 
+    GL::Texture2D testTex;
+    testTex.InitializeHandle();
+    auto testTexData = AGZ::TextureFile::LoadRGBFromFile("C:/Users/lenovo/Documents/Programming/Code/Atrc/Output.png");
+    testTex.InitializeFormatAndData(1, testTexData.GetWidth(), testTexData.GetHeight(), GL_RGB8, testTexData.RawData());
+
     Vec2i filmSize = { 640, 480 };
     FilmFilterSlot filmFilterSlot;
     SamplerSlot samplerSlot;
     RendererSlot rendererSlot;
+
+    SceneRenderer sceneRenderer;
+    GL::Texture2D sceneRendererTex;
+
+    auto initSceneRendererTex = [&](int w, int h)
+    {
+        sceneRendererTex = GL::Texture2D(true);
+        sceneRendererTex.InitializeHandle();
+        sceneRendererTex.InitializeFormat(1, w, h, GL_RGB8);
+    };
 
     filmFilterSlot.SetInstance(rscMgr.Create<FilmFilterInstance>("box", ""));
     samplerSlot.SetInstance(rscMgr.Create<SamplerInstance>("native", ""));
@@ -193,11 +209,13 @@ int Run(GLFWwindow *window)
         bool openGlobalHelpWindow = false;
         bool openGlobalSettingWindow = false;
 
+        AGZ::Config config;
+
         if(showMenuBar && ImGui::BeginMainMenuBar())
         {
             if(ImGui::BeginMenu("file"))
             {
-                if(ImGui::MenuItem("export"))
+                if(ImGui::MenuItem("render"))
                 {
                     std::string scriptDir = scriptSlot.GetExportedFilename("", "");
                     std::string workspaceDir = workspaceSlot.GetExportedFilename("", scriptDir);
@@ -212,7 +230,36 @@ int Run(GLFWwindow *window)
                         outputFilenameBuf,
                         filmSize);
                     LauncherScriptExporter exporter(rscMgr, ctx);
-                    std::cout << exporter.Export();
+                    
+                    initSceneRendererTex(filmSize.x, filmSize.y);
+
+                    try
+                    {
+                        if(sceneRenderer.IsRendering())
+                        {
+                            sceneRenderer.Stop();
+                            sceneRenderer.Clear();
+                        }
+
+                        std::string configStr = exporter.Export();
+                        config.Clear();
+                        if(!config.LoadFromMemory(configStr))
+                        {
+                            Global::ShowErrorMessage("failed to load configure content");
+                            throw std::runtime_error("");
+                        }
+
+                        if(!sceneRenderer.Start(config, scriptDir))
+                        {
+                            Global::ShowErrorMessage("sceneRenderer.Start returns false");
+                            throw std::runtime_error("");
+                        }
+                    }
+                    catch(...)
+                    {
+                        sceneRenderer.Clear();
+                        Global::ShowErrorMessage("failed to start rendering");
+                    }
                 }
                 if(ImGui::MenuItem("exit"))
                     glfwSetWindowShouldClose(window, GLFW_TRUE);
@@ -430,7 +477,6 @@ int Run(GLFWwindow *window)
         EndEntityRendering();
 
         GL::RenderContext::DisableDepthTest();
-
         GL::RenderContext::ClearDepth();
 
         glEnable(GL_BLEND);
@@ -440,7 +486,6 @@ int Run(GLFWwindow *window)
 
         if(selectedCamera)
         {
-
             float LTx = (std::max)(0.0f, 0.5f * fbW - 0.5f * selectedCameraProjData.viewportWidth);
             float LTy = (std::min)(fbH, 0.5f * fbH - 0.5f * selectedCameraProjData.viewportHeight);
             float RBx = (std::min)(fbW, 0.5f * fbW + 0.5f * selectedCameraProjData.viewportWidth);
@@ -453,12 +498,45 @@ int Run(GLFWwindow *window)
 
         glLineWidth(1);
 
+        // 渲染结果预览
+
+        if(sceneRenderer.IsRendering())
+        {
+            if(keyboard.IsKeyPressed('C'))
+            {
+                sceneRenderer.Stop();
+                sceneRenderer.Clear();
+                Global::ShowNormalMessage("rendering interrupted");
+            }
+        }
+
+        if(sceneRenderer.IsRendering())
+        {
+            sceneRenderer.ProcessImage([&](const AGZ::Texture2D<Vec3f> &img)
+            {
+                sceneRendererTex.ReinitializeData(img.GetWidth(), img.GetHeight(), img.RawData());
+            });
+            float LTx = (std::max)(0.0f, 0.5f * fbW - 0.5f * selectedCameraProjData.viewportWidth);
+            float LTy = (std::min)(fbH, 0.5f * fbH - 0.5f * selectedCameraProjData.viewportHeight);
+            float RBx = (std::min)(fbW, 0.5f * fbW + 0.5f * selectedCameraProjData.viewportWidth);
+            float RBy = (std::max)(0.0f, 0.5f * fbH + 0.5f * selectedCameraProjData.viewportHeight);
+            glViewport(LTx, LTy, selectedCameraProjData.viewportWidth, selectedCameraProjData.viewportHeight);
+            imm.DrawTexturedQuad({ -1, -1 }, { 1, 1 }, sceneRendererTex);
+            SetFullViewport();
+        }
+
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         glDisable(GL_BLEND);
 
         glfwSwapBuffers(window);
+    }
+
+    if(sceneRenderer.IsRendering())
+    {
+        sceneRenderer.Stop();
+        sceneRenderer.Clear();
     }
 
     Global::_setConsole(nullptr);

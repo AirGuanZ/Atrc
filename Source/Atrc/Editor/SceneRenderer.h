@@ -43,6 +43,6 @@ public:
     void ProcessImage(Func &&func)
     {
         if(reporter_)
-            reporter_->ProcessTexture(std::forward<Func>(func));
+            reporter_->ConsumeNewData(std::forward<Func>(func));
     }
 };

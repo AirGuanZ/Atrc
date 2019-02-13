@@ -4,6 +4,7 @@
 #include <Atrc/Mgr/BuiltinCreatorRegister.h>
 #include <Atrc/Mgr/Parser.h>
 #include <Atrc/Mgr/SceneBuilder.h>
+#include "Global.h"
 
 SceneRenderer::SceneRenderer()
     : renderer_(nullptr), sampler_(nullptr), filmFilter_(nullptr)
@@ -33,9 +34,11 @@ bool SceneRenderer::Start(const AGZ::Config &config, std::string_view configPath
 		
 		Vec2i filmSize = Atrc::Mgr::Parser::ParseVec2i(root["film.size"]);
 		film_ = std::make_unique<Atrc::Film>(filmSize, *filmFilter_);
-		reporter_ = std::make_unique<FilmRTReporter>(filmSize.x, filmSize.y);
+		reporter_ = std::make_unique<FilmRTReporter>();
 		
 		renderer_->Render(scene_.get(), sampler_, film_.get(), reporter_.get());
+
+        Global::ShowNormalMessage("start rendering");
 	}
 	catch(...)
 	{

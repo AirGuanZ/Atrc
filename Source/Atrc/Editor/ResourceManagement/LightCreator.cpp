@@ -4,8 +4,8 @@ namespace
 {
     class SkyLightInstance : public LightInstance
     {
-        Vec3f top_;
-        Vec3f bottom_;
+        Vec3f top_ = Vec3f(1);
+        Vec3f bottom_ = Vec3f(1);
 
     public:
 
