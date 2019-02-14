@@ -13,7 +13,7 @@ namespace
 
         void Display([[maybe_unused]] ResourceManager &rscMgr) override
         {
-            ImGui::ColorEdit3("texel", &texel_[0]);
+            ImGui::ColorEdit3("texel", &texel_[0], ImGuiColorEditFlags_HDR | ImGuiColorEditFlags_Float);
         }
 
         void Export(const ResourceManager&, LauncherScriptExportingContext &ctx) const override

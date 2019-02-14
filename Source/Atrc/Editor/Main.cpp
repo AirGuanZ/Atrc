@@ -13,7 +13,7 @@
 #include <Atrc/Editor/ResourceManagement/ResourceManager.h>
 #include <Atrc/Editor/SceneRenderer.h>
 #include <Atrc/Editor/ScreenAxis.h>
-#include <Atrc/Editor/TransformController.h>
+#include <Atrc/Editor/EntityController.h>
 
 using namespace std;
 
@@ -202,7 +202,7 @@ int Run(GLFWwindow *window)
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
-        TransformController::BeginFrame();
+        EntityControllerAction::BeginFrame();
 
         // 全局菜单栏
 
@@ -432,8 +432,8 @@ int Run(GLFWwindow *window)
             ImGui::SetNextWindowPos(ImVec2(sceneManagerPosX + 420, sceneManagerPosY), ImGuiCond_FirstUseEver);
             if(ImGui::Begin("property", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
             {
-                selectedEntity->Display(rscMgr);
-                selectedEntity->DisplayTransform(
+                selectedEntity->DisplayEx(
+                    rscMgr,
                     (selectedCamera ? selectedCameraProjData.projMatrix : camera.GetProjMatrix()), camera.GetViewMatrix(),
                     !sceneRenderer.IsRendering());
                 ImGui::End();
@@ -470,14 +470,14 @@ int Run(GLFWwindow *window)
         {
             auto VP = selectedCameraProjData.projMatrix * camera.GetViewMatrix();
             for(auto &ent : rscMgr.GetPool<EntityInstance>())
-                ent->Render(VP);
+                ent->Render(VP, camera.GetPosition());
 
             SetFullViewport();
         }
         else
         {
             for(auto &ent : rscMgr.GetPool<EntityInstance>())
-                ent->Render(defaultCameraProjViewMat);
+                ent->Render(defaultCameraProjViewMat, camera.GetPosition());
         }
         EndEntityRendering();
 
@@ -565,7 +565,7 @@ int main()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
     glfwWindowHint(GLFW_MAXIMIZED, GL_TRUE);
-    GLFWwindow *window = glfwCreateWindow(INIT_WIN_WIDTH, INIT_WIN_HEIGHT, "ModelViewer", nullptr, nullptr);
+    GLFWwindow *window = glfwCreateWindow(INIT_WIN_WIDTH, INIT_WIN_HEIGHT, "Editor", nullptr, nullptr);
     if(!window)
     {
         glfwTerminate();

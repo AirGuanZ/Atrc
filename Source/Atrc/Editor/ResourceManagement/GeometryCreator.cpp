@@ -3,9 +3,131 @@
 #include <Atrc/Editor/ResourceManagement/GeometryCreator.h>
 #include <Atrc/Editor/FileBrowser.h>
 #include <Atrc/Editor/FilenameSlot.h>
+#include <Lib/imgui/imgui/ImGuizmo.h>
 
 namespace
 {
+    void ExportTransform(LauncherScriptExportingContext &ctx)
+    {
+        AGZ_ASSERT(ctx.entityController);
+        ctx.AddLine("transform = (");
+        ctx.IncIndent();
+        ctx.AddLine("Translate",    AGZ::To<char> (ctx.entityController->GetTranslate()), ",");
+        ctx.AddLine("RotateZ(Deg(", std::to_string(ctx.entityController->GetRotate().z),  ")),");
+        ctx.AddLine("RotateY(Deg(", std::to_string(ctx.entityController->GetRotate().y),  ")),");
+        ctx.AddLine("RotateX(Deg(", std::to_string(ctx.entityController->GetRotate().x),  ")),");
+        ctx.AddLine("Scale(",       std::to_string(ctx.entityController->GetScale()),     ")");
+        ctx.DecIndent();
+        ctx.AddLine(");");
+    }
+
+    class TriangleInstance : public GeometryInstance
+    {
+        std::shared_ptr<GL::VertexBuffer<Vertex>> vtxBuf_;
+        Vec3f A_, B_, C_;
+        Vec3f nor_;
+        int editingVtx_;
+
+        void UpdateNormal()
+        {
+            nor_ = Cross(B_ - A_, C_ - A_);
+            if(nor_.Length() < 0.001f)
+                nor_ = Vec3f::UNIT_X();
+            else
+                nor_ = nor_.Normalize();
+        }
+
+        void UpdateVertexBuffer()
+        {
+            if(!vtxBuf_)
+                vtxBuf_ = std::make_shared<GL::VertexBuffer<Vertex>>(true);
+            Vertex vtxData[] =
+            {
+                { A_, nor_ },
+                { B_, nor_ },
+                { C_, nor_ },
+            };
+            vtxBuf_->ReinitializeData(vtxData, 3, GL_STATIC_DRAW);
+        }
+
+    public:
+
+        explicit TriangleInstance(std::string name)
+            : GeometryInstance(std::move(name)),
+              A_(-1, -1, 0), B_(0, 1, 0), C_(1, -1, 0),
+              editingVtx_(0)
+        {
+            UpdateNormal();
+            UpdateVertexBuffer();
+        }
+
+        std::shared_ptr<const GL::VertexBuffer<Vertex>> GetVertexBuffer() const override
+        {
+            return vtxBuf_;
+        }
+
+        std::vector<std::string> GetSubmeshNames() const override
+        {
+            return { };
+        }
+
+        void DisplayEditing(const Mat4f &world, const Mat4f &proj, const Mat4f &view, bool renderController) override
+        {
+            bool ABCChanged = false;
+
+            ABCChanged |= ImGui::InputFloat3("A", &A_[0]);
+            ABCChanged |= ImGui::InputFloat3("B", &B_[0]);
+            ABCChanged |= ImGui::InputFloat3("C", &C_[0]);
+
+            ImGui::RadioButton("A", &editingVtx_, 0); ImGui::SameLine();
+            ImGui::RadioButton("B", &editingVtx_, 1); ImGui::SameLine();
+            ImGui::RadioButton("C", &editingVtx_, 2);
+
+            if(ABCChanged)
+            {
+                UpdateNormal();
+                UpdateVertexBuffer();
+            }
+
+            if(!renderController)
+                return;
+
+            Vec3f *editedVtx;
+            switch(editingVtx_)
+            {
+            case 0: editedVtx = &A_; break;
+            case 1: editedVtx = &B_; break;
+            case 2: editedVtx = &C_; break;
+            default: AGZ::Unreachable();
+            }
+
+            ImGuiIO &io = ImGui::GetIO();
+            ImGuizmo::SetRect(0, 0, io.DisplaySize.x, io.DisplaySize.y);
+            
+            Mat4f worldMat = world * Mat4f::Translate(*editedVtx);
+            ImGuizmo::Manipulate(&view.m[0][0], &proj.m[0][0], ImGuizmo::TRANSLATE, ImGuizmo::WORLD, &worldMat.m[0][0]);
+
+            //float r[3], s[3];
+            worldMat = world.Inverse() * worldMat;
+            //ImGuizmo::DecomposeMatrixToComponents(&worldMat.m[0][0], &editedVtx->x, r, s);
+            *editedVtx = worldMat.m[3].xyz();
+            UpdateNormal();
+            UpdateVertexBuffer();
+        }
+
+        void Export(const ResourceManager&, LauncherScriptExportingContext &ctx) const override
+        {
+            ctx.AddLine("type = Triangle;");
+            ctx.AddLine("A = ", AGZ::To<char>(A_), ";");
+            ctx.AddLine("B = ", AGZ::To<char>(B_), ";");
+            ctx.AddLine("C = ", AGZ::To<char>(C_), ";");
+            ctx.AddLine("tA = (0, 0);");
+            ctx.AddLine("tB = (0, 0);");
+            ctx.AddLine("tC = (0, 0);");
+            ExportTransform(ctx);
+        }
+    };
+
     class WavefrontOBJInstance : public GeometryInstance
     {
         std::shared_ptr<GL::VertexBuffer<Vertex>> vtxBuf_;
@@ -53,7 +175,7 @@ namespace
                 return;
 
             meshGroup_ = obj.ToGeometryMeshGroup();
-            if(!meshGroup_.submeshes.size())
+            if(meshGroup_.submeshes.empty())
                 return;
             obj.Clear();
             BuildVertexBufferFromMeshGroup();
@@ -69,13 +191,6 @@ namespace
             return vtxBuf_;
         }
 
-        void Display(ResourceManager&) override
-        {
-            static FileBrowser fileBrowser("browse .obj", false, "");
-            if(filename_.Display(fileBrowser))
-                LoadWavefrontOBJ(fileBrowser.GetResult());
-        }
-
         std::vector<std::string> GetSubmeshNames() const override
         {
             std::vector<std::string> ret;
@@ -84,28 +199,33 @@ namespace
             return ret;
         }
 
-        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
+        void Export(const ResourceManager&, LauncherScriptExportingContext &ctx) const override
         {
             ctx.AddLine("type = TriangleBVH;");
             ctx.AddLine("filename = \"", filename_.GetExportedFilename(ctx), "\";");
-            AGZ_ASSERT(ctx.entityTransform);
-            ctx.AddLine("transform = (");
-            ctx.IncIndent();
-            ctx.AddLine("Translate", AGZ::To<char>(ctx.entityTransform->GetTranslate()), ",");
-            ctx.AddLine("RotateZ(Deg(", std::to_string(ctx.entityTransform->GetRotate().z), ")),");
-            ctx.AddLine("RotateY(Deg(", std::to_string(ctx.entityTransform->GetRotate().y), ")),");
-            ctx.AddLine("RotateX(Deg(", std::to_string(ctx.entityTransform->GetRotate().x), ")),");
-            ctx.AddLine("Scale(", std::to_string(ctx.entityTransform->GetScale()), ")");
-            ctx.DecIndent();
-            ctx.AddLine(");");
+            ExportTransform(ctx);
+        }
+
+        void DisplayEditing(const Mat4f &, const Mat4f&, const Mat4f&, bool) override
+        {
+            static FileBrowser fileBrowser("browse .obj", false, "");
+            if(filename_.Display(fileBrowser))
+                LoadWavefrontOBJ(fileBrowser.GetResult());
         }
     };
 }
 
 void RegisterGeometryCreators(ResourceManager &rscMgr)
 {
+    static const TriangleCreator iTriangleCreator;
     static const WavefrontOBJCreator iWavefrontOBJCreator;
+    rscMgr.AddCreator(&iTriangleCreator);
     rscMgr.AddCreator(&iWavefrontOBJCreator);
+}
+
+std::shared_ptr<GeometryInstance> TriangleCreator::Create(ResourceManager &rscMgr, std::string name) const
+{
+    return std::make_shared<TriangleInstance>(std::move(name));
 }
 
 std::shared_ptr<GeometryInstance> WavefrontOBJCreator::Create(ResourceManager &rscMgr, std::string name) const

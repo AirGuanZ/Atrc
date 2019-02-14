@@ -1,6 +1,6 @@
 #include <Atrc/Editor/ResourceManagement/EntityCreator.h>
 #include <Atrc/Editor/MaterialMapping.h>
-#include <Atrc/Editor/TransformController.h>
+#include <Atrc/Editor/EntityController.h>
 #include <Lib/imgui/imgui/ImGuizmo.h>
 
 namespace
@@ -9,6 +9,7 @@ namespace
     #version 450 core
     uniform mat4 WVP;
     uniform mat4 WORLD;
+    uniform vec3 EYE_POS;
     in vec3 lPos;
     in vec3 lNor;
     out vec3 wNor;
@@ -16,6 +17,9 @@ namespace
     {
         gl_Position = WVP * vec4(lPos, 1);
         wNor = (WORLD * vec4(lNor, 0)).xyz;
+        vec4 wPos = WORLD * vec4(lPos, 1);
+        if(dot(wNor, EYE_POS - wPos.xyz / wPos.w) < 0)
+            wNor = -wNor;
     }
     )____";
 
@@ -35,6 +39,7 @@ namespace
 
     GL::UniformVariable<Mat4f> uniformWVP;
     GL::UniformVariable<Mat4f> uniformWORLD;
+    GL::UniformVariable<Vec3f> uniformEYE_POS;
     GL::UniformVariable<Vec3f> uniformCOLOR;
 
     GL::AttribVariable<Vec3f> attribLPos;
@@ -52,6 +57,7 @@ namespace
 
         uniformWVP = prog.GetUniformVariable<Mat4f>("WVP");
         uniformWORLD = prog.GetUniformVariable<Mat4f>("WORLD");
+        uniformEYE_POS = prog.GetUniformVariable<Vec3f>("EYE_POS");
         uniformCOLOR = prog.GetUniformVariable<Vec3f>("COLOR");
 
         attribLPos = prog.GetAttribVariable<Vec3f>("lPos");
@@ -76,11 +82,16 @@ namespace
 
         Vec3f renderColor_ = Vec3f(0.5f);
         GeometrySlot geometry_;
-        Transform transform_;
+        EntityController controller_;
 
         void DisplayRenderProperty()
         {
             ImGui::ColorEdit3("render color", &renderColor_[0]);
+        }
+
+        void DisplayController(const Mat4f &proj, const Mat4f &view, bool renderController)
+        {
+            controller_.Display(proj, view, renderController);
         }
 
     public:
@@ -92,12 +103,7 @@ namespace
             geometry_.SetInstance(rscMgr.Create<GeometryInstance>("wavefront", ""));
         }
 
-        void Display(ResourceManager &rscMgr) override
-        {
-            geometry_.Display(rscMgr);
-        }
-
-        void Render(const Mat4f &projViewMat) override
+        void Render(const Mat4f &projViewMat, const Vec3f &eyePos) override
         {
             std::shared_ptr<const GL::VertexBuffer<GeometryInstance::Vertex>> vtxBuf;
             auto geo = geometry_.GetInstance();
@@ -111,11 +117,12 @@ namespace
 
             vao.Bind();
 
-            Mat4f world = GetFinalMatrix(transform_.GetTranslate(), transform_.GetRotate(), transform_.GetScale());
+            Mat4f world = GetFinalMatrix(controller_.GetTranslate(), controller_.GetRotate(), controller_.GetScale());
             Mat4f WVP = projViewMat * world;
 
             uniformWVP.BindValue(WVP);
             uniformWORLD.BindValue(world);
+            uniformEYE_POS.BindValue(eyePos);
             uniformCOLOR.BindValue(renderColor_);
 
             GL::RenderContext::DrawVertices(GL_TRIANGLES, 0, vtxBuf->GetVertexCount());
@@ -123,9 +130,14 @@ namespace
             vao.Unbind();
         }
 
-        void DisplayTransform(const Mat4f &proj, const Mat4f &view, bool renderTransformController) override
+        void DisplayEx(ResourceManager &rscMgr, const Mat4f &proj, const Mat4f &view, bool renderController) override
         {
-            transform_.Display(proj, view, renderTransformController);
+            geometry_.Display(rscMgr);
+            if(auto geo = geometry_.GetInstance())
+            {
+                geo->DisplayEditing(controller_.GetFinalMatrix(), proj, view,
+                    renderController && controller_.GetControllerMode() == EntityControllerAction::Edit);
+            }
         }
     };
 
@@ -137,12 +149,12 @@ namespace
 
         using TransformedGeometricEntityBase::TransformedGeometricEntityBase;
 
-        void Display(ResourceManager &rscMgr) override
+        void DisplayEx(ResourceManager &rscMgr, const Mat4f &proj, const Mat4f &view, bool renderController) override
         {
             DisplayRenderProperty();
             if(ImGui::TreeNode("geometry"))
             {
-                TransformedGeometricEntityBase::Display(rscMgr);
+                TransformedGeometricEntityBase::DisplayEx(rscMgr, proj, view, renderController);
                 ImGui::TreePop();
             }
             if(ImGui::TreeNode("radiance"))
@@ -150,14 +162,15 @@ namespace
                 ImGui::ColorEdit3("radiance", &radiance_[0], ImGuiColorEditFlags_HDR | ImGuiColorEditFlags_Float);
                 ImGui::TreePop();
             }
+            DisplayController(proj, view, renderController);
         }
 
         void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
         {
             ctx.AddLine("type = GeometricDiffuse;");
-            ctx.entityTransform = &transform_;
+            ctx.entityController = &controller_;
             ExportSubResource("geometry", rscMgr, ctx, geometry_);
-            ctx.entityTransform = nullptr;
+            ctx.entityController = nullptr;
             ctx.AddLine("radiance = ", AGZ::To<char>(radiance_), ";");
         }
     };
@@ -170,12 +183,12 @@ namespace
 
         using TransformedGeometricEntityBase::TransformedGeometricEntityBase;
 
-        void Display(ResourceManager &rscMgr) override
+        void DisplayEx(ResourceManager &rscMgr, const Mat4f &proj, const Mat4f &view, bool renderController) override
         {
             DisplayRenderProperty();
             if(ImGui::TreeNode("geometry"))
             {
-                TransformedGeometricEntityBase::Display(rscMgr);
+                TransformedGeometricEntityBase::DisplayEx(rscMgr, proj, view, renderController);
                 ImGui::TreePop();
             }
             if(ImGui::TreeNode("material"))
@@ -183,14 +196,15 @@ namespace
                 material_.Display(rscMgr);
                 ImGui::TreePop();
             }
+            DisplayController(proj, view, renderController);
         }
 
         void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
         {
             ctx.AddLine("type = Geometric;");
-            ctx.entityTransform = &transform_;
+            ctx.entityController = &controller_;
             ExportSubResource("geometry", rscMgr, ctx, geometry_);
-            ctx.entityTransform = nullptr;
+            ctx.entityController = nullptr;
             ExportSubResource("material", rscMgr, ctx, material_);
         }
     };

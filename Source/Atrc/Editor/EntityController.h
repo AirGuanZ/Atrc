@@ -2,7 +2,7 @@
 
 #include <Atrc/Editor/GL.h>
 
-class EntityController
+class EntityControllerAction
 {
 public:
 
@@ -37,12 +37,12 @@ private:
     bool local_ = true;
 };
 
-class Transform
+class EntityController
 {
     Vec3f trans_;
     Vec3f rotate_;
     float scale_ = 1;
-    EntityController controller_;
+    EntityControllerAction controller_;
 
 public:
 
@@ -57,10 +57,12 @@ public:
         ImGui::InputFloat("scale##input_scale", &scale_);
     }
 
-    EntityController::Mode GetControllerMode() const noexcept
+    EntityControllerAction::Mode GetControllerMode() const noexcept
     {
         return controller_.GetCurrentMode();
     }
+
+    Mat4f GetFinalMatrix() const noexcept;
 
     const Vec3f &GetTranslate() const noexcept { return trans_; }
     const Vec3f &GetRotate() const noexcept { return rotate_; }

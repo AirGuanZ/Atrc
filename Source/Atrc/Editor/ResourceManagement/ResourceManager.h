@@ -24,9 +24,14 @@ class ResourceManager;
 class IResource : public AGZ::Uncopiable
 {
     std::string instanceName_;
-    bool isInPool_;
 
 public:
+
+    explicit IResource(std::string name) noexcept
+        : instanceName_(std::move(name))
+    {
+
+    }
 
     template<typename TSubResource>
     static void ExportSubResource(
@@ -40,27 +45,11 @@ public:
         ctx.AddLine("};");
     }
 
-    explicit IResource(std::string name) noexcept
-        : instanceName_(std::move(name)), isInPool_(false)
-    {
-        
-    }
-
     virtual ~IResource() = default;
 
     const std::string &GetName() const noexcept
     {
         return instanceName_;
-    }
-
-    bool IsInPool() const noexcept
-    {
-        return isInPool_;
-    }
-
-    void PutIntoPool() noexcept
-    {
-        isInPool_ = true;
     }
 
     virtual void Display(ResourceManager &rscMgr) = 0;
@@ -218,7 +207,6 @@ public:
                 auto newInstance = creatorSelector_.GetSelectedCreator()->Create(
                     rscMgr, "[" + creatorSelector_.GetSelectedCreator()->GetName() + "] " + nameBuf);
                 instances_.push_back(newInstance);
-                newInstance->PutIntoPool();
                 nameBuf[0] = '\0';
                 if(sortInstanceByName_)
                     SortInstanceByName();
@@ -371,9 +359,11 @@ public:
 
     using IResource::IResource;
 
-    virtual void Render(const Mat4f &projViewMat) = 0;
+    virtual void Render(const Mat4f &projViewMat, const Vec3f &eyePos) = 0;
 
-    virtual void DisplayTransform(const Mat4f &proj, const Mat4f &view, bool renderTransformController) = 0;
+    void Display(ResourceManager&) final override { }
+
+    virtual void DisplayEx(ResourceManager &rscMgr, const Mat4f &proj, const Mat4f &view, bool renderController) = 0;
 };
 using EntityCreator = TResourceCreator<EntityInstance>;
 
@@ -398,6 +388,10 @@ public:
     virtual std::shared_ptr<const GL::VertexBuffer<Vertex>> GetVertexBuffer() const = 0;
 
     virtual std::vector<std::string> GetSubmeshNames() const = 0;
+
+    void Display(ResourceManager &) final override { }
+
+    virtual void DisplayEditing(const Mat4f &world, const Mat4f &proj, const Mat4f &view, bool renderController) = 0;
 };
 using GeometryCreator = TResourceCreator<GeometryInstance>;
 

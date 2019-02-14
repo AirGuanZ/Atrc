@@ -1,37 +1,37 @@
 ﻿#include <Atrc/Editor/EntityController.h>
 #include <Lib/imgui/imgui/ImGuizmo.h>
 
-void EntityController::BeginFrame()
+void EntityControllerAction::BeginFrame()
 {
     ImGuizmo::BeginFrame();
 }
 
-void EntityController::EnableController()
+void EntityControllerAction::EnableController()
 {
     ImGuizmo::Enable(true);
 }
 
-void EntityController::DisableController()
+void EntityControllerAction::DisableController()
 {
     ImGuizmo::Enable(false);
 }
 
-void EntityController::SetCurrentMode(Mode mode) noexcept
+void EntityControllerAction::SetCurrentMode(Mode mode) noexcept
 {
     mode_ = mode;
 }
 
-EntityController::Mode EntityController::GetCurrentMode() const noexcept
+EntityControllerAction::Mode EntityControllerAction::GetCurrentMode() const noexcept
 {
     return mode_;
 }
 
-void EntityController::UseLocal(bool local) noexcept
+void EntityControllerAction::UseLocal(bool local) noexcept
 {
     local_ = local;
 }
 
-void EntityController::Render(const Mat4f &proj, const Mat4f &view, Vec3f *translate, Vec3f *rotate, float *scale) const
+void EntityControllerAction::Render(const Mat4f &proj, const Mat4f &view, Vec3f *translate, Vec3f *rotate, float *scale) const
 {
     // 设置imguizmo参数
 
@@ -66,7 +66,7 @@ void EntityController::Render(const Mat4f &proj, const Mat4f &view, Vec3f *trans
     *scale = scaleVec3[0];
 }
 
-void EntityController::Display()
+void EntityControllerAction::Display()
 {
     int mode = static_cast<int>(mode_);
 
@@ -79,4 +79,12 @@ void EntityController::Display()
     SetCurrentMode(static_cast<Mode>(mode));
 
     ImGui::Checkbox("local##use_local_transform_controller", &local_);
+}
+
+Mat4f EntityController::GetFinalMatrix() const noexcept
+{
+    float scaleVec[3] = { scale_, scale_, scale_ };
+    Mat4f ret;
+    ImGuizmo::RecomposeMatrixFromComponents(&trans_[0], &rotate_[0], scaleVec, &ret.m[0][0]);
+    return ret;
 }

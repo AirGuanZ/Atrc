@@ -3,7 +3,7 @@
 #include <sstream>
 
 #include <Atrc/Editor/Camera.h>
-#include <Atrc/Editor/TransformController.h>
+#include <Atrc/Editor/EntityController.h>
 
 class LauncherScriptExportingContext
 {
@@ -31,12 +31,12 @@ public:
     const std::string workspaceDirectory;
     const std::string scriptDirectory;
 
-    const Transform *entityTransform;
+    const EntityController *entityController;
 
     LauncherScriptExportingContext(const DefaultRenderingCamera *activeCamera, std::string workspace, std::string scriptDir)
         : indent_(0),
           activeCamera(activeCamera), workspaceDirectory(std::move(workspace)), scriptDirectory(std::move(scriptDir)),
-          entityTransform(nullptr)
+          entityController(nullptr)
     {
         AGZ_ASSERT(activeCamera);
     }

@@ -3,7 +3,7 @@
 #include <sstream>
 
 #include <Atrc/Editor/Camera.h>
-#include <Atrc/Editor/TransformController.h>
+#include <Atrc/Editor/EntityController.h>
 
 class CameraInstance;
 class FilmFilterInstance;
@@ -47,7 +47,7 @@ public:
 
     Vec2i outputFilmSize;
 
-    const Transform *entityTransform;
+    const EntityController *entityController;
 
     LauncherScriptExportingContext(
         const DefaultRenderingCamera *activeCamera,
@@ -66,7 +66,7 @@ public:
           workspaceDirectory(std::move(workspace)), scriptDirectory(std::move(scriptDir)),
           outputFilename(std::move(outputFilename)),
           outputFilmSize(outputFilmSize),
-          entityTransform(nullptr)
+          entityController(nullptr)
     {
         AGZ_ASSERT(activeCamera);
     }
