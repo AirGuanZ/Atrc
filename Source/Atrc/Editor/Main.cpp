@@ -427,21 +427,20 @@ int Run(GLFWwindow *window)
             selectedCameraProjData = selectedCamera->GetProjData(filmAspectRatio);
         }
 
-        if(auto selectedEntity = rscMgr.GetPool<EntityInstance>().GetSelectedInstance();
-            !sceneRenderer.IsRendering() && selectedEntity && isEntityPoolDisplayed)
+        if(auto selectedEntity = rscMgr.GetPool<EntityInstance>().GetSelectedInstance(); selectedEntity && isEntityPoolDisplayed)
         {
             ImGui::SetNextWindowPos(ImVec2(sceneManagerPosX + 420, sceneManagerPosY), ImGuiCond_FirstUseEver);
             if(ImGui::Begin("property", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
             {
                 selectedEntity->Display(rscMgr);
                 selectedEntity->DisplayTransform(
-                    (selectedCamera ? selectedCameraProjData.projMatrix : camera.GetProjMatrix()), camera.GetViewMatrix());
+                    (selectedCamera ? selectedCameraProjData.projMatrix : camera.GetProjMatrix()), camera.GetViewMatrix(),
+                    !sceneRenderer.IsRendering());
                 ImGui::End();
             }
         }
 
-        if(auto selectedLight = rscMgr.GetPool<LightInstance>().GetSelectedInstance();
-            !sceneRenderer.IsRendering() && selectedLight && isLightPoolDisplayed)
+        if(auto selectedLight = rscMgr.GetPool<LightInstance>().GetSelectedInstance(); selectedLight && isLightPoolDisplayed)
         {
             ImGui::SetNextWindowPos(ImVec2(sceneManagerPosX + 420, sceneManagerPosY), ImGuiCond_FirstUseEver);
             if(ImGui::Begin("property", nullptr, ImGuiWindowFlags_AlwaysAutoResize))

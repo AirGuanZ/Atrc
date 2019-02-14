@@ -373,7 +373,7 @@ public:
 
     virtual void Render(const Mat4f &projViewMat) = 0;
 
-    virtual void DisplayTransform(const Mat4f &proj, const Mat4f &view) = 0;
+    virtual void DisplayTransform(const Mat4f &proj, const Mat4f &view, bool renderTransformController) = 0;
 };
 using EntityCreator = TResourceCreator<EntityInstance>;
 

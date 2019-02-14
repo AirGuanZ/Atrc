@@ -45,10 +45,11 @@ class Transform
 
 public:
 
-    void Display(const Mat4f &proj, const Mat4f &view)
+    void Display(const Mat4f &proj, const Mat4f &view, bool showController = true)
     {
         controller_.Display();
-        controller_.Render(proj, view, &trans_, &rotate_, &scale_);
+        if(showController)
+            controller_.Render(proj, view, &trans_, &rotate_, &scale_);
 
         ImGui::InputFloat3("translate##input_translate", &trans_[0]);
         ImGui::InputFloat3("rotate##input_rotate", &rotate_[0]);

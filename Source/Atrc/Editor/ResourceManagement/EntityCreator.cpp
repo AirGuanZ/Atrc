@@ -123,9 +123,9 @@ namespace
             vao.Unbind();
         }
 
-        void DisplayTransform(const Mat4f &proj, const Mat4f &view) override
+        void DisplayTransform(const Mat4f &proj, const Mat4f &view, bool renderTransformController) override
         {
-            transform_.Display(proj, view);
+            transform_.Display(proj, view, renderTransformController);
         }
     };
 
