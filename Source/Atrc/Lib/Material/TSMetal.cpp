@@ -26,7 +26,7 @@ ShadingPoint TSMetal::GetShadingPoint(const Intersection &inct, Arena &arena) co
     Spectrum rc = rc_->Sample(ret.uv);
     Real roughness = roughness_->Sample1(ret.uv);
 
-    auto bsdf    = arena.Create<BxDFAggregate<1>>(ret.coordSys, inct.coordSys);
+    auto bsdf = arena.Create<BxDFAggregate<1>>(ret.coordSys, inct.coordSys);
 
     if(!roughness)
     {
@@ -35,8 +35,8 @@ ShadingPoint TSMetal::GetShadingPoint(const Intersection &inct, Arena &arena) co
     }
     else
     {
-        auto md      = arena.Create<BlinnPhong>(1 / roughness);
-        auto ts      = arena.Create<BxDF_TorranceSparrow>(rc, md, fresnel_);
+        auto md = arena.Create<BlinnPhong>(1 / roughness);
+        auto ts = arena.Create<BxDF_TorranceSparrowReflection>(rc, md, fresnel_);
         bsdf->AddBxDF(ts);
     }
 

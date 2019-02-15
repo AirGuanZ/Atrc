@@ -7,7 +7,7 @@
 namespace Atrc
 {
    
-class BxDF_TorranceSparrow : public BxDF
+class BxDF_TorranceSparrowReflection : public BxDF
 {
     Spectrum rc_;
     const MicrofacetDistribution *md_;
@@ -15,7 +15,7 @@ class BxDF_TorranceSparrow : public BxDF
 
 public:
 
-    BxDF_TorranceSparrow(const Spectrum &rc, const MicrofacetDistribution *md, const Fresnel *fresnel) noexcept;
+    BxDF_TorranceSparrowReflection(const Spectrum &rc, const MicrofacetDistribution *md, const Fresnel *fresnel) noexcept;
 
     Spectrum GetAlbedo() const noexcept override;
 
@@ -24,6 +24,13 @@ public:
     std::optional<SampleWiResult> SampleWi(const CoordSystem &geoInShd, const Vec3 &wo, bool star, const Vec2 &sample) const noexcept override;
 
     Real SampleWiPDF(const CoordSystem &geoInShd, const Vec3 &wi, const Vec3 &wo, bool star) const noexcept override;
+};
+
+class BxDF_TorranceSparrowTransmission
+{
+public:
+
+
 };
 
 } // namespace Atrc

@@ -13,6 +13,15 @@ public:
     std::shared_ptr<TextureInstance> Create(ResourceManager &rscMgr, std::string name) const override;
 };
 
+class Constant1TextureCreator : public TextureCreator
+{
+public:
+
+    Constant1TextureCreator() : TextureCreator("constant1") { }
+
+    std::shared_ptr<TextureInstance> Create(ResourceManager &rscMgr, std::string name) const override;
+};
+
 class ImageTextureCreator : public TextureCreator
 {
 public:
