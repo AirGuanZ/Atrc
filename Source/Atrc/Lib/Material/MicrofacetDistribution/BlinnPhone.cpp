@@ -44,6 +44,9 @@ std::optional<BlinnPhong::SampleWiResult> BlinnPhong::SampleWi(const CoordSystem
         return std::nullopt;
     ret.pdf = (e_ + 1) * Pow(cosTheta, e_) / (2 * PI * 4 * Dot(wo, H));
 
+    if(ret.wi.z <= 0)
+        return std::nullopt;
+
     return ret;
 }
 

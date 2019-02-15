@@ -151,11 +151,6 @@ int Run(GLFWwindow *window)
 
     // global setting
 
-    GL::Texture2D testTex;
-    testTex.InitializeHandle();
-    auto testTexData = AGZ::TextureFile::LoadRGBFromFile("C:/Users/lenovo/Documents/Programming/Code/Atrc/Output.png");
-    testTex.InitializeFormatAndData(1, testTexData.GetWidth(), testTexData.GetHeight(), GL_RGB8, testTexData.RawData());
-
     Vec2i filmSize = { 640, 480 };
     FilmFilterSlot filmFilterSlot;
     SamplerSlot samplerSlot;
@@ -242,6 +237,7 @@ int Run(GLFWwindow *window)
                         }
 
                         std::string configStr = exporter.Export();
+                        cout << configStr;
                         config.Clear();
                         if(!config.LoadFromMemory(configStr))
                         {

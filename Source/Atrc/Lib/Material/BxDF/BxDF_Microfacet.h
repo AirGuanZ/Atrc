@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include <Atrc/Lib/Material/Utility/BxDF.h>
 #include <Atrc/Lib/Material/Utility/Fresnel.h>
@@ -7,7 +7,7 @@
 namespace Atrc
 {
 
-class BxDF_TorranceSparrowReflection : public BxDF
+class BxDF_MicrofacetReflection : public BxDF
 {
     Spectrum rc_;
     const MicrofacetDistribution *md_;
@@ -15,7 +15,7 @@ class BxDF_TorranceSparrowReflection : public BxDF
 
 public:
 
-    BxDF_TorranceSparrowReflection(const Spectrum &rc, const MicrofacetDistribution *md, const Fresnel *fresnel) noexcept;
+    BxDF_MicrofacetReflection(const Spectrum &rc, const MicrofacetDistribution *md, const Fresnel *fresnel) noexcept;
 
     Spectrum GetAlbedo() const noexcept override;
 

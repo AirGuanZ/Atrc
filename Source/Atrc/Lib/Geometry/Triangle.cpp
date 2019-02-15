@@ -43,7 +43,7 @@ bool Triangle::FindIntersection(const Ray &r, GeometryIntersection *inct) const 
 
 Real Triangle::GetSurfaceArea() const noexcept
 {
-    return 2 * GetTriangleArea(B_A, C_A);
+    return local2World_.ScaleFactor() * local2World_.ScaleFactor() * 2 * GetTriangleArea(B_A, C_A);
 }
 
 AABB Triangle::GetLocalBound() const noexcept
@@ -86,8 +86,8 @@ Geometry::SampleResult Triangle::Sample(const Vec3 &sample) const noexcept
                 ::UniformOnTriangle<Real>::Transform(sample.xy());
 
     SampleResult ret;
-    ret.pos = A + uv.u * B_A + uv.v * C_A;
-    ret.nor = sample.z < Real(0.5) ? nor : -nor;
+    ret.pos = local2World_.ApplyToPoint(A + uv.u * B_A + uv.v * C_A);
+    ret.nor = local2World_.ApplyToVector(sample.z < Real(0.5) ? nor : -nor).Normalize();
     ret.pdf = 1 / GetSurfaceArea();
 
     return ret;

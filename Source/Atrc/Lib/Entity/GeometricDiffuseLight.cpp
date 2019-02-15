@@ -59,6 +59,9 @@ Light::SampleWiResult GeometricDiffuseLight::SampleWi(const Vec3 &pos, const Vec
     ret.isDelta = false;
     ret.isInf = false;
 
+    if(Dot(gRet.nor, ret.wi) >= 0)
+        ret.radiance = Spectrum();
+
     return ret;
 }
 
