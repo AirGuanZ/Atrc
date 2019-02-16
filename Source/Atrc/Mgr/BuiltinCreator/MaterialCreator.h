@@ -25,6 +25,24 @@ public:
 };
 
 /*
+    type = GGXMetal
+
+    fresnel   = Fresnel
+    rc        = Texture
+    roughness = Texture
+
+    normalMapper = Texture | null
+*/
+class GGXMetalCreator : public Creator<Material>
+{
+public:
+
+    std::string GetTypeName() const override { return "GGXMetal"; }
+
+    Material *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
+};
+
+/*
     type = IdealBlack
 */
 class IdealBlackCreator : public Creator<Material>

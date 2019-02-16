@@ -1,4 +1,5 @@
 #include <Atrc/Lib/Material/BSSRDFSurface.h>
+#include <Atrc/Lib/Material/GGXMetal.h>
 #include <Atrc/Lib/Material/IdealBlack.h>
 #include <Atrc/Lib/Material/IdealDiffuse.h>
 #include <Atrc/Lib/Material/IdealMirror.h>
@@ -75,6 +76,7 @@ namespace
 void RegisterBuiltinMaterialCreators(Context &context)
 {
     static const BSSRDFSurfaceCreator iBSSRDFSurfaceCreator;
+    static const GGXMetalCreator iGGXMetalCreator;
     static const IdealBlackCreator idealBlackCreator;
     static const IdealDiffuseCreator idealDiffuseCreator;
     static const IdealMirrorCreator idealMirrorCreator;
@@ -84,6 +86,7 @@ void RegisterBuiltinMaterialCreators(Context &context)
     static const ONMatteCreator oNMatteCreator;
     static const TSMetalCreator tSMetalCreator;
     context.AddCreator(&iBSSRDFSurfaceCreator);
+    context.AddCreator(&iGGXMetalCreator);
     context.AddCreator(&idealBlackCreator);
     context.AddCreator(&idealDiffuseCreator);
     context.AddCreator(&idealMirrorCreator);
@@ -132,6 +135,20 @@ Material *BSSRDFSurfaceCreator::Create(const ConfigGroup &group, Context &contex
         return arena.Create<BSSRDFSurface>(surface, AMap, dmfpMap, eta);
     }
     ATRC_MGR_CATCH_AND_RETHROW("In creating bssrdf surface material")
+}
+
+Material *GGXMetalCreator::Create(const ConfigGroup &group, Context &context, Arena &arena) const
+{
+    ATRC_MGR_TRY
+    {
+        auto fresnel      = context.Create<Fresnel>(group["fresnel"]);
+        auto rc           = context.Create<Texture>(group["rc"]);
+        auto roughness    = context.Create<Texture>(group["roughness"]);
+        auto normalMapper = CreateNormalMapper(group, context, arena);
+
+        return arena.Create<GGXMetal>(fresnel, rc, roughness, normalMapper);
+    }
+    ATRC_MGR_CATCH_AND_RETHROW("In creating ggx metal material: " + group.ToString())
 }
 
 Material *IdealBlackCreator::Create(

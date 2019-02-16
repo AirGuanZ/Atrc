@@ -4,6 +4,15 @@
 
 void RegisterMaterialCreators(ResourceManager &rscMgr);
 
+class GGXMetalCreator : public MaterialCreator
+{
+public:
+
+    GGXMetalCreator() : MaterialCreator("ggx-metal") { }
+
+    std::shared_ptr<MaterialInstance> Create(ResourceManager &rscMgr, std::string name) const override;
+};
+
 class IdealBlackCreator : public MaterialCreator
 {
 public:

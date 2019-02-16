@@ -75,6 +75,25 @@ inline Real CosTheta(const Vec3 &w) noexcept
     return w.z;
 }
 
+// w must be normalized
+inline Real TanTheta(const Vec3 &w)
+{
+    Real t = 1 - w.z * w.z;
+    if(t <= 0)
+        return 0;
+    return Sqrt(t) / w.z;
+}
+
+// w must be normalized
+inline Real TanTheta2(const Vec3 &w)
+{
+    Real z2 = w.z * w.z;
+    Real t = 1 - z2;
+    if(t <= 0)
+        return 0;
+    return t / z2;
+}
+
 inline Real Phi(const Vec3 &w) noexcept
 {
     if(!w.y && !w.x)
