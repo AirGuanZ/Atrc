@@ -48,25 +48,23 @@ namespace
         Real temp = 1 / (A * A - 1);
         Real B = tanThetaI;
         Real D = Sqrt(Max(B * B * temp * temp - (A * A - B * B) * temp, Real(0)));
-        Real Slope_x_1 = B * temp - D;
-        Real Slope_x_2 = B * temp + D;
-        ret.x = (A < 0.0f || Slope_x_2 > 1.0f / tanThetaI) ? Slope_x_1 : Slope_x_2;
+        Real X1 = B * temp - D, X2 = B * temp + D;
+        ret.x = (A < 0 || X2 > 1 / tanThetaI) ? X1 : X2;
 
         Real S;
-        if(sample.y > 0.5f)
+        if(sample.y > Real(0.5))
         {
-            S = 1.0f;
-            sample.y = 2.0f * (sample.y - 0.5f);
+            S = 1;
+            sample.y = 2 * (sample.y - Real(0.5));
         }
         else
         {
-            S = -1.0f;
-            sample.y = 2.0f * (0.5f - sample.y);
+            S = -1.;
+            sample.y = 2 * (Real(0.5) - sample.y);
         }
 
-        float z =
-            (sample.y * (sample.y * (sample.y * Real(-0.365728915865723) + Real(0.790235037209296)) - Real(0.424965825137544)) + Real(0.000152998850436920)) /
-            (sample.y * (sample.y * (sample.y * (sample.y * Real(0.169507819808272) - Real(0.397203533833404)) - Real(0.232500544458471)) + 1) - Real(0.539825872510702));
+        float z = (sample.y * (sample.y * (sample.y * Real(-0.365728915865723) + Real(0.790235037209296)) - Real(0.424965825137544)) + Real(0.000152998850436920)) /
+                  (sample.y * (sample.y * (sample.y * (sample.y * Real(0.169507819808272) - Real(0.397203533833404)) - Real(0.232500544458471)) + 1) - Real(0.539825872510702));
 
         ret.y = S * z * Sqrt(1 + ret.x * ret.x);
         return ret;

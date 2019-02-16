@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <Atrc/Lib/Core/Material.h>
 #include <Atrc/Lib/Core/Texture.h>
@@ -9,7 +9,7 @@ namespace Atrc
 
 class Fresnel;
     
-// »ùÓÚTorrance-SparrowÄ£ĞÍµÄ½ğÊô²ÄÖÊ£¬²ÉÓÃGGX microfacet distribution
+// åŸºäºTorrance-Sparrowæ¨¡å‹çš„é‡‘å±æè´¨ï¼Œé‡‡ç”¨GGX microfacet distribution
 class GGXMetal : public Material
 {
     const Fresnel *fresnel_;
