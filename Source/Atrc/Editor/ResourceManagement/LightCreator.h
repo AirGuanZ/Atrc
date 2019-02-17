@@ -8,7 +8,7 @@ class SkyLightCreator : public LightCreator
 {
 public:
 
-    SkyLightCreator() : LightCreator("sky") { }
+    SkyLightCreator() : LightCreator("Sky") { }
 
     std::shared_ptr<LightInstance> Create(ResourceManager &rscMgr, std::string name) const override;
 };

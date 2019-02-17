@@ -8,7 +8,7 @@ class TriangleCreator : public GeometryCreator
 {
 public:
 
-    TriangleCreator() : GeometryCreator("triangle") { }
+    TriangleCreator() : GeometryCreator("Triangle") { }
 
     std::shared_ptr<GeometryInstance> Create(ResourceManager &rscMgr, std::string name) const override;
 };
@@ -17,7 +17,7 @@ class WavefrontOBJCreator : public GeometryCreator
 {
 public:
 
-    WavefrontOBJCreator() : GeometryCreator("wavefront") { }
+    WavefrontOBJCreator() : GeometryCreator("TriangleBVH") { }
 
     std::shared_ptr<GeometryInstance> Create(ResourceManager &rscMgr, std::string name) const override;
 };

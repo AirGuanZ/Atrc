@@ -8,7 +8,7 @@ class FresnelConductorCreator : public FresnelCreator
 {
 public:
 
-    FresnelConductorCreator() : FresnelCreator("conductor") { }
+    FresnelConductorCreator() : FresnelCreator("Conductor") { }
 
     std::shared_ptr<FresnelInstance> Create(ResourceManager &rscMgr, std::string name) const override;
 };
@@ -17,7 +17,7 @@ class FresnelDielectricCreator : public FresnelCreator
 {
 public:
 
-    FresnelDielectricCreator() : FresnelCreator("dielectric") { }
+    FresnelDielectricCreator() : FresnelCreator("Dielectric") { }
 
     std::shared_ptr<FresnelInstance> Create(ResourceManager &rscMgr, std::string name) const override;
 };
@@ -26,7 +26,7 @@ class FresnelSchlickCreator : public FresnelCreator
 {
 public:
 
-    FresnelSchlickCreator() : FresnelCreator("schlick") { }
+    FresnelSchlickCreator() : FresnelCreator("Schlick") { }
 
     std::shared_ptr<FresnelInstance> Create(ResourceManager &rscMgr, std::string name) const override;
 };

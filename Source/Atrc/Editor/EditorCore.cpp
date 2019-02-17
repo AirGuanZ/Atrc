@@ -15,9 +15,9 @@ void EditorCore::Initialize()
 
     RegisterResourceCreators(data_->rscMgr);
 
-    data_->filmFilterSlot.SetInstance(data_->rscMgr.Create<FilmFilterInstance>("box", ""));
-    data_->samplerSlot.SetInstance(data_->rscMgr.Create<SamplerInstance>("native", ""));
-    data_->rendererSlot.SetInstance(data_->rscMgr.Create<RendererInstance>("path tracing", ""));
+    data_->filmFilterSlot.SetInstance(data_->rscMgr.Create<FilmFilterInstance>("Box", ""));
+    data_->samplerSlot.SetInstance(data_->rscMgr.Create<SamplerInstance>("Native", ""));
+    data_->rendererSlot.SetInstance(data_->rscMgr.Create<RendererInstance>("PathTracing", ""));
 
     lState_->scriptBrowser.SetLabel("script");
     lState_->scriptBrowser.SetTarget(true);

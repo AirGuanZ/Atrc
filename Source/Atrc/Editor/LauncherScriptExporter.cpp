@@ -1,12 +1,24 @@
-#pragma once
-
+#include <Atrc/Editor/Global.h>
 #include <Atrc/Editor/LauncherScriptExporter.h>
-#include "Global.h"
 
 LauncherScriptExporter::LauncherScriptExporter(ResourceManager &rscMgr, LauncherScriptExportingContext &ctx)
     : rscMgr_(rscMgr), ctx_(ctx)
 {
     
+}
+
+namespace
+{
+    template<typename TResource>
+    void ExportResourcesInPool(ResourceManager &rscMgr, LauncherScriptExportingContext &ctx)
+    {
+        ctx.AddLine(TResource::GetPoolName(), " = {");
+        ctx.IncIndent();
+        for(auto &rsc : rscMgr.GetPool<TResource>())
+            IResource::ExportSubResource(rsc->GetName(), rscMgr, ctx, *rsc);
+        ctx.DecIndent();
+        ctx.AddLine("};");
+    }
 }
 
 std::string LauncherScriptExporter::Export() const
@@ -29,6 +41,19 @@ std::string LauncherScriptExporter::Export() const
 
     ctx_.AddLine();
 
+    ctx_.AddLine("pool = {");
+    ctx_.IncIndent();
+    ExportResourcesInPool<CameraInstance>  (rscMgr_, ctx_);
+    //ExportResourcesInPool<EntityInstance>  (rscMgr_, ctx_);
+    ExportResourcesInPool<GeometryInstance>(rscMgr_, ctx_);
+    //ExportResourcesInPool<LightInstance>   (rscMgr_, ctx_);
+    ExportResourcesInPool<MaterialInstance>(rscMgr_, ctx_);
+    ExportResourcesInPool<TextureInstance> (rscMgr_, ctx_);
+    ctx_.DecIndent();
+    ctx_.AddLine("};");
+
+    ctx_.AddLine();
+
     if(ctx_.sampler)
     {
         IResource::ExportSubResource("sampler", rscMgr_, ctx_, *ctx_.sampler);
@@ -39,7 +64,7 @@ std::string LauncherScriptExporter::Export() const
 
     if(ctx_.camera)
     {
-        IResource::ExportSubResource("camera", rscMgr_, ctx_, *ctx_.camera);
+        IResource::ExportSubResourceAsReference("camera", rscMgr_, ctx_, *ctx_.camera);
         ctx_.AddLine();
     }
     else

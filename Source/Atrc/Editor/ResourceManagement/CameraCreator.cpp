@@ -82,5 +82,5 @@ void RegisterCameraCreators(ResourceManager &rscMgr)
 
 std::shared_ptr<CameraInstance> PinholeCameraCreator::Create(ResourceManager &rscMgr, std::string name) const
 {
-    return std::make_shared<PinholeCameraInstance>(std::move(name));
+    return std::make_shared<PinholeCameraInstance>(GetName(), std::move(name));
 }

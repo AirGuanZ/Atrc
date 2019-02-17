@@ -23,12 +23,14 @@ class ResourceManager;
 
 class IResource : public AGZ::Uncopiable
 {
+    std::string typeName_;
     std::string instanceName_;
+    bool isInPool_;
 
 public:
 
-    explicit IResource(std::string name) noexcept
-        : instanceName_(std::move(name))
+    explicit IResource(std::string typeName, std::string name) noexcept
+        : typeName_(std::move(typeName)), instanceName_(std::move(name)), isInPool_(false)
     {
 
     }
@@ -45,14 +47,42 @@ public:
         ctx.AddLine("};");
     }
 
-    virtual ~IResource() = default;
-
-    const std::string &GetName() const noexcept
+    template<typename TSubResource>
+    static void ExportSubResourceAsReference(
+        std::string left, const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx,
+        const TSubResource &subrsc)
     {
-        return instanceName_;
+        ctx.AddLine(std::move(left) + " = {");
+        ctx.IncIndent();
+        subrsc.template ExportAsReference<TSubResource>(rscMgr, ctx);
+        ctx.DecIndent();
+        ctx.AddLine("};");
     }
 
+    virtual ~IResource() = default;
+
+    const std::string &GetName() const noexcept { return instanceName_; }
+
+    const std::string &GetTypeName() const noexcept { return typeName_; }
+
+    bool IsInPool() const noexcept { return isInPool_; }
+
+    void PutIntoPool() noexcept { isInPool_ = true; }
+
     virtual void Display(ResourceManager &rscMgr) = 0;
+
+    template<typename TResource>
+    void ExportAsReference(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const
+    {
+        AGZ_ASSERT(typeid(*this) == typeid(TResource));
+        if(isInPool_)
+        {
+            ctx.AddLine("type = Reference;");
+            ctx.AddLine("name = \"pool.", TResource::GetPoolName(), ".", GetName(), "\";");
+        }
+        else
+            Export(rscMgr, ctx);
+    }
 
     virtual void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const = 0;
 };
@@ -204,9 +234,9 @@ public:
             auto it = std::find_if(std::begin(instances_), std::end(instances_), [&](auto &c) { return c->GetName() == nameBuf; });
             if(it == instances_.end() && nameBuf[0])
             {
-                auto newInstance = creatorSelector_.GetSelectedCreator()->Create(
-                    rscMgr, "[" + creatorSelector_.GetSelectedCreator()->GetName() + "] " + nameBuf);
+                auto newInstance = creatorSelector_.GetSelectedCreator()->Create(rscMgr, nameBuf);
                 instances_.push_back(newInstance);
+                newInstance->PutIntoPool();
                 nameBuf[0] = '\0';
                 if(sortInstanceByName_)
                     SortInstanceByName();
@@ -245,7 +275,8 @@ public:
             ImGui::PushID(static_cast<int>(i));
             auto instance = instances_[i];
             bool isSelected = instance == selectedInstance_;
-            if(ImGui::Selectable(instance->GetName().c_str(), isSelected))
+            std::string name = "[" + instance->GetTypeName() + "] " + instance->GetName();
+            if(ImGui::Selectable(name.c_str(), isSelected))
             {
                 if(isSelected)
                     selectedInstance_ = nullptr;
@@ -312,7 +343,7 @@ public:
     std::shared_ptr<TResource> Create(const std::string &creatorName, std::string instanceName)
     {
         return _creatorMgr<TResource>().Create(
-            AsRscMgr(), creatorName, "[" + creatorName + "]" + (instanceName.empty() ? "" : " ") + std::move(instanceName));
+            AsRscMgr(), creatorName, std::move(instanceName));
     }
 
     template<typename TResource>
@@ -342,6 +373,8 @@ public:
     
     using IResource::IResource;
 
+    static const char *GetPoolName() { return "camera"; }
+
     struct ProjData
     {
         float viewportWidth  = 1;
@@ -359,6 +392,8 @@ public:
 
     using IResource::IResource;
 
+    static const char *GetPoolName() { return "entity"; }
+
     virtual void Render(const Mat4f &projViewMat, const Vec3f &eyePos) = 0;
 
     void Display(ResourceManager&) final override { }
@@ -367,10 +402,10 @@ public:
 };
 using EntityCreator = TResourceCreator<EntityInstance>;
 
-class FilmFilterInstance : public IResource { using IResource::IResource; };
+class FilmFilterInstance : public IResource { using IResource::IResource; static const char *GetPoolName() { return "filmFilter"; } };
 using FilmFilterCreator = TResourceCreator<FilmFilterInstance>;
 
-class FresnelInstance : public IResource { public: using IResource::IResource; };
+class FresnelInstance : public IResource { public: using IResource::IResource; static const char *GetPoolName() { return "fresnel"; } };
 using FresnelCreator = TResourceCreator<FresnelInstance>;
 
 class GeometryInstance : public IResource
@@ -385,6 +420,8 @@ public:
     
     using IResource::IResource;
 
+    static const char *GetPoolName() { return "geometry"; }
+
     virtual std::shared_ptr<const GL::VertexBuffer<Vertex>> GetVertexBuffer() const = 0;
 
     virtual std::vector<std::string> GetSubmeshNames() const = 0;
@@ -395,22 +432,22 @@ public:
 };
 using GeometryCreator = TResourceCreator<GeometryInstance>;
 
-class LightInstance : public IResource { public: using IResource::IResource; };
+class LightInstance : public IResource { public: using IResource::IResource; static const char *GetPoolName() { return "light"; } };
 using LightCreator = TResourceCreator<LightInstance>;
 
-class MaterialInstance : public IResource { public: using IResource::IResource; };
+class MaterialInstance : public IResource { public: using IResource::IResource; static const char *GetPoolName() { return "material"; } };
 using MaterialCreator = TResourceCreator<MaterialInstance>;
 
-class PathTracingIntegratorInstance : public IResource { public: using IResource::IResource; };
+class PathTracingIntegratorInstance : public IResource { public: using IResource::IResource; static const char *GetPoolName() { return "pathTracingIntegrator"; } };
 using PathTracingIntegratorCreator = TResourceCreator<PathTracingIntegratorInstance>;
 
-class RendererInstance : public IResource { public: using IResource::IResource; };
+class RendererInstance : public IResource { public: using IResource::IResource; static const char *GetPoolName() { return "renderer"; } };
 using RendererCreator = TResourceCreator<RendererInstance>;
 
-class SamplerInstance : public IResource { public: using IResource::IResource; };
+class SamplerInstance : public IResource { public: using IResource::IResource; static const char *GetPoolName() { return "sampler"; } };
 using SamplerCreator = TResourceCreator<SamplerInstance>;
 
-class TextureInstance : public IResource { public: using IResource::IResource; };
+class TextureInstance : public IResource { public: using IResource::IResource; static const char *GetPoolName() { return "texture"; } };
 using TextureCreator = TResourceCreator<TextureInstance>;
 
 class ResourceManager : public TResourceManager<
@@ -458,7 +495,7 @@ class TResourceSlot
         if(ImGui::Button("ok") && selector->GetSelectedCreator())
         {
             ImGui::CloseCurrentPopup();
-            return selector->GetSelectedCreator()->Create(rscMgr, "[" + selector->GetSelectedCreator()->GetName() + "]");
+            return selector->GetSelectedCreator()->Create(rscMgr, "");
         }
 
         ImGui::SameLine();
@@ -504,8 +541,9 @@ public:
         }
 
         {
+            auto type = instance_ ? instance_->GetTypeName() : "?";
             auto text = instance_ ? instance_->GetName().c_str() : "null";
-            ImGui::TextWrapped("%s", text);
+            ImGui::TextWrapped("[%s] %s", type, text);
         }
 
         if constexpr(TAllowAnonymous)
@@ -524,7 +562,7 @@ public:
     {
         if(!instance_)
             throw std::runtime_error("empty resource instance");
-        instance_->Export(rscMgr, ctx);
+        instance_->template ExportAsReference<TResource>(rscMgr, ctx);
     }
 };
 
@@ -533,7 +571,7 @@ using EntitySlot                = TResourceSlot<EntityInstance,                t
 using FilmFilterSlot            = TResourceSlot<FilmFilterInstance,            false, true>;
 using FresnelSlot               = TResourceSlot<FresnelInstance,               false, true>;
 using GeometrySlot              = TResourceSlot<GeometryInstance,              true,  true>;
-using LightSlot                 = TResourceSlot<LightInstance, true, false>;
+using LightSlot                 = TResourceSlot<LightInstance,                 true,  false>;
 using MaterialSlot              = TResourceSlot<MaterialInstance,              true,  true>;
 using PathTracingIntegratorSlot = TResourceSlot<PathTracingIntegratorInstance, false, true>;
 using RendererSlot              = TResourceSlot<RendererInstance,              false, true>;

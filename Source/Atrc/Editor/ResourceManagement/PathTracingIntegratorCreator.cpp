@@ -99,15 +99,15 @@ void RegisterPathTracingIntegratorCreators(ResourceManager &rscMgr)
 
 std::shared_ptr<PathTracingIntegratorInstance> FullPathTracingIntegratorCreator::Create(ResourceManager &rscMgr, std::string name) const
 {
-    return std::make_shared<FullPathTracingIntegratorInstance>(std::move(name));
+    return std::make_shared<FullPathTracingIntegratorInstance>(GetName(), std::move(name));
 }
 
 std::shared_ptr<PathTracingIntegratorInstance> MISPathTracingIntegratorCreator::Create(ResourceManager &rscMgr, std::string name) const
 {
-    return std::make_shared<MISPathTracingIntegratorInstance>(std::move(name));
+    return std::make_shared<MISPathTracingIntegratorInstance>(GetName(), std::move(name));
 }
 
 std::shared_ptr<PathTracingIntegratorInstance> NativePathTracingIntegratorCreator::Create(ResourceManager &rscMgr, std::string name) const
 {
-    return std::make_shared<NativePathTracingIntegratorInstance>(std::move(name));
+    return std::make_shared<NativePathTracingIntegratorInstance>(GetName(), std::move(name));
 }

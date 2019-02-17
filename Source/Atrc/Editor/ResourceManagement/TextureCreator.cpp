@@ -77,15 +77,15 @@ void RegisterTextureCreators(ResourceManager &rscMgr)
 
 std::shared_ptr<TextureInstance> ConstantTextureCreator::Create(ResourceManager &rscMgr, std::string name) const
 {
-    return std::make_shared<ConstantTextureInstance>(std::move(name));
+    return std::make_shared<ConstantTextureInstance>(GetName(), std::move(name));
 }
 
 std::shared_ptr<TextureInstance> Constant1TextureCreator::Create(ResourceManager &rscMgr, std::string name) const
 {
-    return std::make_shared<Constant1TextureInstance>(std::move(name));
+    return std::make_shared<Constant1TextureInstance>(GetName(), std::move(name));
 }
 
 std::shared_ptr<TextureInstance> ImageTextureCreator::Create(ResourceManager &rscMgr, std::string name) const
 {
-    return std::make_shared<ImageTextureInstance>(std::move(name));
+    return std::make_shared<ImageTextureInstance>(GetName(), std::move(name));
 }

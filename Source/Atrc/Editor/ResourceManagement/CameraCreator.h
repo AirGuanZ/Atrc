@@ -8,7 +8,7 @@ class PinholeCameraCreator : public CameraCreator
 {
 public:
 
-    PinholeCameraCreator() : CameraCreator("pinhole") { }
+    PinholeCameraCreator() : CameraCreator("Pinhole") { }
 
     std::shared_ptr<CameraInstance> Create(ResourceManager &rscMgr, std::string name) const override;
 };

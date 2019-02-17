@@ -38,5 +38,5 @@ void RegisterSamplerCreators(ResourceManager &rscMgr)
 
 std::shared_ptr<SamplerInstance> NativeSamplerCreator::Create(ResourceManager &rscMgr, std::string name) const
 {
-    return std::make_shared<NativeSamplerInstance>(std::move(name));
+    return std::make_shared<NativeSamplerInstance>(GetName(), std::move(name));
 }

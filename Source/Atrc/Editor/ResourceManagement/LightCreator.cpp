@@ -34,5 +34,5 @@ void RegisterLightCreators(ResourceManager &rscMgr)
 
 std::shared_ptr<LightInstance> SkyLightCreator::Create(ResourceManager &rscMgr, std::string name) const
 {
-    return std::make_shared<SkyLightInstance>(std::move(name));
+    return std::make_shared<SkyLightInstance>(GetName(), std::move(name));
 }

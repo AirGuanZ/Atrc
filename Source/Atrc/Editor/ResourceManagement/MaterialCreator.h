@@ -8,7 +8,7 @@ class GGXDielectricCreator : public MaterialCreator
 {
 public:
 
-    GGXDielectricCreator() : MaterialCreator("ggx-dielectric") { }
+    GGXDielectricCreator() : MaterialCreator("GGXDielectric") { }
 
     std::shared_ptr<MaterialInstance> Create(ResourceManager &rscMgr, std::string name) const override;
 };
@@ -17,7 +17,7 @@ class GGXMetalCreator : public MaterialCreator
 {
 public:
 
-    GGXMetalCreator() : MaterialCreator("ggx-metal") { }
+    GGXMetalCreator() : MaterialCreator("GGXMetal") { }
 
     std::shared_ptr<MaterialInstance> Create(ResourceManager &rscMgr, std::string name) const override;
 };
@@ -26,7 +26,7 @@ class IdealBlackCreator : public MaterialCreator
 {
 public:
 
-    IdealBlackCreator() : MaterialCreator("black") { }
+    IdealBlackCreator() : MaterialCreator("IdealBlack") { }
 
     std::shared_ptr<MaterialInstance> Create(ResourceManager &rscMgr, std::string name) const override;
 };
@@ -35,7 +35,7 @@ class IdealDiffuseCreator : public MaterialCreator
 {
 public:
 
-    IdealDiffuseCreator() : MaterialCreator("diffuse") { }
+    IdealDiffuseCreator() : MaterialCreator("IdealDiffuse") { }
 
     std::shared_ptr<MaterialInstance> Create(ResourceManager &rscMgr, std::string name) const override;
 };
@@ -44,7 +44,7 @@ class IdealMirrorCreator : public MaterialCreator
 {
 public:
 
-    IdealMirrorCreator() : MaterialCreator("mirror") { }
+    IdealMirrorCreator() : MaterialCreator("IdealMirror") { }
 
     std::shared_ptr<MaterialInstance> Create(ResourceManager &rscMgr, std::string name) const override;
 };
@@ -53,7 +53,7 @@ class IdealScalerCreator : public MaterialCreator
 {
 public:
 
-    IdealScalerCreator() : MaterialCreator("scaler") { }
+    IdealScalerCreator() : MaterialCreator("IdealScaler") { }
 
     std::shared_ptr<MaterialInstance> Create(ResourceManager &rscMgr, std::string name) const override;
 };
@@ -62,7 +62,7 @@ class IdealSpecularCreator : public MaterialCreator
 {
 public:
 
-    IdealSpecularCreator() : MaterialCreator("specular") { }
+    IdealSpecularCreator() : MaterialCreator("IdealSpecular") { }
 
     std::shared_ptr<MaterialInstance> Create(ResourceManager &rscMgr, std::string name) const override;
 };
@@ -71,7 +71,7 @@ class InvisibleSurfaceCreator : public MaterialCreator
 {
 public:
 
-    InvisibleSurfaceCreator() : MaterialCreator("invisible") { }
+    InvisibleSurfaceCreator() : MaterialCreator("Invisible") { }
 
     std::shared_ptr<MaterialInstance> Create(ResourceManager &rscMgr, std::string name) const override;
 };
@@ -80,7 +80,7 @@ class NormalizedDiffusionBSSRDFCreator : public MaterialCreator
 {
 public:
 
-    NormalizedDiffusionBSSRDFCreator() : MaterialCreator("nd-bssrdf") { }
+    NormalizedDiffusionBSSRDFCreator() : MaterialCreator("BSSRDF") { }
 
     std::shared_ptr<MaterialInstance> Create(ResourceManager &rscMgr, std::string name) const override;
 };
@@ -89,7 +89,7 @@ class ONMatteCreator : public MaterialCreator
 {
 public:
 
-    ONMatteCreator() : MaterialCreator("on-matte") { }
+    ONMatteCreator() : MaterialCreator("ONMatte") { }
 
     std::shared_ptr<MaterialInstance> Create(ResourceManager &rscMgr, std::string name) const override;
 };
@@ -98,7 +98,7 @@ class TSMetalCreator : public MaterialCreator
 {
 public:
 
-    TSMetalCreator() : MaterialCreator("ts-metal") { }
+    TSMetalCreator() : MaterialCreator("TSMetal") { }
 
     std::shared_ptr<MaterialInstance> Create(ResourceManager &rscMgr, std::string name) const override;
 };

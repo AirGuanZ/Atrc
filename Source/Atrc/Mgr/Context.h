@@ -123,7 +123,13 @@ T *Factory<T>::Create(const ConfigNode &definition, Context &context, Arena &are
 
     if(auto grp = definition.TryAsGroup())
     {
-        auto it = creators_.find((*grp)["type"].AsValue());
+        auto type = (*grp)["type"].AsValue();
+        if(type == "Reference")
+        {
+            ConfigValue valueNode((*grp)["name"].AsValue());
+            return this->Create(valueNode, context, arena);
+        }
+        auto it = creators_.find(type);
         if(it == creators_.end())
             throw MgrErr("Unknown object type");
         return it->second->Create(*grp, context, arena);

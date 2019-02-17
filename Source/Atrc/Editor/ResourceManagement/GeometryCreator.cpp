@@ -52,8 +52,8 @@ namespace
 
     public:
 
-        explicit TriangleInstance(std::string name)
-            : GeometryInstance(std::move(name)),
+        explicit TriangleInstance(std::string typeName, std::string name)
+            : GeometryInstance(std::move(typeName), std::move(name)),
               A_(-1, -1, 0), B_(0, 1, 0), C_(1, -1, 0),
               editingVtx_(0)
         {
@@ -225,10 +225,10 @@ void RegisterGeometryCreators(ResourceManager &rscMgr)
 
 std::shared_ptr<GeometryInstance> TriangleCreator::Create(ResourceManager &rscMgr, std::string name) const
 {
-    return std::make_shared<TriangleInstance>(std::move(name));
+    return std::make_shared<TriangleInstance>(GetName(), std::move(name));
 }
 
 std::shared_ptr<GeometryInstance> WavefrontOBJCreator::Create(ResourceManager &rscMgr, std::string name) const
 {
-    return std::make_shared<WavefrontOBJInstance>(std::move(name));
+    return std::make_shared<WavefrontOBJInstance>(GetName(), std::move(name));
 }

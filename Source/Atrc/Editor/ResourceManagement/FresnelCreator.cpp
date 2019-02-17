@@ -77,15 +77,15 @@ void RegisterFresnelCreators(ResourceManager &rscMgr)
 
 std::shared_ptr<FresnelInstance> FresnelConductorCreator::Create(ResourceManager &rscMgr, std::string name) const
 {
-    return std::make_shared<FresnelConductorInstance>(std::move(name));
+    return std::make_shared<FresnelConductorInstance>(GetName(), std::move(name));
 }
 
 std::shared_ptr<FresnelInstance> FresnelDielectricCreator::Create(ResourceManager &rscMgr, std::string name) const
 {
-    return std::make_shared<FresnelDielectricInstance>(std::move(name));
+    return std::make_shared<FresnelDielectricInstance>(GetName(), std::move(name));
 }
 
 std::shared_ptr<FresnelInstance> FresnelSchlickCreator::Create(ResourceManager &rscMgr, std::string name) const
 {
-    return std::make_shared<FresnelSchlickInstance>(std::move(name));
+    return std::make_shared<FresnelSchlickInstance>(GetName(), std::move(name));
 }

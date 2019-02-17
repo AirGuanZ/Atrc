@@ -12,7 +12,7 @@ class GeometricDiffuseLightCreator : public EntityCreator
 {
 public:
 
-    GeometricDiffuseLightCreator() : EntityCreator("diffuse") { }
+    GeometricDiffuseLightCreator() : EntityCreator("GeometricDiffuse") { }
 
     std::shared_ptr<EntityInstance> Create(ResourceManager &rscMgr, std::string name) const override;
 };
@@ -21,7 +21,7 @@ class GeometricEntityCreator : public EntityCreator
 {
 public:
 
-    GeometricEntityCreator() : EntityCreator("geometric") { }
+    GeometricEntityCreator() : EntityCreator("Geometric") { }
 
     std::shared_ptr<EntityInstance> Create(ResourceManager &rscMgr, std::string name) const override;
 };

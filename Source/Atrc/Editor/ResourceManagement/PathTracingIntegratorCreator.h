@@ -8,7 +8,7 @@ class FullPathTracingIntegratorCreator : public PathTracingIntegratorCreator
 {
 public:
 
-    FullPathTracingIntegratorCreator() : PathTracingIntegratorCreator("full") { }
+    FullPathTracingIntegratorCreator() : PathTracingIntegratorCreator("Full") { }
 
     std::shared_ptr<PathTracingIntegratorInstance> Create(ResourceManager &rscMgr, std::string name) const override;
 };
@@ -17,7 +17,7 @@ class MISPathTracingIntegratorCreator : public PathTracingIntegratorCreator
 {
 public:
 
-    MISPathTracingIntegratorCreator() : PathTracingIntegratorCreator("mis") { }
+    MISPathTracingIntegratorCreator() : PathTracingIntegratorCreator("MIS") { }
 
     std::shared_ptr<PathTracingIntegratorInstance> Create(ResourceManager &rscMgr, std::string name) const override;
 };
@@ -26,7 +26,7 @@ class NativePathTracingIntegratorCreator : public PathTracingIntegratorCreator
 {
 public:
 
-    NativePathTracingIntegratorCreator() : PathTracingIntegratorCreator("native") { }
+    NativePathTracingIntegratorCreator() : PathTracingIntegratorCreator("Native") { }
 
     std::shared_ptr<PathTracingIntegratorInstance> Create(ResourceManager &rscMgr, std::string name) const override;
 };
