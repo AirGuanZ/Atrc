@@ -100,7 +100,7 @@ std::tuple<Spectrum, std::optional<BSDF::SampleWiResult>, std::optional<Intersec
             scene, selectLight->light, inct, shd, considerMedium, sampler->GetReal3());
     }
 
-    auto bsdfSample = shd.bsdf->SampleWi(shd.coordSys, inct.coordSys, inct.wr, BSDF_ALL, false, sampler->GetReal2());
+    auto bsdfSample = shd.bsdf->SampleWi(shd.coordSys, inct.coordSys, inct.wr, BSDF_ALL, false, sampler->GetReal3());
     if(!bsdfSample || !bsdfSample->coef)
         return { ret, std::nullopt, std::nullopt };
 

@@ -25,7 +25,7 @@ Spectrum BxDF_Black::Eval(
 std::optional<BxDF::SampleWiResult> BxDF_Black::SampleWi(
     [[maybe_unused]] const CoordSystem &geoInShd,
     [[maybe_unused]] const Vec3 &wo, [[maybe_unused]] bool star,
-    [[maybe_unused]] const Vec2 &sample) const noexcept
+    [[maybe_unused]] const Vec3 &sample) const noexcept
 {
     return std::nullopt;
 }

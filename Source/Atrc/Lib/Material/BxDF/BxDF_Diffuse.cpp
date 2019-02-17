@@ -27,13 +27,13 @@ Spectrum BxDF_Diffuse::Eval(const CoordSystem &geoInShd, const Vec3 &wi, const V
     return albedo_ / PI;
 }
 
-std::optional<BxDF::SampleWiResult> BxDF_Diffuse::SampleWi(const CoordSystem &geoInShd, const Vec3 &wo, [[maybe_unused]] bool star, const Vec2 &sample) const noexcept
+std::optional<BxDF::SampleWiResult> BxDF_Diffuse::SampleWi(const CoordSystem &geoInShd, const Vec3 &wo, [[maybe_unused]] bool star, const Vec3 &sample) const noexcept
 {
     if(!geoInShd.InPositiveHemisphere(wo))
         return std::nullopt;
 
     auto [sam, pdf] = AGZ::Math::DistributionTransform
-        ::ZWeightedOnUnitHemisphere<Real>::Transform(sample);
+        ::ZWeightedOnUnitHemisphere<Real>::Transform(sample.xy());
 
     /*
         1. 如果sam在几何坐标系背面，那么这一采样的射线一定会被物体拦截，不如直接返回None好了

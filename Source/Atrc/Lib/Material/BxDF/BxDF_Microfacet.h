@@ -20,7 +20,26 @@ public:
 
     Spectrum Eval(const CoordSystem &geoInShd, const Vec3 &wi, const Vec3 &wo, bool star) const noexcept override;
 
-    std::optional<SampleWiResult> SampleWi(const CoordSystem &geoInShd, const Vec3 &wo, bool star, const Vec2 &sample) const noexcept override;
+    std::optional<SampleWiResult> SampleWi(const CoordSystem &geoInShd, const Vec3 &wo, bool star, const Vec3 &sample) const noexcept override;
+
+    Real SampleWiPDF(const CoordSystem &geoInShd, const Vec3 &wi, const Vec3 &wo, bool star) const noexcept override;
+};
+
+class BxDF_Microfacet : public BxDF
+{
+    Spectrum rc_;
+    Real alpha_;
+    const Dielectric *dielectric_;
+
+public:
+
+    BxDF_Microfacet(const Spectrum &rc, Real roughness, const Dielectric *dielectric) noexcept;
+
+    Spectrum GetAlbedo() const noexcept override;
+
+    Spectrum Eval(const CoordSystem &geoInShd, const Vec3 &wi, const Vec3 &wo, bool star) const noexcept override;
+
+    std::optional<SampleWiResult> SampleWi(const CoordSystem &geoInShd, const Vec3 &wo, bool star, const Vec3 &sample) const noexcept override;
 
     Real SampleWiPDF(const CoordSystem &geoInShd, const Vec3 &wi, const Vec3 &wo, bool star) const noexcept override;
 };

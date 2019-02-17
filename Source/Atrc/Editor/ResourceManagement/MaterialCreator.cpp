@@ -2,6 +2,44 @@
 
 namespace
 {
+    class GGXDielectricInstance : public MaterialInstance
+    {
+        TextureSlot rc_;
+        TextureSlot roughness_;
+        FresnelSlot fresnel_;
+
+    public:
+
+        using MaterialInstance::MaterialInstance;
+
+        void Display(ResourceManager &rscMgr) override
+        {
+            if(ImGui::TreeNode("rc"))
+            {
+                rc_.Display(rscMgr);
+                ImGui::TreePop();
+            }
+            if(ImGui::TreeNode("roughness"))
+            {
+                roughness_.Display(rscMgr);
+                ImGui::TreePop();
+            }
+            if(ImGui::TreeNode("fresnel"))
+            {
+                fresnel_.Display(rscMgr);
+                ImGui::TreePop();
+            }
+        }
+
+        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
+        {
+            ctx.AddLine("type = GGXDielectric;");
+            ExportSubResource("rc", rscMgr, ctx, rc_);
+            ExportSubResource("roughness", rscMgr, ctx, roughness_);
+            ExportSubResource("fresnel", rscMgr, ctx, fresnel_);
+        }
+    };
+
     class GGXMetalInstance : public MaterialInstance
     {
         TextureSlot rc_;
@@ -302,6 +340,7 @@ namespace
 
 void RegisterMaterialCreators(ResourceManager &rscMgr)
 {
+    static const GGXDielectricCreator iGGXDielectricCreator;
     static const GGXMetalCreator iGGXMetalCreator;
     static const IdealBlackCreator iIdealBlackCreator;
     static const IdealDiffuseCreator iIdealDiffuseCreator;
@@ -312,6 +351,7 @@ void RegisterMaterialCreators(ResourceManager &rscMgr)
     static const NormalizedDiffusionBSSRDFCreator iNormalizedDiffusionBSSRDFCreator;
     static const ONMatteCreator iONMatteCreator;
     static const TSMetalCreator iTSMetalCreator;
+    rscMgr.AddCreator(&iGGXDielectricCreator);
     rscMgr.AddCreator(&iGGXMetalCreator);
     rscMgr.AddCreator(&iIdealBlackCreator);
     rscMgr.AddCreator(&iIdealDiffuseCreator);
@@ -322,6 +362,11 @@ void RegisterMaterialCreators(ResourceManager &rscMgr)
     rscMgr.AddCreator(&iNormalizedDiffusionBSSRDFCreator);
     rscMgr.AddCreator(&iONMatteCreator);
     rscMgr.AddCreator(&iTSMetalCreator);
+}
+
+std::shared_ptr<MaterialInstance> GGXDielectricCreator::Create(ResourceManager &rscMgr, std::string name) const
+{
+    return std::make_shared<GGXDielectricInstance>(std::move(name));
 }
 
 std::shared_ptr<MaterialInstance> GGXMetalCreator::Create(ResourceManager &rscMgr, std::string name) const

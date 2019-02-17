@@ -25,6 +25,24 @@ public:
 };
 
 /*
+    type = GGXDielectric
+
+    fresnel   = Dielectric
+    rc        = Texture
+    roughness = Texture
+
+    normalMapper = Texture | null
+*/
+class GGXDielectricCreator : public Creator<Material>
+{
+public:
+
+    std::string GetTypeName() const override { return "GGXDielectric"; }
+
+    Material *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
+};
+
+/*
     type = GGXMetal
 
     fresnel   = Fresnel

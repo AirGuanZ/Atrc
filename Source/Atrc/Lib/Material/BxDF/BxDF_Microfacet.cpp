@@ -94,12 +94,24 @@ namespace
 
         return { H, SampleHPDF(nWi, H, alpha) };
     }
-}
+
+    std::optional<Vec3> GetRefractDirection(const Vec3 &wi, const Vec3 &nor, Real eta)
+    {
+        Real cosThetaI = Dot(wi, nor);
+        if(cosThetaI < 0)
+            eta = 1 / eta;
+        float cosThetaTSqr = 1 - (1 - cosThetaI * cosThetaI) * (eta*eta);
+        if(cosThetaTSqr <= 0.0f)
+            return std::nullopt;
+        float sign = cosThetaI >= 0.0f ? 1.0f : -1.0f;
+        return nor * (-cosThetaI * eta + sign * Sqrt(cosThetaTSqr)) + wi * eta;
+    }
+} // namespace anonymous
 
 BxDF_MicrofacetReflection::BxDF_MicrofacetReflection(const Spectrum &rc, Real roughness, const Fresnel *fresnel) noexcept
     : BxDF(BSDFType(BSDF_GLOSSY | BSDF_REFLECTION)), rc_(rc), alpha_(roughness * roughness), fresnel_(fresnel)
 {
-    
+    AGZ_ASSERT(roughness > 0 && fresnel);
 }
 
 Spectrum BxDF_MicrofacetReflection::GetAlbedo() const noexcept
@@ -124,13 +136,13 @@ Spectrum BxDF_MicrofacetReflection::Eval(const CoordSystem &geoInShd, const Vec3
     return rc_ * Fr * D * G / (4 * nWi.z * nWo.z);
 }
 
-std::optional<BxDF::SampleWiResult> BxDF_MicrofacetReflection::SampleWi(const CoordSystem &geoInShd, const Vec3 &wo, bool star, const Vec2 &sample) const noexcept
+std::optional<BxDF::SampleWiResult> BxDF_MicrofacetReflection::SampleWi(const CoordSystem &geoInShd, const Vec3 &wo, bool star, const Vec3 &sample) const noexcept
 {
     if(wo.z <= 0 || !geoInShd.InPositiveHemisphere(wo))
         return std::nullopt;
 
     Vec3 nWo = wo.Normalize();
-    auto [H, Hpdf] = SampleH(nWo, alpha_, sample);
+    auto [H, Hpdf] = SampleH(nWo, alpha_, sample.xy());
 
     if(Hpdf < EPS || Abs(Dot(nWo, H)) < EPS)
         return std::nullopt;
@@ -158,6 +170,167 @@ Real BxDF_MicrofacetReflection::SampleWiPDF(const CoordSystem &geoInShd, const V
     Vec3 nWh = (nWo + nWi).Normalize();
 
     return SampleHPDF(nWi, nWh, alpha_) / (4 * Abs(Dot(nWi, nWh)));
+}
+
+BxDF_Microfacet::BxDF_Microfacet(const Spectrum &rc, Real roughness, const Dielectric *dielectric) noexcept
+    : BxDF(BSDFType(BSDF_GLOSSY | BSDF_REFLECTION | BSDF_TRANSMISSION)),
+      rc_(rc), alpha_(roughness * roughness), dielectric_(dielectric)
+{
+    AGZ_ASSERT(roughness > 0 && dielectric);
+}
+
+Spectrum BxDF_Microfacet::GetAlbedo() const noexcept
+{
+    return rc_;
+}
+
+Spectrum BxDF_Microfacet::Eval(const CoordSystem &geoInShd, const Vec3 &wi, const Vec3 &wo, bool star) const noexcept
+{
+    Vec3 nWi = wi.Normalize(), nWo = wo.Normalize();
+    Real factor = nWi.z * nWo.z;
+    if(!factor)
+        return Spectrum();
+
+    bool isReflection = factor > 0;
+    bool isEntering = nWo.z > 0;
+
+    Real etaI = dielectric_->GetEtaI(), etaT = dielectric_->GetEtaT();
+    if(!isEntering)
+        std::swap(etaI, etaT);
+
+    Vec3 nH;
+
+    if(isReflection)
+    {
+        nH = nWi + nWo;
+        if(nH.Length() < EPS)
+            return Spectrum();
+        nH = nH.Normalize();
+    }
+    else
+        nH = -(etaI * nWo + etaT * nWi).Normalize();
+
+    if(nH.z < 0)
+        nH = -nH;
+
+    Real D = GGX_D(nH, alpha_);
+    if(!D)
+        return Spectrum();
+
+    Real Fr = dielectric_->Eval(Dot(nWo, nH)).r;
+    Real G = Smith(nWi, nH, alpha_) * Smith(nWo, nH, alpha_);
+
+    if(isReflection)
+        return rc_ * Abs(Fr * G / (4 * nWo.z * nWo.z));
+
+    Real HO = Dot(nH, nWo), HI = Dot(nH, nWi);
+    Real sdem = etaI * HO + etaT * HI;
+    Real val =  (1 - Fr) * D * G * etaT * etaT * HO * HI / (sdem * sdem * nWo.z * nWi.z);
+
+    // TODO star
+    return rc_ * Abs(val);
+}
+
+std::optional<BxDF::SampleWiResult> BxDF_Microfacet::SampleWi(const CoordSystem &geoInShd, const Vec3 &wo, bool star, const Vec3 &sample) const noexcept
+{
+    Vec3 nWo = wo.Normalize();
+    
+    auto [H, Hpdf] = SampleH(nWo.z > 0 ? nWo : -nWo, alpha_, sample.xy());
+    if(!Hpdf)
+        return std::nullopt;
+
+    Real D = GGX_D(H, alpha_);
+    if(!D)
+        return std::nullopt;
+
+    Real Fr = dielectric_->Eval(Dot(nWo, H)).r;
+    
+    if(sample.z <= Fr) // reflection
+    {
+        Vec3 nWi = (2 * Dot(nWo, H) * H - nWo).Normalize();
+        if((nWi.z >= 0) != (nWo.z >= 0))
+            return std::nullopt;
+
+        Real pdf = Hpdf * Fr / Abs(4 * Dot(nWi, H));
+        Real G = Smith(nWi, H, alpha_) * Smith(nWo, H, alpha_);
+
+        SampleWiResult ret;
+        ret.coef    = rc_ * Fr * D * G / Abs(4 * nWi.z * nWo.z);
+        ret.pdf     = pdf;
+        ret.isDelta = false;
+        ret.type    = BSDFType(BSDF_REFLECTION | BSDF_GLOSSY);
+        ret.wi      = nWi;
+
+        return ret;
+    }
+
+    auto oWi = GetRefractDirection(-nWo, H, dielectric_->GetEtaT() / dielectric_->GetEtaI());
+    if(!oWi || ((oWi->z >= 0) == (nWo.z >= 0)))
+        return std::nullopt;
+    Vec3 nWi = oWi->Normalize();
+
+    bool isEntering = nWo.z > 0;
+    Real etaT = dielectric_->GetEtaT(), etaI = dielectric_->GetEtaI();
+    if(!isEntering)
+        std::swap(etaT, etaI);
+
+    Real HO = Dot(H, nWo), HI = Dot(H, nWi);
+    Real sdem = etaI * HO + etaT * HI;
+    if(!sdem)
+        return std::nullopt;
+
+    Real dHdWi = etaT * etaT * HI / (sdem * sdem);
+    Real G = Smith(nWi, H, alpha_) * Smith(nWo, H, alpha_);
+    Real val = (1 - Fr) * D * G * etaT * etaT * HO * HI / (sdem * sdem * nWo.z * nWi.z);
+
+    // TODO star
+    SampleWiResult ret;
+    ret.wi      = nWi;
+    ret.coef    = rc_ * Abs(val);
+    ret.isDelta = false;
+    ret.pdf     = Abs(Hpdf * dHdWi * (1 - Fr));
+    ret.type    = BSDFType(BSDF_TRANSMISSION | BSDF_GLOSSY);
+
+    return ret;
+}
+
+Real BxDF_Microfacet::SampleWiPDF(const CoordSystem &geoInShd, const Vec3 &wi, const Vec3 &wo, bool star) const noexcept
+{
+    Vec3 nWi = wi.Normalize(), nWo = wo.Normalize();
+    Real factor = nWi.z * nWo.z;
+    if(!factor)
+        return 0;
+
+    bool isReflection = factor > 0;
+    bool isEntering = nWo.z > 0;
+
+    Vec3 nH;
+    Real dHdWi;
+    if(isReflection)
+    {
+        nH = (nWo + nWi).Normalize();
+        dHdWi = 1 / (4 * Dot(nWi, nH));
+    }
+    else
+    {
+        Real etaI = dielectric_->GetEtaI(), etaT = dielectric_->GetEtaT();
+        if(!isEntering)
+            std::swap(etaI, etaT);
+        nH = -(etaI * nWo + etaT * nWi).Normalize();
+
+        Real HO = Dot(nWo, nH), HI = Dot(nWi, nH);
+        Real sdem = etaI * HO + etaT * HI;
+        dHdWi = (etaT * etaT * HI) / (sdem * sdem);
+    }
+
+    if(nH.z < 0)
+        nH = -nH;
+
+    Real Hpdf = SampleHPDF(nWo.z > 0 ? nWo : -nWo, nH, alpha_);
+    Real Fr = dielectric_->Eval(Dot(nWo, nH)).r;
+    Real Fpdf = isReflection ? Fr : 1 - Fr;
+
+    return Abs(Hpdf * Fpdf * dHdWi);
 }
 
 } // namespace Atrc

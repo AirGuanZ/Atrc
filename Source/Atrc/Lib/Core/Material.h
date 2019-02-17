@@ -45,7 +45,7 @@ public:
 
     virtual std::optional<SampleWiResult> SampleWi(
         const CoordSystem &shd, const CoordSystem &geo,
-        const Vec3 &wo, BSDFType type, bool star, const Vec2 &sample) const noexcept = 0;
+        const Vec3 &wo, BSDFType type, bool star, const Vec3 &sample) const noexcept = 0;
 
     virtual Real SampleWiPDF(
         const CoordSystem &shd, const CoordSystem &geo,

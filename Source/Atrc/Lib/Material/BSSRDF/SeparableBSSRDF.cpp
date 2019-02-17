@@ -62,13 +62,13 @@ namespace
 
         std::optional<SampleWiResult> SampleWi(
             const CoordSystem &shd, const CoordSystem &geo,
-            const Vec3 &wo, BSDFType type, bool star, const Vec2 &sample) const noexcept override
+            const Vec3 &wo, BSDFType type, bool star, const Vec3 &sample) const noexcept override
         {
             if(!((type & BSDF_TRANSMISSION) && (type & (BSDF_DIFFUSE | BSDF_GLOSSY))))
                 return std::nullopt;
 
             auto [sam, pdf] = AGZ::Math::DistributionTransform
-                ::ZWeightedOnUnitHemisphere<Real>::Transform(sample);
+                ::ZWeightedOnUnitHemisphere<Real>::Transform(sample.xy());
             if(!pdf)
                 return std::nullopt;
             sam = shd.Local2World(sam);

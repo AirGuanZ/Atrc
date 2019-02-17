@@ -28,10 +28,10 @@ Spectrum BxDF_TorranceSparrowReflection::Eval(const CoordSystem &geoInShd, const
     return rc_ * fr * md_->D(H) * G / (4 * nWi.z * nWo.z);
 }
 
-std::optional<BxDF::SampleWiResult> BxDF_TorranceSparrowReflection::SampleWi(const CoordSystem &geoInShd, const Vec3 &wo, bool star, const Vec2 &sample) const noexcept
+std::optional<BxDF::SampleWiResult> BxDF_TorranceSparrowReflection::SampleWi(const CoordSystem &geoInShd, const Vec3 &wo, bool star, const Vec3 &sample) const noexcept
 {
     Vec3 nWo = wo.Normalize();
-    auto mdSample = md_->SampleWi(geoInShd, nWo, sample);
+    auto mdSample = md_->SampleWi(geoInShd, nWo, sample.xy());
     if(!mdSample)
         return std::nullopt;
 

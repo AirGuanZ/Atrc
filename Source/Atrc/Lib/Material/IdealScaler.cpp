@@ -32,7 +32,7 @@ namespace
 
         std::optional<SampleWiResult> SampleWi(
             const CoordSystem &shd, const CoordSystem &geo,
-            const Vec3 &wo, BSDFType type, bool star, const Vec2 &sample) const noexcept override
+            const Vec3 &wo, BSDFType type, bool star, const Vec3 &sample) const noexcept override
         {
             auto ret = internal_->SampleWi(shd, geo, wo, type, star, sample);
             if(ret)

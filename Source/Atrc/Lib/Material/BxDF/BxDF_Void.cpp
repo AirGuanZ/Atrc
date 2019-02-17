@@ -25,7 +25,7 @@ Spectrum BxDF_Void::Eval(
 std::optional<BxDF::SampleWiResult> BxDF_Void::SampleWi(
     [[maybe_unused]] const CoordSystem &geoInShd,
     const Vec3 &wo, [[maybe_unused]] bool star,
-    [[maybe_unused]] const Vec2 &sample) const noexcept
+    [[maybe_unused]] const Vec3 &sample) const noexcept
 {
     SampleWiResult ret;
     ret.coef = Spectrum(Real(1));

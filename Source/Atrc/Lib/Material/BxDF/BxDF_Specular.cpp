@@ -40,7 +40,7 @@ Spectrum BxDF_Specular::Eval(
 }
 
 std::optional<BxDF_Specular::SampleWiResult> BxDF_Specular::SampleWi(
-    [[maybe_unused]] const CoordSystem &geoInShd, const Vec3 &wo, bool star, const Vec2 &sample) const noexcept
+    [[maybe_unused]] const CoordSystem &geoInShd, const Vec3 &wo, bool star, const Vec3 &sample) const noexcept
 {
     Vec3 nor = wo.z > 0 ? Vec3::UNIT_Z() : -Vec3::UNIT_Z();
     Vec3 nWo = wo.Normalize();

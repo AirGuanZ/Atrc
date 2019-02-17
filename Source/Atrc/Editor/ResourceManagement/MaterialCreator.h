@@ -4,6 +4,15 @@
 
 void RegisterMaterialCreators(ResourceManager &rscMgr);
 
+class GGXDielectricCreator : public MaterialCreator
+{
+public:
+
+    GGXDielectricCreator() : MaterialCreator("ggx-dielectric") { }
+
+    std::shared_ptr<MaterialInstance> Create(ResourceManager &rscMgr, std::string name) const override;
+};
+
 class GGXMetalCreator : public MaterialCreator
 {
 public:

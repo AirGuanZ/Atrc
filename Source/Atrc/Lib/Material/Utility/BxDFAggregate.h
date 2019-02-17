@@ -29,7 +29,7 @@ public:
     
     std::optional<SampleWiResult> SampleWi(
         const CoordSystem &shd, const CoordSystem &geo,
-        const Vec3 &wo, BSDFType type, bool star, const Vec2 &sample) const noexcept override;
+        const Vec3 &wo, BSDFType type, bool star, const Vec3 &sample) const noexcept override;
 
     Real SampleWiPDF(
         const CoordSystem &shd, const CoordSystem &geo,
@@ -85,7 +85,7 @@ template<uint8_t MAX_BXDF_CNT>
 std::optional<typename BxDFAggregate<MAX_BXDF_CNT>::SampleWiResult>
 BxDFAggregate<MAX_BXDF_CNT>::SampleWi(
     const CoordSystem &shd, [[maybe_unused]] const CoordSystem &geo,
-    const Vec3 &wo, BSDFType type, bool star, const Vec2 &sample) const noexcept
+    const Vec3 &wo, BSDFType type, bool star, const Vec3 &sample) const noexcept
 {
     // 有多少bxdf的type对得上
 
@@ -99,7 +99,7 @@ BxDFAggregate<MAX_BXDF_CNT>::SampleWi(
     
     auto [dstIdx, newSampleX] = AGZ::Math::DistributionTransform
         ::SampleExtractor<Real>::ExtractInteger<uint8_t>(sample.x, 0, nMatched);
-    Vec2 newSample(newSampleX, sample.y);
+    Vec3 newSample(newSampleX, sample.y ,sample.z);
     
     // 选出bxdf
 
