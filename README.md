@@ -14,7 +14,7 @@ Lib已/将实现以下特性：
 - [x] Torrance-Sparrow Reflection Model & Oren-Nayar Reflection Model
 - [x] Normalized Diffusion BSSRDF
 - [x] Torrance-Sparrow Transmission Model
-- [ ] Saveing/loading of Editor
+- [ ] Saving/loading of Editor
 - [ ] Disney BRDF
 - [ ] Progressive Photon Mapping
 - [ ] Bidirectional Path Tracing
