@@ -45,6 +45,22 @@ void SetFullViewport()
     glViewport(0, 0, Global::GetFramebufferWidth(), Global::GetFramebufferHeight());
 }
 
+struct EditorData
+{
+    DefaultRenderingCamera defaultRenderingCamera;
+
+    ResourceManager rscMgr;
+
+    Vec2i filmSize = { 640, 480 };
+    FilmFilterSlot filmFilterSlot;
+    SamplerSlot samplerSlot;
+    RendererSlot rendererSlot;
+
+    TFilenameSlot<false, FilenameMode::Absolute> scriptSlot;
+    TFilenameSlot<false, FilenameMode::RelativeToScript> workspaceSlot;
+    std::array<char, 512> outputFilenameBuf;
+};
+
 int Run(GLFWwindow *window)
 {
     using namespace AGZ::GraphicsAPI;
@@ -123,9 +139,7 @@ int Run(GLFWwindow *window)
         static_cast<float>(Global::GetFramebufferHeight())
     });
 
-    // Camera
-
-    DefaultRenderingCamera camera("default");
+    EditorData editorData;
 
     // 注册窗口事件
 
@@ -134,7 +148,7 @@ int Run(GLFWwindow *window)
     {
         Global::_setFramebufferWidth(param.w);
         Global::_setFramebufferHeight(param.h);
-        camera.AutoResizeProj();
+        editorData.defaultRenderingCamera.AutoResizeProj();
         SetFullViewport();
         imm.Resize({ static_cast<float>(param.w), static_cast<float>(param.h) });
     }));
@@ -146,15 +160,9 @@ int Run(GLFWwindow *window)
 
     // Object Manager
 
-    ResourceManager rscMgr;
-    RegisterResourceCreators(rscMgr);
+    RegisterResourceCreators(editorData.rscMgr);
 
     // global setting
-
-    Vec2i filmSize = { 640, 480 };
-    FilmFilterSlot filmFilterSlot;
-    SamplerSlot samplerSlot;
-    RendererSlot rendererSlot;
 
     SceneRenderer sceneRenderer;
     GL::Texture2D sceneRendererTex;
@@ -166,17 +174,13 @@ int Run(GLFWwindow *window)
         sceneRendererTex.InitializeFormat(1, w, h, GL_RGB8);
     };
 
-    filmFilterSlot.SetInstance(rscMgr.Create<FilmFilterInstance>("box", ""));
-    samplerSlot.SetInstance(rscMgr.Create<SamplerInstance>("native", ""));
-    rendererSlot.SetInstance(rscMgr.Create<RendererInstance>("path tracing", ""));
+    editorData.filmFilterSlot.SetInstance(editorData.rscMgr.Create<FilmFilterInstance>("box", ""));
+    editorData.samplerSlot.SetInstance(editorData.rscMgr.Create<SamplerInstance>("native", ""));
+    editorData.rendererSlot.SetInstance(editorData.rscMgr.Create<RendererInstance>("path tracing", ""));
 
-    char outputFilenameBuf[512] = "$Output.png";
-
-    TFilenameSlot<false, FilenameMode::Absolute> scriptSlot;
     FileBrowser scriptBrowser("script", true, "");
-
-    TFilenameSlot<false, FilenameMode::RelativeToScript> workspaceSlot;
     FileBrowser workspaceBrowser("workspace", true, "");
+    std::strcpy(editorData.outputFilenameBuf.data(), "$Output.png");
 
     bool showMenuBar = true;
     keyboard.AttachHandler(arena.Create<KeyDownHandler>([&](const KeyDown &param)
@@ -212,21 +216,21 @@ int Run(GLFWwindow *window)
             {
                 if(ImGui::MenuItem("render"))
                 {
-                    std::string scriptDir = scriptSlot.GetExportedFilename("", "");
-                    std::string workspaceDir = workspaceSlot.GetExportedFilename("", scriptDir);
+                    std::string scriptDir = editorData.scriptSlot.GetExportedFilename("", "");
+                    std::string workspaceDir = editorData.workspaceSlot.GetExportedFilename("", scriptDir);
                     LauncherScriptExportingContext ctx(
-                        &camera,
-                        rscMgr.GetPool<CameraInstance>().GetSelectedInstance().get(),
-                        filmFilterSlot.GetInstance().get(),
-                        rendererSlot.GetInstance().get(),
-                        samplerSlot.GetInstance().get(),
+                        &editorData.defaultRenderingCamera,
+                        editorData.rscMgr.GetPool<CameraInstance>().GetSelectedInstance().get(),
+                        editorData.filmFilterSlot.GetInstance().get(),
+                        editorData.rendererSlot.GetInstance().get(),
+                        editorData.samplerSlot.GetInstance().get(),
                         workspaceDir,
                         scriptDir,
-                        outputFilenameBuf,
-                        filmSize);
-                    LauncherScriptExporter exporter(rscMgr, ctx);
+                        editorData.outputFilenameBuf.data(),
+                        editorData.filmSize);
+                    LauncherScriptExporter exporter(editorData.rscMgr, ctx);
                     
-                    initSceneRendererTex(filmSize.x, filmSize.y);
+                    initSceneRendererTex(editorData.filmSize.x, editorData.filmSize.y);
 
                     try
                     {
@@ -283,30 +287,30 @@ int Run(GLFWwindow *window)
             AGZ::ScopeGuard popupExitGuard([] { ImGui::EndPopup(); });
 
             ImGui::Text("script directory"); ImGui::SameLine();
-            scriptSlot.Display(scriptBrowser);
+            editorData.scriptSlot.Display(scriptBrowser);
 
             ImGui::Text("workspace"); ImGui::SameLine();
-            workspaceSlot.Display(workspaceBrowser);
+            editorData.workspaceSlot.Display(workspaceBrowser);
 
-            ImGui::InputText("output filename", outputFilenameBuf, AGZ::ArraySize(outputFilenameBuf));
+            ImGui::InputText("output filename", editorData.outputFilenameBuf.data(), editorData.outputFilenameBuf.size());
 
-            ImGui::InputInt2("film size", &filmSize[0]);
+            ImGui::InputInt2("film size", &editorData.filmSize[0]);
 
             if(ImGui::TreeNodeEx("film filter", ImGuiTreeNodeFlags_DefaultOpen))
             {
-                filmFilterSlot.Display(rscMgr);
+                editorData.filmFilterSlot.Display(editorData.rscMgr);
                 ImGui::TreePop();
             }
 
             if(ImGui::TreeNodeEx("sampler", ImGuiTreeNodeFlags_DefaultOpen))
             {
-                samplerSlot.Display(rscMgr);
+                editorData.samplerSlot.Display(editorData.rscMgr);
                 ImGui::TreePop();
             }
 
             if(ImGui::TreeNodeEx("renderer", ImGuiTreeNodeFlags_DefaultOpen))
             {
-                rendererSlot.Display(rscMgr);
+                editorData.rendererSlot.Display(editorData.rscMgr);
                 ImGui::TreePop();
             }
 
@@ -338,22 +342,22 @@ int Run(GLFWwindow *window)
             {
                 if(ImGui::BeginTabItem("entity"))
                 {
-                    auto &pool = rscMgr.GetPool<EntityInstance>();
-                    pool.Display(rscMgr);
+                    auto &pool = editorData.rscMgr.GetPool<EntityInstance>();
+                    pool.Display(editorData.rscMgr);
                     isEntityPoolDisplayed = true;
                     ImGui::EndTabItem();
                 }
                 if(ImGui::BeginTabItem("light"))
                 {
-                    auto &pool = rscMgr.GetPool<LightInstance>();
-                    pool.Display(rscMgr);
+                    auto &pool = editorData.rscMgr.GetPool<LightInstance>();
+                    pool.Display(editorData.rscMgr);
                     isLightPoolDisplayed = true;
                     ImGui::EndTabItem();
                 }
                 if(ImGui::BeginTabItem("camera"))
                 {
-                    auto &pool = rscMgr.GetPool<CameraInstance>();
-                    pool.Display(rscMgr);
+                    auto &pool = editorData.rscMgr.GetPool<CameraInstance>();
+                    pool.Display(editorData.rscMgr);
                     ImGui::EndTabItem();
                 }
                 ImGui::EndTabBar();
@@ -372,26 +376,26 @@ int Run(GLFWwindow *window)
             {
                 if(ImGui::BeginTabItem("material"))
                 {
-                    auto &pool = rscMgr.GetPool<MaterialInstance>();
-                    pool.Display(rscMgr);
+                    auto &pool = editorData.rscMgr.GetPool<MaterialInstance>();
+                    pool.Display(editorData.rscMgr);
                     if(auto mat = pool.GetSelectedInstance())
-                        mat->Display(rscMgr);
+                        mat->Display(editorData.rscMgr);
                     ImGui::EndTabItem();
                 }
                 if(ImGui::BeginTabItem("texture"))
                 {
-                    auto &pool = rscMgr.GetPool<TextureInstance>();
-                    pool.Display(rscMgr);
+                    auto &pool = editorData.rscMgr.GetPool<TextureInstance>();
+                    pool.Display(editorData.rscMgr);
                     if(auto tex = pool.GetSelectedInstance())
-                        tex->Display(rscMgr);
+                        tex->Display(editorData.rscMgr);
                     ImGui::EndTabItem();
                 }
                 if(ImGui::BeginTabItem("geometry"))
                 {
-                    auto &pool = rscMgr.GetPool<GeometryInstance>();
-                    pool.Display(rscMgr);
+                    auto &pool = editorData.rscMgr.GetPool<GeometryInstance>();
+                    pool.Display(editorData.rscMgr);
                     if(auto data = pool.GetSelectedInstance())
-                        data->Display(rscMgr);
+                        data->Display(editorData.rscMgr);
                     ImGui::EndTabItem();
                 }
                 ImGui::EndTabBar();
@@ -407,41 +411,43 @@ int Run(GLFWwindow *window)
 
         CameraInstance::ProjData selectedCameraProjData;
 
-        std::shared_ptr<CameraInstance> selectedCamera = rscMgr.GetPool<CameraInstance>().GetSelectedInstance();
+        std::shared_ptr<CameraInstance> selectedCamera = editorData.rscMgr.GetPool<CameraInstance>().GetSelectedInstance();
         ImGui::SetNextWindowPos(ImVec2(sceneManagerPosX, sceneManagerPosY + 320 + 320), ImGuiCond_FirstUseEver);
         if(ImGui::Begin("camera", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
         {
-            camera.Display();
+            editorData.defaultRenderingCamera.Display();
             if(selectedCamera)
-                selectedCamera->Display(rscMgr);
+                selectedCamera->Display(editorData.rscMgr);
             ImGui::End();
         }
 
         if(selectedCamera)
         {
-            float filmAspectRatio = static_cast<float>(filmSize.x) / filmSize.y;
+            float filmAspectRatio = static_cast<float>(editorData.filmSize.x) / editorData.filmSize.y;
             selectedCameraProjData = selectedCamera->GetProjData(filmAspectRatio);
         }
 
-        if(auto selectedEntity = rscMgr.GetPool<EntityInstance>().GetSelectedInstance(); selectedEntity && isEntityPoolDisplayed)
+        if(auto selectedEntity = editorData.rscMgr.GetPool<EntityInstance>().GetSelectedInstance(); selectedEntity && isEntityPoolDisplayed)
         {
             ImGui::SetNextWindowPos(ImVec2(sceneManagerPosX + 420, sceneManagerPosY), ImGuiCond_FirstUseEver);
             if(ImGui::Begin("property", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
             {
                 selectedEntity->DisplayEx(
-                    rscMgr,
-                    (selectedCamera ? selectedCameraProjData.projMatrix : camera.GetProjMatrix()), camera.GetViewMatrix(),
+                    editorData.rscMgr,
+                    (selectedCamera ?
+                        selectedCameraProjData.projMatrix : editorData.defaultRenderingCamera.GetProjMatrix()),
+                    editorData.defaultRenderingCamera.GetViewMatrix(),
                     !sceneRenderer.IsRendering());
                 ImGui::End();
             }
         }
 
-        if(auto selectedLight = rscMgr.GetPool<LightInstance>().GetSelectedInstance(); selectedLight && isLightPoolDisplayed)
+        if(auto selectedLight = editorData.rscMgr.GetPool<LightInstance>().GetSelectedInstance(); selectedLight && isLightPoolDisplayed)
         {
             ImGui::SetNextWindowPos(ImVec2(sceneManagerPosX + 420, sceneManagerPosY), ImGuiCond_FirstUseEver);
             if(ImGui::Begin("property", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
             {
-                selectedLight->Display(rscMgr);
+                selectedLight->Display(editorData.rscMgr);
                 ImGui::End();
             }
         }
@@ -449,10 +455,10 @@ int Run(GLFWwindow *window)
         // 更新摄像机状态
 
         if(!ImGui::IsAnyWindowFocused())
-            camera.UpdatePositionAndDirection(keyboard, mouse);
-        camera.UpdateMatrix();
+            editorData.defaultRenderingCamera.UpdatePositionAndDirection(keyboard, mouse);
+        editorData.defaultRenderingCamera.UpdateMatrix();
 
-        auto defaultCameraProjViewMat = camera.GetProjMatrix() * camera.GetViewMatrix();
+        auto defaultCameraProjViewMat = editorData.defaultRenderingCamera.GetProjMatrix() * editorData.defaultRenderingCamera.GetViewMatrix();
 
         GL::RenderContext::SetClearColor(Vec4f(Vec3f(0.2f), 0.0f));
         GL::RenderContext::ClearColorAndDepth();
@@ -464,16 +470,16 @@ int Run(GLFWwindow *window)
         BeginEntityRendering();
         if(selectedCamera)
         {
-            auto VP = selectedCameraProjData.projMatrix * camera.GetViewMatrix();
-            for(auto &ent : rscMgr.GetPool<EntityInstance>())
-                ent->Render(VP, camera.GetPosition());
+            auto VP = selectedCameraProjData.projMatrix * editorData.defaultRenderingCamera.GetViewMatrix();
+            for(auto &ent : editorData.rscMgr.GetPool<EntityInstance>())
+                ent->Render(VP, editorData.defaultRenderingCamera.GetPosition());
 
             SetFullViewport();
         }
         else
         {
-            for(auto &ent : rscMgr.GetPool<EntityInstance>())
-                ent->Render(defaultCameraProjViewMat, camera.GetPosition());
+            for(auto &ent : editorData.rscMgr.GetPool<EntityInstance>())
+                ent->Render(defaultCameraProjViewMat, editorData.defaultRenderingCamera.GetPosition());
         }
         EndEntityRendering();
 

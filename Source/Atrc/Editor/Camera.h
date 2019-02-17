@@ -29,7 +29,7 @@ public:
         float far  = 1000.0f;;
     };
 
-    explicit DefaultRenderingCamera(std::string name) noexcept;
+    explicit DefaultRenderingCamera() noexcept;
 
     const ViewData &GetViewData() const noexcept { return viewData_; }
     const ProjData &GetProjData() const noexcept { return projData_; }
@@ -41,8 +41,6 @@ public:
 
     void Display();
     void UpdatePositionAndDirection(const AGZ::Input::Keyboard &kb, const AGZ::Input::Mouse &m);
-
-    const std::string &GetName() const noexcept { return name_; }
 
     const Vec3f &GetPosition() const noexcept { return viewData_.pos; }
     const Vec3f &GetLookAt() const noexcept { return viewData_.lookAt; }
@@ -67,8 +65,6 @@ private:
 
     void UpdateViewMatrix();
     void UpdateProjMatrix();
-
-    std::string name_;
 
     ViewData viewData_;
     ProjData projData_;

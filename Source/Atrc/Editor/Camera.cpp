@@ -22,8 +22,7 @@ namespace
 
 } // namespace null
 
-DefaultRenderingCamera::DefaultRenderingCamera(std::string name) noexcept
-    : name_(std::move(name))
+DefaultRenderingCamera::DefaultRenderingCamera() noexcept
 {
     projData_.w = Global::GetFramebufferWidth();
     projData_.h = Global::GetFramebufferHeight();

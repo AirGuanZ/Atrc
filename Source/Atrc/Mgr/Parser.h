@@ -6,13 +6,31 @@
 namespace Atrc::Mgr::Parser
 {
 
+namespace TFloat
+{
+    template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
+    AGZ::Math::Vec3<T> ParseSpectrum(const ConfigNode &node);
+
+    template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
+    AGZ::Math::Vec2<T> ParseVec2(const ConfigNode &node);
+
+    template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
+    AGZ::Math::Vec3<T> ParseVec3(const ConfigNode &node);
+
+    template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
+    AGZ::Math::Rad<T> ParseAngle(const ConfigNode &node);
+
+    template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
+    AGZ::Math::RM_Mat3<T> ParseRotateMat(const ConfigNode &node);
+}
+
 /*
     (0.1)           => (0.1, 0.1, 0.1)
     (0.1, 0.2, 0.2) => (0.1, 0.2, 0.2)
     b(1)            => (1/255, 1/255, 1/255)
     b(1, 2, 3)      => (1/255, 2/255, 3/255)
 */
-Spectrum ParseSpectrum(const ConfigNode &node);
+inline Spectrum ParseSpectrum(const ConfigNode &node) { return TFloat::ParseSpectrum<Real>(node); }
 
 /*
     (1)    => (1, 1)
@@ -24,19 +42,19 @@ Vec2i ParseVec2i(const ConfigNode &node);
     (1)    => (1.0, 1.0)
     (1, 2) => (1.0, 2.0, 3.0)
 */
-Vec2 ParseVec2(const ConfigNode &node);
+inline Vec2 ParseVec2(const ConfigNode &node) { return TFloat::ParseVec2<Real>(node); }
 
 /*
     (1)       => (1, 1, 1)
     (1, 2, 3) => (1, 2, 3)
 */
-Vec3 ParseVec3(const ConfigNode &node);
+inline Vec3 ParseVec3(const ConfigNode &node) { return TFloat::ParseVec3<Real>(node); }
 
 /*
     Deg(60)  => Rad(Deg(60))
     Rad(1.4) => Rad(1.4)
 */
-Rad ParseAngle(const ConfigNode &node);
+inline Rad ParseAngle(const ConfigNode &node) { return TFloat::ParseAngle<Real>(node); }
 
 /*
     (t0, t1, t2, ..., tn) => t0 * t1 * t2 * ... * tn
@@ -56,12 +74,161 @@ Transform ParseTransform(const ConfigNode &node);
        | RotateY(Angle)
        | RotateZ(Angle)
 */
-Mat3 ParseRotateMat(const ConfigNode &node);
+inline Mat3 ParseRotateMat(const ConfigNode &node) { return TFloat::ParseRotateMat<Real>(node); }
 
 /*
     True  => true
     False => false
 */
 bool ParseBool(const ConfigNode &node);
+
+namespace TFloat
+{
+    template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int>>
+    AGZ::Math::Vec3<T> ParseSpectrum(const ConfigNode &node)
+    {
+        ATRC_MGR_TRY
+        {
+            if(auto arr = node.TryAsArray())
+            {
+                if(arr->GetTag() == "b")
+                {
+                    if(arr->Size() == 1)
+                        return AGZ::Math::Vec3<T>((*arr)[0].Parse<T>() / 255);
+                    if(arr->Size() == 3)
+                        return AGZ::Math::Vec3<T>(
+                            (*arr)[0].Parse<T>() / 255,
+                            (*arr)[1].Parse<T>() / 255,
+                            (*arr)[2].Parse<T>() / 255);
+                }
+                else if(arr->GetTag().empty())
+                {
+                    if(arr->Size() == 1)
+                        return AGZ::Math::Vec3<T>((*arr)[0].Parse<T>());
+                    if(arr->Size() == 3)
+                        return AGZ::Math::Vec3<T>(
+                            (*arr)[0].Parse<T>(),
+                            (*arr)[1].Parse<T>(),
+                            (*arr)[2].Parse<T>());
+                }
+            }
+
+            throw MgrErr("Invalid spectrum form");
+        }
+        ATRC_MGR_CATCH_AND_RETHROW("In parsing spectrum: " + node.ToString())
+    }
+
+    template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int>>
+    AGZ::Math::Vec2<T> ParseVec2(const ConfigNode &node)
+    {
+        ATRC_MGR_TRY
+        {
+            if(auto arr = node.TryAsArray())
+            {
+                if(arr->Size() == 1)
+                    return AGZ::Math::Vec2<T>((*arr)[0].Parse<T>());
+                if(arr->Size() == 2)
+                    return AGZ::Math::Vec2<T>(
+                        (*arr)[0].Parse<T>(),
+                        (*arr)[1].Parse<T>());
+            }
+            throw MgrErr("Invalid vec2 form");
+        }
+        ATRC_MGR_CATCH_AND_RETHROW("In parsing vec2: " + node.ToString())
+    }
+
+    template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int>>
+    AGZ::Math::Vec3<T> ParseVec3(const ConfigNode &node)
+    {
+        ATRC_MGR_TRY
+        {
+            if(auto arr = node.TryAsArray())
+            {
+                if(arr->Size() == 1)
+                    return AGZ::Math::Vec3<T>((*arr)[0].Parse<T>());
+                if(arr->Size() == 3)
+                    return AGZ::Math::Vec3<T>(
+                        (*arr)[0].Parse<T>(),
+                        (*arr)[1].Parse<T>(),
+                        (*arr)[2].Parse<T>());
+            }
+            throw MgrErr("Invalid vec3 form");
+        }
+        ATRC_MGR_CATCH_AND_RETHROW("In parsing vec3: " + node.ToString())
+    }
+
+    template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int>>
+    AGZ::Math::Rad<T> ParseAngle(const ConfigNode &node)
+    {
+        ATRC_MGR_TRY
+        {
+            if(auto arr = node.TryAsArray())
+            {
+                if(arr->Size() != 1)
+                    throw MgrErr("Array is too long");
+                if(arr->GetTag() == "Deg")
+                    return AGZ::Math::Rad<T>(AGZ::Math::Deg<T>((*arr)[0].Parse<T>()));
+                if(arr->GetTag() == "Rad")
+                    return AGZ::Math::Rad<T>((*arr)[0].Parse<T>());
+            }
+            throw MgrErr("Invalid angle form");
+        }
+        ATRC_MGR_CATCH_AND_RETHROW("In parsing angle: " + node.ToString())
+    }
+
+    template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int>>
+    AGZ::Math::RM_Mat3<T> ParseRotateMat(const ConfigNode &node)
+    {
+        ATRC_MGR_TRY
+        {
+            if(!node.IsArray())
+                throw MgrErr("Array expected");
+            auto &arr = node.AsArray();
+
+            auto ret = AGZ::Math::RM_Mat3<T>::IDENTITY();
+            for(size_t i = 0; i < arr.Size(); ++i)
+            {
+                if(!arr[i].IsArray())
+                    throw MgrErr("Array expected");
+                auto &unit = arr[i].AsArray();
+
+                ATRC_MGR_TRY
+                {
+                    if(unit.GetTag() == "Rotate")
+                    {
+                        if(unit.Size() != 2)
+                            throw MgrErr("Rotate size must be 2");
+                        ret = ret * AGZ::Math::RM_Mat3<T>::template Rotate(
+                            ParseVec3<T>(unit[0]), ParseAngle<T>(unit[1]));
+                    }
+                    else if(unit.GetTag() == "RotateX")
+                    {
+                        if(unit.Size() != 1)
+                            throw MgrErr("RotateX size must be 1");
+                        ret = ret * AGZ::Math::RM_Mat3<T>::template RotateX(ParseAngle<T>(unit[0]));
+                    }
+                    else if(unit.GetTag() == "RotateY")
+                    {
+                        if(unit.Size() != 1)
+                            throw MgrErr("RotateY size must be 1");
+                        ret = ret * AGZ::Math::RM_Mat3<T>::template RotateY(ParseAngle<T>(unit[0]));
+                    }
+                    else if(unit.GetTag() == "RotateZ")
+                    {
+                        if(unit.Size() != 1)
+                            throw MgrErr("RotateZ size must be 1");
+                        ret = ret * AGZ::Math::RM_Mat3<T>::template RotateZ(ParseAngle<T>(unit[0]));
+                    }
+                    else
+                        throw MgrErr("Unknown rotation type");
+                }
+                ATRC_MGR_CATCH_AND_RETHROW("In parsing rotation unit: " + unit.ToString());
+            }
+
+            return ret;
+        }
+        ATRC_MGR_CATCH_AND_RETHROW("In parsing rotation matrix: " + node.ToString())
+    }
+}
 
 } // namespace Atrc::Mgr::Parser

@@ -3,37 +3,6 @@
 namespace Atrc::Mgr::Parser
 {
 
-Spectrum ParseSpectrum(const ConfigNode &node)
-{
-    ATRC_MGR_TRY
-    {
-        if(auto arr = node.TryAsArray())
-        {
-            if(arr->GetTag() == "b")
-            {
-                if(arr->Size() == 1)
-                    return Spectrum((*arr)[0].Parse<Real>() / 255);
-                if(arr->Size() == 3)
-                    return Spectrum((*arr)[0].Parse<Real>() / 255,
-                                    (*arr)[1].Parse<Real>() / 255,
-                                    (*arr)[2].Parse<Real>() / 255);
-            }
-            else if(arr->GetTag().empty())
-            {
-                if(arr->Size() == 1)
-                    return Spectrum((*arr)[0].Parse<Real>());
-                if(arr->Size() == 3)
-                    return Spectrum((*arr)[0].Parse<Real>(),
-                                    (*arr)[1].Parse<Real>(),
-                                    (*arr)[2].Parse<Real>());
-            }
-        }
-
-        throw MgrErr("Invalid spectrum form");
-    }
-    ATRC_MGR_CATCH_AND_RETHROW("In parsing spectrum: " + node.ToString())
-}
-
 Vec2i ParseVec2i(const ConfigNode &node)
 {
     ATRC_MGR_TRY
@@ -49,59 +18,6 @@ Vec2i ParseVec2i(const ConfigNode &node)
         throw MgrErr("Invalid vec2i form");
     }
     ATRC_MGR_CATCH_AND_RETHROW("In parsing vec2i: " + node.ToString())
-}
-
-Vec2 ParseVec2(const ConfigNode &node)
-{
-    ATRC_MGR_TRY
-    {
-        if(auto arr = node.TryAsArray())
-        {
-            if(arr->Size() == 1)
-                return Vec2((*arr)[0].Parse<Real>());
-            if(arr->Size() == 2)
-                return Vec2((*arr)[0].Parse<Real>(),
-                            (*arr)[1].Parse<Real>());
-        }
-        throw MgrErr("Invalid vec2 form");
-    }
-    ATRC_MGR_CATCH_AND_RETHROW("In parsing vec2: " + node.ToString())
-}
-
-Vec3 ParseVec3(const ConfigNode &node)
-{
-    ATRC_MGR_TRY
-    {
-        if(auto arr = node.TryAsArray())
-        {
-            if(arr->Size() == 1)
-                return Vec3((*arr)[0].Parse<Real>());
-            if(arr->Size() == 3)
-                return Vec3((*arr)[0].Parse<Real>(),
-                            (*arr)[1].Parse<Real>(),
-                            (*arr)[2].Parse<Real>());
-        }
-        throw MgrErr("Invalid vec3 form");
-    }
-    ATRC_MGR_CATCH_AND_RETHROW("In parsing vec3: " + node.ToString())
-}
-
-Rad ParseAngle(const ConfigNode &node)
-{
-    ATRC_MGR_TRY
-    {
-        if(auto arr = node.TryAsArray())
-        {
-            if(arr->Size() != 1)
-                throw MgrErr("Array is too long");
-            if(arr->GetTag() == "Deg")
-                return Deg((*arr)[0].Parse<Real>());
-            else if(arr->GetTag() == "Rad")
-                return Rad((*arr)[0].Parse<Real>());
-        }
-        throw MgrErr("Invalid angle form");
-    }
-    ATRC_MGR_CATCH_AND_RETHROW("In parsing angle: " + node.ToString())
 }
 
 Transform ParseTransform(const ConfigNode &node)
@@ -170,59 +86,6 @@ Transform ParseTransform(const ConfigNode &node)
         return ret;
     }
     ATRC_MGR_CATCH_AND_RETHROW("In parsing transform: " + node.ToString())
-}
-
-Mat3 ParseRotateMat(const ConfigNode &node)
-{
-    ATRC_MGR_TRY
-    {
-        if(!node.IsArray())
-            throw MgrErr("Array expected");
-        auto &arr = node.AsArray();
-
-        auto ret = Mat3::IDENTITY();
-        for(size_t i = 0; i < arr.Size(); ++i)
-        {
-            if(!arr[i].IsArray())
-                throw MgrErr("Array expected");
-            auto &unit = arr[i].AsArray();
-
-            ATRC_MGR_TRY
-            {
-                if(unit.GetTag() == "Rotate")
-                {
-                    if(unit.Size() != 2)
-                        throw MgrErr("Rotate size must be 2");
-                    ret = ret * Mat3::Rotate(
-                        ParseVec3(unit[0]), ParseAngle(unit[1]));
-                }
-                else if(unit.GetTag() == "RotateX")
-                {
-                    if(unit.Size() != 1)
-                        throw MgrErr("RotateX size must be 1");
-                    ret = ret * Mat3::RotateX(ParseAngle(unit[0]));
-                }
-                else if(unit.GetTag() == "RotateY")
-                {
-                    if(unit.Size() != 1)
-                        throw MgrErr("RotateY size must be 1");
-                    ret = ret * Mat3::RotateY(ParseAngle(unit[0]));
-                }
-                else if(unit.GetTag() == "RotateZ")
-                {
-                    if(unit.Size() != 1)
-                        throw MgrErr("RotateZ size must be 1");
-                    ret = ret * Mat3::RotateZ(ParseAngle(unit[0]));
-                }
-                else
-                    throw MgrErr("Unknown rotation type");
-            }
-            ATRC_MGR_CATCH_AND_RETHROW("In parsing rotation unit: " + unit.ToString());
-        }
-
-        return ret;
-    }
-    ATRC_MGR_CATCH_AND_RETHROW("In parsing rotation matrix: " + node.ToString())
 }
 
 bool ParseBool(const ConfigNode &node)
