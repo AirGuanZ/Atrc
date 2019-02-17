@@ -221,7 +221,7 @@ Spectrum BxDF_Microfacet::Eval(const CoordSystem &geoInShd, const Vec3 &wi, cons
     Real G = Smith(nWi, nH, alpha_) * Smith(nWo, nH, alpha_);
 
     if(isReflection)
-        return rc_ * Abs(Fr * G / (4 * nWo.z * nWo.z));
+        return rc_ * Abs(Fr * D * G / (4 * nWi.z * nWo.z));
 
     Real HO = Dot(nH, nWo), HI = Dot(nH, nWi);
     Real sdem = etaI * HO + etaT * HI;
