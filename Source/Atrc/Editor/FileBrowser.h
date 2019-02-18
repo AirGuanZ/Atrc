@@ -4,13 +4,17 @@
 
 #include <Atrc/Editor/GL.h>
 
-class FileBrowser
+class FileBrowser : public AGZ::Uncopiable
 {
 public:
 
     FileBrowser() = default;
 
     FileBrowser(std::string label, bool selectDirectory, std::string_view currentDirectory);
+
+    FileBrowser(FileBrowser&&) noexcept = default;
+
+    FileBrowser &operator=(FileBrowser&&) noexcept = default;
 
     void SetLabel(std::string label);
 

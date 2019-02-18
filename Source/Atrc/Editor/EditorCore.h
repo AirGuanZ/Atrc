@@ -31,6 +31,7 @@ class EditorCore
         bool openGlobalHelpWindow    = false;
         bool openGlobalSettingWindow = false;
         bool openSavingWindow        = false;
+        bool openLoadingWindow       = false;
 
         float fbW = 1, fbH = 1;
         float sceneMgrPosX = 0, sceneMgrPosY = 0;
@@ -50,6 +51,8 @@ class EditorCore
 
         SceneRenderer sceneRenderer;
         GL::Texture2D sceneRendererTex;
+
+        FileBrowser loadingFilenameBrowser = FileBrowser("load from", false, "");
     };
 
     std::unique_ptr<EditorData> data_;
@@ -69,6 +72,8 @@ public:
     void ShowGlobalSettingWindow(const AGZ::Input::Keyboard &kb);
 
     void ShowSavingWindow();
+
+    void ShowLoadingWindow();
 
     void ShowResourceManager();
 

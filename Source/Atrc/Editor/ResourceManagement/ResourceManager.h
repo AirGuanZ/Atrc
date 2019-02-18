@@ -215,6 +215,12 @@ public:
         
     }
 
+    void Clear()
+    {
+        selectedInstance_ = nullptr;
+        instances_.clear();
+    }
+
     void AddInstance(std::shared_ptr<TResource> instance)
     {
         instance->PutIntoPool();

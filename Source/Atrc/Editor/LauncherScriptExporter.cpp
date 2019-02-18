@@ -141,7 +141,7 @@ void LauncherScriptImporter::Import(const AGZ::ConfigGroup &root, EditorData *da
         data->rendererSlot.SetInstance(renderer);
     }
     {
-        auto script = absolute(std::filesystem::path(scriptPath));
+        auto script = relative(std::filesystem::path(scriptPath));
         data->scriptSlot.SetFilename(script.string());
         auto workspaceStr = root["workspace"].AsValue();
         std::filesystem::path workspace;

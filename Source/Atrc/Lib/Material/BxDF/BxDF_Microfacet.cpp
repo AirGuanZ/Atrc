@@ -26,16 +26,21 @@ namespace
         return 2 / (1 + Sqrt(1 + root * root));
     }
 
-    Vec2 Slope(Real thetaI, Vec2 sample)
+    Real GGX_G(const Vec3 &wi, const Vec3 &wo, const Vec3 &wh, Real alpha)
     {
-        Vec2 ret;
+        return Smith(wi, wh, alpha) * Smith(wo, wh, alpha);;
+    }
 
+    Vec2 Slope(Real thetaI, const Vec2 &sample)
+    {
         if(thetaI < EPS)
         {
             Real R = Sqrt(Max(sample.x / ((1 - sample.x) + EPS), Real(0)));
             Real phi = 2 * PI * sample.y;
             return Vec2(R * Cos(phi), R * Sin(phi));
         }
+
+        Vec2 ret;
 
         Real tanThetaI = Tan(thetaI);
         Real a = 1 / tanThetaI;
@@ -51,22 +56,13 @@ namespace
         Real X1 = B * temp - D, X2 = B * temp + D;
         ret.x = (A < 0 || X2 > 1 / tanThetaI) ? X1 : X2;
 
-        Real S;
-        if(sample.y > Real(0.5))
-        {
-            S = 1;
-            sample.y = 2 * (sample.y - Real(0.5));
-        }
-        else
-        {
-            S = -1.;
-            sample.y = 2 * (Real(0.5) - sample.y);
-        }
+        auto [rev, sy] = AGZ::Math::DistributionTransform::SampleExtractor<Real>::ExtractInteger(sample.y, 0, 2);
 
-        float z = (sample.y * (sample.y * (sample.y * Real(-0.365728915865723) + Real(0.790235037209296)) - Real(0.424965825137544)) + Real(0.000152998850436920)) /
-                  (sample.y * (sample.y * (sample.y * (sample.y * Real(0.169507819808272) - Real(0.397203533833404)) - Real(0.232500544458471)) + 1) - Real(0.539825872510702));
-
-        ret.y = S * z * Sqrt(1 + ret.x * ret.x);
+        ret.y = ((sy * (sy * (sy * Real(-0.365728915865723) + Real(0.790235037209296)) - Real(0.424965825137544)) + Real(0.000152998850436920)) /
+                 (sy * (sy * (sy * (sy * Real(0.169507819808272) - Real(0.397203533833404)) - Real(0.232500544458471)) + 1) - Real(0.539825872510702)))
+                * Sqrt(1 + ret.x * ret.x);
+        if(rev > 0)
+            ret.y = -ret.y;
         return ret;
     }
 
@@ -89,18 +85,18 @@ namespace
             sinPhi * slope.x + cosPhi * slope.y);
         slope *= alpha;
 
-        Real nor = 1 / Sqrt(slope.LengthSquare() + 1);
-        Vec3 H = Vec3(-slope.x * nor, -slope.y * nor, nor);
+        Real norFactor = 1 / Sqrt(slope.LengthSquare() + 1);
+        Vec3 H = Vec3(-slope.x * norFactor, -slope.y * norFactor, norFactor);
 
         return { H, SampleHPDF(nWi, H, alpha) };
     }
 
-    std::optional<Vec3> GetRefractDirection(const Vec3 &wi, const Vec3 &nor, Real eta)
+    std::optional<Vec3> Refract(const Vec3 &wi, const Vec3 &nor, Real eta)
     {
         Real cosThetaI = Dot(wi, nor);
         if(cosThetaI < 0)
             eta = 1 / eta;
-        float cosThetaTSqr = 1 - (1 - cosThetaI * cosThetaI) * (eta*eta);
+        float cosThetaTSqr = 1 - (1 - cosThetaI * cosThetaI) * eta * eta;
         if(cosThetaTSqr <= 0.0f)
             return std::nullopt;
         float sign = cosThetaI >= 0.0f ? 1.0f : -1.0f;
@@ -127,7 +123,7 @@ Spectrum BxDF_MicrofacetReflection::Eval(const CoordSystem &geoInShd, const Vec3
     Vec3 nWi = wi.Normalize(), nWo = wo.Normalize();
     Vec3 H = (nWi + nWo).Normalize();
 
-    Real G = Smith(nWi, H, alpha_) * Smith(nWo, H, alpha_);
+    Real G = GGX_G(nWi, nWo, H, alpha_);
     Real D = GGX_D(H, alpha_);
     if(!G || !D)
         return Spectrum();
@@ -187,19 +183,16 @@ Spectrum BxDF_Microfacet::GetAlbedo() const noexcept
 Spectrum BxDF_Microfacet::Eval(const CoordSystem &geoInShd, const Vec3 &wi, const Vec3 &wo, bool star) const noexcept
 {
     Vec3 nWi = wi.Normalize(), nWo = wo.Normalize();
-    Real factor = nWi.z * nWo.z;
-    if(!factor)
+    if(!nWi.z || !nWo.z)
         return Spectrum();
 
-    bool isReflection = factor > 0;
-    bool isEntering = nWo.z > 0;
-
     Real etaI = dielectric_->GetEtaI(), etaT = dielectric_->GetEtaT();
+    bool isEntering = nWo.z > 0;
     if(!isEntering)
         std::swap(etaI, etaT);
 
     Vec3 nH;
-
+    bool isReflection = nWi.z * nWo.z > 0;
     if(isReflection)
     {
         nH = nWi + nWo;
@@ -213,12 +206,12 @@ Spectrum BxDF_Microfacet::Eval(const CoordSystem &geoInShd, const Vec3 &wi, cons
     if(nH.z < 0)
         nH = -nH;
 
+    Real Fr = dielectric_->Eval(Dot(nWo, nH)).r;
+    Real G = GGX_G(nWi, nWo, nH, alpha_);
     Real D = GGX_D(nH, alpha_);
+
     if(!D)
         return Spectrum();
-
-    Real Fr = dielectric_->Eval(Dot(nWo, nH)).r;
-    Real G = Smith(nWi, nH, alpha_) * Smith(nWo, nH, alpha_);
 
     if(isReflection)
         return rc_ * Abs(Fr * D * G / (4 * nWi.z * nWo.z));
@@ -227,7 +220,10 @@ Spectrum BxDF_Microfacet::Eval(const CoordSystem &geoInShd, const Vec3 &wi, cons
     Real sdem = etaI * HO + etaT * HI;
     Real val =  (1 - Fr) * D * G * etaT * etaT * HO * HI / (sdem * sdem * nWo.z * nWi.z);
 
-    // TODO star
+    // BUG: is radiance compression computed correctly?
+    if(star)
+        val /= etaT * etaT / (etaI * etaI);
+
     return rc_ * Abs(val);
 }
 
@@ -252,7 +248,7 @@ std::optional<BxDF::SampleWiResult> BxDF_Microfacet::SampleWi(const CoordSystem 
             return std::nullopt;
 
         Real pdf = Hpdf * Fr / Abs(4 * Dot(nWi, H));
-        Real G = Smith(nWi, H, alpha_) * Smith(nWo, H, alpha_);
+        Real G = GGX_G(nWi, nWo, H, alpha_);
 
         SampleWiResult ret;
         ret.coef    = rc_ * Fr * D * G / Abs(4 * nWi.z * nWo.z);
@@ -264,7 +260,7 @@ std::optional<BxDF::SampleWiResult> BxDF_Microfacet::SampleWi(const CoordSystem 
         return ret;
     }
 
-    auto oWi = GetRefractDirection(-nWo, H, dielectric_->GetEtaT() / dielectric_->GetEtaI());
+    auto oWi = Refract(-nWo, H, dielectric_->GetEtaT() / dielectric_->GetEtaI());
     if(!oWi || ((oWi->z >= 0) == (nWo.z >= 0)))
         return std::nullopt;
     Vec3 nWi = oWi->Normalize();
@@ -280,10 +276,13 @@ std::optional<BxDF::SampleWiResult> BxDF_Microfacet::SampleWi(const CoordSystem 
         return std::nullopt;
 
     Real dHdWi = etaT * etaT * HI / (sdem * sdem);
-    Real G = Smith(nWi, H, alpha_) * Smith(nWo, H, alpha_);
+    Real G = GGX_G(nWi, nWo, H, alpha_);
     Real val = (1 - Fr) * D * G * etaT * etaT * HO * HI / (sdem * sdem * nWo.z * nWi.z);
 
-    // TODO star
+    // BUG: is radiance compression computed correctly?
+    if(star)
+        val /= etaT * etaT / (etaI * etaI);
+
     SampleWiResult ret;
     ret.wi      = nWi;
     ret.coef    = rc_ * Abs(val);
@@ -297,11 +296,10 @@ std::optional<BxDF::SampleWiResult> BxDF_Microfacet::SampleWi(const CoordSystem 
 Real BxDF_Microfacet::SampleWiPDF(const CoordSystem &geoInShd, const Vec3 &wi, const Vec3 &wo, bool star) const noexcept
 {
     Vec3 nWi = wi.Normalize(), nWo = wo.Normalize();
-    Real factor = nWi.z * nWo.z;
-    if(!factor)
+    if(!nWi.z || !nWo.z)
         return 0;
 
-    bool isReflection = factor > 0;
+    bool isReflection = nWi.z * nWo.z > 0;
     bool isEntering = nWo.z > 0;
 
     Vec3 nH;

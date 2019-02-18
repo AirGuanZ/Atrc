@@ -59,6 +59,9 @@ class LauncherScriptImporter
     template<typename TResource>
     void ImportFromPool(const AGZ::ConfigGroup &root, ResourceManager &rscMgr)
     {
+        auto &pool = rscMgr.GetPool<TResource>();
+        pool.Clear();
+
         auto &children = root[GetCompletePoolName<TResource>()].AsGroup().GetChildren();
         for(auto &it : children)
             GetResourceInPool<TResource>(rscMgr, root, it.first);

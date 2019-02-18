@@ -102,6 +102,8 @@ void EditorCore::ShowMenuMenuBar()
                 Global::ShowErrorMessage("failed to start rendering");
             }
         }
+        if(ImGui::MenuItem("load"))
+            sState_->openLoadingWindow = true;
         if(ImGui::MenuItem("save"))
             sState_->openSavingWindow = true;
         ImGui::EndMenu();
@@ -178,7 +180,7 @@ void EditorCore::ShowGlobalSettingWindow(const AGZ::Input::Keyboard &kb)
 
 void EditorCore::ShowSavingWindow()
 {
-    static FileBrowser fileBrowser("saving directory", true, "");
+    static FileBrowser fileBrowser("save to", true, "");
     static std::array<char, 512> filenameBuf;
 
     ImGui::PushID(&fileBrowser);
@@ -187,10 +189,10 @@ void EditorCore::ShowSavingWindow()
     if(sState_->openSavingWindow)
     {
         std::strcpy(filenameBuf.data(), "scene.txt");
-        ImGui::OpenPopup("save to");
+        ImGui::OpenPopup("saving");
     }
 
-    if(!ImGui::BeginPopupModal("save to", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+    if(!ImGui::BeginPopupModal("saving", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
         return;
     AGZ::ScopeGuard exitPopupGuard([] { ImGui::EndPopup(); });
 
@@ -237,6 +239,40 @@ void EditorCore::ShowSavingWindow()
 
     if(ImGui::Button("cancel"))
         ImGui::CloseCurrentPopup();
+}
+
+void EditorCore::ShowLoadingWindow()
+{
+    ImGui::PushID(&lState_->loadingFilenameBrowser);
+    AGZ::ScopeGuard popIDGuard([] { ImGui::PopID(); });
+
+    if(sState_->openLoadingWindow)
+        ImGui::OpenPopup(lState_->loadingFilenameBrowser.GetLabel().c_str());
+
+    if(lState_->loadingFilenameBrowser.Display())
+    {
+        std::string filename = lState_->loadingFilenameBrowser.GetResult();
+        try
+        {
+            AGZ::Config config;
+            if(!config.LoadFromFile(filename))
+            {
+                Global::ShowErrorMessage("failed to load configuration from " + filename);
+                return;
+            }
+
+            LauncherScriptImporter importer;
+            importer.Import(config.Root(), data_.get(), absolute(std::filesystem::path(filename)).parent_path().string());
+        }
+        catch(const std::exception &err)
+        {
+            Global::ShowErrorMessage(err.what());
+        }
+        catch(...)
+        {
+            Global::ShowErrorMessage("an unknown error occurred");
+        }
+    }
 }
 
 void EditorCore::ShowResourceManager()

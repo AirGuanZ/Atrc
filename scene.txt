@@ -1,7 +1,7 @@
 workspace = "@.";
 
 film = {
-    size = (640, 480);
+    size = (600, 900);
     filter = {
         type = Box;
         sidelen = 1;
@@ -99,7 +99,7 @@ pool = {
 
 sampler = {
     type = Native;
-    spp = 1000;
+    spp = 100;
 };
 
 camera = {
