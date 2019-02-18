@@ -1,0 +1,142 @@
+workspace = "@.";
+
+film = {
+    size = (640, 480);
+    filter = {
+        type = Box;
+        sidelen = 1;
+    };
+};
+
+pool = {
+    camera = {
+        c = {
+            type = Pinhole;
+            sensorWidth = 0.200000;
+            sensorDistance = 0.425346;
+            pos = (61.822384, 10.100000, -21.263702);
+            lookAt = (60.918167, 9.974668, -20.855431);
+            up = (0, 1, 0);
+        };
+    };
+    entity = {
+        e = {
+            type = Geometric;
+            geometry = {
+                type = TriangleBVH;
+                filename = "Scene\Asset\Test\Mitsuba.obj";
+                transform = (
+                    Translate(0.000000, 0.000000, 0.000000),
+                    RotateZ(Deg(-179.998062)),
+                    RotateY(Deg(87.238487)),
+                    RotateX(Deg(-179.998062)),
+                    Scale(0.646592)
+                );
+            };
+            material = {
+                type = GGXDielectric;
+                rc = {
+                    type = Constant;
+                    texel = (0.761096, 0.949367, 0.942949);
+                };
+                roughness = {
+                    type = Constant1;
+                    texel = 0.55;
+                };
+                fresnel = {
+                    type = Schlick;
+                    etaI = 1.000000;
+                    etaT = 1.550000;
+                };
+            };
+        };
+        e2 = {
+            type = Geometric;
+            geometry = {
+                type = TriangleBVH;
+                filename = "Scene\Asset\Status\Status.obj";
+                transform = (
+                    Translate(2.751493, -6.695536, 10.940793),
+                    RotateZ(Deg(-90.000000)),
+                    RotateY(Deg(-0.000000)),
+                    RotateX(Deg(-118.325127)),
+                    Scale(0.040768)
+                );
+            };
+            material = {
+                type = GGXMetal;
+                rc = {
+                    type = Constant;
+                    texel = (0.949367, 0.586820, 0.428617);
+                };
+                roughness = {
+                    type = Constant1;
+                    texel = 0.4;
+                };
+                fresnel = {
+                    type = Conductor;
+                    etaI = (1.000000, 1.000000, 1.000000);
+                    etaT = (1.500000, 1.500000, 1.500000);
+                    k = (3.900000, 3.900000, 3.900000);
+                };
+            };
+        };
+    };
+    geometry = {
+    };
+    light = {
+        s = {
+            type = Sky;
+            top = (1.000000, 0.999990, 0.999990);
+            bottom = (0.000001, 0.000001, 0.000001);
+        };
+    };
+    material = {
+    };
+    texture = {
+    };
+};
+
+sampler = {
+    type = Native;
+    spp = 1000;
+};
+
+camera = {
+    type = Reference;
+    name = "pool.camera.c";
+};
+
+renderer = {
+    type = PathTracing;
+    integrator = {
+        type = Native;
+        minDepth = 10;
+        maxDepth = 200;
+        contProb = 0.9;
+    };
+    workerCount = -1;
+    taskGridSize = 32;
+};
+
+outputFilename = "$Output.png";
+
+reporter = { type = Default; };
+
+entities = (
+{
+    type = Reference;
+    name = "pool.entity.e";
+},
+{
+    type = Reference;
+    name = "pool.entity.e2";
+},
+);
+
+lights = (
+{
+    type = Reference;
+    name = "pool.light.s";
+},
+);

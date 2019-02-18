@@ -100,7 +100,7 @@ namespace
             : EntityInstance(std::move(typeName), std::move(name))
         {
             CheckRendererInitialization();
-            geometry_.SetInstance(rscMgr.Create<GeometryInstance>("wavefront", ""));
+            geometry_.SetInstance(rscMgr.Create<GeometryInstance>("TriangleBVH", ""));
         }
 
         void Render(const Mat4f &projViewMat, const Vec3f &eyePos) override

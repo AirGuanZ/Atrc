@@ -217,8 +217,8 @@ public:
 
     void AddInstance(std::shared_ptr<TResource> instance)
     {
-        instances_.push_back(std::move(instance));
         instance->PutIntoPool();
+        instances_.push_back(std::move(instance));
         if(sortInstanceByName_)
             SortInstanceByName();
     }

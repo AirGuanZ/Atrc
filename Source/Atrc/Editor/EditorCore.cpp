@@ -22,10 +22,12 @@ void EditorCore::Initialize()
     lState_->scriptBrowser.SetLabel("script");
     lState_->scriptBrowser.SetTarget(true);
     lState_->scriptBrowser.SetCurrentDirectory("");
+    data_->scriptSlot.SetFilename(lState_->scriptBrowser.GetResult());
 
     lState_->workspaceBrowser.SetLabel("workspace");
     lState_->workspaceBrowser.SetTarget(true);
     lState_->workspaceBrowser.SetCurrentDirectory("");
+    data_->workspaceSlot.SetFilename(lState_->workspaceBrowser.GetResult());
 
     std::strcpy(data_->outputFilenameBuf.data(), "$Output.png");
 }
@@ -100,6 +102,8 @@ void EditorCore::ShowMenuMenuBar()
                 Global::ShowErrorMessage("failed to start rendering");
             }
         }
+        if(ImGui::MenuItem("save"))
+            sState_->openSavingWindow = true;
         ImGui::EndMenu();
     }
     if(ImGui::MenuItem("global"))
@@ -169,6 +173,69 @@ void EditorCore::ShowGlobalSettingWindow(const AGZ::Input::Keyboard &kb)
     }
 
     if(kb.IsKeyPressed(AGZ::Input::KEY_ESCAPE))
+        ImGui::CloseCurrentPopup();
+}
+
+void EditorCore::ShowSavingWindow()
+{
+    static FileBrowser fileBrowser("saving directory", true, "");
+    static std::array<char, 512> filenameBuf;
+
+    ImGui::PushID(&fileBrowser);
+    AGZ::ScopeGuard popIDGuard([] { ImGui::PopID(); });
+
+    if(sState_->openSavingWindow)
+    {
+        std::strcpy(filenameBuf.data(), "scene.txt");
+        ImGui::OpenPopup("save to");
+    }
+
+    if(!ImGui::BeginPopupModal("save to", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+        return;
+    AGZ::ScopeGuard exitPopupGuard([] { ImGui::EndPopup(); });
+
+    if(ImGui::Button("directory"))
+        ImGui::OpenPopup(fileBrowser.GetLabel().c_str());
+    fileBrowser.Display();
+    ImGui::SameLine();
+    ImGui::Text("%s", fileBrowser.GetResult().c_str());
+
+    ImGui::InputText("filename", filenameBuf.data(), filenameBuf.size());
+
+    if(ImGui::Button("ok") && filenameBuf[0])
+    {
+        try
+        {
+            std::string scriptDir = fileBrowser.GetResult(false);
+            std::string workspaceDir = data_->workspaceSlot.GetExportedFilename("", scriptDir);
+            LauncherScriptExportingContext ctx(
+                &data_->defaultRenderingCamera,
+                data_->rscMgr.GetPool<CameraInstance>().GetSelectedInstance().get(),
+                data_->filmFilterSlot.GetInstance().get(),
+                data_->rendererSlot.GetInstance().get(),
+                data_->samplerSlot.GetInstance().get(),
+                workspaceDir,
+                scriptDir,
+                data_->outputFilenameBuf.data(),
+                data_->filmSize);
+            LauncherScriptExporter exporter(data_->rscMgr, ctx);
+
+            AGZ::FileSys::WholeFile::WriteText((std::filesystem::path(scriptDir) / filenameBuf.data()).string(), exporter.Export());
+        }
+        catch(const std::exception &err)
+        {
+            Global::ShowErrorMessage(err.what());
+        }
+        catch(...)
+        {
+            Global::ShowErrorMessage("an unknown error occurred");
+        }
+        ImGui::CloseCurrentPopup();
+    }
+
+    ImGui::SameLine();
+
+    if(ImGui::Button("cancel"))
         ImGui::CloseCurrentPopup();
 }
 

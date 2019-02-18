@@ -30,6 +30,7 @@ class EditorCore
     {
         bool openGlobalHelpWindow    = false;
         bool openGlobalSettingWindow = false;
+        bool openSavingWindow        = false;
 
         float fbW = 1, fbH = 1;
         float sceneMgrPosX = 0, sceneMgrPosY = 0;
@@ -66,6 +67,8 @@ public:
     void ShowGlobalHelpWindow(const AGZ::Input::Keyboard &kb);
 
     void ShowGlobalSettingWindow(const AGZ::Input::Keyboard &kb);
+
+    void ShowSavingWindow();
 
     void ShowResourceManager();
 

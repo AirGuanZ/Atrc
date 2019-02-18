@@ -9,7 +9,7 @@
 
 .agz.cache/*
 Asset/*
-Scene/*
+Scene/
 Library/*
 Build/
 Build32/

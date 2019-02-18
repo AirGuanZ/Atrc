@@ -2,6 +2,7 @@
 #include <vector>
 
 #include <AGZUtils/String/StdStr.h>
+#include <AGZUtils/Utils/FileSys.h>
 #include <AGZUtils/Utils/Mesh.h>
 #include <AGZUtils/Utils/Range.h>
 

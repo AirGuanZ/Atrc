@@ -152,6 +152,7 @@ int Run(GLFWwindow *window)
         editorCore.ShowMenuMenuBar();
         editorCore.ShowGlobalHelpWindow(keyboard);
         editorCore.ShowGlobalSettingWindow(keyboard);
+        editorCore.ShowSavingWindow();
 
         editorCore.ShowResourceManager();
         editorCore.ShowCamera();
@@ -161,6 +162,7 @@ int Run(GLFWwindow *window)
         editorCore.UpdateCamera(keyboard, mouse);
 
         editorCore.RenderScene();
+        console.Display();
         editorCore.ShowGUI(imm, keyboard);
 
         editorCore.EndFrame();

@@ -1,5 +1,6 @@
 #include <filesystem>
 
+#include <AGZUtils/Utils/FileSys.h>
 #include <AGZUtils/Utils/Mesh.h>
 
 #include <Atrc/Lib/Geometry/TriangleBVH.h>
