@@ -1,5 +1,6 @@
 #include <Atrc/Editor/Global.h>
 #include <Atrc/Editor/LauncherScriptExporter.h>
+#include <Atrc/Mgr/Parser.h>
 
 LauncherScriptExporter::LauncherScriptExporter(ResourceManager &rscMgr, LauncherScriptExportingContext &ctx)
     : rscMgr_(rscMgr), ctx_(ctx)
@@ -44,9 +45,9 @@ std::string LauncherScriptExporter::Export() const
     ctx_.AddLine("pool = {");
     ctx_.IncIndent();
     ExportResourcesInPool<CameraInstance>  (rscMgr_, ctx_);
-    //ExportResourcesInPool<EntityInstance>  (rscMgr_, ctx_);
+    ExportResourcesInPool<EntityInstance>  (rscMgr_, ctx_);
     ExportResourcesInPool<GeometryInstance>(rscMgr_, ctx_);
-    //ExportResourcesInPool<LightInstance>   (rscMgr_, ctx_);
+    ExportResourcesInPool<LightInstance>   (rscMgr_, ctx_);
     ExportResourcesInPool<MaterialInstance>(rscMgr_, ctx_);
     ExportResourcesInPool<TextureInstance> (rscMgr_, ctx_);
     ctx_.DecIndent();
@@ -91,7 +92,7 @@ std::string LauncherScriptExporter::Export() const
     {
         ctx_.AddLine("{");
         ctx_.IncIndent();
-        ent->Export(rscMgr_, ctx_);
+        ent->ExportAsReference<EntityInstance>(rscMgr_, ctx_);
         ctx_.DecIndent();
         ctx_.AddLine("},");
     }
@@ -103,11 +104,52 @@ std::string LauncherScriptExporter::Export() const
     {
         ctx_.AddLine("{");
         ctx_.IncIndent();
-        ent->Export(rscMgr_, ctx_);
+        ent->ExportAsReference<LightInstance>(rscMgr_, ctx_);
         ctx_.DecIndent();
         ctx_.AddLine("},");
     }
     ctx_.AddLine(");");
 
     return ctx_.GetString();
+}
+
+void LauncherScriptImporter::Import(const AGZ::ConfigGroup &root, EditorData *data, std::string_view scriptPath)
+{
+    ImportFromPool<CameraInstance>  (root, data->rscMgr);
+    ImportFromPool<EntityInstance>  (root, data->rscMgr);
+    ImportFromPool<GeometryInstance>(root, data->rscMgr);
+    ImportFromPool<LightInstance>   (root, data->rscMgr);
+    ImportFromPool<MaterialInstance>(root, data->rscMgr);
+    ImportFromPool<TextureInstance> (root, data->rscMgr);
+
+    {
+        auto &cameraGroup = GetFinalNonReferenceParam(root, root["camera"]);
+        data->defaultRenderingCamera.Import(cameraGroup);
+    }
+
+    data->filmSize = Atrc::Mgr::Parser::ParseVec2i(root["film.size"]);
+    {
+        auto filmFilter = GetResourceInstance<FilmFilterInstance>(data->rscMgr, root, root["film.filter"]);
+        data->filmFilterSlot.SetInstance(filmFilter);
+    }
+    {
+        auto sampler = GetResourceInstance<SamplerInstance>(data->rscMgr, root, root["sampler"]);
+        data->samplerSlot.SetInstance(sampler);
+    }
+    {
+        auto renderer = GetResourceInstance<RendererInstance>(data->rscMgr, root, root["renderer"]);
+        data->rendererSlot.SetInstance(renderer);
+    }
+    {
+        auto script = absolute(std::filesystem::path(scriptPath));
+        data->scriptSlot.SetFilename(script.string());
+        auto workspaceStr = root["workspace"].AsValue();
+        std::filesystem::path workspace;
+        if(AGZ::StartsWith(workspaceStr, "@"))
+            workspace = relative(workspaceStr.substr(1), script);
+        else
+            workspace = workspaceStr;
+        data->workspaceSlot.SetFilename(workspace.string());
+    }
+    std::strcpy(data->outputFilenameBuf.data(), root["outputFilename"].AsValue().c_str());
 }

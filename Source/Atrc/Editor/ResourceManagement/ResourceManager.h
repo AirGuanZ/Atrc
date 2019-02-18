@@ -9,6 +9,7 @@
 
 #include <Atrc/Editor/LauncherScriptExportingContext.h>
 #include <Atrc/Editor/GL.h>
+#include <AGZUtils/Config/Config.h>
 
 /**
  * Instance管理体系
@@ -85,6 +86,8 @@ public:
     }
 
     virtual void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const = 0;
+
+    virtual void Import(const ResourceManager &rscMgr, const AGZ::ConfigGroup &root, const AGZ::ConfigGroup &params) { }
 };
 
 template<typename TResource>
@@ -212,14 +215,34 @@ public:
         
     }
 
+    void AddInstance(std::shared_ptr<TResource> instance)
+    {
+        instances_.push_back(std::move(instance));
+        instance->PutIntoPool();
+        if(sortInstanceByName_)
+            SortInstanceByName();
+    }
+
     std::shared_ptr<TResource> GetSelectedInstance()
     {
         return selectedInstance_;
     }
 
+    void SetSelectedInstance(std::shared_ptr<TResource> instance)
+    {
+        AGZ_ASSERT(std::find(std::begin(instances_), std::end(instances_), instance) != std::end(instances_));
+        selectedInstance_ = instance;
+    }
+
     bool Find(std::shared_ptr<TResource> rsc) const
     {
         return std::find(std::begin(instances_), std::end(instances_), rsc) != std::end(instances_);
+    }
+
+    std::shared_ptr<TResource> GetByName(const std::string &name)
+    {
+        auto it = std::find_if(std::begin(instances_), std::end(instances_), [&](auto &L) { return L->GetName() == name; });
+        return it != std::end(instances_) ? *it : std::shared_ptr<TResource>();
     }
 
     void Display(ResourceManager &rscMgr)
@@ -235,11 +258,8 @@ public:
             if(it == instances_.end() && nameBuf[0])
             {
                 auto newInstance = creatorSelector_.GetSelectedCreator()->Create(rscMgr, nameBuf);
-                instances_.push_back(newInstance);
-                newInstance->PutIntoPool();
+                AddInstance(newInstance);
                 nameBuf[0] = '\0';
-                if(sortInstanceByName_)
-                    SortInstanceByName();
             }
         }
 
@@ -293,17 +313,14 @@ public:
     auto end() { return instances_.end(); }
 };
 
-template<typename...TResourceRegisters>
+template<typename...TResources>
 class TResourceManager
 {
-    std::tuple<TResourceCreatorManager<typename TResourceRegisters::ResourceType>...> creatorMgrList_;
+    std::tuple<TResourceCreatorManager<TResources>...> creatorMgrList_;
 
-    struct DummyPool_t { template<typename...Args> explicit DummyPool_t(Args&&...) { } };
-    template<typename TRegister>
-    using Pool_t = std::conditional_t<TRegister::HasPool,
-                                      TResourcePool<typename TRegister::ResourceType>,
-                                      DummyPool_t>;
-    std::tuple<Pool_t<TResourceRegisters>...> poolList_;
+    template<typename TResource>
+    using Pool_t = TResourcePool<TResource>;
+    std::tuple<Pool_t<TResources>...> poolList_;
 
     template<typename TResource>
     TResourceCreatorManager<TResource> &_creatorMgr() noexcept
@@ -326,7 +343,7 @@ class TResourceManager
 public:
 
     TResourceManager()
-        : poolList_(_creatorMgr<typename TResourceRegisters::ResourceType>()...)
+        : poolList_(_creatorMgr<TResources>()...)
     {
         
     }
@@ -402,7 +419,7 @@ public:
 };
 using EntityCreator = TResourceCreator<EntityInstance>;
 
-class FilmFilterInstance : public IResource { using IResource::IResource; static const char *GetPoolName() { return "filmFilter"; } };
+class FilmFilterInstance : public IResource { public: using IResource::IResource; static const char *GetPoolName() { return "filmFilter"; } };
 using FilmFilterCreator = TResourceCreator<FilmFilterInstance>;
 
 class FresnelInstance : public IResource { public: using IResource::IResource; static const char *GetPoolName() { return "fresnel"; } };
@@ -451,17 +468,17 @@ class TextureInstance : public IResource { public: using IResource::IResource; s
 using TextureCreator = TResourceCreator<TextureInstance>;
 
 class ResourceManager : public TResourceManager<
-    TResourceRegister<CameraInstance, true>,
-    TResourceRegister<EntityInstance, true>,
-    TResourceRegister<FilmFilterInstance, false>,
-    TResourceRegister<FresnelInstance, false>,
-    TResourceRegister<GeometryInstance, true>,
-    TResourceRegister<LightInstance, true>,
-    TResourceRegister<MaterialInstance, true>,
-    TResourceRegister<PathTracingIntegratorInstance, false>,
-    TResourceRegister<RendererInstance, false>,
-    TResourceRegister<SamplerInstance, false>,
-    TResourceRegister<TextureInstance, true>>
+    CameraInstance,
+    EntityInstance,
+    FilmFilterInstance,
+    FresnelInstance,
+    GeometryInstance,
+    LightInstance,
+    MaterialInstance,
+    PathTracingIntegratorInstance,
+    RendererInstance,
+    SamplerInstance,
+    TextureInstance>
 {
 public:
 

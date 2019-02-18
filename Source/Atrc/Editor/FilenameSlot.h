@@ -37,6 +37,11 @@ public:
         filename_ = "";
     }
 
+    void SetFilename(std::string filename) noexcept
+    {
+        filename_ = std::move(filename);
+    }
+
     bool Display(FileBrowser &fileBrowser)
     {
         bool ret;

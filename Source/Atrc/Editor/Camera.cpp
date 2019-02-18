@@ -1,6 +1,7 @@
 #include <Atrc/Editor/Camera.h>
 #include <Atrc/Editor/GL.h>
 #include <Atrc/Editor/Global.h>
+#include <Atrc/Mgr/Parser.h>
 
 namespace
 {
@@ -35,7 +36,7 @@ void DefaultRenderingCamera::Display()
     ImGui::PushID(this);
     AGZ::ScopeGuard cameraIDGuard([]() { ImGui::PopID(); });
 
-    if(ImGui::TreeNode("default proj"))
+    /*if(ImGui::TreeNode("default proj"))
     {
         //ImGui::InputFloat("up", &viewData_.up.value);
         ImGui::InputInt("W", &projData_.w, 0);
@@ -45,7 +46,7 @@ void DefaultRenderingCamera::Display()
         ImGui::InputFloat("far", &projData_.far);
 
         ImGui::TreePop();
-    }
+    }*/
 
     ImGui::PushID(this);
 
@@ -96,6 +97,8 @@ namespace
         return moveDir;
     }
 
+    namespace Parser = Atrc::Mgr::Parser::TFloat;
+
 } // namespace null
 
 void DefaultRenderingCamera::UpdatePositionAndDirection(const AGZ::Input::Keyboard &kb, const AGZ::Input::Mouse &m)
@@ -130,6 +133,16 @@ void DefaultRenderingCamera::AutoResizeProj()
 {
     projData_.w = Global::GetFramebufferWidth();
     projData_.h = Global::GetFramebufferHeight();
+}
+
+void DefaultRenderingCamera::Import(const AGZ::ConfigGroup &params)
+{
+    viewData_.pos = Parser::ParseVec3<float>(params["pos"]);
+    viewData_.lookAt = Parser::ParseVec3<float>(params["lookAt"]);
+    viewData_.useLookAt = true;
+    UpdateViewData();
+    viewData_.useLookAt = false;
+    UpdateViewMatrix();
 }
 
 void DefaultRenderingCamera::UpdateViewData()

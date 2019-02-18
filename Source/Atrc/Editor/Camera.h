@@ -1,5 +1,7 @@
 #pragma once
 
+#include <AGZUtils/Utils/Config.h>
+
 #include <Atrc/Editor/GL.h>
 
 class DefaultRenderingCamera
@@ -50,6 +52,8 @@ public:
     Deg GetProjFOVy() const noexcept { return projData_.FOVy; }
 
     void AutoResizeProj();
+
+    void Import(const AGZ::ConfigGroup &params);
 
     void UpdateMatrix()
     {
