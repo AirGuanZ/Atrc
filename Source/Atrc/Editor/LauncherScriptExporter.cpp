@@ -123,13 +123,13 @@ void LauncherScriptImporter::Import(const AGZ::ConfigGroup &root, EditorData *da
         auto workspaceStr = root["workspace"].AsValue();
         std::filesystem::path workspace;
         if(AGZ::StartsWith(workspaceStr, "@"))
-            workspace = script / relative(std::filesystem::path(workspaceStr.substr(1)));
+            workspace = absolute(script / workspaceStr.substr(1));
         else if(AGZ::StartsWith(workspaceStr, "$"))
             workspace = absolute(std::filesystem::path(workspaceStr.substr(1)));
         else
             workspace = absolute(std::filesystem::path(workspaceStr));
         data->workspaceSlot.SetFilename(relative(workspace, script).string());
-
+        
         ctx.scriptPath = script;
         ctx.workspacePath = absolute(workspace);
     }
@@ -144,6 +144,11 @@ void LauncherScriptImporter::Import(const AGZ::ConfigGroup &root, EditorData *da
     {
         auto &cameraGroup = GetFinalNonReferenceParam(root, root["camera"]);
         data->defaultRenderingCamera.Import(cameraGroup);
+
+        auto cam = GetResourceInstance<CameraInstance>(data->rscMgr, root, root["camera"], ctx);
+        auto &camPool = data->rscMgr.GetPool<CameraInstance>();
+        if(camPool.Find(cam))
+            camPool.SetSelectedInstance(cam);
     }
 
     data->filmSize = Atrc::Mgr::Parser::ParseVec2i(root["film.size"]);

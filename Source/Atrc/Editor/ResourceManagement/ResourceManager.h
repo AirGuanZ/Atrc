@@ -585,8 +585,8 @@ std::shared_ptr<TResource> GetResourceInstance(ResourceManager &rscMgr, const AG
     if(auto pVal = params.TryAsValue()) // 名字必然是引用
     {
         auto &poolName = GetCompletePoolName<TResource>();
-        if(AGZ::StartsWith(*pVal, poolName)) // 这是一个针对池子中的对象的引用
-            return GetResourceInPool<TResource>(rscMgr, root, pVal->substr(poolName.length()), ctx);
+        if(AGZ::StartsWith(*pVal, poolName + ".")) // 这是一个针对池子中的对象的引用
+            return GetResourceInPool<TResource>(rscMgr, root, pVal->substr(poolName.length() + 1), ctx);
 
         // 针对不在池子中的引用，递归地调用自身
         auto &referencedParams = root[*pVal];
@@ -599,8 +599,8 @@ std::shared_ptr<TResource> GetResourceInstance(ResourceManager &rscMgr, const AG
         auto &name = grp["name"].AsValue();
 
         auto &poolName = GetCompletePoolName<TResource>();
-        if(AGZ::StartsWith(name, poolName)) // 这是一个针对池子中的对象的引用
-            return GetResourceInPool<TResource>(rscMgr, root, name.substr(poolName.length()), ctx);
+        if(AGZ::StartsWith(name, poolName + ".")) // 这是一个针对池子中的对象的引用
+            return GetResourceInPool<TResource>(rscMgr, root, name.substr(poolName.length() + 1), ctx);
 
         // 针对不在池子中的引用，递归地调用自身
         auto &referencedParams = root[name];

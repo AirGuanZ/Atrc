@@ -126,7 +126,7 @@ public:
         case FilenameMode::RelativeToWorkspace:
             return relative(path(filename_), (path(scriptDir) / path(workspaceDir))).string();
         case FilenameMode::RelativeToScript:
-            return relative(path(filename_), path(scriptDir)).string();
+            return relative(path(filename_), absolute(path(scriptDir))).string();
         case FilenameMode::RelativeToCurrentDirectory:
             return relative(path(filename_)).string();
         default:

@@ -134,8 +134,8 @@ namespace
         void Import(ResourceManager &rscMgr, const AGZ::ConfigGroup &root, const AGZ::ConfigGroup &params, const ImportContext &ctx) override
         {
             A_ = Atrc::Mgr::Parser::TFloat::ParseVec3<float>(params["A"]);
-            B_ = Atrc::Mgr::Parser::TFloat::ParseVec3<float>(params["A"]);
-            C_ = Atrc::Mgr::Parser::TFloat::ParseVec3<float>(params["A"]);
+            B_ = Atrc::Mgr::Parser::TFloat::ParseVec3<float>(params["B"]);
+            C_ = Atrc::Mgr::Parser::TFloat::ParseVec3<float>(params["C"]);
             UpdateNormal();
             UpdateVertexBuffer();
         }

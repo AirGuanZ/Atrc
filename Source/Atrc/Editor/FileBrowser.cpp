@@ -49,7 +49,12 @@ bool FileBrowser::Display()
         bool selected = u.name == selectedName_;
         std::string displayName = (u.isDir ? "[d] " : "[f] ") + u.name;
         if(ImGui::Selectable(displayName.c_str(), selected, ImGuiSelectableFlags_DontClosePopups) && (u.isDir == selectDirectory_))
-            selectedName_ = u.name;
+        {
+            if(selected)
+                selectedName_ = std::string();
+            else if(u.name != "..")
+                selectedName_ = u.name;
+        }
         if(ImGui::IsItemClicked(0) && ImGui::IsMouseDoubleClicked(0) && u.isDir)
             enterDir = &u.name;
     }
@@ -63,7 +68,7 @@ bool FileBrowser::Display()
             SetCurrentDirectory((pwd_ / *enterDir).string());
     }
 
-    if(ImGui::Button("ok") && !selectedName_.empty())
+    if(ImGui::Button("ok") && (!selectedName_.empty() || selectDirectory_))
     {
         ImGui::CloseCurrentPopup();
         return true;
