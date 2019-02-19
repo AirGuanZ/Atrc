@@ -1,5 +1,4 @@
 #include <Atrc/Editor/ResourceManagement/EntityCreator.h>
-#include <Atrc/Editor/MaterialMapping.h>
 #include <Atrc/Editor/EntityController.h>
 #include <Lib/imgui/imgui/ImGuizmo.h>
 
@@ -177,7 +176,7 @@ namespace
 
     class GeometricEntityInstance : public TransformedGeometricEntityBase
     {
-        SingleMaterialMapping material_;
+        MaterialSlot material_;
 
     public:
 
