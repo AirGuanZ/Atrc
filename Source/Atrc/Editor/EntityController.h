@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Atrc/Editor/GL.h>
+#include <AGZUtils/Config/Config.h>
 
 class EntityControllerAction
 {
@@ -67,4 +68,6 @@ public:
     const Vec3f &GetTranslate() const noexcept { return trans_; }
     const Vec3f &GetRotate() const noexcept { return rotate_; }
     float GetScale() const noexcept { return scale_; }
+
+    void Import(const AGZ::ConfigNode &node);
 };

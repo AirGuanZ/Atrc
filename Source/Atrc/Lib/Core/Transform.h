@@ -29,6 +29,8 @@ public:
 
     Transform();
 
+    const Mat4 &GetMatrix() const noexcept { return mat_; }
+
     Real ScaleFactor() const noexcept;
 
     Real InverseScaleFactor() const noexcept;

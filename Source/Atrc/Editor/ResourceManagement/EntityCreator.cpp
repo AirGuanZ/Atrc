@@ -1,5 +1,6 @@
 #include <Atrc/Editor/ResourceManagement/EntityCreator.h>
 #include <Atrc/Editor/EntityController.h>
+#include <Atrc/Mgr/Parser.h>
 #include <Lib/imgui/imgui/ImGuizmo.h>
 
 namespace
@@ -174,6 +175,13 @@ namespace
             }
             DisplayController(proj, view, renderController);
         }
+
+        void Import(ResourceManager &rscMgr, const AGZ::ConfigGroup &root, const AGZ::ConfigGroup &params, const ImportContext &ctx) override
+        {
+            geometry_.SetInstance(GetResourceInstance<GeometryInstance>(rscMgr, root, params["geometry"], ctx));
+            radiance_ = Atrc::Mgr::Parser::TFloat::ParseSpectrum<float>(params["radiance"]);
+            controller_.Import(params["geometry.transform"]);
+        }
     };
 
     class GeometricEntityInstance : public TransformedGeometricEntityBase
@@ -209,6 +217,13 @@ namespace
                 ImGui::TreePop();
             }
             DisplayController(proj, view, renderController);
+        }
+
+        void Import(ResourceManager &rscMgr, const AGZ::ConfigGroup &root, const AGZ::ConfigGroup &params, const ImportContext &ctx) override
+        {
+            geometry_.SetInstance(GetResourceInstance<GeometryInstance>(rscMgr, root, params["geometry"], ctx));
+            material_.SetInstance(GetResourceInstance<MaterialInstance>(rscMgr, root, params["material"], ctx));
+            controller_.Import(params["geometry.transform"]);
         }
     };
 }

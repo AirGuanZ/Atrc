@@ -1,5 +1,6 @@
 #include <Atrc/Editor/ResourceManagement/TextureCreator.h>
 #include <Atrc/Editor/FilenameSlot.h>
+#include <Atrc/Mgr/Parser.h>
 
 namespace
 {
@@ -23,6 +24,11 @@ namespace
         {
             ImGui::ColorEdit3("texel", &texel_[0], ImGuiColorEditFlags_HDR | ImGuiColorEditFlags_Float);
         }
+
+        void Import(ResourceManager &rscMgr, const AGZ::ConfigGroup &root, const AGZ::ConfigGroup &params, const ImportContext &ctx) override
+        {
+            texel_ = Atrc::Mgr::Parser::TFloat::ParseVec3<float>(params["texel"]);
+        }
     };
 
     class Constant1TextureInstance : public TextureInstance
@@ -44,6 +50,11 @@ namespace
         void Display([[maybe_unused]] ResourceManager &rscMgr) override
         {
             ImGui::InputFloat("texel", &texel_, 0.01f, 0.1f, 7);
+        }
+
+        void Import(ResourceManager &rscMgr, const AGZ::ConfigGroup &root, const AGZ::ConfigGroup &params, const ImportContext &ctx) override
+        {
+            texel_ = params["texel"].Parse<float>();
         }
     };
 
@@ -67,6 +78,11 @@ namespace
         {
             static FileBrowser fileBrowser("browse image filename", false, "");
             filenameSlot_.Display(fileBrowser);
+        }
+
+        void Import(ResourceManager &rscMgr, const AGZ::ConfigGroup &root, const AGZ::ConfigGroup &params, const ImportContext &ctx) override
+        {
+            filenameSlot_.Import(params["filename"].AsValue(), ctx);
         }
     };
 }

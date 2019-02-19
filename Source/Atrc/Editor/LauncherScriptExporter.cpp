@@ -115,12 +115,31 @@ std::string LauncherScriptExporter::Export() const
 
 void LauncherScriptImporter::Import(const AGZ::ConfigGroup &root, EditorData *data, std::string_view scriptPath)
 {
-    ImportFromPool<CameraInstance>  (root, data->rscMgr);
-    ImportFromPool<EntityInstance>  (root, data->rscMgr);
-    ImportFromPool<GeometryInstance>(root, data->rscMgr);
-    ImportFromPool<LightInstance>   (root, data->rscMgr);
-    ImportFromPool<MaterialInstance>(root, data->rscMgr);
-    ImportFromPool<TextureInstance> (root, data->rscMgr);
+    IResource::ImportContext ctx;
+
+    {
+        auto script = absolute(std::filesystem::path(scriptPath));
+        data->scriptSlot.SetFilename(relative(script).string());
+        auto workspaceStr = root["workspace"].AsValue();
+        std::filesystem::path workspace;
+        if(AGZ::StartsWith(workspaceStr, "@"))
+            workspace = script / relative(std::filesystem::path(workspaceStr.substr(1)));
+        else if(AGZ::StartsWith(workspaceStr, "$"))
+            workspace = absolute(std::filesystem::path(workspaceStr.substr(1)));
+        else
+            workspace = absolute(std::filesystem::path(workspaceStr));
+        data->workspaceSlot.SetFilename(relative(workspace, script).string());
+
+        ctx.scriptPath = script;
+        ctx.workspacePath = absolute(workspace);
+    }
+
+    ImportFromPool<CameraInstance>  (root, data->rscMgr, ctx);
+    ImportFromPool<EntityInstance>  (root, data->rscMgr, ctx);
+    ImportFromPool<GeometryInstance>(root, data->rscMgr, ctx);
+    ImportFromPool<LightInstance>   (root, data->rscMgr, ctx);
+    ImportFromPool<MaterialInstance>(root, data->rscMgr, ctx);
+    ImportFromPool<TextureInstance> (root, data->rscMgr, ctx);
 
     {
         auto &cameraGroup = GetFinalNonReferenceParam(root, root["camera"]);
@@ -129,27 +148,16 @@ void LauncherScriptImporter::Import(const AGZ::ConfigGroup &root, EditorData *da
 
     data->filmSize = Atrc::Mgr::Parser::ParseVec2i(root["film.size"]);
     {
-        auto filmFilter = GetResourceInstance<FilmFilterInstance>(data->rscMgr, root, root["film.filter"]);
+        auto filmFilter = GetResourceInstance<FilmFilterInstance>(data->rscMgr, root, root["film.filter"], ctx);
         data->filmFilterSlot.SetInstance(filmFilter);
     }
     {
-        auto sampler = GetResourceInstance<SamplerInstance>(data->rscMgr, root, root["sampler"]);
+        auto sampler = GetResourceInstance<SamplerInstance>(data->rscMgr, root, root["sampler"], ctx);
         data->samplerSlot.SetInstance(sampler);
     }
     {
-        auto renderer = GetResourceInstance<RendererInstance>(data->rscMgr, root, root["renderer"]);
+        auto renderer = GetResourceInstance<RendererInstance>(data->rscMgr, root, root["renderer"], ctx);
         data->rendererSlot.SetInstance(renderer);
-    }
-    {
-        auto script = relative(std::filesystem::path(scriptPath));
-        data->scriptSlot.SetFilename(script.string());
-        auto workspaceStr = root["workspace"].AsValue();
-        std::filesystem::path workspace;
-        if(AGZ::StartsWith(workspaceStr, "@"))
-            workspace = relative(workspaceStr.substr(1), script);
-        else
-            workspace = workspaceStr;
-        data->workspaceSlot.SetFilename(workspace.string());
     }
     std::strcpy(data->outputFilenameBuf.data(), root["outputFilename"].AsValue().c_str());
 }

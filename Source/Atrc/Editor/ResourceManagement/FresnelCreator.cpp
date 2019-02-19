@@ -1,4 +1,5 @@
 #include <Atrc/Editor/ResourceManagement/FresnelCreator.h>
+#include <Atrc/Mgr/Parser.h>
 
 namespace
 {
@@ -26,6 +27,13 @@ namespace
             ImGui::InputFloat3("etaT", &etaT_[0]);
             ImGui::InputFloat3("k", &k_[0]);
         }
+
+        void Import(ResourceManager &rscMgr, const AGZ::ConfigGroup &root, const AGZ::ConfigGroup &params, const ImportContext &ctx) override
+        {
+            etaI_ = Atrc::Mgr::Parser::TFloat::ParseSpectrum<float>(params["etaI"]);
+            etaT_ = Atrc::Mgr::Parser::TFloat::ParseSpectrum<float>(params["etaT"]);
+            k_    = Atrc::Mgr::Parser::TFloat::ParseSpectrum<float>(params["k"]);
+        }
     };
 
     class FresnelDielectricInstance : public FresnelInstance
@@ -49,6 +57,12 @@ namespace
         {
             ImGui::InputFloat("etaI", &etaI_);
             ImGui::InputFloat("etaT", &etaT_);
+        }
+
+        void Import(ResourceManager &rscMgr, const AGZ::ConfigGroup &root, const AGZ::ConfigGroup &params, const ImportContext &ctx) override
+        {
+            etaI_ = params["etaI"].Parse<float>();
+            etaT_ = params["etaT"].Parse<float>();
         }
     };
 

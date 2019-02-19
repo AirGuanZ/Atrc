@@ -1,4 +1,5 @@
 ﻿#include <Atrc/Editor/EntityController.h>
+#include <Atrc/Mgr/Parser.h>
 #include <Lib/imgui/imgui/ImGuizmo.h>
 
 void EntityControllerAction::BeginFrame()
@@ -87,4 +88,22 @@ Mat4f EntityController::GetFinalMatrix() const noexcept
     Mat4f ret;
     ImGuizmo::RecomposeMatrixFromComponents(&trans_[0], &rotate_[0], scaleVec, &ret.m[0][0]);
     return ret;
+}
+
+void EntityController::Import(const AGZ::ConfigNode &node)
+{
+    auto transform = Atrc::Mgr::Parser::ParseTransform(node);
+    auto realMat = transform.GetMatrix().Transpose();
+    Mat4f mat;
+    for(int c = 0; c != 4; ++c)
+    {
+        for(int r = 0; r != 4; ++r)
+            mat.m[c][r] = realMat.m[c][r];
+    }
+    float trans[3], rotate[3], scale[3];
+    ImGuizmo::DecomposeMatrixToComponents(&mat.m[0][0], trans, rotate, scale);
+
+    trans_  = Vec3f(trans);
+    rotate_ = Vec3f(rotate);
+    scale_  = scale[0];
 }

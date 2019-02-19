@@ -22,6 +22,11 @@ namespace
         {
             ImGui::InputFloat("sidelen", &sidelen_);
         }
+
+        void Import(ResourceManager &rscMgr, const AGZ::ConfigGroup &root, const AGZ::ConfigGroup& params, const ImportContext &ctx) override
+        {
+            sidelen_ = std::stof(params["sidelen"].AsValue());
+        }
     };
 
     class GaussianFilterInstance : public FilmFilterInstance
@@ -44,8 +49,14 @@ namespace
 
         void Display(ResourceManager&) override
         {
-            ImGui::InputFloat("radius.x", &radius_);
+            ImGui::InputFloat("radius", &radius_);
             ImGui::InputFloat("alpha", &alpha_);
+        }
+
+        void Import(ResourceManager &rscMgr, const AGZ::ConfigGroup &root, const AGZ::ConfigGroup& params, const ImportContext &ctx) override
+        {
+            radius_ = std::stof(params["radius"].AsValue());
+            alpha_ = std::stof(params["alpha"].AsValue());
         }
     };
 }

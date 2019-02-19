@@ -1,4 +1,5 @@
 #include <Atrc/Editor/ResourceManagement/MaterialCreator.h>
+#include <Atrc/Mgr/Parser.h>
 
 namespace
 {
@@ -40,6 +41,13 @@ namespace
                 ImGui::TreePop();
             }
         }
+
+        void Import(ResourceManager &rscMgr, const AGZ::ConfigGroup &root, const AGZ::ConfigGroup &params, const ImportContext &ctx) override
+        {
+            rc_.SetInstance(GetResourceInstance<TextureInstance>(rscMgr, root, params["rc"], ctx));
+            roughness_.SetInstance(GetResourceInstance<TextureInstance>(rscMgr, root, params["roughness"], ctx));
+            fresnel_.SetInstance(GetResourceInstance<FresnelInstance>(rscMgr, root, params["fresnel"], ctx));
+        }
     };
 
     class GGXMetalInstance : public MaterialInstance
@@ -79,6 +87,13 @@ namespace
                 fresnel_.Display(rscMgr);
                 ImGui::TreePop();
             }
+        }
+
+        void Import(ResourceManager &rscMgr, const AGZ::ConfigGroup &root, const AGZ::ConfigGroup &params, const ImportContext &ctx) override
+        {
+            rc_.SetInstance(GetResourceInstance<TextureInstance>(rscMgr, root, params["rc"], ctx));
+            roughness_.SetInstance(GetResourceInstance<TextureInstance>(rscMgr, root, params["roughness"], ctx));
+            fresnel_.SetInstance(GetResourceInstance<FresnelInstance>(rscMgr, root, params["fresnel"], ctx));
         }
     };
 
@@ -126,6 +141,11 @@ namespace
                 ImGui::TreePop();
             }
         }
+
+        void Import(ResourceManager &rscMgr, const AGZ::ConfigGroup &root, const AGZ::ConfigGroup &params, const ImportContext &ctx) override
+        {
+            albedo_.SetInstance(GetResourceInstance<TextureInstance>(rscMgr, root, params["albedo"], ctx));
+        }
     };
 
     class IdealMirrorInstance : public MaterialInstance
@@ -158,6 +178,12 @@ namespace
                 fresnel_.Display(rscMgr);
                 ImGui::TreePop();
             }
+        }
+
+        void Import(ResourceManager &rscMgr, const AGZ::ConfigGroup &root, const AGZ::ConfigGroup &params, const ImportContext &ctx) override
+        {
+            rc_.SetInstance(GetResourceInstance<TextureInstance>(rscMgr, root, params["rc"], ctx));
+            fresnel_.SetInstance(GetResourceInstance<FresnelInstance>(rscMgr, root, params["fresnel"], ctx));
         }
     };
 
@@ -192,6 +218,13 @@ namespace
                 ImGui::TreePop();
             }
         }
+
+
+        void Import(ResourceManager &rscMgr, const AGZ::ConfigGroup &root, const AGZ::ConfigGroup &params, const ImportContext &ctx) override
+        {
+            scale_.SetInstance(GetResourceInstance<TextureInstance>(rscMgr, root, params["scale"], ctx));
+            internal_.SetInstance(GetResourceInstance<MaterialInstance>(rscMgr, root, params["internal"], ctx));
+        }
     };
 
     class IdealSpecularInstance : public MaterialInstance
@@ -224,6 +257,12 @@ namespace
                 dielectric_.Display(rscMgr);
                 ImGui::TreePop();
             }
+        }
+
+        void Import(ResourceManager &rscMgr, const AGZ::ConfigGroup &root, const AGZ::ConfigGroup &params, const ImportContext &ctx) override
+        {
+            rc_.SetInstance(GetResourceInstance<TextureInstance>(rscMgr, root, params["rc"], ctx));
+            dielectric_.SetInstance(GetResourceInstance<FresnelInstance>(rscMgr, root, params["fresnel"], ctx));
         }
     };
 
@@ -284,6 +323,14 @@ namespace
                 ImGui::TreePop();
             }
         }
+
+        void Import(ResourceManager &rscMgr, const AGZ::ConfigGroup &root, const AGZ::ConfigGroup &params, const ImportContext &ctx) override
+        {
+            surface_.SetInstance(GetResourceInstance<MaterialInstance>(rscMgr, root, params["surface"], ctx));
+            A_.SetInstance(GetResourceInstance<TextureInstance>(rscMgr, root, params["A"], ctx));
+            dmfp_.SetInstance(GetResourceInstance<TextureInstance>(rscMgr, root, params, ctx));
+            eta_ = params["eta"].Parse<float>();
+        }
     };
 
     class ONMatteInstance : public MaterialInstance
@@ -316,6 +363,12 @@ namespace
                 sigma_.Display(rscMgr);
                 ImGui::TreePop();
             }
+        }
+
+        void Import(ResourceManager &rscMgr, const AGZ::ConfigGroup &root, const AGZ::ConfigGroup &params, const ImportContext &ctx) override
+        {
+            albedo_.SetInstance(GetResourceInstance<TextureInstance>(rscMgr, root, params["albedo"], ctx));
+            sigma_.SetInstance(GetResourceInstance<TextureInstance>(rscMgr, root, params["sigma"], ctx));
         }
     };
 
@@ -356,6 +409,13 @@ namespace
                 fresnel_.Display(rscMgr);
                 ImGui::TreePop();
             }
+        }
+
+        void Import(ResourceManager &rscMgr, const AGZ::ConfigGroup &root, const AGZ::ConfigGroup &params, const ImportContext &ctx) override
+        {
+            rc_.SetInstance(GetResourceInstance<TextureInstance>(rscMgr, root, params["rc"], ctx));
+            roughness_.SetInstance(GetResourceInstance<TextureInstance>(rscMgr, root, params["roughness"], ctx));
+            fresnel_.SetInstance(GetResourceInstance<FresnelInstance>(rscMgr, root, params["fresnel"], ctx));
         }
     };
 }

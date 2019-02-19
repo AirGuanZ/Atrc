@@ -1,7 +1,6 @@
 #include <Atrc/Editor/ResourceManagement/CameraCreator.h>
 #include <Atrc/Editor/Global.h>
-#include "Atrc/Mgr/Common.h"
-#include "Atrc/Mgr/Parser.h"
+#include <Atrc/Mgr/Parser.h>
 
 namespace
 {
@@ -76,7 +75,7 @@ namespace
             return ret;
         }
 
-        void Import(const ResourceManager &rscMgr, const AGZ::ConfigGroup &root, const AGZ::ConfigGroup &params) override
+        void Import(ResourceManager &rscMgr, const AGZ::ConfigGroup &root, const AGZ::ConfigGroup &params, const ImportContext &ctx) override
         {
             sensorWidth_ = std::stof(params["sensorWidth"].AsValue());
 

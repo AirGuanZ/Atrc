@@ -4,6 +4,7 @@
 
 #include <Atrc/Editor/LauncherScriptExportingContext.h>
 #include <Atrc/Editor/FileBrowser.h>
+#include <Atrc/Editor/ResourceManagement/ResourceManager.h>
 
 enum class FilenameMode
 {
@@ -136,5 +137,11 @@ public:
     std::string GetExportedFilename(const LauncherScriptExportingContext &ctx) const
     {
         return GetExportedFilename(ctx.workspaceDirectory, ctx.scriptDirectory);
+    }
+
+    void Import(std::string_view filename, const IResource::ImportContext &ctx)
+    {
+        auto absFilename = ctx.GetFilename(filename);
+        filename_ = relative(std::filesystem::path(absFilename)).string();
     }
 };

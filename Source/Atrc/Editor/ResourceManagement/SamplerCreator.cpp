@@ -29,6 +29,18 @@ namespace
                 ImGui::InputInt("seed", &seed_, 0);
             ImGui::InputInt("spp", &spp_, 0);
         }
+
+        void Import(ResourceManager &rscMgr, const AGZ::ConfigGroup &root, const AGZ::ConfigGroup &params, const ImportContext &ctx) override
+        {
+            if(auto nSeed = params.Find("seed"))
+            {
+                hasSeed_ = true;
+                seed_ = nSeed->Parse<int>();
+            }
+            else
+                hasSeed_ = false;
+            spp_ = params["spp"].Parse<int>();
+        }
     };
 }
 

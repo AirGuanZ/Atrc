@@ -36,6 +36,13 @@ namespace
                 ImGui::TreePop();
             }
         }
+
+        void Import(ResourceManager &rscMgr, const AGZ::ConfigGroup &root, const AGZ::ConfigGroup &params, const ImportContext &ctx) override
+        {
+            workerCount_ = params["workerCount"].Parse<int>();
+            taskGridSize_ = params["taskGridSize"].Parse<int>();
+            integratorSlot_.SetInstance(GetResourceInstance<PathTracingIntegratorInstance>(rscMgr, root, params["integrator"], ctx));
+        }
     };
 }
 

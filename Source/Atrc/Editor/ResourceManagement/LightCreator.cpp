@@ -1,4 +1,5 @@
 #include <Atrc/Editor/ResourceManagement/LightCreator.h>
+#include <Atrc/Mgr/Parser.h>
 
 namespace
 {
@@ -24,6 +25,12 @@ namespace
         {
             ImGui::ColorEdit3("top", &top_[0], ImGuiColorEditFlags_HDR | ImGuiColorEditFlags_Float);
             ImGui::ColorEdit3("bottom", &bottom_[0], ImGuiColorEditFlags_HDR | ImGuiColorEditFlags_Float);
+        }
+
+        void Import(ResourceManager &rscMgr, const AGZ::ConfigGroup &root, const AGZ::ConfigGroup &params, const ImportContext &ctx) override
+        {
+            top_ = Atrc::Mgr::Parser::TFloat::ParseSpectrum<float>(params["top"]);
+            bottom_ = Atrc::Mgr::Parser::TFloat::ParseSpectrum<float>(params["bottom"]);
         }
     };
 }

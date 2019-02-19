@@ -1,4 +1,5 @@
 #include <Atrc/Editor/ResourceManagement/PathTracingIntegratorCreator.h>
+#include <Atrc/Mgr/Parser.h>
 
 namespace
 {
@@ -31,6 +32,14 @@ namespace
             ImGui::InputFloat("cont prob", &contProb_);
             ImGui::Checkbox("sample all lights", &sampleAllLights_);
         }
+
+        void Import(ResourceManager &rscMgr, const AGZ::ConfigGroup &root, const AGZ::ConfigGroup &params, const ImportContext &ctx) override
+        {
+            minDepth_ = params["minDepth"].Parse<int>();
+            maxDepth_ = params["maxDepth"].Parse<int>();
+            contProb_ = params["contProb"].Parse<float>();
+            sampleAllLights_ = Atrc::Mgr::Parser::ParseBool(params["sampleAllLights"]);
+        }
     };
 
     class MISPathTracingIntegratorInstance : public PathTracingIntegratorInstance
@@ -62,6 +71,14 @@ namespace
             ImGui::InputFloat("cont prob", &contProb_);
             ImGui::Checkbox("sample all lights", &sampleAllLights_);
         }
+
+        void Import(ResourceManager &rscMgr, const AGZ::ConfigGroup &root, const AGZ::ConfigGroup &params, const ImportContext &ctx) override
+        {
+            minDepth_ = params["minDepth"].Parse<int>();
+            maxDepth_ = params["maxDepth"].Parse<int>();
+            contProb_ = params["contProb"].Parse<float>();
+            sampleAllLights_ = Atrc::Mgr::Parser::ParseBool(params["sampleAllLights"]);
+        }
     };
 
     class NativePathTracingIntegratorInstance : public PathTracingIntegratorInstance
@@ -89,6 +106,13 @@ namespace
             ImGui::InputInt("min depth", &minDepth_, 0);
             ImGui::InputInt("max depth", &maxDepth_, 0);
             ImGui::InputFloat("cont prob", &contProb_);
+        }
+
+        void Import(ResourceManager &rscMgr, const AGZ::ConfigGroup &root, const AGZ::ConfigGroup &params, const ImportContext &ctx) override
+        {
+            minDepth_ = params["minDepth"].Parse<int>();
+            maxDepth_ = params["maxDepth"].Parse<int>();
+            contProb_ = params["contProb"].Parse<float>();
         }
     };
 }

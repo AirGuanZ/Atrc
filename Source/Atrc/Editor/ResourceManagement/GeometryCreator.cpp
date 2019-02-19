@@ -3,6 +3,8 @@
 #include <Atrc/Editor/ResourceManagement/GeometryCreator.h>
 #include <Atrc/Editor/FileBrowser.h>
 #include <Atrc/Editor/FilenameSlot.h>
+#include <Atrc/Editor/Global.h>
+#include <Atrc/Mgr/Parser.h>
 #include <Lib/imgui/imgui/ImGuizmo.h>
 
 namespace
@@ -128,6 +130,15 @@ namespace
             UpdateNormal();
             UpdateVertexBuffer();
         }
+
+        void Import(ResourceManager &rscMgr, const AGZ::ConfigGroup &root, const AGZ::ConfigGroup &params, const ImportContext &ctx) override
+        {
+            A_ = Atrc::Mgr::Parser::TFloat::ParseVec3<float>(params["A"]);
+            B_ = Atrc::Mgr::Parser::TFloat::ParseVec3<float>(params["A"]);
+            C_ = Atrc::Mgr::Parser::TFloat::ParseVec3<float>(params["A"]);
+            UpdateNormal();
+            UpdateVertexBuffer();
+        }
     };
 
     class WavefrontOBJInstance : public GeometryInstance
@@ -168,6 +179,7 @@ namespace
             Clear();
             AGZ::ScopeGuard clearGuard([&]
             {
+                Global::ShowErrorMessage("failed to load wavefront obj from " + filename);
                 Clear();
                 filename_.Clear();
             });
@@ -215,6 +227,12 @@ namespace
             static FileBrowser fileBrowser("browse .obj", false, "");
             if(filename_.Display(fileBrowser))
                 LoadWavefrontOBJ(fileBrowser.GetResult());
+        }
+
+        void Import(ResourceManager &rscMgr, const AGZ::ConfigGroup &root, const AGZ::ConfigGroup &params, const ImportContext &ctx) override
+        {
+            filename_.Import(params["filename"].AsValue(), ctx);
+            LoadWavefrontOBJ(filename_.GetFilename());
         }
     };
 }
