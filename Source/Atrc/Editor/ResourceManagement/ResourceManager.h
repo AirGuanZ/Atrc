@@ -564,8 +564,8 @@ public:
         }
 
         {
-            auto type = instance_ ? instance_->GetTypeName() : "?";
-            auto text = instance_ ? instance_->GetName().c_str() : "null";
+            const char *type = instance_ ? instance_->GetTypeName().c_str() : "?";
+            const char *text = instance_ ? instance_->GetName().c_str() : "null";
             ImGui::TextWrapped("[%s] %s", type, text);
         }
 
