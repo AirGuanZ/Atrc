@@ -15,12 +15,15 @@ Atrc已/将实现以下特性：
 - [x] [Lib] 已构建的BVH树会被自动缓存至`.agz.cache`中，优化启动时间
 - [x] [Lib] Torrance-Sparrow反射/折射模型、Oren-Nayar漫反射模型、镜面、玻璃、黑体等多种材质模型
 - [x] [Lib] Normalized Diffusion BSSRDF
+- [x] [Lib] 几何漫射光源和支持HDR贴图的环境光
+- [x] [Lib] Gamma校正和简单的Tone Mapping
+- [x] [Lib] Box、Gaussian等Windowed Film Filter
 - [x] [Lib] 支持体渲染、多重重要性光照采样等特性的Path Tracing
 - [x] [Editor] 实时编辑待渲染的场景，包括设置材质、几何体、光源、摄像机和各项渲染参数等
 - [x] [Editor] 导出和加载可被Launcher读取并用于渲染的场景描述脚本，也可在编辑器中直接进行渲染
 - [x] [SH2D] 将场景/环境光投影到1~5阶球谐函数上
 - [x] [SH2D] 从场景和环境光的球谐函数系数重建出图像，支持环境光系数的旋转
-- [ ] Disney BRDF
+- [ ] Disney BRDF（施工中）
 - [ ] Progressive Photon Mapping
 - [ ] Bidirectional Path Tracing
 
