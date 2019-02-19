@@ -7,6 +7,15 @@ namespace
         Vec3f top_ = Vec3f(1);
         Vec3f bottom_ = Vec3f(1);
 
+    protected:
+
+        void Export(const ResourceManager&, LauncherScriptExportingContext &ctx) const override
+        {
+            ctx.AddLine("type = Sky;");
+            ctx.AddLine("top = ", AGZ::To<char>(top_), ";");
+            ctx.AddLine("bottom = ", AGZ::To<char>(bottom_), ";");
+        }
+
     public:
 
         using LightInstance::LightInstance;
@@ -15,13 +24,6 @@ namespace
         {
             ImGui::ColorEdit3("top", &top_[0], ImGuiColorEditFlags_HDR | ImGuiColorEditFlags_Float);
             ImGui::ColorEdit3("bottom", &bottom_[0], ImGuiColorEditFlags_HDR | ImGuiColorEditFlags_Float);
-        }
-
-        void Export(const ResourceManager&, LauncherScriptExportingContext &ctx) const override
-        {
-            ctx.AddLine("type = Sky;");
-            ctx.AddLine("top = ", AGZ::To<char>(top_), ";");
-            ctx.AddLine("bottom = ", AGZ::To<char>(bottom_), ";");
         }
     };
 }

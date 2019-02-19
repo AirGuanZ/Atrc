@@ -8,6 +8,16 @@ namespace
         int taskGridSize_ = 16;
         PathTracingIntegratorSlot integratorSlot_;
 
+    protected:
+
+        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
+        {
+            ctx.AddLine("type = PathTracing;");
+            ExportSubResource("integrator", rscMgr, ctx, integratorSlot_);
+            ctx.AddLine("workerCount = ", workerCount_, ";");
+            ctx.AddLine("taskGridSize = ", taskGridSize_, ";");
+        }
+
     public:
 
         PathTracingRendererInstance(ResourceManager &rscMgr, std::string typeName, std::string name)
@@ -25,14 +35,6 @@ namespace
                 integratorSlot_.Display(rscMgr);
                 ImGui::TreePop();
             }
-        }
-
-        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
-        {
-            ctx.AddLine("type = PathTracing;");
-            ExportSubResource("integrator", rscMgr, ctx, integratorSlot_);
-            ctx.AddLine("workerCount = ", workerCount_, ";");
-            ctx.AddLine("taskGridSize = ", taskGridSize_, ";");
         }
     };
 }

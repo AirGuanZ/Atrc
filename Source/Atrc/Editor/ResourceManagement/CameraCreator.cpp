@@ -10,18 +10,7 @@ namespace
         float sensorHeight_ = 0.2f; // 只在autoAspect为false的情况下有意义
         Deg FOVy_ = Deg(60);
 
-    public:
-        
-        using CameraInstance::CameraInstance;
-
-        void Display(ResourceManager&) override
-        {
-            ImGui::Checkbox("auto aspect", &autoAspect_);
-            ImGui::InputFloat("sensor width", &sensorWidth_);
-            if(!autoAspect_)
-                ImGui::InputFloat("sensor height", &sensorHeight_);
-            ImGui::InputFloat("FOV", &FOVy_.value);
-        }
+    protected:
 
         void Export(const ResourceManager&, LauncherScriptExportingContext &ctx) const override
         {
@@ -42,6 +31,19 @@ namespace
             ctx.AddLine("pos = ", AGZ::To<char>(cam->GetPosition()), ";");
             ctx.AddLine("lookAt = ", AGZ::To<char>(cam->GetLookAt()), ";");
             ctx.AddLine("up = (0, 1, 0);");
+        }
+
+    public:
+        
+        using CameraInstance::CameraInstance;
+
+        void Display(ResourceManager&) override
+        {
+            ImGui::Checkbox("auto aspect", &autoAspect_);
+            ImGui::InputFloat("sensor width", &sensorWidth_);
+            if(!autoAspect_)
+                ImGui::InputFloat("sensor height", &sensorHeight_);
+            ImGui::InputFloat("FOV", &FOVy_.value);
         }
 
         ProjData GetProjData(float dstAspectRatio) const override

@@ -8,6 +8,16 @@ namespace
         int seed_ = 42;
         int spp_ = 100;
 
+    protected:
+
+        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
+        {
+            ctx.AddLine("type = Native;");
+            ctx.AddLine("spp = ", spp_, ";");
+            if(hasSeed_)
+                ctx.AddLine("seed = ", seed_, ";");
+        }
+
     public:
 
         using SamplerInstance::SamplerInstance;
@@ -18,14 +28,6 @@ namespace
             if(hasSeed_)
                 ImGui::InputInt("seed", &seed_, 0);
             ImGui::InputInt("spp", &spp_, 0);
-        }
-
-        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
-        {
-            ctx.AddLine("type = Native;");
-            ctx.AddLine("spp = ", spp_, ";");
-            if(hasSeed_)
-                ctx.AddLine("seed = ", seed_, ";");
         }
     };
 }

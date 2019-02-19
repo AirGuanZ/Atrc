@@ -9,6 +9,17 @@ namespace
         float contProb_ = 0.9f;
         bool sampleAllLights_ = true;
 
+    protected:
+
+        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
+        {
+            ctx.AddLine("type = Full;");
+            ctx.AddLine("minDepth = ", minDepth_, ";");
+            ctx.AddLine("maxDepth = ", maxDepth_, ";");
+            ctx.AddLine("contProb = ", contProb_, ";");
+            ctx.AddLine("sampleAllLights = ", sampleAllLights_ ? "True" : "False", ";");
+        }
+
     public:
 
         using PathTracingIntegratorInstance::PathTracingIntegratorInstance;
@@ -19,15 +30,6 @@ namespace
             ImGui::InputInt("max depth", &maxDepth_, 0);
             ImGui::InputFloat("cont prob", &contProb_);
             ImGui::Checkbox("sample all lights", &sampleAllLights_);
-        }
-
-        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
-        {
-            ctx.AddLine("type = Full;");
-            ctx.AddLine("minDepth = ", minDepth_, ";");
-            ctx.AddLine("maxDepth = ", maxDepth_, ";");
-            ctx.AddLine("contProb = ", contProb_, ";");
-            ctx.AddLine("sampleAllLights = ", sampleAllLights_ ? "True" : "False", ";");
         }
     };
 
@@ -38,6 +40,17 @@ namespace
         float contProb_ = 0.9f;
         bool sampleAllLights_ = true;
 
+    protected:
+
+        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
+        {
+            ctx.AddLine("type = Full;");
+            ctx.AddLine("minDepth = ", minDepth_, ";");
+            ctx.AddLine("maxDepth = ", maxDepth_, ";");
+            ctx.AddLine("contProb = ", contProb_, ";");
+            ctx.AddLine("sampleAllLights = ", sampleAllLights_ ? "True" : "False", ";");
+        }
+
     public:
 
         using PathTracingIntegratorInstance::PathTracingIntegratorInstance;
@@ -49,15 +62,6 @@ namespace
             ImGui::InputFloat("cont prob", &contProb_);
             ImGui::Checkbox("sample all lights", &sampleAllLights_);
         }
-
-        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
-        {
-            ctx.AddLine("type = Full;");
-            ctx.AddLine("minDepth = ", minDepth_, ";");
-            ctx.AddLine("maxDepth = ", maxDepth_, ";");
-            ctx.AddLine("contProb = ", contProb_, ";");
-            ctx.AddLine("sampleAllLights = ", sampleAllLights_ ? "True" : "False", ";");
-        }
     };
 
     class NativePathTracingIntegratorInstance : public PathTracingIntegratorInstance
@@ -65,6 +69,16 @@ namespace
         int minDepth_ = 5;
         int maxDepth_ = 50;
         float contProb_ = 0.9f;
+
+    protected:
+
+        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
+        {
+            ctx.AddLine("type = Native;");
+            ctx.AddLine("minDepth = ", minDepth_, ";");
+            ctx.AddLine("maxDepth = ", maxDepth_, ";");
+            ctx.AddLine("contProb = ", contProb_, ";");
+        }
 
     public:
 
@@ -75,14 +89,6 @@ namespace
             ImGui::InputInt("min depth", &minDepth_, 0);
             ImGui::InputInt("max depth", &maxDepth_, 0);
             ImGui::InputFloat("cont prob", &contProb_);
-        }
-
-        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
-        {
-            ctx.AddLine("type = Native;");
-            ctx.AddLine("minDepth = ", minDepth_, ";");
-            ctx.AddLine("maxDepth = ", maxDepth_, ";");
-            ctx.AddLine("contProb = ", contProb_, ";");
         }
     };
 }

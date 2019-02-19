@@ -6,6 +6,16 @@ namespace
     {
         Vec3f etaI_, etaT_, k_;
 
+    protected:
+
+        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
+        {
+            ctx.AddLine("type = Conductor;");
+            ctx.AddLine("etaI = ", AGZ::To<char>(etaI_), ";");
+            ctx.AddLine("etaT = ", AGZ::To<char>(etaT_), ";");
+            ctx.AddLine("k = ", AGZ::To<char>(k_), ";");
+        }
+
     public:
 
         using FresnelInstance::FresnelInstance;
@@ -16,14 +26,6 @@ namespace
             ImGui::InputFloat3("etaT", &etaT_[0]);
             ImGui::InputFloat3("k", &k_[0]);
         }
-
-        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
-        {
-            ctx.AddLine("type = Conductor;");
-            ctx.AddLine("etaI = ", AGZ::To<char>(etaI_), ";");
-            ctx.AddLine("etaT = ", AGZ::To<char>(etaT_), ";");
-            ctx.AddLine("k = ", AGZ::To<char>(k_), ";");
-        }
     };
 
     class FresnelDielectricInstance : public FresnelInstance
@@ -31,6 +33,13 @@ namespace
     protected:
 
         float etaI_ = 0, etaT_ = 0;
+
+        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
+        {
+            ctx.AddLine("type = Dielectric;");
+            ctx.AddLine("etaI = ", std::to_string(etaI_), ";");
+            ctx.AddLine("etaT = ", std::to_string(etaT_), ";");
+        }
 
     public:
 
@@ -41,20 +50,11 @@ namespace
             ImGui::InputFloat("etaI", &etaI_);
             ImGui::InputFloat("etaT", &etaT_);
         }
-
-        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
-        {
-            ctx.AddLine("type = Dielectric;");
-            ctx.AddLine("etaI = ", std::to_string(etaI_), ";");
-            ctx.AddLine("etaT = ", std::to_string(etaT_), ";");
-        }
     };
 
     class FresnelSchlickInstance : public FresnelDielectricInstance
     {
-    public:
-
-        using FresnelDielectricInstance::FresnelDielectricInstance;
+    protected:
 
         void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
         {
@@ -62,6 +62,10 @@ namespace
             ctx.AddLine("etaI = ", std::to_string(etaI_), ";");
             ctx.AddLine("etaT = ", std::to_string(etaT_), ";");
         }
+
+    public:
+
+        using FresnelDielectricInstance::FresnelDielectricInstance;
     };
 }
 

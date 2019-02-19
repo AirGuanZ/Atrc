@@ -8,6 +8,16 @@ namespace
         TextureSlot roughness_;
         FresnelSlot fresnel_;
 
+    protected:
+
+        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
+        {
+            ctx.AddLine("type = GGXDielectric;");
+            ExportSubResource("rc", rscMgr, ctx, rc_);
+            ExportSubResource("roughness", rscMgr, ctx, roughness_);
+            ExportSubResource("fresnel", rscMgr, ctx, fresnel_);
+        }
+
     public:
 
         using MaterialInstance::MaterialInstance;
@@ -29,14 +39,6 @@ namespace
                 fresnel_.Display(rscMgr);
                 ImGui::TreePop();
             }
-        }
-
-        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
-        {
-            ctx.AddLine("type = GGXDielectric;");
-            ExportSubResource("rc", rscMgr, ctx, rc_);
-            ExportSubResource("roughness", rscMgr, ctx, roughness_);
-            ExportSubResource("fresnel", rscMgr, ctx, fresnel_);
         }
     };
 
@@ -46,6 +48,16 @@ namespace
         TextureSlot roughness_;
         FresnelSlot fresnel_;
 
+    protected:
+
+        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
+        {
+            ctx.AddLine("type = GGXMetal;");
+            ExportSubResource("rc", rscMgr, ctx, rc_);
+            ExportSubResource("roughness", rscMgr, ctx, roughness_);
+            ExportSubResource("fresnel", rscMgr, ctx, fresnel_);
+        }
+
     public:
 
         using MaterialInstance::MaterialInstance;
@@ -68,33 +80,35 @@ namespace
                 ImGui::TreePop();
             }
         }
-
-        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
-        {
-            ctx.AddLine("type = GGXMetal;");
-            ExportSubResource("rc", rscMgr, ctx, rc_);
-            ExportSubResource("roughness", rscMgr, ctx, roughness_);
-            ExportSubResource("fresnel", rscMgr, ctx, fresnel_);
-        }
     };
 
     class IdealBlackInstance : public MaterialInstance
     {
-    public:
-
-        using MaterialInstance::MaterialInstance;
-
-        void Display(ResourceManager&) override { }
+    protected:
 
         void Export(const ResourceManager&, LauncherScriptExportingContext &ctx) const override
         {
             ctx.AddLine("type = IdealBlack;");
         }
+
+    public:
+
+        using MaterialInstance::MaterialInstance;
+
+        void Display(ResourceManager&) override { }
     };
 
     class IdealDiffuseInstance : public MaterialInstance
     {
         TextureSlot albedo_;
+
+    protected:
+
+        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
+        {
+            ctx.AddLine("type = IdealDiffuse;");
+            ExportSubResource("albedo", rscMgr, ctx, albedo_);
+        }
 
     public:
 
@@ -112,18 +126,21 @@ namespace
                 ImGui::TreePop();
             }
         }
-
-        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
-        {
-            ctx.AddLine("type = IdealDiffuse;");
-            ExportSubResource("albedo", rscMgr, ctx, albedo_);
-        }
     };
 
     class IdealMirrorInstance : public MaterialInstance
     {
         TextureSlot rc_;
         FresnelSlot fresnel_;
+
+    protected:
+
+        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
+        {
+            ctx.AddLine("type = IdealMirror;");
+            ExportSubResource("rc", rscMgr, ctx, rc_);
+            ExportSubResource("fresnel", rscMgr, ctx, fresnel_);
+        }
 
     public:
 
@@ -142,19 +159,21 @@ namespace
                 ImGui::TreePop();
             }
         }
-
-        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
-        {
-            ctx.AddLine("type = IdealMirror;");
-            ExportSubResource("rc", rscMgr, ctx, rc_);
-            ExportSubResource("fresnel", rscMgr, ctx, fresnel_);
-        }
     };
 
     class IdealScalerInstance : public MaterialInstance
     {
         TextureSlot scale_;
         MaterialSlot internal_;
+
+    protected:
+
+        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
+        {
+            ctx.AddLine("type = IdealScaler;");
+            ExportSubResource("scale", rscMgr, ctx, scale_);
+            ExportSubResource("internal", rscMgr, ctx, internal_);
+        }
 
     public:
 
@@ -173,19 +192,21 @@ namespace
                 ImGui::TreePop();
             }
         }
-
-        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
-        {
-            ctx.AddLine("type = IdealScaler;");
-            ExportSubResource("scale", rscMgr, ctx, scale_);
-            ExportSubResource("internal", rscMgr, ctx, internal_);
-        }
     };
 
     class IdealSpecularInstance : public MaterialInstance
     {
         TextureSlot rc_;
         FresnelSlot dielectric_;
+
+    protected:
+
+        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
+        {
+            ctx.AddLine("type = IdealSpecular;");
+            ExportSubResource("rc", rscMgr, ctx, rc_);
+            ExportSubResource("fresnel", rscMgr, ctx, dielectric_);
+        }
 
     public:
 
@@ -204,27 +225,22 @@ namespace
                 ImGui::TreePop();
             }
         }
-
-        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
-        {
-            ctx.AddLine("type = IdealSpecular;");
-            ExportSubResource("rc", rscMgr, ctx, rc_);
-            ExportSubResource("fresnel", rscMgr, ctx, dielectric_);
-        }
     };
 
     class InvisibleSurfaceInstance : public MaterialInstance
     {
-    public:
-
-        using MaterialInstance::MaterialInstance;
-
-        void Display(ResourceManager&) override { }
+    protected:
 
         void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
         {
             ctx.AddLine("type = Invisible;");
         }
+
+    public:
+
+        using MaterialInstance::MaterialInstance;
+
+        void Display(ResourceManager&) override { }
     };
 
     class NormalizedDiffusionBSSRDFInstance : public MaterialInstance
@@ -233,6 +249,17 @@ namespace
         TextureSlot A_;
         TextureSlot dmfp_;
         float eta_ = 0;
+
+    protected:
+
+        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
+        {
+            ctx.AddLine("type = BSSRDF;");
+            ExportSubResource("surface", rscMgr, ctx, surface_);
+            ExportSubResource("A", rscMgr, ctx, A_);
+            ExportSubResource("dmfp", rscMgr, ctx, dmfp_);
+            ctx.AddLine("eta = ", std::to_string(eta_), ";");
+        }
 
     public:
 
@@ -257,21 +284,21 @@ namespace
                 ImGui::TreePop();
             }
         }
-
-        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
-        {
-            ctx.AddLine("type = BSSRDF;");
-            ExportSubResource("surface", rscMgr, ctx, surface_);
-            ExportSubResource("A", rscMgr, ctx, A_);
-            ExportSubResource("dmfp", rscMgr, ctx, dmfp_);
-            ctx.AddLine("eta = ", std::to_string(eta_), ";");
-        }
     };
 
     class ONMatteInstance : public MaterialInstance
     {
         TextureSlot albedo_;
         TextureSlot sigma_;
+
+    protected:
+
+        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
+        {
+            ctx.AddLine("type = ONMatte;");
+            ExportSubResource("albedo", rscMgr, ctx, albedo_);
+            ExportSubResource("sigma", rscMgr, ctx, sigma_);
+        }
 
     public:
 
@@ -290,13 +317,6 @@ namespace
                 ImGui::TreePop();
             }
         }
-
-        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
-        {
-            ctx.AddLine("type = ONMatte;");
-            ExportSubResource("albedo", rscMgr, ctx, albedo_);
-            ExportSubResource("sigma", rscMgr, ctx, sigma_);
-        }
     };
 
     class TSMetalInstance : public MaterialInstance
@@ -304,6 +324,16 @@ namespace
         TextureSlot rc_;
         TextureSlot roughness_;
         FresnelSlot fresnel_;
+
+    protected:
+
+        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
+        {
+            ctx.AddLine("type = TSMetal;");
+            ExportSubResource("rc", rscMgr, ctx, rc_);
+            ExportSubResource("roughness", rscMgr, ctx, roughness_);
+            ExportSubResource("fresnel", rscMgr, ctx, fresnel_);
+        }
 
     public:
 
@@ -326,14 +356,6 @@ namespace
                 fresnel_.Display(rscMgr);
                 ImGui::TreePop();
             }
-        }
-
-        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
-        {
-            ctx.AddLine("type = TSMetal;");
-            ExportSubResource("rc", rscMgr, ctx, rc_);
-            ExportSubResource("roughness", rscMgr, ctx, roughness_);
-            ExportSubResource("fresnel", rscMgr, ctx, fresnel_);
         }
     };
 }

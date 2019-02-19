@@ -28,6 +28,10 @@ class IResource : public AGZ::Uncopiable
     std::string instanceName_;
     bool isInPool_;
 
+protected:
+
+    virtual void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const = 0;
+
 public:
 
     explicit IResource(std::string typeName, std::string name) noexcept
@@ -84,8 +88,6 @@ public:
         else
             Export(rscMgr, ctx);
     }
-
-    virtual void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const = 0;
 
     virtual void Import(const ResourceManager &rscMgr, const AGZ::ConfigGroup &root, const AGZ::ConfigGroup &params) { }
 };

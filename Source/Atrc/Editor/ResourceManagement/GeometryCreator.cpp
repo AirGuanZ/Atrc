@@ -50,6 +50,20 @@ namespace
             vtxBuf_->ReinitializeData(vtxData, 3, GL_STATIC_DRAW);
         }
 
+    protected:
+
+        void Export(const ResourceManager&, LauncherScriptExportingContext &ctx) const override
+        {
+            ctx.AddLine("type = Triangle;");
+            ctx.AddLine("A = ", AGZ::To<char>(A_), ";");
+            ctx.AddLine("B = ", AGZ::To<char>(B_), ";");
+            ctx.AddLine("C = ", AGZ::To<char>(C_), ";");
+            ctx.AddLine("tA = (0, 0);");
+            ctx.AddLine("tB = (0, 0);");
+            ctx.AddLine("tC = (0, 0);");
+            ExportTransform(ctx);
+        }
+
     public:
 
         explicit TriangleInstance(std::string typeName, std::string name)
@@ -114,18 +128,6 @@ namespace
             UpdateNormal();
             UpdateVertexBuffer();
         }
-
-        void Export(const ResourceManager&, LauncherScriptExportingContext &ctx) const override
-        {
-            ctx.AddLine("type = Triangle;");
-            ctx.AddLine("A = ", AGZ::To<char>(A_), ";");
-            ctx.AddLine("B = ", AGZ::To<char>(B_), ";");
-            ctx.AddLine("C = ", AGZ::To<char>(C_), ";");
-            ctx.AddLine("tA = (0, 0);");
-            ctx.AddLine("tB = (0, 0);");
-            ctx.AddLine("tC = (0, 0);");
-            ExportTransform(ctx);
-        }
     };
 
     class WavefrontOBJInstance : public GeometryInstance
@@ -182,6 +184,15 @@ namespace
             clearGuard.Dismiss();
         }
 
+    protected:
+
+        void Export(const ResourceManager&, LauncherScriptExportingContext &ctx) const override
+        {
+            ctx.AddLine("type = TriangleBVH;");
+            ctx.AddLine("filename = \"", filename_.GetExportedFilename(ctx), "\";");
+            ExportTransform(ctx);
+        }
+
     public:
 
         using GeometryInstance::GeometryInstance;
@@ -197,13 +208,6 @@ namespace
             std::transform(begin(meshGroup_.submeshes), end(meshGroup_.submeshes), std::back_inserter(ret),
                 [](auto &it) { return it.first; });
             return ret;
-        }
-
-        void Export(const ResourceManager&, LauncherScriptExportingContext &ctx) const override
-        {
-            ctx.AddLine("type = TriangleBVH;");
-            ctx.AddLine("filename = \"", filename_.GetExportedFilename(ctx), "\";");
-            ExportTransform(ctx);
         }
 
         void DisplayEditing(const Mat4f &, const Mat4f&, const Mat4f&, bool) override

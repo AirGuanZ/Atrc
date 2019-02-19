@@ -6,6 +6,14 @@ namespace
     {
         float sidelen_ = 1;
 
+    protected:
+
+        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
+        {
+            ctx.AddLine("type = Box;");
+            ctx.AddLine("sidelen = ", sidelen_, ";");
+        }
+
     public:
 
         using FilmFilterInstance::FilmFilterInstance;
@@ -14,18 +22,21 @@ namespace
         {
             ImGui::InputFloat("sidelen", &sidelen_);
         }
-
-        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
-        {
-            ctx.AddLine("type = Box;");
-            ctx.AddLine("sidelen = ", sidelen_, ";");
-        }
     };
 
     class GaussianFilterInstance : public FilmFilterInstance
     {
         float radius_ = 0.7f;
         float alpha_ = 2;
+
+    protected:
+
+        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
+        {
+            ctx.AddLine("type = Gaussian;");
+            ctx.AddLine("radius = ", std::to_string(radius_), ";");
+            ctx.AddLine("alpha = ", std::to_string(alpha_), ";");
+        }
 
     public:
 
@@ -35,13 +46,6 @@ namespace
         {
             ImGui::InputFloat("radius.x", &radius_);
             ImGui::InputFloat("alpha", &alpha_);
-        }
-
-        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
-        {
-            ctx.AddLine("type = Gaussian;");
-            ctx.AddLine("radius = ", std::to_string(radius_), ";");
-            ctx.AddLine("alpha = ", std::to_string(alpha_), ";");
         }
     };
 }

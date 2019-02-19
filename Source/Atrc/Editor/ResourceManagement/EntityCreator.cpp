@@ -144,6 +144,17 @@ namespace
     {
         Vec3f radiance_ = Vec3f(1);
 
+    protected:
+
+        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
+        {
+            ctx.AddLine("type = GeometricDiffuse;");
+            ctx.entityController = &controller_;
+            ExportSubResource("geometry", rscMgr, ctx, geometry_);
+            ctx.entityController = nullptr;
+            ctx.AddLine("radiance = ", AGZ::To<char>(radiance_), ";");
+        }
+
     public:
 
         using TransformedGeometricEntityBase::TransformedGeometricEntityBase;
@@ -163,20 +174,22 @@ namespace
             }
             DisplayController(proj, view, renderController);
         }
-
-        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
-        {
-            ctx.AddLine("type = GeometricDiffuse;");
-            ctx.entityController = &controller_;
-            ExportSubResource("geometry", rscMgr, ctx, geometry_);
-            ctx.entityController = nullptr;
-            ctx.AddLine("radiance = ", AGZ::To<char>(radiance_), ";");
-        }
     };
 
     class GeometricEntityInstance : public TransformedGeometricEntityBase
     {
         MaterialSlot material_;
+
+    protected:
+
+        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
+        {
+            ctx.AddLine("type = Geometric;");
+            ctx.entityController = &controller_;
+            ExportSubResource("geometry", rscMgr, ctx, geometry_);
+            ctx.entityController = nullptr;
+            ExportSubResource("material", rscMgr, ctx, material_);
+        }
 
     public:
 
@@ -196,15 +209,6 @@ namespace
                 ImGui::TreePop();
             }
             DisplayController(proj, view, renderController);
-        }
-
-        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
-        {
-            ctx.AddLine("type = Geometric;");
-            ctx.entityController = &controller_;
-            ExportSubResource("geometry", rscMgr, ctx, geometry_);
-            ctx.entityController = nullptr;
-            ExportSubResource("material", rscMgr, ctx, material_);
         }
     };
 }

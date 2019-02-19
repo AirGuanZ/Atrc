@@ -7,6 +7,14 @@ namespace
     {
         Vec3f texel_;
 
+    protected:
+
+        void Export(const ResourceManager&, LauncherScriptExportingContext &ctx) const override
+        {
+            ctx.AddLine("type = Constant;");
+            ctx.AddLine("texel = ", AGZ::To<char>(texel_), ";");
+        }
+
     public:
 
         using TextureInstance::TextureInstance;
@@ -15,17 +23,19 @@ namespace
         {
             ImGui::ColorEdit3("texel", &texel_[0], ImGuiColorEditFlags_HDR | ImGuiColorEditFlags_Float);
         }
-
-        void Export(const ResourceManager&, LauncherScriptExportingContext &ctx) const override
-        {
-            ctx.AddLine("type = Constant;");
-            ctx.AddLine("texel = ", AGZ::To<char>(texel_), ";");
-        }
     };
 
     class Constant1TextureInstance : public TextureInstance
     {
         float texel_ = 0;
+
+    protected:
+
+        void Export(const ResourceManager&, LauncherScriptExportingContext &ctx) const override
+        {
+            ctx.AddLine("type = Constant1;");
+            ctx.AddLine("texel = ", texel_, ";");
+        }
 
     public:
 
@@ -35,17 +45,19 @@ namespace
         {
             ImGui::InputFloat("texel", &texel_, 0.01f, 0.1f, 7);
         }
-
-        void Export(const ResourceManager&, LauncherScriptExportingContext &ctx) const override
-        {
-            ctx.AddLine("type = Constant1;");
-            ctx.AddLine("texel = ", texel_, ";");
-        }
     };
 
     class ImageTextureInstance : public TextureInstance
     {
         TFilenameSlot<true> filenameSlot_;
+
+    protected:
+
+        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
+        {
+            ctx.AddLine("type = Image;");
+            ctx.AddLine("filename = \"", filenameSlot_.GetExportedFilename(ctx), "\";");
+        }
         
     public:
 
@@ -55,12 +67,6 @@ namespace
         {
             static FileBrowser fileBrowser("browse image filename", false, "");
             filenameSlot_.Display(fileBrowser);
-        }
-
-        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
-        {
-            ctx.AddLine("type = Image;");
-            ctx.AddLine("filename = \"", filenameSlot_.GetExportedFilename(ctx), "\";");
         }
     };
 }
