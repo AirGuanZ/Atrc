@@ -14,7 +14,7 @@ Lib已/将实现以下特性：
 - [x] Torrance-Sparrow Reflection Model & Oren-Nayar Reflection Model
 - [x] Normalized Diffusion BSSRDF
 - [x] Torrance-Sparrow Transmission Model
-- [ ] Saving/loading of Editor
+- [x] Saving/loading of Editor
 - [ ] Disney BRDF
 - [ ] Progressive Photon Mapping
 - [ ] Bidirectional Path Tracing
@@ -37,8 +37,6 @@ mkdir Build64
 cd Build64
 cmake -G "Visual Studio 15 2017 Win64" ..
 ```
-
-即可。
 
 ## Configuration Script
 
