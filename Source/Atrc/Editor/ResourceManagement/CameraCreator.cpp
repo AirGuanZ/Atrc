@@ -1,5 +1,7 @@
 #include <Atrc/Editor/ResourceManagement/CameraCreator.h>
 #include <Atrc/Editor/Global.h>
+#include "Atrc/Mgr/Common.h"
+#include "Atrc/Mgr/Parser.h"
 
 namespace
 {
@@ -72,6 +74,30 @@ namespace
             ret.projMatrix = Mat4f::Perspective(alpha, fbAspectRatio, 0.1f, 1000.0f);
 
             return ret;
+        }
+
+        void Import(const ResourceManager &rscMgr, const AGZ::ConfigGroup &root, const AGZ::ConfigGroup &params) override
+        {
+            sensorWidth_ = std::stof(params["sensorWidth"].AsValue());
+
+            if(auto nSensorHeight = params.Find("sensorHeight"))
+            {
+                autoAspect_ = false;
+                sensorHeight_ = std::stof(nSensorHeight->AsValue());
+            }
+            else
+                autoAspect_ = true;
+
+            float sensorDistance = std::stof(params["sensorDistance"].AsValue());
+
+            if(autoAspect_)
+            {
+                Vec2i filmSize = Atrc::Mgr::Parser::ParseVec2i(root["film.size"]);
+                float autoSensorHeight = sensorWidth_ * filmSize.y / filmSize.x;
+                FOVy_ = Deg(Rad(2 * AGZ::Math::Arctan(autoSensorHeight / 2 / sensorDistance)));
+            }
+            else
+                FOVy_ = Deg(Rad(2 * AGZ::Math::Arctan(sensorHeight_ / 2 / sensorDistance)));
         }
     };
 }

@@ -30,6 +30,7 @@ bld/
 [Oo]bj/
 [Ll]og/
 
+scene.txt
 Output.png
 
 *.o
