@@ -30,9 +30,11 @@ Atrc使用了大量C++17特性，因此只能用版本较新的编译器构建�
 
 Atrc依赖于[glfw](https://www.glfw.org/)、[glew](http://glew.sourceforge.net/)、[dear imgui](https://github.com/ocornut/imgui)以及[AGZ Utils](https://github.com/AirGuanZ/Utils)。其中[glfw](https://www.glfw.org/)和[glew](http://glew.sourceforge.net/)需要提前安装，[dear imgui](https://github.com/ocornut/imgui)已包含在源代码中，[AGZ Utils](https://github.com/AirGuanZ/Utils)则是head-only的，将环境变量`AGZ_UTILS_HOME`设置为其中的`Src`目录即可。
 
-以产生MSVC x64 Solution为例，首先移动到项目根目录下，在`Powershell`中输入：
+以产生MSVC x64 Solution为例，首先移动到要放置项目的目录下，在`Powershell`中输入：
 
 ```powershell
+git clone --recursive https://github.com/AirGuanZ/Atrc.git
+cd Atrc
 mkdir Build64
 cd Build64
 cmake -G "Visual Studio 15 2017 Win64" ..
