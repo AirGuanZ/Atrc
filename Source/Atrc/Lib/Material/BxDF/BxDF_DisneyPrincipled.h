@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Atrc/Lib/Material/Utility/BxDF.h>
+#include <Atrc/Lib/Material/Utility/Fresnel.h>
 
 namespace Atrc
 {
@@ -20,6 +21,17 @@ class DisneyPrincipledBxDF : public BxDF
     Real clearCoat_;
     Real clearCoatGloss_;
 
+    Real gamma_;
+    const Fresnel *fresnel_;
+
+    Real Diffuse(const Vec3 &nWi, const Vec3 &nWo, Real cosThetaD) const;
+
+    Real Subsurface(const Vec3 &nWi, const Vec3 &nWo, Real cosThetaD) const;
+
+    Spectrum Specular(const Vec3 &nWi, const Vec3 &nWo, const Vec3 &nH) const;
+
+    Real ClearCoat(const Vec3 &nWi, const Vec3 &nWo, const Vec3 &nH, Real cosThetaD) const;
+
 public:
 
     DisneyPrincipledBxDF(
@@ -32,42 +44,16 @@ public:
         Real sheenTint,
         Real subsurface,
         Real clearCoat,
-        Real clearCoatGloss) noexcept
-        : BxDF(BSDFType(BSDF_REFLECTION | BSDF_GLOSSY)),
-          rc_            (rc),
-          roughness_     (roughness),
-          specular_      (specular),
-          specularTint_  (specularTint),
-          metallic_      (metallic),
-          sheen_         (sheen),
-          sheenTint_     (sheenTint),
-          subsurface_    (subsurface),
-          clearCoat_     (clearCoat),
-          clearCoatGloss_(clearCoatGloss)
-    {
+        Real clearCoatGloss,
+        const Fresnel *fresnel) noexcept;
 
-    }
+    Spectrum GetAlbedo() const noexcept override;
 
-    Spectrum Eval(const CoordSystem &geoInShd, const Vec3 &wi, const Vec3 &wo, bool star) const noexcept override
-    {
-        if(wi.z <= 0 || wo.z <= 0 || !geoInShd.InPositiveHemisphere(wi))
-            return Spectrum();
+    Spectrum Eval(const CoordSystem &geoInShd, const Vec3 &wi, const Vec3 &wo, bool star) const noexcept override;
 
-        // TODO
-        return Spectrum();
-    }
+    std::optional<SampleWiResult> SampleWi(const CoordSystem &geoInShd, const Vec3 &wo, bool star, const Vec3 &sample) const noexcept override;
 
-    std::optional<SampleWiResult> SampleWi(const CoordSystem &geoInShd, const Vec3 &wo, bool star, const Vec3 &sample) const noexcept override
-    {
-        // TODO
-        return std::nullopt;
-    }
-
-    Real SampleWiPDF(const CoordSystem &geoInShd, const Vec3 &wi, const Vec3 &wo, bool star) const noexcept override
-    {
-        // TODO
-        return 0;
-    }
+    Real SampleWiPDF(const CoordSystem &geoInShd, const Vec3 &wi, const Vec3 &wo, bool star) const noexcept override;
 };
 
 } // namespace Atrc

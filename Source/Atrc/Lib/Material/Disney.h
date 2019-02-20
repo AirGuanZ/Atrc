@@ -2,6 +2,7 @@
 
 #include <Atrc/Lib/Core/Material.h>
 #include <Atrc/Lib/Core/Texture.h>
+#include <Atrc/Lib/Material/Utility/Fresnel.h>
 #include <Atrc/Lib/Material/Utility/NormalMapper.h>
 
 namespace Atrc
@@ -20,6 +21,8 @@ class DisneyPrincipledMaterial : public Material
     const Texture *clearCoat_;
     const Texture *clearCoatGloss_;
 
+    const Fresnel *fresnel_;
+
     const NormalMapper *normalMapper_;
 
 public:
@@ -35,6 +38,7 @@ public:
         const Texture *subsurface,
         const Texture *clearCoat,
         const Texture *clearCoatGloss,
+        const Fresnel *fresnel,
         const NormalMapper *normalMapper) noexcept;
 
     ShadingPoint GetShadingPoint(const Intersection &inct, Arena &arena) const override;

@@ -17,6 +17,7 @@ DisneyPrincipledMaterial::DisneyPrincipledMaterial(
     const Texture *subsurface,
     const Texture *clearCoat,
     const Texture *clearCoatGloss,
+    const Fresnel *fresnel,
     const NormalMapper *normalMapper) noexcept
     : rc_            (rc),
       roughness_     (roughness),
@@ -28,11 +29,12 @@ DisneyPrincipledMaterial::DisneyPrincipledMaterial(
       subsurface_    (subsurface),
       clearCoat_     (clearCoat),
       clearCoatGloss_(clearCoatGloss),
+      fresnel_       (fresnel),
       normalMapper_  (normalMapper)
 {
     AGZ_ASSERT(rc && roughness && specular && specularTint && metallic);
     AGZ_ASSERT(sheen && sheenTint && subsurface && clearCoat && clearCoatGloss);
-    AGZ_ASSERT(normalMapper);
+    AGZ_ASSERT(fresnel && normalMapper);
 }
 
 ShadingPoint DisneyPrincipledMaterial::GetShadingPoint(const Intersection &inct, Arena &arena) const
