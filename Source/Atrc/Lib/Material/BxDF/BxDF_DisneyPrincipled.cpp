@@ -216,7 +216,7 @@ AGZ::Math::Color3<Real> DisneyPrincipledBxDF::GetAlbedo() const noexcept
     return rc_;
 }
 
-Spectrum DisneyPrincipledBxDF::Eval(const CoordSystem &geoInShd, const Vec3 &wi, const Vec3 &wo, bool star) const noexcept
+Spectrum DisneyPrincipledBxDF::Eval(const Vec3 &wi, const Vec3 &wo, bool star) const noexcept
 {
     if(wi.z <= 0 || wo.z <= 0 || !geoInShd.InPositiveHemisphere(wi))
         return Spectrum();
@@ -248,7 +248,7 @@ Spectrum DisneyPrincipledBxDF::Eval(const CoordSystem &geoInShd, const Vec3 &wi,
     return nonMetallic + specular + clearCoat;
 }
 
-std::optional<BxDF::SampleWiResult> DisneyPrincipledBxDF::SampleWi(const CoordSystem &geoInShd, const Vec3 &wo, bool star, const Vec3 &sample) const noexcept
+std::optional<BxDF::SampleWiResult> DisneyPrincipledBxDF::SampleWi(const Vec3 &wo, bool star, const Vec3 &sample) const noexcept
 {
     if(wo.z <= 0)
         return std::nullopt;
@@ -284,7 +284,7 @@ std::optional<BxDF::SampleWiResult> DisneyPrincipledBxDF::SampleWi(const CoordSy
     }
 }
 
-Real DisneyPrincipledBxDF::SampleWiPDF(const CoordSystem &geoInShd, const Vec3 &wi, const Vec3 &wo, bool star) const noexcept
+Real DisneyPrincipledBxDF::SampleWiPDF(const Vec3 &wi, const Vec3 &wo, bool star) const noexcept
 {
     // TODO
     return 0;

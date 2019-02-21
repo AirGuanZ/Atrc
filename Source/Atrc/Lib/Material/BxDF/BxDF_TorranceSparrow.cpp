@@ -14,9 +14,9 @@ Spectrum BxDF_TorranceSparrowReflection::GetAlbedo() const noexcept
     return rc_;
 }
 
-Spectrum BxDF_TorranceSparrowReflection::Eval(const CoordSystem &geoInShd, const Vec3 &wi, const Vec3 &wo, [[maybe_unused]] bool star) const noexcept
+Spectrum BxDF_TorranceSparrowReflection::Eval(const Vec3 &wi, const Vec3 &wo, [[maybe_unused]] bool star) const noexcept
 {
-    if(wi.z <= 0 || wo.z <= 0 || !geoInShd.InPositiveHemisphere(wi) || !geoInShd.InPositiveHemisphere(wo))
+    if(wi.z <= 0 || wo.z <= 0)
         return Spectrum();
 
     Vec3 nWi = wi.Normalize(), nWo = wo.Normalize();
@@ -28,15 +28,15 @@ Spectrum BxDF_TorranceSparrowReflection::Eval(const CoordSystem &geoInShd, const
     return rc_ * fr * md_->D(H) * G / (4 * nWi.z * nWo.z);
 }
 
-std::optional<BxDF::SampleWiResult> BxDF_TorranceSparrowReflection::SampleWi(const CoordSystem &geoInShd, const Vec3 &wo, bool star, const Vec3 &sample) const noexcept
+std::optional<BxDF::SampleWiResult> BxDF_TorranceSparrowReflection::SampleWi(const Vec3 &wo, bool star, const Vec3 &sample) const noexcept
 {
     Vec3 nWo = wo.Normalize();
-    auto mdSample = md_->SampleWi(geoInShd, nWo, sample.xy());
+    auto mdSample = md_->SampleWi(nWo, sample.xy());
     if(!mdSample)
         return std::nullopt;
 
     SampleWiResult ret;
-    ret.coef = Eval(geoInShd, mdSample->wi, wo, star);
+    ret.coef = Eval(mdSample->wi, wo, star);
     if(!ret.coef)
         return std::nullopt;
     ret.wi      = mdSample->wi;
@@ -47,11 +47,11 @@ std::optional<BxDF::SampleWiResult> BxDF_TorranceSparrowReflection::SampleWi(con
     return ret;
 }
 
-Real BxDF_TorranceSparrowReflection::SampleWiPDF(const CoordSystem &geoInShd, const Vec3 &wi, const Vec3 &wo, [[maybe_unused]] bool star) const noexcept
+Real BxDF_TorranceSparrowReflection::SampleWiPDF(const Vec3 &wi, const Vec3 &wo, [[maybe_unused]] bool star) const noexcept
 {
-    if(wi.z <= 0 || wo.z <= 0 || !geoInShd.InPositiveHemisphere(wi) || !geoInShd.InPositiveHemisphere(wo))
+    if(wi.z <= 0 || wo.z <= 0)
         return 0;
-    return md_->SampleWiPDF(geoInShd, wi.Normalize(), wo.Normalize());
+    return md_->SampleWiPDF(wi.Normalize(), wo.Normalize());
 }
 
 } // namespace Atrc

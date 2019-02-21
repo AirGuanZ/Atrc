@@ -25,11 +25,11 @@ public:
 
     virtual Spectrum GetAlbedo() const noexcept = 0;
 
-    virtual Spectrum Eval(const CoordSystem &geoInShd, const Vec3 &wi, const Vec3 &wo, bool star) const noexcept = 0;
+    virtual Spectrum Eval(const Vec3 &wi, const Vec3 &wo, bool star) const noexcept = 0;
 
-    virtual std::optional<SampleWiResult> SampleWi(const CoordSystem &geoInShd, const Vec3 &wo, bool star, const Vec3 &sample) const noexcept;
+    virtual std::optional<SampleWiResult> SampleWi(const Vec3 &wo, bool star, const Vec3 &sample) const noexcept;
 
-    virtual Real SampleWiPDF(const CoordSystem &geoInShd, const Vec3 &wi, const Vec3 &wo, bool star) const noexcept;
+    virtual Real SampleWiPDF(const Vec3 &wi, const Vec3 &wo, bool star) const noexcept;
 };
 
 // ================================= Implementation
@@ -50,18 +50,18 @@ inline bool BxDF::MatchType(BSDFType type) const noexcept
     return Contains(type, GetType());
 }
 
-inline std::optional<BxDF::SampleWiResult> BxDF::SampleWi(const CoordSystem &geoInShd, const Vec3 &wo, bool star, const Vec3 &sample) const noexcept
+inline std::optional<BxDF::SampleWiResult> BxDF::SampleWi(const Vec3 &wo, bool star, const Vec3 &sample) const noexcept
 {
-    if(wo.z <= 0 || !geoInShd.InPositiveHemisphere(wo))
+    if(wo.z <= 0)
         return std::nullopt;
 
-    auto[sam, pdf] = AGZ::Math::DistributionTransform
+    auto [sam, pdf] = AGZ::Math::DistributionTransform
         ::ZWeightedOnUnitHemisphere<Real>::Transform(sample.xy());
-    if(!geoInShd.InPositiveHemisphere(sam) || !pdf)
+    if(sam.z <= 0 || !pdf)
         return std::nullopt;
 
     SampleWiResult ret;
-    ret.coef    = Eval(geoInShd, sam, wo, star);
+    ret.coef    = Eval(sam, wo, star);
     ret.pdf     = pdf;
     ret.type    = type_;
     ret.wi      = sam;
@@ -69,9 +69,9 @@ inline std::optional<BxDF::SampleWiResult> BxDF::SampleWi(const CoordSystem &geo
     return ret;
 }
 
-inline Real BxDF::SampleWiPDF(const CoordSystem &geoInShd, const Vec3 &wi, const Vec3 &wo, [[maybe_unused]] bool star) const noexcept
+inline Real BxDF::SampleWiPDF(const Vec3 &wi, const Vec3 &wo, [[maybe_unused]] bool star) const noexcept
 {
-    if(wi.z <= 0 || wo.z <= 0 || !geoInShd.InPositiveHemisphere(wi) || !geoInShd.InPositiveHemisphere(wo))
+    if(wi.z <= 0 || wo.z <= 0)
         return 0;
     return AGZ::Math::DistributionTransform::ZWeightedOnUnitHemisphere<Real>::PDF(wi.Normalize());
 }

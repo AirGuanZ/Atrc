@@ -115,9 +115,9 @@ Spectrum BxDF_MicrofacetReflection::GetAlbedo() const noexcept
     return rc_;
 }
 
-Spectrum BxDF_MicrofacetReflection::Eval(const CoordSystem &geoInShd, const Vec3 &wi, const Vec3 &wo, bool star) const noexcept
+Spectrum BxDF_MicrofacetReflection::Eval(const Vec3 &wi, const Vec3 &wo, bool star) const noexcept
 {
-    if(wi.z <= 0 || wo.z <= 0 || !geoInShd.InPositiveHemisphere(wi) || !geoInShd.InPositiveHemisphere(wo))
+    if(wi.z <= 0 || wo.z <= 0)
         return Spectrum();
 
     Vec3 nWi = wi.Normalize(), nWo = wo.Normalize();
@@ -132,9 +132,9 @@ Spectrum BxDF_MicrofacetReflection::Eval(const CoordSystem &geoInShd, const Vec3
     return rc_ * Fr * D * G / (4 * nWi.z * nWo.z);
 }
 
-std::optional<BxDF::SampleWiResult> BxDF_MicrofacetReflection::SampleWi(const CoordSystem &geoInShd, const Vec3 &wo, bool star, const Vec3 &sample) const noexcept
+std::optional<BxDF::SampleWiResult> BxDF_MicrofacetReflection::SampleWi(const Vec3 &wo, bool star, const Vec3 &sample) const noexcept
 {
-    if(wo.z <= 0 || !geoInShd.InPositiveHemisphere(wo))
+    if(wo.z <= 0)
         return std::nullopt;
 
     Vec3 nWo = wo.Normalize();
@@ -150,16 +150,16 @@ std::optional<BxDF::SampleWiResult> BxDF_MicrofacetReflection::SampleWi(const Co
     SampleWiResult ret;
     ret.wi      = nWi;
     ret.pdf     = Hpdf / (4 * Abs(Dot(nWi, H)));
-    ret.coef    = Eval(geoInShd, nWi, nWo, star);
+    ret.coef    = Eval(nWi, nWo, star);
     ret.isDelta = false;
     ret.type    = BSDFType(BSDF_REFLECTION | BSDF_GLOSSY);
 
     return ret;
 }
 
-Real BxDF_MicrofacetReflection::SampleWiPDF(const CoordSystem &geoInShd, const Vec3 &wi, const Vec3 &wo, [[maybe_unused]] bool star) const noexcept
+Real BxDF_MicrofacetReflection::SampleWiPDF(const Vec3 &wi, const Vec3 &wo, [[maybe_unused]] bool star) const noexcept
 {
-    if(wi.z <= 0 || wo.z <= 0 || !geoInShd.InPositiveHemisphere(wi) || !geoInShd.InPositiveHemisphere(wo))
+    if(wi.z <= 0 || wo.z <= 0)
         return 0;
 
     Vec3 nWi = wi.Normalize(), nWo = wo.Normalize();
@@ -180,7 +180,7 @@ Spectrum BxDF_Microfacet::GetAlbedo() const noexcept
     return rc_;
 }
 
-Spectrum BxDF_Microfacet::Eval(const CoordSystem &geoInShd, const Vec3 &wi, const Vec3 &wo, bool star) const noexcept
+Spectrum BxDF_Microfacet::Eval(const Vec3 &wi, const Vec3 &wo, bool star) const noexcept
 {
     Vec3 nWi = wi.Normalize(), nWo = wo.Normalize();
     if(!nWi.z || !nWo.z)
@@ -227,7 +227,7 @@ Spectrum BxDF_Microfacet::Eval(const CoordSystem &geoInShd, const Vec3 &wi, cons
     return rc_ * Abs(val);
 }
 
-std::optional<BxDF::SampleWiResult> BxDF_Microfacet::SampleWi(const CoordSystem &geoInShd, const Vec3 &wo, bool star, const Vec3 &sample) const noexcept
+std::optional<BxDF::SampleWiResult> BxDF_Microfacet::SampleWi(const Vec3 &wo, bool star, const Vec3 &sample) const noexcept
 {
     Vec3 nWo = wo.Normalize();
     
@@ -293,7 +293,7 @@ std::optional<BxDF::SampleWiResult> BxDF_Microfacet::SampleWi(const CoordSystem 
     return ret;
 }
 
-Real BxDF_Microfacet::SampleWiPDF(const CoordSystem &geoInShd, const Vec3 &wi, const Vec3 &wo, bool star) const noexcept
+Real BxDF_Microfacet::SampleWiPDF(const Vec3 &wi, const Vec3 &wo, bool star) const noexcept
 {
     Vec3 nWi = wi.Normalize(), nWo = wo.Normalize();
     if(!nWi.z || !nWo.z)

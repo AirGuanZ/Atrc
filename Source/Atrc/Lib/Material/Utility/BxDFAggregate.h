@@ -12,9 +12,6 @@ class BxDFAggregate : public BSDF
     const BxDF *bxdfs_[MAX_BXDF_CNT];
     uint8_t bxdfCnt_;
 
-    // 在着色TBN中的几何TBN
-    const CoordSystem geoInShd_;
-
 public:
 
     BxDFAggregate(const CoordSystem &shd, const CoordSystem &geo) noexcept;
@@ -41,7 +38,7 @@ public:
 template<uint8_t MAX_BXDF_CNT>
 BxDFAggregate<MAX_BXDF_CNT>::BxDFAggregate(
     const CoordSystem &shd, const CoordSystem &geo) noexcept
-    : bxdfCnt_(0), geoInShd_(shd.World2Local(geo))
+    : bxdfCnt_(0)
 {
 
 }
@@ -76,7 +73,7 @@ Spectrum BxDFAggregate<MAX_BXDF_CNT>::Eval(
     for(uint8_t i = 0; i < bxdfCnt_; ++i)
     {
         if(bxdfs_[i]->MatchType(type))
-            ret += bxdfs_[i]->Eval(geoInShd_, lwi, lwo, star);
+            ret += bxdfs_[i]->Eval(lwi, lwo, star);
     }
     return ret;
 }
@@ -116,7 +113,7 @@ BxDFAggregate<MAX_BXDF_CNT>::SampleWi(
     // 采样选出的bxdf
 
     Vec3 lwo = shd.World2Local(wo);
-    auto ret = bxdf->SampleWi(geoInShd_, lwo, star, newSample);
+    auto ret = bxdf->SampleWi(lwo, star, newSample);
     if(!ret)
         return std::nullopt;
     
@@ -135,8 +132,8 @@ BxDFAggregate<MAX_BXDF_CNT>::SampleWi(
     {
         if(!bxdfs_[i]->MatchType(type) || bxdfs_[i] == bxdf)
             continue;
-        ret->pdf += bxdfs_[i]->SampleWiPDF(geoInShd_, ret->wi, lwo, star);
-        ret->coef += bxdfs_[i]->Eval(geoInShd_, ret->wi, lwo, star);
+        ret->pdf += bxdfs_[i]->SampleWiPDF(ret->wi, lwo, star);
+        ret->coef += bxdfs_[i]->Eval(ret->wi, lwo, star);
     }
 
     ret->pdf /= nMatched;
@@ -156,7 +153,7 @@ Real BxDFAggregate<MAX_BXDF_CNT>::SampleWiPDF(
         if(bxdfs_[i]->MatchType(type))
         {
             ++nMatched;
-            pdf += bxdfs_[i]->SampleWiPDF(geoInShd_, lwi, lwo, star);
+            pdf += bxdfs_[i]->SampleWiPDF(lwi, lwo, star);
         }
     }
     return nMatched ? pdf / nMatched : Real(0);

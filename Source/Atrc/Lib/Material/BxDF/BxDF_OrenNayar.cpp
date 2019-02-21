@@ -16,9 +16,9 @@ Spectrum BxDF_OrenNayar::GetAlbedo() const noexcept
     return albedo_;
 }
 
-Spectrum BxDF_OrenNayar::Eval(const CoordSystem &geoInShd, const Vec3 &wi, const Vec3 &wo, [[maybe_unused]] bool star) const noexcept
+Spectrum BxDF_OrenNayar::Eval(const Vec3 &wi, const Vec3 &wo, [[maybe_unused]] bool star) const noexcept
 {
-    if(wi.z <= 0 || wo.z <= 0 || !geoInShd.InPositiveHemisphere(wi) || !geoInShd.InPositiveHemisphere(wo))
+    if(wi.z <= 0 || wo.z <= 0)
         return Spectrum();
 
     Vec3 lwi = wi.Normalize(), lwo = wo.Normalize();

@@ -31,7 +31,6 @@ Spectrum BxDF_Specular::GetAlbedo() const noexcept
 }
 
 Spectrum BxDF_Specular::Eval(
-    [[maybe_unused]] const CoordSystem &geoInShd,
     [[maybe_unused]] const Vec3 &wi,
     [[maybe_unused]] const Vec3 &wo,
     [[maybe_unused]] bool star) const noexcept
@@ -40,7 +39,7 @@ Spectrum BxDF_Specular::Eval(
 }
 
 std::optional<BxDF_Specular::SampleWiResult> BxDF_Specular::SampleWi(
-    [[maybe_unused]] const CoordSystem &geoInShd, const Vec3 &wo, bool star, const Vec3 &sample) const noexcept
+    [[maybe_unused]] const Vec3 &wo, bool star, const Vec3 &sample) const noexcept
 {
     Vec3 nor = wo.z > 0 ? Vec3::UNIT_Z() : -Vec3::UNIT_Z();
     Vec3 nWo = wo.Normalize();
@@ -100,7 +99,6 @@ std::optional<BxDF_Specular::SampleWiResult> BxDF_Specular::SampleWi(
 }
 
 Real BxDF_Specular::SampleWiPDF(
-    [[maybe_unused]] const CoordSystem &geoInShd,
     [[maybe_unused]] const Vec3 &wi,
     [[maybe_unused]] const Vec3 &wo,
     [[maybe_unused]] bool star) const noexcept

@@ -15,7 +15,6 @@ Spectrum BxDF_Void::GetAlbedo() const noexcept
 }
 
 Spectrum BxDF_Void::Eval(
-    [[maybe_unused]] const CoordSystem &geoInShd,
     [[maybe_unused]] const Vec3 &wi, [[maybe_unused]] const Vec3 &wo,
     [[maybe_unused]] bool star) const noexcept
 {
@@ -23,7 +22,6 @@ Spectrum BxDF_Void::Eval(
 }
 
 std::optional<BxDF::SampleWiResult> BxDF_Void::SampleWi(
-    [[maybe_unused]] const CoordSystem &geoInShd,
     const Vec3 &wo, [[maybe_unused]] bool star,
     [[maybe_unused]] const Vec3 &sample) const noexcept
 {
@@ -37,7 +35,6 @@ std::optional<BxDF::SampleWiResult> BxDF_Void::SampleWi(
 }
 
 Real BxDF_Void::SampleWiPDF(
-    [[maybe_unused]] const CoordSystem &geoInShd,
     [[maybe_unused]] const Vec3 &wi, [[maybe_unused]] const Vec3 &wo,
     [[maybe_unused]] bool star) const noexcept
 {

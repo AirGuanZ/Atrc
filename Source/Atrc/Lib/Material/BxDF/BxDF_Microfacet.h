@@ -18,11 +18,11 @@ public:
 
     Spectrum GetAlbedo() const noexcept override;
 
-    Spectrum Eval(const CoordSystem &geoInShd, const Vec3 &wi, const Vec3 &wo, bool star) const noexcept override;
+    Spectrum Eval(const Vec3 &wi, const Vec3 &wo, bool star) const noexcept override;
 
-    std::optional<SampleWiResult> SampleWi(const CoordSystem &geoInShd, const Vec3 &wo, bool star, const Vec3 &sample) const noexcept override;
+    std::optional<SampleWiResult> SampleWi(const Vec3 &wo, bool star, const Vec3 &sample) const noexcept override;
 
-    Real SampleWiPDF(const CoordSystem &geoInShd, const Vec3 &wi, const Vec3 &wo, bool star) const noexcept override;
+    Real SampleWiPDF(const Vec3 &wi, const Vec3 &wo, bool star) const noexcept override;
 };
 
 class BxDF_Microfacet : public BxDF
@@ -37,11 +37,11 @@ public:
 
     Spectrum GetAlbedo() const noexcept override;
 
-    Spectrum Eval(const CoordSystem &geoInShd, const Vec3 &wi, const Vec3 &wo, bool star) const noexcept override;
+    Spectrum Eval(const Vec3 &wi, const Vec3 &wo, bool star) const noexcept override;
 
-    std::optional<SampleWiResult> SampleWi(const CoordSystem &geoInShd, const Vec3 &wo, bool star, const Vec3 &sample) const noexcept override;
+    std::optional<SampleWiResult> SampleWi(const Vec3 &wo, bool star, const Vec3 &sample) const noexcept override;
 
-    Real SampleWiPDF(const CoordSystem &geoInShd, const Vec3 &wi, const Vec3 &wo, bool star) const noexcept override;
+    Real SampleWiPDF(const Vec3 &wi, const Vec3 &wo, bool star) const noexcept override;
 };
 
 } // namespace Atrc

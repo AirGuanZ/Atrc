@@ -15,16 +15,16 @@ Spectrum BxDF_SpecularReflection::GetAlbedo() const noexcept
 }
 
 Spectrum BxDF_SpecularReflection::Eval(
-    [[maybe_unused]] const CoordSystem &geoInShd, [[maybe_unused]] const Vec3& wi, [[maybe_unused]] const Vec3& wo,
+    [[maybe_unused]] [[maybe_unused]] const Vec3& wi, [[maybe_unused]] const Vec3& wo,
     [[maybe_unused]] bool star) const noexcept
 {
     return Spectrum();
 }
 
 std::optional<BxDF::SampleWiResult> BxDF_SpecularReflection::SampleWi(
-    const CoordSystem &geoInShd, const Vec3 &wo, [[maybe_unused]] bool star, [[maybe_unused]] const Vec3 &sample) const noexcept
+    const Vec3 &wo, [[maybe_unused]] bool star, [[maybe_unused]] const Vec3 &sample) const noexcept
 {
-    if(wo.z <= 0 || !geoInShd.InPositiveHemisphere(wo))
+    if(wo.z <= 0)
         return std::nullopt;
 
     Vec3 nWo = wo.Normalize();
@@ -39,7 +39,7 @@ std::optional<BxDF::SampleWiResult> BxDF_SpecularReflection::SampleWi(
 }
 
 Real BxDF_SpecularReflection::SampleWiPDF(
-    [[maybe_unused]] const CoordSystem &geoInShd, [[maybe_unused]] const Vec3 &wi, [[maybe_unused]] const Vec3 &wo,
+    [[maybe_unused]] const Vec3 &wi, [[maybe_unused]] const Vec3 &wo,
     [[maybe_unused]] bool star) const noexcept
 {
     return 0;

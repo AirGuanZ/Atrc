@@ -25,9 +25,9 @@ Real BlinnPhong::G(const Vec3 &H, const Vec3 &wi, const Vec3 &wo) const noexcept
                    2 * Abs(NdH * NdWi / WodH)));
 }
 
-std::optional<BlinnPhong::SampleWiResult> BlinnPhong::SampleWi(const CoordSystem &geoInShd, const Vec3 &wo, const Vec2 &sample) const noexcept
+std::optional<BlinnPhong::SampleWiResult> BlinnPhong::SampleWi(const Vec3 &wo, const Vec2 &sample) const noexcept
 {
-    if(wo.z <= 0 || !geoInShd.InPositiveHemisphere(wo))
+    if(wo.z <= 0)
         return std::nullopt;
 
     Real cosTheta = Pow(sample.x, 1 / (e_ + 1));
@@ -40,7 +40,7 @@ std::optional<BlinnPhong::SampleWiResult> BlinnPhong::SampleWi(const CoordSystem
 
     SampleWiResult ret;
     ret.wi = 2 * Dot(wo, H) * H - wo;
-    if(ret.wi.z <= 0 || !geoInShd.InPositiveHemisphere(ret.wi))
+    if(ret.wi.z <= 0)
         return std::nullopt;
     ret.pdf = (e_ + 1) * Pow(cosTheta, e_) / (2 * PI * 4 * Dot(wo, H));
 
@@ -50,7 +50,7 @@ std::optional<BlinnPhong::SampleWiResult> BlinnPhong::SampleWi(const CoordSystem
     return ret;
 }
 
-Real BlinnPhong::SampleWiPDF([[maybe_unused]] const CoordSystem &geoInShd, const Vec3 &wi, const Vec3 &wo) const noexcept
+Real BlinnPhong::SampleWiPDF([[maybe_unused]] const Vec3 &wi, const Vec3 &wo) const noexcept
 {
     Vec3 H = (wi + wo).Normalize();
     Real cosTheta = H.z;

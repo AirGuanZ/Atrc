@@ -20,14 +20,14 @@ Spectrum BxDF_Diffuse::GetAlbedo() const noexcept
     return albedo_;
 }
 
-Spectrum BxDF_Diffuse::Eval(const CoordSystem &geoInShd, const Vec3 &wi, const Vec3 &wo, [[maybe_unused]] bool star) const noexcept
+Spectrum BxDF_Diffuse::Eval(const Vec3 &wi, const Vec3 &wo, [[maybe_unused]] bool star) const noexcept
 {
     if(wi.z <= 0 || wo.z <= 0)
         return Spectrum();
     return albedo_ / PI;
 }
 
-std::optional<BxDF::SampleWiResult> BxDF_Diffuse::SampleWi(const CoordSystem &geoInShd, const Vec3 &wo, [[maybe_unused]] bool star, const Vec3 &sample) const noexcept
+std::optional<BxDF::SampleWiResult> BxDF_Diffuse::SampleWi(const Vec3 &wo, [[maybe_unused]] bool star, const Vec3 &sample) const noexcept
 {
     if(wo.z <= 0)
         return std::nullopt;
@@ -39,7 +39,7 @@ std::optional<BxDF::SampleWiResult> BxDF_Diffuse::SampleWi(const CoordSystem &ge
         1. 如果sam在几何坐标系背面，那么这一采样的射线一定会被物体拦截，不如直接返回None好了
         2. pdf在理论上不可能为0，但因为数值原因在MSVC上使用float时有微小的概率为0，因此将其滤除
     */
-    if(!geoInShd.InPositiveHemisphere(sam) || !pdf)
+    if(sam.z <= 0 || !pdf)
         return std::nullopt;
 
     SampleWiResult ret;
@@ -51,7 +51,7 @@ std::optional<BxDF::SampleWiResult> BxDF_Diffuse::SampleWi(const CoordSystem &ge
     return ret;
 }
 
-Real BxDF_Diffuse::SampleWiPDF(const CoordSystem &geoInShd, const Vec3 &wi, const Vec3 &wo, [[maybe_unused]] bool star) const noexcept
+Real BxDF_Diffuse::SampleWiPDF(const Vec3 &wi, const Vec3 &wo, [[maybe_unused]] bool star) const noexcept
 {
     if(wi.z <= 0 || wo.z <= 0)
         return 0;
