@@ -5,7 +5,7 @@
 
 namespace Atrc
 {
-    
+    /*
 DisneyPrincipledMaterial::DisneyPrincipledMaterial(
     const Texture *rc,
     const Texture *roughness,
@@ -61,6 +61,6 @@ ShadingPoint DisneyPrincipledMaterial::GetShadingPoint(const Intersection &inct,
     ret.bsdf = bsdf;
 
     return ret;
-}
+}*/
 
 } // namespace Atrc

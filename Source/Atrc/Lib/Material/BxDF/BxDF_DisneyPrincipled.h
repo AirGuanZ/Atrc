@@ -24,14 +24,6 @@ class DisneyPrincipledBxDF : public BxDF
     Real gamma_;
     const Fresnel *fresnel_;
 
-    Real Diffuse(const Vec3 &nWi, const Vec3 &nWo, Real cosThetaD) const;
-
-    Real Subsurface(const Vec3 &nWi, const Vec3 &nWo, Real cosThetaD) const;
-
-    Spectrum Specular(const Vec3 &nWi, const Vec3 &nWo, const Vec3 &nH) const;
-
-    Real ClearCoat(const Vec3 &nWi, const Vec3 &nWo, const Vec3 &nH, Real cosThetaD) const;
-
 public:
 
     DisneyPrincipledBxDF(

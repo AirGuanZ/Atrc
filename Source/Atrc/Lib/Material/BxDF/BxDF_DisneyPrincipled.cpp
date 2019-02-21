@@ -1,5 +1,5 @@
 #include <Atrc/Lib/Material/BxDF/BxDF_DisneyPrincipled.h>
-
+/*
 namespace Atrc
 {
 
@@ -91,12 +91,11 @@ namespace
 
     struct SampleWiResult
     {
-        Spectrum coef;
         Vec3 nWi;
         Real pdf = 0;
     };
 
-    std::optional<SampleWiResult> GTR_SampleWi(const Vec3 &nWo, Real roughness, Real gamma, const Fresnel *fresnel, const Vec2 &sample)
+    std::optional<SampleWiResult> GTR_SampleWi(const Vec3 &nWo, Real roughness, Real gamma, const Vec2 &sample)
     {
         if(nWo.z <= 0)
             return std::nullopt;
@@ -112,11 +111,23 @@ namespace
             return std::nullopt;
 
         SampleWiResult ret;
-        ret.coef = GTR_BRDF(nWi, nWo, nH, roughness, gamma, fresnel);
         ret.nWi = nWi;
         ret.pdf = GTR_NormalizedD(nH.z, gamma, alpha) / 4;
 
         return ret;
+    }
+
+    Real GTR_SampleWiPDF(const Vec3 &nWi, const Vec3 &nWo, Real alpha, Real gamma)
+    {
+        if(nWi.z <= 0 || nWo.z <= 0)
+            return 0;
+        Vec3 nH = (nWi + nWo).Normalize();
+        return GTR_NormalizedD(nH.z, gamma, alpha);
+    }
+
+    Real Luminance(const Spectrum &s)
+    {
+        return Real(0.212671) * s.r + Real(0.715160) * s.g + Real(0.072169) * s.b
     }
 }
 
@@ -214,7 +225,7 @@ Spectrum DisneyPrincipledBxDF::Eval(const CoordSystem &geoInShd, const Vec3 &wi,
     Vec3 nH = (nWi + nWo).Normalize();
     Real cosThetaD = Dot(nWo, nH);
 
-    Real rcUTint = Real(0.212671) * rc_.r + Real(0.715160) * rc_.g + Real(0.072169) * rc_.b;
+    Real rcUTint = Luminance(rc_);
     Spectrum specularRc = specularTint_ * rc_ + (1 - specularTint_) * Spectrum(rcUTint);
     Spectrum sheenRc = sheenTint_ * rc_ + (1 - sheenTint_) * Spectrum(rcUTint);
 
@@ -239,8 +250,38 @@ Spectrum DisneyPrincipledBxDF::Eval(const CoordSystem &geoInShd, const Vec3 &wi,
 
 std::optional<BxDF::SampleWiResult> DisneyPrincipledBxDF::SampleWi(const CoordSystem &geoInShd, const Vec3 &wo, bool star, const Vec3 &sample) const noexcept
 {
-    // TODO
-    return std::nullopt;
+    if(wo.z <= 0)
+        return std::nullopt;
+    Vec3 nWo = wo.Normalize();
+
+    if(clearCoat_)
+    {
+        Real clearCoatWeight = clearCoat_ / (clearCoat_ + Luminance(rc_));
+        float x = 1.0f - nWo.z, x2 = x * x;
+        Real clearCoatFresnel = Real(0.04) + Real(0.96) * x2 * x2 * x;
+        Real clearCoatProb = (clearCoatFresnel * clearCoatWeight)
+            / (clearCoatFresnel * clearCoatWeight + (1 - clearCoatFresnel) * (1 - clearCoatWeight));
+        
+        if(sample.x < clearCoatProb)
+        {
+            Real clearCoatRoughness = Real(0.005) * (1 - clearCoatGloss_) * Real(0.1) * clearCoatGloss_;
+            auto sRet = GTR_SampleWi(nWo, clearCoatRoughness, gamma_, sample.yz());
+            if(!sRet)
+                return std::nullopt;
+            auto [nWi, pdf] = *sRet;
+
+            SampleWiResult ret;
+            ret.wi      = nWi;
+            ret.coef    = Eval(geoInShd, nWi, nWo, star);
+            ret.isDelta = false;
+            ret.pdf     = SampleWiPDF(geoInShd, nWi, nWo, star);
+            ret.type    = BSDFType(BSDF_REFLECTION | BSDF_GLOSSY);
+
+            return ret;
+        }
+
+
+    }
 }
 
 Real DisneyPrincipledBxDF::SampleWiPDF(const CoordSystem &geoInShd, const Vec3 &wi, const Vec3 &wo, bool star) const noexcept
@@ -250,3 +291,4 @@ Real DisneyPrincipledBxDF::SampleWiPDF(const CoordSystem &geoInShd, const Vec3 &
 }
 
 } // namespace Atrc
+*/
