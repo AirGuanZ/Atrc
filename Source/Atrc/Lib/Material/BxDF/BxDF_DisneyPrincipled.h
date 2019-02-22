@@ -22,7 +22,6 @@ class DisneyPrincipledBxDF : public BxDF
     Real clearCoatGloss_;
 
     Real gamma_;
-    const Fresnel *fresnel_;
 
 public:
 
@@ -36,8 +35,7 @@ public:
         Real sheenTint,
         Real subsurface,
         Real clearCoat,
-        Real clearCoatGloss,
-        const Fresnel *fresnel) noexcept;
+        Real clearCoatGloss) noexcept;
 
     Spectrum GetAlbedo() const noexcept override;
 
