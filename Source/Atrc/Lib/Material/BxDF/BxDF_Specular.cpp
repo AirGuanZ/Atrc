@@ -39,7 +39,7 @@ Spectrum BxDF_Specular::Eval(
 }
 
 std::optional<BxDF_Specular::SampleWiResult> BxDF_Specular::SampleWi(
-    [[maybe_unused]] const Vec3 &wo, bool star, const Vec3 &sample) const noexcept
+    const Vec3 &wo, bool star, const Vec3 &sample) const noexcept
 {
     Vec3 nor = wo.z > 0 ? Vec3::UNIT_Z() : -Vec3::UNIT_Z();
     Vec3 nWo = wo.Normalize();
@@ -55,46 +55,30 @@ std::optional<BxDF_Specular::SampleWiResult> BxDF_Specular::SampleWi(
         ret.isDelta = true;
 
         if(ret.coef.HasInf())
-        {
-            ret.coef = Spectrum();
-            ret.pdf = Real(1);
-        }
-
+            return std::nullopt;
         return ret;
     }
 
     // 如果是由内向外，etaI和etaT要反过来
 
-    Real etaI = nWo.z > 0.0 ? fresnel_->GetEtaI() : fresnel_->GetEtaT();
-    Real etaT = nWo.z > 0.0 ? fresnel_->GetEtaT() : fresnel_->GetEtaI();
+    Real etaI = nWo.z > 0 ? fresnel_->GetEtaI() : fresnel_->GetEtaT();
+    Real etaT = nWo.z > 0 ? fresnel_->GetEtaT() : fresnel_->GetEtaI();
 
     Real eta = etaI / etaT;
     auto wi = GetRefractDirection(nWo, nor, eta);
 
-    SampleWiResult ret;
     if(!wi)
-    {
-        ret.wi   = Vec3(-nWo.xy(), nWo.z).Normalize();
-        ret.coef = rc_ * Fr / Abs(ret.wi.z);
-        ret.pdf  = 1;
-        ret.type = BSDFType(BSDF_SPECULAR | BSDF_REFLECTION);
-        ret.isDelta = true;
-    }
-    else
-    {
-        ret.wi   = wi->Normalize();
-        ret.pdf  = 1 - Fr.r;
-        ret.coef = (star ? Real(1) : eta * eta) * rc_ * (Spectrum(1.0f) - Fr) / Abs(ret.wi.z);
-        ret.type = BSDFType(BSDF_SPECULAR | BSDF_TRANSMISSION);
-        ret.isDelta = true;
-    }
+        return std::nullopt;
+    
+    SampleWiResult ret;
+    ret.wi = wi->Normalize();
+    ret.pdf = 1 - Fr.r;
+    ret.coef = (star ? Real(1) : eta * eta) * rc_ * (Spectrum(1.0f) - Fr) / Abs(ret.wi.z);
+    ret.type = BSDFType(BSDF_SPECULAR | BSDF_TRANSMISSION);
+    ret.isDelta = true;
 
     if(ret.coef.HasInf())
-    {
-        ret.coef = Spectrum();
-        ret.pdf = Real(1);
-    }
-
+        return std::nullopt;
     return ret;
 }
 

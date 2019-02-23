@@ -66,6 +66,12 @@ namespace
             cosThetaI = -cosThetaI;
         }
 
+        Real sinThetaI = Sqrt(Max(Real(0), 1 - cosThetaI * cosThetaI));
+        Real sinThetaT = etaI / etaT * sinThetaI;
+
+        if(sinThetaT >= 1)
+            return 1;
+
         Real R0 = (etaI - etaT) / (etaI + etaT);
         R0 *= R0;
         Real t = 1 - cosThetaI;

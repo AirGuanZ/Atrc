@@ -102,6 +102,11 @@ inline Real Phi(const Vec3 &w) noexcept
     return ret < 0 ? (ret + 2 * PI) : ret;
 }
 
+inline Real Theta(const Vec3 &w) noexcept
+{
+    return Arccos(Clamp<Real>(CosTheta(w), -1, 1));
+}
+
 // ================================= Spectrum
 
 using AGZ::Math::Color3b;
