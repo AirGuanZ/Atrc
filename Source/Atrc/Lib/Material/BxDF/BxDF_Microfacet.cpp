@@ -105,7 +105,7 @@ namespace
 } // namespace anonymous
 
 BxDF_MicrofacetReflection::BxDF_MicrofacetReflection(const Spectrum &rc, Real roughness, const Fresnel *fresnel) noexcept
-    : BxDF(BSDFType(BSDF_GLOSSY | BSDF_REFLECTION)), rc_(rc), alpha_(roughness * roughness), fresnel_(fresnel)
+    : BxDF(BSDFType(BSDF_NONESPECULAR | BSDF_REFLECTION)), rc_(rc), alpha_(roughness * roughness), fresnel_(fresnel)
 {
     AGZ_ASSERT(roughness > 0 && fresnel);
 }
@@ -152,7 +152,7 @@ std::optional<BxDF::SampleWiResult> BxDF_MicrofacetReflection::SampleWi(const Ve
     ret.pdf     = Hpdf / (4 * Abs(Dot(nWi, H)));
     ret.coef    = Eval(nWi, nWo, star);
     ret.isDelta = false;
-    ret.type    = BSDFType(BSDF_REFLECTION | BSDF_GLOSSY);
+    ret.type    = BSDFType(BSDF_REFLECTION | BSDF_NONESPECULAR);
 
     return ret;
 }
@@ -169,7 +169,7 @@ Real BxDF_MicrofacetReflection::SampleWiPDF(const Vec3 &wi, const Vec3 &wo, [[ma
 }
 
 BxDF_Microfacet::BxDF_Microfacet(const Spectrum &rc, Real roughness, const Dielectric *dielectric) noexcept
-    : BxDF(BSDFType(BSDF_GLOSSY | BSDF_REFLECTION | BSDF_TRANSMISSION)),
+    : BxDF(BSDFType(BSDF_NONESPECULAR | BSDF_REFLECTION | BSDF_TRANSMISSION)),
       rc_(rc), alpha_(roughness * roughness), dielectric_(dielectric)
 {
     AGZ_ASSERT(roughness > 0 && dielectric);
@@ -254,7 +254,7 @@ std::optional<BxDF::SampleWiResult> BxDF_Microfacet::SampleWi(const Vec3 &wo, bo
         ret.coef    = rc_ * Fr * D * G / Abs(4 * nWi.z * nWo.z);
         ret.pdf     = pdf;
         ret.isDelta = false;
-        ret.type    = BSDFType(BSDF_REFLECTION | BSDF_GLOSSY);
+        ret.type    = BSDFType(BSDF_REFLECTION | BSDF_NONESPECULAR);
         ret.wi      = nWi;
 
         return ret;
@@ -288,7 +288,7 @@ std::optional<BxDF::SampleWiResult> BxDF_Microfacet::SampleWi(const Vec3 &wo, bo
     ret.coef    = rc_ * Abs(val);
     ret.isDelta = false;
     ret.pdf     = Abs(Hpdf * dHdWi * (1 - Fr));
-    ret.type    = BSDFType(BSDF_TRANSMISSION | BSDF_GLOSSY);
+    ret.type    = BSDFType(BSDF_TRANSMISSION | BSDF_NONESPECULAR);
 
     return ret;
 }

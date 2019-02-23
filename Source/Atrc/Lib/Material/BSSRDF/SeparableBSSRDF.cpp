@@ -52,7 +52,7 @@ namespace
             const Vec3 &wi, [[maybe_unused]] const Vec3 &wo,
             BSDFType type, bool star) const noexcept override
         {
-            if(!((type & BSDF_TRANSMISSION) && (type & (BSDF_DIFFUSE | BSDF_GLOSSY))))
+            if(!((type & BSDF_TRANSMISSION) && (type & BSDF_NONESPECULAR)))
                 return Spectrum();
             auto tpi = pi_;
             tpi.wr = wi;
@@ -64,7 +64,7 @@ namespace
             const CoordSystem &shd, const CoordSystem &geo,
             const Vec3 &wo, BSDFType type, bool star, const Vec3 &sample) const noexcept override
         {
-            if(!((type & BSDF_TRANSMISSION) && (type & (BSDF_DIFFUSE | BSDF_GLOSSY))))
+            if(!((type & BSDF_TRANSMISSION) && (type & BSDF_NONESPECULAR)))
                 return std::nullopt;
 
             auto [sam, pdf] = AGZ::Math::DistributionTransform
@@ -76,7 +76,7 @@ namespace
             SampleWiResult ret;
             ret.coef    = Eval(shd, geo, sam, wo, type, star);
             ret.pdf     = pdf;
-            ret.type    = BSDFType(BSDF_TRANSMISSION | BSDF_GLOSSY);
+            ret.type    = BSDFType(BSDF_TRANSMISSION | BSDF_NONESPECULAR);
             ret.wi      = sam;
             ret.isDelta = false;
 
@@ -90,7 +90,7 @@ namespace
             const CoordSystem &shd, [[maybe_unused]] const CoordSystem &geo,
             const Vec3 &wi, const Vec3 &wo, BSDFType type, [[maybe_unused]] bool star) const noexcept override
         {
-            if(!((type & BSDF_TRANSMISSION) && (type & (BSDF_DIFFUSE | BSDF_GLOSSY))))
+            if(!((type & BSDF_TRANSMISSION) && (type & BSDF_NONESPECULAR)))
                 return 0;
             auto lwi = shd.World2Local(wi), lwo = shd.World2Local(wo);
             if(lwi.z <= 0 || lwo.z <= 0 || !geo.InPositiveHemisphere(wi))

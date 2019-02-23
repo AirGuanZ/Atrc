@@ -10,7 +10,7 @@ namespace Atrc
 {
 
 BxDF_Diffuse::BxDF_Diffuse(const Spectrum &albedo) noexcept
-    : BxDF(BSDF_DIFFUSE), albedo_(albedo)
+    : BxDF(BSDF_NONESPECULAR), albedo_(albedo)
 {
 
 }

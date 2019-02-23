@@ -8,16 +8,15 @@ namespace Atrc
 
 enum BSDFType
 {
-    BSDF_DIFFUSE  = (1 << 0),
-    BSDF_GLOSSY   = (1 << 1),
-    BSDF_SPECULAR = (1 << 2),
+    BSDF_NONESPECULAR  = (1 << 0),
+    BSDF_SPECULAR      = (1 << 1),
 
-    BSDF_REFLECTION   = (1 << 3),
-    BSDF_TRANSMISSION = (1 << 4),
+    BSDF_REFLECTION   = (1 << 2),
+    BSDF_TRANSMISSION = (1 << 3),
 
     BSDF_NONE = 0,
-    BSDF_NULL = (1 << 5),
-    BSDF_ALL  = BSDF_DIFFUSE | BSDF_GLOSSY | BSDF_SPECULAR | BSDF_REFLECTION | BSDF_TRANSMISSION
+    BSDF_NULL = (1 << 4),
+    BSDF_ALL  = BSDF_NONESPECULAR | BSDF_SPECULAR | BSDF_REFLECTION | BSDF_TRANSMISSION
 };
 
 bool Contains(BSDFType set, BSDFType subset) noexcept;

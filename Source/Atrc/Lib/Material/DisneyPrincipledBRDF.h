@@ -2,43 +2,43 @@
 
 #include <Atrc/Lib/Core/Material.h>
 #include <Atrc/Lib/Core/Texture.h>
-#include <Atrc/Lib/Material/Utility/Fresnel.h>
 #include <Atrc/Lib/Material/Utility/NormalMapper.h>
 
 namespace Atrc
 {
-    
-class DisneyPrincipledMaterial : public Material
+
+// See https://airguanz.github.io/2019/02/20/disney-brdf.html
+class DisneyBRDFMaterial : public Material
 {
-    const Texture *rc_;
-    const Texture *roughness_;
+    const Texture *baseColor_;
+
+    const Texture *subsurface_;
+    const Texture *metallic_;
     const Texture *specular_;
     const Texture *specularTint_;
-    const Texture *metallic_;
+    const Texture *roughness_;
+    const Texture *anisotropic_;
     const Texture *sheen_;
     const Texture *sheenTint_;
-    const Texture *subsurface_;
-    const Texture *clearCoat_;
-    const Texture *clearCoatGloss_;
-
-    const Fresnel *fresnel_;
+    const Texture *clearcoat_;
+    const Texture *clearcoatGloss_;
 
     const NormalMapper *normalMapper_;
 
 public:
 
-    DisneyPrincipledMaterial(
-        const Texture *rc,
-        const Texture *roughness,
+    DisneyBRDFMaterial(
+        const Texture *baseColor,
+        const Texture *subsurface,
+        const Texture *metallic,
         const Texture *specular,
         const Texture *specularTint,
-        const Texture *metallic,
+        const Texture *roughness,
+        const Texture *anisotropic,
         const Texture *sheen,
         const Texture *sheenTint,
-        const Texture *subsurface,
-        const Texture *clearCoat,
-        const Texture *clearCoatGloss,
-        const Fresnel *fresnel,
+        const Texture *clearcoat,
+        const Texture *clearcoatGloss,
         const NormalMapper *normalMapper) noexcept;
 
     ShadingPoint GetShadingPoint(const Intersection &inct, Arena &arena) const override;

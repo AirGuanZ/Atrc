@@ -4,7 +4,7 @@ namespace Atrc
 {
     
 BxDF_OrenNayar::BxDF_OrenNayar(const Spectrum &albedo, Real sigma) noexcept
-    : BxDF(BSDFType(BSDF_REFLECTION | BSDF_DIFFUSE)), albedo_(albedo)
+    : BxDF(BSDFType(BSDF_REFLECTION | BSDF_NONESPECULAR)), albedo_(albedo)
 {
     Real sigma2 = sigma * sigma;
     A_ = 1 - sigma2 / (2 * sigma2 + 2 * Real(0.33));
