@@ -4,6 +4,24 @@
 
 void RegisterMaterialCreators(ResourceManager &rscMgr);
 
+class BSSRDFCreator : public MaterialCreator
+{
+public:
+
+    BSSRDFCreator() : MaterialCreator("BSSRDF") { }
+
+    std::shared_ptr<MaterialInstance> Create(ResourceManager &rscMgr, std::string name) const override;
+};
+
+class DisneyBRDFCreator : public MaterialCreator
+{
+public:
+
+    DisneyBRDFCreator() : MaterialCreator("DisneyBRDF") { }
+
+    std::shared_ptr<MaterialInstance> Create(ResourceManager &rscMgr, std::string name) const override;
+};
+
 class GGXDielectricCreator : public MaterialCreator
 {
 public:
@@ -72,15 +90,6 @@ class InvisibleSurfaceCreator : public MaterialCreator
 public:
 
     InvisibleSurfaceCreator() : MaterialCreator("Invisible") { }
-
-    std::shared_ptr<MaterialInstance> Create(ResourceManager &rscMgr, std::string name) const override;
-};
-
-class NormalizedDiffusionBSSRDFCreator : public MaterialCreator
-{
-public:
-
-    NormalizedDiffusionBSSRDFCreator() : MaterialCreator("BSSRDF") { }
 
     std::shared_ptr<MaterialInstance> Create(ResourceManager &rscMgr, std::string name) const override;
 };

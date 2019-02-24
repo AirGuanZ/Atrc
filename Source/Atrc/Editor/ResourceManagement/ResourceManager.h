@@ -52,7 +52,7 @@ public:
         }
     };
 
-    explicit IResource(std::string typeName, std::string name) noexcept
+    IResource(std::string typeName, std::string name) noexcept
         : typeName_(std::move(typeName)), instanceName_(std::move(name)), isInPool_(false)
     {
 

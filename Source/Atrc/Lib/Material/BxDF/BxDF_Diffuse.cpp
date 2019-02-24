@@ -35,10 +35,6 @@ std::optional<BxDF::SampleWiResult> BxDF_Diffuse::SampleWi(const Vec3 &wo, [[may
     auto [sam, pdf] = AGZ::Math::DistributionTransform
         ::ZWeightedOnUnitHemisphere<Real>::Transform(sample.xy());
 
-    /*
-        1. 如果sam在几何坐标系背面，那么这一采样的射线一定会被物体拦截，不如直接返回None好了
-        2. pdf在理论上不可能为0，但因为数值原因在MSVC上使用float时有微小的概率为0，因此将其滤除
-    */
     if(sam.z <= 0 || !pdf)
         return std::nullopt;
 
