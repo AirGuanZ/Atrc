@@ -15,7 +15,7 @@ public:
 
     BxDF_Specular(const Spectrum &rc, const Dielectric *fresnel);
 
-    Spectrum GetAlbedo() const noexcept override;
+    Spectrum GetBaseColor() const noexcept override;
 
     Spectrum Eval(const Vec3 &wi, const Vec3 &wo, bool star) const noexcept override;
 

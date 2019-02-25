@@ -42,7 +42,7 @@ namespace
             AGZ_ASSERT(bssrdf);
         }
 
-        Spectrum GetAlbedo([[maybe_unused]] BSDFType type) const noexcept override
+        Spectrum GetBaseColor([[maybe_unused]] BSDFType type) const noexcept override
         {
             return Spectrum();
         }

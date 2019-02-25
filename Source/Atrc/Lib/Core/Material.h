@@ -36,7 +36,7 @@ public:
 
     virtual ~BSDF() = default;
 
-    virtual Spectrum GetAlbedo(BSDFType type) const noexcept = 0;
+    virtual Spectrum GetBaseColor(BSDFType type) const noexcept = 0;
 
     virtual Spectrum Eval(
         const CoordSystem &shd, const CoordSystem &geo,

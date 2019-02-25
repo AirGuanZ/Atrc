@@ -15,7 +15,7 @@ public:
 
     BxDF_SpecularReflection(const Fresnel *fresnel, const Spectrum &rc) noexcept;
 
-    Spectrum GetAlbedo() const noexcept override;
+    Spectrum GetBaseColor() const noexcept override;
 
     Spectrum Eval(const Vec3 &wi, const Vec3 &wo, bool star) const noexcept override;
 

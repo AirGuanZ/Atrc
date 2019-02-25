@@ -9,7 +9,7 @@ BxDF_SpecularReflection::BxDF_SpecularReflection(const Fresnel *fresnel, const S
     AGZ_ASSERT(fresnel);
 }
 
-Spectrum BxDF_SpecularReflection::GetAlbedo() const noexcept
+Spectrum BxDF_SpecularReflection::GetBaseColor() const noexcept
 {
     return rc_;
 }

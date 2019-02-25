@@ -18,9 +18,9 @@ namespace
 
         }
         
-        Spectrum GetAlbedo(BSDFType type) const noexcept override
+        Spectrum GetBaseColor(BSDFType type) const noexcept override
         {
-            return scale_ * internal_->GetAlbedo(type);
+            return scale_ * internal_->GetBaseColor(type);
         }
 
         Spectrum Eval(

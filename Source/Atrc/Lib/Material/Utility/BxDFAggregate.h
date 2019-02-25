@@ -18,7 +18,7 @@ public:
 
     void AddBxDF(const BxDF *bxdf) noexcept;
 
-    Spectrum GetAlbedo(BSDFType type) const noexcept override;
+    Spectrum GetBaseColor(BSDFType type) const noexcept override;
 
     Spectrum Eval(
         const CoordSystem &shd, const CoordSystem &geo,
@@ -52,13 +52,13 @@ void BxDFAggregate<MAX_BXDF_CNT>::AddBxDF(const BxDF *bxdf) noexcept
 }
 
 template<uint8_t MAX_BXDF_CNT>
-Spectrum BxDFAggregate<MAX_BXDF_CNT>::GetAlbedo(BSDFType type) const noexcept
+Spectrum BxDFAggregate<MAX_BXDF_CNT>::GetBaseColor(BSDFType type) const noexcept
 {
     Spectrum ret;
     for(uint8_t i = 0; i < bxdfCnt_; ++i)
     {
         if(bxdfs_[i]->MatchType(type))
-            ret += bxdfs_[i]->GetAlbedo();
+            ret += bxdfs_[i]->GetBaseColor();
     }
     return ret;
 }

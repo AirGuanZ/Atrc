@@ -9,7 +9,7 @@ BxDF_DisneyDiffuse::BxDF_DisneyDiffuse(const Spectrum &baseColor, Real subsurfac
     
 }
 
-Spectrum BxDF_DisneyDiffuse::GetAlbedo() const noexcept
+Spectrum BxDF_DisneyDiffuse::GetBaseColor() const noexcept
 {
     return baseColor_;
 }

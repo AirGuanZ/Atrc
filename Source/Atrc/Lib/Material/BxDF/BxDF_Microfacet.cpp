@@ -110,7 +110,7 @@ BxDF_MicrofacetReflection::BxDF_MicrofacetReflection(const Spectrum &rc, Real ro
     AGZ_ASSERT(roughness > 0 && fresnel);
 }
 
-Spectrum BxDF_MicrofacetReflection::GetAlbedo() const noexcept
+Spectrum BxDF_MicrofacetReflection::GetBaseColor() const noexcept
 {
     return rc_;
 }
@@ -175,7 +175,7 @@ BxDF_Microfacet::BxDF_Microfacet(const Spectrum &rc, Real roughness, const Diele
     AGZ_ASSERT(roughness > 0 && dielectric);
 }
 
-Spectrum BxDF_Microfacet::GetAlbedo() const noexcept
+Spectrum BxDF_Microfacet::GetBaseColor() const noexcept
 {
     return rc_;
 }

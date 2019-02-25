@@ -25,7 +25,7 @@ BxDF_Specular::BxDF_Specular(const Spectrum &rc, const Dielectric *fresnel)
     AGZ_ASSERT(fresnel_);
 }
 
-Spectrum BxDF_Specular::GetAlbedo() const noexcept
+Spectrum BxDF_Specular::GetBaseColor() const noexcept
 {
     return rc_;
 }

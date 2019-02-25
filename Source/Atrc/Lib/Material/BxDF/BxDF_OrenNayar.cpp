@@ -11,7 +11,7 @@ BxDF_OrenNayar::BxDF_OrenNayar(const Spectrum &albedo, Real sigma) noexcept
     B_ = Real(0.45) * sigma2 / (sigma2 + Real(0.09));
 }
 
-Spectrum BxDF_OrenNayar::GetAlbedo() const noexcept
+Spectrum BxDF_OrenNayar::GetBaseColor() const noexcept
 {
     return albedo_;
 }

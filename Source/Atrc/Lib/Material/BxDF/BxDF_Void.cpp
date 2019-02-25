@@ -9,7 +9,7 @@ BxDF_Void::BxDF_Void() noexcept
 
 }
 
-Spectrum BxDF_Void::GetAlbedo() const noexcept
+Spectrum BxDF_Void::GetBaseColor() const noexcept
 {
     return Spectrum();
 }

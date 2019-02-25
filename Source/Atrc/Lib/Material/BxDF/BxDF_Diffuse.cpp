@@ -15,7 +15,7 @@ BxDF_Diffuse::BxDF_Diffuse(const Spectrum &albedo) noexcept
 
 }
 
-Spectrum BxDF_Diffuse::GetAlbedo() const noexcept
+Spectrum BxDF_Diffuse::GetBaseColor() const noexcept
 {
     return albedo_;
 }

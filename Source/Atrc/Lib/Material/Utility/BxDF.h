@@ -24,7 +24,7 @@ public:
 
     bool MatchType(BSDFType type) const noexcept;
 
-    virtual Spectrum GetAlbedo() const noexcept = 0;
+    virtual Spectrum GetBaseColor() const noexcept = 0;
 
     virtual Spectrum Eval(const Vec3 &wi, const Vec3 &wo, bool star) const noexcept = 0;
 

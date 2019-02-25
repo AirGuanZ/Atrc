@@ -438,7 +438,7 @@ public:
         
     }
 
-    Spectrum GetAlbedo(BSDFType type) const noexcept override
+    Spectrum GetBaseColor(BSDFType type) const noexcept override
     {
         if(Contains(type, TYPE))
             return baseColor_;

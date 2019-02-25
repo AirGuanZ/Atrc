@@ -9,7 +9,7 @@ BxDF_TorranceSparrowReflection::BxDF_TorranceSparrowReflection(const Spectrum &r
     AGZ_ASSERT(md && fresnel);
 }
 
-Spectrum BxDF_TorranceSparrowReflection::GetAlbedo() const noexcept
+Spectrum BxDF_TorranceSparrowReflection::GetBaseColor() const noexcept
 {
     return rc_;
 }
