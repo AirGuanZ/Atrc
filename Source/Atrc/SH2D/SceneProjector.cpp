@@ -172,12 +172,12 @@ void SceneProjector::Eval(
         if(depth == 1)
         {
             output->binary = 1;
-            output->albedo = shd.bsdf->GetAlbedo(BSDF_ALL);
+            output->albedo = shd.bsdf->GetBaseColor(BSDF_ALL);
             output->normal = shd.coordSys.ez.Map([](Real c){ return (c + 1) / 2; });
         }
 
         auto bsdfSample = shd.bsdf->SampleWi(
-            shd.coordSys, inct.coordSys, inct.wr, BSDF_ALL, false, sampler->GetReal2());
+            shd.coordSys, inct.coordSys, inct.wr, BSDF_ALL, false, sampler->GetReal3());
         if(!bsdfSample)
             break;
         

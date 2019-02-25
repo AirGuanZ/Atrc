@@ -1,4 +1,5 @@
 #include <Atrc/Lib/Core/Light.h>
+#include <Atrc/Lib/Core/Ray.h>
 #include <Atrc/SH2D/LightProjector.h>
 
 namespace Atrc::SH2D
