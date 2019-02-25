@@ -5,6 +5,7 @@
 namespace Atrc
 {
 
+// 所有方向输入都应是本地归一化的
 class BxDF
 {
 protected:
@@ -73,7 +74,7 @@ inline Real BxDF::SampleWiPDF(const Vec3 &wi, const Vec3 &wo, [[maybe_unused]] b
 {
     if(wi.z <= 0 || wo.z <= 0)
         return 0;
-    return AGZ::Math::DistributionTransform::ZWeightedOnUnitHemisphere<Real>::PDF(wi.Normalize());
+    return AGZ::Math::DistributionTransform::ZWeightedOnUnitHemisphere<Real>::PDF(wi);
 }
 
 } // namespace Atrc

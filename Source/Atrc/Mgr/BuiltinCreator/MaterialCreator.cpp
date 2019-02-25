@@ -1,4 +1,5 @@
 #include <Atrc/Lib/Material/BSSRDFSurface.h>
+#include <Atrc/Lib/Material/DisneyDiffuse.h>
 #include <Atrc/Lib/Material/DisneyPrincipledBRDF.h>
 #include <Atrc/Lib/Material/GGXDielectric.h>
 #include <Atrc/Lib/Material/GGXMetal.h>
@@ -79,6 +80,7 @@ void RegisterBuiltinMaterialCreators(Context &context)
 {
     static const BSSRDFSurfaceCreator iBSSRDFSurfaceCreator;
     static const DisneyBRDFMaterialCreator iDisneyBRDFMaterialCreator;
+    static const DisneyDiffuseCreator iDisneyDiffuseCreator;
     static const GGXDielectricCreator iGGXDielectricCreator;
     static const GGXMetalCreator iGGXMetalCreator;
     static const IdealBlackCreator idealBlackCreator;
@@ -91,6 +93,7 @@ void RegisterBuiltinMaterialCreators(Context &context)
     static const TSMetalCreator tSMetalCreator;
     context.AddCreator(&iBSSRDFSurfaceCreator);
     context.AddCreator(&iDisneyBRDFMaterialCreator);
+    context.AddCreator(&iDisneyDiffuseCreator);
     context.AddCreator(&iGGXDielectricCreator);
     context.AddCreator(&iGGXMetalCreator);
     context.AddCreator(&idealBlackCreator);
@@ -166,6 +169,21 @@ Material *DisneyBRDFMaterialCreator::Create(const ConfigGroup &group, Context &c
             clearcoat, clearcoatGloss, normalMapper);
     }
     ATRC_MGR_CATCH_AND_RETHROW("In creating disney brdf: " + group.ToString())
+}
+
+Material *DisneyDiffuseCreator::Create(const ConfigGroup &group, Context &context, Arena &arena) const
+{
+    ATRC_MGR_TRY
+    {
+        auto baseColor = context.Create<Texture>(group["baseColor"]);
+        auto subsurface = context.Create<Texture>(group["subsurface"]);
+        auto roughness = context.Create<Texture>(group["roughness"]);
+        auto normalMapper = CreateNormalMapper(group, context, arena);
+
+        return arena.Create<DisneyDiffuseMaterial>(
+            baseColor, subsurface, roughness, normalMapper);
+    }
+    ATRC_MGR_CATCH_AND_RETHROW("In creating disney diffuse: " + group.ToString())
 }
 
 Material *GGXDielectricCreator::Create(const ConfigGroup &group, Context &context, Arena &arena) const

@@ -51,6 +51,25 @@ public:
 };
 
 /*
+    type = DisneyDiffuse;
+
+    baseColor      = Texture
+    subsurface     = Texture
+    
+    roughness      = Texture
+
+    normalMapper = Texture | null
+ */
+class DisneyDiffuseCreator : public Creator<Material>
+{
+public:
+
+    std::string GetTypeName() const override { return "DisneyDiffuse"; }
+
+    Material *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
+};
+
+/*
     type = GGXDielectric
 
     fresnel   = Dielectric

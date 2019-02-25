@@ -143,6 +143,55 @@ namespace
         }
     };
 
+    class DisneyDiffuseInstance : public MaterialInstance
+    {
+        TextureSlot baseColor_;
+        TextureSlot subsurface_;
+        TextureSlot roughness_;
+        
+    protected:
+
+        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
+        {
+            ctx.AddLine("type = DisneyDiffuse;");
+            ExportSubResource("baseColor", rscMgr, ctx, baseColor_);
+            ExportSubResource("subsurface", rscMgr, ctx, subsurface_);
+            ExportSubResource("roughness", rscMgr, ctx, roughness_);
+        }
+
+    public:
+
+        DisneyDiffuseInstance(ResourceManager &rscMgr, std::string typeName, std::string name)
+            : MaterialInstance(std::move(typeName), std::move(name))
+        {
+            baseColor_.SetInstance(rscMgr.Create<TextureInstance>("Constant", ""));
+            subsurface_.SetInstance(rscMgr.Create<TextureInstance>("Constant1", ""));
+            roughness_.SetInstance(rscMgr.Create<TextureInstance>("Constant1", ""));
+        }
+
+        void Display(ResourceManager &rscMgr) override
+        {
+            auto T = [&rscMgr](const char *name, TextureSlot &tex)
+            {
+                if(ImGui::TreeNodeEx(name, ImGuiTreeNodeFlags_DefaultOpen))
+                {
+                    tex.Display(rscMgr);
+                    ImGui::TreePop();
+                }
+            };
+            T("baseColor", baseColor_);
+            T("subsurface", subsurface_);
+            T("roughness", roughness_);
+        }
+
+        void Import(ResourceManager &rscMgr, const AGZ::ConfigGroup &root, const AGZ::ConfigGroup &params, const ImportContext &ctx) override
+        {
+            baseColor_.SetInstance(GetResourceInstance<TextureInstance>(rscMgr, root, params["baseColor"], ctx));
+            subsurface_.SetInstance(GetResourceInstance<TextureInstance>(rscMgr, root, params["subsurface"], ctx));
+            roughness_.SetInstance(GetResourceInstance<TextureInstance>(rscMgr, root, params["roughness"], ctx));
+        }
+    };
+
     class GGXDielectricInstance : public MaterialInstance
     {
         TextureSlot rc_;
@@ -513,6 +562,7 @@ void RegisterMaterialCreators(ResourceManager &rscMgr)
 {
     static const BSSRDFCreator iNormalizedDiffusionBSSRDFCreator;
     static const DisneyBRDFCreator iDisneyBRDFCreator;
+    static const DisneyDiffuseCreator iDisneyDiffuseCreator;
     static const GGXDielectricCreator iGGXDielectricCreator;
     static const GGXMetalCreator iGGXMetalCreator;
     static const IdealBlackCreator iIdealBlackCreator;
@@ -525,6 +575,7 @@ void RegisterMaterialCreators(ResourceManager &rscMgr)
     static const TSMetalCreator iTSMetalCreator;
     rscMgr.AddCreator(&iNormalizedDiffusionBSSRDFCreator);
     rscMgr.AddCreator(&iDisneyBRDFCreator);
+    rscMgr.AddCreator(&iDisneyDiffuseCreator);
     rscMgr.AddCreator(&iGGXDielectricCreator);
     rscMgr.AddCreator(&iGGXMetalCreator);
     rscMgr.AddCreator(&iIdealBlackCreator);
@@ -545,6 +596,11 @@ std::shared_ptr<MaterialInstance> BSSRDFCreator::Create(ResourceManager &rscMgr,
 std::shared_ptr<MaterialInstance> DisneyBRDFCreator::Create(ResourceManager &rscMgr, std::string name) const
 {
     return std::make_shared<DisneyBRDFInstance>(rscMgr, GetName(), std::move(name));
+}
+
+std::shared_ptr<MaterialInstance> DisneyDiffuseCreator::Create(ResourceManager &rscMgr, std::string name) const
+{
+    return std::make_shared<DisneyDiffuseInstance>(rscMgr, GetName(), std::move(name));
 }
 
 std::shared_ptr<MaterialInstance> GGXDielectricCreator::Create(ResourceManager &rscMgr, std::string name) const

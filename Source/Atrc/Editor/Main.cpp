@@ -163,6 +163,8 @@ int Run(GLFWwindow *window)
         editorCore.UpdateCamera(keyboard, mouse);
 
         editorCore.RenderScene();
+        editorCore.SaveRenderingResult();
+
         console.Display();
         editorCore.ShowGUI(imm, keyboard);
 

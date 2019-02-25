@@ -294,7 +294,7 @@ class DisneyBRDF : public BSDF
     const Real clearcoat_;
     const Real clearcoatGloss_;
 
-    static constexpr BSDFType TYPE = BSDFType(BSDF_REFLECTION | BSDF_NONESPECULAR);
+    static constexpr BSDFType TYPE = BSDFType(BSDF_REFLECTION | BSDF_NONSPECULAR);
 
     std::pair<Real, Real> GetAnisotropicAlpha() const
     {

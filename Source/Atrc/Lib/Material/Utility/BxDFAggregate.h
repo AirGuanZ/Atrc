@@ -68,7 +68,7 @@ Spectrum BxDFAggregate<MAX_BXDF_CNT>::Eval(
     const CoordSystem &shd, [[maybe_unused]] const CoordSystem &geo,
     const Vec3 &wi, const Vec3 &wo, BSDFType type, bool star) const noexcept
 {
-    Vec3 lwi = shd.World2Local(wi), lwo = shd.World2Local(wo);
+    Vec3 lwi = shd.World2Local(wi).Normalize(), lwo = shd.World2Local(wo).Normalize();
     Spectrum ret;
     for(uint8_t i = 0; i < bxdfCnt_; ++i)
     {
@@ -112,7 +112,7 @@ BxDFAggregate<MAX_BXDF_CNT>::SampleWi(
 
     // 采样选出的bxdf
 
-    Vec3 lwo = shd.World2Local(wo);
+    Vec3 lwo = shd.World2Local(wo).Normalize();
     auto ret = bxdf->SampleWi(lwo, star, newSample);
     if(!ret)
         return std::nullopt;
@@ -137,7 +137,7 @@ BxDFAggregate<MAX_BXDF_CNT>::SampleWi(
     }
 
     ret->pdf /= nMatched;
-    ret->wi = shd.Local2World(ret->wi);
+    ret->wi = shd.Local2World(ret->wi).Normalize();
     return ret;
 }
 
@@ -146,7 +146,7 @@ Real BxDFAggregate<MAX_BXDF_CNT>::SampleWiPDF(
     const CoordSystem &shd, [[maybe_unused]] const CoordSystem &geo,
         const Vec3 &wi, const Vec3 &wo, BSDFType type, bool star) const noexcept
 {
-    Vec3 lwi = shd.World2Local(wi), lwo = shd.World2Local(wo);
+    Vec3 lwi = shd.World2Local(wi).Normalize(), lwo = shd.World2Local(wo).Normalize();
     uint8_t nMatched = 0; Real pdf = 0;
     for(uint8_t i = 0; i < bxdfCnt_; ++i)
     {

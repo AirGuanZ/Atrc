@@ -52,10 +52,12 @@ using AGZ::Math::Cos;
 using AGZ::Math::Exp;
 using AGZ::Math::Log_e;
 using AGZ::Math::Min;
+using AGZ::Math::Mix;
 using AGZ::Math::Max;
 using AGZ::Math::Pow;
 using AGZ::Math::Saturate;
 using AGZ::Math::Sin;
+using AGZ::Math::Sqr;
 using AGZ::Math::Sqrt;
 using AGZ::Math::Tan;
 

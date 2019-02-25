@@ -10,7 +10,7 @@ namespace Atrc
 {
 
 BxDF_Diffuse::BxDF_Diffuse(const Spectrum &albedo) noexcept
-    : BxDF(BSDF_NONESPECULAR), albedo_(albedo)
+    : BxDF(BSDF_NONSPECULAR), albedo_(albedo)
 {
 
 }
@@ -52,7 +52,7 @@ Real BxDF_Diffuse::SampleWiPDF(const Vec3 &wi, const Vec3 &wo, [[maybe_unused]] 
     if(wi.z <= 0 || wo.z <= 0)
         return 0;
     return AGZ::Math::DistributionTransform
-        ::ZWeightedOnUnitHemisphere<Real>::PDF(wi.Normalize());
+        ::ZWeightedOnUnitHemisphere<Real>::PDF(wi);
 }
 
 } // namespace Atrc

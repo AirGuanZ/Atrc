@@ -22,6 +22,9 @@ class SceneRenderer : public AGZ::Uncopiable
     std::unique_ptr<Atrc::Film> film_;
 
     Vec2i filmSize_;
+    std::string outputFilename_;
+
+    bool saved_;
 
 public:
 
@@ -45,4 +48,6 @@ public:
         if(reporter_)
             reporter_->ConsumeNewData(std::forward<Func>(func));
     }
+
+    void CheckSaving();
 };

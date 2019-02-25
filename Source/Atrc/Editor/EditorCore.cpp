@@ -433,6 +433,11 @@ void EditorCore::RenderScene()
     EndEntityRendering();
 }
 
+void EditorCore::SaveRenderingResult()
+{
+    lState_->sceneRenderer.CheckSaving();
+}
+
 void EditorCore::ShowGUI(GL::Immediate2D &imm, const AGZ::Input::Keyboard &kb)
 {
 

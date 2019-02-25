@@ -7,7 +7,7 @@
 #include "Global.h"
 
 SceneRenderer::SceneRenderer()
-    : renderer_(nullptr), sampler_(nullptr), filmFilter_(nullptr)
+    : renderer_(nullptr), sampler_(nullptr), filmFilter_(nullptr), saved_(false)
 {
     
 }
@@ -34,6 +34,7 @@ bool SceneRenderer::Start(const AGZ::Config &config, std::string_view configPath
 		
 		Vec2i filmSize = Atrc::Mgr::Parser::ParseVec2i(root["film.size"]);
 		film_ = std::make_unique<Atrc::Film>(filmSize, *filmFilter_);
+        outputFilename_ = context_->GetPathInWorkspace(root["outputFilename"].AsValue());
 		reporter_ = std::make_unique<FilmRTReporter>();
 		
 		renderer_->Render(scene_.get(), sampler_, film_.get(), reporter_.get());
@@ -82,6 +83,31 @@ void SceneRenderer::Clear()
 	scene_    = nullptr;
 	reporter_ = nullptr;
 	film_     = nullptr;
+    outputFilename_ = "";
 	
 	filmSize_ = Vec2i(0, 0);
+    saved_ = false;
+}
+
+void SceneRenderer::CheckSaving()
+{
+    if(IsRendering() && IsCompleted() && !saved_)
+    {
+        saved_ = true;
+        try
+        {
+            auto img = film_->GetImage();
+            AGZ::TextureFile::WriteRGBToPNG(outputFilename_, img.Map(
+                [](const Atrc::Spectrum &c)
+            {
+                return c.Map([](Atrc::Real s)
+                { return uint8_t(AGZ::Math::Clamp<Atrc::Real>(s * 256, 0, 255)); });
+            }));
+            Global::ShowNormalMessage("film image saved to " + outputFilename_);
+        }
+        catch(...)
+        {
+            Global::ShowErrorMessage("failed to save film image");
+        }
+    }
 }

@@ -4,7 +4,7 @@ namespace Atrc
 {
     
 BxDF_TorranceSparrowReflection::BxDF_TorranceSparrowReflection(const Spectrum &rc, const MicrofacetDistribution *md, const Fresnel *fresnel) noexcept
-    : BxDF(BSDFType(BSDF_REFLECTION | BSDF_NONESPECULAR)), rc_(rc), md_(md), fresnel_(fresnel)
+    : BxDF(BSDFType(BSDF_REFLECTION | BSDF_NONSPECULAR)), rc_(rc), md_(md), fresnel_(fresnel)
 {
     AGZ_ASSERT(md && fresnel);
 }
