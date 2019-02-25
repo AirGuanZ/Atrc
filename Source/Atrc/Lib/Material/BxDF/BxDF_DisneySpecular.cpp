@@ -12,7 +12,7 @@ BxDF_DisneySpecular::BxDF_DisneySpecular(
       specular_(specular), specularTint_(specularTint),
       metallic_(metallic), anisotropic_(anisotropic)
 {
-    roughness_ = Clamp(roughness, Real(0.01), Real(1));
+    roughness_ = Clamp(roughness, Real(0.05), Real(1));
     Real aspect = Sqrt(1 - Real(0.9) * anisotropic);
     ax_ = Sqr(roughness_) / aspect;
     ay_ = Sqr(roughness_) * aspect;
@@ -36,7 +36,8 @@ Spectrum BxDF_DisneySpecular::Eval(const Vec3 &wi, const Vec3 &wo, bool star) co
     Real cosThetaD = Dot(wi, wh);
 
     Real D = Microfacet::AnisotropicGTR2(sinPhiH, cosPhiH, sinThetaH, cosThetaH, ax_, ay_);
-    Real G = Microfacet::SmithAnisotropicGTR2(cosPhiI, sinPhiI, ax_, ay_, tanThetaI) * Microfacet::SmithAnisotropicGTR2(cosPhiO, sinPhiO, ax_, ay_, tanThetaO);
+    Real G = Microfacet::SmithAnisotropicGTR2(cosPhiI, sinPhiI, ax_, ay_, tanThetaI)
+           * Microfacet::SmithAnisotropicGTR2(cosPhiO, sinPhiO, ax_, ay_, tanThetaO);
 
     Real lum = Luminance(baseColor_);
     if(!lum)
