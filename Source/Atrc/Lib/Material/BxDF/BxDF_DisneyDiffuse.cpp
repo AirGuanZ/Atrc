@@ -42,7 +42,7 @@ Spectrum BxDF_DisneyDiffuse::Eval(const Vec3 &wi, const Vec3 &wo, bool star) con
     Vec3 wh = (wi + wo).Normalize();
     Real cosThetaI = CosTheta(wi), cosThetaO = CosTheta(wo);
     Real cosThetaD = Dot(wi, wh), cosThetaD2 = Sqr(cosThetaD);
-    Real FI = Ft(cosThetaI), FO = Ft(cosThetaO), FD = Ft(cosThetaD);
+    Real FI = Ft(cosThetaI), FO = Ft(cosThetaO);
 
     Real f_d = subsurface_ < 1 ? f_diffuse(FI, FO, cosThetaD2, roughness_) : Real(0);
     Real f_s = subsurface_ > 0 ? f_subsurface(cosThetaI, cosThetaO, FI, FO, cosThetaD2, roughness_) : Real(0);
