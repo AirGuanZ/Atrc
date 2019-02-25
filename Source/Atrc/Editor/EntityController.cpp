@@ -98,7 +98,7 @@ void EntityController::Import(const AGZ::ConfigNode &node)
     for(int c = 0; c != 4; ++c)
     {
         for(int r = 0; r != 4; ++r)
-            mat.m[c][r] = realMat.m[c][r];
+            mat.m[c][r] = float(realMat.m[c][r]);
     }
     float trans[3], rotate[3], scale[3];
     ImGuizmo::DecomposeMatrixToComponents(&mat.m[0][0], trans, rotate, scale);

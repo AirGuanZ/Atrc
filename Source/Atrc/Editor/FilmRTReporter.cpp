@@ -21,7 +21,10 @@ void FilmRTReporter::End()
 void FilmRTReporter::Report(const Atrc::Film &film, std::optional<Atrc::Real> percent)
 {
     std::lock_guard<std::mutex> lk(mut_);
-    img_ = film.GetImage();
+    img_ = film.GetImage().Map([](auto &v)
+    {
+        return v.Map(&AGZ::TypeOpr::StaticCaster<float, Atrc::Real>);
+    });
     newData_ = true;
     if(percent)
         Global::ShowNormalMessage("percent: " + std::to_string(*percent));

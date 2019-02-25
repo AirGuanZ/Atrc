@@ -25,32 +25,6 @@ public:
 };
 
 /*
-    type = DisneyBRDF;
-
-    baseColor      = Texture
-    subsurface     = Texture
-    metallic       = Texture
-    specular       = Texture
-    specularTint   = Texture
-    roughness      = Texture
-    anisotropic    = Texture
-    sheen          = Texture
-    sheenTint      = Texture
-    clearcoat      = Texture
-    clearcoatGloss = Texture
-
-    normalMapper = Texture | null
- */
-class DisneyBRDFMaterialCreator : public Creator<Material>
-{
-public:
-
-    std::string GetTypeName() const override { return "DisneyBRDF"; }
-
-    Material *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
-};
-
-/*
     type = DisneyDiffuse;
 
     baseColor      = Texture

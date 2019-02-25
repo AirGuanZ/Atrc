@@ -96,7 +96,7 @@ namespace
         Real cosThetaI = Dot(wi, nor);
         if(cosThetaI < 0)
             eta = 1 / eta;
-        float cosThetaTSqr = 1 - (1 - cosThetaI * cosThetaI) * eta * eta;
+        Real cosThetaTSqr = 1 - (1 - cosThetaI * cosThetaI) * eta * eta;
         if(cosThetaTSqr <= 0.0f)
             return std::nullopt;
         float sign = cosThetaI >= 0.0f ? 1.0f : -1.0f;

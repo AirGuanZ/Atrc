@@ -13,15 +13,6 @@ public:
     std::shared_ptr<MaterialInstance> Create(ResourceManager &rscMgr, std::string name) const override;
 };
 
-class DisneyBRDFCreator : public MaterialCreator
-{
-public:
-
-    DisneyBRDFCreator() : MaterialCreator("DisneyBRDF") { }
-
-    std::shared_ptr<MaterialInstance> Create(ResourceManager &rscMgr, std::string name) const override;
-};
-
 class DisneyDiffuseCreator : public MaterialCreator
 {
 public:

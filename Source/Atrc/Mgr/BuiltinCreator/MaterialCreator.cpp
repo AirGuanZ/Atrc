@@ -1,6 +1,5 @@
 #include <Atrc/Lib/Material/BSSRDFSurface.h>
 #include <Atrc/Lib/Material/DisneyDiffuse.h>
-#include <Atrc/Lib/Material/DisneyPrincipledBRDF.h>
 #include <Atrc/Lib/Material/DisneySpecular.h>
 #include <Atrc/Lib/Material/GGXDielectric.h>
 #include <Atrc/Lib/Material/GGXMetal.h>
@@ -80,7 +79,6 @@ namespace
 void RegisterBuiltinMaterialCreators(Context &context)
 {
     static const BSSRDFSurfaceCreator iBSSRDFSurfaceCreator;
-    static const DisneyBRDFMaterialCreator iDisneyBRDFMaterialCreator;
     static const DisneyDiffuseCreator iDisneyDiffuseCreator;
     static const DisneySpecularCreator iDisneySpecularCreator;
     static const GGXDielectricCreator iGGXDielectricCreator;
@@ -94,7 +92,6 @@ void RegisterBuiltinMaterialCreators(Context &context)
     static const ONMatteCreator oNMatteCreator;
     static const TSMetalCreator tSMetalCreator;
     context.AddCreator(&iBSSRDFSurfaceCreator);
-    context.AddCreator(&iDisneyBRDFMaterialCreator);
     context.AddCreator(&iDisneyDiffuseCreator);
     context.AddCreator(&iDisneySpecularCreator);
     context.AddCreator(&iGGXDielectricCreator);
@@ -147,31 +144,6 @@ Material *BSSRDFSurfaceCreator::Create(const ConfigGroup &group, Context &contex
         return arena.Create<BSSRDFSurface>(surface, AMap, dmfpMap, eta);
     }
     ATRC_MGR_CATCH_AND_RETHROW("In creating bssrdf surface material: " + group.ToString())
-}
-
-Material *DisneyBRDFMaterialCreator::Create(const ConfigGroup &group, Context &context, Arena &arena) const
-{
-    ATRC_MGR_TRY
-    {
-        auto baseColor = context.Create<Texture>(group["baseColor"]);
-        auto subsurface = context.Create<Texture>(group["subsurface"]);
-        auto metallic = context.Create<Texture>(group["metallic"]);
-        auto specular = context.Create<Texture>(group["specular"]);
-        auto specularTint = context.Create<Texture>(group["specularTint"]);
-        auto roughness = context.Create<Texture>(group["roughness"]);
-        auto anisotropic = context.Create<Texture>(group["anisotropic"]);
-        auto sheen = context.Create<Texture>(group["sheen"]);
-        auto sheenTint = context.Create<Texture>(group["sheenTint"]);
-        auto clearcoat = context.Create<Texture>(group["clearcoat"]);
-        auto clearcoatGloss = context.Create<Texture>(group["clearcoatGloss"]);
-        auto normalMapper = CreateNormalMapper(group, context, arena);
-
-        return arena.Create<DisneyBRDFMaterial>(
-            baseColor, subsurface, metallic, specular, specularTint,
-            roughness, anisotropic, sheen, sheenTint,
-            clearcoat, clearcoatGloss, normalMapper);
-    }
-    ATRC_MGR_CATCH_AND_RETHROW("In creating disney brdf: " + group.ToString())
 }
 
 Material *DisneyDiffuseCreator::Create(const ConfigGroup &group, Context &context, Arena &arena) const
