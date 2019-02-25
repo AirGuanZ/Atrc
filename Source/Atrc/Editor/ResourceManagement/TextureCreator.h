@@ -30,3 +30,12 @@ public:
 
     std::shared_ptr<TextureInstance> Create(ResourceManager &rscMgr, std::string name) const override;
 };
+
+class HDRTextureCreator : public TextureCreator
+{
+public:
+
+    HDRTextureCreator() : TextureCreator("HDR") { }
+
+    std::shared_ptr<TextureInstance> Create(ResourceManager &rscMgr, std::string name) const override;
+};

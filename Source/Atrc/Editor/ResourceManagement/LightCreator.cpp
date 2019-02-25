@@ -3,6 +3,33 @@
 
 namespace
 {
+    class EnvironmentLightInstance : public LightInstance
+    {
+        TextureSlot tex_;
+
+    protected:
+
+        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
+        {
+            ctx.AddLine("type = Environment;");
+            ExportSubResource("tex", rscMgr, ctx, tex_);
+        }
+
+    public:
+
+        using LightInstance::LightInstance;
+
+        void Display(ResourceManager &rscMgr) override
+        {
+            tex_.Display(rscMgr);
+        }
+
+        void Import(ResourceManager &rscMgr, const AGZ::ConfigGroup &root, const AGZ::ConfigGroup &params, const ImportContext &ctx) override
+        {
+            tex_.SetInstance(GetResourceInstance<TextureInstance>(rscMgr, root, params["tex"], ctx));
+        }
+    };
+
     class SkyLightInstance : public LightInstance
     {
         Vec3f top_ = Vec3f(1);
@@ -37,8 +64,15 @@ namespace
 
 void RegisterLightCreators(ResourceManager &rscMgr)
 {
+    static const EnvironmentLightCreator iEnvironmentLightCreator;
     static const SkyLightCreator iSkyLightCreator;
+    rscMgr.AddCreator(&iEnvironmentLightCreator);
     rscMgr.AddCreator(&iSkyLightCreator);
+}
+
+std::shared_ptr<LightInstance> EnvironmentLightCreator::Create(ResourceManager &rscMgr, std::string name) const
+{
+    return std::make_shared<EnvironmentLightInstance>(GetName(), std::move(name));
 }
 
 std::shared_ptr<LightInstance> SkyLightCreator::Create(ResourceManager &rscMgr, std::string name) const
