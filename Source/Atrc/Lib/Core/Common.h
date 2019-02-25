@@ -77,6 +77,11 @@ inline Real CosTheta(const Vec3 &w) noexcept
     return w.z;
 }
 
+inline Real Cos2Sin(Real cos)
+{
+    return Sqrt(Max<Real>(0, 1 - cos * cos));
+}
+
 // w must be normalized
 inline Real TanTheta(const Vec3 &w)
 {
@@ -123,6 +128,11 @@ namespace SPECTRUM = AGZ::Math::COLOR;
 inline bool operator!(const Spectrum &s) noexcept
 {
     return s == SPECTRUM::BLACK;
+}
+
+inline Real Luminance(const Spectrum &c)
+{
+    return Real(0.2126) * c.r + Real(0.7152) * c.g + Real(0.0722) * c.b;;
 }
 
 // ================================= Image

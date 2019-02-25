@@ -31,6 +31,15 @@ public:
     std::shared_ptr<MaterialInstance> Create(ResourceManager &rscMgr, std::string name) const override;
 };
 
+class DisneySpecularCreator : public MaterialCreator
+{
+public:
+
+    DisneySpecularCreator() : MaterialCreator("DisneySpecular") { }
+
+    std::shared_ptr<MaterialInstance> Create(ResourceManager &rscMgr, std::string name) const override;
+};
+
 class GGXDielectricCreator : public MaterialCreator
 {
 public:

@@ -54,7 +54,6 @@ Real BlinnPhong::SampleWiPDF([[maybe_unused]] const Vec3 &wi, const Vec3 &wo) co
 {
     Vec3 H = (wi + wo).Normalize();
     Real cosTheta = H.z;
-
     return (e_ + 1) * Pow(cosTheta, e_) / (2 * PI * 4 * Dot(wo, H));
 }
 

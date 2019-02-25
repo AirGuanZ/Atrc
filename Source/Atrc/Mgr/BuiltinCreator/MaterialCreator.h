@@ -70,6 +70,27 @@ public:
 };
 
 /*
+    type = DisneySpecular;
+
+    baseColor    = Texture
+    specular     = Texture
+    specularTint = Texture
+    metallic     = Texture
+    roughness    = Texture
+    anisotropic  = Texture
+
+    normalMapper = Texture | null
+ */
+class DisneySpecularCreator : public Creator<Material>
+{
+public:
+
+    std::string GetTypeName() const override { return "DisneySpecular"; }
+
+    Material *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
+};
+
+/*
     type = GGXDielectric
 
     fresnel   = Dielectric

@@ -192,6 +192,70 @@ namespace
         }
     };
 
+    class DisneySpecularInstance : public MaterialInstance
+    {
+        TextureSlot baseColor_;
+        TextureSlot specular_;
+        TextureSlot specularTint_;
+        TextureSlot metallic_;
+        TextureSlot roughness_;
+        TextureSlot anisotropic_;
+
+    protected:
+
+        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
+        {
+            ctx.AddLine("type = DisneySpecular;");
+            ExportSubResource("baseColor", rscMgr, ctx, baseColor_);
+            ExportSubResource("specular", rscMgr, ctx, specular_);
+            ExportSubResource("specularTint", rscMgr, ctx, specularTint_);
+            ExportSubResource("metallic", rscMgr, ctx, metallic_);
+            ExportSubResource("roughness", rscMgr, ctx, roughness_);
+            ExportSubResource("anisotropic", rscMgr, ctx, anisotropic_);
+        }
+
+    public:
+
+        DisneySpecularInstance(ResourceManager &rscMgr, std::string typeName, std::string name)
+            : MaterialInstance(std::move(typeName), std::move(name))
+        {
+            baseColor_.SetInstance(rscMgr.Create<TextureInstance>("Constant", ""));
+            specular_.SetInstance(rscMgr.Create<TextureInstance>("Constant1", ""));
+            specularTint_.SetInstance(rscMgr.Create<TextureInstance>("Constant1", ""));
+            metallic_.SetInstance(rscMgr.Create<TextureInstance>("Constant1", ""));
+            roughness_.SetInstance(rscMgr.Create<TextureInstance>("Constant1", ""));
+            anisotropic_.SetInstance(rscMgr.Create<TextureInstance>("Constant1", ""));
+        }
+
+        void Display(ResourceManager &rscMgr) override
+        {
+            auto T = [&rscMgr](const char *name, TextureSlot &tex)
+            {
+                if(ImGui::TreeNodeEx(name, ImGuiTreeNodeFlags_DefaultOpen))
+                {
+                    tex.Display(rscMgr);
+                    ImGui::TreePop();
+                }
+            };
+            T("baseColor", baseColor_);
+            T("specular", specular_);
+            T("specularTint", specularTint_);
+            T("metallic", metallic_);
+            T("roughness", roughness_);
+            T("anisotropic", anisotropic_);
+        }
+
+        void Import(ResourceManager &rscMgr, const AGZ::ConfigGroup &root, const AGZ::ConfigGroup &params, const ImportContext &ctx) override
+        {
+            baseColor_.SetInstance(GetResourceInstance<TextureInstance>(rscMgr, root, params["baseColor"], ctx));
+            specular_.SetInstance(GetResourceInstance<TextureInstance>(rscMgr, root, params["specular"], ctx));
+            specularTint_.SetInstance(GetResourceInstance<TextureInstance>(rscMgr, root, params["specularTint"], ctx));
+            metallic_.SetInstance(GetResourceInstance<TextureInstance>(rscMgr, root, params["metallic"], ctx));
+            roughness_.SetInstance(GetResourceInstance<TextureInstance>(rscMgr, root, params["roughness"], ctx));
+            anisotropic_.SetInstance(GetResourceInstance<TextureInstance>(rscMgr, root, params["anisotropic"], ctx));
+        }
+    };
+
     class GGXDielectricInstance : public MaterialInstance
     {
         TextureSlot rc_;
@@ -563,6 +627,7 @@ void RegisterMaterialCreators(ResourceManager &rscMgr)
     static const BSSRDFCreator iNormalizedDiffusionBSSRDFCreator;
     static const DisneyBRDFCreator iDisneyBRDFCreator;
     static const DisneyDiffuseCreator iDisneyDiffuseCreator;
+    static const DisneySpecularCreator iDisneySpecularCreator;
     static const GGXDielectricCreator iGGXDielectricCreator;
     static const GGXMetalCreator iGGXMetalCreator;
     static const IdealBlackCreator iIdealBlackCreator;
@@ -576,6 +641,7 @@ void RegisterMaterialCreators(ResourceManager &rscMgr)
     rscMgr.AddCreator(&iNormalizedDiffusionBSSRDFCreator);
     rscMgr.AddCreator(&iDisneyBRDFCreator);
     rscMgr.AddCreator(&iDisneyDiffuseCreator);
+    rscMgr.AddCreator(&iDisneySpecularCreator);
     rscMgr.AddCreator(&iGGXDielectricCreator);
     rscMgr.AddCreator(&iGGXMetalCreator);
     rscMgr.AddCreator(&iIdealBlackCreator);
@@ -601,6 +667,11 @@ std::shared_ptr<MaterialInstance> DisneyBRDFCreator::Create(ResourceManager &rsc
 std::shared_ptr<MaterialInstance> DisneyDiffuseCreator::Create(ResourceManager &rscMgr, std::string name) const
 {
     return std::make_shared<DisneyDiffuseInstance>(rscMgr, GetName(), std::move(name));
+}
+
+std::shared_ptr<MaterialInstance> DisneySpecularCreator::Create(ResourceManager &rscMgr, std::string name) const
+{
+    return std::make_shared<DisneySpecularInstance>(rscMgr, GetName(), std::move(name));
 }
 
 std::shared_ptr<MaterialInstance> GGXDielectricCreator::Create(ResourceManager &rscMgr, std::string name) const
