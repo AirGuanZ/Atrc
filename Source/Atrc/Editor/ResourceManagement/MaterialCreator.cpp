@@ -103,6 +103,95 @@ namespace
         }
     };
 
+    class DisneyReflectionInstance : public MaterialInstance
+    {
+        TextureSlot baseColor_;
+        TextureSlot metallic_;
+        TextureSlot subsurface_;
+        TextureSlot specular_;
+        TextureSlot specularTint_;
+        TextureSlot roughness_;
+        TextureSlot anisotropic_;
+        TextureSlot sheen_;
+        TextureSlot sheenTint_;
+        TextureSlot clearcoat_;
+        TextureSlot clearcoatGloss_;
+
+    protected:
+
+        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
+        {
+            ctx.AddLine("type = DisneyReflection;");
+            ExportSubResource("baseColor", rscMgr, ctx, baseColor_);
+            ExportSubResource("metallic", rscMgr, ctx, metallic_);
+            ExportSubResource("subsurface", rscMgr, ctx, subsurface_);
+            ExportSubResource("specular", rscMgr, ctx, specular_);
+            ExportSubResource("specularTint", rscMgr, ctx, specularTint_);
+            ExportSubResource("roughness", rscMgr, ctx, roughness_);
+            ExportSubResource("anisotropic", rscMgr, ctx, anisotropic_);
+            ExportSubResource("sheen", rscMgr, ctx, sheen_);
+            ExportSubResource("sheenTint", rscMgr, ctx, sheenTint_);
+            ExportSubResource("clearcoat", rscMgr, ctx, clearcoat_);
+            ExportSubResource("clearcoatGloss", rscMgr, ctx, clearcoatGloss_);
+        }
+
+    public:
+
+        DisneyReflectionInstance(ResourceManager &rscMgr, std::string typeName, std::string name)
+            : MaterialInstance(std::move(typeName), std::move(name))
+        {
+            baseColor_.SetInstance(rscMgr.Create<TextureInstance>("Constant", ""));
+            metallic_.SetInstance(rscMgr.Create<TextureInstance>("Constant1", ""));
+            subsurface_.SetInstance(rscMgr.Create<TextureInstance>("Constant1", ""));
+            specular_.SetInstance(rscMgr.Create<TextureInstance>("Constant1", ""));
+            specularTint_.SetInstance(rscMgr.Create<TextureInstance>("Constant1", ""));
+            roughness_.SetInstance(rscMgr.Create<TextureInstance>("Constant1", ""));
+            anisotropic_.SetInstance(rscMgr.Create<TextureInstance>("Constant1", ""));
+            sheen_.SetInstance(rscMgr.Create<TextureInstance>("Constant1", ""));
+            sheenTint_.SetInstance(rscMgr.Create<TextureInstance>("Constant1", ""));
+            clearcoat_.SetInstance(rscMgr.Create<TextureInstance>("Constant1", ""));
+            clearcoatGloss_ .SetInstance(rscMgr.Create<TextureInstance>("Constant1", ""));
+        }
+
+        void Display(ResourceManager &rscMgr) override
+        {
+            auto T = [&rscMgr](const char *name, TextureSlot &tex)
+            {
+                if(ImGui::TreeNodeEx(name, ImGuiTreeNodeFlags_DefaultOpen))
+                {
+                    tex.Display(rscMgr);
+                    ImGui::TreePop();
+                }
+            };
+            T("baseColor", baseColor_);
+            T("metallic", metallic_);
+            T("subsurface", subsurface_);
+            T("specular", specular_);
+            T("specularTint", specularTint_);
+            T("roughness", roughness_);
+            T("anisotropic", anisotropic_);
+            T("sheen", sheen_);
+            T("sheenTint", sheenTint_);
+            T("clearcoat", clearcoat_);
+            T("clearcoatGloss", clearcoatGloss_);
+        }
+
+        void Import(ResourceManager &rscMgr, const AGZ::ConfigGroup &root, const AGZ::ConfigGroup &params, const ImportContext &ctx) override
+        {
+            baseColor_.SetInstance(GetResourceInstance<TextureInstance>(rscMgr, root, params["baseColor"], ctx));
+            metallic_.SetInstance(GetResourceInstance<TextureInstance>(rscMgr, root, params["metallic"], ctx));
+            subsurface_.SetInstance(GetResourceInstance<TextureInstance>(rscMgr, root, params["subsurface"], ctx));
+            specular_.SetInstance(GetResourceInstance<TextureInstance>(rscMgr, root, params["specular"], ctx));
+            specularTint_.SetInstance(GetResourceInstance<TextureInstance>(rscMgr, root, params["specularTint"], ctx));
+            roughness_.SetInstance(GetResourceInstance<TextureInstance>(rscMgr, root, params["roughness"], ctx));
+            anisotropic_.SetInstance(GetResourceInstance<TextureInstance>(rscMgr, root, params["anisotropic"], ctx));
+            sheen_.SetInstance(GetResourceInstance<TextureInstance>(rscMgr, root, params["sheen"], ctx));
+            sheenTint_.SetInstance(GetResourceInstance<TextureInstance>(rscMgr, root, params["sheenTint"], ctx));
+            clearcoat_.SetInstance(GetResourceInstance<TextureInstance>(rscMgr, root, params["clearcoat"], ctx));
+            clearcoatGloss_.SetInstance(GetResourceInstance<TextureInstance>(rscMgr, root, params["clearcoatGloss"], ctx));
+        }
+    };
+
     class DisneySpecularInstance : public MaterialInstance
     {
         TextureSlot baseColor_;
@@ -537,6 +626,7 @@ void RegisterMaterialCreators(ResourceManager &rscMgr)
 {
     static const BSSRDFCreator iNormalizedDiffusionBSSRDFCreator;
     static const DisneyDiffuseCreator iDisneyDiffuseCreator;
+    static const DisneyReflectionCreator iDisneyReflectionCreator;
     static const DisneySpecularCreator iDisneySpecularCreator;
     static const GGXDielectricCreator iGGXDielectricCreator;
     static const GGXMetalCreator iGGXMetalCreator;
@@ -550,6 +640,7 @@ void RegisterMaterialCreators(ResourceManager &rscMgr)
     static const TSMetalCreator iTSMetalCreator;
     rscMgr.AddCreator(&iNormalizedDiffusionBSSRDFCreator);
     rscMgr.AddCreator(&iDisneyDiffuseCreator);
+    rscMgr.AddCreator(&iDisneyReflectionCreator);
     rscMgr.AddCreator(&iDisneySpecularCreator);
     rscMgr.AddCreator(&iGGXDielectricCreator);
     rscMgr.AddCreator(&iGGXMetalCreator);
@@ -571,6 +662,11 @@ std::shared_ptr<MaterialInstance> BSSRDFCreator::Create(ResourceManager &rscMgr,
 std::shared_ptr<MaterialInstance> DisneyDiffuseCreator::Create(ResourceManager &rscMgr, std::string name) const
 {
     return std::make_shared<DisneyDiffuseInstance>(rscMgr, GetName(), std::move(name));
+}
+
+std::shared_ptr<MaterialInstance> DisneyReflectionCreator::Create(ResourceManager &rscMgr, std::string name) const
+{
+    return std::make_shared<DisneyReflectionInstance>(rscMgr, GetName(), std::move(name));
 }
 
 std::shared_ptr<MaterialInstance> DisneySpecularCreator::Create(ResourceManager &rscMgr, std::string name) const

@@ -9,7 +9,7 @@ void ACESFilm::Process(Image *img) const noexcept
 {
     *img = img->Map([=](const Spectrum &s)
     {
-        return s.Map([=](float x)
+        return s.Map([=](Real x)
         {
             constexpr Real a = Real(2.51);
             constexpr Real b = Real(0.03);

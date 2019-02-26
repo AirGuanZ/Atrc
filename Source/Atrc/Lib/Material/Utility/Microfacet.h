@@ -15,8 +15,12 @@ Vec3 SampleGTR2(Real alpha, const Vec2 &sample);
 
 Real AnisotropicGTR2(Real sinPhiH, Real cosPhiH, Real sinThetaH, Real cosThetaH, Real ax, Real ay);
 
+Real SmithAnisotropicGTR2(Real cosPhi, Real sinPhi, Real ax, Real ay, Real tanTheta);
+
 Vec3 SampleAnisotropicGTR2(Real ax, Real ay, const Vec2 &sample);
 
-Real SmithAnisotropicGTR2(Real cosPhi, Real sinPhi, Real ax, Real ay, Real tanTheta);
+Real GTR1(Real sinThetaH, Real cosThetaH, Real alpha);
+
+Vec3 SampleGTR1(Real alpha, const Vec2 &sample);
 
 } // namespace Atrc::GTR

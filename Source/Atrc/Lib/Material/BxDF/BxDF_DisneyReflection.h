@@ -20,6 +20,9 @@ class BxDF_DisneyReflection : public BxDF
     Real clearcoatGloss_;
 
     Real ax_, ay_;
+    Real clearcoatRoughness_;
+
+    struct SampleWeights { Real wd, ws, wc; } sampleWeights_;
 
 public:
 
@@ -36,7 +39,7 @@ public:
         Real clearcoat,
         Real clearcoatGloss) noexcept;
 
-    Spectrum GetBaseColor() const noexcept override;
+    Spectrum GetBaseColor() const noexcept override { return baseColor_; }
 
     Spectrum Eval(const Vec3 &wi, const Vec3 &wo, bool star) const noexcept override;
 

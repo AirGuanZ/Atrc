@@ -46,6 +46,32 @@ public:
 /*
     type = DisneySpecular;
 
+    baseColor      = Texture
+    metallic       = Texture
+    subsurface     = Texture
+    specular       = Texture
+    specularTint   = Texture
+    roughness      = Texture
+    anisotropic    = Texture
+    sheen          = Texture
+    sheenTint      = Texture
+    clearcoat      = Texture
+    clearcoatGloss = Texture
+
+    normalMapper = Texture | null
+ */
+class DisneyReflectionCreator : public Creator<Material>
+{
+public:
+
+    std::string GetTypeName() const override { return "DisneyReflection"; }
+
+    Material *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
+};
+
+/*
+    type = DisneySpecular;
+
     baseColor    = Texture
     specular     = Texture
     specularTint = Texture

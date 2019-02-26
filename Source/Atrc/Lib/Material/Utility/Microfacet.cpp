@@ -40,10 +40,19 @@ Real AnisotropicGTR2(Real sinPhiH, Real cosPhiH, Real sinThetaH, Real cosThetaH,
     return 1 / (PI * ax * ay * Sqr(RD));
 }
 
+Real SmithAnisotropicGTR2(Real cosPhi, Real sinPhi, Real ax, Real ay, Real tanTheta)
+{
+    Real t = Sqr(ax * cosPhi) + Sqr(ay * sinPhi);
+    Real sqr = 1 + t * Sqr(tanTheta);
+    Real lambda = -Real(0.5) + Real(0.5) * Sqrt(sqr);
+    return 1 / (1 + lambda);
+}
+
 Vec3 SampleAnisotropicGTR2(Real ax, Real ay, const Vec2 &sample)
 {
     Real sinPhiH = ay * Sin(2 * PI * sample.x);
     Real cosPhiH = ax * Cos(2 * PI * sample.x);
+    
     Real nor = 1 / Sqrt(Sqr(sinPhiH) + Sqr(cosPhiH));
     sinPhiH *= nor;
     cosPhiH *= nor;
@@ -53,20 +62,22 @@ Vec3 SampleAnisotropicGTR2(Real ax, Real ay, const Vec2 &sample)
     Real sinThetaH = Sqrt(Max<Real>(0, 1 - Sqr(cosThetaH)));
 
     return Vec3(sinThetaH * cosPhiH, sinThetaH * sinPhiH, cosThetaH).Normalize();
-
-    /*Real A = Sqrt(sample.y / (1 - sample.y));
-    Real xb = ax * Cos(2 * PI * sample.x);
-    Real yb = ay * Sin(2 * PI * sample.x);
-    Vec3 h(A * xb, A * yb, 1);
-    return h.Normalize();*/
 }
 
-Real SmithAnisotropicGTR2(Real cosPhi, Real sinPhi, Real ax, Real ay, Real tanTheta)
+Real GTR1(Real sinThetaH, Real cosThetaH, Real alpha)
 {
-    Real t = Sqr(ax * cosPhi) + Sqr(ay * sinPhi);
-    Real sqr = 1 + t * Sqr(tanTheta);
-    Real lambda = -Real(0.5) + Real(0.5) * Sqrt(sqr);
-    return 1 / (1 + lambda);
+    Real U = Sqr(alpha) - 1;
+    Real LD = 2 * PI  * Log_e(alpha);
+    Real RD = Sqr(alpha * cosThetaH) + Sqr(sinThetaH);
+    return U / (LD * RD);
+}
+
+Vec3 SampleGTR1(Real alpha, const Vec2 &sample)
+{
+    Real phi = 2 * PI * sample.x;
+    Real cosTheta = Sqrt((Pow(alpha, 2 - 2 * sample.y) - 1) / (Sqr(alpha) - 1));
+    Real sinTheta = Cos2Sin(cosTheta);
+    return Vec3(sinTheta * Cos(phi), sinTheta * Sin(phi), cosTheta).Normalize();
 }
 
 } // namespace Atrc::GTR

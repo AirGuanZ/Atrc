@@ -11,19 +11,17 @@ namespace
         if(H.z <= 0)
             return 0;
         Real tanTheta2 = TanTheta2(H), cosTheta2 = H.z * H.z;
-        Real root = alpha / (cosTheta2 * (alpha * alpha + tanTheta2));
-        return root * root / PI;
+        return Sqr(alpha / (cosTheta2 * (alpha * alpha + tanTheta2))) / PI;
     }
 
     Real Smith(const Vec3 &w, const Vec3 &wh, Real alpha)
     {
-        Real tanTheta = Abs(TanTheta(w));
-        if(!tanTheta)
+        Real tanTheta = TanTheta(w);
+        if(tanTheta <= 0)
             return 1;
         if((Dot(w, wh) >= 0) != (w.z >= 0))
             return 0;
-        Real root = alpha * tanTheta;
-        return 2 / (1 + Sqrt(1 + root * root));
+        return 2 / (1 + Sqrt(1 + Sqr(alpha * tanTheta)));
     }
 
     Real GGX_G(const Vec3 &wi, const Vec3 &wo, const Vec3 &wh, Real alpha)
@@ -31,6 +29,7 @@ namespace
         return Smith(wi, wh, alpha) * Smith(wo, wh, alpha);;
     }
 
+    // ref https://github.com/behindthepixels/EDXRay
     Vec2 Slope(Real thetaI, const Vec2 &sample)
     {
         if(thetaI < EPS)
