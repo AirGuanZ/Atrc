@@ -223,7 +223,10 @@ Spectrum BxDF_Microfacet::Eval(const Vec3 &wi, const Vec3 &wo, bool star) const 
     if(star)
         val /= etaT * etaT / (etaI * etaI);
 
-    return rc_ * Abs(val);
+    Spectrum ret = rc_ * Abs(val);
+    if(ret.HasInf())
+        return Spectrum();
+    return ret;
 }
 
 std::optional<BxDF::SampleWiResult> BxDF_Microfacet::SampleWi(const Vec3 &wo, bool star, const Vec3 &sample) const noexcept
@@ -255,6 +258,9 @@ std::optional<BxDF::SampleWiResult> BxDF_Microfacet::SampleWi(const Vec3 &wo, bo
         ret.isDelta = false;
         ret.type    = BSDFType(BSDF_REFLECTION | BSDF_NONSPECULAR);
         ret.wi      = nWi;
+
+        if(pdf < EPS || ret.coef.HasInf())
+            return std::nullopt;
 
         return ret;
     }
@@ -288,6 +294,9 @@ std::optional<BxDF::SampleWiResult> BxDF_Microfacet::SampleWi(const Vec3 &wo, bo
     ret.isDelta = false;
     ret.pdf     = Abs(Hpdf * dHdWi * (1 - Fr));
     ret.type    = BSDFType(BSDF_TRANSMISSION | BSDF_NONSPECULAR);
+
+    if(ret.pdf < EPS || ret.coef.HasInf())
+        return std::nullopt;
 
     return ret;
 }
