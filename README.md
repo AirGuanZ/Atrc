@@ -23,8 +23,8 @@ Atrc已/将实现以下特性：
 - [x] [Editor] 导出和加载可被Launcher读取并用于渲染的场景描述脚本，也可在编辑器中直接进行渲染
 - [x] [SH2D] 将场景/环境光投影到1~5阶球谐函数上
 - [x] [SH2D] 从场景和环境光的球谐函数系数重建出图像，支持环境光系数的旋转
-- [ ] Disney BRDF（施工中）
-- [ ] Progressive Photon Mapping
+- [x] Disney BRDF
+- [ ] Progressive Photon Mapping（施工中）
 - [ ] Bidirectional Path Tracing
 
 下图展示了部分渲染结果，模型主要来自[3D Scans](http://threedscans.com/)和[The Stanford 3D Scanning Repository
