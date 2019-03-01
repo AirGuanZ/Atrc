@@ -37,21 +37,4 @@ public:
     Entity *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
 };
 
-/*
-    type               = GeometryGroup
-    
-    geometryGroup      = Name2GeometryDefinition
-    materialAssignment = { MaterialAssignment }
-    mediumAssignment   = { MediumAssignment }
-    transform          = Transform
-*/
-class GeometryGroupEntityCreator : public Creator<Entity>
-{
-public:
-
-    std::string GetTypeName() const override { return "GeometryGroup"; }
-
-    Entity *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
-};
-
 } // namespace Atrc::Mgr
