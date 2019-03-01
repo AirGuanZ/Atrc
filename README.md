@@ -14,7 +14,7 @@ Atrc已/将实现以下特性：
 - [x] [Lib] 快速构建BVH加速数据结构
 - [x] [Lib] 已构建的BVH树会被自动缓存至`.agz.cache`中，优化启动时间
 - [x] [Lib] Disney Principled BRDF，Oren-Nayar漫反射模型，玻璃，黑体等多种材质模型
-- [ ] [Lib] Microfacet Transmission BSDF
+- [x] [Lib] Microfacet Transmission BSDF
 - [x] [Lib] Normalized Diffusion BSSRDF
 - [x] [Lib] 几何漫射光源和支持HDR贴图的环境光
 - [x] [Lib] Gamma校正和简单的Tone Mapping
@@ -24,10 +24,10 @@ Atrc已/将实现以下特性：
 - [x] [Editor] 导出和加载可被Launcher读取并用于渲染的场景描述脚本，也可在编辑器中直接进行渲染
 - [x] [SH2D] 将场景/环境光投影到1~5阶球谐函数上
 - [x] [SH2D] 从场景和环境光的球谐函数系数重建出图像，支持环境光系数的旋转
+- [ ] [Editor] 将imgui切换为Qt（施工中）
+- [ ] [Mgr] 重构场景构建体系（施工中）
 - [ ] [Lib] Progressive Photon Mapping（学习中）
 - [ ] [Lib] Bidirectional Path Tracing
-- [ ] [Editor] 将imgui切换为Qt
-- [ ] [Mgr] 重构场景构建体系
 - [ ] [Lib] Disney Pincipled BSDF
 
 下图为部分渲染结果，模型主要来自[3D Scans](http://threedscans.com/)和[Stanford 3D Scanning Repository

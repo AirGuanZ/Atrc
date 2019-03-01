@@ -1,11 +1,9 @@
 #pragma once
 
-#include <memory>
-
-#include <QImage>
 #include <QMainWindow>
 
-namespace Ui { class MainWindow; }
+#include "AtrcDialog.h"
+#include "ui_Atrc.h"
 
 class Atrc : public QMainWindow
 {
@@ -13,18 +11,27 @@ class Atrc : public QMainWindow
 
 public:
 
-    explicit Atrc(QWidget *parent = nullptr);
-
-    ~Atrc();
+    explicit Atrc(QWidget *parent = nullptr)
+    {
+        ui_.setupUi(this);
+        connect(ui_.menuItem_quit, &QAction::triggered, this, &QMainWindow::close);
+        connect(ui_.showDialog, &QPushButton::clicked, this, [&dialog = dialog_]
+        {
+            dialog = std::make_unique<AtrcDialog>();
+            dialog->show();
+        });
+    }
 
 private slots:
 
-    void OnOpenFile();
-
-    void OnCloseFile();
+    void onShowDialog()
+    {
+        auto dialog = new AtrcDialog;
+        dialog->show();
+    }
 
 private:
 
-    Ui::MainWindow *ui_;
-    std::unique_ptr<QImage> img_;
+    Ui::MainWindow ui_;
+    std::unique_ptr<AtrcDialog> dialog_;
 };

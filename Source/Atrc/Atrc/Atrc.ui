@@ -6,33 +6,34 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>778</width>
-    <height>570</height>
+    <width>850</width>
+    <height>632</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QHBoxLayout" name="horizontalLayout">
-    <item>
-     <widget class="QLabel" name="label">
-      <property name="text">
-       <string/>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignCenter</set>
-      </property>
-     </widget>
-    </item>
-   </layout>
+   <widget class="QPushButton" name="showDialog">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>10</y>
+      <width>93</width>
+      <height>28</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>showDialog</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>778</width>
+     <width>850</width>
      <height>26</height>
     </rect>
    </property>
@@ -40,8 +41,6 @@
     <property name="title">
      <string>文件</string>
     </property>
-    <addaction name="menuItem_open"/>
-    <addaction name="menuItem_close"/>
     <addaction name="menuItem_quit"/>
    </widget>
    <addaction name="menu"/>
