@@ -1,13 +1,14 @@
 #include <QApplication>
-#include <QPushButton>
+
+#include "Atrc.h"
 
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
 
-    QPushButton button("exit");
-    QObject::connect(&button, SIGNAL(clicked()), &app, SLOT(quit()));
-    button.show();
+    Atrc atrc;
+    atrc.setWindowTitle("Atrc");
+    atrc.show();
 
-    return app.exec();
+    return QApplication::exec();
 }
