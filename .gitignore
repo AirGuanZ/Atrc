@@ -14,6 +14,7 @@ Library/*
 Build/
 Build32/
 Build64/
+BuildQt/
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs

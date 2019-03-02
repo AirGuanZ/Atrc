@@ -3,6 +3,7 @@
 #include <cstdint>
 
 #include <AGZUtils/Utils/Alloc.h>
+#include <AGZUtils/Utils/Exception.h>
 #include <AGZUtils/Utils/Math.h>
 
 namespace AGZ
@@ -167,13 +168,13 @@ using FilmGrid = TFilmGrid<Spectrum>;
 
 // ================================= Exception
 
-class Exception
+class Exception : public AGZ::HierarchyException
 {
     std::string msg_;
 
 public:
 
-    explicit Exception(std::string msg) noexcept : msg_(std::move(msg)) { }
+    using HierarchyException::HierarchyException;
 
     const std::string &What() const noexcept { return msg_; }
 };
@@ -182,7 +183,7 @@ public:
     class NAME : public ::Atrc::Exception \
     { \
     public: \
-        explicit NAME(std::string err) : Exception(std::move(err)) noexcept { } \
+        using Exception::Exception; \
     }
 
 } // namespace Atrc

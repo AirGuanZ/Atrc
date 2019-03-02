@@ -14,6 +14,7 @@ int main(int argc, char *argv[])
 #endif
 
     QApplication app(argc, argv);
+    QApplication::setStyle("Fusion");
 
     Atrc atrc;
     atrc.setWindowTitle("Atrc");
