@@ -13,8 +13,8 @@
     1. Lib使用它创建的可渲染对象进行渲染
     2. Launcher使用它将脚本文件转换为一组可渲染对象
     3. Editor使用它导出用于Launcher进行渲染的脚本
-    4. Editor使用它保存和加载资源对象
-    5. Editor提供展示和修改它的界面，ResourceData -> ResourceDataWidget的映射需要在ResourceData之外的地方维护
+
+    Editor对ResourceData的管理完全使用另一套体系，因为有的Editor中的对象在renderer这边可能没有对应物
 */
 
 namespace Atrc
@@ -86,7 +86,7 @@ public:
         auto &name = creator->GetName();
         auto it = name2Creator_.find(name);
         if(it != name2Creator_.end())
-            throw ResourceDataException("resource data creator name repeated");
+            throw ResourceDataException("resource data creator name repeated: " + name);
         name2Creator_.insert(std::make_pair(name, creator));
         sortedCreators_.push_back(creator);
         std::sort(std::begin(sortedCreators_), std::end(sortedCreators_),
