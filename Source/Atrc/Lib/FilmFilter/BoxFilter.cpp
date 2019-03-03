@@ -5,29 +5,44 @@
 namespace Atrc
 {
 
+namespace
+{
+    class BoxFilter : public FilmFilter
+    {
+    public:
+
+        explicit BoxFilter(const Vec2 &radius) noexcept
+            : FilmFilter(radius)
+        {
+
+        }
+
+        Real Eval(Real relX, Real relY) const noexcept override
+        {
+            return 1;
+        }
+    };
+} // namespace anonymous
+
 std::string BoxFilterData::Serialize() const
 {
     static const AGZ::TFormatter<char> fmt(
         "type = Box;"
-        "radius = {};");
-    return "{" + fmt.Arg(Vec2ToConfigStr(radius_)) + "}";
+        "sidelen = {};");
+    return "{" + fmt.Arg(sidelen_) + "}";
 }
 
 void BoxFilterData::Deserialize(const AGZ::ConfigGroup &param)
 {
-    AGZ_ASSERT(param["type"] == GetTypeName());
-    radius_ = Node2Vec2(param["radius"]);
+    AGZ_ASSERT(param["type"].AsValue() == GetTypeName());
+    sidelen_ = param["sidelen"].Parse<Real>();
+    if(sidelen_ <= 0)
+        throw ResourceDataException("invalid sidelen value: " + std::to_string(sidelen_));
 }
 
-BoxFilter::BoxFilter(const Vec2 &radius) noexcept
-    : FilmFilter(radius)
+FilmFilter *BoxFilterData::CreateResource(Arena &arena) const
 {
-
-}
-
-Real BoxFilter::Eval([[maybe_unused]] Real relX, [[maybe_unused]] Real relY) const noexcept
-{
-    return 1;
+    return arena.Create<BoxFilter>(Vec2(sidelen_ / 2));
 }
 
 } // namespace Atrc

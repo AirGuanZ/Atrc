@@ -8,7 +8,7 @@ namespace Atrc
 
 class BoxFilterData : public ResourceData<FilmFilter>
 {
-    Vec2 radius_;
+    Real sidelen_ = 1;
 
 public:
 
@@ -17,19 +17,8 @@ public:
     std::string Serialize() const override;
 
     void Deserialize(const AGZ::ConfigGroup &param) override;
-};
 
-using BoxFilterCreator = ResourceData2Creator<BoxFilterData>;
-
-class BoxFilter : public FilmFilter
-{
-    Vec2 radius_;
-
-public:
-
-    explicit BoxFilter(const Vec2 &radius) noexcept;
-
-    Real Eval(Real relX, Real relY) const noexcept override;
+    FilmFilter *CreateResource(Arena &arena) const override;
 };
 
 } // namespace Atrc

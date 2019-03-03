@@ -35,7 +35,7 @@ public:
 
     virtual void Deserialize(const AGZ::ConfigGroup &param) = 0;
 
-    virtual TResource *CreateResource() const = 0;
+    virtual TResource *CreateResource(Arena &arena) const = 0;
 };
 
 template<typename TResource>

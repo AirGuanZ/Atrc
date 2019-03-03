@@ -108,7 +108,7 @@
            <x>0</x>
            <y>0</y>
            <width>289</width>
-           <height>533</height>
+           <height>460</height>
           </rect>
          </property>
         </widget>
@@ -190,13 +190,6 @@
              </property>
             </widget>
            </item>
-           <item>
-            <widget class="QPushButton" name="ScrollToConsoleBottom">
-             <property name="text">
-              <string>Bottom</string>
-             </property>
-            </widget>
-           </item>
           </layout>
          </item>
          <item>
@@ -224,16 +217,6 @@
     </layout>
    </widget>
   </widget>
-  <action name="menuItem_open">
-   <property name="text">
-    <string>打开</string>
-   </property>
-  </action>
-  <action name="menuItem_close">
-   <property name="text">
-    <string>关闭</string>
-   </property>
-  </action>
   <action name="MenuItemQuit">
    <property name="text">
     <string>退出</string>

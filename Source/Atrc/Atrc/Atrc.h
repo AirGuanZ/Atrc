@@ -10,7 +10,7 @@ class Atrc : public QMainWindow
 
 public:
 
-    explicit Atrc(QWidget *parent = nullptr)
+    Atrc()
     {
         ui_.setupUi(this);
 
@@ -23,7 +23,6 @@ public:
         connect(ui_.AddErr, &QPushButton::clicked, this, &Atrc::OnAddErrClicked);
 
         connect(ui_.ClearConsole, &QPushButton::clicked, ui_.ConsoleText, &QTextEdit::clear);
-
     }
 
     void ShowNormalMessage(const std::string &msg)
@@ -51,8 +50,6 @@ private:
         static int cnt = 0;
         ShowErrorMessage("this is an error message: " + std::to_string(cnt++));
     }
-
-private:
 
     Ui::MainWindow ui_;
 };

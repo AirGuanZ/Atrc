@@ -9,6 +9,8 @@ namespace Atrc
 
 class FilmFilter
 {
+protected:
+
     Vec2 radius_;
 
 public:

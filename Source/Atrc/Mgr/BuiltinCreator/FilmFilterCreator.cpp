@@ -17,10 +17,9 @@ FilmFilter *BoxFilterCreator::Create(const ConfigGroup &group, [[maybe_unused]] 
 {
     ATRC_MGR_TRY
     {
-        Real sidelen = group["sidelen"].Parse<Real>();
-        if(sidelen <= 0)
-            throw MgrErr("Invalid sidelen value");
-        return arena.Create<BoxFilter>(Vec2(sidelen / 2));
+        BoxFilterData data;
+        data.Deserialize(group);
+        return data.CreateResource(arena);
     }
     ATRC_MGR_CATCH_AND_RETHROW("In creating box filter: " + group.ToString())
 }
@@ -29,13 +28,9 @@ FilmFilter *GaussianFilterCreator::Create(const ConfigGroup &group, [[maybe_unus
 {
     ATRC_MGR_TRY
     {
-        Real radius = group["radius"].Parse<Real>();
-        Real alpha  = group["alpha"].Parse<Real>();
-
-        if(radius <= 0)
-            throw MgrErr("Invalid radius value");
-
-        return arena.Create<GaussianFilter>(Vec2(radius), alpha);
+        GaussianFilterData data;
+        data.Deserialize(group);
+        return data.CreateResource(arena);
     }
     ATRC_MGR_CATCH_AND_RETHROW("In creating gaussian filter")
 }
