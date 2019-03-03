@@ -55,7 +55,7 @@ wi和wo混乱不堪，面对非对称BSDF太烧脑
 
 传播过程也有两类：light-surface传播，以及surface-surface传播，这两个过程都由integrator完成。
 
-## 2018.11.2
+## 2018.11.02
 
 本来是想写个GPU加速的BVH的，但是装了CUDA过后只要写的cu代码一有什么问题，直接死机，我觉得这样下去我是调不出来的，所以暂且放下吧。
 
@@ -63,11 +63,11 @@ wi和wo混乱不堪，面对非对称BSDF太烧脑
 
 Wait，说好的介质渲染呢？我白天推导了一番带介质的path tracer的估计量，只是还没动手写代码。
 
-## 2018.11.3
+## 2018.11.03
 
 今天比较失败。想用SSE/AVX加速BVH，然后喜闻乐见地负优化了。唯一的“进度”是画了张最高精度的Stanford Bunny（之前画的都是低模）。
 
-## 2018.11.4
+## 2018.11.04
 
 发现一个[非常良心的网站](http://threedscans.com/)，上面有一大堆扫描出来的精模，LICENSE是你爱怎么用就怎么用的那种。我立刻在上面下了个人像，简直是素材宝库啊！
 
@@ -75,19 +75,19 @@ Wait，说好的介质渲染呢？我白天推导了一番带介质的path trace
 
 之前觉得跑得太慢，使劲怼代码上的常数；现在发现算法有问题，改了之后，啧啧，真快。
 
-## 2018.11.5
+## 2018.11.05
 
 把VolumetricPathTracer写了大半，真是在考试的边缘疯狂作死。
 
-## 2018.11.6
+## 2018.11.06
 
 VolumetricPathTracer done！开心！刚做出来的时候噪点多得可怕，检查了一番发现是采样介质自发光和表面自发光时没有截断计算透射比用的距离，改掉就好了。目前还没看出其他问题。
 
-## 2018.11.7
+## 2018.11.07
 
 实现了场景描述脚本，不用每次改场景都要改代码了，爽到！
 
-## 2018.11.8
+## 2018.11.08
 
 I wrote this record at 04:12 on my ubuntu VM. Fuck `std::wifstream`!
 
@@ -188,13 +188,13 @@ int main()
 
 要做BDPT，现有的Atrc在Core Interface上必须要做修改——我默认把任务调度策略和LTE求解策略分离了，但是BDPT中有类似Light Tracing的部分必须要访问整个Film。为此我把过去的Integrator、SubareaRenderer和Renderer三者合成了一个Renderer，过去的这三个组件现在变成了一个特殊的Renderer的实现。
 
-## 2018.12.1
+## 2018.12.01
 
 一口气把SH的投影、重建和系数旋转做到了5阶，话说我基本看不出低频光源下用4阶和用5阶的区别……
 
 此外，原来的Integrator是核心接口的一部分，现在只适用于PathTracingRenderer，因此仅应作为后者的组件出现。所以我把Integrator开除出了Core Interface，而只是作为PathTracingRenderer的下属。
 
-## 2018.12.2
+## 2018.12.02
 
 让SH支持了任意bouces number的间接照明，其实这东西和path tracing差不多，不知道为什么那么多文章将它作为“拓展”、“advanced topic”来介绍。
 
@@ -202,11 +202,11 @@ int main()
 
 修改了Camera相关的Core Interface以支持摄像机采样以及measure function，丢掉了原来的PerspectiveCamera，重写了一个比较严格的PinholeCamera。PinholeCamera画出来的东西是上下左右颠倒的，为此又添加了两个用来翻转图像的post-processor stage。
 
-## 2018.12.4
+## 2018.12.04
 
 没做什么东西，只把Camera相关的local-world变换从PinholeCamera中抽取出来，使得其他类型的Camera也可以使用这部分代码。
 
-## 2018.12.5
+## 2018.12.05
 
 实现了薄凸透镜摄像机模型，途中还纠正了一个AGZ Utils中计算UnitDisk上均匀采样的pdf的bug，终于又可以画景深效果了。
 
@@ -214,19 +214,19 @@ int main()
 
 原来的代码在许多地方直接使用了AGZ::Texture2D，采样方式、坐标wrap方式各自为政，混乱不堪；这回在Core Interface中添加了Texture，也把它加入了Creator/Manager体系，用起来舒服多了。
 
-## 2018.12.6
+## 2018.12.06
 
 添加了Environment Camera，这东西的film上的均匀采样并不对应sensor上的均匀采样，于是我不得不干掉原来的We体系，换成基于film的Qe体系，而推导Qe和We间的关系又花费了一些时间。
 
-## 2018.12.7
+## 2018.12.07
 
 想加Normal mapping，于是写了个简单的NormalMapper，由于没有单独的Triangle Geometry Object，一时居然找不到好的测试场景。于是写了个单独的Triangle类，结果测试的时候物体下面的阴影怎么看都很奇怪。一开始以为是Triangle这边local coord system有问题，通过换成mirror材质否认了这一猜想，然后看了半天diffuse材质的wi采样，也没什么错误。我甚至怀疑到path tracer上去了，可是换成volumetric path tracer，问题依然。也设想了是has intersection不对，可是看代码怎么也看不出差错。最后我认为可能是shadow ray测试不对，于是把path tracer的MIS of direct illumination给拆开，结果bsdf sampling的结果是对的，而light sampling的结果就不对，果然问题在这！然而这个MIS我已经用了很久，没道理会有这么明显的bug啊。看了半天，我突然想起triangle不同于以往的geometry object，它的bound可能在某一维度上宽度为0，检查了一番相关代码，也改了一两个不合理之处，而bug变得更加玄学了——地面阴影会随着三角形形状变化而变化，而这个变化显得丝毫没有规律和道理。最后，我也不知道是为什么，检查了一下environment light中计算world radius的代码，结果发现自己不慎把一个+写成了-……
 
-## 2018.12.8
+## 2018.12.08
 
 实现了Diffuse Material的Normal Mapping。
 
-## 2018.12.9
+## 2018.12.09
 
 发现用的人物模型法线有问题，手动加入了纠正代码；局部重构了BSDF对shading coord sys的处理。
 
@@ -287,3 +287,8 @@ int main()
 
 1. 学学Qt并用来做Editor的界面。
 2. 每个渲染对象对应一个Parameter type，其构造函数接受Parameter type类型的参数，Mgr负责Parameter type和配置文件间的转换，Editor负责Parameter type的展示和编辑。也就是说，一个实体的中心不再是渲染对象，而是Parameter type，渲染对象只是渲染器可以用该type来创建的边缘对象而已。
+
+## 2019.03.03
+
+在写之前规划的Parameter type时遇到了一堆不知道该如何决定所有权的问题，主要原因是无法明确它会在Editor中被如何使用，如共享、引用、复制等，所以还是应该先设计一番Editor的使用方式。
+

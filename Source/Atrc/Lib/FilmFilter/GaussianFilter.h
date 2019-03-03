@@ -1,25 +1,32 @@
 #pragma once
 
-#include <Atrc/Lib/Core/ResourceData.h>
 #include <Atrc/Lib/Core/TFilm.h>
 
 namespace Atrc
 {
 
-class GaussianFilterData : public ResourceData<FilmFilter>
+class GaussianFilter : public FilmFilter
 {
-    Real radius_ = 1;
-    Real alpha_ = 2;
+    Real alpha_;
+    Vec2 exp_;
 
 public:
 
-    static const std::string &GetTypeName() { static const std::string RET = "Gaussian"; return RET; }
+    GaussianFilter(const Vec2 &radius, Real alpha) noexcept
+        : FilmFilter(radius), alpha_(alpha),
+        exp_(radius.Map([=](Real c) { return Exp(-alpha * c * c); }))
+    {
 
-    std::string Serialize() const override;
+    }
 
-    void Deserialize(const AGZ::ConfigGroup &param) override;
-
-    FilmFilter *CreateResource(Arena &arena) const override;
+    Real Eval(Real relX, Real relY) const noexcept override
+    {
+        static auto Gaussian = [](Real d, Real expv, Real alpha)
+        {
+            return Max(Real(0), Real(Exp(-alpha * d * d) - expv));
+        };
+        return Gaussian(relX, exp_.x, alpha_) * Gaussian(relY, exp_.y, alpha_);
+    }
 };
 
 } // namespace Atrc

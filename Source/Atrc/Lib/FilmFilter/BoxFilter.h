@@ -1,24 +1,24 @@
 #pragma once
 
-#include <Atrc/Lib/Core/ResourceData.h>
 #include <Atrc/Lib/Core/TFilm.h>
 
 namespace Atrc
 {
 
-class BoxFilterData : public ResourceData<FilmFilter>
+class BoxFilter : public FilmFilter
 {
-    Real sidelen_ = 1;
-
 public:
 
-    static const std::string &GetTypeName() { static const std::string RET = "Box"; return RET; }
+    explicit BoxFilter(const Vec2 &radius) noexcept
+        : FilmFilter(radius)
+    {
 
-    std::string Serialize() const override;
+    }
 
-    void Deserialize(const AGZ::ConfigGroup &param) override;
-
-    FilmFilter *CreateResource(Arena &arena) const override;
+    Real Eval(Real relX, Real relY) const noexcept override
+    {
+        return 1;
+    }
 };
 
 } // namespace Atrc
