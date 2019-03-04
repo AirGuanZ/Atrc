@@ -11,8 +11,7 @@ Atrc是[Z Guan](https://github.com/AirGuanZ)的渲染实验室，主要以C++编
 Atrc已/将实现以下特性：
 
 - [x] [Lib] 多种几何模型，如球体、三角形、OBJ格式的网格等
-- [x] [Lib] 快速构建BVH加速数据结构
-- [x] [Lib] 已构建的BVH树会被自动缓存至`.agz.cache`中，优化启动时间
+- [x] [Lib] 快速构建BVH加速数据结构，已构建的BVH树会被自动缓存至`.agz.cache`中
 - [x] [Lib] Disney Principled BRDF，Oren-Nayar漫反射模型，玻璃，黑体等多种材质模型
 - [x] [Lib] Microfacet Transmission BSDF
 - [x] [Lib] Normalized Diffusion BSSRDF
