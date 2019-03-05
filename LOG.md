@@ -292,3 +292,10 @@ int main()
 
 在写之前规划的Parameter type时遇到了一堆不知道该如何决定所有权的问题，主要原因是无法明确它会在Editor中被如何使用，如共享、引用、复制等，所以还是应该先设计一番Editor的使用方式。
 
+## 2019.03.05
+
+整整两天都在玩botw，什么代码都没写 Orz
+
+目前决定保留Mgr中的东西不变，从头写一个Editor（项目名Atrc，算是这整个solution的整合体吧）。
+
+Editor中的东西和Renderer中的东西不一定是一一对应的，比如Editor中可以有node binding tree，而到了renderer中后就只剩下被完全展平的entity array了。由于editor中可能涉及到的需求太多变，我就不指望搞一套像Mgr一样的统一的InstanceManager体系了，各类resource自行定义公共接口吧。

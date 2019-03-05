@@ -73,6 +73,19 @@
            <string>AddError</string>
           </property>
          </widget>
+         <widget class="QPushButton" name="ChangeRight">
+          <property name="geometry">
+           <rect>
+            <x>10</x>
+            <y>50</y>
+            <width>93</width>
+            <height>28</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Change</string>
+          </property>
+         </widget>
         </widget>
         <widget class="QWidget" name="tab_2">
          <attribute name="title">
@@ -111,6 +124,11 @@
            <height>460</height>
           </rect>
          </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_4">
+          <item>
+           <layout class="QVBoxLayout" name="ChangableLayout"/>
+          </item>
+         </layout>
         </widget>
        </widget>
       </item>
