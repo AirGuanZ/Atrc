@@ -4,6 +4,7 @@
 #include <crtdbg.h>
 #endif
 
+#include "ResourceInterface/FilmFilter.h"
 #include "Atrc.h"
 
 int main(int argc, char *argv[])

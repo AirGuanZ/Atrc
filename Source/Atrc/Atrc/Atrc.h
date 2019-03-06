@@ -13,9 +13,13 @@ public:
     Atrc()
     {
         ui_.setupUi(this);
-
         ui_.ConsoleDock->setTitleBarWidget(new QWidget);
+        ui_.LeftDockWindow->setTitleBarWidget(new QWidget);
+        ui_.RightDock->setTitleBarWidget(new QWidget);
         ui_.ConsoleText->document()->setMaximumBlockCount(300);
+
+        textEdit_ = new QTextEdit(ui_.RightDock);
+        button_ = new QPushButton(ui_.RightDock);
 
         connect(ui_.MenuItemQuit, &QAction::triggered, this, &QMainWindow::close);
 
@@ -25,10 +29,13 @@ public:
         connect(ui_.ClearConsole, &QPushButton::clicked, ui_.ConsoleText, &QTextEdit::clear);
 
         showText_ = true;
-        textEdit_.setText("Minecraft");
-        button_.setText("Button");
+        textEdit_->setText("Minecraft");
+        button_->setText("Button");
 
-        ui_.ChangableLayout->addWidget(&textEdit_);
+        textEdit_->show();
+        button_->hide();
+
+        ui_.ChangableLayout->addWidget(textEdit_);
         connect(ui_.ChangeRight, &QPushButton::clicked, this, &Atrc::OnChangeRightClicked);
     }
 
@@ -62,17 +69,17 @@ private:
     {
         if(showText_)
         {
-            ui_.ChangableLayout->removeWidget(&textEdit_);
-            ui_.ChangableLayout->addWidget(&button_);
-            textEdit_.hide();
-            button_.show();
+            ui_.ChangableLayout->removeWidget(textEdit_);
+            ui_.ChangableLayout->addWidget(button_);
+            textEdit_->hide();
+            button_->show();
         }
         else
         {
-            ui_.ChangableLayout->removeWidget(&button_);
-            ui_.ChangableLayout->addWidget(&textEdit_);
-            button_.hide();
-            textEdit_.show();
+            ui_.ChangableLayout->removeWidget(button_);
+            ui_.ChangableLayout->addWidget(textEdit_);
+            button_->hide();
+            textEdit_->show();
         }
         showText_ = !showText_;
     }
@@ -80,6 +87,6 @@ private:
     Ui::MainWindow ui_;
 
     bool showText_;
-    QTextEdit textEdit_;
-    QPushButton button_;
+    QTextEdit *textEdit_;
+    QPushButton *button_;
 };
