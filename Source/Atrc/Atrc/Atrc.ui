@@ -93,7 +93,7 @@
         <enum>QTabWidget::South</enum>
        </property>
        <property name="currentIndex">
-        <number>0</number>
+        <number>1</number>
        </property>
        <widget class="QWidget" name="ConsoleLayout">
         <attribute name="title">
@@ -130,6 +130,19 @@
         <attribute name="title">
          <string>Rendering</string>
         </attribute>
+        <widget class="QGroupBox" name="groupBox">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>10</y>
+           <width>241</width>
+           <height>191</height>
+          </rect>
+         </property>
+         <property name="title">
+          <string>FilmFilter</string>
+         </property>
+        </widget>
        </widget>
       </widget>
      </item>

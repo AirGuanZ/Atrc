@@ -1,26 +1,13 @@
 #pragma once
 
+#include <map>
+#include <memory>
 #include <string>
-#include <type_traits>
+
 #include <QWidget>
 
 #include <AGZUtils/Config/Config.h>
-
-template<typename TWidget, std::enable_if_t<std::is_base_of_v<QWidget, TWidget>, int> = 0>
-class AutoDeletedQWidgetPtr
-{
-    TWidget *qWidget_ = nullptr;
-
-public:
-
-    ~AutoDeletedQWidgetPtr()
-    {
-        if(qWidget_ && !qWidget_->parentWidget())
-            delete qWidget_;
-    }
-
-    QWidget *GetWidget() const { return qWidget_; }
-};
+#include "Atrc/Atrc/QUtils.h"
 
 class FilmFilterInstance
 {
@@ -33,4 +20,49 @@ public:
     virtual void Deserialize(const AGZ::ConfigNode &node) = 0;
 
     virtual QWidget *GetWidget() = 0;
+};
+
+class FilmFilterInstanceCreator
+{
+public:
+
+    virtual ~FilmFilterInstanceCreator() = default;
+
+    virtual std::shared_ptr<FilmFilterInstance> Create() const = 0;
+
+    static const std::map<std::string, const FilmFilterInstanceCreator*> &GetAllCreators();
+};
+
+template<typename TFilmFilterInstance>
+class FilmFilterInstance2Creator : public FilmFilterInstanceCreator
+{
+public:
+
+    std::shared_ptr<FilmFilterInstance> Create() const override
+    {
+        return std::make_shared<TFilmFilterInstance>();
+    }
+};
+
+template<typename TWidgetCore>
+class WidgetCore2FilmFilterInstance : public FilmFilterInstance
+{
+    UniqueQPtr<TWidgetCore> core_;
+
+public:
+
+    std::string Serialize() const override
+    {
+        return core_->Serialize();
+    }
+
+    void Deserialize(const AGZ::ConfigNode &node) override
+    {
+        core_->Deserialize(node);
+    }
+
+    QWidget *GetWidget() override
+    {
+        return core_.get();
+    }
 };
