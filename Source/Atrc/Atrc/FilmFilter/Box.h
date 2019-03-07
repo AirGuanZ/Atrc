@@ -12,6 +12,8 @@ class BoxCore : public QWidget
 
 public:
 
+    static const char *GetTypeName();
+
     BoxCore();
 
     std::string Serialize() const;

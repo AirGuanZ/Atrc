@@ -299,3 +299,7 @@ int main()
 目前决定保留Mgr中的东西不变，从头写一个Editor（项目名Atrc，算是这整个solution的整合体吧）。
 
 Editor中的东西和Renderer中的东西不一定是一一对应的，比如Editor中可以有node binding tree，而到了renderer中后就只剩下被完全展平的entity array了。由于editor中可能涉及到的需求太多变，我就不指望搞一套像Mgr一样的统一的InstanceManager体系了，各类resource自行定义公共接口吧。
+
+## 2019.03.07
+
+再这样下去一个月都没法动手，别考虑怎么抽象了，直接暴力写，到时候该怎么抽象自会浮出水面。

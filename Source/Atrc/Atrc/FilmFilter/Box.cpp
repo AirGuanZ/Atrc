@@ -8,11 +8,17 @@ namespace
     constexpr double BOX_SIDELEN_MIN = 0.01;
 }
 
+const char *BoxCore::GetTypeName()
+{
+    return "Box";
+}
+
 BoxCore::BoxCore()
 {
     ui_.setupUi(this);
     ui_.sidelen->setMaximum(BOX_SIDELEN_MAX);
     ui_.sidelen->setMinimum(BOX_SIDELEN_MIN);
+    ui_.sidelen->setSingleStep(0.05);
 }
 
 std::string BoxCore::Serialize() const
@@ -27,7 +33,7 @@ void BoxCore::Deserialize(const AGZ::ConfigNode &node)
 {
     AGZ_HIERARCHY_TRY
 
-        auto &param = node.AsGroup();
+    auto &param = node.AsGroup();
     AGZ_ASSERT(param["type"].AsValue() == "Box");
 
     auto sidelen = param["sidelen"].Parse<double>();

@@ -3,6 +3,7 @@
 #include <QMainWindow>
 
 #include "ui_Atrc.h"
+#include "FilmFilter/Box.h"
 
 class Atrc : public QMainWindow
 {
@@ -37,6 +38,8 @@ public:
 
         ui_.ChangableLayout->addWidget(textEdit_);
         connect(ui_.ChangeRight, &QPushButton::clicked, this, &Atrc::OnChangeRightClicked);
+
+        ui_.ChangableLayout->addWidget(box_.GetWidget());
     }
 
     void ShowNormalMessage(const std::string &msg)
@@ -89,4 +92,6 @@ private:
     bool showText_;
     QTextEdit *textEdit_;
     QPushButton *button_;
+
+    Box box_;
 };

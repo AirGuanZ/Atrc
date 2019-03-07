@@ -28,6 +28,8 @@ public:
 
     virtual ~FilmFilterInstanceCreator() = default;
 
+    virtual const char *GetName() const = 0;
+
     virtual std::shared_ptr<FilmFilterInstance> Create() const = 0;
 
     static const std::map<std::string, const FilmFilterInstanceCreator*> &GetAllCreators();
@@ -37,6 +39,11 @@ template<typename TFilmFilterInstance>
 class FilmFilterInstance2Creator : public FilmFilterInstanceCreator
 {
 public:
+
+    const char *GetName() const override
+    {
+        return TFilmFilterInstance::GetTypeName();
+    }
 
     std::shared_ptr<FilmFilterInstance> Create() const override
     {
@@ -50,6 +57,17 @@ class WidgetCore2FilmFilterInstance : public FilmFilterInstance
     UniqueQPtr<TWidgetCore> core_;
 
 public:
+
+    static const char *GetTypeName()
+    {
+        return TWidgetCore::GetTypeName();
+    }
+
+    WidgetCore2FilmFilterInstance()
+        : core_(MakeUniqueQ<TWidgetCore>())
+    {
+
+    }
 
     std::string Serialize() const override
     {
