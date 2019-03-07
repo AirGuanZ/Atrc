@@ -1,14 +1,13 @@
 #pragma once
 
-#include <Atrc/Atrc/ResourceInterface/FilmFilter.h>
+#include <QGroupBox>
 
+#include <Atrc/Atrc/ResourceInterface/FilmFilter.h>
 #include "ui_Box.h"
 
-class BoxCore : public QWidget
+class BoxCore : public QGroupBox
 {
     Q_OBJECT
-
-    Ui::BoxWidget ui_;
 
 public:
 
@@ -19,6 +18,10 @@ public:
     std::string Serialize() const;
 
     void Deserialize(const AGZ::ConfigNode &node);
+
+private:
+
+    Ui::BoxWidget ui_;
 };
 
 using Box = WidgetCore2FilmFilterInstance<BoxCore>;
