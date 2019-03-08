@@ -1,10 +1,10 @@
-#include <QApplication>
+#include <QFile>
+#include <QTextStream>
 
 #if defined(_WIN32) && defined(_DEBUG)
 #include <crtdbg.h>
 #endif
 
-#include "ResourceInterface/FilmFilter.h"
 #include "Atrc.h"
 
 int main(int argc, char *argv[])
@@ -15,7 +15,7 @@ int main(int argc, char *argv[])
 #endif
 
     QApplication app(argc, argv);
-    //QApplication::setStyle("Fusion");
+    QApplication::setStyle("Fusion");
 
     Atrc atrc;
     atrc.showMaximized();

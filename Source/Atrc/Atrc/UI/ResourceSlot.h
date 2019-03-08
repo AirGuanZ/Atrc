@@ -14,6 +14,8 @@ public:
 
     explicit ResourceSlotWidget(const std::vector<std::string> &names)
     {
+        setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+
         creatorSelector_ = MakeUniqueQ<QComboBox>();
         creatorSelector_->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
         for(size_t i = 0; i < names.size(); ++i)
@@ -24,6 +26,12 @@ public:
 
         vLayout_->addLayout(hLayout_.get());
         hLayout_->addWidget(creatorSelector_.get());
+
+        hWidget_ = MakeUniqueQ<QWidget>(this);
+        hwLayout_ = MakeUniqueQ<QHBoxLayout>();
+        hWidget_->setLayout(hwLayout_.get());
+        
+        hLayout_->addWidget(hWidget_.get());
 
         connect(creatorSelector_.get(), &QComboBox::currentTextChanged, this, [=](const QString &text)
         {
@@ -43,8 +51,8 @@ public:
 
     QWidget *GetWidget() noexcept
     {
-        if(hLayout_->count() > 1)
-            return hLayout_->itemAt(1)->widget();
+        if(hwLayout_->count() > 0)
+            return hwLayout_->itemAt(0)->widget();
         if(vLayout_->count() > 1)
             return vLayout_->itemAt(1)->widget();
         return nullptr;
@@ -53,21 +61,22 @@ public:
     void SetWidget(QWidget *widget, bool multiline)
     {
         auto oldWidget = GetWidget();
-        if(hLayout_->count() > 1)
-            hLayout_->removeWidget(hLayout_->itemAt(1)->widget());
+        if(hwLayout_->count() > 0)
+            hwLayout_->removeWidget(hwLayout_->itemAt(0)->widget());
         if(vLayout_->count() > 1)
             vLayout_->removeWidget(vLayout_->itemAt(1)->widget());
         if(oldWidget)
         {
-            AGZ_ASSERT(oldWidget->parentWidget() == vLayout_->parentWidget());
+            AGZ_ASSERT(oldWidget->parentWidget() == vLayout_->parentWidget() || oldWidget->parentWidget() == hWidget_.get());
             oldWidget->setParent(nullptr);
         }
         if(!widget)
             return;
+
         if(multiline)
             vLayout_->addWidget(widget);
         else
-            hLayout_->addWidget(widget);
+            hwLayout_->addWidget(widget);
     }
 
     void SetCallbackOnSelectedTextChanged(std::function<void(const std::string&)> func)
@@ -82,6 +91,9 @@ private:
     UniqueQPtr<QComboBox> creatorSelector_;
     UniqueQPtr<QVBoxLayout> vLayout_;
     UniqueQPtr<QHBoxLayout> hLayout_;
+
+    UniqueQPtr<QWidget> hWidget_;
+    UniqueQPtr<QHBoxLayout> hwLayout_;
 };
 
 template<typename TResourceInstance>
