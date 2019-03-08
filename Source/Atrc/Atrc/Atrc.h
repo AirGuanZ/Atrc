@@ -3,7 +3,9 @@
 #include <QMainWindow>
 
 #include "ui_Atrc.h"
+
 #include "FilmFilter/Box.h"
+#include "UI/ResourceSlot.h"
 
 class Atrc : public QMainWindow
 {
@@ -39,7 +41,9 @@ public:
         ui_.ChangableLayout->addWidget(textEdit_);
         connect(ui_.ChangeRight, &QPushButton::clicked, this, &Atrc::OnChangeRightClicked);
 
-        ui_.ChangableLayout->addWidget(box_.GetWidget());
+        RegisterBuiltinFilmFilterCreators(filterCreatorMgr_);
+        filterSlot_ = std::make_unique<ResourceSlot<FilmFilterInstance>>(filterCreatorMgr_);
+        ui_.ChangableLayout->addWidget(filterSlot_->GetWidget());
     }
 
     void ShowNormalMessage(const std::string &msg)
@@ -73,14 +77,14 @@ private:
         if(showText_)
         {
             ui_.ChangableLayout->removeWidget(textEdit_);
-            ui_.ChangableLayout->addWidget(button_);
+            ui_.ChangableLayout->insertWidget(0, button_);
             textEdit_->hide();
             button_->show();
         }
         else
         {
             ui_.ChangableLayout->removeWidget(button_);
-            ui_.ChangableLayout->addWidget(textEdit_);
+            ui_.ChangableLayout->insertWidget(0, textEdit_);
             button_->hide();
             textEdit_->show();
         }
@@ -93,5 +97,6 @@ private:
     QTextEdit *textEdit_;
     QPushButton *button_;
 
-    Box box_;
+    std::unique_ptr<ResourceSlot<FilmFilterInstance>> filterSlot_;
+    FilmFilterCreatorManager filterCreatorMgr_;
 };

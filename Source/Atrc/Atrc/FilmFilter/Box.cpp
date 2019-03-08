@@ -43,3 +43,8 @@ void BoxCore::Deserialize(const AGZ::ConfigNode &node)
 
     AGZ_HIERARCHY_WRAP("in deserializing box filmfilter: " + node.ToString())
 }
+
+bool BoxCore::IsMultiline() const noexcept
+{
+    return false;
+}

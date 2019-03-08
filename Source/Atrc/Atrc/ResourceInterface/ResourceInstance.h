@@ -19,6 +19,8 @@ public:
     virtual void Deserialize(const AGZ::ConfigNode &node) = 0;
 
     virtual QWidget *GetWidget() = 0;
+
+    virtual bool IsMultiline() const noexcept = 0;
 };
 
 template<typename TResourceInstance>
@@ -30,7 +32,7 @@ public:
 
     virtual const char *GetName() const = 0;
 
-    virtual std::shared_ptr<TResourceInstance> Create() const = 0;
+    virtual TResourceInstance *Create() const = 0;
 };
 
 template<typename TResourceInstance>
@@ -50,7 +52,7 @@ public:
     {
         AGZ_HIERARCHY_TRY
 
-            auto it = name2Creator_.find(name);
+        auto it = name2Creator_.find(name);
         if(it == name2Creator_.end())
             throw AGZ::HierarchyException("unknown creator name: " + name);
         return it->second;
@@ -78,9 +80,9 @@ public:
         return TResourceInstance::GetTypeName();
     }
 
-    std::shared_ptr<TResourceInstanceBase> Create() const override
+    TResourceInstanceBase *Create() const override
     {
-        return std::make_shared<TResourceInstance>();
+        return new TResourceInstance();
     }
 };
 
@@ -118,5 +120,10 @@ public:
     QWidget *GetWidget() override
     {
         return core_.get();
+    }
+
+    bool IsMultiline() const noexcept override
+    {
+        return core_->IsMultiline();
     }
 };

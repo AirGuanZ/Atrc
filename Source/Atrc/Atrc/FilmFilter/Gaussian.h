@@ -2,9 +2,9 @@
 
 #include <Atrc/Atrc/ResourceInterface/FilmFilter.h>
 
-#include "ui_Box.h"
+#include "ui_Gaussian.h"
 
-class BoxCore : public QWidget
+class GaussianCore : public QWidget
 {
     Q_OBJECT
 
@@ -12,7 +12,7 @@ public:
 
     static const char *GetTypeName();
 
-    BoxCore();
+    GaussianCore();
 
     std::string Serialize() const;
 
@@ -22,7 +22,7 @@ public:
 
 private:
 
-    Ui::BoxWidget ui_;
+    Ui::GaussianWidget ui_;
 };
 
-using Box = WidgetCore2FilmFilterInstance<BoxCore>;
+using Gaussian = WidgetCore2FilmFilterInstance<GaussianCore>;
