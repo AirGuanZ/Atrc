@@ -1,11 +1,11 @@
 #include <QFile>
-#include <QTextStream>
 
 #if defined(_WIN32) && defined(_DEBUG)
 #include <crtdbg.h>
 #endif
 
 #include "Atrc.h"
+#include "GL.h"
 
 int main(int argc, char *argv[])
 {

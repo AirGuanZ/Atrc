@@ -1,9 +1,9 @@
 #pragma once
 
-#include "ui_Atrc.h"
+#include <Atrc/Atrc/FilmFilter/Box.h>
+#include <Atrc/Atrc/UI/ResourceSlot.h>
 
-#include "FilmFilter/Box.h"
-#include "UI/ResourceSlot.h"
+#include "ui_Atrc.h"
 
 class Atrc : public QMainWindow
 {
