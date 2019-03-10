@@ -103,25 +103,3 @@ FOREACH(_SRC IN ITEMS ${SH2D_SRC})
     SOURCE_GROUP("${_GRP_PATH}" FILES "${_SRC}")
 ENDFOREACH()
 TARGET_LINK_LIBRARIES(SH2D PRIVATE Lib Mgr AGZUtils)
-
-QT_BEGIN()
-
-FILE(GLOB_RECURSE ATRC_SRC "Source/Atrc/Atrc/*.cpp" "Source/Atrc/Atrc/*.h"
-						   "Source/Atrc/Atrc/*.ui" "Source/Atrc/Atrc/*.qrc")
-ADD_EXECUTABLE(Atrc ${ATRC_SRC})
-FOREACH(_SRC IN ITEMS ${ATRC_SRC})
-    GET_FILENAME_COMPONENT(ATRC_SRC "${_SRC}" PATH)
-    STRING(REPLACE "${CMAKE_SOURCE_DIR}/Source/Atrc/Atrc" "" _GRP_PATH "${ATRC_SRC}")
-    STRING(REPLACE "/" "\\" _GRP_PATH "${_GRP_PATH}")
-    SOURCE_GROUP("${_GRP_PATH}" FILES "${_SRC}")
-ENDFOREACH()
-TARGET_LINK_LIBRARIES(Atrc PUBLIC Qt5::Core Qt5::Gui Qt5::Widgets)
-
-if(WIN32)
-	ADD_CUSTOM_COMMAND(TARGET Atrc POST_BUILD
-		COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:Qt5::Core>    $<TARGET_FILE_DIR:Atrc>
-		COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:Qt5::Gui>     $<TARGET_FILE_DIR:Atrc>
-		COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:Qt5::Widgets> $<TARGET_FILE_DIR:Atrc>)
-endif(WIN32)
-
-QT_END()
