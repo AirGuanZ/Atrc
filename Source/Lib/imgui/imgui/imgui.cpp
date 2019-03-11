@@ -5111,7 +5111,7 @@ bool ImGui::Begin(const char* name, bool* p_open, ImGuiWindowFlags flags)
                 Scrollbar(ImGuiLayoutType_Vertical);
 
             // Render resize grips (after their input handling so we don't have a frame of latency)
-            if (!(flags & ImGuiWindowFlags_NoResize))
+            if (!(flags & ImGuiWindowFlags_NoResize) && !(flags & ImGuiWindowFlags_NoResizeGrip))
             {
                 for (int resize_grip_n = 0; resize_grip_n < resize_grip_count; resize_grip_n++)
                 {

@@ -40,6 +40,8 @@ public:
     virtual void Deserialize(DeserializeContext &ctx, const AGZ::ConfigNode &node) = 0;
 
     virtual void Display(ResourceDisplayContext &ctx) = 0;
+
+    virtual bool IsMultiline() const noexcept = 0;
 };
 
 template<typename TResource>
@@ -88,6 +90,11 @@ public:
     void Display(ResourceDisplayContext &ctx) override
     {
         core_.Display(ctx);
+    }
+
+    bool IsMultiline() const noexcept override
+    {
+        return TCore::IsMultiline();
     }
 };
 

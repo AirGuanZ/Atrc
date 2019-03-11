@@ -23,6 +23,8 @@ public:
         AGZ_ASSERT(rsc_);
         if(creatorSelector_.Display())
             rsc_ = creatorSelector_.GetSelectedCreator()->Create(ctx, "anonymous object");
+        if(!rsc_->IsMultiline())
+            ImGui::SameLine();
         rsc_->Display(ctx);
     }
 
