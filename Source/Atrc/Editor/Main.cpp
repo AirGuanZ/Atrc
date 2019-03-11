@@ -13,26 +13,6 @@ using namespace std;
 constexpr int INIT_WIN_WIDTH = 1400;
 constexpr int INIT_WIN_HEIGHT = 900;
 
-void ShowGlobalHelpWindow(bool open, const AGZ::Input::Keyboard &kb)
-{
-    if(open)
-        ImGui::OpenPopup("global help");
-    ImGui::SetNextWindowSize(ImVec2(640, 640), ImGuiCond_FirstUseEver);
-    if(!ImGui::BeginPopupModal("global help", nullptr))
-        return;
-    AGZ::ScopeGuard windowExitGuard([] { ImGui::EndPopup(); });
-
-    static const auto MSG =
-AGZ::Trim(u8R"____(
-Hold mouse middle button to adjust camera direction when there is no focused window.
-Press ESC to close this help window.
-)____");
-    ImGui::TextWrapped("%s", MSG.c_str());
-
-    if(kb.IsKeyPressed(AGZ::Input::KEY_ESCAPE))
-        ImGui::CloseCurrentPopup();
-}
-
 void SetFullViewport()
 {
     glViewport(0, 0, Global::GetFramebufferWidth(), Global::GetFramebufferHeight());
