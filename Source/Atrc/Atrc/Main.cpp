@@ -92,6 +92,8 @@ int Run(GLFWwindow *window)
     ResourceCreateContext ctrCtx = { &ctrMgrList };
 
     ResourceSlot<FilmFilterInstance> filmFilterSlot(ctrCtx, "Box");
+
+    float rightWindowSizeX = 100;
     
     while(!glfwWindowShouldClose(window))
     {
@@ -105,21 +107,25 @@ int Run(GLFWwindow *window)
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        ImVec2 leftWindowSize;
         ImGui::SetNextWindowPos(ImVec2(0, 0));
-        ImGui::SetNextWindowSizeConstraints(ImVec2(100, winInfo.FBHf()), ImVec2(winInfo.FBWf() - 100, winInfo.FBHf()));
-        if(ImGui::Begin("Window", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResizeGrip))
+        ImGui::SetNextWindowSizeConstraints(
+            ImVec2(100, winInfo.FbHf()),
+            ImVec2(winInfo.FbWf() / 2 - 100, winInfo.FbHf()));
+        if(ImGui::Begin("Window", nullptr,
+            ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResizeGrip | ImGuiWindowFlags_NoTitleBar))
         {
             filmFilterSlot.Display(ctrCtx);
-
-            leftWindowSize = ImGui::GetWindowSize();
             ImGui::End();
         }
-        
-        ImGui::SetNextWindowPos(ImVec2(leftWindowSize.x, 0));
-        ImGui::SetNextWindowSize(ImVec2(winInfo.FBW() - leftWindowSize.x, winInfo.FBHf()));
-        if(ImGui::Begin("Another Window", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize))
+
+        ImGui::SetNextWindowSizeConstraints(
+            ImVec2(100, winInfo.FbHf()),
+            ImVec2(winInfo.FbWf() / 2 - 100, winInfo.FbHf()));
+        ImGui::SetNextWindowPos(ImVec2(winInfo.FbWf() - rightWindowSizeX, 0));
+        if(ImGui::Begin("Another Window", nullptr,
+            ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResizeGrip | ImGuiWindowFlags_NoTitleBar))
         {
+            rightWindowSizeX = ImGui::GetWindowSize().x;
             ImGui::End();
         }
 

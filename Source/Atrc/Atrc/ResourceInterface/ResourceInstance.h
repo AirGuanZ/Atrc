@@ -44,7 +44,7 @@ public:
     
     virtual ~ResourceCreator() = default;
 
-    virtual std::unique_ptr<TResource> Create(const ResourceCreateContext &ctx, std::string name) const = 0;
+    virtual std::unique_ptr<TResource> Create(ResourceCreateContext &ctx, std::string name) const = 0;
 
     virtual const char *GetName() const noexcept = 0;
 };
@@ -88,7 +88,7 @@ class Core2ResourceCreator : public ResourceCreator<TBase>
 
 public:
 
-    std::unique_ptr<TBase> Create(const ResourceCreateContext &ctx, std::string name) const override
+    std::unique_ptr<TBase> Create(ResourceCreateContext &ctx, std::string name) const override
     {
         return std::make_unique<Core2ResourceInstance<TBase, TCore>>(std::move(name), ctx);
     }
@@ -106,7 +106,7 @@ class ResourceCreatorManager
 
 public:
 
-    std::unique_ptr<TResource> Create(const ResourceCreateContext &ctx, std::string typeName, std::string name)
+    std::unique_ptr<TResource> Create(ResourceCreateContext &ctx, std::string typeName, std::string name)
     {
         auto it = name2Creator_.find(typeName);
         AGZ_ASSERT(it != name2Creator_.end());

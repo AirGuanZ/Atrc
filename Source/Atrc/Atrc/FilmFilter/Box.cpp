@@ -1,7 +1,7 @@
 #include <Atrc/Atrc/FilmFilter/Box.h>
 #include <Atrc/Atrc/GL.h>
 
-BoxCore::BoxCore(const ResourceCreateContext&)
+BoxCore::BoxCore(ResourceCreateContext&)
     : sidelen_(1)
 {
     

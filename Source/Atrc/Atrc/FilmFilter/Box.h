@@ -15,7 +15,7 @@ public:
 
     static bool IsMultiline() noexcept { return false; }
 
-    explicit BoxCore(const ResourceCreateContext&);
+    explicit BoxCore(ResourceCreateContext&);
 
     void Display(ResourceCreateContext &ctx);
 };
