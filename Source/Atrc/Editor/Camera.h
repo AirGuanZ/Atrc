@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <AGZUtils/Utils/Config.h>
 
@@ -8,9 +8,9 @@ class DefaultRenderingCamera
 {
 public:
 
-    // ºÍView MatrixÏà¹ØµÄÊı¾İ
-    // hori + vertÓëlookAt¶¼ÊÇÓÃÀ´¹ÜÀíÉãÏñ»úÊÓ½ÇµÄ£¬¾ßÌåÔÚdisplay½çÃæÏÔÊ¾ÄÄ¸öÓÉuseLookAt¾ö¶¨¡£
-    // ËæÊ±±£Ö¤Á½ÕßÊÇÒ»ÖÂµÄ¡£
+    // å’ŒView Matrixç›¸å…³çš„æ•°æ®
+    // hori + vertä¸lookAtéƒ½æ˜¯ç”¨æ¥ç®¡ç†æ‘„åƒæœºè§†è§’çš„ï¼Œå…·ä½“åœ¨displayç•Œé¢æ˜¾ç¤ºå“ªä¸ªç”±useLookAtå†³å®šã€‚
+    // éšæ—¶ä¿è¯ä¸¤è€…æ˜¯ä¸€è‡´çš„ã€‚
     struct ViewData
     {
         Vec3f pos      = Vec3f(10.0f);
@@ -21,7 +21,7 @@ public:
         Deg up         = Deg(0);
     };
 
-    // ºÍProjection MatrixÏà¹ØµÄÊı¾İ
+    // å’ŒProjection Matrixç›¸å…³çš„æ•°æ®
     struct ProjData
     {
         int w      = 1000;
