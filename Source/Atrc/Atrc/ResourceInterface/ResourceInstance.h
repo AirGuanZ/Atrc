@@ -9,10 +9,7 @@
 #include <AGZUtils/Utils/Config.h>
 #include <AGZUtils/Utils/Misc.h>
 
-class DeserializeContext { };
 class ResourceCreateContext;
-class ResourceDisplayContext;
-class SerializeContext { };
 
 class ResourceInstance : public AGZ::Uncopiable
 {
@@ -35,11 +32,7 @@ public:
 
     virtual const char *GetTypeName() const noexcept = 0;
 
-    virtual std::string Serialize(SerializeContext &ctx) const = 0;
-
-    virtual void Deserialize(DeserializeContext &ctx, const AGZ::ConfigNode &node) = 0;
-
-    virtual void Display(ResourceDisplayContext &ctx) = 0;
+    virtual void Display(ResourceCreateContext &ctx) = 0;
 
     virtual bool IsMultiline() const noexcept = 0;
 };
@@ -51,7 +44,7 @@ public:
     
     virtual ~ResourceCreator() = default;
 
-    virtual std::unique_ptr<TResource> Create(const ResourceCreateContext &ctx, std::string name) = 0;
+    virtual std::unique_ptr<TResource> Create(const ResourceCreateContext &ctx, std::string name) const = 0;
 
     virtual const char *GetName() const noexcept = 0;
 };
@@ -77,17 +70,7 @@ public:
         return TCore::GetTypeName();
     }
 
-    std::string Serialize(SerializeContext &ctx) const override
-    {
-        return core_.Serialize(ctx);
-    }
-
-    void Deserialize(DeserializeContext &ctx, const AGZ::ConfigNode &node) override
-    {
-        core_.Deserialize(ctx, node);
-    }
-
-    void Display(ResourceDisplayContext &ctx) override
+    void Display(ResourceCreateContext &ctx) override
     {
         core_.Display(ctx);
     }
@@ -105,7 +88,7 @@ class Core2ResourceCreator : public ResourceCreator<TBase>
 
 public:
 
-    std::unique_ptr<TBase> Create(const ResourceCreateContext &ctx, std::string name) override
+    std::unique_ptr<TBase> Create(const ResourceCreateContext &ctx, std::string name) const override
     {
         return std::make_unique<Core2ResourceInstance<TBase, TCore>>(std::move(name), ctx);
     }
@@ -140,7 +123,7 @@ public:
     const ResourceCreator<TResource> *operator[](const std::string &name) const
     {
         auto it = name2Creator_.find(name);
-        return it != name2Creator_, end() ? it->second : nullptr;
+        return it != name2Creator_.end() ? it->second : nullptr;
     }
 
     auto begin() { return name2Creator_.begin(); }
@@ -177,20 +160,15 @@ class ResourceCreatorManagerList
 public:
 
     template<typename TBase>
-    ResourceCreatorManager<TBase> *GetCreatorMgr()
+    ResourceCreatorManager<TBase> &GetCreatorMgr() noexcept
     {
-        return &std::get<ResourceCreatorManager<TBase>>(mgrs_);
+        return std::get<ResourceCreatorManager<TBase>>(mgrs_);
     }
 };
 
-class ResourceCreateContext : public ResourceCreatorManagerList
+class ResourceCreateContext
 {
 public:
 
-};
-
-class ResourceDisplayContext : public ResourceCreatorManagerList
-{
-public:
-
+    ResourceCreatorManagerList *ctrMgrList;
 };

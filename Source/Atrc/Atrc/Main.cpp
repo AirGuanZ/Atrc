@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include <Atrc/Atrc/ResourceInterface/ResourceSlot.h>
+#include <Atrc/Atrc/FilmFilter/FilmFilter.h>
 #include <Atrc/Atrc/Window.h>
 
 void InitializeImGui(GLFWwindow *window)
@@ -84,6 +85,13 @@ int Run(GLFWwindow *window)
     {
         ImGui_ImplGlfw_WheelScroll(param.offset);
     }));
+
+    ResourceCreatorManagerList ctrMgrList;
+    RegisterFilmFilterCreators(ctrMgrList.GetCreatorMgr<FilmFilterInstance>());
+
+    ResourceCreateContext ctrCtx = { &ctrMgrList };
+
+    ResourceSlot<FilmFilterInstance> filmFilterSlot(ctrCtx, "Box");
     
     while(!glfwWindowShouldClose(window))
     {
@@ -102,8 +110,7 @@ int Run(GLFWwindow *window)
         ImGui::SetNextWindowSizeConstraints(ImVec2(100, winInfo.FBHf()), ImVec2(winInfo.FBWf() - 100, winInfo.FBHf()));
         if(ImGui::Begin("Window", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResizeGrip))
         {
-            static char buf[1024];
-            ImGui::InputText("input text", buf, AGZ::ArraySize(buf), ImGuiInputTextFlags_Multiline);
+            filmFilterSlot.Display(ctrCtx);
 
             leftWindowSize = ImGui::GetWindowSize();
             ImGui::End();

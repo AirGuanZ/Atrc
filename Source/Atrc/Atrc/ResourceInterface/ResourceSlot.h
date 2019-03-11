@@ -11,18 +11,20 @@ class ResourceSlot
 public:
 
     explicit ResourceSlot(ResourceCreateContext &ctx, const std::string &selectedCreatorName = "")
-        : creatorSelector_(ctx.GetCreatorMgr<TBase>())
+        : creatorSelector_(ctx.ctrMgrList->GetCreatorMgr<TBase>())
     {
         if(!selectedCreatorName.empty())
             creatorSelector_.SetSelectedCreator(selectedCreatorName);
         rsc_ = creatorSelector_.GetSelectedCreator()->Create(ctx, "anonymous object");
     }
 
-    void Display(ResourceDisplayContext &ctx)
+    void Display(ResourceCreateContext &ctx)
     {
         AGZ_ASSERT(rsc_);
+        ImGui::PushItemWidth(100);
         if(creatorSelector_.Display())
             rsc_ = creatorSelector_.GetSelectedCreator()->Create(ctx, "anonymous object");
+        ImGui::PopItemWidth();
         if(!rsc_->IsMultiline())
             ImGui::SameLine();
         rsc_->Display(ctx);
