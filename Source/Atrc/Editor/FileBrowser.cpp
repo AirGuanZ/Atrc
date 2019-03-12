@@ -40,7 +40,7 @@ bool FileBrowser::Display()
 
     ImGui::SameLine();
 
-    auto pwdStr = INV_WIDEN(pwd_.wstring());
+    auto pwdStr = pwd_.string();
     ImGui::Text("%s", pwdStr.c_str());
 
     ImGui::BeginChild("files", ImVec2(640, 300));

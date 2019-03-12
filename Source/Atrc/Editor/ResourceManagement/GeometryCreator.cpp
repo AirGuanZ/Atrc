@@ -183,7 +183,6 @@ namespace
                 Clear();
                 filename_.Clear();
             });
-
             AGZ::Mesh::WavefrontObj<float> obj;
             if(!obj.LoadFromFile(filename) || obj.name2Obj.empty())
                 return;

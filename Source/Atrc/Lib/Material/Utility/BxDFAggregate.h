@@ -79,7 +79,7 @@ Spectrum BxDFAggregate<MAX_BXDF_CNT>::Eval(
 }
 
 template<uint8_t MAX_BXDF_CNT>
-std::optional<typename BxDFAggregate<MAX_BXDF_CNT>::SampleWiResult>
+std::optional<BSDF::SampleWiResult>
 BxDFAggregate<MAX_BXDF_CNT>::SampleWi(
     const CoordSystem &shd, [[maybe_unused]] const CoordSystem &geo,
     const Vec3 &wo, BSDFType type, bool star, const Vec3 &sample) const noexcept

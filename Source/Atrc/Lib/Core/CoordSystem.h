@@ -13,6 +13,8 @@ public:
 
     CoordSystem() = default;
 
+    CoordSystem(const CoordSystem&) = default;
+
     CoordSystem(const Vec3 &ex, const Vec3 &ey, const Vec3 &ez) noexcept;
 
     static CoordSystem FromEz(const Vec3 &ez) noexcept;

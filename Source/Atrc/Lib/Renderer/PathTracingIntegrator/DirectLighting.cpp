@@ -178,8 +178,8 @@ std::tuple<Spectrum, std::optional<BSDF::SampleWiResult>, std::optional<Intersec
     }
 
     if(hasInct)
-        return { ret, bsdfSample, nInct };
-    return { ret, bsdfSample, std::nullopt };
+        return std::make_tuple(ret, bsdfSample, std::make_optional(nInct));
+    return { ret, std::optional(*bsdfSample), std::nullopt };
 }
 
 std::tuple<Spectrum, PhaseFunction::SampleWiResult, std::optional<Intersection>> ComputeDirectLighting(
