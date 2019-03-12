@@ -128,7 +128,7 @@ void LauncherScriptImporter::Import(const AGZ::ConfigGroup &root, EditorData *da
             workspace = absolute(std::filesystem::path(workspaceStr.substr(1)));
         else
             workspace = absolute(std::filesystem::path(workspaceStr));
-        data->workspaceSlot.SetFilename(relative(workspace, script).string());
+        data->workspaceSlot.SetFilename(relative(workspace).string());
         
         ctx.scriptPath = script;
         ctx.workspacePath = absolute(workspace);
