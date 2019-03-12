@@ -13,6 +13,8 @@
 #include <Lib/imgui/imgui_impl_glfw.h>
 #include <Lib/imgui/imgui_impl_opengl3.h>
 
+#include <Lib/ImFileBrowser/imfilebrowser.h>
+
 using namespace AGZ::GraphicsAPI;
 
 namespace ImGui

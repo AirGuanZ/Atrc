@@ -2,3 +2,7 @@
 	path = Source/Lib/Utils
 	url = https://github.com/AirGuanZ/Utils.git
 	shallow = true
+[submodule "Source/Lib/ImFileBrowser"]
+	path = Source/Lib/ImFileBrowser
+	url = https://github.com/AirGuanZ/imgui-filebrowser.git
+	shallow = true
