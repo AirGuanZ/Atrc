@@ -1,4 +1,4 @@
-#include <Atrc/Editor/Console.h>
+ï»¿#include <Atrc/Editor/Console.h>
 #include <Atrc/Editor/GL.h>
 #include <Atrc/Editor/Global.h>
 
@@ -28,7 +28,7 @@ void Console::Display()
         return;
     }
 
-    //ÁôÒ»¸öseparator+Ò»ÐÐtextµÄ¿Õ¼ä¸øÊäÈë²Û
+    //ç•™ä¸€ä¸ªseparator+ä¸€è¡Œtextçš„ç©ºé—´ç»™è¾“å…¥æ§½
     const float reservedFooterHeight = ImGui::GetStyle().ItemSpacing.y + ImGui::GetItemsLineHeightWithSpacing();
     ImGui::BeginChild("ScrollingRegion", ImVec2(0, -reservedFooterHeight), false, ImGuiWindowFlags_HorizontalScrollbar);
 

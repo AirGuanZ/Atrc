@@ -93,6 +93,7 @@ int Run(GLFWwindow *window)
 
     ResourceSlot<FilmFilterInstance> filmFilterSlot(ctrCtx, "Box");
 
+    float bottomWindowSizeY = 100;
     float rightWindowSizeX = 100;
     
     while(!glfwWindowShouldClose(window))
@@ -107,22 +108,57 @@ int Run(GLFWwindow *window)
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
+        // Four windows
+
+        // top
+
+        float topWindowSizeY = 0;
         ImGui::SetNextWindowPos(ImVec2(0, 0));
         ImGui::SetNextWindowSizeConstraints(
-            ImVec2(100, winInfo.FbHf()),
-            ImVec2(winInfo.FbWf() / 2 - 100, winInfo.FbHf()));
-        if(ImGui::Begin("Window", nullptr,
+            ImVec2(winInfo.FbWf(), 50),
+            ImVec2(winInfo.FbWf(), winInfo.FbHf() / 2 - 100));
+        if(ImGui::Begin("Top Window", nullptr,
+            ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResizeGrip | ImGuiWindowFlags_NoTitleBar))
+        {
+            topWindowSizeY = ImGui::GetWindowSize().y;
+            ImGui::End();
+        }
+
+        // bottom
+
+        ImGui::SetNextWindowSizeConstraints(
+            ImVec2(winInfo.FbWf(), 50),
+            ImVec2(winInfo.FbWf(), winInfo.FbHf() / 2 - 100));
+        ImGui::SetNextWindowPos(ImVec2(0, winInfo.FbHf() - bottomWindowSizeY));
+        if(ImGui::Begin("Bottom Window", nullptr,
+            ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResizeGrip | ImGuiWindowFlags_NoTitleBar))
+        {
+            bottomWindowSizeY = ImGui::GetWindowSize().y;
+            ImGui::End();
+        }
+
+        // left
+
+        float middleWindowSizeY = winInfo.FbHf() - topWindowSizeY - bottomWindowSizeY;
+
+        ImGui::SetNextWindowPos(ImVec2(0, topWindowSizeY));
+        ImGui::SetNextWindowSizeConstraints(
+            ImVec2(100, middleWindowSizeY),
+            ImVec2(winInfo.FbWf() / 2 - 100, middleWindowSizeY));
+        if(ImGui::Begin("Left Window", nullptr,
             ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResizeGrip | ImGuiWindowFlags_NoTitleBar))
         {
             filmFilterSlot.Display(ctrCtx);
             ImGui::End();
         }
 
+        // right
+
         ImGui::SetNextWindowSizeConstraints(
-            ImVec2(100, winInfo.FbHf()),
-            ImVec2(winInfo.FbWf() / 2 - 100, winInfo.FbHf()));
-        ImGui::SetNextWindowPos(ImVec2(winInfo.FbWf() - rightWindowSizeX, 0));
-        if(ImGui::Begin("Another Window", nullptr,
+            ImVec2(100, middleWindowSizeY),
+            ImVec2(winInfo.FbWf() / 2 - 100, middleWindowSizeY));
+        ImGui::SetNextWindowPos(ImVec2(winInfo.FbWf() - rightWindowSizeX, topWindowSizeY));
+        if(ImGui::Begin("Right Window", nullptr,
             ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResizeGrip | ImGuiWindowFlags_NoTitleBar))
         {
             rightWindowSizeX = ImGui::GetWindowSize().x;

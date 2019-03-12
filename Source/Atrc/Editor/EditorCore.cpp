@@ -1,4 +1,4 @@
-#include <iostream>
+ï»¿#include <iostream>
 
 #include <Atrc/Editor/EditorCore.h>
 #include <Atrc/Editor/LauncherScriptExporter.h>
@@ -412,7 +412,7 @@ void EditorCore::RenderScene()
 
     GL::RenderContext::EnableDepthTest();
 
-    // ³¡¾°»æÖÆ
+    // åœºæ™¯ç»˜åˆ¶
 
     BeginEntityRendering();
     auto selectedCamera = data_->rscMgr.GetPool<CameraInstance>().GetSelectedInstance();
@@ -440,7 +440,6 @@ void EditorCore::SaveRenderingResult()
 
 void EditorCore::ShowGUI(GL::Immediate2D &imm, const AGZ::Input::Keyboard &kb)
 {
-
     GL::RenderContext::DisableDepthTest();
     GL::RenderContext::ClearDepth();
 
@@ -467,7 +466,7 @@ void EditorCore::ShowGUI(GL::Immediate2D &imm, const AGZ::Input::Keyboard &kb)
 
     glLineWidth(1);
 
-    // äÖÈ¾½á¹ûÔ¤ÀÀ
+    // æ¸²æŸ“ç»“æžœé¢„è§ˆ
 
     if(lState_->sceneRenderer.IsRendering())
     {
