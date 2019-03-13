@@ -2,7 +2,7 @@
 #include <Atrc/Lib/Material/BxDF/BxDF_TorranceSparrow.h>
 #include <Atrc/Lib/Material/MicrofacetDistribution/BlinnPhong.h>
 #include <Atrc/Lib/Material/TSMetal.h>
-#include <Atrc/Lib/Material/Utility/BxDFAggregate.h>
+#include <Atrc/Lib/Material/Utility/BxDF2BSDF.h>
 #include <Atrc/Lib/Material/Utility/Fresnel.h>
 #include <Atrc/Lib/Material/Utility/MaterialHelper.h>
 
@@ -26,21 +26,29 @@ ShadingPoint TSMetal::GetShadingPoint(const Intersection &inct, Arena &arena) co
     Spectrum rc = rc_->Sample(ret.uv);
     Real roughness = roughness_->Sample1(ret.uv);
 
-    auto bsdf = arena.Create<BxDFAggregate<1>>(ret.coordSys, inct.coordSys);
+    //auto bsdf = arena.Create<BxDFAggregate<1>>(ret.coordSys, inct.coordSys);
+    //
+    //if(!roughness)
+    //{
+    //    auto ms = arena.Create<BxDF_SpecularReflection>(fresnel_, rc);
+    //    bsdf->AddBxDF(ms);
+    //}
+    //else
+    //{
+    //    auto md = arena.Create<BlinnPhong>(1 / roughness);
+    //    auto ts = arena.Create<BxDF_TorranceSparrowReflection>(rc, md, fresnel_);
+    //    bsdf->AddBxDF(ts);
+    //}
+    //
+    //ret.bsdf = bsdf;
 
     if(!roughness)
-    {
-        auto ms = arena.Create<BxDF_SpecularReflection>(fresnel_, rc);
-        bsdf->AddBxDF(ms);
-    }
+        ret.bsdf = arena.Create<BxDF2BSDF<BxDF_SpecularReflection>>(fresnel_, rc);
     else
     {
         auto md = arena.Create<BlinnPhong>(1 / roughness);
-        auto ts = arena.Create<BxDF_TorranceSparrowReflection>(rc, md, fresnel_);
-        bsdf->AddBxDF(ts);
+        ret.bsdf = arena.Create<BxDF2BSDF<BxDF_TorranceSparrowReflection>>(rc, md, fresnel_);
     }
-
-    ret.bsdf = bsdf;
 
     return ret;
 }

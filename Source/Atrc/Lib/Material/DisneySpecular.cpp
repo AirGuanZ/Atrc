@@ -1,6 +1,6 @@
 #include <Atrc/Lib/Material/BxDF/BxDF_DisneySpecular.h>
 #include <Atrc/Lib/Material/DisneySpecular.h>
-#include <Atrc/Lib/Material/Utility/BxDFAggregate.h>
+#include <Atrc/Lib/Material/Utility/BxDF2BSDF.h>
 #include <Atrc/Lib/Material/Utility/MaterialHelper.h>
 
 namespace Atrc
@@ -33,11 +33,14 @@ ShadingPoint DisneySpecularMaterial::GetShadingPoint(const Intersection &inct, A
     Real metallic = metallic_->Sample1(ret.uv);
     Real roughness = roughness_->Sample1(ret.uv);
     Real anisotropic = anisotropic_->Sample1(ret.uv);
-    BxDF *bxdf = arena.Create<BxDF_DisneySpecular>(baseColor, specular, specularTint, metallic, roughness, anisotropic);
-
-    auto bsdf = arena.Create<BxDFAggregate<1>>(ret.coordSys, inct.coordSys);
-    bsdf->AddBxDF(bxdf);
-    ret.bsdf = bsdf;
+    
+    //BxDF *bxdf = arena.Create<BxDF_DisneySpecular>(baseColor, specular, specularTint, metallic, roughness, anisotropic);
+    //
+    //auto bsdf = arena.Create<BxDFAggregate<1>>();
+    //bsdf->AddBxDF(bxdf);
+    //ret.bsdf = bsdf;
+    ret.bsdf = arena.Create<BxDF2BSDF<BxDF_DisneySpecular>>(
+        baseColor, specular, specularTint, metallic, roughness, anisotropic);
 
     return ret;
 }

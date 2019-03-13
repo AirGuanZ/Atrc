@@ -14,7 +14,7 @@ class BxDFAggregate : public BSDF
 
 public:
 
-    BxDFAggregate(const CoordSystem &shd, const CoordSystem &geo) noexcept;
+    BxDFAggregate() noexcept;
 
     void AddBxDF(const BxDF *bxdf) noexcept;
 
@@ -36,8 +36,7 @@ public:
 // ================================= Implementation
 
 template<uint8_t MAX_BXDF_CNT>
-BxDFAggregate<MAX_BXDF_CNT>::BxDFAggregate(
-    const CoordSystem &shd, const CoordSystem &geo) noexcept
+BxDFAggregate<MAX_BXDF_CNT>::BxDFAggregate() noexcept
     : bxdfCnt_(0)
 {
 

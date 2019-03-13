@@ -1,6 +1,6 @@
 #include <Atrc/Lib/Material/DisneyReflection.h>
 #include <Atrc/Lib/Material/BxDF/BxDF_DisneyReflection.h>
-#include <Atrc/Lib/Material/Utility/BxDFAggregate.h>
+#include <Atrc/Lib/Material/Utility/BxDF2BSDF.h>
 #include <Atrc/Lib/Material/Utility/MaterialHelper.h>
 
 namespace Atrc
@@ -52,13 +52,17 @@ ShadingPoint DisneyReflection::GetShadingPoint(const Intersection &inct, Arena &
     Real sheenTint = sheenTint_->Sample1(ret.uv);
     Real clearcoat = clearcoat_->Sample1(ret.uv);
     Real clearcoatGloss = clearcoatGloss_->Sample1(ret.uv);
-    BxDF *bxdf = arena.Create<BxDF_DisneyReflection>(
+
+    //BxDF *bxdf = arena.Create<BxDF_DisneyReflection>(
+    //    baseColor, metallic, subsurface, specular, specularTint, roughness,
+    //    anisotropic, sheen, sheenTint, clearcoat, clearcoatGloss);
+    //auto bsdf = arena.Create<BxDFAggregate<1>>(ret.coordSys, inct.coordSys);
+    //bsdf->AddBxDF(bxdf);
+    //ret.bsdf = bsdf;
+
+    ret.bsdf = arena.Create<BxDF2BSDF<BxDF_DisneyReflection>>(
         baseColor, metallic, subsurface, specular, specularTint, roughness,
         anisotropic, sheen, sheenTint, clearcoat, clearcoatGloss);
-
-    auto bsdf = arena.Create<BxDFAggregate<1>>(ret.coordSys, inct.coordSys);
-    bsdf->AddBxDF(bxdf);
-    ret.bsdf = bsdf;
 
     return ret;
 }

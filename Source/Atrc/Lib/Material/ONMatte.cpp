@@ -1,6 +1,6 @@
 #include <Atrc/Lib/Material/BxDF/BxDF_Diffuse.h>
 #include <Atrc/Lib/Material/BxDF/BxDF_OrenNayar.h>
-#include <Atrc/Lib/Material/Utility/BxDFAggregate.h>
+#include <Atrc/Lib/Material/Utility/BxDF2BSDF.h>
 #include <Atrc/Lib/Material/Utility/MaterialHelper.h>
 #include <Atrc/Lib/Material/ONMatte.h>
 
@@ -27,12 +27,17 @@ ShadingPoint ONMatte::GetShadingPoint(const Intersection &inct, Arena &arena) co
     Spectrum albedo = albedoMap_->Sample(ret.uv);
     Real sigma      = sigmaMap_->Sample1(ret.uv);
 
-    auto bsdf = arena.Create<BxDFAggregate<1>>(ret.coordSys, inct.coordSys);
+    //auto bsdf = arena.Create<BxDFAggregate<1>>(ret.coordSys, inct.coordSys);
+    //if(!sigma)
+    //    bsdf->AddBxDF(arena.Create<BxDF_Diffuse>(albedo));
+    //else
+    //    bsdf->AddBxDF(arena.Create<BxDF_OrenNayar>(albedo, sigma));
+    //ret.bsdf = bsdf;
+
     if(!sigma)
-        bsdf->AddBxDF(arena.Create<BxDF_Diffuse>(albedo));
+        ret.bsdf = arena.Create<BxDF2BSDF<BxDF_Diffuse>>(albedo);
     else
-        bsdf->AddBxDF(arena.Create<BxDF_OrenNayar>(albedo, sigma));
-    ret.bsdf = bsdf;
+        ret.bsdf = arena.Create<BxDF2BSDF<BxDF_OrenNayar>>(albedo, sigma);
 
     return ret;
 }

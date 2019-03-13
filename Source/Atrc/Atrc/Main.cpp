@@ -3,6 +3,8 @@
 #include <Atrc/Atrc/ResourceInterface/ResourceSlot.h>
 #include <Atrc/Atrc/FilmFilter/FilmFilter.h>
 #include <Atrc/Atrc/Window.h>
+
+#include <Lib/imgui/imgui/imgui.h>
 #include <Lib/ImFileBrowser/imfilebrowser.h>
 
 void InitializeImGui(GLFWwindow *window)
@@ -13,7 +15,6 @@ void InitializeImGui(GLFWwindow *window)
 
     ImGui::StyleColorsDark();
 
-    //ImGui::GetStyle().WindowBorderSize = 5;
     ImGui::GetStyle().WindowRounding = 0;
 
     ImFontConfig defaultFontConfig;
@@ -97,7 +98,7 @@ int Run(GLFWwindow *window)
     float bottomWindowSizeY = 100;
     float rightWindowSizeX = 100;
 
-    ImGui::FileBrowser fileBrowser;
+    ImGui::FileBrowser fileBrowser(ImGuiFileBrowserFlags_CloseOnEsc);
     
     while(!glfwWindowShouldClose(window))
     {

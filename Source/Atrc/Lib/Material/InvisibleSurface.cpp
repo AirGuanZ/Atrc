@@ -7,12 +7,14 @@ namespace Atrc
 
 ShadingPoint InvisibleSurface::GetShadingPoint(const Intersection &inct, Arena &arena) const
 {
+    static const BxDF_Void BXDF_VOID;
+
     ShadingPoint ret;
     ret.uv = inct.usr.uv;
     ret.coordSys = inct.coordSys;
     
-    auto bsdf = arena.Create<BxDFAggregate<1>>(ret.coordSys, inct.coordSys);
-    bsdf->AddBxDF(arena.Create<BxDF_Void>());
+    auto bsdf = arena.Create<BxDFAggregate<1>>();
+    bsdf->AddBxDF(&BXDF_VOID);
     ret.bsdf = bsdf;
 
     return ret;
