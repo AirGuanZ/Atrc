@@ -5,8 +5,8 @@
 
 void RegisterFilmFilterCreators(ResourceCreatorManager<FilmFilterInstance> &mgr)
 {
-    static const Core2ResourceCreator<FilmFilterInstance, BoxCore> iBoxCreator;
-    static const Core2ResourceCreator<FilmFilterInstance, GaussianCore> iGaussianCreator;
+    static const Core2FilmFilterCreator<BoxCore> iBoxCreator;
+    static const Core2FilmFilterCreator<GaussianCore> iGaussianCreator;
     mgr.AddCreator(&iBoxCreator);
     mgr.AddCreator(&iGaussianCreator);
 }

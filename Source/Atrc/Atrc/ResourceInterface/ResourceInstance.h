@@ -10,6 +10,7 @@
 #include <AGZUtils/Utils/Misc.h>
 
 class ResourceCreateContext;
+class ResourceCreatorManagerList;
 
 class ResourceInstance : public AGZ::Uncopiable
 {
@@ -52,9 +53,11 @@ public:
 template<typename TBase, typename TCore>
 class Core2ResourceInstance : public TBase
 {
-    TCore core_;
-
     static_assert(std::is_base_of_v<ResourceInstance, TBase>);
+
+protected:
+
+    TCore core_;
 
 public:
 
@@ -81,7 +84,7 @@ public:
     }
 };
 
-template<typename TBase, typename TCore>
+template<typename TBase, typename TCore, template<typename> typename TCore2Instance>
 class Core2ResourceCreator : public ResourceCreator<TBase>
 {
     static_assert(std::is_base_of_v<ResourceInstance, TBase>);
@@ -90,7 +93,7 @@ public:
 
     std::unique_ptr<TBase> Create(ResourceCreateContext &ctx, std::string name) const override
     {
-        return std::make_unique<Core2ResourceInstance<TBase, TCore>>(std::move(name), ctx);
+        return std::make_unique<TCore2Instance<TCore>>(std::move(name), ctx);
     }
 
     const char *GetName() const noexcept override
@@ -133,12 +136,24 @@ public:
     auto end()   const { return name2Creator_.end(); }
 };
 
+class ResourceCreateContext
+{
+public:
+
+    ResourceCreatorManagerList *ctrMgrList;
+};
+
 class CameraInstance : public ResourceInstance
 {
 public:
 
     using ResourceInstance::ResourceInstance;
 };
+
+template<typename TCore>
+using Core2CameraInstance = Core2ResourceInstance<CameraInstance, TCore>;
+template<typename TCore>
+using Core2CameraCreator = Core2ResourceCreator<CameraInstance, TCore, Core2CameraInstance>;
 
 class FilmFilterInstance : public ResourceInstance
 {
@@ -147,6 +162,35 @@ public:
     using ResourceInstance::ResourceInstance;
 };
 
+template<typename TCore>
+using Core2FilmFilterInstance = Core2ResourceInstance<FilmFilterInstance, TCore>;
+template<typename TCore>
+using Core2FilmFilterCreator = Core2ResourceCreator<FilmFilterInstance, TCore, Core2FilmFilterInstance>;
+
+class Texture1Instance : public ResourceInstance
+{
+public:
+
+    using ResourceInstance::ResourceInstance;
+
+    virtual void SetRange([[maybe_unused]] float minValue, [[maybe_unused]] float maxValue) { }
+};
+
+template<typename TCore>
+class Core2Texture1Instance : public Core2ResourceInstance<Texture1Instance, TCore>
+{
+public:
+
+    using Core2ResourceInstance<Texture1Instance, TCore>::Core2ResourceInstance;
+
+    void SetRange(float minValue, float maxValue) override
+    {
+        this->core_.SetRange(minValue, maxValue);
+    }
+};
+template<typename TCore>
+using Core2Texture1Creator = Core2ResourceCreator<Texture1Instance, TCore, Core2Texture1Instance>;
+
 class ResourceCreatorManagerList
 {
     template<typename...TBases>
@@ -154,7 +198,8 @@ class ResourceCreatorManagerList
 
     TupleOfCreatorManager<
         CameraInstance,
-        FilmFilterInstance
+        FilmFilterInstance,
+        Texture1Instance
     > mgrs_;
 
 public:
@@ -164,11 +209,4 @@ public:
     {
         return std::get<ResourceCreatorManager<TBase>>(mgrs_);
     }
-};
-
-class ResourceCreateContext
-{
-public:
-
-    ResourceCreatorManagerList *ctrMgrList;
 };

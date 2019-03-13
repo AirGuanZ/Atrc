@@ -2,6 +2,7 @@
 
 #include <Atrc/Atrc/ResourceInterface/ResourceSlot.h>
 #include <Atrc/Atrc/FilmFilter/FilmFilter.h>
+#include <Atrc/Atrc/Texture1/Texture1.h>
 #include <Atrc/Atrc/Window.h>
 
 #include <Lib/imgui/imgui/imgui.h>
@@ -90,15 +91,24 @@ int Run(GLFWwindow *window)
 
     ResourceCreatorManagerList ctrMgrList;
     RegisterFilmFilterCreators(ctrMgrList.GetCreatorMgr<FilmFilterInstance>());
+    RegisterTexture1Creators(ctrMgrList.GetCreatorMgr<Texture1Instance>());
 
     ResourceCreateContext ctrCtx = { &ctrMgrList };
 
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplGlfw_NewFrame();
+    ImGui::NewFrame();
+
     ResourceSlot<FilmFilterInstance> filmFilterSlot(ctrCtx, "Box");
+    ResourceSlot<Texture1Instance> tex1Slot(ctrCtx);
+    tex1Slot.SetRscTypeChangedCallback([](Texture1Instance &i) {i.SetRange(0, 1); }, true);
+
+    ImGui::EndFrame();
 
     float bottomWindowSizeY = 100;
     float rightWindowSizeX = 100;
 
-    ImGui::FileBrowser fileBrowser(ImGuiFileBrowserFlags_CloseOnEsc);
+    ImGui::FileBrowser fileBrowser(ImGuiFileBrowserFlags_CloseOnEsc | ImGuiFileBrowserFlags_NoModal);
     
     while(!glfwWindowShouldClose(window))
     {
@@ -112,7 +122,7 @@ int Run(GLFWwindow *window)
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        // Four windows
+        // four windows
 
         // top
 
@@ -144,6 +154,7 @@ int Run(GLFWwindow *window)
         // left
 
         float middleWindowSizeY = winInfo.FbHf() - topWindowSizeY - bottomWindowSizeY;
+        float leftWindowSizeX = 0;
 
         ImGui::SetNextWindowPos(ImVec2(0, topWindowSizeY));
         ImGui::SetNextWindowSizeConstraints(
@@ -155,10 +166,16 @@ int Run(GLFWwindow *window)
             filmFilterSlot.Display(ctrCtx);
             if(ImGui::Button("file"))
                 fileBrowser.Open();
+            leftWindowSizeX = ImGui::GetWindowSize().x;
             ImGui::End();
         }
 
         fileBrowser.Display();
+        if(fileBrowser.HasSelected())
+        {
+            std::cout << fileBrowser.GetSelected() << std::endl;
+            fileBrowser.ClearSelected();
+        }
 
         // right
 
@@ -169,9 +186,14 @@ int Run(GLFWwindow *window)
         if(ImGui::Begin("Right Window", nullptr,
             ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResizeGrip | ImGuiWindowFlags_NoTitleBar))
         {
+            tex1Slot.Display(ctrCtx);
             rightWindowSizeX = ImGui::GetWindowSize().x;
             ImGui::End();
         }
+
+        winInfo.SetPvSize(
+            static_cast<int>(winInfo.FbWf() - leftWindowSizeX - rightWindowSizeX),
+            static_cast<int>(winInfo.FbHf() - topWindowSizeY - bottomWindowSizeY));
 
         GL::RenderContext::ClearColorAndDepth();
 

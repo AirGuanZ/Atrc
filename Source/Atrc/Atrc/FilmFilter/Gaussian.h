@@ -9,10 +9,7 @@ class GaussianCore
 
 public:
 
-    static const char *GetTypeName() noexcept
-    {
-        return "Gaussian";
-    }
+    static const char *GetTypeName() noexcept { return "Gaussian"; }
 
     static bool IsMultiline() noexcept { return true; }
 

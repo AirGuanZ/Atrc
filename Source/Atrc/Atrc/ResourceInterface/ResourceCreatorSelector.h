@@ -10,14 +10,18 @@ class ResourceCreatorSelector
 
     const ResourceCreatorManager<TBase> creatorMgr_;
     const ResourceCreator<TBase> *selectedCreator_;
+    float widgetWidth_;
 
 public:
 
     explicit ResourceCreatorSelector(const ResourceCreatorManager<TBase> &creatorMgr) noexcept
-        : creatorMgr_(creatorMgr)
+        : creatorMgr_(creatorMgr), widgetWidth_(0)
     {
-        AGZ_ASSERT(creatorMgr.begin() != creator.end());
+        AGZ_ASSERT(creatorMgr.begin() != creatorMgr.end());
         selectedCreator_ = creatorMgr.begin()->second;
+        for(auto &p : creatorMgr_)
+            widgetWidth_ = AGZ::Math::Max(widgetWidth_, ImGui::CalcTextSize(p.first.c_str()).x);
+        widgetWidth_ += 40;
     }
 
     void SetSelectedCreator(const std::string &name)
@@ -34,6 +38,9 @@ public:
     bool Display()
     {
         auto oldSelectedCreator = selectedCreator_;
+
+        ImGui::PushItemWidth(widgetWidth_);
+        AGZ::ScopeGuard popItemWidth([] { ImGui::PopItemWidth(); });
 
         if(ImGui::BeginCombo("", selectedCreator_->GetName()))
         {

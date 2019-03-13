@@ -13,7 +13,7 @@ BSSRDFSurface::BSSRDFSurface(
 
 ShadingPoint BSSRDFSurface::GetShadingPoint(const Intersection &inct, Arena &arena) const noexcept
 {
-    auto shd   = surface_->GetShadingPoint(inct, arena);
+    auto shd = surface_->GetShadingPoint(inct, arena);
 
     if(inct.coordSys.InPositiveHemisphere(inct.wr))
     {

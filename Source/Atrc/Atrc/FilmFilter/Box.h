@@ -8,10 +8,7 @@ class BoxCore
 
 public:
 
-    static const char *GetTypeName() noexcept
-    {
-        return "Box";
-    }
+    static const char *GetTypeName() noexcept { return "Box"; }
 
     static bool IsMultiline() noexcept { return false; }
 
