@@ -21,7 +21,7 @@ public:
         selectedCreator_ = creatorMgr.begin()->second;
         for(auto &p : creatorMgr_)
             widgetWidth_ = AGZ::Math::Max(widgetWidth_, ImGui::CalcTextSize(p.first.c_str()).x);
-        widgetWidth_ += 40;
+        widgetWidth_ += 2 * ImGui::GetFontSize();
     }
 
     void SetSelectedCreator(const std::string &name)

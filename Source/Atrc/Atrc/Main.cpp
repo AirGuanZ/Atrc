@@ -1,4 +1,4 @@
-#include <iostream>
+﻿#include <iostream>
 
 #include <Atrc/Atrc/ResourceInterface/ResourceSlot.h>
 #include <Atrc/Atrc/FilmFilter/FilmFilter.h>
@@ -19,8 +19,8 @@ void InitializeImGui(GLFWwindow *window)
     ImGui::GetStyle().WindowRounding = 0;
 
     ImFontConfig defaultFontConfig;
-    defaultFontConfig.SizePixels = 16;
-    ImGui::GetIO().Fonts->AddFontDefault(&defaultFontConfig);
+    ImGui::GetIO().Fonts->AddFontFromFileTTF(
+        "./font.ttf", 16, nullptr, ImGui::GetIO().Fonts->GetGlyphRangesChineseSimplifiedCommon());
 }
 
 int Run(GLFWwindow *window)
@@ -164,13 +164,14 @@ int Run(GLFWwindow *window)
             ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResizeGrip | ImGuiWindowFlags_NoTitleBar))
         {
             filmFilterSlot.Display(ctrCtx);
-            if(ImGui::Button("file"))
+            if(ImGui::Button(u8"文件"))
                 fileBrowser.Open();
             leftWindowSizeX = ImGui::GetWindowSize().x;
             ImGui::End();
         }
 
         fileBrowser.Display();
+
         if(fileBrowser.HasSelected())
         {
             std::cout << fileBrowser.GetSelected() << std::endl;
