@@ -14,7 +14,7 @@ Spectrum BxDF_Black::GetBaseColor() const noexcept
     return Spectrum();
 }
 
-Spectrum BxDF_Black::Eval(
+Spectrum BxDF_Black::EvalUncolored(
     [[maybe_unused]] const Vec3 &wi, [[maybe_unused]] const Vec3 &wo,
     [[maybe_unused]] bool star) const noexcept
 {

@@ -35,6 +35,14 @@ public:
         return bxdf_.Eval(lwi, lwo, star);
     }
 
+    Spectrum EvalUncolored(const CoordSystem &shd, const CoordSystem &geo, const Vec3 &wi, const Vec3 &wo, BSDFType type, bool star) const noexcept override
+    {
+        if(!bxdf_.MatchType(type))
+            return Spectrum();
+        Vec3 lwi = shd.World2Local(wi).Normalize(), lwo = shd.World2Local(wo).Normalize();
+        return bxdf_.EvalUncolored(lwi, lwo, star);
+    }
+
     std::optional<SampleWiResult> SampleWi(const CoordSystem &shd, const CoordSystem &geo, const Vec3 &wo, BSDFType type, bool star, const Vec3 &sample) const noexcept override
     {
         if(!bxdf_.MatchType(type))

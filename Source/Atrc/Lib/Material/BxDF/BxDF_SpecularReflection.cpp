@@ -14,8 +14,8 @@ Spectrum BxDF_SpecularReflection::GetBaseColor() const noexcept
     return rc_;
 }
 
-Spectrum BxDF_SpecularReflection::Eval(
-    [[maybe_unused]] [[maybe_unused]] const Vec3& wi, [[maybe_unused]] const Vec3& wo,
+Spectrum BxDF_SpecularReflection::EvalUncolored(
+    [[maybe_unused]] const Vec3& wi, [[maybe_unused]] const Vec3& wo,
     [[maybe_unused]] bool star) const noexcept
 {
     return Spectrum();

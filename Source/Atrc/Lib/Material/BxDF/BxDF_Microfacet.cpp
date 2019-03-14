@@ -114,7 +114,7 @@ Spectrum BxDF_MicrofacetReflection::GetBaseColor() const noexcept
     return rc_;
 }
 
-Spectrum BxDF_MicrofacetReflection::Eval(const Vec3 &wi, const Vec3 &wo, bool star) const noexcept
+Spectrum BxDF_MicrofacetReflection::EvalUncolored(const Vec3 &wi, const Vec3 &wo, bool star) const noexcept
 {
     if(wi.z <= 0 || wo.z <= 0)
         return Spectrum();
@@ -128,7 +128,7 @@ Spectrum BxDF_MicrofacetReflection::Eval(const Vec3 &wi, const Vec3 &wo, bool st
         return Spectrum();
     Spectrum Fr = fresnel_->Eval(Dot(nWi, H));
 
-    return rc_ * Fr * D * G / (4 * nWi.z * nWo.z);
+    return Fr * D * G / (4 * nWi.z * nWo.z);
 }
 
 std::optional<BxDF::SampleWiResult> BxDF_MicrofacetReflection::SampleWi(const Vec3 &wo, bool star, const Vec3 &sample) const noexcept
@@ -179,7 +179,7 @@ Spectrum BxDF_Microfacet::GetBaseColor() const noexcept
     return rc_;
 }
 
-Spectrum BxDF_Microfacet::Eval(const Vec3 &wi, const Vec3 &wo, bool star) const noexcept
+Spectrum BxDF_Microfacet::EvalUncolored(const Vec3 &wi, const Vec3 &wo, bool star) const noexcept
 {
     Vec3 nWi = wi.Normalize(), nWo = wo.Normalize();
     if(!nWi.z || !nWo.z)
@@ -213,7 +213,7 @@ Spectrum BxDF_Microfacet::Eval(const Vec3 &wi, const Vec3 &wo, bool star) const 
         return Spectrum();
 
     if(isReflection)
-        return rc_ * Abs(Fr * D * G / (4 * nWi.z * nWo.z));
+        return Spectrum(Abs(Fr * D * G / (4 * nWi.z * nWo.z)));
 
     Real HO = Dot(nH, nWo), HI = Dot(nH, nWi);
     Real sdem = etaI * HO + etaT * HI;
@@ -223,10 +223,7 @@ Spectrum BxDF_Microfacet::Eval(const Vec3 &wi, const Vec3 &wo, bool star) const 
     if(star)
         val /= etaT * etaT / (etaI * etaI);
 
-    Spectrum ret = rc_ * Abs(val);
-    if(ret.HasInf())
-        return Spectrum();
-    return ret;
+    return Spectrum(Abs(val));
 }
 
 std::optional<BxDF::SampleWiResult> BxDF_Microfacet::SampleWi(const Vec3 &wo, bool star, const Vec3 &sample) const noexcept

@@ -60,6 +60,13 @@ namespace
             return ret;
         }
 
+        Spectrum EvalUncolored(
+            const CoordSystem &shd, const CoordSystem &geo,
+            const Vec3 &wi, const Vec3 &wo, BSDFType type, bool star) const noexcept override
+        {
+            return Spectrum();
+        }
+
         std::optional<SampleWiResult> SampleWi(
             const CoordSystem &shd, const CoordSystem &geo,
             const Vec3 &wo, BSDFType type, bool star, const Vec3 &sample) const noexcept override

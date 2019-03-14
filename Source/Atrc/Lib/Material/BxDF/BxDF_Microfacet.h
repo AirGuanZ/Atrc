@@ -18,7 +18,7 @@ public:
 
     Spectrum GetBaseColor() const noexcept override;
 
-    Spectrum Eval(const Vec3 &wi, const Vec3 &wo, bool star) const noexcept override;
+    Spectrum EvalUncolored(const Vec3 &wi, const Vec3 &wo, bool star) const noexcept override;
 
     std::optional<SampleWiResult> SampleWi(const Vec3 &wo, bool star, const Vec3 &sample) const noexcept override;
 
@@ -37,7 +37,7 @@ public:
 
     Spectrum GetBaseColor() const noexcept override;
 
-    Spectrum Eval(const Vec3 &wi, const Vec3 &wo, bool star) const noexcept override;
+    Spectrum EvalUncolored(const Vec3 &wi, const Vec3 &wo, bool star) const noexcept override;
 
     std::optional<SampleWiResult> SampleWi(const Vec3 &wo, bool star, const Vec3 &sample) const noexcept override;
 

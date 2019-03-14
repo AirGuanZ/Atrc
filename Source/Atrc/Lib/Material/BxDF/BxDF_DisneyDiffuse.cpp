@@ -37,7 +37,7 @@ namespace
 
 } // namespace anonymous
 
-Spectrum BxDF_DisneyDiffuse::Eval(const Vec3 &wi, const Vec3 &wo, bool star) const noexcept
+Spectrum BxDF_DisneyDiffuse::EvalUncolored(const Vec3 &wi, const Vec3 &wo, bool star) const noexcept
 {
     Vec3 wh = (wi + wo).Normalize();
     Real cosThetaI = CosTheta(wi), cosThetaO = CosTheta(wo);
@@ -47,7 +47,7 @@ Spectrum BxDF_DisneyDiffuse::Eval(const Vec3 &wi, const Vec3 &wo, bool star) con
     Real f_d = subsurface_ < 1 ? f_diffuse(FI, FO, cosThetaD2, roughness_) : Real(0);
     Real f_s = subsurface_ > 0 ? f_subsurface(cosThetaI, cosThetaO, FI, FO, cosThetaD2, roughness_) : Real(0);
 
-    return baseColor_ / PI * Mix(f_d, f_s, subsurface_);
+    return Spectrum(1 / PI * Mix(f_d, f_s, subsurface_));
 }
 
 } // namespace Atrc

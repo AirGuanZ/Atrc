@@ -26,7 +26,9 @@ public:
 
     virtual Spectrum GetBaseColor() const noexcept = 0;
 
-    virtual Spectrum Eval(const Vec3 &wi, const Vec3 &wo, bool star) const noexcept = 0;
+    virtual Spectrum EvalUncolored(const Vec3 &wi, const Vec3 &wo, bool star) const noexcept = 0;
+
+    virtual Spectrum Eval(const Vec3 &wi, const Vec3 &wo, bool star) const noexcept;
 
     virtual std::optional<SampleWiResult> SampleWi(const Vec3 &wo, bool star, const Vec3 &sample) const noexcept;
 
@@ -49,6 +51,11 @@ inline BSDFType BxDF::GetType() const noexcept
 inline bool BxDF::MatchType(BSDFType type) const noexcept
 {
     return Contains(type, GetType());
+}
+
+inline Spectrum BxDF::Eval(const Vec3 &wi, const Vec3 &wo, bool star) const noexcept
+{
+    return GetBaseColor() * EvalUncolored(wi, wo, star);
 }
 
 inline std::optional<BxDF::SampleWiResult> BxDF::SampleWi(const Vec3 &wo, bool star, const Vec3 &sample) const noexcept

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <Atrc/Lib/Material/Utility/BxDF.h>
 #include <Atrc/Lib/Material/Utility/Fresnel.h>
@@ -17,7 +17,8 @@ public:
 
     Spectrum GetBaseColor() const noexcept override;
 
-    Spectrum Eval(const Vec3 &wi, const Vec3 &wo, bool star) const noexcept override;
+    // 由于specular是delta分布，此函数固定为0
+    Spectrum EvalUncolored(const Vec3 &wi, const Vec3 &wo, bool star) const noexcept override;
 
     std::optional<SampleWiResult> SampleWi(const Vec3 &wo, bool star, const Vec3 &sample) const noexcept override;
 

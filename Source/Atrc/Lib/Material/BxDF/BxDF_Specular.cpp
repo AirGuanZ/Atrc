@@ -30,7 +30,7 @@ Spectrum BxDF_Specular::GetBaseColor() const noexcept
     return rc_;
 }
 
-Spectrum BxDF_Specular::Eval(
+Spectrum BxDF_Specular::EvalUncolored(
     [[maybe_unused]] const Vec3 &wi,
     [[maybe_unused]] const Vec3 &wo,
     [[maybe_unused]] bool star) const noexcept

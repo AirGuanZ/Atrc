@@ -20,11 +20,11 @@ Spectrum BxDF_Diffuse::GetBaseColor() const noexcept
     return albedo_;
 }
 
-Spectrum BxDF_Diffuse::Eval(const Vec3 &wi, const Vec3 &wo, [[maybe_unused]] bool star) const noexcept
+Spectrum BxDF_Diffuse::EvalUncolored(const Vec3 &wi, const Vec3 &wo, [[maybe_unused]] bool star) const noexcept
 {
     if(wi.z <= 0 || wo.z <= 0)
         return Spectrum();
-    return albedo_ / PI;
+    return Spectrum(1 / PI);
 }
 
 std::optional<BxDF::SampleWiResult> BxDF_Diffuse::SampleWi(const Vec3 &wo, [[maybe_unused]] bool star, const Vec3 &sample) const noexcept

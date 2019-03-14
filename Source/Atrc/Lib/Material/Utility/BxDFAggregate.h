@@ -23,6 +23,10 @@ public:
     Spectrum Eval(
         const CoordSystem &shd, const CoordSystem &geo,
         const Vec3 &wi, const Vec3 &wo, BSDFType type, bool star) const noexcept override;
+
+    Spectrum EvalUncolored(
+        const CoordSystem &shd, const CoordSystem &geo,
+        const Vec3 &wi, const Vec3 &wo, BSDFType type, bool star) const noexcept override;
     
     std::optional<SampleWiResult> SampleWi(
         const CoordSystem &shd, const CoordSystem &geo,
@@ -73,6 +77,21 @@ Spectrum BxDFAggregate<MAX_BXDF_CNT>::Eval(
     {
         if(bxdfs_[i]->MatchType(type))
             ret += bxdfs_[i]->Eval(lwi, lwo, star);
+    }
+    return ret;
+}
+
+template<uint8_t MAX_BXDF_CNT>
+Spectrum BxDFAggregate<MAX_BXDF_CNT>::EvalUncolored(
+    const CoordSystem &shd, [[maybe_unused]] const CoordSystem &geo,
+    const Vec3 &wi, const Vec3 &wo, BSDFType type, bool star) const noexcept
+{
+    Vec3 lwi = shd.World2Local(wi).Normalize(), lwo = shd.World2Local(wo).Normalize();
+    Spectrum ret;
+    for(uint8_t i = 0; i < bxdfCnt_; ++i)
+    {
+        if(bxdfs_[i]->MatchType(type))
+            ret += bxdfs_[i]->EvalUncolored(lwi, lwo, star);
     }
     return ret;
 }

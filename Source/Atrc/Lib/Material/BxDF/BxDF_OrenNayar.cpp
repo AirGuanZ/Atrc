@@ -16,7 +16,7 @@ Spectrum BxDF_OrenNayar::GetBaseColor() const noexcept
     return albedo_;
 }
 
-Spectrum BxDF_OrenNayar::Eval(const Vec3 &wi, const Vec3 &wo, [[maybe_unused]] bool star) const noexcept
+Spectrum BxDF_OrenNayar::EvalUncolored(const Vec3 &wi, const Vec3 &wo, [[maybe_unused]] bool star) const noexcept
 {
     if(wi.z <= 0 || wo.z <= 0)
         return Spectrum();
@@ -25,7 +25,7 @@ Spectrum BxDF_OrenNayar::Eval(const Vec3 &wi, const Vec3 &wo, [[maybe_unused]] b
     Real phiI = Phi(lwi), phiO = Phi(lwo);
     auto [beta, alpha] = std::minmax(Arccos(CosTheta(lwi)), Arccos(CosTheta(lwo)));
 
-    return albedo_ / PI * (A_ + B_ * Max(Real(0), Cos(phiI - phiO)) * Sin(alpha) * Tan(beta));
+    return Spectrum(1 / PI * (A_ + B_ * Max(Real(0), Cos(phiI - phiO)) * Sin(alpha) * Tan(beta)));
 }
 
 } // namespace Atrc

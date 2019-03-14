@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <Atrc/Lib/Core/Common.h>
 #include <Atrc/Lib/Core/SurfacePoint.h>
@@ -42,11 +42,19 @@ public:
         const CoordSystem &shd, const CoordSystem &geo,
         const Vec3 &wi, const Vec3 &wo, BSDFType type, bool star) const noexcept = 0;
 
+    // 满足约束：ret.coef = Eval, ret.pdf = SampleWiPDF
     virtual std::optional<SampleWiResult> SampleWi(
         const CoordSystem &shd, const CoordSystem &geo,
         const Vec3 &wo, BSDFType type, bool star, const Vec3 &sample) const noexcept = 0;
 
     virtual Real SampleWiPDF(
+        const CoordSystem &shd, const CoordSystem &geo,
+        const Vec3 &wi, const Vec3 &wo, BSDFType type, bool star) const noexcept = 0;
+
+    // 返回BaseColor == WHITE时Eval出的结果
+    // 一般来说应满足约束：Eval = BaseColor * EvalUncolored
+    // 但不是所有的材质都做得到，这种情况下不对该函数的结果做任何要求
+    virtual Spectrum EvalUncolored(
         const CoordSystem &shd, const CoordSystem &geo,
         const Vec3 &wi, const Vec3 &wo, BSDFType type, bool star) const noexcept = 0;
 };

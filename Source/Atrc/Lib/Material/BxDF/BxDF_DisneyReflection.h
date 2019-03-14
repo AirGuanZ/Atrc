@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <Atrc/Lib/Material/Utility/BxDF.h>
 
@@ -42,6 +42,9 @@ public:
     Spectrum GetBaseColor() const noexcept override { return baseColor_; }
 
     Spectrum Eval(const Vec3 &wi, const Vec3 &wo, bool star) const noexcept override;
+
+    // disney brdf实现不了符合约束的eval uncolored，故此函数无意义
+    Spectrum EvalUncolored(const Vec3 &wi, const Vec3 &wo, bool star) const noexcept override { return Spectrum(); }
 
     std::optional<SampleWiResult> SampleWi(const Vec3 &wo, bool star, const Vec3 &sample) const noexcept override;
 

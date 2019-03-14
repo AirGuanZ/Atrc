@@ -14,7 +14,7 @@ Spectrum BxDF_TorranceSparrowReflection::GetBaseColor() const noexcept
     return rc_;
 }
 
-Spectrum BxDF_TorranceSparrowReflection::Eval(const Vec3 &wi, const Vec3 &wo, [[maybe_unused]] bool star) const noexcept
+Spectrum BxDF_TorranceSparrowReflection::EvalUncolored(const Vec3 &wi, const Vec3 &wo, [[maybe_unused]] bool star) const noexcept
 {
     if(wi.z <= 0 || wo.z <= 0)
         return Spectrum();
@@ -25,7 +25,7 @@ Spectrum BxDF_TorranceSparrowReflection::Eval(const Vec3 &wi, const Vec3 &wo, [[
     if(!G)
         return Spectrum();
     Spectrum fr = fresnel_->Eval(Dot(nWi, H));
-    return rc_ * fr * md_->D(H) * G / (4 * nWi.z * nWo.z);
+    return fr * md_->D(H) * G / (4 * nWi.z * nWo.z);
 }
 
 std::optional<BxDF::SampleWiResult> BxDF_TorranceSparrowReflection::SampleWi(const Vec3 &wo, bool star, const Vec3 &sample) const noexcept
