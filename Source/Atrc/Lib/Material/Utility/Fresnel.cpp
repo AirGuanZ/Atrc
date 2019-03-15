@@ -3,32 +3,32 @@
 namespace Atrc
 {
 
-Real ComputeFresnelDielectric(Real etaI, Real etaT, Real cosThetaI) noexcept
+Real ComputeFresnelDielectric(Real etaOut, Real etaIn, Real cosThetaI) noexcept
 {
     if(cosThetaI < 0)
     {
-        std::swap(etaI, etaT);
+        std::swap(etaOut, etaIn);
         cosThetaI = -cosThetaI;
     }
 
     Real sinThetaI = Sqrt(Max(Real(0), 1 - cosThetaI * cosThetaI));
-    Real sinThetaT = etaI / etaT * sinThetaI;
+    Real sinThetaT = etaOut / etaIn * sinThetaI;
 
     if(sinThetaT >= 1)
         return 1;
 
     Real cosThetaT = Sqrt(Max(Real(0), 1 - sinThetaT * sinThetaT));
-    Real para = (etaT * cosThetaI - etaI * cosThetaT) / (etaT * cosThetaI + etaI * cosThetaT);
-    Real perp = (etaI * cosThetaI - etaT * cosThetaT) / (etaI * cosThetaI + etaT * cosThetaT);
+    Real para = (etaIn * cosThetaI - etaOut * cosThetaT) / (etaIn * cosThetaI + etaOut * cosThetaT);
+    Real perp = (etaOut * cosThetaI - etaIn * cosThetaT) / (etaOut * cosThetaI + etaIn * cosThetaT);
 
     return Real(0.5) * (para * para + perp * perp);
 }
     
-FresnelConductor::FresnelConductor(const Spectrum &etaI, const Spectrum &etaT, const Spectrum &k) noexcept
-    : etaI(etaI), etaT(etaT), k(k)
+FresnelConductor::FresnelConductor(const Spectrum &etaOut, const Spectrum &etaIn, const Spectrum &k) noexcept
+    : etaOut(etaOut), etaIn(etaIn), k(k)
 {
-    eta2 = etaT / etaI; eta2 *= eta2;
-    etaK2 = k / etaI; etaK2 *= etaK2;
+    eta2 = etaIn / etaOut; eta2 *= eta2;
+    etaK2 = k / etaOut; etaK2 *= etaK2;
 }
 
 Spectrum FresnelConductor::Eval(Real cosThetaI) const noexcept
@@ -50,8 +50,8 @@ Spectrum FresnelConductor::Eval(Real cosThetaI) const noexcept
     return Real(0.5) * (rp + rs);
 }
 
-Dielectric::Dielectric(Real etaI, Real etaT) noexcept
-    : etaI(etaI), etaT(etaT)
+Dielectric::Dielectric(Real etaOut, Real etaIn) noexcept
+    : etaOut(etaOut), etaIn(etaIn)
 {
 
 }
@@ -83,12 +83,12 @@ namespace
 
 Spectrum FresnelDielectric::Eval(Real cosThetaI) const noexcept
 {
-    return Spectrum(ComputeFresnelDielectric(etaI, etaT, cosThetaI));
+    return Spectrum(ComputeFresnelDielectric(etaOut, etaIn, cosThetaI));
 }
 
 Spectrum SchlickApproximation::Eval(Real cosThetaI) const noexcept
 {
-    return Spectrum(ComputeSchlickApproximation(etaI, etaT, cosThetaI));
+    return Spectrum(ComputeSchlickApproximation(etaOut, etaIn, cosThetaI));
 }
 
 } // namespace Atrc

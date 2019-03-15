@@ -185,7 +185,7 @@ Spectrum BxDF_Microfacet::EvalUncolored(const Vec3 &wi, const Vec3 &wo, bool sta
     if(!nWi.z || !nWo.z)
         return Spectrum();
 
-    Real etaI = dielectric_->GetEtaI(), etaT = dielectric_->GetEtaT();
+    Real etaI = dielectric_->GetEtaOut(), etaT = dielectric_->GetEtaIn();
     bool isEntering = nWo.z > 0;
     if(!isEntering)
         std::swap(etaI, etaT);
@@ -262,13 +262,13 @@ std::optional<BxDF::SampleWiResult> BxDF_Microfacet::SampleWi(const Vec3 &wo, bo
         return ret;
     }
 
-    auto oWi = Refract(-nWo, H, dielectric_->GetEtaT() / dielectric_->GetEtaI());
+    auto oWi = Refract(-nWo, H, dielectric_->GetEtaIn() / dielectric_->GetEtaOut());
     if(!oWi || ((oWi->z >= 0) == (nWo.z >= 0)))
         return std::nullopt;
     Vec3 nWi = oWi->Normalize();
 
     bool isEntering = nWo.z > 0;
-    Real etaT = dielectric_->GetEtaT(), etaI = dielectric_->GetEtaI();
+    Real etaT = dielectric_->GetEtaIn(), etaI = dielectric_->GetEtaOut();
     if(!isEntering)
         std::swap(etaT, etaI);
 
@@ -316,7 +316,7 @@ Real BxDF_Microfacet::SampleWiPDF(const Vec3 &wi, const Vec3 &wo, bool star) con
     }
     else
     {
-        Real etaI = dielectric_->GetEtaI(), etaT = dielectric_->GetEtaT();
+        Real etaI = dielectric_->GetEtaOut(), etaT = dielectric_->GetEtaIn();
         if(!isEntering)
             std::swap(etaI, etaT);
         nH = -(etaI * nWo + etaT * nWi).Normalize();

@@ -5,7 +5,7 @@
 namespace Atrc
 {
 
-Real ComputeFresnelDielectric(Real etaI, Real etaT, Real cosThetaI) noexcept;
+Real ComputeFresnelDielectric(Real etaOut, Real etaIn, Real cosThetaI) noexcept;
     
 // Fresnel项
 class Fresnel
@@ -20,12 +20,12 @@ public:
 // 导体的fresnel项
 class FresnelConductor : public Fresnel
 {
-    Spectrum etaI, etaT, k;
+    Spectrum etaOut, etaIn, k;
     Spectrum eta2, etaK2;
 
 public:
 
-    FresnelConductor(const Spectrum &etaI, const Spectrum &etaT, const Spectrum &k) noexcept;
+    FresnelConductor(const Spectrum &etaOut, const Spectrum &etaIn, const Spectrum &k) noexcept;
 
     Spectrum Eval(Real cosThetaI) const noexcept override;
 };
@@ -35,14 +35,14 @@ class Dielectric : public Fresnel
 {
 protected:
 
-    Real etaI, etaT;
+    Real etaOut, etaIn;
 
 public:
 
-    Dielectric(Real etaI, Real etaT) noexcept;
+    Dielectric(Real etaOut, Real etaIn) noexcept;
 
-    Real GetEtaI() const noexcept { return etaI; }
-    Real GetEtaT() const noexcept { return etaT; }
+    Real GetEtaOut() const noexcept { return etaOut; }
+    Real GetEtaIn() const noexcept { return etaIn; }
 };
 
 // 使用fresnel公式的绝缘体fresnel项

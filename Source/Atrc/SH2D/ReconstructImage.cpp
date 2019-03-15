@@ -6,7 +6,7 @@ using namespace Atrc;
 Atrc::Image ReconstructImage(int SHOrder, const Image *sceneCoefs, const Spectrum *lightCoefs)
 {
     int SHC = SHOrder * SHOrder;
-    Vec2i resolution = sceneCoefs[0].GetSize();
+    auto resolution = sceneCoefs[0].GetSize();
     Image ret(resolution[0], resolution[1]);
 
     for(uint32_t y = 0; y < ret.GetHeight(); ++y)

@@ -61,8 +61,8 @@ std::optional<BxDF_Specular::SampleWiResult> BxDF_Specular::SampleWi(
 
     // 如果是由内向外，etaI和etaT要反过来
 
-    Real etaI = nWo.z > 0 ? fresnel_->GetEtaI() : fresnel_->GetEtaT();
-    Real etaT = nWo.z > 0 ? fresnel_->GetEtaT() : fresnel_->GetEtaI();
+    Real etaI = nWo.z > 0 ? fresnel_->GetEtaOut() : fresnel_->GetEtaIn();
+    Real etaT = nWo.z > 0 ? fresnel_->GetEtaIn() : fresnel_->GetEtaOut();
 
     Real eta = etaI / etaT;
     auto wi = GetRefractDirection(nWo, nor, eta);

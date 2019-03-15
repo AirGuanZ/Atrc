@@ -2,7 +2,7 @@
 
 using namespace Atrc;
 
-void RotateLightCoefs(const Atrc::Mat3 &rotateMatrix, int SHOrder, Spectrum *coefs)
+void RotateLightCoefs(const Mat3 &rotateMatrix, int SHOrder, Spectrum *coefs)
 {
     int SHC = SHOrder * SHOrder;
     std::vector<std::vector<Real>> channels(
