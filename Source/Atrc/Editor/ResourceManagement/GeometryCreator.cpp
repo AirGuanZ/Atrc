@@ -9,7 +9,7 @@
 
 namespace
 {
-    void ExportTransform(LauncherScriptExportingContext &ctx)
+    void ExportTransform(SceneExportingContext &ctx)
     {
         AGZ_ASSERT(ctx.entityController);
         ctx.AddLine("transform = (");
@@ -54,7 +54,7 @@ namespace
 
     protected:
 
-        void Export(const ResourceManager&, LauncherScriptExportingContext &ctx) const override
+        void Export(const ResourceManager&, SceneExportingContext &ctx) const override
         {
             ctx.AddLine("type = Triangle;");
             ctx.AddLine("A = ", AGZ::To<char>(A_), ";");
@@ -197,7 +197,7 @@ namespace
 
     protected:
 
-        void Export(const ResourceManager&, LauncherScriptExportingContext &ctx) const override
+        void Export(const ResourceManager&, SceneExportingContext &ctx) const override
         {
             ctx.AddLine("type = TriangleBVH;");
             ctx.AddLine("filename = \"", filename_.GetExportedFilename(ctx), "\";");

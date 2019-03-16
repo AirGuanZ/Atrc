@@ -13,7 +13,7 @@ namespace
 
     protected:
 
-        void Export(const ResourceManager&, LauncherScriptExportingContext &ctx) const override
+        void Export(const ResourceManager&, SceneExportingContext &ctx) const override
         {
             auto cam = ctx.activeCamera;
             ctx.AddLine("type = Pinhole;");

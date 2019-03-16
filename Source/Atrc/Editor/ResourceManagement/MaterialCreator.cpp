@@ -12,7 +12,7 @@ namespace
 
     protected:
 
-        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
+        void Export(const ResourceManager &rscMgr, SceneExportingContext &ctx) const override
         {
             ctx.AddLine("type = BSSRDF;");
             ExportSubResource("surface", rscMgr, ctx, surface_);
@@ -62,7 +62,7 @@ namespace
         
     protected:
 
-        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
+        void Export(const ResourceManager &rscMgr, SceneExportingContext &ctx) const override
         {
             ctx.AddLine("type = DisneyDiffuse;");
             ExportSubResource("baseColor", rscMgr, ctx, baseColor_);
@@ -119,7 +119,7 @@ namespace
 
     protected:
 
-        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
+        void Export(const ResourceManager &rscMgr, SceneExportingContext &ctx) const override
         {
             ctx.AddLine("type = DisneyReflection;");
             ExportSubResource("baseColor", rscMgr, ctx, baseColor_);
@@ -203,7 +203,7 @@ namespace
 
     protected:
 
-        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
+        void Export(const ResourceManager &rscMgr, SceneExportingContext &ctx) const override
         {
             ctx.AddLine("type = DisneySpecular;");
             ExportSubResource("baseColor", rscMgr, ctx, baseColor_);
@@ -264,7 +264,7 @@ namespace
 
     protected:
 
-        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
+        void Export(const ResourceManager &rscMgr, SceneExportingContext &ctx) const override
         {
             ctx.AddLine("type = GGXDielectric;");
             ExportSubResource("rc", rscMgr, ctx, rc_);
@@ -311,7 +311,7 @@ namespace
 
     protected:
 
-        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
+        void Export(const ResourceManager &rscMgr, SceneExportingContext &ctx) const override
         {
             ctx.AddLine("type = GGXMetal;");
             ExportSubResource("rc", rscMgr, ctx, rc_);
@@ -354,7 +354,7 @@ namespace
     {
     protected:
 
-        void Export(const ResourceManager&, LauncherScriptExportingContext &ctx) const override
+        void Export(const ResourceManager&, SceneExportingContext &ctx) const override
         {
             ctx.AddLine("type = IdealBlack;");
         }
@@ -372,7 +372,7 @@ namespace
 
     protected:
 
-        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
+        void Export(const ResourceManager &rscMgr, SceneExportingContext &ctx) const override
         {
             ctx.AddLine("type = IdealDiffuse;");
             ExportSubResource("albedo", rscMgr, ctx, albedo_);
@@ -408,7 +408,7 @@ namespace
 
     protected:
 
-        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
+        void Export(const ResourceManager &rscMgr, SceneExportingContext &ctx) const override
         {
             ctx.AddLine("type = IdealMirror;");
             ExportSubResource("rc", rscMgr, ctx, rc_);
@@ -447,7 +447,7 @@ namespace
 
     protected:
 
-        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
+        void Export(const ResourceManager &rscMgr, SceneExportingContext &ctx) const override
         {
             ctx.AddLine("type = IdealScaler;");
             ExportSubResource("scale", rscMgr, ctx, scale_);
@@ -487,7 +487,7 @@ namespace
 
     protected:
 
-        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
+        void Export(const ResourceManager &rscMgr, SceneExportingContext &ctx) const override
         {
             ctx.AddLine("type = IdealSpecular;");
             ExportSubResource("rc", rscMgr, ctx, rc_);
@@ -523,7 +523,7 @@ namespace
     {
     protected:
 
-        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
+        void Export(const ResourceManager &rscMgr, SceneExportingContext &ctx) const override
         {
             ctx.AddLine("type = Invisible;");
         }
@@ -542,7 +542,7 @@ namespace
 
     protected:
 
-        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
+        void Export(const ResourceManager &rscMgr, SceneExportingContext &ctx) const override
         {
             ctx.AddLine("type = ONMatte;");
             ExportSubResource("albedo", rscMgr, ctx, albedo_);
@@ -582,7 +582,7 @@ namespace
 
     protected:
 
-        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
+        void Export(const ResourceManager &rscMgr, SceneExportingContext &ctx) const override
         {
             ctx.AddLine("type = TSMetal;");
             ExportSubResource("rc", rscMgr, ctx, rc_);

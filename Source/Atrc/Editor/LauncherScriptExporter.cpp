@@ -2,7 +2,7 @@
 #include <Atrc/Editor/LauncherScriptExporter.h>
 #include <Atrc/Mgr/Parser.h>
 
-LauncherScriptExporter::LauncherScriptExporter(ResourceManager &rscMgr, LauncherScriptExportingContext &ctx)
+LauncherScriptExporter::LauncherScriptExporter(ResourceManager &rscMgr, SceneExportingContext &ctx)
     : rscMgr_(rscMgr), ctx_(ctx)
 {
     
@@ -11,7 +11,7 @@ LauncherScriptExporter::LauncherScriptExporter(ResourceManager &rscMgr, Launcher
 namespace
 {
     template<typename TResource>
-    void ExportResourcesInPool(ResourceManager &rscMgr, LauncherScriptExportingContext &ctx)
+    void ExportResourcesInPool(ResourceManager &rscMgr, SceneExportingContext &ctx)
     {
         ctx.AddLine(TResource::GetPoolName(), " = {");
         ctx.IncIndent();
@@ -22,7 +22,7 @@ namespace
     }
 }
 
-std::string LauncherScriptExporter::Export() const
+std::string LauncherScriptExporter::Export(const RendererInstance *renderer, const std::string &outputFilename) const
 {
     ctx_.ClearString();
 
@@ -71,15 +71,15 @@ std::string LauncherScriptExporter::Export() const
     else
         Global::ShowNormalMessage("camera is unspecified");
 
-    if(ctx_.renderer)
+    if(renderer)
     {
-        IResource::ExportSubResource("renderer", rscMgr_, ctx_, *ctx_.renderer);
+        IResource::ExportSubResource("renderer", rscMgr_, ctx_, *renderer);
         ctx_.AddLine();
     }
     else
         Global::ShowNormalMessage("renderer is unspecified");
 
-    ctx_.AddLine("outputFilename = \"", ctx_.outputFilename, "\";");
+    ctx_.AddLine("outputFilename = \"", outputFilename, "\";");
 
     ctx_.AddLine();
 
@@ -133,6 +133,13 @@ void LauncherScriptImporter::Import(const AGZ::ConfigGroup &root, EditorData *da
         ctx.scriptPath = script;
         ctx.workspacePath = absolute(workspace);
     }
+
+    data->rscMgr.GetPool<CameraInstance>().Clear();
+    data->rscMgr.GetPool<EntityInstance>().Clear();
+    data->rscMgr.GetPool<GeometryInstance>().Clear();
+    data->rscMgr.GetPool<LightInstance>().Clear();
+    data->rscMgr.GetPool<MaterialInstance>().Clear();
+    data->rscMgr.GetPool<TextureInstance>().Clear();
 
     ImportFromPool<CameraInstance>  (root, data->rscMgr, ctx);
     ImportFromPool<EntityInstance>  (root, data->rscMgr, ctx);

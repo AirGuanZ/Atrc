@@ -4,10 +4,10 @@
 
 struct Scene2SHResult
 {
-    Atrc::Film *coefs;
-    Atrc::Film *mask;
-    Atrc::Film *albedo;
-    Atrc::Film *normal;
+    Atrc::Film *coefs  = nullptr;
+    Atrc::Film *binary = nullptr;
+    Atrc::Film *albedo = nullptr;
+    Atrc::Film *normal = nullptr;
 };
 
 void Scene2SH(

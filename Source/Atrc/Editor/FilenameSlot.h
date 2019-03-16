@@ -2,7 +2,7 @@
 
 #include <filesystem>
 
-#include <Atrc/Editor/LauncherScriptExportingContext.h>
+#include <Atrc/Editor/SceneExportingContext.h>
 #include <Atrc/Editor/FileBrowser.h>
 #include <Atrc/Editor/ResourceManagement/ResourceManager.h>
 
@@ -134,7 +134,7 @@ public:
         }
     }
 
-    std::string GetExportedFilename(const LauncherScriptExportingContext &ctx) const
+    std::string GetExportedFilename(const SceneExportingContext &ctx) const
     {
         return GetExportedFilename(ctx.workspaceDirectory, ctx.scriptDirectory);
     }

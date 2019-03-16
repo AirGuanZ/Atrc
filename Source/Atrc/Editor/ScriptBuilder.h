@@ -1,16 +1,15 @@
 #pragma once
 
 #include <sstream>
+#include <string>
 
-#include <Atrc/Editor/Camera.h>
-#include <Atrc/Editor/EntityController.h>
-
-class SceneExportingContext
+class ScriptBuilder
 {
-    size_t indent_;
+    size_t indent_ = 0;
     std::string indentStr_;
-
     std::stringstream sst_;
+
+    void AddLineAux() const { }
 
     template<typename TStr>
     void AddLineAux(TStr &&str)
@@ -26,20 +25,6 @@ class SceneExportingContext
     }
 
 public:
-
-    const DefaultRenderingCamera * const activeCamera;
-    const std::string workspaceDirectory;
-    const std::string scriptDirectory;
-
-    const EntityController *entityController;
-
-    SceneExportingContext(const DefaultRenderingCamera *activeCamera, std::string workspace, std::string scriptDir)
-        : indent_(0),
-          activeCamera(activeCamera), workspaceDirectory(std::move(workspace)), scriptDirectory(std::move(scriptDir)),
-          entityController(nullptr)
-    {
-        AGZ_ASSERT(activeCamera);
-    }
 
     void IncIndent()
     {
@@ -62,5 +47,10 @@ public:
         sst_ << indentStr_;
         AddLineAux(std::forward<TStrs>(strs)...);
         sst_ << std::endl;
+    }
+
+    void ClearString()
+    {
+        sst_.str("");
     }
 };

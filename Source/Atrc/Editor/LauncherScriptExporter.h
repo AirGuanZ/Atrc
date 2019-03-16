@@ -2,18 +2,18 @@
 
 #include <Atrc/Editor/ResourceManagement/ResourceManager.h>
 #include <Atrc/Editor/EditorCore.h>
-#include <Atrc/Editor/LauncherScriptExportingContext.h>
+#include <Atrc/Editor/SceneExportingContext.h>
 
 class LauncherScriptExporter
 {
     ResourceManager &rscMgr_;
-    LauncherScriptExportingContext &ctx_;
+    SceneExportingContext &ctx_;
 
 public:
 
-    LauncherScriptExporter(ResourceManager &rscMgr, LauncherScriptExportingContext &ctx);
+    LauncherScriptExporter(ResourceManager &rscMgr, SceneExportingContext &ctx);
 
-    std::string Export() const;
+    std::string Export(const RendererInstance *renderer, const std::string &outputFilename) const;
 };
 
 class LauncherScriptImporter

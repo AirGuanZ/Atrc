@@ -30,6 +30,7 @@ class EditorCore
     {
         bool openGlobalHelpWindow    = false;
         bool openGlobalSettingWindow = false;
+        bool openExportingSH2DWindow = false;
         bool openSavingWindow        = false;
         bool openLoadingWindow       = false;
 
@@ -70,6 +71,8 @@ public:
     void ShowGlobalHelpWindow(const AGZ::Input::Keyboard &kb);
 
     void ShowGlobalSettingWindow(const AGZ::Input::Keyboard &kb);
+
+    void ShowExportingSH2DWindow();
 
     void ShowSavingWindow();
 

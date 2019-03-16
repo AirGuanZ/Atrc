@@ -10,7 +10,7 @@ namespace
 
     protected:
 
-        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
+        void Export(const ResourceManager &rscMgr, SceneExportingContext &ctx) const override
         {
             ctx.AddLine("type = Native;");
             ctx.AddLine("spp = ", spp_, ";");

@@ -9,7 +9,7 @@ namespace
 
     protected:
 
-        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
+        void Export(const ResourceManager &rscMgr, SceneExportingContext &ctx) const override
         {
             ctx.AddLine("type = Conductor;");
             ctx.AddLine("etaI = ", AGZ::To<char>(etaI_), ";");
@@ -42,7 +42,7 @@ namespace
 
         float etaI_ = 0, etaT_ = 0;
 
-        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
+        void Export(const ResourceManager &rscMgr, SceneExportingContext &ctx) const override
         {
             ctx.AddLine("type = Dielectric;");
             ctx.AddLine("etaI = ", std::to_string(etaI_), ";");
@@ -70,7 +70,7 @@ namespace
     {
     protected:
 
-        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
+        void Export(const ResourceManager &rscMgr, SceneExportingContext &ctx) const override
         {
             ctx.AddLine("type = Schlick;");
             ctx.AddLine("etaI = ", std::to_string(etaI_), ";");

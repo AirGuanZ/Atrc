@@ -10,7 +10,7 @@ namespace
 
     protected:
 
-        void Export(const ResourceManager&, LauncherScriptExportingContext &ctx) const override
+        void Export(const ResourceManager&, SceneExportingContext &ctx) const override
         {
             ctx.AddLine("type = Constant;");
             ctx.AddLine("texel = ", AGZ::To<char>(texel_), ";");
@@ -37,7 +37,7 @@ namespace
 
     protected:
 
-        void Export(const ResourceManager&, LauncherScriptExportingContext &ctx) const override
+        void Export(const ResourceManager&, SceneExportingContext &ctx) const override
         {
             ctx.AddLine("type = Constant1;");
             ctx.AddLine("texel = ", texel_, ";");
@@ -64,7 +64,7 @@ namespace
 
     protected:
 
-        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
+        void Export(const ResourceManager &rscMgr, SceneExportingContext &ctx) const override
         {
             ctx.AddLine("type = Image;");
             ctx.AddLine("filename = \"", filenameSlot_.GetExportedFilename(ctx), "\";");
@@ -92,7 +92,7 @@ namespace
 
     protected:
 
-        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
+        void Export(const ResourceManager &rscMgr, SceneExportingContext &ctx) const override
         {
             ctx.AddLine("type = HDR;");
             ctx.AddLine("filename = \"", filenameSlot_.GetExportedFilename(ctx), "\";");

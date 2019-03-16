@@ -145,7 +145,7 @@ void Scene2SH(
         std::vector<FilmGrid> coefsGrid;
         for(int i = 0; i < SHC; ++i)
             coefsGrid.push_back(result->coefs[i].CreateFilmGrid(task));
-        FilmGrid binaryGrid = result->mask->CreateFilmGrid(task);
+        FilmGrid binaryGrid = result->binary->CreateFilmGrid(task);
         FilmGrid albedoGrid = result->albedo->CreateFilmGrid(task);
         FilmGrid normalGrid = result->normal->CreateFilmGrid(task);
 
@@ -159,7 +159,7 @@ void Scene2SH(
 
         for(int i = 0; i < SHC; ++i)
             result->coefs[i].MergeFilmGrid(coefsGrid[i]);
-        result->mask->MergeFilmGrid(binaryGrid);
+        result->binary->MergeFilmGrid(binaryGrid);
         result->albedo->MergeFilmGrid(albedoGrid);
         result->normal->MergeFilmGrid(normalGrid);
 

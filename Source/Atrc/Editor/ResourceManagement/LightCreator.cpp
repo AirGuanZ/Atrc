@@ -9,7 +9,7 @@ namespace
 
     protected:
 
-        void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const override
+        void Export(const ResourceManager &rscMgr, SceneExportingContext &ctx) const override
         {
             ctx.AddLine("type = Environment;");
             ExportSubResource("tex", rscMgr, ctx, tex_);
@@ -37,7 +37,7 @@ namespace
 
     protected:
 
-        void Export(const ResourceManager&, LauncherScriptExportingContext &ctx) const override
+        void Export(const ResourceManager&, SceneExportingContext &ctx) const override
         {
             ctx.AddLine("type = Sky;");
             ctx.AddLine("top = ", AGZ::To<char>(top_), ";");

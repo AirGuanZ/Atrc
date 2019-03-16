@@ -4,6 +4,7 @@
 #include <Atrc/Editor/LauncherScriptExporter.h>
 #include <Atrc/Editor/ResourceManagement/EntityCreator.h>
 #include <Atrc/Editor/ScreenAxis.h>
+#include "SH2DScriptExporter.h"
 
 void EditorCore::Initialize()
 {
@@ -57,15 +58,13 @@ void EditorCore::ShowMenuMenuBar()
         {
             std::string scriptDir = data_->scriptSlot.GetExportedFilename("", "");
             std::string workspaceDir = data_->workspaceSlot.GetExportedFilename("", scriptDir);
-            LauncherScriptExportingContext ctx(
+            SceneExportingContext ctx(
                 &data_->defaultRenderingCamera,
                 data_->rscMgr.GetPool<CameraInstance>().GetSelectedInstance().get(),
                 data_->filmFilterSlot.GetInstance().get(),
-                data_->rendererSlot.GetInstance().get(),
                 data_->samplerSlot.GetInstance().get(),
                 workspaceDir,
                 scriptDir,
-                data_->outputFilenameBuf.data(),
                 data_->filmSize);
             LauncherScriptExporter exporter(data_->rscMgr, ctx);
 
@@ -80,7 +79,8 @@ void EditorCore::ShowMenuMenuBar()
                     lState_->sceneRenderer.Clear();
                 }
 
-                std::string configStr = exporter.Export();
+                std::string configStr = exporter.Export(
+                    data_->rendererSlot.GetInstance().get(), data_->outputFilenameBuf.data());
                 std::cout << configStr;
 
                 AGZ::Config config;
@@ -106,6 +106,8 @@ void EditorCore::ShowMenuMenuBar()
             sState_->openLoadingWindow = true;
         if(ImGui::MenuItem("save"))
             sState_->openSavingWindow = true;
+        if(ImGui::MenuItem("export SH2D"))
+            sState_->openExportingSH2DWindow = true;
         ImGui::EndMenu();
     }
     if(ImGui::MenuItem("global"))
@@ -178,6 +180,76 @@ void EditorCore::ShowGlobalSettingWindow(const AGZ::Input::Keyboard &kb)
         ImGui::CloseCurrentPopup();
 }
 
+void EditorCore::ShowExportingSH2DWindow()
+{
+    static FileBrowser fileBrowser("save to", true, "");
+    static std::array<char, 512> filenameBuf;
+
+    ImGui::PushID(&fileBrowser);
+    AGZ::ScopeGuard popIDGuard([] { ImGui::PopID(); });
+
+    if(sState_->openExportingSH2DWindow)
+    {
+        std::strcpy(filenameBuf.data(), "sh2d.txt");
+        ImGui::OpenPopup("export to SH2D script");
+    }
+
+    if(!ImGui::BeginPopupModal("export to SH2D script", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+        return;
+    AGZ::ScopeGuard exitPopupGuard([] { ImGui::EndPopup(); });
+
+    static int SHOrder = 4;
+    static int workerCount = -1;
+    static int taskGirdSize = 32;
+
+    ImGui::InputInt("SH order", &SHOrder);
+    ImGui::InputInt("worker count", &workerCount);
+    ImGui::InputInt("task grid size", &taskGirdSize);
+
+    if(ImGui::Button("directory"))
+        ImGui::OpenPopup(fileBrowser.GetLabel().c_str());
+    fileBrowser.Display();
+    ImGui::SameLine();
+    ImGui::Text("%s", fileBrowser.GetResult().c_str());
+
+    ImGui::InputText("filename", filenameBuf.data(), filenameBuf.size());
+
+    if(ImGui::Button("ok") && filenameBuf[0])
+    {
+        try
+        {
+            std::string scriptDir = fileBrowser.GetResult(false);
+            std::string workspaceDir = data_->workspaceSlot.GetExportedFilename("", scriptDir);
+            SceneExportingContext ctx(
+                &data_->defaultRenderingCamera,
+                data_->rscMgr.GetPool<CameraInstance>().GetSelectedInstance().get(),
+                data_->filmFilterSlot.GetInstance().get(),
+                data_->samplerSlot.GetInstance().get(),
+                workspaceDir,
+                scriptDir,
+                data_->filmSize);
+            SH2DSceneScriptExporter exporter;
+
+            AGZ::FileSys::WholeFile::WriteText((std::filesystem::path(scriptDir) / filenameBuf.data()).string(),
+                exporter.Export(data_->rscMgr, ctx, workerCount, taskGirdSize, SHOrder));
+        }
+        catch(const std::exception &err)
+        {
+            Global::ShowErrorMessage(err.what());
+        }
+        catch(...)
+        {
+            Global::ShowErrorMessage("an unknown error occurred");
+        }
+        ImGui::CloseCurrentPopup();
+    }
+
+    ImGui::SameLine();
+
+    if(ImGui::Button("cancel"))
+        ImGui::CloseCurrentPopup();
+}
+
 void EditorCore::ShowSavingWindow()
 {
     static FileBrowser fileBrowser("save to", true, "");
@@ -210,19 +282,18 @@ void EditorCore::ShowSavingWindow()
         {
             std::string scriptDir = fileBrowser.GetResult(false);
             std::string workspaceDir = data_->workspaceSlot.GetExportedFilename("", scriptDir);
-            LauncherScriptExportingContext ctx(
+            SceneExportingContext ctx(
                 &data_->defaultRenderingCamera,
                 data_->rscMgr.GetPool<CameraInstance>().GetSelectedInstance().get(),
                 data_->filmFilterSlot.GetInstance().get(),
-                data_->rendererSlot.GetInstance().get(),
                 data_->samplerSlot.GetInstance().get(),
                 workspaceDir,
                 scriptDir,
-                data_->outputFilenameBuf.data(),
                 data_->filmSize);
             LauncherScriptExporter exporter(data_->rscMgr, ctx);
 
-            AGZ::FileSys::WholeFile::WriteText((std::filesystem::path(scriptDir) / filenameBuf.data()).string(), exporter.Export());
+            AGZ::FileSys::WholeFile::WriteText((std::filesystem::path(scriptDir) / filenameBuf.data()).string(),
+                exporter.Export(data_->rendererSlot.GetInstance().get(), data_->outputFilenameBuf.data()));
         }
         catch(const std::exception &err)
         {

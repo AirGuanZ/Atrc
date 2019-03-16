@@ -7,7 +7,7 @@
 
 #include <AGZUtils/Utils/Misc.h>
 
-#include <Atrc/Editor/LauncherScriptExportingContext.h>
+#include <Atrc/Editor/SceneExportingContext.h>
 #include <Atrc/Editor/GL.h>
 #include <AGZUtils/Config/Config.h>
 
@@ -19,7 +19,7 @@
  * InstancePool持有一组Instance
  */
 
-class LauncherScriptExportingContext;
+class SceneExportingContext;
 class ResourceManager;
 
 class IResource : public AGZ::Uncopiable
@@ -30,7 +30,7 @@ class IResource : public AGZ::Uncopiable
 
 protected:
 
-    virtual void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const = 0;
+    virtual void Export(const ResourceManager &rscMgr, SceneExportingContext &ctx) const = 0;
 
 public:
 
@@ -60,7 +60,7 @@ public:
 
     template<typename TSubResource>
     static void ExportSubResource(
-        std::string left, const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx,
+        std::string left, const ResourceManager &rscMgr, SceneExportingContext &ctx,
         const TSubResource &subrsc)
     {
         ctx.AddLine(std::move(left) + " = {");
@@ -72,7 +72,7 @@ public:
 
     template<typename TSubResource>
     static void ExportSubResourceAsReference(
-        std::string left, const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx,
+        std::string left, const ResourceManager &rscMgr, SceneExportingContext &ctx,
         const TSubResource &subrsc)
     {
         ctx.AddLine(std::move(left) + " = {");
@@ -92,10 +92,12 @@ public:
 
     void PutIntoPool() noexcept { isInPool_ = true; }
 
+    void DropFromPool() noexcept { isInPool_ = false; }
+
     virtual void Display(ResourceManager &rscMgr) = 0;
 
     template<typename TResource>
-    void ExportAsReference(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const
+    void ExportAsReference(const ResourceManager &rscMgr, SceneExportingContext &ctx) const
     {
         AGZ_ASSERT(typeid(*this) == typeid(TResource));
         if(isInPool_)
@@ -298,6 +300,7 @@ public:
 
             size_t idx = it - instances_.begin();
             instances_.erase(it);
+            selectedInstance_->DropFromPool();
             selectedInstance_ = nullptr;
 
             if(idx >= instances_.size())
@@ -555,7 +558,6 @@ template<typename TResource>
 void ImportFromPool(const AGZ::ConfigGroup &root, ResourceManager &rscMgr, const IResource::ImportContext &ctx)
 {
     auto &pool = rscMgr.GetPool<TResource>();
-    pool.Clear();
 
     auto &children = root[GetCompletePoolName<TResource>()].AsGroup().GetChildren();
     for(auto &it : children)
@@ -699,7 +701,7 @@ public:
             instance_->Display(rscMgr);
     }
 
-    void Export(const ResourceManager &rscMgr, LauncherScriptExportingContext &ctx) const
+    void Export(const ResourceManager &rscMgr, SceneExportingContext &ctx) const
     {
         if(!instance_)
             throw std::runtime_error("empty resource instance");
