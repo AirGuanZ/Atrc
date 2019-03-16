@@ -15,6 +15,7 @@ Build/
 Build32/
 Build64/
 BuildQt/
+Output/
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
@@ -32,6 +33,7 @@ bld/
 [Ll]og/
 
 scene.txt
+sh2d.txt
 Output.png
 
 *.o

@@ -48,6 +48,7 @@ namespace
             pixel->binary = Spectrum();
             pixel->albedo = Spectrum();
             pixel->normal = Spectrum();
+            return;
         }
 
         ShadingPoint shd = inct.material->GetShadingPoint(inct, arena);
@@ -186,6 +187,6 @@ void Scene2SH(
     else
     {
         std::cout << "Complete rendering..."
-                  << "Total time: " << clock.Milliseconds() << std::endl;
+                  << "Total time: " << clock.Milliseconds() / 1000.0 << std::endl;
     }
 }

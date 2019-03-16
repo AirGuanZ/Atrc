@@ -74,7 +74,7 @@ int main(int argc, char *argv[])
             return 0;
         }
 
-        if(argv[1] != std::string("ps") || argv[1] != std::string("project_scene"))
+        if(argv[1] != std::string("ps") && argv[1] != std::string("project_scene"))
         {
             std::cout << USAGE_MSG << std::endl;
             return 0;
@@ -96,7 +96,7 @@ int main(int argc, char *argv[])
             return -1;
         }
 
-        ProjectScene(config, absolute(std::filesystem::path(outputDir)).parent_path().string(), outputDir);
+        ProjectScene(config, absolute(std::filesystem::path(filename)).parent_path().string(), outputDir);
     }
     catch(const Atrc::Mgr::MgrErr &err)
     {

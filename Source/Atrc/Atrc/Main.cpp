@@ -18,7 +18,6 @@ void InitializeImGui(GLFWwindow *window)
 
     ImGui::GetStyle().WindowRounding = 0;
 
-    ImFontConfig defaultFontConfig;
     ImGui::GetIO().Fonts->AddFontFromFileTTF(
         "./font.ttf", 16, nullptr, ImGui::GetIO().Fonts->GetGlyphRangesChineseSimplifiedCommon());
 }
@@ -174,7 +173,7 @@ int Run(GLFWwindow *window)
 
         if(fileBrowser.HasSelected())
         {
-            std::cout << fileBrowser.GetSelected() << std::endl;
+            std::cout << fileBrowser.GetSelected().string() << std::endl;
             fileBrowser.ClearSelected();
         }
 
