@@ -14,6 +14,8 @@ void Light2SH(const Light *light, int SHOrder, int N, Spectrum *coefs)
     for(int i = 0; i < SHC; ++i)
         coefs[i] = Spectrum();
 
+    int step = (std::max)(10, N / 50);
+
     for(int n = 0; n < N; ++n)
     {
         Real u = AGZ::Math::Random::Uniform<Real>(0, 1);
@@ -25,6 +27,9 @@ void Light2SH(const Light *light, int SHOrder, int N, Spectrum *coefs)
 
         for(int i = 0; i < SHC; ++i)
             coefs[i] += light->NonAreaLe(Ray(Vec3(), dir, EPS)) * SHTable[i](dir) / pdf;
+
+        if(n % step == 0)
+            std::cout << "Progress: " << (static_cast<double>(n + 1) / N) << std::endl;
     }
 
     for(int i = 0; i < SHC; ++i)
