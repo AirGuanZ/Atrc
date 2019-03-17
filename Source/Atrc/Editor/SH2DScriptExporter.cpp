@@ -71,10 +71,6 @@ std::string SH2DSceneScriptExporter::Export(
 
     ctx.AddLine();
 
-    ctx.AddLine("reporter = { type = Default; };");
-
-    ctx.AddLine();
-
     ctx.AddLine("entities = (");
     for(auto &ent : rscMgr.GetPool<EntityInstance>())
     {
