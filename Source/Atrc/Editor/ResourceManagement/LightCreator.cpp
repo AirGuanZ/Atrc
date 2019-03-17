@@ -6,6 +6,7 @@ namespace
     class EnvironmentLightInstance : public LightInstance
     {
         TextureSlot tex_;
+        Deg rotateDeg_;
 
     protected:
 
@@ -13,6 +14,8 @@ namespace
         {
             ctx.AddLine("type = Environment;");
             ExportSubResource("tex", rscMgr, ctx, tex_);
+            ctx.AddLine("transform = (RotateY(Deg(", rotateDeg_.value, ")));");
+            ctx.AddLine("rotateYDeg = ", rotateDeg_.value, ";");
         }
 
     public:
@@ -22,11 +25,13 @@ namespace
         void Display(ResourceManager &rscMgr) override
         {
             tex_.Display(rscMgr);
+            ImGui::InputFloat("rotate angle", &rotateDeg_.value);
         }
 
         void Import(ResourceManager &rscMgr, const AGZ::ConfigGroup &root, const AGZ::ConfigGroup &params, const ImportContext &ctx) override
         {
             tex_.SetInstance(GetResourceInstance<TextureInstance>(rscMgr, root, params["tex"], ctx));
+            rotateDeg_.value = params["rotateYDeg"].Parse<float>();
         }
     };
 
