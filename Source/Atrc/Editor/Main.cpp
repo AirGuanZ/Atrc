@@ -148,17 +148,17 @@ int Run(GLFWwindow *window)
         {
             if(ImGui::BeginTabBar("property", ImGuiTabBarFlags_FittingPolicyScroll | ImGuiTabBarFlags_Reorderable))
             {
-                if(ImGui::BeginTabItem("ent"))
+                if(ImGui::BeginTabItem("entity"))
                 {
                     editorCore.ShowEntityEditor();
                     ImGui::EndTabItem();
                 }
-                if(ImGui::BeginTabItem("lht"))
+                if(ImGui::BeginTabItem("light"))
                 {
                     editorCore.ShowLightEditor();
                     ImGui::EndTabItem();
                 }
-                if(ImGui::BeginTabItem("cam"))
+                if(ImGui::BeginTabItem("camera"))
                 {
                     editorCore.ShowCamera();
                     ImGui::EndTabItem();
