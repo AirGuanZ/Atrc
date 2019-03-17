@@ -166,6 +166,7 @@ namespace
             if(ImGui::TreeNode("geometry"))
             {
                 TransformedGeometricEntityBase::DisplayEx(rscMgr, proj, view, renderController);
+                DisplayController(proj, view, renderController);
                 ImGui::TreePop();
             }
             if(ImGui::TreeNode("radiance"))
@@ -173,7 +174,6 @@ namespace
                 ImGui::ColorEdit3("radiance", &radiance_[0], ImGuiColorEditFlags_HDR | ImGuiColorEditFlags_Float);
                 ImGui::TreePop();
             }
-            DisplayController(proj, view, renderController);
         }
 
         void Import(ResourceManager &rscMgr, const AGZ::ConfigGroup &root, const AGZ::ConfigGroup &params, const ImportContext &ctx) override
@@ -209,6 +209,7 @@ namespace
             if(ImGui::TreeNode("geometry"))
             {
                 TransformedGeometricEntityBase::DisplayEx(rscMgr, proj, view, renderController);
+                DisplayController(proj, view, renderController);
                 ImGui::TreePop();
             }
             if(ImGui::TreeNode("material"))
@@ -216,7 +217,6 @@ namespace
                 material_.Display(rscMgr);
                 ImGui::TreePop();
             }
-            DisplayController(proj, view, renderController);
         }
 
         void Import(ResourceManager &rscMgr, const AGZ::ConfigGroup &root, const AGZ::ConfigGroup &params, const ImportContext &ctx) override

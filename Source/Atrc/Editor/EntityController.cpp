@@ -56,8 +56,6 @@ void EntityControllerAction::Render(const Mat4f &proj, const Mat4f &view, Vec3f 
     float scaleVec3[3] = { *scale, *scale, *scale };
     ImGuizmo::RecomposeMatrixFromComponents(&translate->x, &rotate->x, scaleVec3, worldMat);
 
-    ImGuiIO &io = ImGui::GetIO();
-    ImGuizmo::SetRect(0, 0, io.DisplaySize.x, io.DisplaySize.y);
     ImGuizmo::Manipulate(&view.m[0][0], &proj.m[0][0], guizmoOperation, guizmoMode, worldMat);
 
     ImGuizmo::DecomposeMatrixToComponents(worldMat, &translate->x, &rotate->x, scaleVec3);

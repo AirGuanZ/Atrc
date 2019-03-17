@@ -478,7 +478,16 @@ public:
 };
 using GeometryCreator = TResourceCreator<GeometryInstance>;
 
-class LightInstance : public IResource { public: using IResource::IResource; static const char *GetPoolName() { return "light"; } };
+class LightInstance : public IResource
+{
+public:
+
+    using IResource::IResource;
+    
+    static const char *GetPoolName() { return "light"; }
+
+    virtual void Render(const Mat4f &projViewMat, const Vec3f &eyePos) { }
+};
 using LightCreator = TResourceCreator<LightInstance>;
 
 class MaterialInstance : public IResource { public: using IResource::IResource; static const char *GetPoolName() { return "material"; } };

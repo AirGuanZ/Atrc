@@ -25,8 +25,8 @@ namespace
 
 DefaultRenderingCamera::DefaultRenderingCamera() noexcept
 {
-    projData_.w = Global::GetFramebufferWidth();
-    projData_.h = Global::GetFramebufferHeight();
+    projData_.w = Global::FbW();
+    projData_.h = Global::FbH();
 
     UpdateMatrix();
 }
@@ -131,8 +131,8 @@ void DefaultRenderingCamera::UpdatePositionAndDirection(const AGZ::Input::Keyboa
 
 void DefaultRenderingCamera::AutoResizeProj()
 {
-    projData_.w = Global::GetFramebufferWidth();
-    projData_.h = Global::GetFramebufferHeight();
+    projData_.w = Global::FbW();
+    projData_.h = Global::FbH();
 }
 
 void DefaultRenderingCamera::Import(const AGZ::ConfigGroup &params)

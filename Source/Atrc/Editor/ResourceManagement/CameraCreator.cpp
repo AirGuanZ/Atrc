@@ -49,28 +49,28 @@ namespace
 
         ProjData GetProjData(float dstAspectRatio) const override
         {
-            float fbW = static_cast<float>(Global::GetFramebufferWidth());
-            float fbH = static_cast<float>(Global::GetFramebufferHeight());
-            float fbAspectRatio = fbW / fbH;
+            float pvW = Global::PvWf();
+            float pvH = Global::PvHf();
+            float pvAspectRatio = pvW / pvH;
 
             if(!autoAspect_)
                 dstAspectRatio = sensorWidth_ / sensorHeight_;
 
             ProjData ret;
 
-            if(dstAspectRatio > fbAspectRatio)
+            if(dstAspectRatio > pvAspectRatio)
             {
-                ret.viewportWidth = fbW - 100;
+                ret.viewportWidth = pvW - 50;
                 ret.viewportHeight = ret.viewportWidth / dstAspectRatio;
             }
             else
             {
-                ret.viewportHeight = fbH - 100;
+                ret.viewportHeight = pvH - 50;
                 ret.viewportWidth = ret.viewportHeight * dstAspectRatio;
             }
 
-            Deg alpha = Rad2Deg(Rad(2 * AGZ::Math::Arctan(fbH / ret.viewportHeight * AGZ::Math::Tan(FOVy_ * 0.5f))));
-            ret.projMatrix = Mat4f::Perspective(alpha, fbAspectRatio, 0.1f, 1000.0f);
+            Deg alpha = Rad2Deg(Rad(2 * AGZ::Math::Arctan(pvH / ret.viewportHeight * AGZ::Math::Tan(FOVy_ * 0.5f))));
+            ret.projMatrix = Mat4f::Perspective(alpha, pvAspectRatio, 0.1f, 1000.0f);
 
             return ret;
         }

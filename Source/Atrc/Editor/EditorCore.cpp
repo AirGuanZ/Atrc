@@ -3,8 +3,20 @@
 #include <Atrc/Editor/EditorCore.h>
 #include <Atrc/Editor/LauncherScriptExporter.h>
 #include <Atrc/Editor/ResourceManagement/EntityCreator.h>
-#include <Atrc/Editor/ScreenAxis.h>
-#include "SH2DScriptExporter.h"
+#include <Atrc/Editor/SH2DScriptExporter.h>
+#include "Lib/imgui/imgui/ImGuizmo.h"
+
+void EditorCore::UpdateRenderPvRect()
+{
+    if(data_->rscMgr.GetPool<CameraInstance>().GetSelectedInstance())
+    {
+        float pvW = Global::PvWf(), pvH = Global::PvHf();
+        lState_->renderPvLx = Global::PvX() + (std::max)(0.0f, 0.5f * pvW - 0.5f * lState_->selectedCameraProjData.viewportWidth);
+        lState_->renderPvBy = Global::FbH() - (Global::PvY() + (std::min)(pvH, 0.5f * pvH - 0.5f *  lState_->selectedCameraProjData.viewportHeight));
+        lState_->renderPvRx = Global::PvX() + (std::min)(pvW, 0.5f * pvW + 0.5f *  lState_->selectedCameraProjData.viewportWidth);
+        lState_->renderPvTy = Global::FbH() - (Global::PvY() + (std::max)(0.0f, 0.5f * pvH + 0.5f * lState_->selectedCameraProjData.viewportHeight));
+    }
+}
 
 void EditorCore::Initialize()
 {
@@ -95,6 +107,8 @@ void EditorCore::ShowMenuMenuBar()
                     Global::ShowErrorMessage("sceneRenderer.Start returns false");
                     throw std::runtime_error("");
                 }
+
+                UpdateRenderPvRect();
             }
             catch(...)
             {
@@ -114,6 +128,82 @@ void EditorCore::ShowMenuMenuBar()
         sState_->openGlobalSettingWindow = true;
     if(ImGui::MenuItem("help"))
         sState_->openGlobalHelpWindow = true;
+
+    sState_->mainMenuBarHeight = ImGui::GetWindowHeight();
+}
+
+bool EditorCore::BeginLeftWindow()
+{
+    const float sizeY = Global::FbHf() - sState_->mainMenuBarHeight;
+    ImGui::SetNextWindowPos(ImVec2(0, sState_->mainMenuBarHeight));
+    ImGui::SetNextWindowSizeConstraints(
+        ImVec2(100, sizeY),
+        ImVec2(Global::FbWf() / 2 - 100, sizeY));
+    return ImGui::Begin("left window", nullptr,
+        ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResizeGrip | ImGuiWindowFlags_NoTitleBar);
+}
+
+void EditorCore::EndLeftWindow()
+{
+    sState_->leftWindowSizeX = ImGui::GetWindowWidth();
+    ImGui::End();
+}
+
+bool EditorCore::BeginRightWindow()
+{
+    const float sizeY = Global::FbHf() - sState_->mainMenuBarHeight;
+    ImGui::SetNextWindowSizeConstraints(
+        ImVec2(100, sizeY),
+        ImVec2(Global::FbWf() / 2 - 100, sizeY));
+    ImGui::SetNextWindowPos(
+        ImVec2(Global::FbWf() - lState_->rightWindowSizeX,
+            sState_->mainMenuBarHeight));
+    return ImGui::Begin("right window", nullptr,
+        ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResizeGrip | ImGuiWindowFlags_NoTitleBar);
+}
+
+void EditorCore::EndRightWindow()
+{
+    lState_->rightWindowSizeX = ImGui::GetWindowWidth();
+    ImGui::End();
+}
+
+bool EditorCore::BeginBottomWindow()
+{
+    const float sizeX = Global::FbWf() - sState_->leftWindowSizeX - lState_->rightWindowSizeX;
+    ImGui::SetNextWindowSizeConstraints(
+        ImVec2(sizeX, 100),
+        ImVec2(sizeX, Global::FbHf() / 2 - 80));
+    ImGui::SetNextWindowPos(
+        ImVec2(sState_->leftWindowSizeX, Global::FbH() - lState_->bottomWindowSizeY));
+    return ImGui::Begin("bottom window", nullptr,
+        ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResizeGrip | ImGuiWindowFlags_NoTitleBar);
+}
+
+void EditorCore::EndBottomWindow()
+{
+    lState_->bottomWindowSizeY = ImGui::GetWindowHeight();
+    ImGui::End();
+}
+
+float EditorCore::GetViewportX() const noexcept
+{
+    return sState_->leftWindowSizeX;
+}
+
+float EditorCore::GetViewportY() const noexcept
+{
+    return lState_->bottomWindowSizeY;
+}
+
+float EditorCore::GetViewportWidth() const noexcept
+{
+    return Global::FbWf() - sState_->leftWindowSizeX - lState_->rightWindowSizeX;
+}
+
+float EditorCore::GetViewportHeight() const noexcept
+{
+    return Global::FbHf() - sState_->mainMenuBarHeight - lState_->bottomWindowSizeY;
 }
 
 void EditorCore::ShowGlobalHelpWindow(const AGZ::Input::Keyboard &kb)
@@ -348,124 +438,91 @@ void EditorCore::ShowLoadingWindow()
 
 void EditorCore::ShowResourceManager()
 {
-    ImGui::SetNextWindowPos(ImVec2(sState_->sceneMgrPosX, sState_->sceneMgrPosY), ImGuiCond_FirstUseEver);
-    if(ImGui::Begin("scene manager", nullptr, ImVec2(0, 0), -1,
-        ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoTitleBar))
+    if(ImGui::BeginTabBar("scene manager tab", ImGuiTabBarFlags_FittingPolicyScroll | ImGuiTabBarFlags_Reorderable))
     {
-        AGZ::ScopeGuard windowExitGuard([] { ImGui::End(); });
-
-        if(ImGui::BeginTabBar("scene manager tab"))
+        if(ImGui::BeginTabItem("entity"))
         {
-            if(ImGui::BeginTabItem("entity"))
-            {
-                auto &pool = data_->rscMgr.GetPool<EntityInstance>();
-                pool.Display(data_->rscMgr);
-                sState_->isEntityPoolDisplayed = true;
-                ImGui::EndTabItem();
-            }
-            if(ImGui::BeginTabItem("light"))
-            {
-                auto &pool = data_->rscMgr.GetPool<LightInstance>();
-                pool.Display(data_->rscMgr);
-                sState_->isLightPoolDisplayed = true;
-                ImGui::EndTabItem();
-            }
-            if(ImGui::BeginTabItem("camera"))
-            {
-                auto &pool = data_->rscMgr.GetPool<CameraInstance>();
-                pool.Display(data_->rscMgr);
-                ImGui::EndTabItem();
-            }
-            ImGui::EndTabBar();
+            auto &pool = data_->rscMgr.GetPool<EntityInstance>();
+            pool.Display(data_->rscMgr);
+            sState_->isEntityPoolDisplayed = true;
+            ImGui::EndTabItem();
         }
+        if(ImGui::BeginTabItem("light"))
+        {
+            auto &pool = data_->rscMgr.GetPool<LightInstance>();
+            pool.Display(data_->rscMgr);
+            sState_->isLightPoolDisplayed = true;
+            ImGui::EndTabItem();
+        }
+        if(ImGui::BeginTabItem("camera"))
+        {
+            auto &pool = data_->rscMgr.GetPool<CameraInstance>();
+            pool.Display(data_->rscMgr);
+            ImGui::EndTabItem();
+        }
+        ImGui::EndTabBar();
     }
 
-    ImGui::SetNextWindowPos(ImVec2(sState_->sceneMgrPosX, sState_->sceneMgrPosY + 320), ImGuiCond_FirstUseEver);
-    if(ImGui::Begin("resource", nullptr, ImVec2(0, 0), -1,
-        ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysAutoResize))
+    if(ImGui::BeginTabBar("resource manager tab", ImGuiTabBarFlags_FittingPolicyScroll | ImGuiTabBarFlags_Reorderable))
     {
-        AGZ::ScopeGuard windowExitGuard([] { ImGui::End(); });
-
-        if(ImGui::BeginTabBar("object tab"))
+        if(ImGui::BeginTabItem("material"))
         {
-            if(ImGui::BeginTabItem("material"))
-            {
-                auto &pool = data_->rscMgr.GetPool<MaterialInstance>();
-                pool.Display(data_->rscMgr);
-                if(auto mat = pool.GetSelectedInstance())
-                    mat->Display(data_->rscMgr);
-                ImGui::EndTabItem();
-            }
-            if(ImGui::BeginTabItem("texture"))
-            {
-                auto &pool = data_->rscMgr.GetPool<TextureInstance>();
-                pool.Display(data_->rscMgr);
-                if(auto tex = pool.GetSelectedInstance())
-                    tex->Display(data_->rscMgr);
-                ImGui::EndTabItem();
-            }
-            if(ImGui::BeginTabItem("geometry"))
-            {
-                auto &pool = data_->rscMgr.GetPool<GeometryInstance>();
-                pool.Display(data_->rscMgr);
-                if(auto data = pool.GetSelectedInstance())
-                    data->Display(data_->rscMgr);
-                ImGui::EndTabItem();
-            }
-            ImGui::EndTabBar();
+            auto &pool = data_->rscMgr.GetPool<MaterialInstance>();
+            pool.Display(data_->rscMgr);
+            if(auto mat = pool.GetSelectedInstance())
+                mat->Display(data_->rscMgr);
+            ImGui::EndTabItem();
         }
+        if(ImGui::BeginTabItem("texture"))
+        {
+            auto &pool = data_->rscMgr.GetPool<TextureInstance>();
+            pool.Display(data_->rscMgr);
+            if(auto tex = pool.GetSelectedInstance())
+                tex->Display(data_->rscMgr);
+            ImGui::EndTabItem();
+        }
+        if(ImGui::BeginTabItem("geometry"))
+        {
+            auto &pool = data_->rscMgr.GetPool<GeometryInstance>();
+            pool.Display(data_->rscMgr);
+            if(auto data = pool.GetSelectedInstance())
+                data->Display(data_->rscMgr);
+            ImGui::EndTabItem();
+        }
+        ImGui::EndTabBar();
     }
 }
 
 void EditorCore::ShowCamera()
 {
     auto selectedCamera = data_->rscMgr.GetPool<CameraInstance>().GetSelectedInstance();
-    ImGui::SetNextWindowPos(ImVec2(sState_->sceneMgrPosX, sState_->sceneMgrPosY + 320 + 320), ImGuiCond_FirstUseEver);
-    if(ImGui::Begin("camera", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
-    {
-        data_->defaultRenderingCamera.Display();
-        if(selectedCamera)
-            selectedCamera->Display(data_->rscMgr);
-        ImGui::End();
-    }
 
+    data_->defaultRenderingCamera.Display();
     if(selectedCamera)
-    {
-        float filmAspectRatio = static_cast<float>(data_->filmSize.x) / data_->filmSize.y;
-        sState_->selectedCameraProjData = selectedCamera->GetProjData(filmAspectRatio);
-    }
+        selectedCamera->Display(data_->rscMgr);
 }
 
 void EditorCore::ShowEntityEditor()
 {
     auto selectedCamera = data_->rscMgr.GetPool<CameraInstance>().GetSelectedInstance();
 
-    if(auto selectedEntity = data_->rscMgr.GetPool<EntityInstance>().GetSelectedInstance(); selectedEntity && sState_->isEntityPoolDisplayed)
+    if(auto selectedEntity = data_->rscMgr.GetPool<EntityInstance>().GetSelectedInstance())
     {
-        ImGui::SetNextWindowPos(ImVec2(sState_->sceneMgrPosX + 420, sState_->sceneMgrPosY), ImGuiCond_FirstUseEver);
-        if(ImGui::Begin("property", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
-        {
-            selectedEntity->DisplayEx(
-                data_->rscMgr,
-                (selectedCamera ?
-                    sState_->selectedCameraProjData.projMatrix : data_->defaultRenderingCamera.GetProjMatrix()),
-                data_->defaultRenderingCamera.GetViewMatrix(),
-                !lState_->sceneRenderer.IsRendering());
-            ImGui::End();
-        }
+        Mat4f projMat = selectedCamera ? lState_->selectedCameraProjData.projMatrix : data_->defaultRenderingCamera.GetProjMatrix();
+        ImGuizmo::SetRect(Global::PvXf(), Global::FbHf() - Global::PvYf() - Global::PvHf(), Global::PvWf(), Global::PvHf());
+        selectedEntity->DisplayEx(
+            data_->rscMgr,
+            projMat,
+            data_->defaultRenderingCamera.GetViewMatrix(),
+            !lState_->sceneRenderer.IsRendering());
     }
 }
 
 void EditorCore::ShowLightEditor()
 {
-    if(auto selectedLight = data_->rscMgr.GetPool<LightInstance>().GetSelectedInstance(); selectedLight && sState_->isLightPoolDisplayed)
+    if(auto selectedLight = data_->rscMgr.GetPool<LightInstance>().GetSelectedInstance())
     {
-        ImGui::SetNextWindowPos(ImVec2(sState_->sceneMgrPosX + 420, sState_->sceneMgrPosY), ImGuiCond_FirstUseEver);
-        if(ImGui::Begin("property", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
-        {
-            selectedLight->Display(data_->rscMgr);
-            ImGui::End();
-        }
+        selectedLight->Display(data_->rscMgr);
     }
 }
 
@@ -474,6 +531,12 @@ void EditorCore::UpdateCamera(const AGZ::Input::Keyboard &kb, const AGZ::Input::
     if(!ImGui::IsAnyWindowFocused())
         data_->defaultRenderingCamera.UpdatePositionAndDirection(kb, m);
     data_->defaultRenderingCamera.UpdateMatrix();
+
+    if(auto selectedCamera = data_->rscMgr.GetPool<CameraInstance>().GetSelectedInstance())
+    {
+        float filmAspectRatio = static_cast<float>(data_->filmSize.x) / data_->filmSize.y;
+        lState_->selectedCameraProjData = selectedCamera->GetProjData(filmAspectRatio);
+    }
 }
 
 void EditorCore::RenderScene()
@@ -485,15 +548,15 @@ void EditorCore::RenderScene()
 
     // 场景绘制
 
+    glViewport(Global::PvX(), Global::PvY(), Global::PvW(), Global::PvH());
+
     BeginEntityRendering();
     auto selectedCamera = data_->rscMgr.GetPool<CameraInstance>().GetSelectedInstance();
     if(selectedCamera)
     {
-        auto VP = sState_->selectedCameraProjData.projMatrix * data_->defaultRenderingCamera.GetViewMatrix();
+        auto VP = lState_->selectedCameraProjData.projMatrix * data_->defaultRenderingCamera.GetViewMatrix();
         for(auto &ent : data_->rscMgr.GetPool<EntityInstance>())
             ent->Render(VP, data_->defaultRenderingCamera.GetPosition());
-
-        SetFullViewport();
     }
     else
     {
@@ -502,6 +565,8 @@ void EditorCore::RenderScene()
             ent->Render(defaultCameraProjViewMat, data_->defaultRenderingCamera.GetPosition());
     }
     EndEntityRendering();
+
+    SetFullViewport();
 }
 
 void EditorCore::SaveRenderingResult()
@@ -517,27 +582,25 @@ void EditorCore::ShowGUI(GL::Immediate2D &imm, const AGZ::Input::Keyboard &kb)
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+    SetFullViewport();
+
     glLineWidth(3);
 
-    float fbW = sState_->fbW, fbH = sState_->fbH;
-
     auto selectedCamera = data_->rscMgr.GetPool<CameraInstance>().GetSelectedInstance();
+
     if(selectedCamera)
     {
-        float LTx = (std::max)(0.0f, 0.5f * fbW - 0.5f * sState_->selectedCameraProjData.viewportWidth);
-        float LTy = (std::min)(fbH, 0.5f * fbH - 0.5f *  sState_->selectedCameraProjData.viewportHeight);
-        float RBx = (std::min)(fbW, 0.5f * fbW + 0.5f *  sState_->selectedCameraProjData.viewportWidth);
-        float RBy = (std::max)(0.0f, 0.5f * fbH + 0.5f * sState_->selectedCameraProjData.viewportHeight);
+        float pvW = Global::PvWf(), pvH = Global::PvHf();
+        float Lx = Global::PvX() + (std::max)(0.0f, 0.5f * pvW - 0.5f * lState_->selectedCameraProjData.viewportWidth);
+        float By = Global::FbH() - (Global::PvY() + (std::min)(pvH, 0.5f * pvH - 0.5f *  lState_->selectedCameraProjData.viewportHeight));
+        float Rx = Global::PvX() + (std::min)(pvW, 0.5f * pvW + 0.5f *  lState_->selectedCameraProjData.viewportWidth);
+        float Ty = Global::FbH() - (Global::PvY() + (std::max)(0.0f, 0.5f * pvH + 0.5f * lState_->selectedCameraProjData.viewportHeight));
         imm.DrawQuadP(
-            { LTx, LTy }, { RBx, RBy },
+            { Lx, Ty }, { Rx, By },
             { 1.0f, 1.0f, 1.0f, 0.3f }, false);
     }
-    ScreenAxis().Display(
-        data_->defaultRenderingCamera.GetProjMatrix() * data_->defaultRenderingCamera.GetViewMatrix(), imm);
 
     glLineWidth(1);
-
-    // 渲染结果预览
 
     if(lState_->sceneRenderer.IsRendering())
     {
@@ -547,24 +610,17 @@ void EditorCore::ShowGUI(GL::Immediate2D &imm, const AGZ::Input::Keyboard &kb)
             lState_->sceneRenderer.Clear();
             Global::ShowNormalMessage("rendering interrupted");
         }
-    }
 
-    if(lState_->sceneRenderer.IsRendering())
-    {
         lState_->sceneRenderer.ProcessImage([&](const AGZ::Texture2D<Vec3f> &img)
         {
             lState_->sceneRendererTex.ReinitializeData(img.GetWidth(), img.GetHeight(), img.RawData());
         });
-        float LTx = (std::max)(0.0f, 0.5f * fbW - 0.5f * sState_->selectedCameraProjData.viewportWidth);
-        float LTy = (std::min)(fbH, 0.5f * fbH - 0.5f *  sState_->selectedCameraProjData.viewportHeight);
-        glViewport(
-            static_cast<int>(LTx),
-            static_cast<int>(LTy),
-            static_cast<GLsizei>( sState_->selectedCameraProjData.viewportWidth),
-            static_cast<GLsizei>(sState_->selectedCameraProjData.viewportHeight));
-        imm.DrawTexturedQuad({ -1, -1 }, { 1, 1 }, lState_->sceneRendererTex);
-        SetFullViewport();
+        imm.DrawTexturedQuadP(
+            { lState_->renderPvLx, lState_->renderPvBy },
+            { lState_->renderPvRx, lState_->renderPvTy }, lState_->sceneRendererTex);
     }
+
+    SetFullViewport();
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

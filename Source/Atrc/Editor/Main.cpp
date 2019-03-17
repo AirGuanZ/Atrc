@@ -15,7 +15,7 @@ constexpr int INIT_WIN_HEIGHT = 900;
 
 void SetFullViewport()
 {
-    glViewport(0, 0, Global::GetFramebufferWidth(), Global::GetFramebufferHeight());
+    glViewport(0, 0, Global::FbW(), Global::FbH());
 }
 
 int Run(GLFWwindow *window)
@@ -31,13 +31,13 @@ int Run(GLFWwindow *window)
     ImGui_ImplGlfw_InitForOpenGL(window);
     ImGui_ImplOpenGL3_Init();
 
-    ImGui::StyleColorsLight();
+    ImGui::StyleColorsDark();
 
-    ImGui::GetStyle().PopupRounding   = 7;
-    ImGui::GetStyle().WindowRounding  = 7;
-    ImGui::GetStyle().GrabRounding    = 7;
-    ImGui::GetStyle().FrameRounding   = 7;
-    ImGui::GetStyle().FrameBorderSize = 1;
+    //ImGui::GetStyle().PopupRounding   = 7;
+    //ImGui::GetStyle().WindowRounding  = 7;
+    //ImGui::GetStyle().GrabRounding    = 7;
+    //ImGui::GetStyle().FrameRounding   = 7;
+    //ImGui::GetStyle().FrameBorderSize = 1;
 
     ImFontConfig defaultFontConfig;
     defaultFontConfig.SizePixels = 16.0f;
@@ -61,8 +61,8 @@ int Run(GLFWwindow *window)
 
     GL::Immediate2D imm;
     imm.Initialize({
-        static_cast<float>(Global::GetFramebufferWidth()),
-        static_cast<float>(Global::GetFramebufferHeight())
+        static_cast<float>(Global::FbW()),
+        static_cast<float>(Global::FbH())
     });
 
     // Editor core
@@ -136,17 +136,56 @@ int Run(GLFWwindow *window)
         editorCore.ShowLoadingWindow();
         editorCore.ShowSavingWindow();
 
-        editorCore.ShowResourceManager();
-        editorCore.ShowCamera();
-        editorCore.ShowEntityEditor();
-        editorCore.ShowLightEditor();
+        ImGui::SetNextWindowSize(ImVec2(300, 100), ImGuiCond_FirstUseEver);
+        if(editorCore.BeginLeftWindow())
+        {
+            editorCore.ShowResourceManager();
+            editorCore.EndLeftWindow();
+        }
+
+        ImGui::SetNextWindowSize(ImVec2(300, 100), ImGuiCond_FirstUseEver);
+        if(editorCore.BeginRightWindow())
+        {
+            if(ImGui::BeginTabBar("property", ImGuiTabBarFlags_FittingPolicyScroll | ImGuiTabBarFlags_Reorderable))
+            {
+                if(ImGui::BeginTabItem("ent"))
+                {
+                    editorCore.ShowEntityEditor();
+                    ImGui::EndTabItem();
+                }
+                if(ImGui::BeginTabItem("lht"))
+                {
+                    editorCore.ShowLightEditor();
+                    ImGui::EndTabItem();
+                }
+                if(ImGui::BeginTabItem("cam"))
+                {
+                    editorCore.ShowCamera();
+                    ImGui::EndTabItem();
+                }
+                ImGui::EndTabBar();
+            }
+            editorCore.EndRightWindow();
+        }
+
+        ImGui::SetNextWindowSize(ImVec2(200, 200), ImGuiCond_FirstUseEver);
+        if(editorCore.BeginBottomWindow())
+        {
+            console.Display();
+            editorCore.EndBottomWindow();
+        }
+
+        Global::_setPreviewWindow(
+            static_cast<int>(editorCore.GetViewportX()),
+            static_cast<int>(editorCore.GetViewportY()),
+            static_cast<int>(editorCore.GetViewportWidth()),
+            static_cast<int>(editorCore.GetViewportHeight()));
 
         editorCore.UpdateCamera(keyboard, mouse);
 
         editorCore.RenderScene();
         editorCore.SaveRenderingResult();
 
-        console.Display();
         editorCore.ShowGUI(imm, keyboard);
 
         editorCore.EndFrame();

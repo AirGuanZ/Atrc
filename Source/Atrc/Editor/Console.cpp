@@ -15,19 +15,6 @@ Console::Console(int inputBufSize, int maxTextCount)
 
 void Console::Display()
 {
-    float fbW = static_cast<float>(Global::GetFramebufferWidth());
-    float fbH = static_cast<float>(Global::GetFramebufferHeight());
-    float posX = fbW - 550 - 40;
-    float posY = fbH - 150 - (fbH / fbW) * 40;
-    ImGui::SetNextWindowPos(ImVec2(posX, posY), ImGuiCond_FirstUseEver);
-    ImGui::SetNextWindowSize(ImVec2(550, 150), ImGuiCond_FirstUseEver);
-
-    if(!ImGui::Begin("console##model_viewer_console"))
-    {
-        ImGui::End();
-        return;
-    }
-
     //留一个separator+一行text的空间给输入槽
     const float reservedFooterHeight = ImGui::GetStyle().ItemSpacing.y + ImGui::GetItemsLineHeightWithSpacing();
     ImGui::BeginChild("ScrollingRegion", ImVec2(0, -reservedFooterHeight), false, ImGuiWindowFlags_HorizontalScrollbar);
@@ -36,7 +23,7 @@ void Console::Display()
     {
         static const ImVec4 TEXT_COLOR[] =
         {
-            { 0.0f, 0.0f, 0.0f, 1.0f }, //Normal
+            { 1.0f, 1.0f, 1.0f, 1.0f }, //Normal
             { 1.0f, 0.4f, 0.4f, 1.0f }, //Error
         };
         ImGui::PushStyleColor(ImGuiCol_Text, TEXT_COLOR[static_cast<int>(t.type)]);
@@ -68,8 +55,6 @@ void Console::Display()
 
     if(ImGui::Button("clear"))
         texts_.clear();
-
-    ImGui::End();
 }
 
 void Console::SetMaxTextCount(int count)

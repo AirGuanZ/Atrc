@@ -40,7 +40,8 @@ class EditorCore
         bool isEntityPoolDisplayed = false;
         bool isLightPoolDisplayed = false;
 
-        CameraInstance::ProjData selectedCameraProjData;
+        float mainMenuBarHeight = 0;
+        float leftWindowSizeX = 0;
     };
 
     struct BetweenFrameState
@@ -54,11 +55,22 @@ class EditorCore
         GL::Texture2D sceneRendererTex;
 
         FileBrowser loadingFilenameBrowser = FileBrowser("load from", false, "");
+
+        float rightWindowSizeX = 0;
+        float bottomWindowSizeY = 0;
+
+        CameraInstance::ProjData selectedCameraProjData;
+        float renderPvLx = 0;
+        float renderPvRx = 0;
+        float renderPvBy = 0;
+        float renderPvTy = 0;
     };
 
     std::unique_ptr<EditorData> data_;
     std::unique_ptr<WithinFrameState> sState_;
     std::unique_ptr<BetweenFrameState> lState_;
+
+    void UpdateRenderPvRect();
 
 public:
 
@@ -67,6 +79,20 @@ public:
     void Destroy();
 
     void ShowMenuMenuBar();
+
+    bool BeginLeftWindow();
+    void EndLeftWindow();
+
+    bool BeginRightWindow();
+    void EndRightWindow();
+
+    bool BeginBottomWindow();
+    void EndBottomWindow();
+
+    float GetViewportX() const noexcept;
+    float GetViewportY() const noexcept;
+    float GetViewportWidth() const noexcept;
+    float GetViewportHeight() const noexcept;
 
     void ShowGlobalHelpWindow(const AGZ::Input::Keyboard &kb);
 
@@ -109,8 +135,8 @@ public:
     {
         *sState_ = WithinFrameState();
 
-        sState_->fbW = static_cast<float>(Global::GetFramebufferWidth());
-        sState_->fbH = static_cast<float>(Global::GetFramebufferHeight());
+        sState_->fbW = static_cast<float>(Global::FbW());
+        sState_->fbH = static_cast<float>(Global::FbH());
         sState_->sceneMgrPosX = 40;
         sState_->sceneMgrPosY = ImGui::GetFrameHeight() + sState_->sceneMgrPosX * (sState_->fbH / sState_->fbW);
     }
@@ -122,6 +148,6 @@ public:
 
     void SetFullViewport()
     {
-        glViewport(0, 0, Global::GetFramebufferWidth(), Global::GetFramebufferHeight());
+        glViewport(0, 0, Global::FbW(), Global::FbH());
     }
 };
