@@ -173,7 +173,7 @@ bool EditorCore::BeginBottomWindow()
     const float sizeX = Global::FbWf() - sState_->leftWindowSizeX - lState_->rightWindowSizeX;
     ImGui::SetNextWindowSizeConstraints(
         ImVec2(sizeX, 100),
-        ImVec2(sizeX, Global::FbHf() / 2 - 80));
+        ImVec2(sizeX, Global::FbHf() - 200));
     ImGui::SetNextWindowPos(
         ImVec2(sState_->leftWindowSizeX, Global::FbH() - lState_->bottomWindowSizeY));
     return ImGui::Begin("bottom window", nullptr,
@@ -574,7 +574,7 @@ void EditorCore::SaveRenderingResult()
     lState_->sceneRenderer.CheckSaving();
 }
 
-void EditorCore::ShowGUI(GL::Immediate2D &imm, const AGZ::Input::Keyboard &kb)
+void EditorCore::ShowPreviewGUI(GL::Immediate2D &imm, const AGZ::Input::Keyboard &kb)
 {
     GL::RenderContext::DisableDepthTest();
     GL::RenderContext::ClearDepth();

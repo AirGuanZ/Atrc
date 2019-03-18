@@ -38,6 +38,7 @@ int Run(GLFWwindow *window)
     //ImGui::GetStyle().GrabRounding    = 7;
     //ImGui::GetStyle().FrameRounding   = 7;
     //ImGui::GetStyle().FrameBorderSize = 1;
+    ImGui::GetStyle().WindowRounding = 0;
 
     ImFontConfig defaultFontConfig;
     defaultFontConfig.SizePixels = 16.0f;
@@ -143,7 +144,7 @@ int Run(GLFWwindow *window)
             editorCore.EndLeftWindow();
         }
 
-        ImGui::SetNextWindowSize(ImVec2(300, 100), ImGuiCond_FirstUseEver);
+        ImGui::SetNextWindowSize(ImVec2(450, 100), ImGuiCond_FirstUseEver);
         if(editorCore.BeginRightWindow())
         {
             if(ImGui::BeginTabBar("property", ImGuiTabBarFlags_FittingPolicyScroll | ImGuiTabBarFlags_Reorderable))
@@ -186,7 +187,7 @@ int Run(GLFWwindow *window)
         editorCore.RenderScene();
         editorCore.SaveRenderingResult();
 
-        editorCore.ShowGUI(imm, keyboard);
+        editorCore.ShowPreviewGUI(imm, keyboard);
 
         editorCore.EndFrame();
 

@@ -107,7 +107,7 @@ int Run(GLFWwindow *window)
     float bottomWindowSizeY = 100;
     float rightWindowSizeX = 100;
 
-    ImGui::FileBrowser fileBrowser(ImGuiFileBrowserFlags_CloseOnEsc | ImGuiFileBrowserFlags_NoModal);
+    ImGui::FileBrowser fileBrowser(ImGuiFileBrowserFlags_CloseOnEsc | ImGuiFileBrowserFlags_NoModal | ImGuiFileBrowserFlags_CreateNewDir);
     
     while(!glfwWindowShouldClose(window))
     {

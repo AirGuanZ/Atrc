@@ -1,5 +1,5 @@
 #include <Atrc/Editor/ResourceManagement/TextureCreator.h>
-#include <Atrc/Editor/FilenameSlot.h>
+#include <Atrc/Editor/FileSelector.h>
 #include <Atrc/Mgr/Parser.h>
 
 namespace
@@ -60,14 +60,14 @@ namespace
 
     class ImageTextureInstance : public TextureInstance
     {
-        TFilenameSlot<true> filenameSlot_;
+        FileSelector filename_;
 
     protected:
 
         void Export(const ResourceManager &rscMgr, SceneExportingContext &ctx) const override
         {
             ctx.AddLine("type = Image;");
-            ctx.AddLine("filename = \"", filenameSlot_.GetExportedFilename(ctx), "\";");
+            ctx.AddLine("filename = \"", filename_.RelativeTo(ctx.workspaceDirectory).string(), "\";");
         }
         
     public:
@@ -76,26 +76,25 @@ namespace
 
         void Display([[maybe_unused]] ResourceManager &rscMgr) override
         {
-            static FileBrowser fileBrowser("browse image filename", false, "");
-            filenameSlot_.Display(fileBrowser);
+            filename_.Display();
         }
 
         void Import(ResourceManager &rscMgr, const AGZ::ConfigGroup &root, const AGZ::ConfigGroup &params, const ImportContext &ctx) override
         {
-            filenameSlot_.Import(params["filename"].AsValue(), ctx);
+            filename_.SetFilename(std::filesystem::path(ctx.workspacePath) / params["filename"].AsValue());
         }
     };
 
     class HDRTextureInstance : public TextureInstance
     {
-        TFilenameSlot<true> filenameSlot_;
+        FileSelector filename_;
 
     protected:
 
         void Export(const ResourceManager &rscMgr, SceneExportingContext &ctx) const override
         {
             ctx.AddLine("type = HDR;");
-            ctx.AddLine("filename = \"", filenameSlot_.GetExportedFilename(ctx), "\";");
+            ctx.AddLine("filename = \"", filename_.RelativeTo(ctx.workspaceDirectory).string(), "\";");
         }
 
     public:
@@ -104,13 +103,12 @@ namespace
 
         void Display([[maybe_unused]] ResourceManager &rscMgr) override
         {
-            static FileBrowser fileBrowser("browse image filename", false, "");
-            filenameSlot_.Display(fileBrowser);
+            filename_.Display();
         }
 
         void Import(ResourceManager &rscMgr, const AGZ::ConfigGroup &root, const AGZ::ConfigGroup &params, const ImportContext &ctx) override
         {
-            filenameSlot_.Import(params["filename"].AsValue(), ctx);
+            filename_.SetFilename(std::filesystem::path(ctx.workspacePath) / params["filename"].AsValue());
         }
     };
 }

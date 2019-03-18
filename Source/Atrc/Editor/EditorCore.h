@@ -118,7 +118,7 @@ public:
 
     void SaveRenderingResult();
 
-    void ShowGUI(GL::Immediate2D &imm, const AGZ::Input::Keyboard &kb);
+    void ShowPreviewGUI(GL::Immediate2D &imm, const AGZ::Input::Keyboard &kb);
 
     void OnFramebufferResized()
     {

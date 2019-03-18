@@ -4,6 +4,7 @@
 #include <Atrc/Editor/FileBrowser.h>
 #include <Atrc/Editor/FilenameSlot.h>
 #include <Atrc/Editor/Global.h>
+#include <Atrc/Editor/FileSelector.h>
 #include <Atrc/Mgr/Parser.h>
 #include <Lib/imgui/imgui/ImGuizmo.h>
 
@@ -145,7 +146,7 @@ namespace
     {
         std::shared_ptr<GL::VertexBuffer<Vertex>> vtxBuf_;
         AGZ::Mesh::GeometryMeshGroup<float> meshGroup_;
-        TFilenameSlot<true> filename_;
+        FileSelector filename_;
 
         void BuildVertexBufferFromMeshGroup()
         {
@@ -200,7 +201,7 @@ namespace
         void Export(const ResourceManager&, SceneExportingContext &ctx) const override
         {
             ctx.AddLine("type = TriangleBVH;");
-            ctx.AddLine("filename = \"", filename_.GetExportedFilename(ctx), "\";");
+            ctx.AddLine("filename = \"", filename_.RelativeTo(ctx.workspaceDirectory).string(), "\";");
             ExportTransform(ctx);
         }
 
@@ -223,15 +224,14 @@ namespace
 
         void DisplayEditing(const Mat4f &, const Mat4f&, const Mat4f&, bool) override
         {
-            static FileBrowser fileBrowser("browse .obj", false, "");
-            if(filename_.Display(fileBrowser))
-                LoadWavefrontOBJ(fileBrowser.GetResult());
+            if(filename_.Display())
+                LoadWavefrontOBJ(filename_.GetFilename().string());
         }
 
         void Import(ResourceManager &rscMgr, const AGZ::ConfigGroup &root, const AGZ::ConfigGroup &params, const ImportContext &ctx) override
         {
-            filename_.Import(params["filename"].AsValue(), ctx);
-            LoadWavefrontOBJ(filename_.GetFilename());
+            filename_.SetFilename(std::filesystem::path(ctx.workspacePath) / params["filename"].AsValue());
+            LoadWavefrontOBJ(filename_.GetFilename().string());
         }
     };
 }
