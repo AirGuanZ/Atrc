@@ -29,9 +29,9 @@ std::optional<BxDF::SampleWiResult> BxDF_Void::SampleWi(
         return std::nullopt;
 
     SampleWiResult ret;
-    ret.coef = Spectrum(Real(1));
+    ret.coef = Spectrum(Real(1)) / Abs(wo.z);
     ret.wi   = -wo;
-    ret.pdf  = 1 / Abs(wo.z);
+    ret.pdf  = 1;
     ret.type = type_;
     ret.isDelta = true;
     return ret;
