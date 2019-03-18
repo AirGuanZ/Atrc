@@ -105,7 +105,7 @@ namespace
 
         void Render(const Mat4f &projViewMat, const Vec3f &eyePos) override
         {
-            std::shared_ptr<const GL::VertexBuffer<GeometryInstance::Vertex>> vtxBuf;
+            const GL::VertexBuffer<GeometryInstance::Vertex> *vtxBuf = nullptr;
             auto geo = geometry_.GetInstance();
             if(geo)
                 vtxBuf = geo->GetVertexBuffer();

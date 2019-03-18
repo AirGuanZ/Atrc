@@ -3,6 +3,30 @@
 
 namespace
 {
+    class AlwaysOneFresnelInstance : public FresnelInstance
+    {
+    protected:
+
+        void Export(const ResourceManager &rscMgr, SceneExportingContext &ctx) const override
+        {
+            ctx.AddLine("type = AlwaysOne;");
+        }
+
+    public:
+
+        using FresnelInstance::FresnelInstance;
+
+        void Display(ResourceManager&) override
+        {
+
+        }
+
+        void Import(ResourceManager &rscMgr, const AGZ::ConfigGroup &root, const AGZ::ConfigGroup &params, const ImportContext &ctx) override
+        {
+
+        }
+    };
+
     class FresnelConductorInstance : public FresnelInstance
     {
         Vec3f etaI_, etaT_, k_;
@@ -85,12 +109,19 @@ namespace
 
 void RegisterFresnelCreators(ResourceManager &rscMgr)
 {
+    static const AlwaysOneFresnelCreator iAlwaysOneFresnelCreator;
     static const FresnelConductorCreator iFresnelConductorCreator;
     static const FresnelDielectricCreator iFresnelDielectricCreator;
     static const FresnelSchlickCreator iFresnelSchlickCreator;
+    rscMgr.AddCreator(&iAlwaysOneFresnelCreator);
     rscMgr.AddCreator(&iFresnelConductorCreator);
     rscMgr.AddCreator(&iFresnelDielectricCreator);
     rscMgr.AddCreator(&iFresnelSchlickCreator);
+}
+
+std::shared_ptr<FresnelInstance> AlwaysOneFresnelCreator::Create(ResourceManager &rscMgr, std::string name) const
+{
+    return std::make_shared<AlwaysOneFresnelInstance>(GetName(), std::move(name));
 }
 
 std::shared_ptr<FresnelInstance> FresnelConductorCreator::Create(ResourceManager &rscMgr, std::string name) const

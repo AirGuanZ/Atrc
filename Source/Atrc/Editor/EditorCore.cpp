@@ -215,7 +215,7 @@ Press ESC to close this help window.
 )____");
     ImGui::TextWrapped("%s", MSG.c_str());
 
-    if(kb.IsKeyPressed(AGZ::Input::KEY_ESCAPE))
+    if(kb.IsKeyPressed(AGZ::Input::KEY_ESCAPE) && ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows))
         ImGui::CloseCurrentPopup();
 }
 
@@ -259,7 +259,7 @@ void EditorCore::ShowGlobalSettingWindow(const AGZ::Input::Keyboard &kb)
         ImGui::TreePop();
     }
 
-    if(kb.IsKeyPressed(AGZ::Input::KEY_ESCAPE))
+    if(kb.IsKeyPressed(AGZ::Input::KEY_ESCAPE) && ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows))
         ImGui::CloseCurrentPopup();
 }
 
@@ -326,21 +326,24 @@ void EditorCore::ShowExportingSH2DWindow()
 
 void EditorCore::ShowSavingWindow()
 {
-    FileSelector filename;
+    static ImGui::FileBrowser filename(ImGuiFileBrowserFlags_NoModal | ImGuiFileBrowserFlags_EnterNewFilename);
 
     ImGui::PushID(&filename);
     AGZ::ScopeGuard popIDGuard([] { ImGui::PopID(); });
 
-    if(sState_->openSavingWindow)
-        ImGui::OpenPopup("saving");
+    /*if(sState_->openSavingWindow)
+        ImGui::OpenPopup("saving");*/
 
-    if(!ImGui::BeginPopupModal("saving", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+    /*if(!ImGui::BeginPopupModal("saving", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
         return;
-    AGZ::ScopeGuard exitPopupGuard([] { ImGui::EndPopup(); });
+    AGZ::ScopeGuard exitPopupGuard([] { ImGui::EndPopup(); });*/
+
+    if(sState_->openSavingWindow)
+        filename.Open();
 
     filename.Display();
 
-    if(ImGui::Button("ok") && filename.HasFilename())
+    if(filename.HasSelected())
     {
         try
         {
@@ -356,9 +359,9 @@ void EditorCore::ShowSavingWindow()
                 data_->filmSize);
             LauncherScriptExporter exporter(data_->rscMgr, ctx);
 
-            AGZ::FileSys::WholeFile::WriteText(filename.GetFilename().string(),
+            AGZ::FileSys::WholeFile::WriteText(filename.GetSelected().string(),
                 exporter.Export(data_->rendererSlot.GetInstance().get(), data_->outputFilenameBuf.data()));
-            filename.Clear();
+            filename.ClearSelected();
         }
         catch(const std::exception &err)
         {
@@ -368,13 +371,7 @@ void EditorCore::ShowSavingWindow()
         {
             Global::ShowErrorMessage("an unknown error occurred");
         }
-        ImGui::CloseCurrentPopup();
     }
-
-    ImGui::SameLine();
-
-    if(ImGui::Button("cancel"))
-        ImGui::CloseCurrentPopup();
 }
 
 void EditorCore::ShowLoadingWindow()

@@ -15,24 +15,15 @@ struct EditorData
 
     ResourceManager rscMgr;
 
-    Vec2i filmSize;
+    Vec2i filmSize = { 640, 480 };
     FilmFilterSlot filmFilterSlot;
     SamplerSlot    samplerSlot;
     RendererSlot   rendererSlot;
 
-    FileSelector scriptFilename;
-    FileSelector workspaceDir;
+    FileSelector scriptFilename = FileSelector(ImGuiFileBrowserFlags_NoModal | ImGuiFileBrowserFlags_EnterNewFilename);
+    FileSelector workspaceDir = FileSelector(ImGuiFileBrowserFlags_NoModal | ImGuiFileBrowserFlags_SelectDirectory);
 
-    std::array<char, 512> outputFilenameBuf;
-
-    EditorData()
-        : filmSize(640, 480),
-          scriptFilename(ImGuiFileBrowserFlags_NoModal | ImGuiFileBrowserFlags_EnterNewFilename),
-          workspaceDir(ImGuiFileBrowserFlags_NoModal | ImGuiFileBrowserFlags_SelectDirectory),
-          outputFilenameBuf{ '\0' }
-    {
-        
-    }
+    std::array<char, 512> outputFilenameBuf = { '\0' };
 };
 
 class EditorCore

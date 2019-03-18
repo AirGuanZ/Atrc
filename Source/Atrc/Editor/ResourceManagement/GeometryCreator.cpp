@@ -1,8 +1,6 @@
 #include <AGZUtils/Utils/Mesh.h>
 
 #include <Atrc/Editor/ResourceManagement/GeometryCreator.h>
-#include <Atrc/Editor/FileBrowser.h>
-#include <Atrc/Editor/FilenameSlot.h>
 #include <Atrc/Editor/Global.h>
 #include <Atrc/Editor/FileSelector.h>
 #include <Atrc/Mgr/Parser.h>
@@ -78,14 +76,9 @@ namespace
             UpdateVertexBuffer();
         }
 
-        std::shared_ptr<const GL::VertexBuffer<Vertex>> GetVertexBuffer() const override
+        const GL::VertexBuffer<Vertex> *GetVertexBuffer() const override
         {
-            return vtxBuf_;
-        }
-
-        std::vector<std::string> GetSubmeshNames() const override
-        {
-            return { };
+            return vtxBuf_.get();
         }
 
         void DisplayEditing(const Mat4f &world, const Mat4f &proj, const Mat4f &view, bool renderController) override
@@ -117,9 +110,6 @@ namespace
             case 2: editedVtx = &C_; break;
             default: AGZ::Unreachable();
             }
-
-            ImGuiIO &io = ImGui::GetIO();
-            ImGuizmo::SetRect(0, 0, io.DisplaySize.x, io.DisplaySize.y);
             
             Mat4f worldMat = world * Mat4f::Translate(*editedVtx);
             ImGuizmo::Manipulate(&view.m[0][0], &proj.m[0][0], ImGuizmo::TRANSLATE, ImGuizmo::WORLD, &worldMat.m[0][0]);
@@ -142,18 +132,24 @@ namespace
         }
     };
 
+    struct NameVtxBufRecord
+    {
+        std::string name;
+        GL::VertexBuffer<GeometryInstance::Vertex> buf;
+    };
+    std::map<std::string, std::shared_ptr<NameVtxBufRecord>> name2VtxBuf_;
+
     class WavefrontOBJInstance : public GeometryInstance
     {
-        std::shared_ptr<GL::VertexBuffer<Vertex>> vtxBuf_;
-        AGZ::Mesh::GeometryMeshGroup<float> meshGroup_;
+        std::shared_ptr<NameVtxBufRecord> vtxBuf_;
         FileSelector filename_;
 
-        void BuildVertexBufferFromMeshGroup()
+        void BuildVertexBufferFromMeshGroup(const std::string &name, const AGZ::Mesh::GeometryMeshGroup<float> &meshGroup)
         {
-            std::shared_ptr<GL::VertexBuffer<Vertex>> buf = std::make_shared<GL::VertexBuffer<Vertex>>();
+            GL::VertexBuffer<Vertex> buf;
             std::vector<Vertex> vtxData;
 
-            for(auto &it : meshGroup_.submeshes)
+            for(auto &it : meshGroup.submeshes)
             {
                 for(auto &v : it.second.vertices)
                 {
@@ -164,18 +160,25 @@ namespace
                 }
             }
 
-            buf->InitializeHandle();
-            buf->ReinitializeData(vtxData.data(), static_cast<uint32_t>(vtxData.size()), GL_STATIC_DRAW);
-            vtxBuf_ = std::move(buf);
+            buf.InitializeHandle();
+            buf.ReinitializeData(vtxData.data(), static_cast<uint32_t>(vtxData.size()), GL_STATIC_DRAW);
+
+            if(vtxBuf_ && vtxBuf_.use_count() <= 2)
+                name2VtxBuf_.erase(vtxBuf_->name);
+            vtxBuf_ = std::make_shared<NameVtxBufRecord>();
+            vtxBuf_->name = name;
+            vtxBuf_->buf = std::move(buf);
+            name2VtxBuf_[name] = vtxBuf_;
         }
 
         void Clear()
         {
+            if(vtxBuf_ && vtxBuf_.use_count() <= 2)
+                name2VtxBuf_.erase(vtxBuf_->name);
             vtxBuf_ = nullptr;
-            meshGroup_.submeshes.clear();
         }
 
-        void LoadWavefrontOBJ(std::string filename)
+        void LoadWavefrontOBJ(const std::string &filename)
         {
             Clear();
             AGZ::ScopeGuard clearGuard([&]
@@ -184,15 +187,26 @@ namespace
                 Clear();
                 filename_.Clear();
             });
+
+            auto name = absolute(std::filesystem::path(filename)).string();
+            if(auto it = name2VtxBuf_.find(name); it != name2VtxBuf_.end())
+            {
+                if(vtxBuf_ && vtxBuf_.use_count() <= 2)
+                    name2VtxBuf_.erase(vtxBuf_->name);
+                vtxBuf_ = it->second;
+                clearGuard.Dismiss();
+                return;
+            }
+
             AGZ::Mesh::WavefrontObj<float> obj;
             if(!obj.LoadFromFile(filename) || obj.name2Obj.empty())
                 return;
 
-            meshGroup_ = obj.ToGeometryMeshGroup();
-            if(meshGroup_.submeshes.empty())
+            auto meshGroup = obj.ToGeometryMeshGroup();
+            if(meshGroup.submeshes.empty())
                 return;
             obj.Clear();
-            BuildVertexBufferFromMeshGroup();
+            BuildVertexBufferFromMeshGroup(name, meshGroup);
             clearGuard.Dismiss();
         }
 
@@ -209,17 +223,9 @@ namespace
 
         using GeometryInstance::GeometryInstance;
 
-        std::shared_ptr<const GL::VertexBuffer<Vertex>> GetVertexBuffer() const override
+        const GL::VertexBuffer<Vertex> *GetVertexBuffer() const override
         {
-            return vtxBuf_;
-        }
-
-        std::vector<std::string> GetSubmeshNames() const override
-        {
-            std::vector<std::string> ret;
-            std::transform(begin(meshGroup_.submeshes), end(meshGroup_.submeshes), std::back_inserter(ret),
-                [](auto &it) { return it.first; });
-            return ret;
+            return vtxBuf_ ? &vtxBuf_->buf : nullptr;
         }
 
         void DisplayEditing(const Mat4f &, const Mat4f&, const Mat4f&, bool) override

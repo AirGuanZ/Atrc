@@ -35,6 +35,7 @@ bld/
 scene.txt
 scene1.txt
 sh2d.txt
+white-test.txt
 Output.png
 
 *.o

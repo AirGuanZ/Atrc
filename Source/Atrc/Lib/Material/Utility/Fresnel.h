@@ -45,6 +45,19 @@ public:
     Real GetEtaIn() const noexcept { return etaIn; }
 };
 
+// 恒为1的fresnel
+class AlwaysOneFresnel : public Dielectric
+{
+public:
+
+    AlwaysOneFresnel() : Dielectric(1, 1) { }
+
+    Spectrum Eval(Real cosThetaI) const noexcept override
+    {
+        return Spectrum(1);
+    }
+};
+
 // 使用fresnel公式的绝缘体fresnel项
 class FresnelDielectric : public Dielectric
 {

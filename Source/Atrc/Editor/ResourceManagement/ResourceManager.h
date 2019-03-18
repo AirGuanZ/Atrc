@@ -99,7 +99,6 @@ public:
     template<typename TResource>
     void ExportAsReference(const ResourceManager &rscMgr, SceneExportingContext &ctx) const
     {
-        AGZ_ASSERT(typeid(*this) == typeid(TResource));
         if(isInPool_)
         {
             ctx.AddLine("type = Reference;");
@@ -468,9 +467,7 @@ public:
 
     static const char *GetPoolName() { return "geometry"; }
 
-    virtual std::shared_ptr<const GL::VertexBuffer<Vertex>> GetVertexBuffer() const = 0;
-
-    virtual std::vector<std::string> GetSubmeshNames() const = 0;
+    virtual const GL::VertexBuffer<Vertex> *GetVertexBuffer() const = 0;
 
     void Display(ResourceManager &) final override { }
 

@@ -21,6 +21,22 @@ namespace Atrc::Mgr
 
 namespace
 {
+    class AlwaysOneFresnelCreator : public Creator<Fresnel>
+    {
+    public:
+
+        std::string GetTypeName() const override { return "AlwaysOne"; }
+
+        Fresnel *Create(const ConfigGroup &group, [[maybe_unused]] Context &context, Arena &arena) const override
+        {
+            ATRC_MGR_TRY
+            {
+                return arena.Create<AlwaysOneFresnel>();
+            }
+            ATRC_MGR_CATCH_AND_RETHROW("In creating always-one fresnel object: " + group.ToString())
+        }
+    };
+
     class FresnelConductorCreator : public Creator<Fresnel>
     {
     public:
@@ -108,9 +124,11 @@ void RegisterBuiltinMaterialCreators(Context &context)
     context.AddCreator(&oNMatteCreator);
     context.AddCreator(&tSMetalCreator);
 
+    static const AlwaysOneFresnelCreator iAlwaysOneFresnelCreator;
     static const FresnelConductorCreator fresnelConductorCreator;
     static const FresnelDielectricCreator fresnelDielectricCreator;
     static const SchlickApproximationCreator schlickApproximationCreator;
+    context.AddCreator(&iAlwaysOneFresnelCreator);
     context.AddCreator(&fresnelConductorCreator);
     context.AddCreator(&fresnelDielectricCreator);
     context.AddCreator(&schlickApproximationCreator);

@@ -4,6 +4,15 @@
 
 void RegisterFresnelCreators(ResourceManager &rscMgr);
 
+class AlwaysOneFresnelCreator : public FresnelCreator
+{
+public:
+
+    AlwaysOneFresnelCreator() : FresnelCreator("AlwaysOne") { }
+
+    std::shared_ptr<FresnelInstance> Create(ResourceManager &rscMgr, std::string name) const override;
+};
+
 class FresnelConductorCreator : public FresnelCreator
 {
 public:

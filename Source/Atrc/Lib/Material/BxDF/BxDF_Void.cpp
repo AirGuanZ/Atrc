@@ -25,10 +25,13 @@ std::optional<BxDF::SampleWiResult> BxDF_Void::SampleWi(
     const Vec3 &wo, [[maybe_unused]] bool star,
     [[maybe_unused]] const Vec3 &sample) const noexcept
 {
+    if(!wo.z)
+        return std::nullopt;
+
     SampleWiResult ret;
     ret.coef = Spectrum(Real(1));
     ret.wi   = -wo;
-    ret.pdf  = 1;
+    ret.pdf  = 1 / Abs(wo.z);
     ret.type = type_;
     ret.isDelta = true;
     return ret;
