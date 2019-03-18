@@ -21,7 +21,7 @@ std::string SH2DSceneScriptExporter::Export(
 {
     ctx.ClearString();
 
-    ctx.AddLine("workspace = \"@", ctx.workspaceDirectory, "\";");
+    ctx.AddLine("workspace = \"@", ctx.workspaceDirectory.string(), "\";");
 
     ctx.AddLine();
 

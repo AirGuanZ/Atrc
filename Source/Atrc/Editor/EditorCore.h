@@ -3,7 +3,7 @@
 #include <memory>
 
 #include <Atrc/Editor/Camera.h>
-#include <Atrc/Editor/FilenameSlot.h>
+#include <Atrc/Editor/FileSelector.h>
 #include <Atrc/Editor/GL.h>
 #include <Atrc/Editor/Global.h>
 #include <Atrc/Editor/ResourceManagement/ResourceManager.h>
@@ -15,13 +15,24 @@ struct EditorData
 
     ResourceManager rscMgr;
 
-    Vec2i filmSize = { 640, 480 };
+    Vec2i filmSize;
     FilmFilterSlot filmFilterSlot;
     SamplerSlot    samplerSlot;
     RendererSlot   rendererSlot;
-    TFilenameSlot<false, FilenameMode::Absolute> scriptSlot;
-    TFilenameSlot<false, FilenameMode::RelativeToScript> workspaceSlot;
-    std::array<char, 512> outputFilenameBuf = { '\0' };
+
+    FileSelector scriptFilename;
+    FileSelector workspaceDir;
+
+    std::array<char, 512> outputFilenameBuf;
+
+    EditorData()
+        : filmSize(640, 480),
+          scriptFilename(ImGuiFileBrowserFlags_NoModal | ImGuiFileBrowserFlags_EnterNewFilename),
+          workspaceDir(ImGuiFileBrowserFlags_NoModal | ImGuiFileBrowserFlags_SelectDirectory),
+          outputFilenameBuf{ '\0' }
+    {
+        
+    }
 };
 
 class EditorCore
@@ -46,18 +57,15 @@ class EditorCore
 
     struct BetweenFrameState
     {
-        FileBrowser scriptBrowser;
-        FileBrowser workspaceBrowser;
-
         bool showMenuBar = true;
 
         SceneRenderer sceneRenderer;
         GL::Texture2D sceneRendererTex;
 
-        FileBrowser loadingFilenameBrowser = FileBrowser("load from", false, "");
-
         float rightWindowSizeX = 0;
         float bottomWindowSizeY = 0;
+
+        ImGui::FileBrowser loadingFilename = ImGui::FileBrowser(ImGuiFileBrowserFlags_NoModal);
 
         CameraInstance::ProjData selectedCameraProjData;
         float renderPvLx = 0;

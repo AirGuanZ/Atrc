@@ -26,7 +26,7 @@ std::string LauncherScriptExporter::Export(const RendererInstance *renderer, con
 {
     ctx_.ClearString();
 
-    ctx_.AddLine("workspace = \"@", ctx_.workspaceDirectory, "\";");
+    ctx_.AddLine("workspace = \"@", ctx_.workspaceDirectory.string(), "\";");
 
     ctx_.AddLine();
 
@@ -113,24 +113,24 @@ std::string LauncherScriptExporter::Export(const RendererInstance *renderer, con
     return ctx_.GetString();
 }
 
-void LauncherScriptImporter::Import(const AGZ::ConfigGroup &root, EditorData *data, std::string_view scriptPath)
+void LauncherScriptImporter::Import(const AGZ::ConfigGroup &root, EditorData *data, std::string_view scriptFilename)
 {
     IResource::ImportContext ctx;
 
     {
-        auto script = absolute(std::filesystem::path(scriptPath));
-        data->scriptSlot.SetFilename(relative(script).string());
+        auto scriptDir = absolute(std::filesystem::path(scriptFilename).parent_path());
+        data->scriptFilename.SetFilename(relative(std::filesystem::path(scriptFilename)).string());
         auto workspaceStr = root["workspace"].AsValue();
         std::filesystem::path workspace;
         if(AGZ::StartsWith(workspaceStr, "@"))
-            workspace = absolute(script / workspaceStr.substr(1));
+            workspace = absolute(scriptDir / workspaceStr.substr(1));
         else if(AGZ::StartsWith(workspaceStr, "$"))
             workspace = absolute(std::filesystem::path(workspaceStr.substr(1)));
         else
             workspace = absolute(std::filesystem::path(workspaceStr));
-        data->workspaceSlot.SetFilename(relative(workspace).string());
+        data->workspaceDir.SetFilename(relative(workspace).string());
         
-        ctx.scriptPath = script;
+        ctx.scriptPath = scriptDir;
         ctx.workspacePath = absolute(workspace);
     }
 

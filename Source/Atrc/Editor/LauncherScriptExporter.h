@@ -20,5 +20,5 @@ class LauncherScriptImporter
 {
 public:
 
-    void Import(const AGZ::ConfigGroup &root, EditorData *data, std::string_view scriptPath);
+    void Import(const AGZ::ConfigGroup &root, EditorData *data, std::string_view scriptFilename);
 };

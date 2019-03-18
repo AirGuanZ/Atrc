@@ -19,8 +19,8 @@ public:
     const FilmFilterInstance *const filmFilter;
     const SamplerInstance    *const sampler;
 
-    const std::string workspaceDirectory;
-    const std::string scriptDirectory;
+    const std::filesystem::path workspaceDirectory;
+    const std::filesystem::path scriptDirectory;
 
     Vec2i outputFilmSize;
 
@@ -31,7 +31,7 @@ public:
         const CameraInstance *camera,
         const FilmFilterInstance *filmFilter,
         const SamplerInstance *sampler,
-        std::string workspace, std::string scriptDir,
+        std::filesystem::path workspace, std::filesystem::path scriptDir,
         const Vec2i &outputFilmSize)
         : activeCamera(activeCamera),
           camera(camera),
