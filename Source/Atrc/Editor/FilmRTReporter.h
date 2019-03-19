@@ -2,8 +2,8 @@
 
 #include <mutex>
 
+#include <AGZUtils/Utils/Time.h>
 #include <Atrc/Lib/Core/Reporter.h>
-
 #include <Atrc/Editor/GL.h>
 
 class FilmRTReporter : public Atrc::Reporter, public AGZ::Uncopiable
@@ -29,10 +29,18 @@ public:
         newData_ = false;
     }
 
+    float GetPercent() const noexcept
+    {
+        return percent_;
+    }
+
 private:
 
     bool newData_;
+    std::atomic<Atrc::Real> percent_;
 
     AGZ::Texture2D<Vec3f> img_;
     std::mutex mut_;
+
+    AGZ::Clock clock_;
 };

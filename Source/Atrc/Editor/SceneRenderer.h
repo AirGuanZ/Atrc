@@ -36,6 +36,8 @@ public:
 
     bool IsRendering() const;
 
+    float GetRenderingPercent() const noexcept; // assert reporter_
+
     bool IsCompleted() const;
 
     void Join();

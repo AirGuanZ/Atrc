@@ -10,12 +10,15 @@ FilmRTReporter::FilmRTReporter()
 
 void FilmRTReporter::Start()
 {
+    Global::ShowNormalMessage("start rendering...");
     newData_ = false;
+    percent_ = 0;
+    clock_.Restart();
 }
 
 void FilmRTReporter::End()
 {
-    
+    Global::ShowNormalMessage("complete rendering...total time: " + std::to_string(clock_.Milliseconds() / 1000.0) + "s");
 }
 
 void FilmRTReporter::Report(const Atrc::Film &film, std::optional<Atrc::Real> percent)
@@ -27,7 +30,7 @@ void FilmRTReporter::Report(const Atrc::Film &film, std::optional<Atrc::Real> pe
     });
     newData_ = true;
     if(percent)
-        Global::ShowNormalMessage("percent: " + std::to_string(*percent));
+        percent_ = *percent;
 }
 
 void FilmRTReporter::Message(std::string_view msg)

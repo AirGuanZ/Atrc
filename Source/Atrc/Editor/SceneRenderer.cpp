@@ -38,8 +38,6 @@ bool SceneRenderer::Start(const AGZ::Config &config, std::string_view configPath
 		reporter_ = std::make_unique<FilmRTReporter>();
 		
 		renderer_->Render(scene_.get(), sampler_, film_.get(), reporter_.get());
-
-        Global::ShowNormalMessage("start rendering");
 	}
 	catch(...)
 	{
@@ -59,6 +57,11 @@ void SceneRenderer::Stop()
 bool SceneRenderer::IsRendering() const
 {
     return renderer_ != nullptr;
+}
+
+float SceneRenderer::GetRenderingPercent() const noexcept
+{
+    return reporter_->GetPercent();
 }
 
 bool SceneRenderer::IsCompleted() const
@@ -96,6 +99,8 @@ void SceneRenderer::CheckSaving()
         saved_ = true;
         try
         {
+            reporter_->End();
+
             auto img = film_->GetImage();
             AGZ::TextureFile::WriteRGBToPNG(outputFilename_, img.Map(
                 [](const Atrc::Spectrum &c)

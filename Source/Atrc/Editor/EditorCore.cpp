@@ -437,6 +437,13 @@ void EditorCore::ShowLoadingWindow()
 
 void EditorCore::ShowRenderingSettings()
 {
+    if(lState_->sceneRenderer.IsRendering())
+    {
+        ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4(0, 0.6f, 0, 1));
+        ImGui::ProgressBar(lState_->sceneRenderer.GetRenderingPercent() / 100);
+        ImGui::PopStyleColor();
+    }
+
     if(!ImGui::BeginTabBar("rendering setting"))
         return;
     AGZ::ScopeGuard endTabBar([] { ImGui::EndTabBar(); });
