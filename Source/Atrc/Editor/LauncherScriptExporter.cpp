@@ -26,7 +26,7 @@ std::string LauncherScriptExporter::Export(const RendererInstance *renderer, con
 {
     ctx_.ClearString();
 
-    ctx_.AddLine("workspace = \"@", ctx_.workspaceDirectory.string(), "\";");
+    ctx_.AddLine("workspace = \"@", relative(ctx_.workspaceDirectory, ctx_.scriptDirectory).string(), "\";");
 
     ctx_.AddLine();
 

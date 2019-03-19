@@ -133,7 +133,8 @@ int Run(GLFWwindow *window)
         editorCore.ShowMenuMenuBar();
         editorCore.ShowGlobalHelpWindow(keyboard);
         editorCore.ShowGlobalSettingWindow(keyboard);
-        editorCore.ShowExportingSH2DWindow();
+        editorCore.ShowExportingSH2DSceneWindow();
+        editorCore.ShowExportingSH2DLightWindow();
         editorCore.ShowLoadingWindow();
         editorCore.ShowSavingWindow();
 

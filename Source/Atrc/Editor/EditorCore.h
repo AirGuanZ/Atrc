@@ -30,11 +30,12 @@ class EditorCore
 {
     struct WithinFrameState
     {
-        bool openGlobalHelpWindow    = false;
-        bool openGlobalSettingWindow = false;
-        bool openExportingSH2DWindow = false;
-        bool openSavingWindow        = false;
-        bool openLoadingWindow       = false;
+        bool openGlobalHelpWindow     = false;
+        bool openGlobalSettingWindow  = false;
+        bool openExportingSH2DWindow  = false;
+        bool openExportingLightWindow = false;
+        bool openSavingWindow         = false;
+        bool openLoadingWindow        = false;
 
         float fbW = 1, fbH = 1;
         float sceneMgrPosX = 0, sceneMgrPosY = 0;
@@ -97,7 +98,9 @@ public:
 
     void ShowGlobalSettingWindow(const AGZ::Input::Keyboard &kb);
 
-    void ShowExportingSH2DWindow();
+    void ShowExportingSH2DSceneWindow();
+
+    void ShowExportingSH2DLightWindow();
 
     void ShowSavingWindow();
 

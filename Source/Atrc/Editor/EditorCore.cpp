@@ -4,6 +4,7 @@
 #include <Atrc/Editor/LauncherScriptExporter.h>
 #include <Atrc/Editor/ResourceManagement/EntityCreator.h>
 #include <Atrc/Editor/SH2DScriptExporter.h>
+#include <Atrc/Editor/SH2DLightScriptExporter.h>
 #include <Lib/imgui/imgui/ImGuizmo.h>
 
 void EditorCore::UpdateRenderPvRect()
@@ -64,7 +65,7 @@ void EditorCore::ShowMenuMenuBar()
             try
             {
                 auto scriptDir = absolute(data_->scriptFilename.GetFilename()).parent_path();
-                auto workspaceDir = data_->workspaceDir.RelativeTo(scriptDir);
+                auto workspaceDir = absolute(data_->workspaceDir.GetFilename());
                 SceneExportingContext ctx(
                     &data_->defaultRenderingCamera,
                     data_->rscMgr.GetPool<CameraInstance>().GetSelectedInstance().get(),
@@ -113,8 +114,10 @@ void EditorCore::ShowMenuMenuBar()
             sState_->openLoadingWindow = true;
         if(ImGui::MenuItem("save"))
             sState_->openSavingWindow = true;
-        if(ImGui::MenuItem("export SH2D"))
+        if(ImGui::MenuItem("export SH2D scene"))
             sState_->openExportingSH2DWindow = true;
+        if(ImGui::MenuItem("export SH2D light"))
+            sState_->openExportingLightWindow = true;
         ImGui::EndMenu();
     }
     if(ImGui::MenuItem("global"))
@@ -231,7 +234,7 @@ void EditorCore::ShowGlobalSettingWindow(const AGZ::Input::Keyboard &kb)
         return;
     AGZ::ScopeGuard popupExitGuard([] { ImGui::EndPopup(); });
 
-    ImGui::Text("script directory"); ImGui::SameLine();
+    ImGui::Text("script filename"); ImGui::SameLine();
     data_->scriptFilename.Display();
 
     ImGui::Text("workspace"); ImGui::SameLine();
@@ -263,7 +266,7 @@ void EditorCore::ShowGlobalSettingWindow(const AGZ::Input::Keyboard &kb)
         ImGui::CloseCurrentPopup();
 }
 
-void EditorCore::ShowExportingSH2DWindow()
+void EditorCore::ShowExportingSH2DSceneWindow()
 {
     static FileSelector filename(ImGuiFileBrowserFlags_NoModal | ImGuiFileBrowserFlags_EnterNewFilename);
 
@@ -271,9 +274,9 @@ void EditorCore::ShowExportingSH2DWindow()
     AGZ::ScopeGuard popIDGuard([] { ImGui::PopID(); });
 
     if(sState_->openExportingSH2DWindow)
-        ImGui::OpenPopup("export to SH2D script");
+        ImGui::OpenPopup("export to SH2D scene script");
 
-    if(!ImGui::BeginPopupModal("export to SH2D script", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+    if(!ImGui::BeginPopupModal("export to SH2D scene script", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
         return;
     AGZ::ScopeGuard exitPopupGuard([] { ImGui::EndPopup(); });
 
@@ -291,8 +294,8 @@ void EditorCore::ShowExportingSH2DWindow()
     {
         try
         {
-            auto scriptDir = absolute(data_->scriptFilename.GetFilename()).parent_path();
-            auto workspaceDir = data_->workspaceDir.RelativeTo(scriptDir);
+            auto scriptDir = absolute(filename.GetFilename()).parent_path();
+            auto workspaceDir = absolute(data_->workspaceDir.GetFilename());
             SceneExportingContext ctx(
                 &data_->defaultRenderingCamera,
                 data_->rscMgr.GetPool<CameraInstance>().GetSelectedInstance().get(),
@@ -324,19 +327,71 @@ void EditorCore::ShowExportingSH2DWindow()
         ImGui::CloseCurrentPopup();
 }
 
+void EditorCore::ShowExportingSH2DLightWindow()
+{
+    static FileSelector filename(ImGuiFileBrowserFlags_NoModal | ImGuiFileBrowserFlags_EnterNewFilename);
+
+    ImGui::PushID(&filename);
+    AGZ::ScopeGuard popIDGuard([] { ImGui::PopID(); });
+
+    if(sState_->openExportingLightWindow)
+        ImGui::OpenPopup("export to SH2D light script");
+
+    if(!ImGui::BeginPopupModal("export to SH2D light script", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+        return;
+    AGZ::ScopeGuard exitPopupGuard([] { ImGui::EndPopup(); });
+
+    static int SHOrder = 4;
+    static int N = 100000;
+
+    ImGui::InputInt("SH order", &SHOrder);
+    ImGui::InputInt("N", &N);
+
+    filename.Display();
+
+    if(ImGui::Button("ok") && filename.HasFilename())
+    {
+        try
+        {
+            auto scriptDir = absolute(filename.GetFilename()).parent_path();
+            auto workspaceDir = absolute(data_->workspaceDir.GetFilename());
+            SceneExportingContext ctx(
+                &data_->defaultRenderingCamera,
+                data_->rscMgr.GetPool<CameraInstance>().GetSelectedInstance().get(),
+                data_->filmFilterSlot.GetInstance().get(),
+                data_->samplerSlot.GetInstance().get(),
+                workspaceDir,
+                scriptDir,
+                data_->filmSize);
+            SH2DLightScriptExporter exporter;
+
+            AGZ::FileSys::WholeFile::WriteText(filename.GetFilename().string(),
+                exporter.Export(data_->rscMgr, ctx, SHOrder, N));
+            filename.Clear();
+        }
+        catch(const std::exception &err)
+        {
+            Global::ShowErrorMessage(err.what());
+        }
+        catch(...)
+        {
+            Global::ShowErrorMessage("an unknown error occurred");
+        }
+        ImGui::CloseCurrentPopup();
+    }
+
+    ImGui::SameLine();
+
+    if(ImGui::Button("cancel"))
+        ImGui::CloseCurrentPopup();
+}
+
 void EditorCore::ShowSavingWindow()
 {
     static ImGui::FileBrowser filename(ImGuiFileBrowserFlags_NoModal | ImGuiFileBrowserFlags_EnterNewFilename);
 
     ImGui::PushID(&filename);
     AGZ::ScopeGuard popIDGuard([] { ImGui::PopID(); });
-
-    /*if(sState_->openSavingWindow)
-        ImGui::OpenPopup("saving");*/
-
-    /*if(!ImGui::BeginPopupModal("saving", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
-        return;
-    AGZ::ScopeGuard exitPopupGuard([] { ImGui::EndPopup(); });*/
 
     if(sState_->openSavingWindow)
         filename.Open();
@@ -347,8 +402,8 @@ void EditorCore::ShowSavingWindow()
     {
         try
         {
-            auto scriptDir = absolute(data_->scriptFilename.GetFilename()).parent_path();
-            auto workspaceDir = data_->workspaceDir.RelativeTo(scriptDir);
+            auto scriptDir = absolute(filename.GetSelected()).parent_path();
+            auto workspaceDir = absolute(data_->workspaceDir.GetFilename());
             SceneExportingContext ctx(
                 &data_->defaultRenderingCamera,
                 data_->rscMgr.GetPool<CameraInstance>().GetSelectedInstance().get(),

@@ -10,6 +10,17 @@
 #include <Atrc/SH2D/Scene2SH.h>
 #include <Atrc/SH2D/Light2SH.h>
 
+Atrc::Image Gamma(const Atrc::Image &img, Atrc::Real gamma)
+{
+    return img.Map([=](const Atrc::Spectrum &s)
+    {
+        return s.Map([=](Atrc::Real c)
+        {
+            return AGZ::Math::Pow(c, gamma);
+        });
+    });
+}
+
 void ProjectScene(const AGZ::Config &config, const std::string &configPath, const std::string &outputDir)
 {
     using namespace Atrc;
@@ -40,7 +51,7 @@ void ProjectScene(const AGZ::Config &config, const std::string &configPath, cons
         return;
     }
 
-    int SHC = SHOrder * SHOrder;
+    int SHC = (SHOrder + 1) * (SHOrder + 1);
     std::vector<Film> coefs;
     coefs.reserve(SHC);
     for(int i = 0; i < SHC; ++i)
@@ -60,17 +71,36 @@ void ProjectScene(const AGZ::Config &config, const std::string &configPath, cons
 
     Scene2SH(workerCount, taskGridSize, SHOrder, scene, sampler, &result);
 
-    auto saveToHDR = [&](const std::string &filename, const Film &film)
+    auto saveToFile = [&](const std::string &filename, const Film &film)
     {
         auto img = film.GetImage().Map([](const Spectrum &pixel) { return pixel.ToFloats(); });
-        AGZ::TextureFile::WriteRGBToHDR((std::filesystem::path(outputDir) / filename).string(), img);
+        std::ofstream fout(filename, std::ofstream::trunc | std::ofstream::binary);
+        if(!fout)
+            throw AGZ::Exception("Failed to open file: " + filename);
+        AGZ::BinaryOStreamSerializer s(fout);
+        if(!s.Serialize(img))
+            throw AGZ::Exception("Failed to serialize into: " + filename);
     };
 
+    auto outDir = std::filesystem::path(outputDir);
+
     for(int i = 0; i < SHC; ++i)
-        saveToHDR("coef" + std::to_string(i) + ".hdr", coefs[i]);
-    saveToHDR("binary.hdr", binary);
-    saveToHDR("albedo.hdr", albedo);
-    saveToHDR("normal.hdr", normal);
+        saveToFile((outDir / ("coef" + std::to_string(i) + ".img")).string(), coefs[i]);
+
+    saveToFile((outDir / "binary.img").string(), binary);
+    AGZ::TextureFile::WriteRGBToHDR(
+        (std::filesystem::path(outputDir) / "binary.hdr").string(),
+        Gamma(binary.GetImage().Map([](const Spectrum &s) { return s.ToFloats(); }), Real(2.2)));
+
+    saveToFile((outDir / "albedo.img").string(), albedo);
+    AGZ::TextureFile::WriteRGBToHDR(
+        (std::filesystem::path(outputDir) / "albedo.hdr").string(),
+        Gamma(albedo.GetImage().Map([](const Spectrum &s) { return s.ToFloats(); }), Real(2.2)));
+
+    saveToFile((outDir / "normal.img").string(), normal);
+    AGZ::TextureFile::WriteRGBToHDR(
+        (std::filesystem::path(outputDir) / "normal.hdr").string(),
+        Gamma(normal.GetImage().Map([](const Spectrum &s) { return s.ToFloats(); }), Real(2.2)));
 }
 
 void ProjectLight(const AGZ::Config &config, const std::string &configPath, const std::string &outputFilename)
@@ -85,7 +115,7 @@ void ProjectLight(const AGZ::Config &config, const std::string &configPath, cons
     int N = root["N"].Parse<int>();
 
     int SHOrder = root["SHOrder"].Parse<int>();
-    int SHC = SHOrder * SHOrder;
+    int SHC = (SHOrder + 1) * (SHOrder + 1);
 
     if(SHOrder < 0 || SHOrder > 4)
     {
@@ -123,7 +153,7 @@ void ReconstructImage(
 {
     using namespace Atrc;
 
-    int SHC = SHOrder * SHOrder;
+    int SHC = (SHOrder + 1) * (SHOrder + 1);
     if(SHOrder < 0 || SHOrder > 4)
     {
         std::cout << "Invalid SHOrder value: " << SHOrder << std::endl;
@@ -158,21 +188,35 @@ void ReconstructImage(
 
     fin.close();
 
-    std::vector<Image> sceneCoefs(SHOrder);
+    auto loadImg = [&](const std::string &filename)->Image
+    {
+        std::ifstream fi(filename, std::ifstream::binary);
+        if(!fi)
+            throw AGZ::Exception("Failed to open file: " + filename);
+        AGZ::BinaryIStreamDeserializer ds(fi);
+        Image ret;
+        if(!ds.Deserialize(ret))
+            throw AGZ::Exception("Failed to deserialize image from: " + filename);
+        return ret;
+    };
+
+    std::vector<Image> sceneCoefs(SHC);
     for(int i = 0; i < SHC; ++i)
     {
-        sceneCoefs[i] = AGZ::TextureFile::LoadRGBFromHDR(sceneCoefFilenames[i]);
+        /*sceneCoefs[i] = AGZ::TextureFile::LoadRGBFromHDR(sceneCoefFilenames[i]);
         if(i > 0 && sceneCoefs[i].GetSize() != sceneCoefs[i - 1].GetSize())
         {
             std::cout << "Invalid scene coef image size" << std::endl;
             return;
-        }
+        }*/
+        sceneCoefs[i] = loadImg(sceneCoefFilenames[i]);
     }
 
     Image albedo;
     if(!albedoFilename.empty())
     {
-        albedo = AGZ::TextureFile::LoadRGBFromHDR(albedoFilename);
+        //albedo = AGZ::TextureFile::LoadRGBFromHDR(albedoFilename);
+        albedo = loadImg(albedoFilename);
         if(albedo.GetSize() != sceneCoefs[0].GetSize())
         {
             std::cout << "Invalid albedo image size" << std::endl;
@@ -194,7 +238,13 @@ void ReconstructImage(
         }
     }
 
-    AGZ::TextureFile::WriteRGBToHDR(outputFilename, ret);
+    AGZ::TextureFile::WriteRGBToPNG(outputFilename, ret.Map([](const Spectrum &spec)
+    {
+        return spec.Map([](Real c)
+        {
+            return static_cast<uint8_t>(AGZ::Math::Clamp<int>(static_cast<int>(c * 255), 0, 255));
+        });
+    }));
 }
 
 int main(int argc, char *argv[])
@@ -204,7 +254,7 @@ int main(int argc, char *argv[])
         static const char USAGE_MSG[] = R"___(
     SH2D ps/project_scene scene_desc_filename output_dir_name
     SH2D pl/project_light light_desc_filename output_filename
-    SH2D rc/reconstruct   SH_order(0 to 4) light_coef_filename scene_coef_filenames... output_filename [albedo_filename]
+    SH2D rc/reconstruct   SH_order(0 to 4) light_coef_filename scene_coef_dir output_filename
 )___";
 
         if(argc < 2)
@@ -268,7 +318,7 @@ int main(int argc, char *argv[])
         }
         else if(argv[1] == std::string("rc") || argv[1] == std::string("reconstruct"))
         {
-            if(argc < 4)
+            if(argc != 6)
             {
                 std::cout << USAGE_MSG << std::endl;
                 return 0;
@@ -281,24 +331,16 @@ int main(int argc, char *argv[])
                 return 0;
             }
 
-            int SHC = SHOrder * SHOrder;
-            if(argc < 4 + SHC + 1 || argc > 4 + SHC + 2)
-            {
-                std::cout << USAGE_MSG << std::endl;
-                return 0;
-            }
-
+            int SHC = (SHOrder + 1) * (SHOrder + 1);
             std::string lightFilename = argv[3];
 
             std::vector<std::string> sceneCoefFilenames(SHC);
             for(int i = 0; i < SHC; ++i)
-                sceneCoefFilenames[i] = argv[4 + i];
+                sceneCoefFilenames[i] = (std::filesystem::path(argv[4]) / ("coef" + std::to_string(i) + ".img")).string();
 
-            std::string outputFilename = argv[4 + SHC];
+            std::string outputFilename = argv[5];
 
-            std::string albedoFilename;
-            if(argc == 4 + SHC + 2)
-                albedoFilename = argv[4 + SHC + 1];
+            std::string albedoFilename = (std::filesystem::path(argv[4]) / "albedo.img").string();
 
             ReconstructImage(SHOrder, lightFilename, sceneCoefFilenames.data(), albedoFilename, outputFilename);
         }

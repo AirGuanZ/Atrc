@@ -3,7 +3,6 @@
 #include <filesystem>
 
 #include <AGZUtils/Utils/Config.h>
-
 #include <Atrc/Lib/Core/Common.h>
 
 namespace Atrc::Mgr
@@ -54,11 +53,6 @@ public:
             ::Atrc::Mgr::MgrErr("An unknown error occurred"), (MSG)); \
     }
 
-inline std::string GetCacheFilename(std::string_view filename)
-{
-    std::filesystem::path parent("./.agz.cache/");
-    parent.append(filename);
-    return parent.relative_path().string();
-}
+std::string GetCacheFilename(std::string_view filename);
 
 } // namespace Atrc::Mgr

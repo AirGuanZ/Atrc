@@ -4,7 +4,7 @@ using namespace Atrc;
 
 void RotateLightCoefs(const Mat3 &rotateMatrix, int SHOrder, Spectrum *coefs)
 {
-    int SHC = SHOrder * SHOrder;
+    int SHC = (SHOrder + 1) * (SHOrder + 1);
     std::vector<std::vector<Real>> channels(
         SPECTRUM_CHANNEL_COUNT, std::vector<Real>(SHC));
 

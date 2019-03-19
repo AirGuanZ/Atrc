@@ -1,6 +1,5 @@
 ﻿#include <Atrc/Editor/Console.h>
 #include <Atrc/Editor/GL.h>
-#include <Atrc/Editor/Global.h>
 
 Console::Console(int inputBufSize, int maxTextCount)
 {

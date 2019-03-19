@@ -127,7 +127,7 @@ void Scene2SH(
     AGZ_ASSERT(sampler && result);
 
     using Grid = GridDivider<int32_t>::Grid;
-    int SHC = SHOrder * SHOrder;
+    int SHC = (SHOrder + 1) * (SHOrder + 1);
 
     Vec2i resolution = result->albedo->GetResolution();
     std::queue<Grid> tasks = GridDivider<int32_t>::Divide(
