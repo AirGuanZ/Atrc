@@ -96,7 +96,7 @@ public:
 
     void ShowGlobalHelpWindow(const AGZ::Input::Keyboard &kb);
 
-    void ShowGlobalSettingWindow(const AGZ::Input::Keyboard &kb);
+    void ShowGlobalSettings();
 
     void ShowExportingSH2DSceneWindow();
 
@@ -105,6 +105,8 @@ public:
     void ShowSavingWindow();
 
     void ShowLoadingWindow();
+
+    void ShowRenderingSettings();
 
     void ShowResourceManager();
 

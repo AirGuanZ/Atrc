@@ -114,14 +114,16 @@ void EditorCore::ShowMenuMenuBar()
             sState_->openLoadingWindow = true;
         if(ImGui::MenuItem("save"))
             sState_->openSavingWindow = true;
-        if(ImGui::MenuItem("export SH2D scene"))
-            sState_->openExportingSH2DWindow = true;
-        if(ImGui::MenuItem("export SH2D light"))
-            sState_->openExportingLightWindow = true;
+        if(ImGui::BeginMenu("export"))
+        {
+            if(ImGui::MenuItem("SH2D scene"))
+                sState_->openExportingSH2DWindow = true;
+            if(ImGui::MenuItem("SH2D light"))
+                sState_->openExportingLightWindow = true;
+            ImGui::EndMenu();
+        }
         ImGui::EndMenu();
     }
-    if(ImGui::MenuItem("global"))
-        sState_->openGlobalSettingWindow = true;
     if(ImGui::MenuItem("help"))
         sState_->openGlobalHelpWindow = true;
 
@@ -222,48 +224,13 @@ Press ESC to close this help window.
         ImGui::CloseCurrentPopup();
 }
 
-void EditorCore::ShowGlobalSettingWindow(const AGZ::Input::Keyboard &kb)
+void EditorCore::ShowGlobalSettings()
 {
-    if(sState_->openGlobalSettingWindow)
-    {
-        ImGui::OpenPopup("global setting");
-        ImGui::SetNextWindowSize(ImVec2(600, 800), ImGuiCond_FirstUseEver);
-    }
-
-    if(!ImGui::BeginPopupModal("global setting", nullptr))
-        return;
-    AGZ::ScopeGuard popupExitGuard([] { ImGui::EndPopup(); });
-
-    ImGui::Text("script filename"); ImGui::SameLine();
+    ImGui::Text("script file"); ImGui::SameLine();
     data_->scriptFilename.Display();
 
-    ImGui::Text("workspace"); ImGui::SameLine();
+    ImGui::Text("workspace  "); ImGui::SameLine();
     data_->workspaceDir.Display();
-
-    ImGui::InputText("output filename", data_->outputFilenameBuf.data(), data_->outputFilenameBuf.size());
-
-    ImGui::InputInt2("film size", &data_->filmSize[0]);
-
-    if(ImGui::TreeNodeEx("film filter", ImGuiTreeNodeFlags_DefaultOpen))
-    {
-        data_->filmFilterSlot.Display(data_->rscMgr);
-        ImGui::TreePop();
-    }
-
-    if(ImGui::TreeNodeEx("sampler", ImGuiTreeNodeFlags_DefaultOpen))
-    {
-        data_->samplerSlot.Display(data_->rscMgr);
-        ImGui::TreePop();
-    }
-
-    if(ImGui::TreeNodeEx("renderer", ImGuiTreeNodeFlags_DefaultOpen))
-    {
-        data_->rendererSlot.Display(data_->rscMgr);
-        ImGui::TreePop();
-    }
-
-    if(kb.IsKeyPressed(AGZ::Input::KEY_ESCAPE) && ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows))
-        ImGui::CloseCurrentPopup();
 }
 
 void EditorCore::ShowExportingSH2DSceneWindow()
@@ -465,6 +432,46 @@ void EditorCore::ShowLoadingWindow()
         {
             Global::ShowErrorMessage("an unknown error occurred");
         }
+    }
+}
+
+void EditorCore::ShowRenderingSettings()
+{
+    if(!ImGui::BeginTabBar("rendering setting"))
+        return;
+    AGZ::ScopeGuard endTabBar([] { ImGui::EndTabBar(); });
+
+    if(ImGui::BeginTabItem("film"))
+    {
+        AGZ::ScopeGuard endTabItem([] { ImGui::EndTabItem(); });
+        ImGui::BeginChild("");
+        ImGui::InputText("output filename", data_->outputFilenameBuf.data(), data_->outputFilenameBuf.size());
+        ImGui::InputInt2("film size", &data_->filmSize[0]);
+        ImGui::EndChild();
+    }
+
+    if(ImGui::BeginTabItem("filter"))
+    {
+        AGZ::ScopeGuard endTabItem([] { ImGui::EndTabItem(); });
+        ImGui::BeginChild("");
+        data_->filmFilterSlot.Display(data_->rscMgr);
+        ImGui::EndChild();
+    }
+
+    if(ImGui::BeginTabItem("sampler"))
+    {
+        AGZ::ScopeGuard endTabItem([] { ImGui::EndTabItem(); });
+        ImGui::BeginChild("");
+        data_->samplerSlot.Display(data_->rscMgr);
+        ImGui::EndChild();
+    }
+
+    if(ImGui::BeginTabItem("renderer"))
+    {
+        AGZ::ScopeGuard endTabItem([] { ImGui::EndTabItem(); });
+        ImGui::BeginChild("");
+        data_->rendererSlot.Display(data_->rscMgr);
+        ImGui::EndChild();
     }
 }
 

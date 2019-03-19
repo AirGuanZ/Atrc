@@ -132,7 +132,6 @@ int Run(GLFWwindow *window)
 
         editorCore.ShowMenuMenuBar();
         editorCore.ShowGlobalHelpWindow(keyboard);
-        editorCore.ShowGlobalSettingWindow(keyboard);
         editorCore.ShowExportingSH2DSceneWindow();
         editorCore.ShowExportingSH2DLightWindow();
         editorCore.ShowLoadingWindow();
@@ -152,17 +151,23 @@ int Run(GLFWwindow *window)
             {
                 if(ImGui::BeginTabItem("entity"))
                 {
+                    ImGui::BeginChild("");
                     editorCore.ShowEntityEditor();
+                    ImGui::EndChild();
                     ImGui::EndTabItem();
                 }
                 if(ImGui::BeginTabItem("light"))
                 {
+                    ImGui::BeginChild("");
                     editorCore.ShowLightEditor();
+                    ImGui::EndChild();
                     ImGui::EndTabItem();
                 }
                 if(ImGui::BeginTabItem("camera"))
                 {
+                    ImGui::BeginChild("");
                     editorCore.ShowCamera();
+                    ImGui::EndChild();
                     ImGui::EndTabItem();
                 }
                 ImGui::EndTabBar();
@@ -170,10 +175,34 @@ int Run(GLFWwindow *window)
             editorCore.EndRightWindow();
         }
 
-        ImGui::SetNextWindowSize(ImVec2(200, 200), ImGuiCond_FirstUseEver);
+        ImGui::SetNextWindowSize(ImVec2(200, 350), ImGuiCond_FirstUseEver);
         if(editorCore.BeginBottomWindow())
         {
-            console.Display();
+            if(ImGui::BeginTabBar("bottom window tab"))
+            {
+                AGZ::ScopeGuard endTabBar([] { ImGui::EndTabBar(); });
+                if(ImGui::BeginTabItem("console"))
+                {
+                    AGZ::ScopeGuard endTabItem([] { ImGui::EndTabItem(); });
+                    ImGui::BeginChild("");
+                    console.Display();
+                    ImGui::EndChild();
+                }
+                if(ImGui::BeginTabItem("global"))
+                {
+                    AGZ::ScopeGuard endTabItem([] { ImGui::EndTabItem(); });
+                    ImGui::BeginChild("");
+                    editorCore.ShowGlobalSettings();
+                    ImGui::EndChild();
+                }
+                if(ImGui::BeginTabItem("rendering"))
+                {
+                    AGZ::ScopeGuard endTabItem([] { ImGui::EndTabItem(); });
+                    ImGui::BeginChild("");
+                    editorCore.ShowRenderingSettings();
+                    ImGui::EndChild();
+                }
+            }
             editorCore.EndBottomWindow();
         }
 

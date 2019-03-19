@@ -85,19 +85,19 @@ void ProjectScene(const AGZ::Config &config, const std::string &configPath, cons
     auto outDir = std::filesystem::path(outputDir);
 
     for(int i = 0; i < SHC; ++i)
-        saveToFile((outDir / ("coef" + std::to_string(i) + ".img")).string(), coefs[i]);
+        saveToFile((outDir / ("coef" + std::to_string(i) + ".sh2d")).string(), coefs[i]);
 
-    saveToFile((outDir / "binary.img").string(), binary);
+    saveToFile((outDir / "binary.sh2d").string(), binary);
     AGZ::TextureFile::WriteRGBToHDR(
         (std::filesystem::path(outputDir) / "binary.hdr").string(),
         Gamma(binary.GetImage().Map([](const Spectrum &s) { return s.ToFloats(); }), Real(2.2)));
 
-    saveToFile((outDir / "albedo.img").string(), albedo);
+    saveToFile((outDir / "albedo.sh2d").string(), albedo);
     AGZ::TextureFile::WriteRGBToHDR(
         (std::filesystem::path(outputDir) / "albedo.hdr").string(),
         Gamma(albedo.GetImage().Map([](const Spectrum &s) { return s.ToFloats(); }), Real(2.2)));
 
-    saveToFile((outDir / "normal.img").string(), normal);
+    saveToFile((outDir / "normal.sh2d").string(), normal);
     AGZ::TextureFile::WriteRGBToHDR(
         (std::filesystem::path(outputDir) / "normal.hdr").string(),
         Gamma(normal.GetImage().Map([](const Spectrum &s) { return s.ToFloats(); }), Real(2.2)));
@@ -203,19 +203,12 @@ void ReconstructImage(
     std::vector<Image> sceneCoefs(SHC);
     for(int i = 0; i < SHC; ++i)
     {
-        /*sceneCoefs[i] = AGZ::TextureFile::LoadRGBFromHDR(sceneCoefFilenames[i]);
-        if(i > 0 && sceneCoefs[i].GetSize() != sceneCoefs[i - 1].GetSize())
-        {
-            std::cout << "Invalid scene coef image size" << std::endl;
-            return;
-        }*/
         sceneCoefs[i] = loadImg(sceneCoefFilenames[i]);
     }
 
     Image albedo;
     if(!albedoFilename.empty())
     {
-        //albedo = AGZ::TextureFile::LoadRGBFromHDR(albedoFilename);
         albedo = loadImg(albedoFilename);
         if(albedo.GetSize() != sceneCoefs[0].GetSize())
         {
@@ -336,11 +329,11 @@ int main(int argc, char *argv[])
 
             std::vector<std::string> sceneCoefFilenames(SHC);
             for(int i = 0; i < SHC; ++i)
-                sceneCoefFilenames[i] = (std::filesystem::path(argv[4]) / ("coef" + std::to_string(i) + ".img")).string();
+                sceneCoefFilenames[i] = (std::filesystem::path(argv[4]) / ("coef" + std::to_string(i) + ".sh2d")).string();
 
             std::string outputFilename = argv[5];
 
-            std::string albedoFilename = (std::filesystem::path(argv[4]) / "albedo.img").string();
+            std::string albedoFilename = (std::filesystem::path(argv[4]) / "albedo.sh2d").string();
 
             ReconstructImage(SHOrder, lightFilename, sceneCoefFilenames.data(), albedoFilename, outputFilename);
         }
