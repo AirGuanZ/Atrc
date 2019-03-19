@@ -77,7 +77,7 @@ void EditorCore::ShowMenuMenuBar()
                 LauncherScriptExporter exporter(data_->rscMgr, ctx);
 
                 lState_->sceneRendererTex = GL::Texture2D(true);
-                lState_->sceneRendererTex.InitializeFormat(1, data_->filmSize.x, data_->filmSize.y, GL_RGB8);
+                lState_->sceneRendererTex.InitializeFormat(1, data_->filmSize.x, data_->filmSize.y, GL_RGBA8);
 
                 if(lState_->sceneRenderer.IsRendering())
                 {
@@ -235,7 +235,7 @@ void EditorCore::ShowGlobalSettings()
 
 void EditorCore::ShowExportingSH2DSceneWindow()
 {
-    static FileSelector filename(ImGuiFileBrowserFlags_NoModal | ImGuiFileBrowserFlags_EnterNewFilename);
+    static FileSelector filename(ImGuiFileBrowserFlags_EnterNewFilename);
 
     ImGui::PushID(&filename);
     AGZ::ScopeGuard popIDGuard([] { ImGui::PopID(); });
@@ -296,7 +296,7 @@ void EditorCore::ShowExportingSH2DSceneWindow()
 
 void EditorCore::ShowExportingSH2DLightWindow()
 {
-    static FileSelector filename(ImGuiFileBrowserFlags_NoModal | ImGuiFileBrowserFlags_EnterNewFilename);
+    static FileSelector filename(ImGuiFileBrowserFlags_EnterNewFilename);
 
     ImGui::PushID(&filename);
     AGZ::ScopeGuard popIDGuard([] { ImGui::PopID(); });
@@ -355,7 +355,7 @@ void EditorCore::ShowExportingSH2DLightWindow()
 
 void EditorCore::ShowSavingWindow()
 {
-    static ImGui::FileBrowser filename(ImGuiFileBrowserFlags_NoModal | ImGuiFileBrowserFlags_EnterNewFilename);
+    static ImGui::FileBrowser filename(ImGuiFileBrowserFlags_EnterNewFilename);
 
     ImGui::PushID(&filename);
     AGZ::ScopeGuard popIDGuard([] { ImGui::PopID(); });
@@ -657,7 +657,7 @@ void EditorCore::ShowPreviewGUI(GL::Immediate2D &imm, const AGZ::Input::Keyboard
             Global::ShowNormalMessage("rendering interrupted");
         }
 
-        lState_->sceneRenderer.ProcessImage([&](const AGZ::Texture2D<Vec3f> &img)
+        lState_->sceneRenderer.ProcessImage([&](const AGZ::Texture2D<Vec4f> &img)
         {
             lState_->sceneRendererTex.ReinitializeData(img.GetWidth(), img.GetHeight(), img.RawData());
         });

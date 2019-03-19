@@ -39,7 +39,7 @@ private:
     bool newData_;
     std::atomic<Atrc::Real> percent_;
 
-    AGZ::Texture2D<Vec3f> img_;
+    AGZ::Texture2D<Vec4f> img_;
     std::mutex mut_;
 
     AGZ::Clock clock_;

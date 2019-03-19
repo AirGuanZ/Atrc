@@ -20,8 +20,8 @@ struct EditorData
     SamplerSlot    samplerSlot;
     RendererSlot   rendererSlot;
 
-    FileSelector scriptFilename = FileSelector(ImGuiFileBrowserFlags_NoModal | ImGuiFileBrowserFlags_EnterNewFilename);
-    FileSelector workspaceDir = FileSelector(ImGuiFileBrowserFlags_NoModal | ImGuiFileBrowserFlags_SelectDirectory);
+    FileSelector scriptFilename = FileSelector(ImGuiFileBrowserFlags_EnterNewFilename);
+    FileSelector workspaceDir = FileSelector(ImGuiFileBrowserFlags_SelectDirectory);
 
     std::array<char, 512> outputFilenameBuf = { '\0' };
 };
@@ -57,7 +57,7 @@ class EditorCore
         float rightWindowSizeX = 0;
         float bottomWindowSizeY = 0;
 
-        ImGui::FileBrowser loadingFilename = ImGui::FileBrowser(ImGuiFileBrowserFlags_NoModal);
+        ImGui::FileBrowser loadingFilename;
 
         CameraInstance::ProjData selectedCameraProjData;
         float renderPvLx = 0;

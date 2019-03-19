@@ -24,10 +24,16 @@ void FilmRTReporter::End()
 void FilmRTReporter::Report(const Atrc::Film &film, std::optional<Atrc::Real> percent)
 {
     std::lock_guard<std::mutex> lk(mut_);
-    img_ = film.GetImage().Map([](const Atrc::Spectrum &v)
+
+    auto &values = film.GetValues();
+    auto &weights = film.GetWeights();
+    img_ = AGZ::Texture2D<Vec4f>(weights.GetWidth(), weights.GetHeight());
+    for(uint32_t y = 0; y < img_.GetHeight(); ++y)
     {
-        return v.Map(&AGZ::TypeOpr::StaticCaster<float, Atrc::Real>);
-    });
+        for(uint32_t x = 0; x < img_.GetWidth(); ++x)
+            img_(x, y) = weights(x, y) > 0 ? Vec4f(values(x, y) / weights(x, y), 1) : Vec4f();
+    }
+
     newData_ = true;
     if(percent)
         percent_ = *percent;

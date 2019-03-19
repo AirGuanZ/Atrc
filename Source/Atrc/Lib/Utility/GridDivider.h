@@ -15,11 +15,10 @@ public:
 
     using Grid = AGZ::Math::Rect<T>;
 
-    static std::queue<Grid> Divide(const Grid &wholeGrid, T xGridSize, T yGridSize)
+    template<typename OutIterator>
+    static void Divide(const Grid &wholeGrid, T xGridSize, T yGridSize, OutIterator outIt)
     {
         AGZ_ASSERT(xGridSize > 0 && yGridSize > 0);
-
-        std::queue<Grid> ret;
 
         for(T yBegin = wholeGrid.low.y; yBegin < wholeGrid.high.y; yBegin += yGridSize)
         {
@@ -27,11 +26,9 @@ public:
             for(T xBegin = wholeGrid.low.x; xBegin < wholeGrid.high.x; xBegin += xGridSize)
             {
                 T xEnd = (std::min)(xBegin + xGridSize, wholeGrid.high.x);
-                ret.push({ { xBegin, yBegin }, { xEnd, yEnd} });
+                *outIt++ = Grid{ { xBegin, yBegin }, { xEnd, yEnd} };
             }
         }
-
-        return ret;
     }
 };
 

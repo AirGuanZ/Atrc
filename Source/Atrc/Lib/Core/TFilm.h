@@ -150,6 +150,9 @@ public:
         }
         return ret;
     }
+
+    auto &GetValues() const noexcept { return accValues_; }
+    auto &GetWeights() const noexcept { return weights_; }
 };
 
 } // namespace Atrc

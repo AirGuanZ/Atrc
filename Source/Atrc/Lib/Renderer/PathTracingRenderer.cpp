@@ -51,8 +51,18 @@ void PathTracingRenderer::Render(const Scene *scene, Sampler *sampler, Film *fil
     AGZ_ASSERT(sampler && film && reporter);
 
     auto resolution = film->GetResolution();
-    std::queue<Grid> tasks = GridDivider<int32_t>::Divide(
-        { { 0, 0 }, { resolution.x, resolution.y } }, taskGridSize_, taskGridSize_);
+
+    std::vector<Grid> tasks0;
+    GridDivider<int32_t>::Divide(
+        Grid{ { 0, 0 }, { resolution.x, resolution.y } },
+        taskGridSize_, taskGridSize_, std::back_inserter(tasks0));
+
+    /*std::default_random_engine rng(42);
+    std::shuffle(tasks0.begin(), tasks0.end(), rng);*/
+    
+    std::queue<Grid> tasks;
+    for(auto &g : tasks0)
+        tasks.push(g);
 
     auto func = [=](const Grid &task, AGZ::NoSharedParam_t)
     {

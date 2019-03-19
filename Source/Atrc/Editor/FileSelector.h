@@ -11,7 +11,7 @@ class FileSelector
 
 public:
 
-    explicit FileSelector(ImGuiFileBrowserFlags flags = ImGuiFileBrowserFlags_NoModal)
+    explicit FileSelector(ImGuiFileBrowserFlags flags = 0)
         : fileBrowser_(flags)
     {
 
@@ -41,9 +41,9 @@ public:
         return ret;
     }
 
-    void SetFilename(std::filesystem::path path)
+    void SetFilename(const std::filesystem::path &path)
     {
-        filename_ = relative(std::move(path));
+        filename_ = relative(path);
         u8str_ = filename_.u8string();
     }
 

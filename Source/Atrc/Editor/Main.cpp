@@ -13,11 +13,6 @@ using namespace std;
 constexpr int INIT_WIN_WIDTH = 1400;
 constexpr int INIT_WIN_HEIGHT = 900;
 
-void SetFullViewport()
-{
-    glViewport(0, 0, Global::FbW(), Global::FbH());
-}
-
 int Run(GLFWwindow *window)
 {
     using namespace AGZ::GraphicsAPI;
@@ -79,7 +74,7 @@ int Run(GLFWwindow *window)
         Global::_setFramebufferWidth(param.w);
         Global::_setFramebufferHeight(param.h);
         editorCore.OnFramebufferResized();
-        SetFullViewport();
+        glViewport(0, 0, Global::FbW(), Global::FbH());
         imm.Resize({ static_cast<float>(param.w), static_cast<float>(param.h) });
     }));
     keyboard.AttachHandler(arena.Create<KeyDownHandler>(
@@ -216,7 +211,6 @@ int Run(GLFWwindow *window)
 
         editorCore.RenderScene();
         editorCore.SaveRenderingResult();
-
         editorCore.ShowPreviewGUI(imm, keyboard);
 
         editorCore.EndFrame();
