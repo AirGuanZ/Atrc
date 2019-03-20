@@ -6,14 +6,15 @@
 
 class LauncherScriptExporter
 {
-    ResourceManager &rscMgr_;
-    SceneExportingContext &ctx_;
-
 public:
 
-    LauncherScriptExporter(ResourceManager &rscMgr, SceneExportingContext &ctx);
-
-    std::string Export(const RendererInstance *renderer, const std::string &outputFilename) const;
+    std::string Export(
+        ResourceManager &rscMgr, SceneExportingContext &ctx,
+        const RendererInstance *renderer,
+        const FilmFilterInstance *filmFilter,
+        const SamplerInstance    *sampler,
+        const Vec2i &outputFilmSize,
+        const std::string &outputFilename) const;
 };
 
 class LauncherScriptImporter

@@ -163,10 +163,10 @@ namespace
         void DisplayEx(ResourceManager &rscMgr, const Mat4f &proj, const Mat4f &view, bool renderController) override
         {
             DisplayRenderProperty();
+            DisplayController(proj, view, renderController);
             if(ImGui::TreeNode("geometry"))
             {
                 TransformedGeometricEntityBase::DisplayEx(rscMgr, proj, view, renderController);
-                DisplayController(proj, view, renderController);
                 ImGui::TreePop();
             }
             if(ImGui::TreeNode("radiance"))
@@ -206,10 +206,10 @@ namespace
         void DisplayEx(ResourceManager &rscMgr, const Mat4f &proj, const Mat4f &view, bool renderController) override
         {
             DisplayRenderProperty();
+            DisplayController(proj, view, renderController);
             if(ImGui::TreeNode("geometry"))
             {
                 TransformedGeometricEntityBase::DisplayEx(rscMgr, proj, view, renderController);
-                DisplayController(proj, view, renderController);
                 ImGui::TreePop();
             }
             if(ImGui::TreeNode("material"))

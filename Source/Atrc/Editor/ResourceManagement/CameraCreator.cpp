@@ -20,7 +20,7 @@ namespace
             ctx.AddLine("sensorWidth = ", std::to_string(sensorWidth_), ";");
             if(autoAspect_)
             {
-                float ratio = static_cast<float>(ctx.outputFilmSize.y) / ctx.outputFilmSize.x * Cot(FOVy_ * 0.5f) * 0.5f;
+                float ratio = 1 / ctx.filmAspectRatio * Cot(FOVy_ * 0.5f) * 0.5f;
                 ctx.AddLine("sensorDistance = ", sensorWidth_ * ratio, ";");
             }
             else

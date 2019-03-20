@@ -3,7 +3,7 @@
 #include <Atrc/Lib/Core/TFilm.h>
 
 FilmRTReporter::FilmRTReporter()
-    : newData_(false)
+    : newData_(false), percent_(0)
 {
 
 }

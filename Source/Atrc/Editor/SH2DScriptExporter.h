@@ -9,5 +9,8 @@ public:
 
     std::string Export(
         ResourceManager &rscMgr, SceneExportingContext &ctx,
-        int workerCount, int taskGridSize, int SHOrder) const;
+        int workerCount, int taskGridSize, int SHOrder,
+        const Vec2i &outputFilmSize,
+        const FilmFilterInstance *filmFilter,
+        const SamplerInstance *sampler) const;
 };

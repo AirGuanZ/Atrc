@@ -17,7 +17,10 @@ namespace
 
 std::string SH2DSceneScriptExporter::Export(
     ResourceManager &rscMgr, SceneExportingContext &ctx,
-    int workerCount, int taskGridSize, int SHOrder) const
+    int workerCount, int taskGridSize, int SHOrder,
+    const Vec2i &outputFilmSize,
+    const FilmFilterInstance *filmFilter,
+    const SamplerInstance *sampler) const
 {
     ctx.ClearString();
 
@@ -27,9 +30,9 @@ std::string SH2DSceneScriptExporter::Export(
 
     ctx.AddLine("film = {");
     ctx.IncIndent();
-    ctx.AddLine("size = (", ctx.outputFilmSize.x, ", ", ctx.outputFilmSize.y, ");");
-    if(ctx.filmFilter)
-        IResource::ExportSubResource("filter", rscMgr, ctx, *ctx.filmFilter);
+    ctx.AddLine("size = (", outputFilmSize.x, ", ", outputFilmSize.y, ");");
+    if(filmFilter)
+        IResource::ExportSubResource("filter", rscMgr, ctx, *filmFilter);
     else
         Global::ShowNormalMessage("film filter is unspecified");
     ctx.DecIndent();
@@ -49,9 +52,9 @@ std::string SH2DSceneScriptExporter::Export(
 
     ctx.AddLine();
 
-    if(ctx.sampler)
+    if(sampler)
     {
-        IResource::ExportSubResource("sampler", rscMgr, ctx, *ctx.sampler);
+        IResource::ExportSubResource("sampler", rscMgr, ctx, *sampler);
         ctx.AddLine();
     }
     else

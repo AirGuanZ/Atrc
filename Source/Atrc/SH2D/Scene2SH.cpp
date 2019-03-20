@@ -130,8 +130,16 @@ void Scene2SH(
     int SHC = (SHOrder + 1) * (SHOrder + 1);
 
     Vec2i resolution = result->albedo->GetResolution();
-    std::queue<Grid> tasks = GridDivider<int32_t>::Divide(
-        { { 0, 0 }, resolution }, taskGridSize, taskGridSize);
+
+    std::vector<Grid> tasks0;
+    std::queue<Grid> tasks;
+    
+    GridDivider<int32_t>::Divide(
+        { { 0, 0 }, resolution }, taskGridSize, taskGridSize, std::back_inserter(tasks0));
+    for(auto &grid : tasks0)
+        tasks.push(grid);
+    tasks0.clear();
+    tasks0.shrink_to_fit();
     
     size_t totalTaskCount = tasks.size();
     std::atomic<size_t> finishedTaskCount = 0;

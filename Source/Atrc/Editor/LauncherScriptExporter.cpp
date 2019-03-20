@@ -2,12 +2,6 @@
 #include <Atrc/Editor/LauncherScriptExporter.h>
 #include <Atrc/Mgr/Parser.h>
 
-LauncherScriptExporter::LauncherScriptExporter(ResourceManager &rscMgr, SceneExportingContext &ctx)
-    : rscMgr_(rscMgr), ctx_(ctx)
-{
-    
-}
-
 namespace
 {
     template<typename TResource>
@@ -22,95 +16,101 @@ namespace
     }
 }
 
-std::string LauncherScriptExporter::Export(const RendererInstance *renderer, const std::string &outputFilename) const
+std::string LauncherScriptExporter::Export(
+    ResourceManager &rscMgr, SceneExportingContext &ctx,
+    const RendererInstance *renderer,
+    const FilmFilterInstance *filmFilter,
+    const SamplerInstance    *sampler,
+    const Vec2i &outputFilmSize,
+    const std::string &outputFilename) const
 {
-    ctx_.ClearString();
+    ctx.ClearString();
 
-    ctx_.AddLine("workspace = \"@", relative(ctx_.workspaceDirectory, ctx_.scriptDirectory).string(), "\";");
+    ctx.AddLine("workspace = \"@", relative(ctx.workspaceDirectory, ctx.scriptDirectory).string(), "\";");
 
-    ctx_.AddLine();
+    ctx.AddLine();
 
-    ctx_.AddLine("film = {");
-    ctx_.IncIndent();
-    ctx_.AddLine("size = (", ctx_.outputFilmSize.x, ", ", ctx_.outputFilmSize.y, ");");
-    if(ctx_.filmFilter)
-        IResource::ExportSubResource("filter", rscMgr_, ctx_, *ctx_.filmFilter);
+    ctx.AddLine("film = {");
+    ctx.IncIndent();
+    ctx.AddLine("size = (", outputFilmSize.x, ", ", outputFilmSize.y, ");");
+    if(filmFilter)
+        IResource::ExportSubResource("filter", rscMgr, ctx, *filmFilter);
     else
         Global::ShowNormalMessage("film filter is unspecified");
-    ctx_.DecIndent();
-    ctx_.AddLine("};");
+    ctx.DecIndent();
+    ctx.AddLine("};");
 
-    ctx_.AddLine();
+    ctx.AddLine();
 
-    ctx_.AddLine("pool = {");
-    ctx_.IncIndent();
-    ExportResourcesInPool<CameraInstance>  (rscMgr_, ctx_);
-    ExportResourcesInPool<EntityInstance>  (rscMgr_, ctx_);
-    ExportResourcesInPool<GeometryInstance>(rscMgr_, ctx_);
-    ExportResourcesInPool<LightInstance>   (rscMgr_, ctx_);
-    ExportResourcesInPool<MaterialInstance>(rscMgr_, ctx_);
-    ExportResourcesInPool<TextureInstance> (rscMgr_, ctx_);
-    ctx_.DecIndent();
-    ctx_.AddLine("};");
+    ctx.AddLine("pool = {");
+    ctx.IncIndent();
+    ExportResourcesInPool<CameraInstance>  (rscMgr, ctx);
+    ExportResourcesInPool<EntityInstance>  (rscMgr, ctx);
+    ExportResourcesInPool<GeometryInstance>(rscMgr, ctx);
+    ExportResourcesInPool<LightInstance>   (rscMgr, ctx);
+    ExportResourcesInPool<MaterialInstance>(rscMgr, ctx);
+    ExportResourcesInPool<TextureInstance> (rscMgr, ctx);
+    ctx.DecIndent();
+    ctx.AddLine("};");
 
-    ctx_.AddLine();
+    ctx.AddLine();
 
-    if(ctx_.sampler)
+    if(sampler)
     {
-        IResource::ExportSubResource("sampler", rscMgr_, ctx_, *ctx_.sampler);
-        ctx_.AddLine();
+        IResource::ExportSubResource("sampler", rscMgr, ctx, *sampler);
+        ctx.AddLine();
     }
     else
         Global::ShowNormalMessage("sampler is unspecified");
 
-    if(ctx_.camera)
+    if(ctx.camera)
     {
-        IResource::ExportSubResourceAsReference("camera", rscMgr_, ctx_, *ctx_.camera);
-        ctx_.AddLine();
+        IResource::ExportSubResourceAsReference("camera", rscMgr, ctx, *ctx.camera);
+        ctx.AddLine();
     }
     else
         Global::ShowNormalMessage("camera is unspecified");
 
     if(renderer)
     {
-        IResource::ExportSubResource("renderer", rscMgr_, ctx_, *renderer);
-        ctx_.AddLine();
+        IResource::ExportSubResource("renderer", rscMgr, ctx, *renderer);
+        ctx.AddLine();
     }
     else
         Global::ShowNormalMessage("renderer is unspecified");
 
-    ctx_.AddLine("outputFilename = \"", outputFilename, "\";");
+    ctx.AddLine("outputFilename = \"", outputFilename, "\";");
 
-    ctx_.AddLine();
+    ctx.AddLine();
 
-    ctx_.AddLine("reporter = { type = Default; };");
+    ctx.AddLine("reporter = { type = Default; };");
 
-    ctx_.AddLine();
+    ctx.AddLine();
 
-    ctx_.AddLine("entities = (");
-    for(auto &ent : rscMgr_.GetPool<EntityInstance>())
+    ctx.AddLine("entities = (");
+    for(auto &ent : rscMgr.GetPool<EntityInstance>())
     {
-        ctx_.AddLine("{");
-        ctx_.IncIndent();
-        ent->ExportAsReference<EntityInstance>(rscMgr_, ctx_);
-        ctx_.DecIndent();
-        ctx_.AddLine("},");
+        ctx.AddLine("{");
+        ctx.IncIndent();
+        ent->ExportAsReference<EntityInstance>(rscMgr, ctx);
+        ctx.DecIndent();
+        ctx.AddLine("},");
     }
-    ctx_.AddLine(");");
-    ctx_.AddLine();
+    ctx.AddLine(");");
+    ctx.AddLine();
 
-    ctx_.AddLine("lights = (");
-    for(auto &ent : rscMgr_.GetPool<LightInstance>())
+    ctx.AddLine("lights = (");
+    for(auto &ent : rscMgr.GetPool<LightInstance>())
     {
-        ctx_.AddLine("{");
-        ctx_.IncIndent();
-        ent->ExportAsReference<LightInstance>(rscMgr_, ctx_);
-        ctx_.DecIndent();
-        ctx_.AddLine("},");
+        ctx.AddLine("{");
+        ctx.IncIndent();
+        ent->ExportAsReference<LightInstance>(rscMgr, ctx);
+        ctx.DecIndent();
+        ctx.AddLine("},");
     }
-    ctx_.AddLine(");");
+    ctx.AddLine(");");
 
-    return ctx_.GetString();
+    return ctx.GetString();
 }
 
 void LauncherScriptImporter::Import(const AGZ::ConfigGroup &root, EditorData *data, std::string_view scriptFilename)

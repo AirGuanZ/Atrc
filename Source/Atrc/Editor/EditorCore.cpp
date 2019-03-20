@@ -67,14 +67,17 @@ void EditorCore::ShowMenuMenuBar()
                 auto scriptDir = absolute(data_->scriptFilename.GetFilename()).parent_path();
                 auto workspaceDir = absolute(data_->workspaceDir.GetFilename());
                 SceneExportingContext ctx(
-                    &data_->defaultRenderingCamera,
+                    workspaceDir, scriptDir, &data_->defaultRenderingCamera,
+                    data_->rscMgr.GetPool<CameraInstance>().GetSelectedInstance().get(),
+                    static_cast<float>(data_->filmSize.x) / data_->filmSize.y);
+               /*     &data_->defaultRenderingCamera,
                     data_->rscMgr.GetPool<CameraInstance>().GetSelectedInstance().get(),
                     data_->filmFilterSlot.GetInstance().get(),
                     data_->samplerSlot.GetInstance().get(),
                     workspaceDir,
                     scriptDir,
-                    data_->filmSize);
-                LauncherScriptExporter exporter(data_->rscMgr, ctx);
+                    data_->filmSize);*/
+                //LauncherScriptExporter exporter(data_->rscMgr, ctx);
 
                 lState_->sceneRendererTex = GL::Texture2D(true);
                 lState_->sceneRendererTex.InitializeFormat(1, data_->filmSize.x, data_->filmSize.y, GL_RGBA8);
@@ -85,8 +88,11 @@ void EditorCore::ShowMenuMenuBar()
                     lState_->sceneRenderer.Clear();
                 }
 
-                std::string configStr = exporter.Export(
-                    data_->rendererSlot.GetInstance().get(), data_->outputFilenameBuf.data());
+                std::string configStr = LauncherScriptExporter().Export(
+                    data_->rscMgr, ctx,
+                    data_->rendererSlot.GetInstance().get(), data_->filmFilterSlot.GetInstance().get(),
+                    data_->samplerSlot.GetInstance().get(),
+                    data_->filmSize, data_->outputFilenameBuf.data());
                 std::cout << configStr;
 
                 AGZ::Config config;
@@ -263,18 +269,23 @@ void EditorCore::ShowExportingSH2DSceneWindow()
         {
             auto scriptDir = absolute(filename.GetFilename()).parent_path();
             auto workspaceDir = absolute(data_->workspaceDir.GetFilename());
-            SceneExportingContext ctx(
+            /*SceneExportingContext ctx(
                 &data_->defaultRenderingCamera,
                 data_->rscMgr.GetPool<CameraInstance>().GetSelectedInstance().get(),
                 data_->filmFilterSlot.GetInstance().get(),
                 data_->samplerSlot.GetInstance().get(),
                 workspaceDir,
                 scriptDir,
-                data_->filmSize);
+                data_->filmSize);*/
+            SceneExportingContext ctx(
+                workspaceDir, scriptDir, &data_->defaultRenderingCamera,
+                data_->rscMgr.GetPool<CameraInstance>().GetSelectedInstance().get(),
+                static_cast<float>(data_->filmSize.x) / data_->filmSize.y);
             SH2DSceneScriptExporter exporter;
 
             AGZ::FileSys::WholeFile::WriteText(filename.GetFilename().string(),
-                exporter.Export(data_->rscMgr, ctx, workerCount, taskGirdSize, SHOrder));
+                exporter.Export(data_->rscMgr, ctx, workerCount, taskGirdSize, SHOrder,
+                    data_->filmSize, data_->filmFilterSlot.GetInstance().get(), data_->samplerSlot.GetInstance().get()));
             filename.Clear();
         }
         catch(const std::exception &err)
@@ -322,14 +333,19 @@ void EditorCore::ShowExportingSH2DLightWindow()
         {
             auto scriptDir = absolute(filename.GetFilename()).parent_path();
             auto workspaceDir = absolute(data_->workspaceDir.GetFilename());
-            SceneExportingContext ctx(
+            /*SceneExportingContext ctx(
                 &data_->defaultRenderingCamera,
                 data_->rscMgr.GetPool<CameraInstance>().GetSelectedInstance().get(),
                 data_->filmFilterSlot.GetInstance().get(),
                 data_->samplerSlot.GetInstance().get(),
                 workspaceDir,
                 scriptDir,
-                data_->filmSize);
+                data_->filmSize);*/
+
+            SceneExportingContext ctx(
+                workspaceDir, scriptDir, &data_->defaultRenderingCamera,
+                data_->rscMgr.GetPool<CameraInstance>().GetSelectedInstance().get(),
+                static_cast<float>(data_->filmSize.x) / data_->filmSize.y);
             SH2DLightScriptExporter exporter;
 
             AGZ::FileSys::WholeFile::WriteText(filename.GetFilename().string(),
@@ -371,7 +387,7 @@ void EditorCore::ShowSavingWindow()
         {
             auto scriptDir = absolute(filename.GetSelected()).parent_path();
             auto workspaceDir = absolute(data_->workspaceDir.GetFilename());
-            SceneExportingContext ctx(
+            /*SceneExportingContext ctx(
                 &data_->defaultRenderingCamera,
                 data_->rscMgr.GetPool<CameraInstance>().GetSelectedInstance().get(),
                 data_->filmFilterSlot.GetInstance().get(),
@@ -379,10 +395,18 @@ void EditorCore::ShowSavingWindow()
                 workspaceDir,
                 scriptDir,
                 data_->filmSize);
-            LauncherScriptExporter exporter(data_->rscMgr, ctx);
+            LauncherScriptExporter exporter(data_->rscMgr, ctx);*/
+
+            SceneExportingContext ctx(
+                workspaceDir, scriptDir, &data_->defaultRenderingCamera,
+                data_->rscMgr.GetPool<CameraInstance>().GetSelectedInstance().get(),
+                static_cast<float>(data_->filmSize.x) / data_->filmSize.y);
 
             AGZ::FileSys::WholeFile::WriteText(filename.GetSelected().string(),
-                exporter.Export(data_->rendererSlot.GetInstance().get(), data_->outputFilenameBuf.data()));
+                LauncherScriptExporter().Export(
+                    data_->rscMgr, ctx, data_->rendererSlot.GetInstance().get(),
+                    data_->filmFilterSlot.GetInstance().get(), data_->samplerSlot.GetInstance().get(),
+                    data_->filmSize, data_->outputFilenameBuf.data()));
             filename.ClearSelected();
         }
         catch(const std::exception &err)
