@@ -13,6 +13,29 @@ using namespace std;
 constexpr int INIT_WIN_WIDTH = 1400;
 constexpr int INIT_WIN_HEIGHT = 900;
 
+void InitializeImGui(GLFWwindow *window)
+{
+    ImGui::CreateContext();
+    ImGui_ImplGlfw_InitForOpenGL(window);
+    ImGui_ImplOpenGL3_Init();
+
+    ImGui::StyleColorsDark();
+
+    ImGui::GetStyle().WindowRounding = 0;
+
+    ImFontConfig fontConfig;
+    fontConfig.SizePixels = 16;
+    ImGui::GetIO().Fonts->AddFontDefault(&fontConfig);
+
+    /*ImFontConfig config;
+    config.MergeMode = true;
+    ImGui::GetIO().Fonts->AddFontFromFileTTF(
+        "./InputSerifCondensed-Italic.ttf", 16);
+    ImGui::GetIO().Fonts->AddFontFromFileTTF(
+        "./songti.ttf", 16, &config, ImGui::GetIO().Fonts->GetGlyphRangesChineseSimplifiedCommon());
+    ImGui::GetIO().Fonts->Build();*/
+}
+
 int Run(GLFWwindow *window)
 {
     using namespace AGZ::GraphicsAPI;
@@ -22,22 +45,7 @@ int Run(GLFWwindow *window)
     
     // 初始化IMGUI
 
-    ImGui::CreateContext();
-    ImGui_ImplGlfw_InitForOpenGL(window);
-    ImGui_ImplOpenGL3_Init();
-
-    ImGui::StyleColorsDark();
-
-    //ImGui::GetStyle().PopupRounding   = 7;
-    //ImGui::GetStyle().WindowRounding  = 7;
-    //ImGui::GetStyle().GrabRounding    = 7;
-    //ImGui::GetStyle().FrameRounding   = 7;
-    //ImGui::GetStyle().FrameBorderSize = 1;
-    ImGui::GetStyle().WindowRounding = 0;
-
-    ImFontConfig defaultFontConfig;
-    defaultFontConfig.SizePixels = 16.0f;
-    ImGui::GetIO().Fonts->AddFontDefault(&defaultFontConfig);
+    InitializeImGui(window);
 
     // 准备输入category
 
