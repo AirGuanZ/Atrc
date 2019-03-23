@@ -1,8 +1,6 @@
 ﻿#include <iostream>
 
-#include <Atrc/Atrc/ResourceInterface/ResourceSlot.h>
-#include <Atrc/Atrc/FilmFilter/FilmFilter.h>
-#include <Atrc/Atrc/Texture1/Texture1.h>
+#include <Atrc/Atrc/GL.h>
 #include <Atrc/Atrc/Window.h>
 
 #include <Lib/imgui/imgui/imgui.h>
@@ -88,19 +86,9 @@ int Run(GLFWwindow *window)
         ImGui_ImplGlfw_WheelScroll(param.offset);
     }));
 
-    ResourceCreatorManagerList ctrMgrList;
-    RegisterFilmFilterCreators(ctrMgrList.GetCreatorMgr<FilmFilterInstance>());
-    RegisterTexture1Creators(ctrMgrList.GetCreatorMgr<Texture1Instance>());
-
-    ResourceCreateContext ctrCtx = { &ctrMgrList };
-
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
-
-    ResourceSlot<FilmFilterInstance> filmFilterSlot(ctrCtx, "Box");
-    ResourceSlot<Texture1Instance> tex1Slot(ctrCtx);
-    tex1Slot.SetRscTypeChangedCallback([](Texture1Instance &i) {i.SetRange(0, 1); }, true);
 
     ImGui::EndFrame();
 
@@ -162,7 +150,6 @@ int Run(GLFWwindow *window)
         if(ImGui::Begin("Left Window", nullptr,
             ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResizeGrip | ImGuiWindowFlags_NoTitleBar))
         {
-            filmFilterSlot.Display(ctrCtx);
             if(ImGui::Button(u8"文件"))
                 fileBrowser.Open();
             leftWindowSizeX = ImGui::GetWindowSize().x;
@@ -186,7 +173,6 @@ int Run(GLFWwindow *window)
         if(ImGui::Begin("Right Window", nullptr,
             ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResizeGrip | ImGuiWindowFlags_NoTitleBar))
         {
-            tex1Slot.Display(ctrCtx);
             rightWindowSizeX = ImGui::GetWindowSize().x;
             ImGui::End();
         }
