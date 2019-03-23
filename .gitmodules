@@ -9,3 +9,4 @@
 [submodule "Source/Lib/ImWinLayout"]
 	path = Source/Lib/ImWinLayout
 	url = https://github.com/AirGuanZ/imgui-windowlayout
+	shallow = true
