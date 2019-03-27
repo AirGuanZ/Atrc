@@ -255,7 +255,6 @@ int main()
     }
 
     glfwMakeContextCurrent(window);
-    glfwSetWindowAspectRatio(window, INIT_WIN_WIDTH, INIT_WIN_HEIGHT);
 
     if(glewInit() != GLEW_OK)
     {

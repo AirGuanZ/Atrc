@@ -1,12 +1,10 @@
 #pragma once
 
 #include <map>
-#include <memory>
 #include <string>
 #include <type_traits>
 
 #include <AGZUtils/Utils/Exception.h>
-#include <AGZUtils/Utils/Misc.h>
 
 class ResourceCreatingContext;
 
@@ -28,9 +26,35 @@ public:
     }
 };
 
+template<typename...TExportArgs>
+class ExportAsConfigGroup
+{
+protected:
+
+    static std::string Wrap(const std::string &content)
+    {
+        return "{" + content + "}";
+    }
+
+    virtual std::string ExportImpl(TExportArgs...exportArgs) const = 0;
+
+public:
+
+    virtual ~ExportAsConfigGroup() = default;
+
+    std::string Export(TExportArgs...exportArgs) const
+    {
+        return Wrap(ExportImpl(exportArgs...));
+    }
+};
+
 class IResource : public HasName
 {
     const HasName *creator_;
+
+protected:
+
+    static std::string TG(const std::string &content) { return "{" + content + "}"; }
 
 public:
 
@@ -40,17 +64,16 @@ public:
         
     }
 
+    virtual ~IResource() = default;
+
     const std::string &GetType() const noexcept
     {
         return creator_->GetName();
     }
 };
 
-template<typename TResourceCategory>
 class IResourceCreator : public HasName
 {
-    static_assert(std::is_base_of_v<IResource, TResourceCategory>);
-
 public:
 
     explicit IResourceCreator(std::string name) noexcept
@@ -60,20 +83,20 @@ public:
     }
 
     virtual ~IResourceCreator() = default;
-
-    virtual std::shared_ptr<TResourceCategory> Create(std::string name, ResourceCreatingContext &ctx) const = 0;
 };
 
-template<typename TResourceCategory>
+template<typename TResourceCreatorCategory>
 class ResourceFactory
 {
-    static_assert(std::is_base_of_v<IResource, TResourceCategory>);
+    static_assert(std::is_base_of_v<IResource, typename TResourceCreatorCategory::Resource>);
+    static_assert(std::is_base_of_v<IResourceCreator, TResourceCreatorCategory>);
 
-    std::map<std::string, const IResourceCreator<TResourceCategory>*> name2Creator_;
+    std::map<std::string, const TResourceCreatorCategory*> name2Creator_;
 
 public:
 
-    using Creator = IResourceCreator<TResourceCategory>;
+    using Resource = typename TResourceCreatorCategory::Resource;
+    using Creator = TResourceCreatorCategory;
 
     void AddCreator(const Creator *creator)
     {
@@ -97,11 +120,6 @@ public:
         return *it->second;
 
         AGZ_HIERARCHY_WRAP("in getting creator from creator factory: " + name)
-    }
-
-    std::shared_ptr<TResourceCategory> Create(const std::string &creatorName, std::string name, ResourceCreatingContext &ctx) const
-    {
-        return (*this)[creatorName].Create(std::move(name), ctx);
     }
 
     auto begin() const { return name2Creator_.begin(); }

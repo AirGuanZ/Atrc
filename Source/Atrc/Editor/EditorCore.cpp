@@ -93,10 +93,17 @@ void EditorCore::ShowMenuMenuBar()
                     data_->rendererSlot.GetInstance().get(), data_->filmFilterSlot.GetInstance().get(),
                     data_->samplerSlot.GetInstance().get(),
                     data_->filmSize, data_->outputFilenameBuf.data());
-                std::cout << configStr;
 
                 AGZ::Config config;
                 if(!config.LoadFromMemory(configStr))
+                {
+                    Global::ShowErrorMessage("failed to load configure content");
+                    throw std::runtime_error("");
+                }
+
+                std::cout << config.ToPrettyString();
+
+                if(!config.LoadFromMemory(config.ToPrettyString()))
                 {
                     Global::ShowErrorMessage("failed to load configure content");
                     throw std::runtime_error("");

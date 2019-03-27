@@ -12,6 +12,23 @@ class ResourceSlot
     std::function<void(TResourceCategory&)> rscChangedCallback_;
     ResourceCreatingContext &rscCreatingCtx_;
 
+    template<typename T, typename = void>
+    struct HasIsMultiline : std::false_type { };
+
+    template<typename T>
+    struct HasIsMultiline<T, std::void_t<decltype(std::declval<const T&>().IsMultiline())>> : std::true_type { };
+    
+    template<typename T, bool THasMultiline>
+    struct CallIsMultilineAux { static bool Call(const T &v) noexcept { return true; } };
+
+    template<typename T>
+    struct CallIsMultilineAux<T, true> { static bool Call(const T &v) noexcept { return v.IsMultiline(); } };
+
+    static bool CallIsMultiline(const TResourceCategory &t) noexcept
+    {
+        return CallIsMultilineAux<TResourceCategory, HasIsMultiline<TResourceCategory>::value>::Call(t);
+    }
+
 public:
 
     explicit ResourceSlot(ResourceCreatingContext &ctx)
@@ -37,7 +54,7 @@ public:
     template<typename...RscDisplayArgs>
     void Display(RscDisplayArgs&&...rscDisplayArgs)
     {
-        bool useMiniWidth = rsc_ ? !rsc_->IsMultiline() : false;
+        bool useMiniWidth = rsc_ ? !CallIsMultiline(*rsc_) : false;
         if(selector_.Display(useMiniWidth))
         {
             rsc_ = selector_.GetSelectedCreator()->Create("", rscCreatingCtx_);
