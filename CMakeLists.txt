@@ -46,7 +46,7 @@ FOREACH(_SRC IN ITEMS ${MGR_SRC})
     SOURCE_GROUP("${_GRP_PATH}" FILES "${_SRC}")
 ENDFOREACH()
 
-FILE(GLOB_RECURSE IMGUI_SRC "Source/Lib/imgui/*.cpp" "Source/Lib/imgui/*.h" "Source/Lib/ImFileBrowser/*.h")
+FILE(GLOB_RECURSE IMGUI_SRC "Source/Lib/imgui/*.cpp" "Source/Lib/imgui/*.h" "Source/Lib/ImFileBrowser/*.h" "Source/Lib/ImWinLayout/*.h")
 ADD_LIBRARY(ImGui STATIC ${IMGUI_SRC})
 TARGET_INCLUDE_DIRECTORIES(ImGui PRIVATE
 	${GLEW_INCLUDE_DIRS}
