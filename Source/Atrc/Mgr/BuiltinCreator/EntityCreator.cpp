@@ -1,7 +1,7 @@
 #include <map>
 
-#include <Atrc/Lib/Entity/GeometricDiffuseLight.h>
-#include <Atrc/Lib/Entity/GeometricEntity.h>
+#include <Atrc/Core/Entity/GeometricDiffuseLight.h>
+#include <Atrc/Core/Entity/GeometricEntity.h>
 #include <Atrc/Mgr/BuiltinCreator/EntityCreator.h>
 #include <Atrc/Mgr/Parser.h>
 

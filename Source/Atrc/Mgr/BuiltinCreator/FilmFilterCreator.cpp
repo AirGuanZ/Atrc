@@ -1,5 +1,5 @@
-#include <Atrc/Lib/FilmFilter/BoxFilter.h>
-#include <Atrc/Lib/FilmFilter/GaussianFilter.h>
+#include <Atrc/Core/FilmFilter/BoxFilter.h>
+#include <Atrc/Core/FilmFilter/GaussianFilter.h>
 #include <Atrc/Mgr/BuiltinCreator/FilmFilterCreator.h>
 
 namespace Atrc::Mgr

@@ -1,6 +1,6 @@
-#include <Atrc/Lib/Light/CubeEnvironmentLight.h>
-#include <Atrc/Lib/Light/EnvironmentLight.h>
-#include <Atrc/Lib/Light/SkyLight.h>
+#include <Atrc/Core/Light/CubeEnvironmentLight.h>
+#include <Atrc/Core/Light/EnvironmentLight.h>
+#include <Atrc/Core/Light/SkyLight.h>
 #include <Atrc/Mgr/BuiltinCreator/LightCreator.h>
 #include <Atrc/Mgr/Parser.h>
 

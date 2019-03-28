@@ -1,4 +1,4 @@
-#include <Atrc/Lib/Renderer/PathTracingRenderer.h>
+#include <Atrc/Core/Renderer/PathTracingRenderer.h>
 #include <Atrc/Mgr/BuiltinCreator/RendererCreator.h>
 #include "Atrc/Mgr/Parser.h"
 

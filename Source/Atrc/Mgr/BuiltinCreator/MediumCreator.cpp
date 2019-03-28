@@ -1,4 +1,4 @@
-#include <Atrc/Lib/Medium/HomogeneousMedium.h>
+#include <Atrc/Core/Medium/HomogeneousMedium.h>
 #include <Atrc/Mgr/BuiltinCreator/MediumCreator.h>
 #include <Atrc/Mgr/Parser.h>
 

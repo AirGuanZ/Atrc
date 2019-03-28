@@ -1,6 +1,6 @@
 #include <chrono>
 
-#include <Atrc/Lib/Sampler/NativeSampler.h>
+#include <Atrc/Core/Sampler/NativeSampler.h>
 #include <Atrc/Mgr/BuiltinCreator/SamplerCreator.h>
 
 namespace Atrc::Mgr

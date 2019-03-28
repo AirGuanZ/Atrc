@@ -1,8 +1,8 @@
-#include <Atrc/Lib/PostProcessor/ACESFilm.h>
-#include <Atrc/Lib/PostProcessor/FlipImage.h>
-#include <Atrc/Lib/PostProcessor/GammaCorrection.h>
-#include <Atrc/Lib/PostProcessor/NativeToneMapping.h>
-#include <Atrc/Lib/PostProcessor/SaveAsHDR.h>
+#include <Atrc/Core/PostProcessor/ACESFilm.h>
+#include <Atrc/Core/PostProcessor/FlipImage.h>
+#include <Atrc/Core/PostProcessor/GammaCorrection.h>
+#include <Atrc/Core/PostProcessor/NativeToneMapping.h>
+#include <Atrc/Core/PostProcessor/SaveAsHDR.h>
 #include <Atrc/Mgr/Parser.h>
 #include <Atrc/Mgr/BuiltinCreator/PostProcessorCreator.h>
 

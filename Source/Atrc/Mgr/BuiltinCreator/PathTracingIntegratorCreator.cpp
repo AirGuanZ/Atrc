@@ -1,7 +1,7 @@
-#include <Atrc/Lib/Renderer/PathTracingIntegrator/FullPathTracingIntegrator.h>
-#include <Atrc/Lib/Renderer/PathTracingIntegrator/MISPathTracingIntegrator.h>
-#include <Atrc/Lib/Renderer/PathTracingIntegrator/NativePathTracingIntegrator.h>
-#include <Atrc/Lib/Renderer/PathTracingIntegrator/ShadingNormalIntegrator.h>
+#include <Atrc/Core/Renderer/PathTracingIntegrator/FullPathTracingIntegrator.h>
+#include <Atrc/Core/Renderer/PathTracingIntegrator/MISPathTracingIntegrator.h>
+#include <Atrc/Core/Renderer/PathTracingIntegrator/NativePathTracingIntegrator.h>
+#include <Atrc/Core/Renderer/PathTracingIntegrator/ShadingNormalIntegrator.h>
 #include <Atrc/Mgr/BuiltinCreator/PathTracingIntegratorCreator.h>
 #include <Atrc/Mgr/Parser.h>
 

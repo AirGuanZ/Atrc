@@ -3,7 +3,7 @@
 #include <mutex>
 
 #include <AGZUtils/Utils/Time.h>
-#include <Atrc/Lib/Core/Reporter.h>
+#include <Atrc/Core/Core/Reporter.h>
 #include <Atrc/Editor/GL.h>
 
 class FilmRTReporter : public Atrc::Reporter, public AGZ::Uncopiable

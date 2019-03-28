@@ -4,8 +4,8 @@
 
 #include <Atrc/Editor/FilmRTReporter.h>
 #include <Atrc/Editor/GL.h>
-#include <Atrc/Lib/Core/Scene.h>
-#include <Atrc/Lib/Core/TFilm.h>
+#include <Atrc/Core/Core/Scene.h>
+#include <Atrc/Core/Core/TFilm.h>
 #include <Atrc/Mgr/Context.h>
 
 class SceneRenderer : public AGZ::Uncopiable

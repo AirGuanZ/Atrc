@@ -1,6 +1,6 @@
 #include <Atrc/Editor/FilmRTReporter.h>
 #include <Atrc/Editor/Global.h>
-#include <Atrc/Lib/Core/TFilm.h>
+#include <Atrc/Core/Core/TFilm.h>
 
 FilmRTReporter::FilmRTReporter()
     : newData_(false), percent_(0)

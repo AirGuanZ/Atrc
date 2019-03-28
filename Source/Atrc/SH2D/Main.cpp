@@ -2,7 +2,7 @@
 
 #include <AGZUtils/Utils/Config.h>
 #include <AGZUtils/Utils/Texture.h>
-#include <Atrc/Lib/Core/TFilm.h>
+#include <Atrc/Core/Core/TFilm.h>
 #include <Atrc/Mgr/BuiltinCreatorRegister.h>
 #include <Atrc/Mgr/Context.h>
 #include <Atrc/Mgr/Parser.h>

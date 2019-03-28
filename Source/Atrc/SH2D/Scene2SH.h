@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Atrc/Lib/Core/Common.h>
+#include <Atrc/Core/Core/Common.h>
 
 struct Scene2SHResult
 {

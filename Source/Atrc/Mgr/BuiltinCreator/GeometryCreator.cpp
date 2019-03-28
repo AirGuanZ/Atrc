@@ -6,9 +6,9 @@
 #include <AGZUtils/Utils/Mesh.h>
 #include <AGZUtils/Utils/Range.h>
 
-#include <Atrc/Lib/Geometry/Sphere.h>
-#include <Atrc/Lib/Geometry/Triangle.h>
-#include <Atrc/Lib/Geometry/TriangleBVH.h>
+#include <Atrc/Core/Geometry/Sphere.h>
+#include <Atrc/Core/Geometry/Triangle.h>
+#include <Atrc/Core/Geometry/TriangleBVH.h>
 #include <Atrc/Mgr/BuiltinCreator/GeometryCreator.h>
 #include <Atrc/Mgr/Parser.h>
 

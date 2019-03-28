@@ -1,10 +1,10 @@
 #include <queue>
 
-#include <Atrc/Lib/Core/Camera.h>
-#include <Atrc/Lib/Core/TFilm.h>
-#include <Atrc/Lib/Core/Sampler.h>
-#include <Atrc/Lib/Core/Scene.h>
-#include <Atrc/Lib/Utility/GridDivider.h>
+#include <Atrc/Core/Core/Camera.h>
+#include <Atrc/Core/Core/TFilm.h>
+#include <Atrc/Core/Core/Sampler.h>
+#include <Atrc/Core/Core/Scene.h>
+#include <Atrc/Core/Utility/GridDivider.h>
 #include <Atrc/SH2D/Scene2SH.h>
 #include <AGZUtils/Utils/Thread.h>
 #include <AGZUtils/Utils/Time.h>

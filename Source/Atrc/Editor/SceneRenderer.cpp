@@ -1,6 +1,6 @@
 #include <Atrc/Editor/FilmRTReporter.h>
 #include <Atrc/Editor/SceneRenderer.h>
-#include <Atrc/Lib/Core/Renderer.h>
+#include <Atrc/Core/Core/Renderer.h>
 #include <Atrc/Mgr/BuiltinCreatorRegister.h>
 #include <Atrc/Mgr/Parser.h>
 #include <Atrc/Mgr/SceneBuilder.h>

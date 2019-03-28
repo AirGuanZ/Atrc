@@ -1,7 +1,7 @@
 #pragma once
 
 #include <AGZUtils/Utils/Config.h>
-#include <Atrc/Lib/Core/Common.h>
+#include <Atrc/Core/Core/Common.h>
 
 namespace Atrc::Mgr
 {

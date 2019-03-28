@@ -1,4 +1,4 @@
-#include <Atrc/Lib/Camera/PinholeCamera.h>
+#include <Atrc/Core/Camera/PinholeCamera.h>
 #include <Atrc/Mgr/BuiltinCreator/CameraCreator.h>
 #include <Atrc/Mgr/Parser.h>
 

@@ -8,8 +8,8 @@
 
 #include <AGZUtils/Utils/Config.h>
 
-#include <Atrc/Lib/Core/Reporter.h>
-#include <Atrc/Lib/Core/Sampler.h>
+#include <Atrc/Core/Core/Reporter.h>
+#include <Atrc/Core/Core/Sampler.h>
 #include <Atrc/Mgr/Common.h>
 
 namespace Atrc

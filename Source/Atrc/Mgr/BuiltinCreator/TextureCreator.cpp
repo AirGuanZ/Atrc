@@ -1,7 +1,7 @@
-#include <Atrc/Lib/Texture/ConstantTexture.h>
-#include <Atrc/Lib/Texture/HDRTexture.h>
-#include <Atrc/Lib/Texture/ImageTexture.h>
-#include <Atrc/Lib/Texture/TextureMultiplier.h>
+#include <Atrc/Core/Texture/ConstantTexture.h>
+#include <Atrc/Core/Texture/HDRTexture.h>
+#include <Atrc/Core/Texture/ImageTexture.h>
+#include <Atrc/Core/Texture/TextureMultiplier.h>
 #include <Atrc/Mgr/BuiltinCreator/TextureCreator.h>
 #include <Atrc/Mgr/Parser.h>
 

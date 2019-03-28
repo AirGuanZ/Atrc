@@ -1,5 +1,5 @@
-#include <Atrc/Lib/Core/Light.h>
-#include <Atrc/Lib/Core/Ray.h>
+#include <Atrc/Core/Core/Light.h>
+#include <Atrc/Core/Core/Ray.h>
 #include <Atrc/SH2D/Light2SH.h>
 
 using namespace Atrc;

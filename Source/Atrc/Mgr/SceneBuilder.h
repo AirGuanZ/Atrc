@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Atrc/Lib/Core/Scene.h>
+#include <Atrc/Core/Core/Scene.h>
 #include <Atrc/Mgr/Context.h>
 
 namespace Atrc::Mgr
