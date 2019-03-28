@@ -23,7 +23,7 @@ void RegisterBuiltinPathTracingIntegratorCreators(Context &context)
 PathTracingIntegrator *FullPathTracingIntegratorCreator::Create(
     const ConfigGroup &group, [[maybe_unused]] Context &context, Arena &arena) const
 {
-    ATRC_MGR_TRY
+    AGZ_HIERARCHY_TRY
     {
         int minDepth = group["minDepth"].Parse<int>();
         int maxDepth = group["maxDepth"].Parse<int>();
@@ -31,21 +31,21 @@ PathTracingIntegrator *FullPathTracingIntegratorCreator::Create(
         bool sampleAllLights = Parser::ParseBool(group["sampleAllLights"]);
 
         if(minDepth <= 0 || maxDepth < minDepth)
-            throw MgrErr("Invalid min/max depth value");
+            throw AGZ::HierarchyException("Invalid min/max depth value");
 
         if(contProb <= 0 || contProb > 1)
-            throw MgrErr("Invalid contProb value");
+            throw AGZ::HierarchyException("Invalid contProb value");
 
         return arena.Create<FullPathTracingIntegrator>(
             minDepth, maxDepth, contProb, sampleAllLights);
     }
-        ATRC_MGR_CATCH_AND_RETHROW("In creating full path tracing integrator: " + group.ToString())
+        AGZ_HIERARCHY_WRAP("In creating full path tracing integrator: " + group.ToString())
 }
 
 PathTracingIntegrator *MISPathTracingIntegratorCreator::Create(
     const ConfigGroup &group, [[maybe_unused]] Context &context, Arena &arena) const
 {
-    ATRC_MGR_TRY
+    AGZ_HIERARCHY_TRY
     {
         int minDepth  = group["minDepth"].Parse<int>();
         int maxDepth  = group["maxDepth"].Parse<int>();
@@ -53,45 +53,45 @@ PathTracingIntegrator *MISPathTracingIntegratorCreator::Create(
         bool sampleAllLights = Parser::ParseBool(group["sampleAllLights"]);
 
         if(minDepth <= 0 || maxDepth < minDepth)
-            throw MgrErr("Invalid min/max depth value");
+            throw AGZ::HierarchyException("Invalid min/max depth value");
 
         if(contProb <= 0 || contProb > 1)
-            throw MgrErr("Invalid contProb value");
+            throw AGZ::HierarchyException("Invalid contProb value");
 
         return arena.Create<MISPathTracingIntegrator>(
             minDepth, maxDepth, contProb, sampleAllLights);
     }
-    ATRC_MGR_CATCH_AND_RETHROW("In creating MIS path tracing integrator: " + group.ToString())
+    AGZ_HIERARCHY_WRAP("In creating MIS path tracing integrator: " + group.ToString())
 }
 
 PathTracingIntegrator *NativePathTracingIntegratorCreator::Create(
     const ConfigGroup &group, [[maybe_unused]] Context &context, Arena &arena) const
 {
-    ATRC_MGR_TRY
+    AGZ_HIERARCHY_TRY
     {
         int minDepth  = group["minDepth"].Parse<int>();
         int maxDepth  = group["maxDepth"].Parse<int>();
         Real contProb = group["contProb"].Parse<Real>();
 
         if(minDepth <= 0 || maxDepth < minDepth)
-            throw MgrErr("Invalid min/max depth value");
+            throw AGZ::HierarchyException("Invalid min/max depth value");
 
         if(contProb <= 0 || contProb > 1)
-            throw MgrErr("Invalid contProb value");
+            throw AGZ::HierarchyException("Invalid contProb value");
 
         return arena.Create<NativePathTracingIntegrator>(minDepth, maxDepth, contProb);
     }
-    ATRC_MGR_CATCH_AND_RETHROW("In creating native path tracing integrator: " + group.ToString())
+    AGZ_HIERARCHY_WRAP("In creating native path tracing integrator: " + group.ToString())
 }
 
 PathTracingIntegrator *ShadingNormalIntegratorCreator::Create(
     const ConfigGroup &group, [[maybe_unused]] Context &context, Arena &arena) const
 {
-    ATRC_MGR_TRY
+    AGZ_HIERARCHY_TRY
     {
         return arena.Create<ShadingNormalIntegrator>();
     }
-    ATRC_MGR_CATCH_AND_RETHROW("In creating shading normal integrator: " + group.ToString())
+    AGZ_HIERARCHY_WRAP("In creating shading normal integrator: " + group.ToString())
 }
 
 } // namespace Atrc::Mgr

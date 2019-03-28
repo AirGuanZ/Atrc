@@ -1,3 +1,4 @@
+#include <filesystem>
 #include <iostream>
 
 #include <Atrc/Lib/Core/PostProcessor.h>
@@ -28,16 +29,16 @@ int Run(const AGZ::Config &config, std::string_view configPath)
     auto outputFilename = context.GetPathInWorkspace(root["outputFilename"].AsValue());
 
     Vec2i filmSize;
-    ATRC_MGR_TRY
+    AGZ_HIERARCHY_TRY
     {
         filmSize = Mgr::Parser::ParseVec2i(root["film.size"]);
         if(filmSize.x <= 0 || filmSize.y <= 0)
-            throw Mgr::MgrErr("Invalid film size value");
+            throw AGZ::HierarchyException("Invalid film size value");
     }
-    ATRC_MGR_CATCH_AND_RETHROW("In creating film")
+    AGZ_HIERARCHY_WRAP("In creating film")
 
     PostProcessorChain postProcessChain;
-    ATRC_MGR_TRY
+    AGZ_HIERARCHY_TRY
     {
         if(auto ppNode = root.Find("postProcessors"))
         {
@@ -46,7 +47,7 @@ int Run(const AGZ::Config &config, std::string_view configPath)
                 postProcessChain.AddBack(context.Create<PostProcessor>(arr[i]));
         }
     }
-    ATRC_MGR_CATCH_AND_RETHROW("In creating post processors")
+    AGZ_HIERARCHY_WRAP("In creating post processors")
 
     Film film(filmSize, *filter);
     renderer->Render(&scene, sampler, &film, reporter);
@@ -92,7 +93,7 @@ int main(int argc, char *argv[])
         {
             configPath = ".";
             if(!config.LoadFromFile("./Scene.txt"))
-                throw Mgr::MgrErr("Failed to load configuration file from ./scene.txt");
+                throw AGZ::HierarchyException("Failed to load configuration file from ./scene.txt");
         }
         else if(argc == 2)
         {
@@ -104,13 +105,13 @@ int main(int argc, char *argv[])
 
             configPath = std::filesystem::path(argv[1]).parent_path().string();
             if(!config.LoadFromFile(argv[1]))
-                throw Mgr::MgrErr("Failed to load configuration file from " + std::string(argv[1]));
+                throw AGZ::HierarchyException("Failed to load configuration file from " + std::string(argv[1]));
         }
         else if(std::string(argv[1]) == "-m" && argc == 4)
         {
             configPath = argv[2];
             if(!config.LoadFromMemory(argv[3]))
-                throw Mgr::MgrErr("Failed to load configuration from memory");
+                throw AGZ::HierarchyException("Failed to load configuration from memory");
         }
         else
         {
@@ -120,17 +121,12 @@ int main(int argc, char *argv[])
 
         return Run(config, configPath);
     }
-    catch(const Mgr::MgrErr &err)
+    catch(const AGZ::HierarchyException &err)
     {
-        for(auto pErr = &err; pErr; pErr = pErr->TryGetInterior())
-        {
-            std::cout << pErr->GetMsg() << std::endl;
-            if(pErr->TryGetLeaf())
-            {
-                std::cout << pErr->TryGetLeaf()->what() << std::endl;
-                break;
-            }
-        }
+        std::vector<std::string> errMsgs;
+        err.GetAllMessages(std::back_inserter(errMsgs));
+        for(auto &m : errMsgs)
+            std::cout << m << std::endl;
     }
     catch(const std::exception &err)
     {

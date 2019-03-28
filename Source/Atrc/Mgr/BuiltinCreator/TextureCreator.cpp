@@ -22,27 +22,27 @@ void RegisterBuiltinTextureCreators(Context &context)
 
 Texture *ConstantTextureCreator::Create(const ConfigGroup &group, [[maybe_unused]] Context &context, Arena &arena) const
 {
-    ATRC_MGR_TRY
+    AGZ_HIERARCHY_TRY
     {
         auto texel = Parser::ParseSpectrum(group["texel"]);
         return arena.Create<ConstantTexture>(texel);
     }
-    ATRC_MGR_CATCH_AND_RETHROW("In creating constant texture: " + group.ToString())
+    AGZ_HIERARCHY_WRAP("In creating constant texture: " + group.ToString())
 }
 
 Texture *ConstantTexture1Creator::Create(const ConfigGroup &group, [[maybe_unused]] Context &context, Arena &arena) const
 {
-    ATRC_MGR_TRY
+    AGZ_HIERARCHY_TRY
     {
         Real texel = group["texel"].Parse<Real>();
         return arena.Create<ConstantTexture1>(texel);
     }
-    ATRC_MGR_CATCH_AND_RETHROW("In creating constant texture: " + group.ToString())
+    AGZ_HIERARCHY_WRAP("In creating constant texture: " + group.ToString())
 }
 
 Texture *HDRTextureCreator::Create(const ConfigGroup &group, Context &context, Arena &arena) const
 {
-    ATRC_MGR_TRY
+    AGZ_HIERARCHY_TRY
     {
         const AGZ::Texture2D<Color3f> *tex;
 
@@ -68,7 +68,7 @@ Texture *HDRTextureCreator::Create(const ConfigGroup &group, Context &context, A
             else if(sampler == "Linear")
                 samplingStrategy = HDRTexture::Linear;
             else
-                throw MgrErr("Invalid sampler value");
+                throw AGZ::HierarchyException("Invalid sampler value");
         }
 
         if(auto wrapperNode = group.Find("wrapper"))
@@ -77,7 +77,7 @@ Texture *HDRTextureCreator::Create(const ConfigGroup &group, Context &context, A
             if(wrapper == "Clamp")
                 wrappingStrategy = HDRTexture::Clamp;
             else
-                throw MgrErr("Invalid wrapper value");
+                throw AGZ::HierarchyException("Invalid wrapper value");
         }
 
         bool reverseV = false;
@@ -86,12 +86,12 @@ Texture *HDRTextureCreator::Create(const ConfigGroup &group, Context &context, A
 
         return arena.Create<HDRTexture>(*tex, samplingStrategy, wrappingStrategy, reverseV);
     }
-    ATRC_MGR_CATCH_AND_RETHROW("In creating hdr texture: " + group.ToString())
+    AGZ_HIERARCHY_WRAP("In creating hdr texture: " + group.ToString())
 }
 
 Texture *ImageTextureCreator::Create(const ConfigGroup &group, Context &context, Arena &arena) const
 {
-    ATRC_MGR_TRY
+    AGZ_HIERARCHY_TRY
     {
         const AGZ::Texture2D<Color3b> *tex;
 
@@ -101,13 +101,13 @@ Texture *ImageTextureCreator::Create(const ConfigGroup &group, Context &context,
             tex = it->second;
         else
         {
-            ATRC_MGR_TRY
+            AGZ_HIERARCHY_TRY
             {
                 auto ttex = arena.Create<AGZ::Texture2D<Color3b>>();
                 *ttex = AGZ::Texture2D<Color3b>(AGZ::TextureFile::LoadRGBFromFile(filename));
                 tex = ttex;
             }
-            ATRC_MGR_CATCH_AND_RETHROW("Failed to load image from " + filename)
+            AGZ_HIERARCHY_WRAP("Failed to load image from " + filename)
         }
 
         auto samplingStrategy = ImageTexture::Linear;
@@ -121,7 +121,7 @@ Texture *ImageTextureCreator::Create(const ConfigGroup &group, Context &context,
             else if(sampler == "Linear")
                 samplingStrategy = ImageTexture::Linear;
             else
-                throw MgrErr("Invalid sampler value");
+                throw AGZ::HierarchyException("Invalid sampler value");
         }
 
         if(auto wrapperNode = group.Find("wrapper"))
@@ -130,7 +130,7 @@ Texture *ImageTextureCreator::Create(const ConfigGroup &group, Context &context,
             if(wrapper == "Clamp")
                 wrappingStrategy = ImageTexture::Clamp;
             else
-                throw MgrErr("Invalid wrapper value");
+                throw AGZ::HierarchyException("Invalid wrapper value");
         }
 
         bool reverseV = false;
@@ -139,18 +139,18 @@ Texture *ImageTextureCreator::Create(const ConfigGroup &group, Context &context,
 
         return arena.Create<ImageTexture>(*tex, samplingStrategy, wrappingStrategy, reverseV);
     }
-    ATRC_MGR_CATCH_AND_RETHROW("In creating image texture: " + group.ToString())
+    AGZ_HIERARCHY_WRAP("In creating image texture: " + group.ToString())
 }
 
 Texture *TextureMultiplierCreator::Create(const ConfigGroup &group, Context &context, Arena &arena) const
 {
-    ATRC_MGR_TRY
+    AGZ_HIERARCHY_TRY
     {
         auto lhs = context.Create<Texture>(group["lhs"]);
         auto rhs = context.Create<Texture>(group["rhs"]);
         return arena.Create<TextureMultiplier>(lhs, rhs);
     }
-    ATRC_MGR_CATCH_AND_RETHROW("In creating texture multiplier: " + group.ToString())
+    AGZ_HIERARCHY_WRAP("In creating texture multiplier: " + group.ToString())
 }
 
 } // namespace Atrc::Mgr

@@ -19,7 +19,7 @@ void RegisterBuiltinLightCreators(Context &context)
 
 Light *CubeEnvironmentLightCreator::Create(const ConfigGroup &group, Context &context, Arena &arena) const
 {
-    ATRC_MGR_TRY
+    AGZ_HIERARCHY_TRY
     {
         auto posX = context.Create<Texture>(group["posX"]);
         auto posY = context.Create<Texture>(group["posY"]);
@@ -38,12 +38,12 @@ Light *CubeEnvironmentLightCreator::Create(const ConfigGroup &group, Context &co
 
         return arena.Create<CubeEnvironmentLight>(envTex, transform);
     }
-    ATRC_MGR_CATCH_AND_RETHROW("In creating cube environment light: " + group.ToString())
+    AGZ_HIERARCHY_WRAP("In creating cube environment light: " + group.ToString())
 }
 
 Light *EnvironmentLightCreator::Create(const ConfigGroup &group, Context &context, Arena &arena) const
 {
-    ATRC_MGR_TRY
+    AGZ_HIERARCHY_TRY
     {
         auto tex = context.Create<Texture>(group["tex"]);
 
@@ -53,12 +53,12 @@ Light *EnvironmentLightCreator::Create(const ConfigGroup &group, Context &contex
 
         return arena.Create<EnvironmentLight>(tex, transform);
     }
-    ATRC_MGR_CATCH_AND_RETHROW("In creating environment light: " + group.ToString())
+    AGZ_HIERARCHY_WRAP("In creating environment light: " + group.ToString())
 }
 
 Light *SkyLightCreator::Create(const ConfigGroup &group, [[maybe_unused]] Context &context, Arena &arena) const
 {
-    ATRC_MGR_TRY
+    AGZ_HIERARCHY_TRY
     {
         auto top    = Parser::ParseSpectrum(group["top"]);
         auto bottom = Parser::ParseSpectrum(group["bottom"]);
@@ -69,7 +69,7 @@ Light *SkyLightCreator::Create(const ConfigGroup &group, [[maybe_unused]] Contex
 
         return arena.Create<SkyLight>(top, bottom, transform);
     }
-    ATRC_MGR_CATCH_AND_RETHROW("In creating sky light: " + group.ToString())
+    AGZ_HIERARCHY_WRAP("In creating sky light: " + group.ToString())
 }
 
 } // namespace Atrc::Mgr

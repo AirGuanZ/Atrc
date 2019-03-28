@@ -14,7 +14,7 @@ void RegisterBuiltinSamplerCreators(Context &context)
 
 Sampler *NativeSamplerCreator::Create(const ConfigGroup &group, [[maybe_unused]] Context &context, Arena &arena) const
 {
-    ATRC_MGR_TRY
+    AGZ_HIERARCHY_TRY
     {
         int seed;
         if(auto seedNode = group.Find("seed"))
@@ -24,11 +24,11 @@ Sampler *NativeSamplerCreator::Create(const ConfigGroup &group, [[maybe_unused]]
         
         int spp = group["spp"].Parse<int>();
         if(spp <= 0)
-            throw MgrErr("Invalid spp value");
+            throw AGZ::HierarchyException("Invalid spp value");
 
         return arena.Create<NativeSampler>(seed, spp);
     }
-    ATRC_MGR_CATCH_AND_RETHROW("In creating native sampler: " + group.ToString())
+    AGZ_HIERARCHY_WRAP("In creating native sampler: " + group.ToString())
 }
 
 } // namespace Atrc::Mgr

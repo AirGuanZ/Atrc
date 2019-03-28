@@ -15,7 +15,7 @@ Context::Context(const ConfigGroup &root, std::string_view configPath)
             workspace_ = std::filesystem::path(pNode->AsValue());
     }
     else
-        throw MgrErr("'workspace' is undefined");
+        throw AGZ::HierarchyException("'workspace' is undefined");
 }
 
 std::string Context::GetPathInWorkspace(std::string_view subFilename) const

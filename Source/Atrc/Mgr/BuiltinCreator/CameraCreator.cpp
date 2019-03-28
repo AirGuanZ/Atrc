@@ -13,11 +13,11 @@ void RegisterBuiltinCameraCreators(Context &context)
 
 Camera *PinholeCameraCreator::Create(const ConfigGroup &group, Context &context, Arena &arena) const
 {
-    ATRC_MGR_TRY
+    AGZ_HIERARCHY_TRY
     {
         auto filmSize = Parser::ParseVec2i(context.Root()["film.size"]);
         if(filmSize.x <= 0 || filmSize.y <= 0)
-            throw MgrErr("Invalid film size value");
+            throw AGZ::HierarchyException("Invalid film size value");
 
         Vec2 sensorRectSize;
         if(auto widthNode = group.Find("sensorWidth"))
@@ -29,25 +29,25 @@ Camera *PinholeCameraCreator::Create(const ConfigGroup &group, Context &context,
             sensorRectSize = Parser::ParseVec2(group["sensorRectSize"]);
 
         if(sensorRectSize.x <= 0 || sensorRectSize.y <= 0)
-            throw MgrErr("Invalid sensor rect size value");
+            throw AGZ::HierarchyException("Invalid sensor rect size value");
         
         auto sensorDistance = group["sensorDistance"].Parse<Real>();
 
         if(sensorDistance <= 0)
-            throw MgrErr("Invalid sensorDistance value");
+            throw AGZ::HierarchyException("Invalid sensorDistance value");
         
         auto pinholePos = Parser::ParseVec3(group["pos"]);
         auto lookAt     = Parser::ParseVec3(group["lookAt"]);
         auto up         = Parser::ParseVec3(group["up"]);
 
         if(up == Vec3(Real(0)))
-            throw MgrErr("Up vector must be non-zero");
+            throw AGZ::HierarchyException("Up vector must be non-zero");
         
         return arena.Create<PinholeCamera>(
             filmSize.x, filmSize.y, sensorRectSize,
             sensorDistance, pinholePos, lookAt, up);
     }
-    ATRC_MGR_CATCH_AND_RETHROW("In creating pinhole camera: " + group.ToString())
+    AGZ_HIERARCHY_WRAP("In creating pinhole camera: " + group.ToString())
 }
 
 } // namespace Atrc::Mgr

@@ -1,3 +1,5 @@
+#include <filesystem>
+
 #include <Atrc/Mgr/Common.h>
 
 namespace Atrc::Mgr

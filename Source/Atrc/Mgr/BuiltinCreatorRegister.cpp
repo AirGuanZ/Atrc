@@ -18,23 +18,23 @@ namespace Atrc::Mgr
 
 void RegisterBuiltinCreators(Context &context)
 {
-    ATRC_MGR_TRY
-    {
-        RegisterBuiltinCameraCreators               (context);
-        RegisterBuiltinEntityCreators               (context);
-        RegisterBuiltinFilmFilterCreators           (context);
-        RegisterBuiltinGeometryCreators             (context);
-        RegisterBuiltinLightCreators                (context);
-        RegisterBuiltinMaterialCreators             (context);
-        RegisterBuiltinMediumCreators               (context);
-        RegisterBuiltinPathTracingIntegratorCreators(context);
-        RegisterBuiltinPostProcessorCreators        (context);
-        RegisterBuiltinRendererCreators             (context);
-        RegisterBuiltinReportCreators               (context);
-        RegisterBuiltinSamplerCreators              (context);
-        RegisterBuiltinTextureCreators              (context);
-    }
-    ATRC_MGR_CATCH_AND_RETHROW("In registering builtin object creators")
+    AGZ_HIERARCHY_TRY
+
+    RegisterBuiltinCameraCreators(context);
+    RegisterBuiltinEntityCreators(context);
+    RegisterBuiltinFilmFilterCreators(context);
+    RegisterBuiltinGeometryCreators(context);
+    RegisterBuiltinLightCreators(context);
+    RegisterBuiltinMaterialCreators(context);
+    RegisterBuiltinMediumCreators(context);
+    RegisterBuiltinPathTracingIntegratorCreators(context);
+    RegisterBuiltinPostProcessorCreators(context);
+    RegisterBuiltinRendererCreators(context);
+    RegisterBuiltinReportCreators(context);
+    RegisterBuiltinSamplerCreators(context);
+    RegisterBuiltinTextureCreators(context);
+
+    AGZ_HIERARCHY_WRAP("In registering builtin object creators")
 }
 
 } // namespace Atrc::Mgr

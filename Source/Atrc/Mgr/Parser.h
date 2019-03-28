@@ -87,7 +87,7 @@ namespace TFloat
     template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int>>
     AGZ::Math::Vec3<T> ParseSpectrum(const ConfigNode &node)
     {
-        ATRC_MGR_TRY
+        AGZ_HIERARCHY_TRY
         {
             if(auto arr = node.TryAsArray())
             {
@@ -113,15 +113,15 @@ namespace TFloat
                 }
             }
 
-            throw MgrErr("Invalid spectrum form");
+            throw AGZ::HierarchyException("Invalid spectrum form");
         }
-        ATRC_MGR_CATCH_AND_RETHROW("In parsing spectrum: " + node.ToString())
+        AGZ_HIERARCHY_WRAP("In parsing spectrum: " + node.ToString())
     }
 
     template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int>>
     AGZ::Math::Vec2<T> ParseVec2(const ConfigNode &node)
     {
-        ATRC_MGR_TRY
+        AGZ_HIERARCHY_TRY
         {
             if(auto arr = node.TryAsArray())
             {
@@ -132,15 +132,15 @@ namespace TFloat
                         (*arr)[0].Parse<T>(),
                         (*arr)[1].Parse<T>());
             }
-            throw MgrErr("Invalid vec2 form");
+            throw AGZ::HierarchyException("Invalid vec2 form");
         }
-        ATRC_MGR_CATCH_AND_RETHROW("In parsing vec2: " + node.ToString())
+        AGZ_HIERARCHY_WRAP("In parsing vec2: " + node.ToString())
     }
 
     template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int>>
     AGZ::Math::Vec3<T> ParseVec3(const ConfigNode &node)
     {
-        ATRC_MGR_TRY
+        AGZ_HIERARCHY_TRY
         {
             if(auto arr = node.TryAsArray())
             {
@@ -152,82 +152,82 @@ namespace TFloat
                         (*arr)[1].Parse<T>(),
                         (*arr)[2].Parse<T>());
             }
-            throw MgrErr("Invalid vec3 form");
+            throw AGZ::HierarchyException("Invalid vec3 form");
         }
-        ATRC_MGR_CATCH_AND_RETHROW("In parsing vec3: " + node.ToString())
+        AGZ_HIERARCHY_WRAP("In parsing vec3: " + node.ToString())
     }
 
     template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int>>
     AGZ::Math::Rad<T> ParseAngle(const ConfigNode &node)
     {
-        ATRC_MGR_TRY
+        AGZ_HIERARCHY_TRY
         {
             if(auto arr = node.TryAsArray())
             {
                 if(arr->Size() != 1)
-                    throw MgrErr("Array is too long");
+                    throw AGZ::HierarchyException("Array is too long");
                 if(arr->GetTag() == "Deg")
                     return AGZ::Math::Rad<T>(AGZ::Math::Deg<T>((*arr)[0].Parse<T>()));
                 if(arr->GetTag() == "Rad")
                     return AGZ::Math::Rad<T>((*arr)[0].Parse<T>());
             }
-            throw MgrErr("Invalid angle form");
+            throw AGZ::HierarchyException("Invalid angle form");
         }
-        ATRC_MGR_CATCH_AND_RETHROW("In parsing angle: " + node.ToString())
+        AGZ_HIERARCHY_WRAP("In parsing angle: " + node.ToString())
     }
 
     template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int>>
     AGZ::Math::RM_Mat3<T> ParseRotateMat(const ConfigNode &node)
     {
-        ATRC_MGR_TRY
+        AGZ_HIERARCHY_TRY
         {
             if(!node.IsArray())
-                throw MgrErr("Array expected");
+                throw AGZ::HierarchyException("Array expected");
             auto &arr = node.AsArray();
 
             auto ret = AGZ::Math::RM_Mat3<T>::IDENTITY();
             for(size_t i = 0; i < arr.Size(); ++i)
             {
                 if(!arr[i].IsArray())
-                    throw MgrErr("Array expected");
+                    throw AGZ::HierarchyException("Array expected");
                 auto &unit = arr[i].AsArray();
 
-                ATRC_MGR_TRY
+                AGZ_HIERARCHY_TRY
                 {
                     if(unit.GetTag() == "Rotate")
                     {
                         if(unit.Size() != 2)
-                            throw MgrErr("Rotate size must be 2");
+                            throw AGZ::HierarchyException("Rotate size must be 2");
                         ret = ret * AGZ::Math::RM_Mat3<T>::template Rotate(
                             ParseVec3<T>(unit[0]), ParseAngle<T>(unit[1]));
                     }
                     else if(unit.GetTag() == "RotateX")
                     {
                         if(unit.Size() != 1)
-                            throw MgrErr("RotateX size must be 1");
+                            throw AGZ::HierarchyException("RotateX size must be 1");
                         ret = ret * AGZ::Math::RM_Mat3<T>::template RotateX(ParseAngle<T>(unit[0]));
                     }
                     else if(unit.GetTag() == "RotateY")
                     {
                         if(unit.Size() != 1)
-                            throw MgrErr("RotateY size must be 1");
+                            throw AGZ::HierarchyException("RotateY size must be 1");
                         ret = ret * AGZ::Math::RM_Mat3<T>::template RotateY(ParseAngle<T>(unit[0]));
                     }
                     else if(unit.GetTag() == "RotateZ")
                     {
                         if(unit.Size() != 1)
-                            throw MgrErr("RotateZ size must be 1");
+                            throw AGZ::HierarchyException("RotateZ size must be 1");
                         ret = ret * AGZ::Math::RM_Mat3<T>::template RotateZ(ParseAngle<T>(unit[0]));
                     }
                     else
-                        throw MgrErr("Unknown rotation type");
+                        throw AGZ::HierarchyException("Unknown rotation type");
                 }
-                ATRC_MGR_CATCH_AND_RETHROW("In parsing rotation unit: " + unit.ToString());
+                AGZ_HIERARCHY_WRAP("In parsing rotation unit: " + unit.ToString());
             }
 
             return ret;
         }
-        ATRC_MGR_CATCH_AND_RETHROW("In parsing rotation matrix: " + node.ToString())
+        AGZ_HIERARCHY_WRAP("In parsing rotation matrix: " + node.ToString())
     }
 }
 

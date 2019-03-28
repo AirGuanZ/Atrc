@@ -31,4 +31,6 @@ public:
     virtual std::shared_ptr<IFilmFilter> Create() const = 0;
 };
 
-void RegisterBuiltinFilmFilterCreators(ResourceFactory<IFilmFilterCreator> &factory);
+using FilmFilterFactory = ResourceFactory<IFilmFilterCreator>;
+
+void RegisterBuiltinFilmFilterCreators(FilmFilterFactory &factory);

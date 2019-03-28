@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include <filesystem>
 #include <map>
 #include <typeinfo>
 #include <tuple>
@@ -112,7 +113,7 @@ T *Factory<T>::Create(const ConfigNode &definition, Context &context, Arena &are
 
         auto node = context.Root().Find(*val);
         if(!node)
-            throw MgrErr("Object definition not found: " + *val);
+            throw AGZ::HierarchyException("Object definition not found: " + *val);
         
         // 先把pubObjs_[*val]设为nullptr，避免对同一类型同一名字的循环引用，这样可以消除循环引用产生的死循环
         pubObjs_[*val] = nullptr;
@@ -131,11 +132,11 @@ T *Factory<T>::Create(const ConfigNode &definition, Context &context, Arena &are
         }
         auto it = creators_.find(type);
         if(it == creators_.end())
-            throw MgrErr("Unknown object type");
+            throw AGZ::HierarchyException("Unknown object type");
         return it->second->Create(*grp, context, arena);
     }
 
-    throw MgrErr("Invalid object definition form");
+    throw AGZ::HierarchyException("Invalid object definition form");
 }
 
 template<typename T>
@@ -154,14 +155,14 @@ void Context::AddCreator(const Creator<T> *creator)
 template<typename T>
 T *Context::Create(const ConfigNode &definition)
 {
-    ATRC_MGR_TRY
+    AGZ_HIERARCHY_TRY
     {
         T *ret = std::get<Factory<T>>(factories_).Create(definition, *this, arena_);
         if(!ret)
-            throw MgrErr("Context::Create: factory returns nullptr");
+            throw AGZ::HierarchyException("Context::Create: factory returns nullptr");
         return ret;
     }
-    ATRC_MGR_CATCH_AND_RETHROW(
+    AGZ_HIERARCHY_WRAP(
         "In creating : " + std::string(typeid(T).name()) + " with " + definition.ToString())
 }
 

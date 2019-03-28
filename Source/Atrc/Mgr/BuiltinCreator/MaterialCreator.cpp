@@ -29,11 +29,11 @@ namespace
 
         Fresnel *Create(const ConfigGroup &group, [[maybe_unused]] Context &context, Arena &arena) const override
         {
-            ATRC_MGR_TRY
+            AGZ_HIERARCHY_TRY
             {
                 return arena.Create<AlwaysOneFresnel>();
             }
-            ATRC_MGR_CATCH_AND_RETHROW("In creating always-one fresnel object: " + group.ToString())
+            AGZ_HIERARCHY_WRAP("In creating always-one fresnel object: " + group.ToString())
         }
     };
 
@@ -45,14 +45,14 @@ namespace
 
         Fresnel *Create(const ConfigGroup &group, [[maybe_unused]] Context &context, Arena &arena) const override
         {
-            ATRC_MGR_TRY
+            AGZ_HIERARCHY_TRY
             {
                 auto etaI = Parser::ParseSpectrum(group["etaI"]);
                 auto etaT = Parser::ParseSpectrum(group["etaT"]);
                 auto k = Parser::ParseSpectrum(group["k"]);
                 return arena.Create<FresnelConductor>(etaI, etaT, k);
             }
-            ATRC_MGR_CATCH_AND_RETHROW("In creating conductor fresnel object: " + group.ToString())
+            AGZ_HIERARCHY_WRAP("In creating conductor fresnel object: " + group.ToString())
         }
     };
 
@@ -64,13 +64,13 @@ namespace
 
         Fresnel *Create(const ConfigGroup &group, [[maybe_unused]] Context &context, Arena &arena) const override
         {
-            ATRC_MGR_TRY
+            AGZ_HIERARCHY_TRY
             {
                 Real etaI = group["etaI"].Parse<Real>();
                 Real etaT = group["etaT"].Parse<Real>();
                 return arena.Create<FresnelDielectric>(etaI, etaT);
             }
-            ATRC_MGR_CATCH_AND_RETHROW("In creating dielectric object: " + group.ToString())
+            AGZ_HIERARCHY_WRAP("In creating dielectric object: " + group.ToString())
         }
     };
 
@@ -82,13 +82,13 @@ namespace
 
         Fresnel *Create(const ConfigGroup &group, [[maybe_unused]] Context &context, Arena &arena) const override
         {
-            ATRC_MGR_TRY
+            AGZ_HIERARCHY_TRY
             {
                 Real etaI = group["etaI"].Parse<Real>();
                 Real etaT = group["etaT"].Parse<Real>();
                 return arena.Create<SchlickApproximation>(etaI, etaT);
             }
-            ATRC_MGR_CATCH_AND_RETHROW("In creating dielectric object: " + group.ToString())
+            AGZ_HIERARCHY_WRAP("In creating dielectric object: " + group.ToString())
         }
     };
 } // namespace null
@@ -139,7 +139,7 @@ namespace
     // 若group.Find("normalMapper")不为nullptr，则以之为texture创建一个texture normal mapper，否则返回default normal mapper
     const NormalMapper *CreateNormalMapper(const ConfigGroup &group, Context &context, Arena &arena)
     {
-        ATRC_MGR_TRY
+        AGZ_HIERARCHY_TRY
         {
             if(auto texNode = group.Find("normalMapper"))
             {
@@ -149,13 +149,13 @@ namespace
             static const DefaultNormalMapper DEFAULT_NORMAL_MAPPER;
             return &DEFAULT_NORMAL_MAPPER;
         }
-        ATRC_MGR_CATCH_AND_RETHROW("In creating normal mapper: " + group.ToString())
+        AGZ_HIERARCHY_WRAP("In creating normal mapper: " + group.ToString())
     }
 }
 
 Material *BSSRDFSurfaceCreator::Create(const ConfigGroup &group, Context &context, Arena &arena) const
 {
-    ATRC_MGR_TRY
+    AGZ_HIERARCHY_TRY
     {
         auto surface = context.Create<Material>(group["surface"]);
         auto AMap    = context.Create<Texture>(group["A"]);
@@ -164,12 +164,12 @@ Material *BSSRDFSurfaceCreator::Create(const ConfigGroup &group, Context &contex
 
         return arena.Create<BSSRDFSurface>(surface, AMap, dmfpMap, eta);
     }
-    ATRC_MGR_CATCH_AND_RETHROW("In creating bssrdf surface material: " + group.ToString())
+    AGZ_HIERARCHY_WRAP("In creating bssrdf surface material: " + group.ToString())
 }
 
 Material *DisneyDiffuseCreator::Create(const ConfigGroup &group, Context &context, Arena &arena) const
 {
-    ATRC_MGR_TRY
+    AGZ_HIERARCHY_TRY
     {
         auto baseColor = context.Create<Texture>(group["baseColor"]);
         auto subsurface = context.Create<Texture>(group["subsurface"]);
@@ -179,12 +179,12 @@ Material *DisneyDiffuseCreator::Create(const ConfigGroup &group, Context &contex
         return arena.Create<DisneyDiffuseMaterial>(
             baseColor, subsurface, roughness, normalMapper);
     }
-    ATRC_MGR_CATCH_AND_RETHROW("In creating disney diffuse: " + group.ToString())
+    AGZ_HIERARCHY_WRAP("In creating disney diffuse: " + group.ToString())
 }
 
 Material *DisneyReflectionCreator::Create(const ConfigGroup &group, Context &context, Arena &arena) const
 {
-    ATRC_MGR_TRY
+    AGZ_HIERARCHY_TRY
     {
         auto baseColor = context.Create<Texture>(group["baseColor"]);
         auto metallic = context.Create<Texture>(group["metallic"]);
@@ -205,12 +205,12 @@ Material *DisneyReflectionCreator::Create(const ConfigGroup &group, Context &con
             roughness, anisotropic, sheen, sheenTint,
             clearcoat, clearcoatGloss, normalMapper);
     }
-    ATRC_MGR_CATCH_AND_RETHROW("In creating disney brdf: " + group.ToString())
+    AGZ_HIERARCHY_WRAP("In creating disney brdf: " + group.ToString())
 }
 
 Material *DisneySpecularCreator::Create(const ConfigGroup &group, Context &context, Arena &arena) const
 {
-    ATRC_MGR_TRY
+    AGZ_HIERARCHY_TRY
     {
         auto baseColor = context.Create<Texture>(group["baseColor"]);
         auto specular = context.Create<Texture>(group["specular"]);
@@ -224,12 +224,12 @@ Material *DisneySpecularCreator::Create(const ConfigGroup &group, Context &conte
         return arena.Create<DisneySpecularMaterial>(
             baseColor, specular, specularTint, metallic, roughness, anisotropic, normalMapper);
     }
-    ATRC_MGR_CATCH_AND_RETHROW("In creating disney specular: " + group.ToString())
+    AGZ_HIERARCHY_WRAP("In creating disney specular: " + group.ToString())
 }
 
 Material *GGXDielectricCreator::Create(const ConfigGroup &group, Context &context, Arena &arena) const
 {
-    ATRC_MGR_TRY
+    AGZ_HIERARCHY_TRY
     {
         auto dielectric = dynamic_cast<Dielectric*>(context.Create<Fresnel>(group["fresnel"]));
         auto rc = context.Create<Texture>(group["rc"]);
@@ -238,12 +238,12 @@ Material *GGXDielectricCreator::Create(const ConfigGroup &group, Context &contex
 
         return arena.Create<GGXDielectric>(dielectric, rc, roughness, normalMapper);
     }
-    ATRC_MGR_CATCH_AND_RETHROW("In creating ggx dielectric material: " + group.ToString())
+    AGZ_HIERARCHY_WRAP("In creating ggx dielectric material: " + group.ToString())
 }
 
 Material *GGXMetalCreator::Create(const ConfigGroup &group, Context &context, Arena &arena) const
 {
-    ATRC_MGR_TRY
+    AGZ_HIERARCHY_TRY
     {
         auto fresnel      = context.Create<Fresnel>(group["fresnel"]);
         auto rc           = context.Create<Texture>(group["rc"]);
@@ -252,7 +252,7 @@ Material *GGXMetalCreator::Create(const ConfigGroup &group, Context &context, Ar
 
         return arena.Create<GGXMetal>(fresnel, rc, roughness, normalMapper);
     }
-    ATRC_MGR_CATCH_AND_RETHROW("In creating ggx metal material: " + group.ToString())
+    AGZ_HIERARCHY_WRAP("In creating ggx metal material: " + group.ToString())
 }
 
 Material *IdealBlackCreator::Create(
@@ -263,46 +263,46 @@ Material *IdealBlackCreator::Create(
 
 Material *IdealDiffuseCreator::Create(const ConfigGroup &group, Context &context, Arena &arena) const
 {
-    ATRC_MGR_TRY
+    AGZ_HIERARCHY_TRY
     {
         auto albedoMap = context.Create<Texture>(group["albedo"]);
         auto normalMapper = CreateNormalMapper(group, context, arena);
         return arena.Create<IdealDiffuse>(albedoMap, normalMapper);
     }
-    ATRC_MGR_CATCH_AND_RETHROW("In creating ideal diffuse material: " + group.ToString())
+    AGZ_HIERARCHY_WRAP("In creating ideal diffuse material: " + group.ToString())
 }
 
 Material *IdealMirrorCreator::Create(const ConfigGroup &group, Context &context, Arena &arena) const
 {
-    ATRC_MGR_TRY
+    AGZ_HIERARCHY_TRY
     {
         auto rcMap = context.Create<Texture>(group["rc"]);
         auto fresnel = context.Create<Fresnel>(group["fresnel"]);
         return arena.Create<IdealMirror>(rcMap, fresnel);
     }
-    ATRC_MGR_CATCH_AND_RETHROW("In creating ideal mirror material: " + group.ToString())
+    AGZ_HIERARCHY_WRAP("In creating ideal mirror material: " + group.ToString())
 }
 
 Material *IdealScalerCreator::Create(const ConfigGroup &group, Context &context, Arena &arena) const
 {
-    ATRC_MGR_TRY
+    AGZ_HIERARCHY_TRY
     {
         auto scaleMap = context.Create<Texture>(group["scale"]);
         auto internal = context.Create<Material>(group["internal"]);
         return arena.Create<IdealScaler>(scaleMap, internal);
     }
-    ATRC_MGR_CATCH_AND_RETHROW("In creating ideal scaler material: " + group.ToString())
+    AGZ_HIERARCHY_WRAP("In creating ideal scaler material: " + group.ToString())
 }
 
 Material *IdealSpecularCreator::Create(const ConfigGroup &group, Context &context, Arena &arena) const
 {
-    ATRC_MGR_TRY
+    AGZ_HIERARCHY_TRY
     {
         auto rcMap = context.Create<Texture>(group["rc"]);
         auto fresnel = context.Create<Fresnel>(group["fresnel"]);
         return arena.Create<IdealSpecular>(rcMap, fresnel);
     }
-    ATRC_MGR_CATCH_AND_RETHROW("In creating ideal specular material: " + group.ToString())
+    AGZ_HIERARCHY_WRAP("In creating ideal specular material: " + group.ToString())
 }
 
 Material *InvisibleSurfaceCreator::Create(
@@ -314,7 +314,7 @@ Material *InvisibleSurfaceCreator::Create(
 
 Material *ONMatteCreator::Create(const ConfigGroup &group, Context &context, Arena &arena) const
 {
-    ATRC_MGR_TRY
+    AGZ_HIERARCHY_TRY
     {
         auto albedoMap    = context.Create<Texture>(group["albedo"]);
         auto sigmaMap     = context.Create<Texture>(group["sigma"]);
@@ -322,12 +322,12 @@ Material *ONMatteCreator::Create(const ConfigGroup &group, Context &context, Are
 
         return arena.Create<ONMatte>(albedoMap, sigmaMap, normalMapper);
     }
-    ATRC_MGR_CATCH_AND_RETHROW("In creating Oren-Nayar matte material: " + group.ToString())
+    AGZ_HIERARCHY_WRAP("In creating Oren-Nayar matte material: " + group.ToString())
 }
 
 Material *TSMetalCreator::Create(const ConfigGroup &group, Context &context, Arena &arena) const
 {
-    ATRC_MGR_TRY
+    AGZ_HIERARCHY_TRY
     {
         auto fresnel = context.Create<Fresnel>(group["fresnel"]);
         auto rc = context.Create<Texture>(group["rc"]);
@@ -336,7 +336,7 @@ Material *TSMetalCreator::Create(const ConfigGroup &group, Context &context, Are
 
         return arena.Create<TSMetal>(fresnel, rc, roughness, normalMapper);
     }
-    ATRC_MGR_CATCH_AND_RETHROW("In creating Torrance-Sparrow metal material: " + group.ToString())
+    AGZ_HIERARCHY_WRAP("In creating Torrance-Sparrow metal material: " + group.ToString())
 }
 
 } // namespace Atrc::Mgr

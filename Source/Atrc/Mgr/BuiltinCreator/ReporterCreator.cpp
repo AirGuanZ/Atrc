@@ -12,11 +12,11 @@ void RegisterBuiltinReportCreators(Context &context)
 
 Reporter *DefaultReporterCreator::Create(const ConfigGroup &group, [[maybe_unused]] Context &context, Arena &arena) const
 {
-    ATRC_MGR_TRY
+    AGZ_HIERARCHY_TRY
     {
         return arena.Create<DefaultReporter>();
     }
-    ATRC_MGR_CATCH_AND_RETHROW("In creating default reporter: " + group.ToString())
+    AGZ_HIERARCHY_WRAP("In creating default reporter: " + group.ToString())
 }
 
 } // namespace Atrc::Mgr

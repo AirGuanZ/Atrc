@@ -340,17 +340,12 @@ int main(int argc, char *argv[])
         else
             std::cout << USAGE_MSG << std::endl;
     }
-    catch(const Atrc::Mgr::MgrErr &err)
+    catch(const AGZ::HierarchyException &err)
     {
-        for(auto pErr = &err; pErr; pErr = pErr->TryGetInterior())
-        {
-            std::cout << pErr->GetMsg() << std::endl;
-            if(pErr->TryGetLeaf())
-            {
-                std::cout << pErr->TryGetLeaf()->what() << std::endl;
-                break;
-            }
-        }
+        std::vector<std::string> errMsgs;
+        err.GetAllMessages(std::back_inserter(errMsgs));
+        for(auto &m : errMsgs)
+            std::cout << m << std::endl;
     }
     catch(const std::exception &err)
     {

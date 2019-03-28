@@ -7,14 +7,14 @@ namespace Atrc::Mgr
 
 Scene SceneBuilder::Build(const ConfigGroup &root, Context &context)
 {
-    ATRC_MGR_TRY
+    AGZ_HIERARCHY_TRY
     {
         auto camera = context.Create<Camera>(root["camera"]);
 
         std::vector<Entity*> entities;
         std::vector<Light*> lights;
 
-        ATRC_MGR_TRY
+        AGZ_HIERARCHY_TRY
         {
             if(auto entN = root.Find("entities"))
             {
@@ -23,9 +23,9 @@ Scene SceneBuilder::Build(const ConfigGroup &root, Context &context)
                     entities.push_back(context.Create<Entity>(*ent));
             }
         }
-        ATRC_MGR_CATCH_AND_RETHROW("In creating entities")
+        AGZ_HIERARCHY_WRAP("In creating entities")
 
-        ATRC_MGR_TRY
+        AGZ_HIERARCHY_TRY
         {
             if(auto lhtN = root.Find("lights"))
             {
@@ -34,7 +34,7 @@ Scene SceneBuilder::Build(const ConfigGroup &root, Context &context)
                     lights.push_back(context.Create<Light>(*lht));
             }
         }
-        ATRC_MGR_CATCH_AND_RETHROW("In creating lights")
+        AGZ_HIERARCHY_WRAP("In creating lights")
 
         std::vector<const Entity*> cEntities;
         std::vector<const Light*> cLights;
@@ -63,7 +63,7 @@ Scene SceneBuilder::Build(const ConfigGroup &root, Context &context)
         
         return scene;
     }
-    ATRC_MGR_CATCH_AND_RETHROW("In creating Atrc scene")
+    AGZ_HIERARCHY_WRAP("In creating Atrc scene")
 }
 
 } // namespace Atrc::Mgr

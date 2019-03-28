@@ -25,50 +25,50 @@ void RegisterBuiltinPostProcessorCreators(Context& context)
 
 PostProcessor *ACESFilmCreator::Create([[maybe_unused]] const ConfigGroup &group, [[maybe_unused]] Context &context, Arena &arena) const
 {
-    ATRC_MGR_TRY
+    AGZ_HIERARCHY_TRY
     {
         return arena.Create<ACESFilm>();
     }
-    ATRC_MGR_CATCH_AND_RETHROW("In creating post processor (aces film)")
+    AGZ_HIERARCHY_WRAP("In creating post processor (aces film)")
 }
 
 PostProcessor *FlipImageCreator::Create([[maybe_unused]] const ConfigGroup &group, [[maybe_unused]] Context &context, Arena &arena) const
 {
-    ATRC_MGR_TRY
+    AGZ_HIERARCHY_TRY
     {
         return arena.Create<FlipImage>();
     }
-    ATRC_MGR_CATCH_AND_RETHROW("In creating post processor (flip image)")
+    AGZ_HIERARCHY_WRAP("In creating post processor (flip image)")
 }
 
 PostProcessor *GammaCorrectionCreator::Create(const ConfigGroup &group, [[maybe_unused]] Context &context, Arena &arena) const
 {
-    ATRC_MGR_TRY
+    AGZ_HIERARCHY_TRY
     {
         Real gamma = group["gamma"].Parse<Real>();
         return arena.Create<GammaCorrection>(gamma);
     }
-    ATRC_MGR_CATCH_AND_RETHROW("In creating post processor (gamma correction)")
+    AGZ_HIERARCHY_WRAP("In creating post processor (gamma correction)")
 }
 
 PostProcessor* NativeToneMappingCreator::Create(const ConfigGroup &group, [[maybe_unused]] Context &context, Arena &arena) const
 {
-    ATRC_MGR_TRY
+    AGZ_HIERARCHY_TRY
     {
         auto LWhite = Parser::ParseSpectrum(group["LWhite"]);
         return arena.Create<NativeToneMapping>(LWhite);
     }
-    ATRC_MGR_CATCH_AND_RETHROW("In creating post processor (native tone mapping)")
+    AGZ_HIERARCHY_WRAP("In creating post processor (native tone mapping)")
 }
 
 PostProcessor *SaveAsHDRCreator::Create(const ConfigGroup &group, Context &context, Arena &arena) const
 {
-    ATRC_MGR_TRY
+    AGZ_HIERARCHY_TRY
     {
         std::string filename = context.GetPathInWorkspace(group["filename"].AsValue());
         return arena.Create<SaveAsHDR>(filename);
     }
-    ATRC_MGR_CATCH_AND_RETHROW("In creating post processor (save as hdr)")
+    AGZ_HIERARCHY_WRAP("In creating post processor (save as hdr)")
 }
 
 } // namespace Atrc::Mgr

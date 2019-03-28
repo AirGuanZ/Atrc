@@ -26,18 +26,18 @@ void RegisterBuiltinGeometryCreators(Context &context)
 
 Geometry *SphereCreator::Create(const ConfigGroup &group, [[maybe_unused]] Context &context, Arena &arena) const
 {
-    ATRC_MGR_TRY
+    AGZ_HIERARCHY_TRY
     {
         Real radius    = group["radius"].Parse<Real>();
         auto transform = Parser::ParseTransform(group["transform"]);
         return arena.Create<Sphere>(transform, radius);
     }
-    ATRC_MGR_CATCH_AND_RETHROW("In creating sphere: " + group.ToString())
+    AGZ_HIERARCHY_WRAP("In creating sphere: " + group.ToString())
 }
 
 Geometry *TriangleCreator::Create(const ConfigGroup &group, [[maybe_unused]] Context &context, Arena &arena) const
 {
-    ATRC_MGR_TRY
+    AGZ_HIERARCHY_TRY
     {
         Vec3 A = Parser::ParseVec3(group["A"]);
         Vec3 B = Parser::ParseVec3(group["B"]);
@@ -48,7 +48,7 @@ Geometry *TriangleCreator::Create(const ConfigGroup &group, [[maybe_unused]] Con
         auto transform = Parser::ParseTransform(group["transform"]);
         return arena.Create<Triangle>(transform, A, B, C, tA, tB, tC);
     }
-    ATRC_MGR_CATCH_AND_RETHROW("In creating triangle: " + group.ToString())
+    AGZ_HIERARCHY_WRAP("In creating triangle: " + group.ToString())
 }
 
 namespace
@@ -57,7 +57,7 @@ namespace
     {
         AGZ::Mesh::WavefrontObj<Real> obj;
         if(!obj.LoadFromFile(filename))
-            throw MgrErr("Failed to load obj file from " + std::string(filename));
+            throw AGZ::HierarchyException("Failed to load obj file from " + std::string(filename));
         auto mesh = obj.ToGeometryMeshGroup().MergeAllSubmeshes();
         obj.Clear();
 
@@ -78,17 +78,17 @@ namespace
 
         std::ofstream fout(WIDEN(cacheFilename), std::ofstream::trunc | std::ofstream::binary);
         if(!fout)
-            throw MgrErr("Failed to create new triangle mesh cache file: " + std::string(cacheFilename));
+            throw AGZ::HierarchyException("Failed to create new triangle mesh cache file: " + std::string(cacheFilename));
 
         auto oriFileTime = AGZ::FileSys::File::GetLastWriteTime(filename);
         if(!oriFileTime)
-            throw MgrErr("Failed to load last write time of " + std::string(filename));
+            throw AGZ::HierarchyException("Failed to load last write time of " + std::string(filename));
 
         AGZ::BinaryOStreamSerializer serializer(fout);
         if(!serializer.Serialize(*oriFileTime) || !serializer.Serialize(*ret))
         {
             AGZ::FileSys::File::DeleteRegularFile(cacheFilename);
-            throw MgrErr("Failed to serialize into triangle mesh cache file: " + std::string(cacheFilename));
+            throw AGZ::HierarchyException("Failed to serialize into triangle mesh cache file: " + std::string(cacheFilename));
         }
 
         return ret;
@@ -103,7 +103,7 @@ namespace
 
         auto oriFileTime = AGZ::FileSys::File::GetLastWriteTime(filename);
         if(!oriFileTime)
-            throw MgrErr("Failed to load last write time of " + std::string(filename));
+            throw AGZ::HierarchyException("Failed to load last write time of " + std::string(filename));
 
         AGZ::BinaryIStreamDeserializer deserializer(fin);
         auto cacheTime = deserializer.Deserialize<AGZ::FileSys::FileTime>();
@@ -127,7 +127,7 @@ namespace
 
 Geometry *TriangleBVHCreator::Create(const ConfigGroup &group, Context &context, Arena &arena) const
 {
-    ATRC_MGR_TRY
+    AGZ_HIERARCHY_TRY
     {
         auto transform = Parser::ParseTransform(group["transform"]);
 
@@ -147,7 +147,7 @@ Geometry *TriangleBVHCreator::Create(const ConfigGroup &group, Context &context,
 
         return arena.Create<TriangleBVH>(transform, *core);
     }
-    ATRC_MGR_CATCH_AND_RETHROW("In creating triangle bvh: " + group.ToString())
+    AGZ_HIERARCHY_WRAP("In creating triangle bvh: " + group.ToString())
 }
 
 } // namespace Atrc::Mgr

@@ -52,10 +52,6 @@ class IResource : public HasName
 {
     const HasName *creator_;
 
-protected:
-
-    static std::string TG(const std::string &content) { return "{" + content + "}"; }
-
 public:
 
     IResource(std::string name, const HasName *creator) noexcept

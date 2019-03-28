@@ -13,7 +13,7 @@ void RegisterBuiltinMediumCreators(Context &context)
 
 Medium *HomogeneousMediumCreator::Create(const ConfigGroup &group, [[maybe_unused]] Context &context, Arena &arena) const
 {
-    ATRC_MGR_TRY
+    AGZ_HIERARCHY_TRY
     {
         Spectrum sigmaA = Parser::ParseSpectrum(group["sigmaA"]);
         Spectrum sigmaS = Parser::ParseSpectrum(group["sigmaS"]);
@@ -21,7 +21,7 @@ Medium *HomogeneousMediumCreator::Create(const ConfigGroup &group, [[maybe_unuse
         Real g          = group["g"].Parse<Real>();
         return arena.Create<HomogeneousMedium>(sigmaA, sigmaS, le, g);
     }
-    ATRC_MGR_CATCH_AND_RETHROW("In creating homogeneous medium: " + group.ToString())
+    AGZ_HIERARCHY_WRAP("In creating homogeneous medium: " + group.ToString())
 }
 
 } // namespace Atrc::Mgr
