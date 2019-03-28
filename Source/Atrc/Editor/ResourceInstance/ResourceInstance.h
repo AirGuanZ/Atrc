@@ -88,11 +88,6 @@ public:
 template<typename TResourceCreatorCategory>
 class ResourceFactory
 {
-    static_assert(std::is_base_of_v<IResource, typename TResourceCreatorCategory::Resource>);
-    static_assert(std::is_base_of_v<IResourceCreator, TResourceCreatorCategory>);
-
-    std::map<std::string, const TResourceCreatorCategory*> name2Creator_;
-
 public:
 
     using Resource = typename TResourceCreatorCategory::Resource;
@@ -127,4 +122,11 @@ public:
 
     auto begin() { return name2Creator_.begin(); }
     auto end()   { return name2Creator_.end(); }
+
+private:
+
+    static_assert(std::is_base_of_v<IResource, Resource>);
+    static_assert(std::is_base_of_v<IResourceCreator, TResourceCreatorCategory>);
+
+    std::map<std::string, const TResourceCreatorCategory*> name2Creator_;
 };

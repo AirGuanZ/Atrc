@@ -6,6 +6,10 @@ namespace
     {
         int workerCount_ = -1;
         int taskGridSize_ = 16;
+
+        int epoch_ = 1;
+        bool shuffle_ = false;
+
         PathTracingIntegratorSlot integratorSlot_;
 
     protected:
@@ -16,6 +20,8 @@ namespace
             ExportSubResource("integrator", rscMgr, ctx, integratorSlot_);
             ctx.AddLine("workerCount = ", workerCount_, ";");
             ctx.AddLine("taskGridSize = ", taskGridSize_, ";");
+            ctx.AddLine("epoch = ", epoch_, ";");
+            ctx.AddLine("shuffle = ", shuffle_ ? "True" : "False", ";");
         }
 
     public:
@@ -30,6 +36,8 @@ namespace
         {
             ImGui::InputInt("worker count", &workerCount_, 0);
             ImGui::InputInt("task size", &taskGridSize_, 0);
+            ImGui::InputInt("epoch", &epoch_, 0);
+            ImGui::Checkbox("shuffle", &shuffle_);
             if(ImGui::TreeNodeEx("integrator", ImGuiTreeNodeFlags_DefaultOpen))
             {
                 integratorSlot_.Display(rscMgr);
@@ -41,6 +49,8 @@ namespace
         {
             workerCount_ = params["workerCount"].Parse<int>();
             taskGridSize_ = params["taskGridSize"].Parse<int>();
+            epoch_ = params["epoch"].Parse<int>();
+            shuffle_ = params["shuffle"].AsValue() == "True";
             integratorSlot_.SetInstance(GetResourceInstance<PathTracingIntegratorInstance>(rscMgr, root, params["integrator"], ctx));
         }
     };

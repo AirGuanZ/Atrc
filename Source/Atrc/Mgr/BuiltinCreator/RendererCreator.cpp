@@ -1,5 +1,6 @@
 #include <Atrc/Lib/Renderer/PathTracingRenderer.h>
 #include <Atrc/Mgr/BuiltinCreator/RendererCreator.h>
+#include "Atrc/Mgr/Parser.h"
 
 namespace Atrc::Mgr
 {
@@ -18,10 +19,20 @@ Renderer *PathTracingRendererCreator::Create(const ConfigGroup &group, Context &
         int workerCount  = group["workerCount"].Parse<int>();
         int taskGridSize = group["taskGridSize"].Parse<int>();
 
+        int epoch = 1;
+        if(auto pN = group.Find("epoch"))
+            epoch = pN->Parse<int>();
+        if(epoch <= 0)
+            throw MgrErr("Invalid epoch value: " + std::to_string(epoch));
+
+        bool shuffle = false;
+        if(auto pN = group.Find("shuffle"))
+            shuffle = Parser::ParseBool(*pN);
+
         if(taskGridSize <= 0)
             throw MgrErr("Invalid taskGridSize value");
         
-        return arena.Create<PathTracingRenderer>(workerCount, taskGridSize, *integrator);
+        return arena.Create<PathTracingRenderer>(workerCount, taskGridSize, epoch, shuffle, *integrator);
     }
     ATRC_MGR_CATCH_AND_RETHROW("In creating path tracing renderer: " + group.ToString())
 }

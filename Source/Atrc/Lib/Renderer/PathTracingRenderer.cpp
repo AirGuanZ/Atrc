@@ -40,8 +40,12 @@ void PathTracingRenderer::RenderGrid(const Scene *scene, FilmGrid *filmGrid, Sam
     }
 }
 
-PathTracingRenderer::PathTracingRenderer(int workerCount, int taskGridSize, const PathTracingIntegrator &integrator) noexcept
-    : taskGridSize_(taskGridSize), dispatcher_(workerCount), totalCount_(0), finishedCount_(0), integrator_(integrator)
+PathTracingRenderer::PathTracingRenderer(
+    int workerCount, int taskGridSize, int epoch, bool shuffle, const PathTracingIntegrator &integrator) noexcept
+    : taskGridSize_(taskGridSize), dispatcher_(workerCount),
+      totalCount_(0), finishedCount_(0),
+      totalEpoch_(epoch), shuffle_(shuffle),
+      integrator_(integrator)
 {
     AGZ_ASSERT(taskGridSize > 0);
 }
@@ -57,23 +61,28 @@ void PathTracingRenderer::Render(const Scene *scene, Sampler *sampler, Film *fil
         Grid{ { 0, 0 }, { resolution.x, resolution.y } },
         taskGridSize_, taskGridSize_, std::back_inserter(tasks0));
 
-    /*std::default_random_engine rng(42);
-    std::shuffle(tasks0.begin(), tasks0.end(), rng);*/
-    
-    std::queue<Grid> tasks;
-    for(auto &g : tasks0)
-        tasks.push(g);
-
-    auto func = [=](const Grid &task, AGZ::NoSharedParam_t)
+    std::queue<Task> tasks;
+    for(size_t i = 0; i < totalEpoch_; ++i)
     {
-        int32_t taskID = task.low.x * int32_t(totalCount_) + task.low.y;
+        if(shuffle_)
+        {
+            std::default_random_engine rng(
+                static_cast<std::default_random_engine::result_type>(42 + i * totalEpoch_));
+            std::shuffle(tasks0.begin(), tasks0.end(), rng);
+        }
+        for(auto &g : tasks0)
+            tasks.push({ g, static_cast<int>(i) });
+    }
+
+    auto func = [=](const Task &task, AGZ::NoSharedParam_t)
+    {
+        int32_t taskID = task.grid.low.x * int32_t(totalCount_) * task.epoch + task.grid.low.y;
         auto gridSampler = sampler->Clone(taskID);
 
-        auto filmGrid = film->CreateFilmGrid(task);
+        auto filmGrid = film->CreateFilmGrid(task.grid);
         RenderGrid(scene, &filmGrid, gridSampler.get());
 
         std::lock_guard<std::mutex> lk(mergeMut_);
-        
         film->MergeFilmGrid(filmGrid);
 
         Real percent = Real(100) * ++finishedCount_ / totalCount_;

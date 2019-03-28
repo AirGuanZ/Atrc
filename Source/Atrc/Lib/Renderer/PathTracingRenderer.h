@@ -23,12 +23,22 @@ class PathTracingRenderer : public Renderer
 {
     using Grid = GridDivider<int32_t>::Grid;
 
+    struct Task
+    {
+        Grid grid;
+        int epoch;
+    };
+
     int taskGridSize_;
-    AGZ::StaticTaskDispatcher<Grid> dispatcher_;
+    AGZ::StaticTaskDispatcher<Task> dispatcher_;
 
     std::mutex mergeMut_;
     size_t totalCount_;
     std::atomic<size_t> finishedCount_;
+
+    size_t totalEpoch_;
+
+    bool shuffle_;
 
     const PathTracingIntegrator &integrator_;
 
@@ -36,7 +46,7 @@ class PathTracingRenderer : public Renderer
 
 public:
 
-    PathTracingRenderer(int workerCount, int taskGridSize, const PathTracingIntegrator &integrator) noexcept;
+    PathTracingRenderer(int workerCount, int taskGridSize, int epoch, bool shuffle, const PathTracingIntegrator &integrator) noexcept;
 
     void Render(const Scene *scene, Sampler *sampler, Film *film, Reporter *reporter) override;
 
