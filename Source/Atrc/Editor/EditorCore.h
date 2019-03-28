@@ -9,6 +9,9 @@
 #include <Atrc/Editor/ResourceManagement/ResourceManager.h>
 #include <Atrc/Editor/SceneRenderer.h>
 
+#include <Atrc/Editor/FilmFilter/FilmFilter.h>
+#include <Atrc/Editor/ResourceInstance/ResourceSlot.h>
+
 struct EditorData
 {
     DefaultRenderingCamera defaultRenderingCamera;
@@ -16,9 +19,11 @@ struct EditorData
     ResourceManager rscMgr;
 
     Vec2i filmSize = { 640, 480 };
-    FilmFilterSlot filmFilterSlot;
     SamplerSlot    samplerSlot;
     RendererSlot   rendererSlot;
+
+    FilmFilterFactory filmFilterFactory;
+    std::unique_ptr<ResourceSlot<FilmFilterFactory>> filmFilter;
 
     FileSelector scriptFilename = FileSelector(ImGuiFileBrowserFlags_EnterNewFilename);
     FileSelector workspaceDir = FileSelector(ImGuiFileBrowserFlags_SelectDirectory);

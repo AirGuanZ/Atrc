@@ -10,7 +10,7 @@ namespace
         ctx.AddLine(TResource::GetPoolName(), " = {");
         ctx.IncIndent();
         for(auto &rsc : rscMgr.GetPool<TResource>())
-            IResource::ExportSubResource(rsc->GetName(), rscMgr, ctx, *rsc);
+            ResourceInstance::ExportSubResource(rsc->GetName(), rscMgr, ctx, *rsc);
         ctx.DecIndent();
         ctx.AddLine("};");
     }
@@ -19,7 +19,7 @@ namespace
 std::string LauncherScriptExporter::Export(
     ResourceManager &rscMgr, SceneExportingContext &ctx,
     const RendererInstance *renderer,
-    const FilmFilterInstance *filmFilter,
+    const IFilmFilter *filmFilter,
     const SamplerInstance    *sampler,
     const Vec2i &outputFilmSize,
     const std::string &outputFilename) const
@@ -34,7 +34,7 @@ std::string LauncherScriptExporter::Export(
     ctx.IncIndent();
     ctx.AddLine("size = (", outputFilmSize.x, ", ", outputFilmSize.y, ");");
     if(filmFilter)
-        IResource::ExportSubResource("filter", rscMgr, ctx, *filmFilter);
+        ctx.AddLine("filter = ", filmFilter->Export(), ";");
     else
         Global::ShowNormalMessage("film filter is unspecified");
     ctx.DecIndent();
@@ -57,7 +57,7 @@ std::string LauncherScriptExporter::Export(
 
     if(sampler)
     {
-        IResource::ExportSubResource("sampler", rscMgr, ctx, *sampler);
+        ResourceInstance::ExportSubResource("sampler", rscMgr, ctx, *sampler);
         ctx.AddLine();
     }
     else
@@ -65,7 +65,7 @@ std::string LauncherScriptExporter::Export(
 
     if(ctx.camera)
     {
-        IResource::ExportSubResourceAsReference("camera", rscMgr, ctx, *ctx.camera);
+        ResourceInstance::ExportSubResourceAsReference("camera", rscMgr, ctx, *ctx.camera);
         ctx.AddLine();
     }
     else
@@ -73,7 +73,7 @@ std::string LauncherScriptExporter::Export(
 
     if(renderer)
     {
-        IResource::ExportSubResource("renderer", rscMgr, ctx, *renderer);
+        ResourceInstance::ExportSubResource("renderer", rscMgr, ctx, *renderer);
         ctx.AddLine();
     }
     else
@@ -115,7 +115,7 @@ std::string LauncherScriptExporter::Export(
 
 void LauncherScriptImporter::Import(const AGZ::ConfigGroup &root, EditorData *data, std::string_view scriptFilename)
 {
-    IResource::ImportContext ctx;
+    ResourceInstance::ImportContext ctx;
 
     {
         auto scriptDir = absolute(std::filesystem::path(scriptFilename).parent_path());
@@ -160,8 +160,9 @@ void LauncherScriptImporter::Import(const AGZ::ConfigGroup &root, EditorData *da
 
     data->filmSize = Atrc::Mgr::Parser::ParseVec2i(root["film.size"]);
     {
-        auto filmFilter = GetResourceInstance<FilmFilterInstance>(data->rscMgr, root, root["film.filter"], ctx);
-        data->filmFilterSlot.SetInstance(filmFilter);
+        auto filter = data->filmFilterFactory[root["film.filter.type"].AsValue()].Create();
+        filter->Load(root["film.filter"].AsGroup());
+        data->filmFilter->SetResource(filter);
     }
     {
         auto sampler = GetResourceInstance<SamplerInstance>(data->rscMgr, root, root["sampler"], ctx);

@@ -26,7 +26,7 @@ void InitializeImGui(GLFWwindow *window)
     ImFontConfig fontConfig;
     fontConfig.SizePixels = 16;
     ImGui::GetIO().Fonts->AddFontDefault(&fontConfig);
-
+    
     /*ImFontConfig config;
     config.MergeMode = true;
     ImGui::GetIO().Fonts->AddFontFromFileTTF(
@@ -34,6 +34,11 @@ void InitializeImGui(GLFWwindow *window)
     ImGui::GetIO().Fonts->AddFontFromFileTTF(
         "./songti.ttf", 16, &config, ImGui::GetIO().Fonts->GetGlyphRangesChineseSimplifiedCommon());
     ImGui::GetIO().Fonts->Build();*/
+
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplGlfw_NewFrame();
+    ImGui::NewFrame();
+    ImGui::EndFrame();
 }
 
 int Run(GLFWwindow *window)

@@ -8,7 +8,7 @@ namespace
         ctx.AddLine(TResource::GetPoolName(), " = {");
         ctx.IncIndent();
         for(auto &rsc : rscMgr.GetPool<TResource>())
-            IResource::ExportSubResource(rsc->GetName(), rscMgr, ctx, *rsc);
+            ResourceInstance::ExportSubResource(rsc->GetName(), rscMgr, ctx, *rsc);
         ctx.DecIndent();
         ctx.AddLine("};");
     }
@@ -43,7 +43,7 @@ std::string SH2DLightScriptExporter::Export(ResourceManager &rscMgr, SceneExport
     auto beg = pool.begin(), end = pool.end();
 
     if(beg != end)
-        IResource::ExportSubResource("light", rscMgr, ctx, **beg);
+        ResourceInstance::ExportSubResource("light", rscMgr, ctx, **beg);
 
     return ctx.GetString();
 }

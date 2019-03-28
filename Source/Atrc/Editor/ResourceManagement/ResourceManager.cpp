@@ -1,6 +1,5 @@
 #include <Atrc/Editor/ResourceManagement/CameraCreator.h>
 #include <Atrc/Editor/ResourceManagement/EntityCreator.h>
-#include <Atrc/Editor/ResourceManagement/FilmFilterCreator.h>
 #include <Atrc/Editor/ResourceManagement/FresnelCreator.h>
 #include <Atrc/Editor/ResourceManagement/GeometryCreator.h>
 #include <Atrc/Editor/ResourceManagement/LightCreator.h>
@@ -14,7 +13,6 @@ void RegisterResourceCreators(ResourceManager &rscMgr)
 {
     RegisterCameraCreators(rscMgr);
     RegisterEntityCreators(rscMgr);
-    RegisterFilmFilterCreators(rscMgr);
     RegisterFresnelCreators(rscMgr);
     RegisterGeometryCreators(rscMgr);
     RegisterLightCreators(rscMgr);

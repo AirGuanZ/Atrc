@@ -27,9 +27,11 @@ void EditorCore::Initialize()
     sState_ = std::make_unique<WithinFrameState>();
     lState_ = std::make_unique<BetweenFrameState>();
 
+    RegisterBuiltinFilmFilterCreators(data_->filmFilterFactory);
+    data_->filmFilter = std::make_unique<ResourceSlot<FilmFilterFactory>>(data_->filmFilterFactory);
+
     RegisterResourceCreators(data_->rscMgr);
 
-    data_->filmFilterSlot.SetInstance(data_->rscMgr.Create<FilmFilterInstance>("Box", ""));
     data_->samplerSlot.SetInstance(data_->rscMgr.Create<SamplerInstance>("Native", ""));
     data_->rendererSlot.SetInstance(data_->rscMgr.Create<RendererInstance>("PathTracing", ""));
 
@@ -70,14 +72,6 @@ void EditorCore::ShowMenuMenuBar()
                     workspaceDir, scriptDir, &data_->defaultRenderingCamera,
                     data_->rscMgr.GetPool<CameraInstance>().GetSelectedInstance().get(),
                     static_cast<float>(data_->filmSize.x) / data_->filmSize.y);
-               /*     &data_->defaultRenderingCamera,
-                    data_->rscMgr.GetPool<CameraInstance>().GetSelectedInstance().get(),
-                    data_->filmFilterSlot.GetInstance().get(),
-                    data_->samplerSlot.GetInstance().get(),
-                    workspaceDir,
-                    scriptDir,
-                    data_->filmSize);*/
-                //LauncherScriptExporter exporter(data_->rscMgr, ctx);
 
                 lState_->sceneRendererTex = GL::Texture2D(true);
                 lState_->sceneRendererTex.InitializeFormat(1, data_->filmSize.x, data_->filmSize.y, GL_RGBA8);
@@ -90,7 +84,7 @@ void EditorCore::ShowMenuMenuBar()
 
                 std::string configStr = LauncherScriptExporter().Export(
                     data_->rscMgr, ctx,
-                    data_->rendererSlot.GetInstance().get(), data_->filmFilterSlot.GetInstance().get(),
+                    data_->rendererSlot.GetInstance().get(), data_->filmFilter->GetResource().get(),
                     data_->samplerSlot.GetInstance().get(),
                     data_->filmSize, data_->outputFilenameBuf.data());
 
@@ -276,14 +270,7 @@ void EditorCore::ShowExportingSH2DSceneWindow()
         {
             auto scriptDir = absolute(filename.GetFilename()).parent_path();
             auto workspaceDir = absolute(data_->workspaceDir.GetFilename());
-            /*SceneExportingContext ctx(
-                &data_->defaultRenderingCamera,
-                data_->rscMgr.GetPool<CameraInstance>().GetSelectedInstance().get(),
-                data_->filmFilterSlot.GetInstance().get(),
-                data_->samplerSlot.GetInstance().get(),
-                workspaceDir,
-                scriptDir,
-                data_->filmSize);*/
+
             SceneExportingContext ctx(
                 workspaceDir, scriptDir, &data_->defaultRenderingCamera,
                 data_->rscMgr.GetPool<CameraInstance>().GetSelectedInstance().get(),
@@ -292,7 +279,7 @@ void EditorCore::ShowExportingSH2DSceneWindow()
 
             AGZ::FileSys::WholeFile::WriteText(filename.GetFilename().string(),
                 exporter.Export(data_->rscMgr, ctx, workerCount, taskGirdSize, SHOrder,
-                    data_->filmSize, data_->filmFilterSlot.GetInstance().get(), data_->samplerSlot.GetInstance().get()));
+                    data_->filmSize, data_->filmFilter->GetResource().get(), data_->samplerSlot.GetInstance().get()));
             filename.Clear();
         }
         catch(const std::exception &err)
@@ -340,14 +327,6 @@ void EditorCore::ShowExportingSH2DLightWindow()
         {
             auto scriptDir = absolute(filename.GetFilename()).parent_path();
             auto workspaceDir = absolute(data_->workspaceDir.GetFilename());
-            /*SceneExportingContext ctx(
-                &data_->defaultRenderingCamera,
-                data_->rscMgr.GetPool<CameraInstance>().GetSelectedInstance().get(),
-                data_->filmFilterSlot.GetInstance().get(),
-                data_->samplerSlot.GetInstance().get(),
-                workspaceDir,
-                scriptDir,
-                data_->filmSize);*/
 
             SceneExportingContext ctx(
                 workspaceDir, scriptDir, &data_->defaultRenderingCamera,
@@ -394,15 +373,6 @@ void EditorCore::ShowSavingWindow()
         {
             auto scriptDir = absolute(filename.GetSelected()).parent_path();
             auto workspaceDir = absolute(data_->workspaceDir.GetFilename());
-            /*SceneExportingContext ctx(
-                &data_->defaultRenderingCamera,
-                data_->rscMgr.GetPool<CameraInstance>().GetSelectedInstance().get(),
-                data_->filmFilterSlot.GetInstance().get(),
-                data_->samplerSlot.GetInstance().get(),
-                workspaceDir,
-                scriptDir,
-                data_->filmSize);
-            LauncherScriptExporter exporter(data_->rscMgr, ctx);*/
 
             SceneExportingContext ctx(
                 workspaceDir, scriptDir, &data_->defaultRenderingCamera,
@@ -412,7 +382,7 @@ void EditorCore::ShowSavingWindow()
             AGZ::FileSys::WholeFile::WriteText(filename.GetSelected().string(),
                 LauncherScriptExporter().Export(
                     data_->rscMgr, ctx, data_->rendererSlot.GetInstance().get(),
-                    data_->filmFilterSlot.GetInstance().get(), data_->samplerSlot.GetInstance().get(),
+                    data_->filmFilter->GetResource().get(), data_->samplerSlot.GetInstance().get(),
                     data_->filmSize, data_->outputFilenameBuf.data()));
             filename.ClearSelected();
         }
@@ -492,7 +462,9 @@ void EditorCore::ShowRenderingSettings()
     {
         AGZ::ScopeGuard endTabItem([] { ImGui::EndTabItem(); });
         ImGui::BeginChild("");
-        data_->filmFilterSlot.Display(data_->rscMgr);
+        /*data_->filmFilterSlot.Display(data_->rscMgr);
+        ImGui::Separator();*/
+        data_->filmFilter->Display();
         ImGui::EndChild();
     }
 

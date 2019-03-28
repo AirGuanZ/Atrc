@@ -5,9 +5,9 @@ std::string Box::ExportImpl() const
 {
     static const AGZ::Fmt fmt(
         "type = {};"
-        "radius = {};"
+        "sidelen = {};"
     );
-    return fmt.Arg(GetType(), radius_);
+    return fmt.Arg(GetType(), sidelen_);
 }
 
 std::string Box::Save() const
@@ -19,24 +19,30 @@ void Box::Load(const AGZ::ConfigGroup &params)
 {
     AGZ_HIERARCHY_TRY
 
-    radius_ = params["radius"].Parse<float>();
-    if(radius_ <= 0)
-        throw AGZ::HierarchyException("invalid radius value: " + std::to_string(radius_));
+    sidelen_ = params["sidelen"].Parse<float>();
+    if(sidelen_ <= 0)
+        throw AGZ::HierarchyException("invalid sidelen value: " + std::to_string(sidelen_));
 
     AGZ_HIERARCHY_WRAP("in loading box film filter with " + params.ToString())
 }
 
 void Box::Display()
 {
-    ImGui::PushID(this);
-    AGZ_SCOPE_GUARD({ ImGui::PopID(); });
+    ImGui::Text("sidelen"); ImGui::SameLine();
 
+    ImGui::PushID(0);
     ImGui::PushItemWidth(-1);
-    AGZ_SCOPE_GUARD({ ImGui::PopItemWidth(); });
-    ImGui::InputFloat("radius", &radius_);
+    AGZ_SCOPE_GUARD({ ImGui::PopItemWidth(); ImGui::PopID(); });
+
+    ImGui::InputFloat("", &sidelen_);
 }
 
 bool Box::IsMultiline() const noexcept
 {
     return false;
+}
+
+std::shared_ptr<IFilmFilter> BoxCreator::Create() const
+{
+    return std::make_shared<Box>("", this);
 }

@@ -2,9 +2,10 @@
 
 #include <Atrc/Editor/FilmFilter/FilmFilter.h>
 
-class Box : public IFilmFilter
+class Gaussian : public IFilmFilter
 {
-    float sidelen_ = 1;
+    float radius_ = 0.7f;
+    float alpha_ = 2;
     
 protected:
 
@@ -23,11 +24,11 @@ public:
     bool IsMultiline() const noexcept override;
 };
 
-class BoxCreator : public IFilmFilterCreator
+class GaussianCreator : public IFilmFilterCreator
 {
 public:
 
-    BoxCreator() : IFilmFilterCreator("Box") { }
+    GaussianCreator() : IFilmFilterCreator("Gaussian") { }
 
     std::shared_ptr<IFilmFilter> Create() const override;
 };

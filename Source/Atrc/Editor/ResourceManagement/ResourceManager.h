@@ -22,7 +22,7 @@
 class SceneExportingContext;
 class ResourceManager;
 
-class IResource : public AGZ::Uncopiable
+class ResourceInstance : public AGZ::Uncopiable
 {
     std::string typeName_;
     std::string instanceName_;
@@ -52,7 +52,7 @@ public:
         }
     };
 
-    IResource(std::string typeName, std::string name) noexcept
+    ResourceInstance(std::string typeName, std::string name) noexcept
         : typeName_(std::move(typeName)), instanceName_(std::move(name)), isInPool_(false)
     {
 
@@ -82,7 +82,7 @@ public:
         ctx.AddLine("};");
     }
 
-    virtual ~IResource() = default;
+    virtual ~ResourceInstance() = default;
 
     const std::string &GetName() const noexcept { return instanceName_; }
 
@@ -412,11 +412,11 @@ public:
     virtual ResourceManager &AsRscMgr() = 0;
 };
 
-class CameraInstance : public IResource
+class CameraInstance : public ResourceInstance
 {
 public:
     
-    using IResource::IResource;
+    using ResourceInstance::ResourceInstance;
 
     static const char *GetPoolName() { return "camera"; }
 
@@ -431,11 +431,11 @@ public:
 };
 using CameraCreator = TResourceCreator<CameraInstance>;
 
-class EntityInstance : public IResource
+class EntityInstance : public ResourceInstance
 {
 public:
 
-    using IResource::IResource;
+    using ResourceInstance::ResourceInstance;
 
     static const char *GetPoolName() { return "entity"; }
 
@@ -447,13 +447,10 @@ public:
 };
 using EntityCreator = TResourceCreator<EntityInstance>;
 
-class FilmFilterInstance : public IResource { public: using IResource::IResource; static const char *GetPoolName() { return "filmFilter"; } };
-using FilmFilterCreator = TResourceCreator<FilmFilterInstance>;
-
-class FresnelInstance : public IResource { public: using IResource::IResource; static const char *GetPoolName() { return "fresnel"; } };
+class FresnelInstance : public ResourceInstance { public: using ResourceInstance::ResourceInstance; static const char *GetPoolName() { return "fresnel"; } };
 using FresnelCreator = TResourceCreator<FresnelInstance>;
 
-class GeometryInstance : public IResource
+class GeometryInstance : public ResourceInstance
 {
 public:
 
@@ -463,7 +460,7 @@ public:
         Vec3f nor;
     };
     
-    using IResource::IResource;
+    using ResourceInstance::ResourceInstance;
 
     static const char *GetPoolName() { return "geometry"; }
 
@@ -475,11 +472,11 @@ public:
 };
 using GeometryCreator = TResourceCreator<GeometryInstance>;
 
-class LightInstance : public IResource
+class LightInstance : public ResourceInstance
 {
 public:
 
-    using IResource::IResource;
+    using ResourceInstance::ResourceInstance;
     
     static const char *GetPoolName() { return "light"; }
 
@@ -487,25 +484,24 @@ public:
 };
 using LightCreator = TResourceCreator<LightInstance>;
 
-class MaterialInstance : public IResource { public: using IResource::IResource; static const char *GetPoolName() { return "material"; } };
+class MaterialInstance : public ResourceInstance { public: using ResourceInstance::ResourceInstance; static const char *GetPoolName() { return "material"; } };
 using MaterialCreator = TResourceCreator<MaterialInstance>;
 
-class PathTracingIntegratorInstance : public IResource { public: using IResource::IResource; static const char *GetPoolName() { return "pathTracingIntegrator"; } };
+class PathTracingIntegratorInstance : public ResourceInstance { public: using ResourceInstance::ResourceInstance; static const char *GetPoolName() { return "pathTracingIntegrator"; } };
 using PathTracingIntegratorCreator = TResourceCreator<PathTracingIntegratorInstance>;
 
-class RendererInstance : public IResource { public: using IResource::IResource; static const char *GetPoolName() { return "renderer"; } };
+class RendererInstance : public ResourceInstance { public: using ResourceInstance::ResourceInstance; static const char *GetPoolName() { return "renderer"; } };
 using RendererCreator = TResourceCreator<RendererInstance>;
 
-class SamplerInstance : public IResource { public: using IResource::IResource; static const char *GetPoolName() { return "sampler"; } };
+class SamplerInstance : public ResourceInstance { public: using ResourceInstance::ResourceInstance; static const char *GetPoolName() { return "sampler"; } };
 using SamplerCreator = TResourceCreator<SamplerInstance>;
 
-class TextureInstance : public IResource { public: using IResource::IResource; static const char *GetPoolName() { return "texture"; } };
+class TextureInstance : public ResourceInstance { public: using ResourceInstance::ResourceInstance; static const char *GetPoolName() { return "texture"; } };
 using TextureCreator = TResourceCreator<TextureInstance>;
 
 class ResourceManager : public TResourceManager<
     CameraInstance,
     EntityInstance,
-    FilmFilterInstance,
     FresnelInstance,
     GeometryInstance,
     LightInstance,
@@ -532,7 +528,7 @@ const std::string &GetCompletePoolName()
 // 直接根据参数创建一个对象
 // params一定不是引用
 template<typename TResource>
-std::shared_ptr<TResource> CreateResourceFromScratch(ResourceManager &rscMgr, std::string instanceName, const AGZ::ConfigGroup &root, const AGZ::ConfigGroup &params, const IResource::ImportContext &ctx)
+std::shared_ptr<TResource> CreateResourceFromScratch(ResourceManager &rscMgr, std::string instanceName, const AGZ::ConfigGroup &root, const AGZ::ConfigGroup &params, const ResourceInstance::ImportContext &ctx)
 {
     auto &type = params["type"].AsValue();
     auto instance = rscMgr.GetCreatorManager<TResource>().Create(rscMgr, type, std::move(instanceName));
@@ -545,7 +541,7 @@ std::shared_ptr<TResource> CreateResourceFromScratch(ResourceManager &rscMgr, st
 // 如果池子中已经有了，就直接返回
 // 否则，根据参数来创建并存进池子里
 template<typename TResource>
-std::shared_ptr<TResource> GetResourceInPool(ResourceManager &rscMgr, const AGZ::ConfigGroup &root, const std::string &rscName, const IResource::ImportContext &ctx)
+std::shared_ptr<TResource> GetResourceInPool(ResourceManager &rscMgr, const AGZ::ConfigGroup &root, const std::string &rscName, const ResourceInstance::ImportContext &ctx)
 {
     auto &pool = rscMgr.GetPool<TResource>();
     if(auto instance = pool.GetByName(rscName))
@@ -561,7 +557,7 @@ std::shared_ptr<TResource> GetResourceInPool(ResourceManager &rscMgr, const AGZ:
 
 // 导入某种类型的池子中的所有数据
 template<typename TResource>
-void ImportFromPool(const AGZ::ConfigGroup &root, ResourceManager &rscMgr, const IResource::ImportContext &ctx)
+void ImportFromPool(const AGZ::ConfigGroup &root, ResourceManager &rscMgr, const ResourceInstance::ImportContext &ctx)
 {
     auto &pool = rscMgr.GetPool<TResource>();
 
@@ -588,7 +584,7 @@ inline const AGZ::ConfigGroup &GetFinalNonReferenceParam(const AGZ::ConfigGroup 
 // 否则，如果该对象是一个引用，递归地处理其解引用后的结果
 // 否则，原地用参数创建匿名对象
 template<typename TResource>
-std::shared_ptr<TResource> GetResourceInstance(ResourceManager &rscMgr, const AGZ::ConfigGroup &root, const AGZ::ConfigNode &params, const IResource::ImportContext &ctx)
+std::shared_ptr<TResource> GetResourceInstance(ResourceManager &rscMgr, const AGZ::ConfigGroup &root, const AGZ::ConfigNode &params, const ResourceInstance::ImportContext &ctx)
 {
     if(auto pVal = params.TryAsValue()) // 名字必然是引用
     {

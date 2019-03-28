@@ -9,7 +9,7 @@ namespace
         ctx.AddLine(TResource::GetPoolName(), " = {");
         ctx.IncIndent();
         for(auto &rsc : rscMgr.GetPool<TResource>())
-            IResource::ExportSubResource(rsc->GetName(), rscMgr, ctx, *rsc);
+            ResourceInstance::ExportSubResource(rsc->GetName(), rscMgr, ctx, *rsc);
         ctx.DecIndent();
         ctx.AddLine("};");
     }
@@ -19,7 +19,7 @@ std::string SH2DSceneScriptExporter::Export(
     ResourceManager &rscMgr, SceneExportingContext &ctx,
     int workerCount, int taskGridSize, int SHOrder,
     const Vec2i &outputFilmSize,
-    const FilmFilterInstance *filmFilter,
+    const IFilmFilter *filmFilter,
     const SamplerInstance *sampler) const
 {
     ctx.ClearString();
@@ -32,7 +32,8 @@ std::string SH2DSceneScriptExporter::Export(
     ctx.IncIndent();
     ctx.AddLine("size = (", outputFilmSize.x, ", ", outputFilmSize.y, ");");
     if(filmFilter)
-        IResource::ExportSubResource("filter", rscMgr, ctx, *filmFilter);
+        ctx.AddLine("filter = ", filmFilter->Export(), ";");
+        //ResourceInstance::ExportSubResource("filter", rscMgr, ctx, *filmFilter);
     else
         Global::ShowNormalMessage("film filter is unspecified");
     ctx.DecIndent();
@@ -54,7 +55,7 @@ std::string SH2DSceneScriptExporter::Export(
 
     if(sampler)
     {
-        IResource::ExportSubResource("sampler", rscMgr, ctx, *sampler);
+        ResourceInstance::ExportSubResource("sampler", rscMgr, ctx, *sampler);
         ctx.AddLine();
     }
     else
@@ -62,7 +63,7 @@ std::string SH2DSceneScriptExporter::Export(
 
     if(ctx.camera)
     {
-        IResource::ExportSubResourceAsReference("camera", rscMgr, ctx, *ctx.camera);
+        ResourceInstance::ExportSubResourceAsReference("camera", rscMgr, ctx, *ctx.camera);
         ctx.AddLine();
     }
     else

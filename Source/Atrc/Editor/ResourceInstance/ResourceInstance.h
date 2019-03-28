@@ -6,8 +6,6 @@
 
 #include <AGZUtils/Utils/Exception.h>
 
-class ResourceCreatingContext;
-
 class HasName
 {
     std::string name_;
@@ -95,7 +93,7 @@ public:
 
         auto it = name2Creator_.find(creator->GetName());
         if(it != name2Creator_.end())
-            throw AGZ::HierarchyException("creator name repeated: " + creator->GetName());
+            throw AGZ::HierarchyException("repeated creator name: " + creator->GetName());
         name2Creator_[creator->GetName()] = creator;
 
         AGZ_HIERARCHY_WRAP("in registering resource creator")
@@ -107,10 +105,10 @@ public:
 
         auto it = name2Creator_.find(name);
         if(it == name2Creator_.end())
-            throw AGZ::HierarchyException("invalid ");
+            throw AGZ::HierarchyException("unknown creator name: " + name);
         return *it->second;
 
-        AGZ_HIERARCHY_WRAP("in getting creator from creator factory: " + name)
+        AGZ_HIERARCHY_WRAP("in getting creator from creator factory")
     }
 
     auto begin() const { return name2Creator_.begin(); }
@@ -125,4 +123,30 @@ private:
     static_assert(std::is_base_of_v<IResourceCreator, TResourceCreatorCategory>);
 
     std::map<std::string, const TResourceCreatorCategory*> name2Creator_;
+};
+
+template<typename...TResourceCreatorCategoryList>
+class ResourceFactoryList
+{
+    std::tuple<ResourceFactory<TResourceCreatorCategoryList>*...> facs_;
+
+public:
+
+    explicit ResourceFactoryList(ResourceFactory<TResourceCreatorCategoryList>&...facs) noexcept
+        : facs_(std::make_tuple<ResourceFactory<TResourceCreatorCategoryList>*...>(&facs...))
+    {
+        
+    }
+
+    template<typename TResourceCreatorCategory>
+    ResourceFactory<TResourceCreatorCategory> &GetFactory() noexcept
+    {
+        return *std::get<ResourceFactory<TResourceCreatorCategory>*>(facs_);
+    }
+
+    template<typename...TResourceCreatorCategorySubList>
+    ResourceFactoryList<TResourceCreatorCategorySubList...> GetSubList() noexcept
+    {
+        return ResourceFactoryList<TResourceCreatorCategorySubList>(GetFactory<TResourceCreatorCategorySubList>()...);
+    }
 };

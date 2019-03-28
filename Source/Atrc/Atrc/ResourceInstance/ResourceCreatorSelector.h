@@ -8,7 +8,7 @@
 template<typename TResourceCategory>
 class ResourceCreatorSelector
 {
-    static_assert(std::is_base_of_v<IResource, TResourceCategory>);
+    static_assert(std::is_base_of_v<ResourceInstance, TResourceCategory>);
 
     const ResourceFactory<TResourceCategory> &factory_;
     const IResourceCreator<TResourceCategory> *selectedCreator_;

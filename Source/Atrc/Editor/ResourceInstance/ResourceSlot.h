@@ -1,41 +1,21 @@
 #pragma once
 
-#include <Atrc/Editor/ResourceInstance/ResourceCreatingContext.h>
 #include <Atrc/Editor/ResourceInstance/ResourceCreatorSelector.h>
 
-template<typename TResourceCategory>
+template<typename TResourceFactory, typename...CreatingArgs>
 class ResourceSlot
 {
-    ResourceCreatorSelector<TResourceCategory> selector_;
-    std::shared_ptr<TResourceCategory> rsc_;
-
-    std::function<void(TResourceCategory&)> rscChangedCallback_;
-    ResourceCreatingContext &rscCreatingCtx_;
-
-    template<typename T, typename = void>
-    struct HasIsMultiline : std::false_type { };
-
-    template<typename T>
-    struct HasIsMultiline<T, std::void_t<decltype(std::declval<const T&>().IsMultiline())>> : std::true_type { };
-    
-    template<typename T, bool THasMultiline>
-    struct CallIsMultilineAux { static bool Call(const T &v) noexcept { return true; } };
-
-    template<typename T>
-    struct CallIsMultilineAux<T, true> { static bool Call(const T &v) noexcept { return v.IsMultiline(); } };
-
-    static bool CallIsMultiline(const TResourceCategory &t) noexcept
-    {
-        return CallIsMultilineAux<TResourceCategory, HasIsMultiline<TResourceCategory>::value>::Call(t);
-    }
-
 public:
 
-    explicit ResourceSlot(ResourceCreatingContext &ctx)
-        : selector_(ctx.GetFactory<TResourceCategory>()),
-          rscCreatingCtx_(ctx)
-    {
+    using Factory = TResourceFactory;
+    using Creator = typename Factory::Creator;
+    using Resource = typename Creator::Resource;
 
+    explicit ResourceSlot(const Factory &factory, CreatingArgs...creatingArgs)
+        : selector_(factory), creatingArgs_(std::make_tuple<CreatingArgs...>(creatingArgs...))
+    {
+        rsc_ = std::apply(std::mem_fn(&Creator::Create),
+                          std::tuple_cat(std::make_tuple(selector_.GetSelectedCreator()), creatingArgs_));
     }
 
     template<typename TCallback>
@@ -43,6 +23,13 @@ public:
     {
         rscChangedCallback_ = std::forward<TCallback>(callback);
         if(applyRightAway && rsc_)
+            rscChangedCallback_(*rsc_);
+    }
+
+    void SetResource(std::shared_ptr<Resource> rsc)
+    {
+        rsc_ = std::move(rsc);
+        if(rscChangedCallback_)
             rscChangedCallback_(*rsc_);
     }
 
@@ -57,7 +44,8 @@ public:
         bool useMiniWidth = rsc_ ? !CallIsMultiline(*rsc_) : false;
         if(selector_.Display(useMiniWidth))
         {
-            rsc_ = selector_.GetSelectedCreator()->Create("", rscCreatingCtx_);
+            rsc_ = std::apply(std::mem_fn(&Creator::Create),
+                              std::tuple_cat(std::make_tuple(selector_.GetSelectedCreator()), creatingArgs_));
             if(rscChangedCallback_)
                 rscChangedCallback_(*rsc_);
         }
@@ -66,12 +54,40 @@ public:
         {
             if(!rsc_->IsMultiline())
                 ImGui::SameLine();
+            ImGui::PushID(rsc_.get());
+            AGZ_SCOPE_GUARD({ ImGui::PopID(); });
             rsc_->Display(std::forward<RscDisplayArgs>(rscDisplayArgs)...);
         }
     }
 
-    TResourceCategory *GetResource() noexcept
+    std::shared_ptr<Resource> GetResource() noexcept
     {
-        return rsc_.get();
+        return rsc_;
+    }
+
+private:
+
+    ResourceCreatorSelector<Factory> selector_;
+    std::shared_ptr<Resource> rsc_;
+
+    std::function<void(Resource&)> rscChangedCallback_;
+
+    std::tuple<CreatingArgs...> creatingArgs_;
+
+    template<typename T, typename = void>
+    struct HasIsMultiline : std::false_type { };
+
+    template<typename T>
+    struct HasIsMultiline<T, std::void_t<decltype(std::declval<const T&>().IsMultiline())>> : std::true_type { };
+
+    template<typename T, bool THasMultiline>
+    struct CallIsMultilineAux { static bool Call(const T &v) noexcept { return true; } };
+
+    template<typename T>
+    struct CallIsMultilineAux<T, true> { static bool Call(const T &v) noexcept { return v.IsMultiline(); } };
+
+    static bool CallIsMultiline(const Resource &t) noexcept
+    {
+        return CallIsMultilineAux<Resource, HasIsMultiline<Resource>::value>::Call(t);
     }
 };

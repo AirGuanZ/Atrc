@@ -4,6 +4,8 @@
 #include <Atrc/Editor/EditorCore.h>
 #include <Atrc/Editor/SceneExportingContext.h>
 
+#include <Atrc/Editor/FilmFilter/FilmFilter.h>
+
 class LauncherScriptExporter
 {
 public:
@@ -11,7 +13,7 @@ public:
     std::string Export(
         ResourceManager &rscMgr, SceneExportingContext &ctx,
         const RendererInstance *renderer,
-        const FilmFilterInstance *filmFilter,
+        const IFilmFilter *filmFilter,
         const SamplerInstance    *sampler,
         const Vec2i &outputFilmSize,
         const std::string &outputFilename) const;

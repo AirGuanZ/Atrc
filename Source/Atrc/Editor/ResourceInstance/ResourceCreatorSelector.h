@@ -5,18 +5,23 @@
 #include <Atrc/Editor/GL.h>
 #include <Atrc/Editor/ResourceInstance/ResourceInstance.h>
 
-template<typename TResourceCategory>
+template<typename TResourceFactory>
 class ResourceCreatorSelector
 {
-    static_assert(std::is_base_of_v<IResource, TResourceCategory>);
-
-    const ResourceFactory<TResourceCategory> &factory_;
-    const IResourceCreator<TResourceCategory> *selectedCreator_;
+    const TResourceFactory &factory_;
+    const typename TResourceFactory::Creator *selectedCreator_;
     float widgetWidth_;
 
 public:
 
-    explicit ResourceCreatorSelector(const ResourceFactory<TResourceCategory> &factory) noexcept
+    using Factory = TResourceFactory;
+    using Creator = typename Factory::Creator;
+    using Resource = typename Creator::Resource;
+
+    static_assert(std::is_base_of_v<IResourceCreator, Creator>);
+    static_assert(std::is_base_of_v<IResource, Resource>);
+
+    explicit ResourceCreatorSelector(const Factory &factory) noexcept
         : factory_(factory)
     {
         AGZ_ASSERT(factory.begin() != factory.end());
@@ -33,7 +38,7 @@ public:
         selectedCreator_ = factory_[name];
     }
 
-    const IResourceCreator<TResourceCategory> *GetSelectedCreator() const noexcept
+    const Creator *GetSelectedCreator() const noexcept
     {
         return selectedCreator_;
     }
@@ -54,11 +59,11 @@ public:
             for(auto &p : factory_)
             {
                 bool selected = selectedCreator_ == p.second;
-                if(ImGui::Selectable(p.first.c_str(), selected, ImGuiSelectableFlags_DontClosePopups))
+                if(ImGui::Selectable(p.first.c_str(), selected))
                     selectedCreator_ = p.second;
             }
         }
 
-        return selectedCreator_ == oldSelectedCreator;
+        return selectedCreator_ != oldSelectedCreator;
     }
 };

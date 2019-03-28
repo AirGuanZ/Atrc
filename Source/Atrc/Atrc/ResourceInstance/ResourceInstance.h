@@ -28,13 +28,13 @@ public:
     }
 };
 
-class IResource : public HasName
+class ResourceInstance : public HasName
 {
     const HasName *creator_;
 
 public:
 
-    IResource(std::string name, const HasName *creator) noexcept
+    ResourceInstance(std::string name, const HasName *creator) noexcept
         : HasName(std::move(name)), creator_(creator)
     {
         
@@ -49,7 +49,7 @@ public:
 template<typename TResourceCategory>
 class IResourceCreator : public HasName
 {
-    static_assert(std::is_base_of_v<IResource, TResourceCategory>);
+    static_assert(std::is_base_of_v<ResourceInstance, TResourceCategory>);
 
 public:
 
@@ -67,7 +67,7 @@ public:
 template<typename TResourceCategory>
 class ResourceFactory
 {
-    static_assert(std::is_base_of_v<IResource, TResourceCategory>);
+    static_assert(std::is_base_of_v<ResourceInstance, TResourceCategory>);
 
     std::map<std::string, const IResourceCreator<TResourceCategory>*> name2Creator_;
 
