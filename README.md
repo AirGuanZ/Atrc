@@ -2,7 +2,7 @@
 
 Atrc是[Z Guan](https://github.com/AirGuanZ)的渲染实验室，主要以C++编写，包含以下组件：
 
-- [x] Lib 离线渲染核心组件库，包含各种实体、材质模型和常见渲染算法，会随着我的学习不断扩展/重构
+- [x] Core 离线渲染核心组件库，包含各种实体、材质模型和常见渲染算法，会随着我的学习不断扩展/重构
 - [x] Mgr 用于管理核心组件的辅助库，根据配置字符串创建各种类型的核心组件中的对象（如模型、摄像机、灯光等）
 - [x] Launcher 渲染器启动器
 - [x] SH2D 将场景、灯光投影到1~5阶球谐函数系数，以及旋转球谐系数、根据球谐系数重建图像的工具
@@ -10,23 +10,23 @@ Atrc是[Z Guan](https://github.com/AirGuanZ)的渲染实验室，主要以C++编
 
 Atrc已/将实现以下特性：
 
-- [x] [Lib] 多种几何模型，如球体、三角形、OBJ格式的网格等
-- [x] [Lib] 快速构建BVH加速数据结构，已构建的BVH树会被自动缓存至`.agz.cache`中
-- [x] [Lib] Disney Principled BRDF，Oren-Nayar漫反射模型，玻璃，黑体等多种材质模型
-- [x] [Lib] Microfacet Transmission BSDF
-- [x] [Lib] Normalized Diffusion BSSRDF
-- [x] [Lib] 几何漫射光源和支持HDR贴图的环境光
-- [x] [Lib] Gamma校正和简单的Tone Mapping
-- [x] [Lib] Box、Gaussian等Windowed Film Filter
-- [x] [Lib] 支持体渲染、多重重要性光照采样等特性的Path Tracing
+- [x] [Core] 多种几何模型，如球体、三角形、OBJ格式的网格等
+- [x] [Core] 快速构建BVH加速数据结构，已构建的BVH树会被自动缓存至`.agz.cache`中
+- [x] [Core] Disney Principled BRDF，Oren-Nayar漫反射模型，玻璃，黑体等多种材质模型
+- [x] [Core] Microfacet Transmission BSDF
+- [x] [Core] Normalized Diffusion BSSRDF
+- [x] [Core] 几何漫射光源和支持HDR贴图的环境光
+- [x] [Core] Gamma校正和简单的Tone Mapping
+- [x] [Core] Box、Gaussian等Windowed Film Filter
+- [x] [Core] 支持体渲染、多重重要性光照采样等特性的Path Tracing
 - [x] [Editor] 实时编辑待渲染的场景，包括设置材质、几何体、光源、摄像机和各项渲染参数等
 - [x] [Editor] 导出和加载可被Launcher读取并用于渲染的场景描述脚本，也可在编辑器中直接进行渲染
 - [x] [SH2D] 将场景/环境光投影到1~5阶球谐函数上
 - [x] [SH2D] 从场景和环境光的球谐函数系数重建出图像，支持环境光系数的旋转
 - [ ] [Editor] 重构Editor
-- [ ] [Lib] Progressive Photon Mapping（学习中）
-- [ ] [Lib] Bidirectional Path Tracing
-- [ ] [Lib] Disney Pincipled BSDF
+- [ ] [Core] Progressive Photon Mapping（学习中）
+- [ ] [Core] Bidirectional Path Tracing
+- [ ] [Core] Disney Pincipled BSDF
 
 下图为部分渲染结果，模型主要来自[3D Scans](http://threedscans.com/)和[Stanford 3D Scanning Repository
 ](http://graphics.stanford.edu/data/3Dscanrep/)，所有场景和渲染参数均通过配置文件指定：
