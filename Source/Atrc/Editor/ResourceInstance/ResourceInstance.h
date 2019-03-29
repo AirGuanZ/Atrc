@@ -24,7 +24,6 @@ public:
     }
 };
 
-template<typename...TExportArgs>
 class ExportAsConfigGroup
 {
 protected:
@@ -32,17 +31,6 @@ protected:
     static std::string Wrap(const std::string &content)
     {
         return "{" + content + "}";
-    }
-
-    virtual std::string ExportImpl(TExportArgs...exportArgs) const = 0;
-
-public:
-
-    virtual ~ExportAsConfigGroup() = default;
-
-    std::string Export(TExportArgs...exportArgs) const
-    {
-        return Wrap(ExportImpl(exportArgs...));
     }
 };
 
@@ -125,28 +113,11 @@ private:
     std::map<std::string, const TResourceCreatorCategory*> name2Creator_;
 };
 
-template<typename...TResourceCreatorCategoryList>
-class ResourceFactoryList
-{
-    std::tuple<ResourceFactory<TResourceCreatorCategoryList>*...> facs_;
+class IFilmFilterCreator;
+using FilmFilterFactory = ResourceFactory<IFilmFilterCreator>;
 
-public:
+class IMaterialCreator;
+using MaterialFactory = ResourceFactory<IMaterialCreator>;
 
-    explicit ResourceFactoryList(ResourceFactory<TResourceCreatorCategoryList>&...facs) noexcept
-        : facs_(std::make_tuple<ResourceFactory<TResourceCreatorCategoryList>*...>(&facs...))
-    {
-        
-    }
-
-    template<typename TResourceCreatorCategory>
-    ResourceFactory<TResourceCreatorCategory> &GetFactory() noexcept
-    {
-        return *std::get<ResourceFactory<TResourceCreatorCategory>*>(facs_);
-    }
-
-    template<typename...TResourceCreatorCategorySubList>
-    ResourceFactoryList<TResourceCreatorCategorySubList...> GetSubList() noexcept
-    {
-        return ResourceFactoryList<TResourceCreatorCategorySubList>(GetFactory<TResourceCreatorCategorySubList>()...);
-    }
-};
+class ITextureCreator;
+using TextureFactory = ResourceFactory<ITextureCreator>;

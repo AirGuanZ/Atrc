@@ -1,15 +1,6 @@
 #include <Atrc/Editor/FilmFilter/Box.h>
 #include <Atrc/Editor/GL.h>
 
-std::string Box::ExportImpl() const
-{
-    static const AGZ::Fmt fmt(
-        "type = {};"
-        "sidelen = {};"
-    );
-    return fmt.Arg(GetType(), sidelen_);
-}
-
 std::string Box::Save() const
 {
     return Export();
@@ -24,6 +15,15 @@ void Box::Load(const AGZ::ConfigGroup &params)
         throw AGZ::HierarchyException("invalid sidelen value: " + std::to_string(sidelen_));
 
     AGZ_HIERARCHY_WRAP("in loading box film filter with " + params.ToString())
+}
+
+std::string Box::Export() const
+{
+    static const AGZ::Fmt fmt(
+        "type = {};"
+        "sidelen = {};"
+    );
+    return Wrap(fmt.Arg(GetType(), sidelen_));
 }
 
 void Box::Display()

@@ -6,10 +6,6 @@ class Gaussian : public IFilmFilter
 {
     float radius_ = 0.7f;
     float alpha_ = 2;
-    
-protected:
-
-    std::string ExportImpl() const override;
 
 public:
 
@@ -18,6 +14,8 @@ public:
     std::string Save() const override;
 
     void Load(const AGZ::ConfigGroup &params) override;
+
+    std::string Export() const override;
 
     void Display() override;
 

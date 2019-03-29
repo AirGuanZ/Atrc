@@ -5,7 +5,7 @@
 #include <AGZUtils/Utils/Config.h>
 #include <Atrc/Editor/ResourceInstance/ResourceInstance.h>
 
-class IFilmFilter : public IResource, public ExportAsConfigGroup<>
+class IFilmFilter : public IResource, public ExportAsConfigGroup
 {
 public:
 
@@ -14,6 +14,8 @@ public:
     virtual std::string Save() const = 0;
 
     virtual void Load(const AGZ::ConfigGroup &params) = 0;
+
+    virtual std::string Export() const = 0;
 
     virtual void Display() = 0;
 
@@ -30,7 +32,5 @@ public:
 
     virtual std::shared_ptr<IFilmFilter> Create() const = 0;
 };
-
-using FilmFilterFactory = ResourceFactory<IFilmFilterCreator>;
 
 void RegisterBuiltinFilmFilterCreators(FilmFilterFactory &factory);

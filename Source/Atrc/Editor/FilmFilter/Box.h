@@ -5,10 +5,6 @@
 class Box : public IFilmFilter
 {
     float sidelen_ = 1;
-    
-protected:
-
-    std::string ExportImpl() const override;
 
 public:
 
@@ -17,6 +13,8 @@ public:
     std::string Save() const override;
 
     void Load(const AGZ::ConfigGroup &params) override;
+
+    std::string Export() const override;
 
     void Display() override;
 

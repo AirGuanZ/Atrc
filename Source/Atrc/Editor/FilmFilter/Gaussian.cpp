@@ -1,16 +1,6 @@
 #include <Atrc/Editor/FilmFilter/Gaussian.h>
 #include <Atrc/Editor/GL.h>
 
-std::string Gaussian::ExportImpl() const
-{
-    static const AGZ::Fmt fmt(
-        "type = {};"
-        "radius = {};"
-        "alpha = {};"
-    );
-    return fmt.Arg(GetType(), radius_, alpha_);
-}
-
 std::string Gaussian::Save() const
 {
     return Export();
@@ -29,6 +19,16 @@ void Gaussian::Load(const AGZ::ConfigGroup &params)
         throw AGZ::HierarchyException("invalid alpha value: " + std::to_string(alpha_));
 
     AGZ_HIERARCHY_WRAP("in loading box film filter with " + params.ToString())
+}
+
+std::string Gaussian::Export() const
+{
+    static const AGZ::Fmt fmt(
+        "type = {};"
+        "radius = {};"
+        "alpha = {};"
+    );
+    return Wrap(fmt.Arg(GetType(), radius_, alpha_));
 }
 
 void Gaussian::Display()
