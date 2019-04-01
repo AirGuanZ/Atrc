@@ -1,7 +1,7 @@
 #include <Atrc/Core/Utility/ConfigConvert.h>
 #include <Atrc/Editor/Texture/Constant.h>
 
-std::string Constant::Save() const
+std::string Constant::Save(const std::filesystem::path &relPath) const
 {
     static const AGZ::Fmt fmt(
         "type = {};"
@@ -14,7 +14,7 @@ std::string Constant::Save() const
         Atrc::Vec3fToCS(texel_)));
 }
 
-void Constant::Load(const AGZ::ConfigGroup &params)
+void Constant::Load(const AGZ::ConfigGroup &params, const std::filesystem::path &relPath)
 {
     AGZ_HIERARCHY_TRY
 
@@ -24,7 +24,7 @@ void Constant::Load(const AGZ::ConfigGroup &params)
     AGZ_HIERARCHY_WRAP("in loading constant texture with " + params.ToString())
 }
 
-std::string Constant::Export() const
+std::string Constant::Export(const std::filesystem::path &relPath) const
 {
     static const AGZ::Fmt fmt(
         "type = Constant;"
@@ -40,19 +40,16 @@ void Constant::Display()
     ImGui::PopID();
 
     ImGui::PushID(1);
+    ImGui::PushItemWidth(-1);
     if(asColor_)
         ImGui::ColorEdit3("", &texel_[0], ImGuiColorEditFlags_Float | ImGuiColorEditFlags_HDR);
     else
         ImGui::InputFloat3("", &texel_[0]);
+    ImGui::PopItemWidth();
     ImGui::PopID();
 }
 
 bool Constant::IsMultiline() const noexcept
 {
     return false;
-}
-
-std::shared_ptr<ITexture> ConstantCreator::Create(std::string name) const
-{
-    return std::make_shared<Constant>(std::move(name), this);
 }

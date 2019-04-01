@@ -28,7 +28,9 @@ void EditorCore::Initialize()
     lState_ = std::make_unique<BetweenFrameState>();
 
     RegisterBuiltinFilmFilterCreators(data_->filmFilterFactory);
+    RegisterBuiltinTextureCreators(data_->texFactory);
     data_->filmFilter = std::make_unique<ResourceSlot<FilmFilterFactory>>(data_->filmFilterFactory);
+    data_->tex = std::make_unique<ResourceSlot<TextureFactory>>(data_->texFactory);
 
     RegisterResourceCreators(data_->rscMgr);
 
@@ -465,6 +467,7 @@ void EditorCore::ShowRenderingSettings()
         /*data_->filmFilterSlot.Display(data_->rscMgr);
         ImGui::Separator();*/
         data_->filmFilter->Display();
+        data_->tex->Display();
         ImGui::EndChild();
     }
 

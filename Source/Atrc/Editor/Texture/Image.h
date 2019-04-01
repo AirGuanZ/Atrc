@@ -1,13 +1,11 @@
 #pragma once
 
 #include <Atrc/Editor/Texture/Texture.h>
+#include <Atrc/Editor/FileSelector.h>
 #include <Atrc/Editor/GL.h>
 
-class Constant : public ITexture
+class Image : public ITexture
 {
-    bool asColor_ = true;
-    Vec3f texel_ = Vec3f();
-
 public:
 
     using ITexture::ITexture;
@@ -21,6 +19,19 @@ public:
     void Display() override;
 
     bool IsMultiline() const noexcept override;
+
+private:
+
+    struct GLTextureWithFilename
+    {
+        std::filesystem::path filename;
+        GL::Texture2D tex;
+    };
+
+    std::shared_ptr<GLTextureWithFilename> glTex_;
+    FileSelector fileSelector_;
+
+    bool SetGLTextureFilename(const std::filesystem::path &filename);
 };
 
-DEFINE_DEFAULT_TEXTURE_CREATOR(Constant, "Constant");
+DEFINE_DEFAULT_TEXTURE_CREATOR(Image, "Image");

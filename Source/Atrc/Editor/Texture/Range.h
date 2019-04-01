@@ -11,11 +11,11 @@ public:
 
     using ITexture::ITexture;
 
-    std::string Save() const override;
+    std::string Save(const std::filesystem::path &relPath) const override;
 
-    void Load(const AGZ::ConfigGroup &params) override;
+    void Load(const AGZ::ConfigGroup &params, const std::filesystem::path &relPath) override;
 
-    std::string Export() const override;
+    std::string Export(const std::filesystem::path &relPath) const override;
 
     void Display() override;
 
@@ -24,11 +24,4 @@ public:
     void SetRange(float low, float high) override;
 };
 
-class RangeCreator : public ITextureCreator
-{
-public:
-
-    RangeCreator() : ITextureCreator("Range") { }
-
-    std::shared_ptr<ITexture> Create(std::string name) const override;
-};
+DEFINE_DEFAULT_TEXTURE_CREATOR(Range, "Range");

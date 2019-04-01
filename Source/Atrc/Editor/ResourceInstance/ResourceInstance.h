@@ -1,5 +1,6 @@
 #pragma once
 
+#include <filesystem>
 #include <map>
 #include <string>
 #include <type_traits>
@@ -37,6 +38,13 @@ protected:
 class IResource : public HasName
 {
     const HasName *creator_;
+
+protected:
+
+    static std::filesystem::path RelPath(const std::filesystem::path &dst, const std::filesystem::path &base)
+    {
+        return relative(absolute(dst), absolute(base));
+    }
 
 public:
 

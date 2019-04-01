@@ -10,6 +10,7 @@
 #include <Atrc/Editor/SceneRenderer.h>
 
 #include <Atrc/Editor/FilmFilter/FilmFilter.h>
+#include <Atrc/Editor/Texture/Texture.h>
 #include <Atrc/Editor/ResourceInstance/ResourceSlot.h>
 
 struct EditorData
@@ -24,6 +25,9 @@ struct EditorData
 
     FilmFilterFactory filmFilterFactory;
     std::unique_ptr<ResourceSlot<FilmFilterFactory>> filmFilter;
+
+    TextureFactory texFactory;
+    std::unique_ptr<ResourceSlot<TextureFactory>> tex;
 
     FileSelector scriptFilename = FileSelector(ImGuiFileBrowserFlags_EnterNewFilename);
     FileSelector workspaceDir = FileSelector(ImGuiFileBrowserFlags_SelectDirectory);

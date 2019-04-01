@@ -1,7 +1,7 @@
 #include <Atrc/Editor/Texture/Range.h>
 #include <Atrc/Editor/GL.h>
 
-std::string Range::Save() const
+std::string Range::Save(const std::filesystem::path &relPath) const
 {
     static const AGZ::Fmt fmt(
         "type = {};"
@@ -11,7 +11,7 @@ std::string Range::Save() const
     return Wrap(fmt.Arg(GetType(), low_, high_, value_));
 }
 
-void Range::Load(const AGZ::ConfigGroup &params)
+void Range::Load(const AGZ::ConfigGroup &params, const std::filesystem::path &relPath)
 {
     AGZ_HIERARCHY_TRY
 
@@ -27,7 +27,7 @@ void Range::Load(const AGZ::ConfigGroup &params)
     AGZ_HIERARCHY_WRAP("in loading range texture with " + params.ToString())
 }
 
-std::string Range::Export() const
+std::string Range::Export(const std::filesystem::path &relPath) const
 {
     static const AGZ::Fmt fmt(
         "type = Constant1;"
@@ -57,9 +57,4 @@ void Range::SetRange(float low, float high)
     low_ = low;
     high_ = high;
     value_ = AGZ::Math::Clamp(value_, low, high);
-}
-
-std::shared_ptr<ITexture> RangeCreator::Create(std::string name) const
-{
-    return std::make_shared<Range>(std::move(name), this);
 }
