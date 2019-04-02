@@ -60,9 +60,16 @@ public:
         }
     }
 
-    std::shared_ptr<Resource> GetResource() noexcept
+    std::shared_ptr<Resource> GetResource() const noexcept
     {
         return rsc_;
+    }
+
+    std::shared_ptr<Resource> GetNoneNullResource() const
+    {
+        if(rsc_)
+            return rsc_;
+        throw AGZ::HierarchyException("GetNoneNullResource is called with a null resource slot");
     }
 
 private:

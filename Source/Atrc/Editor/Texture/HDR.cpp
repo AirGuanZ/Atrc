@@ -1,8 +1,8 @@
 #include <AGZUtils/Container/SharedPtrPool.h>
-#include <Atrc/Editor/Texture/Image.h>
+#include <Atrc/Editor/Texture/HDR.h>
 #include <Atrc/Editor/Global.h>
 
-bool Image::SetGLTextureFilename(const std::filesystem::path &filename)
+bool HDR::SetGLTextureFilename(const std::filesystem::path &filename)
 {
     struct V2K
     {
@@ -17,7 +17,12 @@ bool Image::SetGLTextureFilename(const std::filesystem::path &filename)
     {
         try
         {
-            auto data = AGZ::TextureFile::LoadRGBFromFile(filename.string());
+            auto data = AGZ::TextureFile::LoadRGBFromHDR(filename.string()).Map(
+                [](const AGZ::Math::Color3f &c)
+            {
+                return c.Map([](float f)
+                { return static_cast<uint8_t>(AGZ::Math::Clamp(f, 0.0f, 1.0f) * 255); });
+            });
             auto ret = new GLTextureWithFilename;
             ret->filename = filename;
             ret->tex.InitializeHandle();
@@ -36,12 +41,12 @@ bool Image::SetGLTextureFilename(const std::filesystem::path &filename)
     return glTex_ != nullptr;
 }
 
-std::string Image::Save(const std::filesystem::path &relPath) const
+std::string HDR::Save(const std::filesystem::path &relPath) const
 {
     AGZ_HIERARCHY_TRY
 
     if(!glTex_)
-        throw AGZ::HierarchyException("empty image object");
+        throw AGZ::HierarchyException("empty hdr object");
 
     const AGZ::Fmt fmt(R"___(
         type = {};
@@ -49,10 +54,10 @@ std::string Image::Save(const std::filesystem::path &relPath) const
     )___");
     return Wrap(fmt.Arg(GetType(), RelPath(fileSelector_.GetFilename(), relPath).string()));
 
-    AGZ_HIERARCHY_WRAP("in saving image texture")
+    AGZ_HIERARCHY_WRAP("in saving hdr texture")
 }
 
-void Image::Load(const AGZ::ConfigGroup &params, const std::filesystem::path &relPath)
+void HDR::Load(const AGZ::ConfigGroup &params, const std::filesystem::path &relPath)
 {
     AGZ_HIERARCHY_TRY
 
@@ -65,15 +70,15 @@ void Image::Load(const AGZ::ConfigGroup &params, const std::filesystem::path &re
         throw AGZ::HierarchyException("failed to set gl texture filename to " + filename.string());
     }
 
-    AGZ_HIERARCHY_WRAP("in loading image texture with " + params.ToString())
+    AGZ_HIERARCHY_WRAP("in loading hdr texture with " + params.ToString())
 }
 
-std::string Image::Export(const std::filesystem::path &relPath) const
+std::string HDR::Export(const std::filesystem::path &relPath) const
 {
     return Save(relPath);
 }
 
-void Image::Display()
+void HDR::Display()
 {
     if(fileSelector_.Display())
     {
@@ -93,7 +98,7 @@ void Image::Display()
     }
 }
 
-bool Image::IsMultiline() const noexcept
+bool HDR::IsMultiline() const noexcept
 {
     return false;
 }

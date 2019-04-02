@@ -4,7 +4,7 @@
 #include <Atrc/Editor/FileSelector.h>
 #include <Atrc/Editor/GL.h>
 
-class Image : public ITexture
+class HDR : public ITexture
 {
 public:
 
@@ -35,4 +35,4 @@ private:
     bool SetGLTextureFilename(const std::filesystem::path &filename);
 };
 
-DEFINE_DEFAULT_TEXTURE_CREATOR(Image, "Image");
+DEFINE_DEFAULT_TEXTURE_CREATOR(HDR, "HDR");

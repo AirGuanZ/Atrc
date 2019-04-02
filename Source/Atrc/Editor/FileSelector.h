@@ -22,7 +22,7 @@ public:
         ImGui::PushID(this);
         AGZ::ScopeGuard popID([] { ImGui::PopID(); });
         
-        if(ImGui::SmallButton("browse"))
+        if(ImGui::Button("browse"))
             fileBrowser_.Open();
         fileBrowser_.Display();
 
