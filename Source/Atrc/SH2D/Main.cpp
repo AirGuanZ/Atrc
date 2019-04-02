@@ -240,6 +240,27 @@ void ReconstructImage(
     }));
 }
 
+void ExtractImageFromSceneCoef(const std::string &inputFilename, const std::string &outputFilename)
+{
+    using namespace Atrc;
+
+    auto loadImg = [&](const std::string &filename)->Image
+    {
+        std::ifstream fi(filename, std::ifstream::binary);
+        if(!fi)
+            throw AGZ::Exception("Failed to open file: " + filename);
+        AGZ::BinaryIStreamDeserializer ds(fi);
+        Image ret;
+        if(!ds.Deserialize(ret))
+            throw AGZ::Exception("Failed to deserialize image from: " + filename);
+        return ret;
+    };
+
+    Image input = loadImg(inputFilename);
+    AGZ::TextureFile::WriteRGBToHDR(outputFilename,
+        Gamma(input.Map([](const Spectrum &s) { return s.ToFloats(); }), Real(2.2)));
+}
+
 int main(int argc, char *argv[])
 {
     try
@@ -248,6 +269,7 @@ int main(int argc, char *argv[])
     SH2D ps/project_scene scene_desc_filename output_dir_name
     SH2D pl/project_light light_desc_filename output_filename
     SH2D rc/reconstruct   SH_order(0 to 4) light_coef_filename scene_coef_dir output_filename
+    SH2D ex/extract       input_filename output_filename
 )___";
 
         if(argc < 2)
@@ -336,6 +358,18 @@ int main(int argc, char *argv[])
             std::string albedoFilename = (std::filesystem::path(argv[4]) / "albedo.sh2d").string();
 
             ReconstructImage(SHOrder, lightFilename, sceneCoefFilenames.data(), albedoFilename, outputFilename);
+        }
+        else if(argv[1] == std::string("ex") || argv[1] == std::string("extract"))
+        {
+            if(argc != 4)
+            {
+                std::cout << USAGE_MSG << std::endl;
+                return 0;
+            }
+
+            std::string inputFilename = argv[2];
+            std::string outputFilename = argv[3];
+            ExtractImageFromSceneCoef(inputFilename, outputFilename);
         }
         else
             std::cout << USAGE_MSG << std::endl;

@@ -71,7 +71,7 @@ namespace
             BSDF_ALL, false) * Abs(Cos(shd.coordSys.ez, bsdfSample->wi)) / bsdfSample->pdf;
 
         ray = Ray(inct.pos + EPS * inct.coordSys.ez, bsdfSample->wi, 0).Normalize();
-        if(scene.FindIntersection(ray, &inct))
+        if(scene.HasIntersection(ray))
         {
             ClearPixelCoefs(pixel, SHC);
             return;
