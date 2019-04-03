@@ -4,7 +4,6 @@
 
 #include <AGZUtils/Utils/Config.h>
 #include <Atrc/Editor/ResourceInstance/ResourceInstance.h>
-#include "Atrc/Editor/ResourceInstance/ResourceSlot.h"
 
 class ITexture : public IResource, public ExportAsConfigGroup
 {

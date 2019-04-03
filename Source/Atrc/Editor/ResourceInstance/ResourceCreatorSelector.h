@@ -25,7 +25,7 @@ public:
         : factory_(factory)
     {
         AGZ_ASSERT(factory.begin() != factory.end());
-        selectedCreator_ = factory.begin()->second;
+        selectedCreator_ = nullptr;
 
         widgetWidth_ = 0;
         for(auto &p : factory)
@@ -35,7 +35,10 @@ public:
 
     void SetSelectedCreator(const std::string &name)
     {
-        selectedCreator_ = factory_[name];
+        if(!name.empty())
+            selectedCreator_ = &factory_[name];
+        else
+            selectedCreator_ = nullptr;
     }
 
     const Creator *GetSelectedCreator() const noexcept
@@ -53,7 +56,7 @@ public:
 
         auto oldSelectedCreator = selectedCreator_;
 
-        if(ImGui::BeginCombo("", selectedCreator_->GetName().c_str()))
+        if(ImGui::BeginCombo("", selectedCreator_ ? selectedCreator_->GetName().c_str() : "?"))
         {
             AGZ_SCOPE_GUARD({ ImGui::EndCombo(); });
             for(auto &p : factory_)

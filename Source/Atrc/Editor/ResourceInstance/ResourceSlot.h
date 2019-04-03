@@ -14,8 +14,11 @@ public:
     explicit ResourceSlot(const Factory &factory, CreatingArgs...creatingArgs)
         : selector_(factory), creatingArgs_(std::make_tuple<CreatingArgs...>(creatingArgs...))
     {
-        rsc_ = std::apply(std::mem_fn(&Creator::Create),
-                          std::tuple_cat(std::make_tuple(selector_.GetSelectedCreator()), creatingArgs_));
+        if(selector_.GetSelectedCreator())
+        {
+            rsc_ = std::apply(std::mem_fn(&Creator::Create),
+                std::tuple_cat(std::make_tuple(selector_.GetSelectedCreator()), creatingArgs_));
+        }
     }
 
     template<typename TCallback>
@@ -29,7 +32,8 @@ public:
     void SetResource(std::shared_ptr<Resource> rsc)
     {
         rsc_ = std::move(rsc);
-        if(rscChangedCallback_)
+        selector_.SetSelectedCreator(rsc_ ? rsc_->GetType() : "");
+        if(rscChangedCallback_ && rsc_)
             rscChangedCallback_(*rsc_);
     }
 

@@ -124,6 +124,9 @@ private:
 class IFilmFilterCreator;
 using FilmFilterFactory = ResourceFactory<IFilmFilterCreator>;
 
+class ILightCreator;
+using LightFactory = ResourceFactory<ILightCreator>;
+
 class IMaterialCreator;
 using MaterialFactory = ResourceFactory<IMaterialCreator>;
 
