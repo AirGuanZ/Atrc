@@ -125,6 +125,7 @@ T *Factory<T>::Create(const ConfigNode &definition, Context &context, Arena &are
     if(auto grp = definition.TryAsGroup())
     {
         auto type = (*grp)["type"].AsValue();
+        printf("type = %s\n", type.c_str());
         if(type == "Reference")
         {
             ConfigValue valueNode((*grp)["name"].AsValue());

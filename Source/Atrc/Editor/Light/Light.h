@@ -42,7 +42,7 @@ public:
 
     std::shared_ptr<ILight> Create() const override
     {
-        return std::make_shared<TLight>(std::move(name), this);
+        return std::make_shared<TLight>(this);
     }
 };
 

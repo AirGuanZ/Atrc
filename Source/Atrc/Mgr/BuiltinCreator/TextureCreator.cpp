@@ -53,7 +53,7 @@ Texture *HDRTextureCreator::Create(const ConfigGroup &group, Context &context, A
         else
         {
             auto ttex = arena.Create<AGZ::Texture2D<Color3f>>();
-            *ttex = AGZ::Texture2D<Color3f>(AGZ::TextureFile::LoadRGBFromHDR(filename));
+            *ttex = AGZ::TextureFile::LoadRGBFromHDR(filename);
             tex = ttex;
         }
 

@@ -19,7 +19,7 @@ void InitializeImGui(GLFWwindow *window)
     ImGui_ImplGlfw_InitForOpenGL(window);
     ImGui_ImplOpenGL3_Init();
 
-    ImGui::StyleColorsLight();
+    ImGui::StyleColorsDark();
 
     ImGui::GetStyle().WindowRounding = 0;
     ImGui::GetStyle().FrameBorderSize = 1;

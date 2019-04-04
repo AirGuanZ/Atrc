@@ -1,10 +1,10 @@
 #include <Atrc/Editor/FilmRTReporter.h>
+#include <Atrc/Editor/Global.h>
 #include <Atrc/Editor/SceneRenderer.h>
 #include <Atrc/Core/Core/Renderer.h>
 #include <Atrc/Mgr/BuiltinCreatorRegister.h>
 #include <Atrc/Mgr/Parser.h>
 #include <Atrc/Mgr/SceneBuilder.h>
-#include "Global.h"
 
 SceneRenderer::SceneRenderer()
     : renderer_(nullptr), sampler_(nullptr), filmFilter_(nullptr), saved_(false)
@@ -39,11 +39,29 @@ bool SceneRenderer::Start(const AGZ::Config &config, std::string_view configPath
 		
 		renderer_->Render(scene_.get(), sampler_, film_.get(), reporter_.get());
 	}
-	catch(...)
-	{
+    catch(const AGZ::HierarchyException &err)
+    {
+        std::vector<std::string> errMsgs;
+        err.GetAllMessages(std::back_inserter(errMsgs));
+        for(auto &m : errMsgs)
+            Global::ShowErrorMessage(m);
 		return false;
-	}
-	
+    }
+	catch(const AGZ::Exception &err)
+    {
+        Global::ShowErrorMessage(err.what());
+		return false;
+    }
+    catch(const std::exception &err)
+    {
+        Global::ShowErrorMessage(err.what());
+		return false;
+    }
+    catch(...)
+    {
+        Global::ShowErrorMessage("???");
+		return false;
+    }
 	clearGuard.Dismiss();
 	return true;
 }

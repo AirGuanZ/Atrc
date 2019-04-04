@@ -9,7 +9,12 @@ Scene SceneBuilder::Build(const ConfigGroup &root, Context &context)
 {
     AGZ_HIERARCHY_TRY
     {
-        auto camera = context.Create<Camera>(root["camera"]);
+        Camera *camera = nullptr;
+        AGZ_HIERARCHY_TRY
+        {
+            camera = context.Create<Camera>(root["camera"]);
+        }
+        AGZ_HIERARCHY_WRAP("in creating camera")
 
         std::vector<Entity*> entities;
         std::vector<Light*> lights;
@@ -39,27 +44,39 @@ Scene SceneBuilder::Build(const ConfigGroup &root, Context &context)
         std::vector<const Entity*> cEntities;
         std::vector<const Light*> cLights;
 
-        for(auto ent : entities)
+        AGZ_HIERARCHY_TRY
         {
-            cEntities.push_back(ent);
-            if(auto lht = ent->AsLight())
-                lights.push_back(lht);
-        }
+            for(auto ent : entities)
+            {
+                cEntities.push_back(ent);
+                if(auto lht = ent->AsLight())
+                    lights.push_back(lht);
+            }
 
-        for(auto lht : lights)
-            cLights.push_back(lht);
+            for(auto lht : lights)
+                cLights.push_back(lht);
+        }
+        AGZ_HIERARCHY_WRAP("in wrapping lights")
 
         Medium *globalMedium = nullptr;
-        if(auto medNode = root.Find("globalMedium"))
-            globalMedium = context.Create<Medium>(*medNode);
+        AGZ_HIERARCHY_TRY
+        {
+            if(auto medNode = root.Find("globalMedium"))
+                globalMedium = context.Create<Medium>(*medNode);
+        }
+        AGZ_HIERARCHY_WRAP("in creating global medium")
 
         Scene scene(
             cEntities.data(), cEntities.size(),
             cLights.data(), cLights.size(),
             camera, globalMedium);
 
-        for(auto lht : lights)
-            lht->PreprocessScene(scene);
+        AGZ_HIERARCHY_TRY
+        {
+            for(auto lht : lights)
+                lht->PreprocessScene(scene);
+        }
+        AGZ_HIERARCHY_WRAP("in preprocessing scene")
         
         return scene;
     }
