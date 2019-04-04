@@ -2,7 +2,7 @@
 
 #include <Atrc/Editor/ResourceInstance/ResourceCreatorSelector.h>
 
-template<typename TResourceFactory, typename...CreatingArgs>
+template<typename TResourceFactory>
 class ResourceSlot
 {
 public:
@@ -11,14 +11,10 @@ public:
     using Creator = typename Factory::Creator;
     using Resource = typename Creator::Resource;
 
-    explicit ResourceSlot(const Factory &factory, CreatingArgs...creatingArgs)
-        : selector_(factory), creatingArgs_(std::make_tuple<CreatingArgs...>(creatingArgs...))
+    ResourceSlot()
     {
-        if(selector_.GetSelectedCreator())
-        {
-            rsc_ = std::apply(std::mem_fn(&Creator::Create),
-                std::tuple_cat(std::make_tuple(selector_.GetSelectedCreator()), creatingArgs_));
-        }
+        if(auto c = selector_.GetSelectedCreator())
+            rsc_ = c->Create();
     }
 
     template<typename TCallback>
@@ -48,8 +44,7 @@ public:
         bool useMiniWidth = rsc_ ? !CallIsMultiline(*rsc_) : false;
         if(selector_.Display(useMiniWidth))
         {
-            rsc_ = std::apply(std::mem_fn(&Creator::Create),
-                              std::tuple_cat(std::make_tuple(selector_.GetSelectedCreator()), creatingArgs_));
+            rsc_ = selector_.GetSelectedCreator()->Create();
             if(rscChangedCallback_)
                 rscChangedCallback_(*rsc_);
         }
@@ -82,8 +77,6 @@ private:
     std::shared_ptr<Resource> rsc_;
 
     std::function<void(Resource&)> rscChangedCallback_;
-
-    std::tuple<CreatingArgs...> creatingArgs_;
 
     template<typename T, typename = void>
     struct HasIsMultiline : std::false_type { };

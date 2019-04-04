@@ -4,11 +4,11 @@
 
 #include <Atrc/Editor/GL.h>
 #include <Atrc/Editor/ResourceInstance/ResourceInstance.h>
+#include <Atrc/Editor/ResourceInstance/ResourceFactory.h>
 
 template<typename TResourceFactory>
 class ResourceCreatorSelector
 {
-    const TResourceFactory &factory_;
     const typename TResourceFactory::Creator *selectedCreator_;
     float widgetWidth_;
 
@@ -21,13 +21,12 @@ public:
     static_assert(std::is_base_of_v<IResourceCreator, Creator>);
     static_assert(std::is_base_of_v<IResource, Resource>);
 
-    explicit ResourceCreatorSelector(const Factory &factory) noexcept
-        : factory_(factory)
+    ResourceCreatorSelector()
     {
-        AGZ_ASSERT(factory.begin() != factory.end());
         selectedCreator_ = nullptr;
 
         widgetWidth_ = 0;
+        auto &factory = RF.Get<Resource>();
         for(auto &p : factory)
             widgetWidth_ = (std::max)(widgetWidth_, ImGui::CalcTextSize(p.first.c_str()).x);
         widgetWidth_ += 2 * ImGui::GetFontSize();
@@ -36,7 +35,10 @@ public:
     void SetSelectedCreator(const std::string &name)
     {
         if(!name.empty())
-            selectedCreator_ = &factory_[name];
+        {
+            auto &factory = RF.Get<Resource>();
+            selectedCreator_ = &factory[name];
+        }
         else
             selectedCreator_ = nullptr;
     }
@@ -55,11 +57,12 @@ public:
         AGZ_SCOPE_GUARD({ ImGui::PopItemWidth(); });
 
         auto oldSelectedCreator = selectedCreator_;
+        auto &factory = RF.Get<Resource>();
 
         if(ImGui::BeginCombo("", selectedCreator_ ? selectedCreator_->GetName().c_str() : "?"))
         {
             AGZ_SCOPE_GUARD({ ImGui::EndCombo(); });
-            for(auto &p : factory_)
+            for(auto &p : factory)
             {
                 bool selected = selectedCreator_ == p.second;
                 if(ImGui::Selectable(p.first.c_str(), selected))

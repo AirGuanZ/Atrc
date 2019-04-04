@@ -30,7 +30,7 @@ public:
 
     using IResourceCreator::IResourceCreator;
 
-    virtual std::shared_ptr<ILight> Create(const std::string &name) const = 0;
+    virtual std::shared_ptr<ILight> Create() const = 0;
 };
 
 template<typename TLight>
@@ -40,7 +40,7 @@ public:
 
     using ILightCreator::ILightCreator;
 
-    std::shared_ptr<ILight> Create(const std::string &name) const override
+    std::shared_ptr<ILight> Create() const override
     {
         return std::make_shared<TLight>(std::move(name), this);
     }

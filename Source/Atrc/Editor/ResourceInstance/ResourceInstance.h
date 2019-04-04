@@ -35,7 +35,7 @@ protected:
     }
 };
 
-class IResource : public HasName
+class IResource
 {
     const HasName *creator_;
 
@@ -48,8 +48,8 @@ protected:
 
 public:
 
-    IResource(std::string name, const HasName *creator) noexcept
-        : HasName(std::move(name)), creator_(creator)
+    explicit IResource(const HasName *creator) noexcept
+        : creator_(creator)
     {
         
     }

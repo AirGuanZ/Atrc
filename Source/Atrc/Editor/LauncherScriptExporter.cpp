@@ -160,7 +160,7 @@ void LauncherScriptImporter::Import(const AGZ::ConfigGroup &root, EditorData *da
 
     data->filmSize = Atrc::Mgr::Parser::ParseVec2i(root["film.size"]);
     {
-        auto filter = data->filmFilterFactory[root["film.filter.type"].AsValue()].Create();
+        auto filter = RF.Get<IFilmFilter>()[root["film.filter.type"].AsValue()].Create();
         filter->Load(root["film.filter"].AsGroup());
         data->filmFilter->SetResource(filter);
     }

@@ -59,5 +59,5 @@ bool Gaussian::IsMultiline() const noexcept
 
 std::shared_ptr<IFilmFilter> GaussianCreator::Create() const
 {
-    return std::make_shared<Gaussian>("", this);
+    return std::make_shared<Gaussian>(this);
 }

@@ -44,5 +44,5 @@ bool Box::IsMultiline() const noexcept
 
 std::shared_ptr<IFilmFilter> BoxCreator::Create() const
 {
-    return std::make_shared<Box>("", this);
+    return std::make_shared<Box>(this);
 }

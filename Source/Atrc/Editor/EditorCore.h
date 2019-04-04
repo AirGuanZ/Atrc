@@ -23,10 +23,7 @@ struct EditorData
     SamplerSlot    samplerSlot;
     RendererSlot   rendererSlot;
 
-    FilmFilterFactory filmFilterFactory;
     std::unique_ptr<ResourceSlot<FilmFilterFactory>> filmFilter;
-
-    TextureFactory texFactory;
     std::unique_ptr<ResourceSlot<TextureFactory>> tex;
 
     FileSelector scriptFilename = FileSelector(ImGuiFileBrowserFlags_EnterNewFilename);

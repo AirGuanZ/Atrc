@@ -27,10 +27,9 @@ void EditorCore::Initialize()
     sState_ = std::make_unique<WithinFrameState>();
     lState_ = std::make_unique<BetweenFrameState>();
 
-    RegisterBuiltinFilmFilterCreators(data_->filmFilterFactory);
-    RegisterBuiltinTextureCreators(data_->texFactory);
-    data_->filmFilter = std::make_unique<ResourceSlot<FilmFilterFactory>>(data_->filmFilterFactory);
-    data_->tex = std::make_unique<ResourceSlot<TextureFactory>>(data_->texFactory);
+    RegisterBuiltinResourceCreators();
+    data_->filmFilter = std::make_unique<ResourceSlot<FilmFilterFactory>>();
+    data_->tex = std::make_unique<ResourceSlot<TextureFactory>>();
 
     RegisterResourceCreators(data_->rscMgr);
 

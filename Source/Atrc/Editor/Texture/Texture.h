@@ -46,7 +46,7 @@ public:
 
     std::shared_ptr<ITexture> Create() const override
     {
-        return std::make_shared<TTexture>("", this);
+        return std::make_shared<TTexture>(this);
     }
 };
 
