@@ -68,7 +68,7 @@ public:
     {
         if(rsc_)
             return rsc_;
-        throw AGZ::HierarchyException("GetNoneNullResource is called with a null resource slot");
+        throw std::runtime_error("GetNoneNullResource is called with a null resource slot");
     }
 
 private:

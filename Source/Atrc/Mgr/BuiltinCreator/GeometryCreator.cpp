@@ -57,7 +57,7 @@ namespace
     {
         AGZ::Mesh::WavefrontObj<Real> obj;
         if(!obj.LoadFromFile(filename))
-            throw AGZ::HierarchyException("Failed to load obj file from " + std::string(filename));
+            throw std::runtime_error("Failed to load obj file from " + std::string(filename));
         auto mesh = obj.ToGeometryMeshGroup().MergeAllSubmeshes();
         obj.Clear();
 
@@ -78,17 +78,17 @@ namespace
 
         std::ofstream fout(WIDEN(cacheFilename), std::ofstream::trunc | std::ofstream::binary);
         if(!fout)
-            throw AGZ::HierarchyException("Failed to create new triangle mesh cache file: " + std::string(cacheFilename));
+            throw std::runtime_error("Failed to create new triangle mesh cache file: " + std::string(cacheFilename));
 
         auto oriFileTime = AGZ::FileSys::File::GetLastWriteTime(filename);
         if(!oriFileTime)
-            throw AGZ::HierarchyException("Failed to load last write time of " + std::string(filename));
+            throw std::runtime_error("Failed to load last write time of " + std::string(filename));
 
         AGZ::BinaryOStreamSerializer serializer(fout);
         if(!serializer.Serialize(*oriFileTime) || !serializer.Serialize(*ret))
         {
             AGZ::FileSys::File::DeleteRegularFile(cacheFilename);
-            throw AGZ::HierarchyException("Failed to serialize into triangle mesh cache file: " + std::string(cacheFilename));
+            throw std::runtime_error("Failed to serialize into triangle mesh cache file: " + std::string(cacheFilename));
         }
 
         return ret;
@@ -103,7 +103,7 @@ namespace
 
         auto oriFileTime = AGZ::FileSys::File::GetLastWriteTime(filename);
         if(!oriFileTime)
-            throw AGZ::HierarchyException("Failed to load last write time of " + std::string(filename));
+            throw std::runtime_error("Failed to load last write time of " + std::string(filename));
 
         AGZ::BinaryIStreamDeserializer deserializer(fin);
         auto cacheTime = deserializer.Deserialize<AGZ::FileSys::FileTime>();

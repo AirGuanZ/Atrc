@@ -24,7 +24,7 @@ Sampler *NativeSamplerCreator::Create(const ConfigGroup &group, [[maybe_unused]]
         
         int spp = group["spp"].Parse<int>();
         if(spp <= 0)
-            throw AGZ::HierarchyException("Invalid spp value");
+            throw std::runtime_error("Invalid spp value");
 
         return arena.Create<NativeSampler>(seed, spp);
     }

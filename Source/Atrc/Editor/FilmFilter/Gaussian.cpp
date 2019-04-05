@@ -12,11 +12,11 @@ void Gaussian::Load(const AGZ::ConfigGroup &params)
 
     radius_ = params["radius"].Parse<float>();
     if(radius_ <= 0)
-        throw AGZ::HierarchyException("invalid radius value: " + std::to_string(radius_));
+        throw std::runtime_error("invalid radius value: " + std::to_string(radius_));
 
     alpha_ = params["alpha"].Parse<float>();
     if(alpha_ <= 0)
-        throw AGZ::HierarchyException("invalid alpha value: " + std::to_string(alpha_));
+        throw std::runtime_error("invalid alpha value: " + std::to_string(alpha_));
 
     AGZ_HIERARCHY_WRAP("in loading box film filter with " + params.ToString())
 }

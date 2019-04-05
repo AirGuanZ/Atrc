@@ -113,7 +113,7 @@ T *Factory<T>::Create(const ConfigNode &definition, Context &context, Arena &are
 
         auto node = context.Root().Find(*val);
         if(!node)
-            throw AGZ::HierarchyException("Object definition not found: " + *val);
+            throw std::runtime_error("Object definition not found: " + *val);
         
         // 先把pubObjs_[*val]设为nullptr，避免对同一类型同一名字的循环引用，这样可以消除循环引用产生的死循环
         pubObjs_[*val] = nullptr;
@@ -125,7 +125,6 @@ T *Factory<T>::Create(const ConfigNode &definition, Context &context, Arena &are
     if(auto grp = definition.TryAsGroup())
     {
         auto type = (*grp)["type"].AsValue();
-        printf("type = %s\n", type.c_str());
         if(type == "Reference")
         {
             ConfigValue valueNode((*grp)["name"].AsValue());
@@ -133,11 +132,11 @@ T *Factory<T>::Create(const ConfigNode &definition, Context &context, Arena &are
         }
         auto it = creators_.find(type);
         if(it == creators_.end())
-            throw AGZ::HierarchyException("Unknown object type");
+            throw std::runtime_error("Unknown object type");
         return it->second->Create(*grp, context, arena);
     }
 
-    throw AGZ::HierarchyException("Invalid object definition form");
+    throw std::runtime_error("Invalid object definition form");
 }
 
 template<typename T>
@@ -160,7 +159,7 @@ T *Context::Create(const ConfigNode &definition)
     {
         T *ret = std::get<Factory<T>>(factories_).Create(definition, *this, arena_);
         if(!ret)
-            throw AGZ::HierarchyException("Context::Create: factory returns nullptr");
+            throw std::runtime_error("Context::Create: factory returns nullptr");
         return ret;
     }
     AGZ_HIERARCHY_WRAP(

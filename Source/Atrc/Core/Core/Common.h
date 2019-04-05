@@ -168,13 +168,13 @@ using FilmGrid = TFilmGrid<Spectrum>;
 
 // ================================= Exception
 
-class Exception : public AGZ::HierarchyException
+class Exception : public std::runtime_error
 {
     std::string msg_;
 
 public:
 
-    using HierarchyException::HierarchyException;
+    using runtime_error::runtime_error;
 
     const std::string &What() const noexcept { return msg_; }
 };

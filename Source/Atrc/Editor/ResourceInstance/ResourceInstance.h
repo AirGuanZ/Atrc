@@ -89,7 +89,7 @@ public:
 
         auto it = name2Creator_.find(creator->GetName());
         if(it != name2Creator_.end())
-            throw AGZ::HierarchyException("repeated creator name: " + creator->GetName());
+            throw std::runtime_error("repeated creator name: " + creator->GetName());
         name2Creator_[creator->GetName()] = creator;
 
         AGZ_HIERARCHY_WRAP("in registering resource creator")
@@ -101,7 +101,7 @@ public:
 
         auto it = name2Creator_.find(name);
         if(it == name2Creator_.end())
-            throw AGZ::HierarchyException("unknown creator name: " + name);
+            throw std::runtime_error("unknown creator name: " + name);
         return *it->second;
 
         AGZ_HIERARCHY_WRAP("in getting creator from creator factory")

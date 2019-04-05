@@ -68,7 +68,7 @@ Texture *HDRTextureCreator::Create(const ConfigGroup &group, Context &context, A
             else if(sampler == "Linear")
                 samplingStrategy = HDRTexture::Linear;
             else
-                throw AGZ::HierarchyException("Invalid sampler value");
+                throw std::runtime_error("Invalid sampler value");
         }
 
         if(auto wrapperNode = group.Find("wrapper"))
@@ -77,7 +77,7 @@ Texture *HDRTextureCreator::Create(const ConfigGroup &group, Context &context, A
             if(wrapper == "Clamp")
                 wrappingStrategy = HDRTexture::Clamp;
             else
-                throw AGZ::HierarchyException("Invalid wrapper value");
+                throw std::runtime_error("Invalid wrapper value");
         }
 
         bool reverseV = false;
@@ -121,7 +121,7 @@ Texture *ImageTextureCreator::Create(const ConfigGroup &group, Context &context,
             else if(sampler == "Linear")
                 samplingStrategy = ImageTexture::Linear;
             else
-                throw AGZ::HierarchyException("Invalid sampler value");
+                throw std::runtime_error("Invalid sampler value");
         }
 
         if(auto wrapperNode = group.Find("wrapper"))
@@ -130,7 +130,7 @@ Texture *ImageTextureCreator::Create(const ConfigGroup &group, Context &context,
             if(wrapper == "Clamp")
                 wrappingStrategy = ImageTexture::Clamp;
             else
-                throw AGZ::HierarchyException("Invalid wrapper value");
+                throw std::runtime_error("Invalid wrapper value");
         }
 
         bool reverseV = false;

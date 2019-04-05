@@ -31,10 +31,10 @@ PathTracingIntegrator *FullPathTracingIntegratorCreator::Create(
         bool sampleAllLights = Parser::ParseBool(group["sampleAllLights"]);
 
         if(minDepth <= 0 || maxDepth < minDepth)
-            throw AGZ::HierarchyException("Invalid min/max depth value");
+            throw std::runtime_error("Invalid min/max depth value");
 
         if(contProb <= 0 || contProb > 1)
-            throw AGZ::HierarchyException("Invalid contProb value");
+            throw std::runtime_error("Invalid contProb value");
 
         return arena.Create<FullPathTracingIntegrator>(
             minDepth, maxDepth, contProb, sampleAllLights);
@@ -53,10 +53,10 @@ PathTracingIntegrator *MISPathTracingIntegratorCreator::Create(
         bool sampleAllLights = Parser::ParseBool(group["sampleAllLights"]);
 
         if(minDepth <= 0 || maxDepth < minDepth)
-            throw AGZ::HierarchyException("Invalid min/max depth value");
+            throw std::runtime_error("Invalid min/max depth value");
 
         if(contProb <= 0 || contProb > 1)
-            throw AGZ::HierarchyException("Invalid contProb value");
+            throw std::runtime_error("Invalid contProb value");
 
         return arena.Create<MISPathTracingIntegrator>(
             minDepth, maxDepth, contProb, sampleAllLights);
@@ -74,10 +74,10 @@ PathTracingIntegrator *NativePathTracingIntegratorCreator::Create(
         Real contProb = group["contProb"].Parse<Real>();
 
         if(minDepth <= 0 || maxDepth < minDepth)
-            throw AGZ::HierarchyException("Invalid min/max depth value");
+            throw std::runtime_error("Invalid min/max depth value");
 
         if(contProb <= 0 || contProb > 1)
-            throw AGZ::HierarchyException("Invalid contProb value");
+            throw std::runtime_error("Invalid contProb value");
 
         return arena.Create<NativePathTracingIntegrator>(minDepth, maxDepth, contProb);
     }

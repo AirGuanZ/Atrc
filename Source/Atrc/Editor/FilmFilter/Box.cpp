@@ -12,7 +12,7 @@ void Box::Load(const AGZ::ConfigGroup &params)
 
     sidelen_ = params["sidelen"].Parse<float>();
     if(sidelen_ <= 0)
-        throw AGZ::HierarchyException("invalid sidelen value: " + std::to_string(sidelen_));
+        throw std::runtime_error("invalid sidelen value: " + std::to_string(sidelen_));
 
     AGZ_HIERARCHY_WRAP("in loading box film filter with " + params.ToString())
 }

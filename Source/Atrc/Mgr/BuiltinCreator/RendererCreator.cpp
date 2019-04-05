@@ -23,14 +23,14 @@ Renderer *PathTracingRendererCreator::Create(const ConfigGroup &group, Context &
         if(auto pN = group.Find("epoch"))
             epoch = pN->Parse<int>();
         if(epoch <= 0)
-            throw AGZ::HierarchyException("Invalid epoch value: " + std::to_string(epoch));
+            throw std::runtime_error("Invalid epoch value: " + std::to_string(epoch));
 
         bool shuffle = false;
         if(auto pN = group.Find("shuffle"))
             shuffle = Parser::ParseBool(*pN);
 
         if(taskGridSize <= 0)
-            throw AGZ::HierarchyException("Invalid taskGridSize value");
+            throw std::runtime_error("Invalid taskGridSize value");
         
         return arena.Create<PathTracingRenderer>(workerCount, taskGridSize, epoch, shuffle, *integrator);
     }

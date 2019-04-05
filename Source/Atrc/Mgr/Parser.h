@@ -113,7 +113,7 @@ namespace TFloat
                 }
             }
 
-            throw AGZ::HierarchyException("Invalid spectrum form");
+            throw std::runtime_error("Invalid spectrum form");
         }
         AGZ_HIERARCHY_WRAP("In parsing spectrum: " + node.ToString())
     }
@@ -132,7 +132,7 @@ namespace TFloat
                         (*arr)[0].Parse<T>(),
                         (*arr)[1].Parse<T>());
             }
-            throw AGZ::HierarchyException("Invalid vec2 form");
+            throw std::runtime_error("Invalid vec2 form");
         }
         AGZ_HIERARCHY_WRAP("In parsing vec2: " + node.ToString())
     }
@@ -152,7 +152,7 @@ namespace TFloat
                         (*arr)[1].Parse<T>(),
                         (*arr)[2].Parse<T>());
             }
-            throw AGZ::HierarchyException("Invalid vec3 form");
+            throw std::runtime_error("Invalid vec3 form");
         }
         AGZ_HIERARCHY_WRAP("In parsing vec3: " + node.ToString())
     }
@@ -165,13 +165,13 @@ namespace TFloat
             if(auto arr = node.TryAsArray())
             {
                 if(arr->Size() != 1)
-                    throw AGZ::HierarchyException("Array is too long");
+                    throw std::runtime_error("Array is too long");
                 if(arr->GetTag() == "Deg")
                     return AGZ::Math::Rad<T>(AGZ::Math::Deg<T>((*arr)[0].Parse<T>()));
                 if(arr->GetTag() == "Rad")
                     return AGZ::Math::Rad<T>((*arr)[0].Parse<T>());
             }
-            throw AGZ::HierarchyException("Invalid angle form");
+            throw std::runtime_error("Invalid angle form");
         }
         AGZ_HIERARCHY_WRAP("In parsing angle: " + node.ToString())
     }
@@ -182,14 +182,14 @@ namespace TFloat
         AGZ_HIERARCHY_TRY
         {
             if(!node.IsArray())
-                throw AGZ::HierarchyException("Array expected");
+                throw std::runtime_error("Array expected");
             auto &arr = node.AsArray();
 
             auto ret = AGZ::Math::RM_Mat3<T>::IDENTITY();
             for(size_t i = 0; i < arr.Size(); ++i)
             {
                 if(!arr[i].IsArray())
-                    throw AGZ::HierarchyException("Array expected");
+                    throw std::runtime_error("Array expected");
                 auto &unit = arr[i].AsArray();
 
                 AGZ_HIERARCHY_TRY
@@ -197,30 +197,30 @@ namespace TFloat
                     if(unit.GetTag() == "Rotate")
                     {
                         if(unit.Size() != 2)
-                            throw AGZ::HierarchyException("Rotate size must be 2");
+                            throw std::runtime_error("Rotate size must be 2");
                         ret = ret * AGZ::Math::RM_Mat3<T>::template Rotate(
                             ParseVec3<T>(unit[0]), ParseAngle<T>(unit[1]));
                     }
                     else if(unit.GetTag() == "RotateX")
                     {
                         if(unit.Size() != 1)
-                            throw AGZ::HierarchyException("RotateX size must be 1");
+                            throw std::runtime_error("RotateX size must be 1");
                         ret = ret * AGZ::Math::RM_Mat3<T>::template RotateX(ParseAngle<T>(unit[0]));
                     }
                     else if(unit.GetTag() == "RotateY")
                     {
                         if(unit.Size() != 1)
-                            throw AGZ::HierarchyException("RotateY size must be 1");
+                            throw std::runtime_error("RotateY size must be 1");
                         ret = ret * AGZ::Math::RM_Mat3<T>::template RotateY(ParseAngle<T>(unit[0]));
                     }
                     else if(unit.GetTag() == "RotateZ")
                     {
                         if(unit.Size() != 1)
-                            throw AGZ::HierarchyException("RotateZ size must be 1");
+                            throw std::runtime_error("RotateZ size must be 1");
                         ret = ret * AGZ::Math::RM_Mat3<T>::template RotateZ(ParseAngle<T>(unit[0]));
                     }
                     else
-                        throw AGZ::HierarchyException("Unknown rotation type");
+                        throw std::runtime_error("Unknown rotation type");
                 }
                 AGZ_HIERARCHY_WRAP("In parsing rotation unit: " + unit.ToString());
             }

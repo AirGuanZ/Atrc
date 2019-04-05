@@ -41,7 +41,7 @@ std::string Image::Save(const std::filesystem::path &relPath) const
     AGZ_HIERARCHY_TRY
 
     if(!glTex_)
-        throw AGZ::HierarchyException("empty image object");
+        throw std::runtime_error("empty image object");
 
     const AGZ::Fmt fmt(R"___(
         type = {};
@@ -62,7 +62,7 @@ void Image::Load(const AGZ::ConfigGroup &params, const std::filesystem::path &re
     else
     {
         fileSelector_.SetFilename("");
-        throw AGZ::HierarchyException("failed to set gl texture filename to " + filename.string());
+        throw std::runtime_error("failed to set gl texture filename to " + filename.string());
     }
 
     AGZ_HIERARCHY_WRAP("in loading image texture with " + params.ToString())

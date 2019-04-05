@@ -20,9 +20,9 @@ void Range::Load(const AGZ::ConfigGroup &params, const std::filesystem::path &re
     value_ = params["value"].Parse<float>();
 
     if(low_ > high_)
-        throw AGZ::HierarchyException("invalid range parameter (low > high)");
+        throw std::runtime_error("invalid range parameter (low > high)");
     if(value_ < low_ || value_ > high_)
-        throw AGZ::HierarchyException("invalid range parameter (value \notin [low, high])");
+        throw std::runtime_error("invalid range parameter (value \notin [low, high])");
 
     AGZ_HIERARCHY_WRAP("in loading range texture with " + params.ToString())
 }

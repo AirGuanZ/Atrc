@@ -19,7 +19,7 @@ FilmFilter *BoxFilterCreator::Create(const ConfigGroup &group, [[maybe_unused]] 
     {
         Real sidelen = group["sidelen"].Parse<Real>();
         if(sidelen <= 0)
-            throw AGZ::HierarchyException("Invalid sidelen value");
+            throw std::runtime_error("Invalid sidelen value");
         return arena.Create<BoxFilter>(Vec2(sidelen / 2));
     }
     AGZ_HIERARCHY_WRAP("In creating box filter: " + group.ToString())
@@ -33,7 +33,7 @@ FilmFilter *GaussianFilterCreator::Create(const ConfigGroup &group, [[maybe_unus
         Real alpha = group["alpha"].Parse<Real>();
 
         if(radius <= 0)
-            throw AGZ::HierarchyException("Invalid radius value");
+            throw std::runtime_error("Invalid radius value");
 
         return arena.Create<GaussianFilter>(Vec2(radius), alpha);
     }

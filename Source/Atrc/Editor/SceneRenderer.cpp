@@ -39,23 +39,12 @@ bool SceneRenderer::Start(const AGZ::Config &config, std::string_view configPath
 		
 		renderer_->Render(scene_.get(), sampler_, film_.get(), reporter_.get());
 	}
-    catch(const AGZ::HierarchyException &err)
-    {
-        std::vector<std::string> errMsgs;
-        err.GetAllMessages(std::back_inserter(errMsgs));
-        for(auto &m : errMsgs)
-            Global::ShowErrorMessage(m);
-		return false;
-    }
-	catch(const AGZ::Exception &err)
-    {
-        Global::ShowErrorMessage(err.what());
-		return false;
-    }
     catch(const std::exception &err)
     {
-        Global::ShowErrorMessage(err.what());
-		return false;
+        std::vector<std::string> errMsgs;
+        AGZ::ExtractHierarchyExceptions(err, std::back_inserter(errMsgs));
+        for(auto &m : errMsgs)
+            std::cout << m << std::endl;
     }
     catch(...)
     {

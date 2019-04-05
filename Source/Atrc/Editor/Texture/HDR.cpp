@@ -46,7 +46,7 @@ std::string HDR::Save(const std::filesystem::path &relPath) const
     AGZ_HIERARCHY_TRY
 
     if(!glTex_)
-        throw AGZ::HierarchyException("empty hdr object");
+        throw std::runtime_error("empty hdr object");
 
     const AGZ::Fmt fmt(R"___(
         type = {};
@@ -67,7 +67,7 @@ void HDR::Load(const AGZ::ConfigGroup &params, const std::filesystem::path &relP
     else
     {
         fileSelector_.SetFilename("");
-        throw AGZ::HierarchyException("failed to set gl texture filename to " + filename.string());
+        throw std::runtime_error("failed to set gl texture filename to " + filename.string());
     }
 
     AGZ_HIERARCHY_WRAP("in loading hdr texture with " + params.ToString())

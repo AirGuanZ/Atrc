@@ -374,16 +374,12 @@ int main(int argc, char *argv[])
         else
             std::cout << USAGE_MSG << std::endl;
     }
-    catch(const AGZ::HierarchyException &err)
-    {
-        std::vector<std::string> errMsgs;
-        err.GetAllMessages(std::back_inserter(errMsgs));
-        for(auto &m : errMsgs)
-            std::cout << m << std::endl;
-    }
     catch(const std::exception &err)
     {
-        std::cout << err.what() << std::endl;
+        std::vector<std::string> errMsgs;
+        AGZ::ExtractHierarchyExceptions(err, std::back_inserter(errMsgs));
+        for(auto &m : errMsgs)
+            std::cout << m << std::endl;
     }
     catch(...)
     {

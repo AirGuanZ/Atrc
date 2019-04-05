@@ -33,7 +33,7 @@ int Run(const AGZ::Config &config, std::string_view configPath)
     {
         filmSize = Mgr::Parser::ParseVec2i(root["film.size"]);
         if(filmSize.x <= 0 || filmSize.y <= 0)
-            throw AGZ::HierarchyException("Invalid film size value");
+            throw std::runtime_error("Invalid film size value");
     }
     AGZ_HIERARCHY_WRAP("In creating film")
 
@@ -93,7 +93,7 @@ int main(int argc, char *argv[])
         {
             configPath = ".";
             if(!config.LoadFromFile("./Scene.txt"))
-                throw AGZ::HierarchyException("Failed to load configuration file from ./scene.txt");
+                throw std::runtime_error("Failed to load configuration file from ./scene.txt");
         }
         else if(argc == 2)
         {
@@ -105,13 +105,13 @@ int main(int argc, char *argv[])
 
             configPath = std::filesystem::path(argv[1]).parent_path().string();
             if(!config.LoadFromFile(argv[1]))
-                throw AGZ::HierarchyException("Failed to load configuration file from " + std::string(argv[1]));
+                throw std::runtime_error("Failed to load configuration file from " + std::string(argv[1]));
         }
         else if(std::string(argv[1]) == "-m" && argc == 4)
         {
             configPath = argv[2];
             if(!config.LoadFromMemory(argv[3]))
-                throw AGZ::HierarchyException("Failed to load configuration from memory");
+                throw std::runtime_error("Failed to load configuration from memory");
         }
         else
         {
@@ -121,16 +121,12 @@ int main(int argc, char *argv[])
 
         return Run(config, configPath);
     }
-    catch(const AGZ::HierarchyException &err)
-    {
-        std::vector<std::string> errMsgs;
-        err.GetAllMessages(std::back_inserter(errMsgs));
-        for(auto &m : errMsgs)
-            std::cout << m << std::endl;
-    }
     catch(const std::exception &err)
     {
-        std::cout << err.what() << std::endl;
+        std::vector<std::string> errMsgs;
+        AGZ::ExtractHierarchyExceptions(err, std::back_inserter(errMsgs));
+        for(auto &m : errMsgs)
+            std::cout << m << std::endl;
     }
     catch(...)
     {
