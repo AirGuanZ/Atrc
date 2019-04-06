@@ -14,23 +14,11 @@ namespace
     }
 }
 
-std::string SH2DLightScriptExporter::Export(ResourceManager &rscMgr, SceneExportingContext &ctx, int SHOrder, int N) const
+std::string SH2DLightScriptExporter::Export(const ILight *light, SceneExportingContext &ctx, int SHOrder, int N) const
 {
     ctx.ClearString();
 
     ctx.AddLine("workspace = \"@", relative(ctx.workspaceDirectory, ctx.scriptDirectory).string(), "\";");
-
-    ctx.AddLine();
-
-    ctx.AddLine("pool = {");
-    ctx.IncIndent();
-    ExportResourcesInPool<CameraInstance>(rscMgr, ctx);
-    ExportResourcesInPool<EntityInstance>(rscMgr, ctx);
-    ExportResourcesInPool<GeometryInstance>(rscMgr, ctx);
-    ExportResourcesInPool<MaterialInstance>(rscMgr, ctx);
-    ExportResourcesInPool<TextureInstance>(rscMgr, ctx);
-    ctx.DecIndent();
-    ctx.AddLine("};");
 
     ctx.AddLine();
 
@@ -39,11 +27,7 @@ std::string SH2DLightScriptExporter::Export(ResourceManager &rscMgr, SceneExport
 
     ctx.AddLine();
 
-    auto &pool = rscMgr.GetPool<LightInstance>();
-    auto beg = pool.begin(), end = pool.end();
-
-    if(beg != end)
-        ResourceInstance::ExportSubResource("light", rscMgr, ctx, **beg);
+    ctx.AddLine("light = ", light->Export(ctx.workspaceDirectory), ";");
 
     return ctx.GetString();
 }

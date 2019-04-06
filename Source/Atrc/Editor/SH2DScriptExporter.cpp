@@ -33,7 +33,6 @@ std::string SH2DSceneScriptExporter::Export(
     ctx.AddLine("size = (", outputFilmSize.x, ", ", outputFilmSize.y, ");");
     if(filmFilter)
         ctx.AddLine("filter = ", filmFilter->Export(), ";");
-        //ResourceInstance::ExportSubResource("filter", rscMgr, ctx, *filmFilter);
     else
         Global::ShowNormalMessage("film filter is unspecified");
     ctx.DecIndent();
@@ -55,7 +54,6 @@ std::string SH2DSceneScriptExporter::Export(
 
     if(sampler)
     {
-        //ResourceInstance::ExportSubResource("sampler", rscMgr, ctx, *sampler);
         ctx.AddLine("sampler=", sampler->Export(), ";");
         ctx.AddLine();
     }

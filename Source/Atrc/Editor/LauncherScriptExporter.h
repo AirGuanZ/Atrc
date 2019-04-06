@@ -15,6 +15,7 @@ public:
         const RendererInstance *renderer,
         const IFilmFilter *filmFilter,
         const ISampler    *sampler,
+        const ILight *envLight,
         const Vec2i &outputFilmSize,
         const std::string &outputFilename) const;
 };

@@ -30,6 +30,7 @@ void EditorCore::Initialize()
     lState_ = std::make_unique<BetweenFrameState>();
 
     RegisterBuiltinResourceCreators();
+    data_->envLight = std::make_unique<ResourceSlot<LightFactory>>();
     data_->filmFilter = std::make_unique<ResourceSlot<FilmFilterFactory>>();
     data_->sampler = std::make_unique<ResourceSlot<SamplerFactory>>();
 
@@ -91,6 +92,7 @@ void EditorCore::ShowMenuMenuBar()
                     data_->rendererSlot.GetInstance().get(), data_->filmFilter->GetResource().get(),
                     //data_->samplerSlot.GetInstance().get(),
                     data_->sampler->GetNoneNullResource().get(),
+                    data_->envLight->GetNoneNullResource().get(),
                     data_->filmSize, data_->outputFilenameBuf.data());
 
                 AGZ::Config config;
@@ -352,7 +354,7 @@ void EditorCore::ShowExportingSH2DLightWindow()
             SH2DLightScriptExporter exporter;
 
             AGZ::FileSys::WholeFile::WriteText(filename.GetFilename().string(),
-                exporter.Export(data_->rscMgr, ctx, SHOrder, N));
+                exporter.Export(data_->envLight->GetNoneNullResource().get(), ctx, SHOrder, N));
             filename.Clear();
         }
         catch(const std::exception &err)
@@ -401,6 +403,7 @@ void EditorCore::ShowSavingWindow()
                     data_->rscMgr, ctx, data_->rendererSlot.GetInstance().get(),
                     data_->filmFilter->GetResource().get(),
                     data_->sampler->GetNoneNullResource().get(),
+                    data_->envLight->GetNoneNullResource().get(),
                     data_->filmSize, data_->outputFilenameBuf.data()));
             filename.ClearSelected();
         }
@@ -514,13 +517,6 @@ void EditorCore::ShowResourceManager()
             sState_->isEntityPoolDisplayed = true;
             ImGui::EndTabItem();
         }
-        if(ImGui::BeginTabItem("light"))
-        {
-            auto &pool = data_->rscMgr.GetPool<LightInstance>();
-            pool.Display(data_->rscMgr);
-            sState_->isLightPoolDisplayed = true;
-            ImGui::EndTabItem();
-        }
         if(ImGui::BeginTabItem("camera"))
         {
             auto &pool = data_->rscMgr.GetPool<CameraInstance>();
@@ -587,10 +583,7 @@ void EditorCore::ShowEntityEditor()
 
 void EditorCore::ShowLightEditor()
 {
-    if(auto selectedLight = data_->rscMgr.GetPool<LightInstance>().GetSelectedInstance())
-    {
-        selectedLight->Display(data_->rscMgr);
-    }
+    data_->envLight->Display();
 }
 
 void EditorCore::UpdateCamera(const AGZ::Input::Keyboard &kb, const AGZ::Input::Mouse &m)

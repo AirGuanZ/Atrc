@@ -13,11 +13,11 @@ void Environment::Load(const AGZ::ConfigGroup &params, const std::filesystem::pa
 {
     AGZ_HIERARCHY_TRY
 
-    auto tex = RF.Get<ITexture>()[params["type"].AsValue()].Create();
-    tex->Load(params, relPath);
+    auto tex = RF.Get<ITexture>()[params["tex.type"].AsValue()].Create();
+    tex->Load(params["tex"].AsGroup(), relPath);
     tex_.SetResource(tex);
 
-    AGZ_HIERARCHY_WRAP("in loading environment light")
+    AGZ_HIERARCHY_WRAP("in loading environment light with " + params.ToString())
 }
 
 std::string Environment::Export(const std::filesystem::path &path) const

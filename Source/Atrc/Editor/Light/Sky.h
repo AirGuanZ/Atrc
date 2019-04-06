@@ -3,9 +3,10 @@
 #include <Atrc/Editor/Light/Light.h>
 #include <Atrc/Editor/ResourceInstance/ResourceSlot.h>
 
-class Environment : public ILight
+class Sky : public ILight
 {
-    ResourceSlot<TextureFactory> tex_;
+    Vec3f top_;
+    Vec3f bottom_;
 
 public:
 
@@ -22,4 +23,4 @@ public:
     bool IsMultiline() const noexcept override;
 };
 
-DEFINE_DEFAULT_LIGHT_CREATOR(Environment, "Environment");
+DEFINE_DEFAULT_LIGHT_CREATOR(Sky, "Sky");

@@ -472,18 +472,6 @@ public:
 };
 using GeometryCreator = TResourceCreator<GeometryInstance>;
 
-class LightInstance : public ResourceInstance
-{
-public:
-
-    using ResourceInstance::ResourceInstance;
-    
-    static const char *GetPoolName() { return "light"; }
-
-    virtual void Render(const Mat4f &projViewMat, const Vec3f &eyePos) { }
-};
-using LightCreator = TResourceCreator<LightInstance>;
-
 class MaterialInstance : public ResourceInstance { public: using ResourceInstance::ResourceInstance; static const char *GetPoolName() { return "material"; } };
 using MaterialCreator = TResourceCreator<MaterialInstance>;
 
@@ -504,7 +492,6 @@ class ResourceManager : public TResourceManager<
     EntityInstance,
     FresnelInstance,
     GeometryInstance,
-    LightInstance,
     MaterialInstance,
     PathTracingIntegratorInstance,
     RendererInstance,
@@ -721,7 +708,6 @@ using EntitySlot                = TResourceSlot<EntityInstance,                t
 using FilmFilterSlot            = TResourceSlot<FilmFilterInstance,            false, true>;
 using FresnelSlot               = TResourceSlot<FresnelInstance,               false, true>;
 using GeometrySlot              = TResourceSlot<GeometryInstance,              true,  true>;
-using LightSlot                 = TResourceSlot<LightInstance,                 true,  false>;
 using MaterialSlot              = TResourceSlot<MaterialInstance,              true,  true>;
 using PathTracingIntegratorSlot = TResourceSlot<PathTracingIntegratorInstance, false, true>;
 using RendererSlot              = TResourceSlot<RendererInstance,              false, true>;

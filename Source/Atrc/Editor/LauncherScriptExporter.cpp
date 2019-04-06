@@ -21,6 +21,7 @@ std::string LauncherScriptExporter::Export(
     const RendererInstance *renderer,
     const IFilmFilter *filmFilter,
     const ISampler    *sampler,
+    const ILight *envLight,
     const Vec2i &outputFilmSize,
     const std::string &outputFilename) const
 {
@@ -47,7 +48,6 @@ std::string LauncherScriptExporter::Export(
     ExportResourcesInPool<CameraInstance>  (rscMgr, ctx);
     ExportResourcesInPool<EntityInstance>  (rscMgr, ctx);
     ExportResourcesInPool<GeometryInstance>(rscMgr, ctx);
-    ExportResourcesInPool<LightInstance>   (rscMgr, ctx);
     ExportResourcesInPool<MaterialInstance>(rscMgr, ctx);
     ExportResourcesInPool<TextureInstance> (rscMgr, ctx);
     ctx.DecIndent();
@@ -88,6 +88,10 @@ std::string LauncherScriptExporter::Export(
 
     ctx.AddLine();
 
+    ctx.AddLine("envLight = ", envLight->Export(ctx.workspaceDirectory), ";");
+
+    ctx.AddLine();
+
     ctx.AddLine("entities = (");
     for(auto &ent : rscMgr.GetPool<EntityInstance>())
     {
@@ -100,16 +104,7 @@ std::string LauncherScriptExporter::Export(
     ctx.AddLine(");");
     ctx.AddLine();
 
-    ctx.AddLine("lights = (");
-    for(auto &ent : rscMgr.GetPool<LightInstance>())
-    {
-        ctx.AddLine("{");
-        ctx.IncIndent();
-        ent->ExportAsReference<LightInstance>(rscMgr, ctx);
-        ctx.DecIndent();
-        ctx.AddLine("},");
-    }
-    ctx.AddLine(");");
+    ctx.AddLine("lights = (", envLight->Export(ctx.workspaceDirectory), ");");
 
     return ctx.GetString();
 }
@@ -138,14 +133,12 @@ void LauncherScriptImporter::Import(const AGZ::ConfigGroup &root, EditorData *da
     data->rscMgr.GetPool<CameraInstance>().Clear();
     data->rscMgr.GetPool<EntityInstance>().Clear();
     data->rscMgr.GetPool<GeometryInstance>().Clear();
-    data->rscMgr.GetPool<LightInstance>().Clear();
     data->rscMgr.GetPool<MaterialInstance>().Clear();
     data->rscMgr.GetPool<TextureInstance>().Clear();
 
     ImportFromPool<CameraInstance>  (root, data->rscMgr, ctx);
     ImportFromPool<EntityInstance>  (root, data->rscMgr, ctx);
     ImportFromPool<GeometryInstance>(root, data->rscMgr, ctx);
-    ImportFromPool<LightInstance>   (root, data->rscMgr, ctx);
     ImportFromPool<MaterialInstance>(root, data->rscMgr, ctx);
     ImportFromPool<TextureInstance> (root, data->rscMgr, ctx);
 
@@ -175,6 +168,11 @@ void LauncherScriptImporter::Import(const AGZ::ConfigGroup &root, EditorData *da
     {
         auto renderer = GetResourceInstance<RendererInstance>(data->rscMgr, root, root["renderer"], ctx);
         data->rendererSlot.SetInstance(renderer);
+    }
+    {
+        auto envLight = RF.Get<ILight>()[root["envLight.type"].AsValue()].Create();
+        envLight->Load(root["envLight"].AsGroup(), ctx.workspacePath);
+        data->envLight->SetResource(envLight);
     }
     std::strcpy(data->outputFilenameBuf.data(), root["outputFilename"].AsValue().c_str());
 }
