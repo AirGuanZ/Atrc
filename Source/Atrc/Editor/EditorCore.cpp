@@ -7,6 +7,8 @@
 #include <Atrc/Editor/SH2DLightScriptExporter.h>
 #include <Lib/imgui/imgui/ImGuizmo.h>
 
+#include <Atrc/Editor/Exporter/LauncherExporter.h>
+
 void EditorCore::UpdateRenderPvRect()
 {
     if(data_->rscMgr.GetPool<CameraInstance>().GetSelectedInstance())
@@ -29,11 +31,12 @@ void EditorCore::Initialize()
 
     RegisterBuiltinResourceCreators();
     data_->filmFilter = std::make_unique<ResourceSlot<FilmFilterFactory>>();
-    data_->tex = std::make_unique<ResourceSlot<TextureFactory>>();
+    data_->sampler = std::make_unique<ResourceSlot<SamplerFactory>>();
 
     RegisterResourceCreators(data_->rscMgr);
 
-    data_->samplerSlot.SetInstance(data_->rscMgr.Create<SamplerInstance>("Native", ""));
+    //data_->samplerSlot.SetInstance(data_->rscMgr.Create<SamplerInstance>("Native", ""));
+    data_->sampler->SetResource(RF.Get<ISampler>()["Native"].Create());
     data_->rendererSlot.SetInstance(data_->rscMgr.Create<RendererInstance>("PathTracing", ""));
 
     data_->scriptFilename.SetFilename(std::filesystem::current_path() / "scene.txt");
@@ -86,7 +89,8 @@ void EditorCore::ShowMenuMenuBar()
                 std::string configStr = LauncherScriptExporter().Export(
                     data_->rscMgr, ctx,
                     data_->rendererSlot.GetInstance().get(), data_->filmFilter->GetResource().get(),
-                    data_->samplerSlot.GetInstance().get(),
+                    //data_->samplerSlot.GetInstance().get(),
+                    data_->sampler->GetNoneNullResource().get(),
                     data_->filmSize, data_->outputFilenameBuf.data());
 
                 AGZ::Config config;
@@ -96,7 +100,9 @@ void EditorCore::ShowMenuMenuBar()
                     throw std::runtime_error("");
                 }
 
-                std::cout << config.ToPrettyString();
+                //AGZ::Config tConfig;
+                //tConfig.LoadFromMemory(LauncherExporter().Export(data_.get()));
+                //std::cout << tConfig.ToPrettyString();
 
                 if(!config.LoadFromMemory(config.ToPrettyString()))
                 {
@@ -111,6 +117,15 @@ void EditorCore::ShowMenuMenuBar()
                 }
 
                 UpdateRenderPvRect();
+            }
+            catch(const std::exception &e)
+            {
+                lState_->sceneRenderer.Clear();
+                Global::ShowErrorMessage("failed to start rendering");
+                std::vector<std::string> errs;
+                AGZ::ExtractHierarchyExceptions(e, std::back_inserter(errs));
+                for(auto &m : errs)
+                    Global::ShowErrorMessage(m);
             }
             catch(...)
             {
@@ -280,7 +295,8 @@ void EditorCore::ShowExportingSH2DSceneWindow()
 
             AGZ::FileSys::WholeFile::WriteText(filename.GetFilename().string(),
                 exporter.Export(data_->rscMgr, ctx, workerCount, taskGirdSize, SHOrder,
-                    data_->filmSize, data_->filmFilter->GetResource().get(), data_->samplerSlot.GetInstance().get()));
+                    data_->filmSize, data_->filmFilter->GetResource().get(),
+                    data_->sampler->GetNoneNullResource().get()));
             filename.Clear();
         }
         catch(const std::exception &err)
@@ -383,7 +399,8 @@ void EditorCore::ShowSavingWindow()
             AGZ::FileSys::WholeFile::WriteText(filename.GetSelected().string(),
                 LauncherScriptExporter().Export(
                     data_->rscMgr, ctx, data_->rendererSlot.GetInstance().get(),
-                    data_->filmFilter->GetResource().get(), data_->samplerSlot.GetInstance().get(),
+                    data_->filmFilter->GetResource().get(),
+                    data_->sampler->GetNoneNullResource().get(),
                     data_->filmSize, data_->outputFilenameBuf.data()));
             filename.ClearSelected();
         }
@@ -466,7 +483,6 @@ void EditorCore::ShowRenderingSettings()
         /*data_->filmFilterSlot.Display(data_->rscMgr);
         ImGui::Separator();*/
         data_->filmFilter->Display();
-        data_->tex->Display();
         ImGui::EndChild();
     }
 
@@ -474,7 +490,7 @@ void EditorCore::ShowRenderingSettings()
     {
         AGZ::ScopeGuard endTabItem([] { ImGui::EndTabItem(); });
         ImGui::BeginChild("");
-        data_->samplerSlot.Display(data_->rscMgr);
+        data_->sampler->Display();
         ImGui::EndChild();
     }
 

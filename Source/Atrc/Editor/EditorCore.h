@@ -20,11 +20,10 @@ struct EditorData
     ResourceManager rscMgr;
 
     Vec2i filmSize = { 640, 480 };
-    SamplerSlot    samplerSlot;
     RendererSlot   rendererSlot;
 
     std::unique_ptr<ResourceSlot<FilmFilterFactory>> filmFilter;
-    std::unique_ptr<ResourceSlot<TextureFactory>> tex;
+    std::unique_ptr<ResourceSlot<SamplerFactory>> sampler;
 
     FileSelector scriptFilename = FileSelector(ImGuiFileBrowserFlags_EnterNewFilename);
     FileSelector workspaceDir = FileSelector(ImGuiFileBrowserFlags_SelectDirectory);

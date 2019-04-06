@@ -5,6 +5,7 @@
 #include <Atrc/Editor/FilmFilter/FilmFilter.h>
 #include <Atrc/Editor/Light/Light.h>
 #include <Atrc/Editor/Material/Material.h>
+#include <Atrc/Editor/Sampler/Sampler.h>
 #include <Atrc/Editor/Texture/Texture.h>
 
 class ResourceFactoryList
@@ -13,6 +14,7 @@ class ResourceFactoryList
         FilmFilterFactory,
         LightFactory,
         MaterialFactory,
+        SamplerFactory,
         TextureFactory
     >;
 

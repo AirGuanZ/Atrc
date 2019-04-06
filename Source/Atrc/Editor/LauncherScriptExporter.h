@@ -14,7 +14,7 @@ public:
         ResourceManager &rscMgr, SceneExportingContext &ctx,
         const RendererInstance *renderer,
         const IFilmFilter *filmFilter,
-        const SamplerInstance    *sampler,
+        const ISampler    *sampler,
         const Vec2i &outputFilmSize,
         const std::string &outputFilename) const;
 };

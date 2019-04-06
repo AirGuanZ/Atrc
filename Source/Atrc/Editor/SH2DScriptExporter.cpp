@@ -20,7 +20,7 @@ std::string SH2DSceneScriptExporter::Export(
     int workerCount, int taskGridSize, int SHOrder,
     const Vec2i &outputFilmSize,
     const IFilmFilter *filmFilter,
-    const SamplerInstance *sampler) const
+    const ISampler *sampler) const
 {
     ctx.ClearString();
 
@@ -55,7 +55,8 @@ std::string SH2DSceneScriptExporter::Export(
 
     if(sampler)
     {
-        ResourceInstance::ExportSubResource("sampler", rscMgr, ctx, *sampler);
+        //ResourceInstance::ExportSubResource("sampler", rscMgr, ctx, *sampler);
+        ctx.AddLine("sampler=", sampler->Export(), ";");
         ctx.AddLine();
     }
     else

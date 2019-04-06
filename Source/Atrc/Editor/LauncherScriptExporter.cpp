@@ -20,7 +20,7 @@ std::string LauncherScriptExporter::Export(
     ResourceManager &rscMgr, SceneExportingContext &ctx,
     const RendererInstance *renderer,
     const IFilmFilter *filmFilter,
-    const SamplerInstance    *sampler,
+    const ISampler    *sampler,
     const Vec2i &outputFilmSize,
     const std::string &outputFilename) const
 {
@@ -57,7 +57,8 @@ std::string LauncherScriptExporter::Export(
 
     if(sampler)
     {
-        ResourceInstance::ExportSubResource("sampler", rscMgr, ctx, *sampler);
+        //ResourceInstance::ExportSubResource("sampler", rscMgr, ctx, *sampler);
+        ctx.AddLine("sampler=", sampler->Export(), ";");
         ctx.AddLine();
     }
     else
@@ -165,8 +166,11 @@ void LauncherScriptImporter::Import(const AGZ::ConfigGroup &root, EditorData *da
         data->filmFilter->SetResource(filter);
     }
     {
-        auto sampler = GetResourceInstance<SamplerInstance>(data->rscMgr, root, root["sampler"], ctx);
-        data->samplerSlot.SetInstance(sampler);
+        //auto sampler = GetResourceInstance<SamplerInstance>(data->rscMgr, root, root["sampler"], ctx);
+        //data->samplerSlot.SetInstance(sampler);
+        auto sampler = RF.Get<ISampler>()[root["sampler.type"].AsValue()].Create();
+        sampler->Load(root["sampler"].AsGroup());
+        data->sampler->SetResource(sampler);
     }
     {
         auto renderer = GetResourceInstance<RendererInstance>(data->rscMgr, root, root["renderer"], ctx);

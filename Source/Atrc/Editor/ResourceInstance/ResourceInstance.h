@@ -130,5 +130,8 @@ using LightFactory = ResourceFactory<ILightCreator>;
 class IMaterialCreator;
 using MaterialFactory = ResourceFactory<IMaterialCreator>;
 
+class ISamplerCreator;
+using SamplerFactory = ResourceFactory<ISamplerCreator>;
+
 class ITextureCreator;
 using TextureFactory = ResourceFactory<ITextureCreator>;
