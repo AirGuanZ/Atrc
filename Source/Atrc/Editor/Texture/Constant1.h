@@ -1,11 +1,12 @@
 #pragma once
 
 #include <Atrc/Editor/Texture/Texture.h>
+#include <Atrc/Editor/GL.h>
 
-class Range : public ITexture
+class Constant1 : public ITexture
 {
-    float value_ = 0;
-    float low_ = 0, high_ = 1;
+    float texel_ = 0;
+    float low_ = 1, high_ = 0;
 
 public:
 
@@ -24,4 +25,4 @@ public:
     void SetRange(float low, float high) override;
 };
 
-DEFINE_DEFAULT_TEXTURE_CREATOR(Range, "Range");
+DEFINE_DEFAULT_RESOURCE_CREATOR(ITextureCreator, Constant1, "Constant1");

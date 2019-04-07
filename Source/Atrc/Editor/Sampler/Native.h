@@ -24,4 +24,4 @@ public:
     bool IsMultiline() const noexcept override;
 };
 
-DEFINE_DEFAULT_SAMPLER_CREATOR(Native, "Native");
+DEFINE_DEFAULT_RESOURCE_CREATOR(ISamplerCreator, Native, "Native");

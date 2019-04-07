@@ -121,8 +121,31 @@ private:
     std::map<std::string, const TResourceCreatorCategory*> name2Creator_;
 };
 
+#define DEFINE_DEFAULT_RESOURCE_CREATOR_INTERFACE(RESOURCE) \
+    class RESOURCE##Creator : public IResourceCreator \
+    { \
+    public: \
+        using Resource = RESOURCE; \
+        using IResourceCreator::IResourceCreator; \
+        virtual std::shared_ptr<RESOURCE> Create() const = 0; \
+    }
+
+#define DEFINE_DEFAULT_RESOURCE_CREATOR(CREATOR_BASE, RESOURCE, NAME) \
+    class RESOURCE##Creator : public CREATOR_BASE \
+    { \
+    public: \
+        RESOURCE##Creator() : CREATOR_BASE(NAME) { } \
+        std::shared_ptr<CREATOR_BASE::Resource> Create() const override \
+        { \
+            return std::make_shared<RESOURCE>(this); \
+        } \
+    }
+
 class IFilmFilterCreator;
 using FilmFilterFactory = ResourceFactory<IFilmFilterCreator>;
+
+class IFresnelCreator;
+using FresnelFactory = ResourceFactory<IFresnelCreator>;
 
 class ILightCreator;
 using LightFactory = ResourceFactory<ILightCreator>;

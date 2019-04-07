@@ -481,9 +481,6 @@ using PathTracingIntegratorCreator = TResourceCreator<PathTracingIntegratorInsta
 class RendererInstance : public ResourceInstance { public: using ResourceInstance::ResourceInstance; static const char *GetPoolName() { return "renderer"; } };
 using RendererCreator = TResourceCreator<RendererInstance>;
 
-class SamplerInstance : public ResourceInstance { public: using ResourceInstance::ResourceInstance; static const char *GetPoolName() { return "sampler"; } };
-using SamplerCreator = TResourceCreator<SamplerInstance>;
-
 class TextureInstance : public ResourceInstance { public: using ResourceInstance::ResourceInstance; static const char *GetPoolName() { return "texture"; } };
 using TextureCreator = TResourceCreator<TextureInstance>;
 
@@ -495,7 +492,6 @@ class ResourceManager : public TResourceManager<
     MaterialInstance,
     PathTracingIntegratorInstance,
     RendererInstance,
-    SamplerInstance,
     TextureInstance>
 {
 public:
@@ -711,7 +707,6 @@ using GeometrySlot              = TResourceSlot<GeometryInstance,              t
 using MaterialSlot              = TResourceSlot<MaterialInstance,              true,  true>;
 using PathTracingIntegratorSlot = TResourceSlot<PathTracingIntegratorInstance, false, true>;
 using RendererSlot              = TResourceSlot<RendererInstance,              false, true>;
-using SamplerSlot               = TResourceSlot<SamplerInstance,               false, true>;
 using TextureSlot               = TResourceSlot<TextureInstance,               true,  true>;
 
 void RegisterResourceCreators(ResourceManager &rscMgr);

@@ -35,4 +35,4 @@ private:
     bool SetGLTextureFilename(const std::filesystem::path &filename);
 };
 
-DEFINE_DEFAULT_TEXTURE_CREATOR(HDR, "HDR");
+DEFINE_DEFAULT_RESOURCE_CREATOR(ITextureCreator, HDR, "HDR");

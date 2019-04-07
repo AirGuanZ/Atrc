@@ -24,15 +24,6 @@ public:
     virtual const MaterialPool *GetPool() const noexcept = 0;
 };
 
-class IMaterialCreator : public IResourceCreator
-{
-public:
-
-    using Resource = IMaterial;
-
-    using IResourceCreator::IResourceCreator;
-
-    virtual std::shared_ptr<IFilmFilter> Create(AGZ::RefList<MaterialFactory, TextureFactory> facs) const = 0;
-};
+DEFINE_DEFAULT_RESOURCE_CREATOR_INTERFACE(IMaterial);
 
 void RegisterBuiltinMaterialCreators(MaterialFactory &factory);

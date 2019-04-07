@@ -5,7 +5,6 @@
 #include <Atrc/Editor/ResourceManagement/MaterialCreator.h>
 #include <Atrc/Editor/ResourceManagement/PathTracingIntegratorCreator.h>
 #include <Atrc/Editor/ResourceManagement/RendererCreator.h>
-#include <Atrc/Editor/ResourceManagement/SamplerCreator.h>
 #include <Atrc/Editor/ResourceManagement/TextureCreator.h>
 
 void RegisterResourceCreators(ResourceManager &rscMgr)
@@ -17,6 +16,5 @@ void RegisterResourceCreators(ResourceManager &rscMgr)
     RegisterMaterialCreators(rscMgr);
     RegisterPathTracingIntegratorCreators(rscMgr);
     RegisterRendererCreators(rscMgr);
-    RegisterSamplerCreators(rscMgr);
     RegisterTextureCreators(rscMgr);
 }

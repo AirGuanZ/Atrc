@@ -22,35 +22,6 @@ public:
     virtual bool IsMultiline() const noexcept = 0;
 };
 
-class ILightCreator : public IResourceCreator
-{
-public:
-
-    using Resource = ILight;
-
-    using IResourceCreator::IResourceCreator;
-
-    virtual std::shared_ptr<ILight> Create() const = 0;
-};
-
-template<typename TLight>
-class DefaultLightCreator : public ILightCreator
-{
-public:
-
-    using ILightCreator::ILightCreator;
-
-    std::shared_ptr<ILight> Create() const override
-    {
-        return std::make_shared<TLight>(this);
-    }
-};
-
-#define DEFINE_DEFAULT_LIGHT_CREATOR(LIGHT, NAME) \
-    class LIGHT##Creator : public DefaultLightCreator<LIGHT> \
-    { \
-    public: \
-        LIGHT##Creator() : DefaultLightCreator(NAME) { } \
-    }
+DEFINE_DEFAULT_RESOURCE_CREATOR_INTERFACE(ILight);
 
 void RegisterBuiltinLightCreators(LightFactory &factory);

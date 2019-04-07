@@ -22,15 +22,6 @@ public:
     virtual bool IsMultiline() const noexcept = 0;
 };
 
-class IFilmFilterCreator : public IResourceCreator
-{
-public:
-
-    using Resource = IFilmFilter;
-
-    using IResourceCreator::IResourceCreator;
-
-    virtual std::shared_ptr<IFilmFilter> Create() const = 0;
-};
+DEFINE_DEFAULT_RESOURCE_CREATOR_INTERFACE(IFilmFilter);
 
 void RegisterBuiltinFilmFilterCreators(FilmFilterFactory &factory);

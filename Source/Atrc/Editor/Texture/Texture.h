@@ -24,37 +24,6 @@ public:
     virtual void SetRange(float low, float high) { }
 };
 
-class ITextureCreator : public IResourceCreator
-{
-public:
-
-    using Resource = ITexture;
-
-    using IResourceCreator::IResourceCreator;
-
-    virtual std::shared_ptr<ITexture> Create() const = 0;
-};
-
-template<typename TTexture>
-class DefaultTextureCreator : public ITextureCreator
-{
-    static_assert(std::is_base_of_v<ITexture, TTexture>);
-
-public:
-
-    using ITextureCreator::ITextureCreator;
-
-    std::shared_ptr<ITexture> Create() const override
-    {
-        return std::make_shared<TTexture>(this);
-    }
-};
-
-#define DEFINE_DEFAULT_TEXTURE_CREATOR(TEXTURE, NAME) \
-    class TEXTURE##Creator : public DefaultTextureCreator<TEXTURE> \
-    { \
-    public: \
-        TEXTURE##Creator() : DefaultTextureCreator(NAME) { } \
-    }
+DEFINE_DEFAULT_RESOURCE_CREATOR_INTERFACE(ITexture);
 
 void RegisterBuiltinTextureCreators(TextureFactory &factory);

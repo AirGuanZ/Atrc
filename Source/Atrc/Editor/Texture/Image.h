@@ -35,4 +35,4 @@ private:
     bool SetGLTextureFilename(const std::filesystem::path &filename);
 };
 
-DEFINE_DEFAULT_TEXTURE_CREATOR(Image, "Image");
+DEFINE_DEFAULT_RESOURCE_CREATOR(ITextureCreator, Image, "Image");

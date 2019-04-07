@@ -23,4 +23,4 @@ public:
     bool IsMultiline() const noexcept override;
 };
 
-DEFINE_DEFAULT_LIGHT_CREATOR(Sky, "Sky");
+DEFINE_DEFAULT_RESOURCE_CREATOR(ILightCreator, Sky, "Sky");

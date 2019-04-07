@@ -23,4 +23,4 @@ public:
     bool IsMultiline() const noexcept override;
 };
 
-DEFINE_DEFAULT_TEXTURE_CREATOR(Constant, "Constant");
+DEFINE_DEFAULT_RESOURCE_CREATOR(ITextureCreator, Constant, "Constant");

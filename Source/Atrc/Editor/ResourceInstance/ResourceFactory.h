@@ -3,6 +3,7 @@
 #include <Atrc/Editor/ResourceInstance/ResourceInstance.h>
 
 #include <Atrc/Editor/FilmFilter/FilmFilter.h>
+#include <Atrc/Editor/Fresnel/Fresnel.h>
 #include <Atrc/Editor/Light/Light.h>
 #include <Atrc/Editor/Material/Material.h>
 #include <Atrc/Editor/Sampler/Sampler.h>
@@ -12,6 +13,7 @@ class ResourceFactoryList
 {
     using Tuple = std::tuple<
         FilmFilterFactory,
+        FresnelFactory,
         LightFactory,
         MaterialFactory,
         SamplerFactory,

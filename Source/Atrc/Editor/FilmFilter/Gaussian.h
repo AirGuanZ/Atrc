@@ -22,11 +22,4 @@ public:
     bool IsMultiline() const noexcept override;
 };
 
-class GaussianCreator : public IFilmFilterCreator
-{
-public:
-
-    GaussianCreator() : IFilmFilterCreator("Gaussian") { }
-
-    std::shared_ptr<IFilmFilter> Create() const override;
-};
+DEFINE_DEFAULT_RESOURCE_CREATOR(IFilmFilterCreator, Gaussian, "Gaussian");

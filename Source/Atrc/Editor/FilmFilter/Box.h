@@ -21,11 +21,4 @@ public:
     bool IsMultiline() const noexcept override;
 };
 
-class BoxCreator : public IFilmFilterCreator
-{
-public:
-
-    BoxCreator() : IFilmFilterCreator("Box") { }
-
-    std::shared_ptr<IFilmFilter> Create() const override;
-};
+DEFINE_DEFAULT_RESOURCE_CREATOR(IFilmFilterCreator, Box, "Box");

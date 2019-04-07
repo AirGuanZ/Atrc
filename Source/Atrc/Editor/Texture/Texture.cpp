@@ -1,16 +1,16 @@
 #include <Atrc/Editor/Texture/Constant.h>
+#include <Atrc/Editor/Texture/Constant1.h>
 #include <Atrc/Editor/Texture/HDR.h>
 #include <Atrc/Editor/Texture/Image.h>
-#include <Atrc/Editor/Texture/Range.h>
 
 void RegisterBuiltinTextureCreators(TextureFactory &factory)
 {
     static const ConstantCreator iConstantCreator;
+    static const Constant1Creator iConstant1Creator;
     static const HDRCreator iHDRCreator;
     static const ImageCreator iImageCreator;
-    static const RangeCreator iRangeCreator;
     factory.AddCreator(&iConstantCreator);
+    factory.AddCreator(&iConstant1Creator);
     factory.AddCreator(&iHDRCreator);
     factory.AddCreator(&iImageCreator);
-    factory.AddCreator(&iRangeCreator);
 }

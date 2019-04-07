@@ -5,7 +5,7 @@
 #include <AGZUtils/Utils/Config.h>
 #include <Atrc/Editor/ResourceInstance/ResourceInstance.h>
 
-class ISampler : public IResource, public ExportAsConfigGroup
+class IFresnel : public IResource, public ExportAsConfigGroup
 {
 public:
 
@@ -22,6 +22,6 @@ public:
     virtual bool IsMultiline() const noexcept = 0;
 };
 
-DEFINE_DEFAULT_RESOURCE_CREATOR_INTERFACE(ISampler);
+DEFINE_DEFAULT_RESOURCE_CREATOR_INTERFACE(IFresnel);
 
-void RegisterBuiltinSamplerCreators(SamplerFactory &factory);
+void RegisterBuiltinFresnelCreators(FresnelFactory &factory);
