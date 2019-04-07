@@ -44,7 +44,8 @@ bool SceneRenderer::Start(const AGZ::Config &config, std::string_view configPath
         std::vector<std::string> errMsgs;
         AGZ::ExtractHierarchyExceptions(err, std::back_inserter(errMsgs));
         for(auto &m : errMsgs)
-            std::cout << m << std::endl;
+            Global::ShowErrorMessage(m);
+        return false;
     }
     catch(...)
     {
