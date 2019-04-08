@@ -71,6 +71,11 @@ public:
         throw std::runtime_error("GetNoneNullResource is called with a null resource slot");
     }
 
+    bool IsMultiline() const noexcept
+    {
+        return rsc_ ? CallIsMultiline(*rsc_) : false;
+    }
+
 private:
 
     ResourceCreatorSelector<Factory> selector_;

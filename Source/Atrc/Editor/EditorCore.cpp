@@ -34,9 +34,10 @@ void EditorCore::Initialize()
     data_->filmFilter = std::make_unique<ResourceSlot<FilmFilterFactory>>();
     data_->sampler = std::make_unique<ResourceSlot<SamplerFactory>>();
 
+    //data_->mat = std::make_unique<ResourceSlot<MaterialFactory>>();
+
     RegisterResourceCreators(data_->rscMgr);
 
-    //data_->samplerSlot.SetInstance(data_->rscMgr.Create<SamplerInstance>("Native", ""));
     data_->sampler->SetResource(RF.Get<ISampler>()["Native"].Create());
     data_->rendererSlot.SetInstance(data_->rscMgr.Create<RendererInstance>("PathTracing", ""));
 
@@ -90,7 +91,6 @@ void EditorCore::ShowMenuMenuBar()
                 std::string configStr = LauncherScriptExporter().Export(
                     data_->rscMgr, ctx,
                     data_->rendererSlot.GetInstance().get(), data_->filmFilter->GetResource().get(),
-                    //data_->samplerSlot.GetInstance().get(),
                     data_->sampler->GetNoneNullResource().get(),
                     data_->envLight->GetNoneNullResource().get(),
                     data_->filmSize, data_->outputFilenameBuf.data());
@@ -98,24 +98,17 @@ void EditorCore::ShowMenuMenuBar()
                 AGZ::Config config;
                 if(!config.LoadFromMemory(configStr))
                 {
-                    Global::ShowErrorMessage("failed to load configure content");
-                    throw std::runtime_error("");
+                    throw std::runtime_error("failed to load configure content");
                 }
-
-                //AGZ::Config tConfig;
-                //tConfig.LoadFromMemory(LauncherExporter().Export(data_.get()));
-                //std::cout << tConfig.ToPrettyString();
 
                 if(!config.LoadFromMemory(config.ToPrettyString()))
                 {
-                    Global::ShowErrorMessage("failed to load configure content");
-                    throw std::runtime_error("");
+                    throw std::runtime_error("failed to load configure content");
                 }
 
                 if(!lState_->sceneRenderer.Start(config, scriptDir.string()))
                 {
-                    Global::ShowErrorMessage("sceneRenderer.Start returns false");
-                    throw std::runtime_error("");
+                    throw std::runtime_error("sceneRenderer.Start returns false");
                 }
 
                 UpdateRenderPvRect();
@@ -483,9 +476,8 @@ void EditorCore::ShowRenderingSettings()
     {
         AGZ::ScopeGuard endTabItem([] { ImGui::EndTabItem(); });
         ImGui::BeginChild("");
-        /*data_->filmFilterSlot.Display(data_->rscMgr);
-        ImGui::Separator();*/
         data_->filmFilter->Display();
+        //data_->mat->Display();
         ImGui::EndChild();
     }
 

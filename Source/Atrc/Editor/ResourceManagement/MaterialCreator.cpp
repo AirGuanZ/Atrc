@@ -624,102 +624,102 @@ namespace
 
 void RegisterMaterialCreators(ResourceManager &rscMgr)
 {
-    static const BSSRDFCreator iNormalizedDiffusionBSSRDFCreator;
-    static const DisneyDiffuseCreator iDisneyDiffuseCreator;
-    static const DisneyReflectionCreator iDisneyReflectionCreator;
-    static const DisneySpecularCreator iDisneySpecularCreator;
-    static const GGXDielectricCreator iGGXDielectricCreator;
-    static const GGXMetalCreator iGGXMetalCreator;
-    static const IdealBlackCreator iIdealBlackCreator;
-    static const IdealDiffuseCreator iIdealDiffuseCreator;
-    static const IdealMirrorCreator iIdealMirrorCreator;
-    static const IdealScalerCreator iIdealScalerCreator;
-    static const IdealSpecularCreator iIdealSpecularCreator;
-    static const InvisibleSurfaceCreator iInvisibleSurfaceCreator;
-    static const ONMatteCreator iONMatteCreator;
-    static const TSMetalCreator iTSMetalCreator;
-    rscMgr.AddCreator(&iNormalizedDiffusionBSSRDFCreator);
-    rscMgr.AddCreator(&iDisneyDiffuseCreator);
-    rscMgr.AddCreator(&iDisneyReflectionCreator);
-    rscMgr.AddCreator(&iDisneySpecularCreator);
-    rscMgr.AddCreator(&iGGXDielectricCreator);
-    rscMgr.AddCreator(&iGGXMetalCreator);
-    rscMgr.AddCreator(&iIdealBlackCreator);
-    rscMgr.AddCreator(&iIdealDiffuseCreator);
-    rscMgr.AddCreator(&iIdealMirrorCreator);
-    rscMgr.AddCreator(&iIdealScalerCreator);
-    rscMgr.AddCreator(&iIdealSpecularCreator);
-    rscMgr.AddCreator(&iInvisibleSurfaceCreator);
-    rscMgr.AddCreator(&iONMatteCreator);
-    rscMgr.AddCreator(&iTSMetalCreator);
+    static const BSSRDFInstanceCreator iNormalizedDiffusionBSSRDFInstanceCreator;
+    static const DisneyDiffuseInstanceCreator iDisneyDiffuseInstanceCreator;
+    static const DisneyReflectionInstanceCreator iDisneyReflectionInstanceCreator;
+    static const DisneySpecularInstanceCreator iDisneySpecularInstanceCreator;
+    static const GGXDielectricInstanceCreator iGGXDielectricInstanceCreator;
+    static const GGXMetalInstanceCreator iGGXMetalInstanceCreator;
+    static const IdealBlackInstanceCreator iIdealBlackInstanceCreator;
+    static const IdealDiffuseInstanceCreator iIdealDiffuseInstanceCreator;
+    static const IdealMirrorInstanceCreator iIdealMirrorInstanceCreator;
+    static const IdealScalerInstanceCreator iIdealScalerInstanceCreator;
+    static const IdealSpecularInstanceCreator iIdealSpecularInstanceCreator;
+    static const InvisibleSurfaceInstanceCreator iInvisibleSurfaceInstanceCreator;
+    static const ONMatteInstanceCreator iONMatteInstanceCreator;
+    static const TSMetalInstanceCreator iTSMetalInstanceCreator;
+    rscMgr.AddCreator(&iNormalizedDiffusionBSSRDFInstanceCreator);
+    rscMgr.AddCreator(&iDisneyDiffuseInstanceCreator);
+    rscMgr.AddCreator(&iDisneyReflectionInstanceCreator);
+    rscMgr.AddCreator(&iDisneySpecularInstanceCreator);
+    rscMgr.AddCreator(&iGGXDielectricInstanceCreator);
+    rscMgr.AddCreator(&iGGXMetalInstanceCreator);
+    rscMgr.AddCreator(&iIdealBlackInstanceCreator);
+    rscMgr.AddCreator(&iIdealDiffuseInstanceCreator);
+    rscMgr.AddCreator(&iIdealMirrorInstanceCreator);
+    rscMgr.AddCreator(&iIdealScalerInstanceCreator);
+    rscMgr.AddCreator(&iIdealSpecularInstanceCreator);
+    rscMgr.AddCreator(&iInvisibleSurfaceInstanceCreator);
+    rscMgr.AddCreator(&iONMatteInstanceCreator);
+    rscMgr.AddCreator(&iTSMetalInstanceCreator);
 }
 
-std::shared_ptr<MaterialInstance> BSSRDFCreator::Create(ResourceManager &rscMgr, std::string name) const
+std::shared_ptr<MaterialInstance> BSSRDFInstanceCreator::Create(ResourceManager &rscMgr, std::string name) const
 {
     return std::make_shared<BSSRDFInstance>(GetName(), std::move(name));
 }
 
-std::shared_ptr<MaterialInstance> DisneyDiffuseCreator::Create(ResourceManager &rscMgr, std::string name) const
+std::shared_ptr<MaterialInstance> DisneyDiffuseInstanceCreator::Create(ResourceManager &rscMgr, std::string name) const
 {
     return std::make_shared<DisneyDiffuseInstance>(rscMgr, GetName(), std::move(name));
 }
 
-std::shared_ptr<MaterialInstance> DisneyReflectionCreator::Create(ResourceManager &rscMgr, std::string name) const
+std::shared_ptr<MaterialInstance> DisneyReflectionInstanceCreator::Create(ResourceManager &rscMgr, std::string name) const
 {
     return std::make_shared<DisneyReflectionInstance>(rscMgr, GetName(), std::move(name));
 }
 
-std::shared_ptr<MaterialInstance> DisneySpecularCreator::Create(ResourceManager &rscMgr, std::string name) const
+std::shared_ptr<MaterialInstance> DisneySpecularInstanceCreator::Create(ResourceManager &rscMgr, std::string name) const
 {
     return std::make_shared<DisneySpecularInstance>(rscMgr, GetName(), std::move(name));
 }
 
-std::shared_ptr<MaterialInstance> GGXDielectricCreator::Create(ResourceManager &rscMgr, std::string name) const
+std::shared_ptr<MaterialInstance> GGXDielectricInstanceCreator::Create(ResourceManager &rscMgr, std::string name) const
 {
     return std::make_shared<GGXDielectricInstance>(GetName(), std::move(name));
 }
 
-std::shared_ptr<MaterialInstance> GGXMetalCreator::Create(ResourceManager &rscMgr, std::string name) const
+std::shared_ptr<MaterialInstance> GGXMetalInstanceCreator::Create(ResourceManager &rscMgr, std::string name) const
 {
     return std::make_shared<GGXMetalInstance>(GetName(), std::move(name));
 }
 
-std::shared_ptr<MaterialInstance> IdealBlackCreator::Create(ResourceManager &rscMgr, std::string name) const
+std::shared_ptr<MaterialInstance> IdealBlackInstanceCreator::Create(ResourceManager &rscMgr, std::string name) const
 {
     return std::make_shared<IdealBlackInstance>(GetName(), std::move(name));
 }
 
-std::shared_ptr<MaterialInstance> IdealDiffuseCreator::Create(ResourceManager &rscMgr, std::string name) const
+std::shared_ptr<MaterialInstance> IdealDiffuseInstanceCreator::Create(ResourceManager &rscMgr, std::string name) const
 {
     return std::make_shared<IdealDiffuseInstance>(rscMgr, GetName(), std::move(name));
 }
 
-std::shared_ptr<MaterialInstance> IdealMirrorCreator::Create(ResourceManager &rscMgr, std::string name) const
+std::shared_ptr<MaterialInstance> IdealMirrorInstanceCreator::Create(ResourceManager &rscMgr, std::string name) const
 {
     return std::make_shared<IdealMirrorInstance>(GetName(), std::move(name));
 }
 
-std::shared_ptr<MaterialInstance> IdealScalerCreator::Create(ResourceManager &rscMgr, std::string name) const
+std::shared_ptr<MaterialInstance> IdealScalerInstanceCreator::Create(ResourceManager &rscMgr, std::string name) const
 {
     return std::make_shared<IdealScalerInstance>(GetName(), std::move(name));
 }
 
-std::shared_ptr<MaterialInstance> IdealSpecularCreator::Create(ResourceManager &rscMgr, std::string name) const
+std::shared_ptr<MaterialInstance> IdealSpecularInstanceCreator::Create(ResourceManager &rscMgr, std::string name) const
 {
     return std::make_shared<IdealSpecularInstance>(GetName(), std::move(name));
 }
 
-std::shared_ptr<MaterialInstance> InvisibleSurfaceCreator::Create(ResourceManager &rscMgr, std::string name) const
+std::shared_ptr<MaterialInstance> InvisibleSurfaceInstanceCreator::Create(ResourceManager &rscMgr, std::string name) const
 {
     return std::make_shared<InvisibleSurfaceInstance>(GetName(), std::move(name));
 }
 
-std::shared_ptr<MaterialInstance> ONMatteCreator::Create(ResourceManager &rscMgr, std::string name) const
+std::shared_ptr<MaterialInstance> ONMatteInstanceCreator::Create(ResourceManager &rscMgr, std::string name) const
 {
     return std::make_shared<ONMatteInstance>(GetName(), std::move(name));
 }
 
-std::shared_ptr<MaterialInstance> TSMetalCreator::Create(ResourceManager &rscMgr, std::string name) const
+std::shared_ptr<MaterialInstance> TSMetalInstanceCreator::Create(ResourceManager &rscMgr, std::string name) const
 {
     return std::make_shared<TSMetalInstance>(GetName(), std::move(name));
 }

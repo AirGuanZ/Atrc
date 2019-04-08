@@ -93,6 +93,7 @@ void HDR::Display()
     if(ImGui::IsItemHovered())
     {
         ImGui::BeginTooltip();
+        ImGui::Text("%s", fileSelector_.GetFilename().c_str());
         ImGui::Image(ImTextureID(size_t(glTex_->tex.GetHandle())), ImVec2(200 * glTex_->WOverH, 200));
         ImGui::EndTooltip();
     }

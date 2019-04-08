@@ -26,6 +26,8 @@ struct EditorData
     std::unique_ptr<ResourceSlot<FilmFilterFactory>> filmFilter;
     std::unique_ptr<ResourceSlot<SamplerFactory>> sampler;
 
+    //std::unique_ptr<ResourceSlot<MaterialFactory>> mat;
+
     FileSelector scriptFilename = FileSelector(ImGuiFileBrowserFlags_EnterNewFilename);
     FileSelector workspaceDir = FileSelector(ImGuiFileBrowserFlags_SelectDirectory);
 
