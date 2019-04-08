@@ -40,6 +40,15 @@ public:
     {
         return std::get<Rsc2Idx<TResource, 0>()>(facs_);
     }
+
+    template<typename TResource, typename...LoadArgs>
+    auto CreateAndLoad(const AGZ::ConfigNode &params, LoadArgs&&...loadArgs)
+    {
+        auto &group = params.AsGroup();
+        auto ret = Get<TResource>()[group["type"].AsValue()].Create();
+        ret->Load(group, std::forward<LoadArgs>(loadArgs)...);
+        return ret;
+    }
 };
 
 extern ResourceFactoryList RF;

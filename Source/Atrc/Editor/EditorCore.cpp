@@ -34,6 +34,8 @@ void EditorCore::Initialize()
     data_->filmFilter = std::make_unique<Atrc::Editor::FilmFilterSlot>();
     data_->sampler = std::make_unique<Atrc::Editor::SamplerSlot>();
 
+    data_->mat = std::make_unique<Atrc::Editor::MaterialSlot>();
+
     RegisterResourceCreators(data_->rscMgr);
 
     data_->sampler->SetResource(Atrc::Editor::RF.Get<Atrc::Editor::ISampler>()["Native"].Create());
@@ -475,6 +477,7 @@ void EditorCore::ShowRenderingSettings()
         AGZ::ScopeGuard endTabItem([] { ImGui::EndTabItem(); });
         ImGui::BeginChild("");
         data_->filmFilter->Display();
+        data_->mat->Display();
         ImGui::EndChild();
     }
 
