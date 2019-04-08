@@ -45,16 +45,22 @@ std::string IdealDiffuse::Export(const std::filesystem::path &relPath) const
 void IdealDiffuse::Display()
 {
     ImGui::Text("albedo: ");
-    if(!albedo_.IsMultiline())
+    if(albedo_.IsMultiline())
+    {
+        ImGui::Indent();
+        albedo_.Display();
+        ImGui::Unindent();
+    }
+    else
+    {
         ImGui::SameLine();
-    albedo_.Display();
+        albedo_.Display();
+    }
 }
 
 bool IdealDiffuse::IsMultiline() const noexcept
 {
-    if(auto albedo = albedo_.GetResource())
-        return albedo->IsMultiline();
-    return false;
+    return albedo_.IsMultiline();
 }
 
 }; // namespace Atrc::Editor

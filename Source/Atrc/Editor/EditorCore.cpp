@@ -475,7 +475,6 @@ void EditorCore::ShowRenderingSettings()
         AGZ::ScopeGuard endTabItem([] { ImGui::EndTabItem(); });
         ImGui::BeginChild("");
         data_->filmFilter->Display();
-        //data_->mat->Display();
         ImGui::EndChild();
     }
 
