@@ -1,5 +1,8 @@
 #include <Atrc/Editor/Texture/Constant1.h>
 
+namespace Atrc::Editor
+{
+
 std::string Constant1::Save(const std::filesystem::path &relPath) const
 {
     static const AGZ::Fmt fmt(
@@ -71,3 +74,5 @@ void Constant1::SetRange(float low, float high)
     if(low_ < high_)
         texel_ = AGZ::Math::Clamp(texel_, low_, high_);
 }
+
+}; // namespace Atrc::Editor

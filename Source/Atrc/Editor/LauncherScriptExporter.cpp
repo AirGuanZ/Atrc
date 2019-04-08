@@ -19,9 +19,9 @@ namespace
 std::string LauncherScriptExporter::Export(
     ResourceManager &rscMgr, SceneExportingContext &ctx,
     const RendererInstance *renderer,
-    const IFilmFilter *filmFilter,
-    const ISampler    *sampler,
-    const ILight *envLight,
+    const Atrc::Editor::IFilmFilter *filmFilter,
+    const Atrc::Editor::ISampler    *sampler,
+    const Atrc::Editor::ILight *envLight,
     const Vec2i &outputFilmSize,
     const std::string &outputFilename) const
 {
@@ -57,7 +57,6 @@ std::string LauncherScriptExporter::Export(
 
     if(sampler)
     {
-        //ResourceInstance::ExportSubResource("sampler", rscMgr, ctx, *sampler);
         ctx.AddLine("sampler=", sampler->Export(), ";");
         ctx.AddLine();
     }
@@ -154,14 +153,12 @@ void LauncherScriptImporter::Import(const AGZ::ConfigGroup &root, EditorData *da
 
     data->filmSize = Atrc::Mgr::Parser::ParseVec2i(root["film.size"]);
     {
-        auto filter = RF.Get<IFilmFilter>()[root["film.filter.type"].AsValue()].Create();
+        auto filter = Atrc::Editor::RF.Get<Atrc::Editor::IFilmFilter>()[root["film.filter.type"].AsValue()].Create();
         filter->Load(root["film.filter"].AsGroup());
         data->filmFilter->SetResource(filter);
     }
     {
-        //auto sampler = GetResourceInstance<SamplerInstance>(data->rscMgr, root, root["sampler"], ctx);
-        //data->samplerSlot.SetInstance(sampler);
-        auto sampler = RF.Get<ISampler>()[root["sampler.type"].AsValue()].Create();
+        auto sampler = Atrc::Editor::RF.Get<Atrc::Editor::ISampler>()[root["sampler.type"].AsValue()].Create();
         sampler->Load(root["sampler"].AsGroup());
         data->sampler->SetResource(sampler);
     }
@@ -170,7 +167,7 @@ void LauncherScriptImporter::Import(const AGZ::ConfigGroup &root, EditorData *da
         data->rendererSlot.SetInstance(renderer);
     }
     {
-        auto envLight = RF.Get<ILight>()[root["envLight.type"].AsValue()].Create();
+        auto envLight = Atrc::Editor::RF.Get<Atrc::Editor::ILight>()[root["envLight.type"].AsValue()].Create();
         envLight->Load(root["envLight"].AsGroup(), ctx.workspacePath);
         data->envLight->SetResource(envLight);
     }

@@ -1,6 +1,9 @@
 #include <Atrc/Core/Utility/ConfigConvert.h>
 #include <Atrc/Editor/Light/Sky.h>
 
+namespace Atrc::Editor
+{
+
 std::string Sky::Save(const std::filesystem::path &relPath) const
 {
     static const AGZ::Fmt fmt(
@@ -36,3 +39,5 @@ bool Sky::IsMultiline() const noexcept
 {
     return true;
 }
+
+}; // namespace Atrc::Editor

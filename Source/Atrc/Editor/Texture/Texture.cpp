@@ -3,6 +3,9 @@
 #include <Atrc/Editor/Texture/HDR.h>
 #include <Atrc/Editor/Texture/Image.h>
 
+namespace Atrc::Editor
+{
+
 void RegisterBuiltinTextureCreators(TextureFactory &factory)
 {
     static const ConstantCreator iConstantCreator;
@@ -14,3 +17,5 @@ void RegisterBuiltinTextureCreators(TextureFactory &factory)
     factory.AddCreator(&iHDRCreator);
     factory.AddCreator(&iImageCreator);
 }
+
+}; // namespace Atrc::Editor

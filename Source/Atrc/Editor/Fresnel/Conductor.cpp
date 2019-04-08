@@ -1,6 +1,9 @@
 #include <Atrc/Core/Utility/ConfigConvert.h>
 #include <Atrc/Editor/Fresnel/Conductor.h>
 
+namespace Atrc::Editor
+{
+
 std::string Conductor::Save() const
 {
     static const AGZ::Fmt fmt(
@@ -43,3 +46,5 @@ bool Conductor::IsMultiline() const noexcept
 {
     return true;
 }
+
+}; // namespace Atrc::Editor

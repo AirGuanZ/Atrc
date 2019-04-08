@@ -3,6 +3,9 @@
 #include <Atrc/Editor/Light/Light.h>
 #include <Atrc/Editor/ResourceInstance/ResourceSlot.h>
 
+namespace Atrc::Editor
+{
+
 class Environment : public ILight
 {
     ResourceSlot<TextureFactory> tex_;
@@ -23,3 +26,5 @@ public:
 };
 
 DEFINE_DEFAULT_RESOURCE_CREATOR(ILightCreator, Environment, "Environment");
+
+}; // namespace Atrc::Editor

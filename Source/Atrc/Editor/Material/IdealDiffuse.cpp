@@ -1,5 +1,8 @@
 #include <Atrc/Editor/Material/IdealDiffuse.h>
 
+namespace Atrc::Editor
+{
+
 IdealDiffuse::IdealDiffuse(const HasName *creator)
     : IMaterial(creator)
 {
@@ -53,3 +56,5 @@ bool IdealDiffuse::IsMultiline() const noexcept
         return albedo->IsMultiline();
     return false;
 }
+
+}; // namespace Atrc::Editor

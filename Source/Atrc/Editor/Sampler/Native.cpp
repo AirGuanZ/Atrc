@@ -1,6 +1,9 @@
 #include <Atrc/Editor/Sampler/Native.h>
 #include <Atrc/Editor/GL.h>
 
+namespace Atrc::Editor
+{
+
 std::string Native::Save() const
 {
     static const AGZ::Fmt fmt(
@@ -52,3 +55,5 @@ bool Native::IsMultiline() const noexcept
 {
     return true;
 }
+
+}; // namespace Atrc::Editor

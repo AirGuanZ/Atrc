@@ -2,6 +2,9 @@
 
 #include <Atrc/Editor/FilmFilter/FilmFilter.h>
 
+namespace Atrc::Editor
+{
+
 class Gaussian : public IFilmFilter
 {
     float radius_ = 0.7f;
@@ -23,3 +26,5 @@ public:
 };
 
 DEFINE_DEFAULT_RESOURCE_CREATOR(IFilmFilterCreator, Gaussian, "Gaussian");
+
+}; // namespace Atrc::Editor

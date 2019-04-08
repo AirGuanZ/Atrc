@@ -5,6 +5,9 @@
 #include <AGZUtils/Utils/Config.h>
 #include <Atrc/Editor/ResourceInstance/ResourceInstance.h>
 
+namespace Atrc::Editor
+{
+
 class ITexture : public IResource, public ExportAsConfigGroup
 {
 public:
@@ -27,3 +30,5 @@ public:
 DEFINE_DEFAULT_RESOURCE_CREATOR_INTERFACE(ITexture);
 
 void RegisterBuiltinTextureCreators(TextureFactory &factory);
+
+}; // namespace Atrc::Editor

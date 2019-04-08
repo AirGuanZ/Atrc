@@ -1,6 +1,9 @@
 #include <Atrc/Editor/Exporter/Exporter.h>
 #include <Atrc/Editor/Exporter/LauncherExporter.h>
 
+namespace Atrc::Editor
+{
+
 std::string LauncherExporter::Export(EditorData *data) const
 {
     AGZ_ASSERT(data);
@@ -27,3 +30,5 @@ std::string LauncherExporter::Export(EditorData *data) const
 
     AGZ_HIERARCHY_WRAP("in exporting launcher script")
 }
+
+}; // namespace Atrc::Editor

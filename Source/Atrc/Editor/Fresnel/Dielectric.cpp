@@ -1,6 +1,9 @@
 #include <Atrc/Editor/Fresnel/Dielectric.h>
 #include <Atrc/Editor/GL.h>
 
+namespace Atrc::Editor
+{
+
 std::string Dielectric::Save() const
 {
     static const AGZ::Fmt fmt(
@@ -36,3 +39,5 @@ bool Dielectric::IsMultiline() const noexcept
 {
     return true;
 }
+
+}; // namespace Atrc::Editor

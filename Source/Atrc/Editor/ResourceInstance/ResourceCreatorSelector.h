@@ -6,6 +6,9 @@
 #include <Atrc/Editor/ResourceInstance/ResourceInstance.h>
 #include <Atrc/Editor/ResourceInstance/ResourceFactory.h>
 
+namespace Atrc::Editor
+{
+
 template<typename TResourceFactory>
 class ResourceCreatorSelector
 {
@@ -73,3 +76,5 @@ public:
         return selectedCreator_ != oldSelectedCreator;
     }
 };
+
+}; // namespace Atrc::Editor

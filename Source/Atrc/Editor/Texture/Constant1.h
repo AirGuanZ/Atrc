@@ -3,6 +3,9 @@
 #include <Atrc/Editor/Texture/Texture.h>
 #include <Atrc/Editor/GL.h>
 
+namespace Atrc::Editor
+{
+
 class Constant1 : public ITexture
 {
     float texel_ = 0;
@@ -26,3 +29,5 @@ public:
 };
 
 DEFINE_DEFAULT_RESOURCE_CREATOR(ITextureCreator, Constant1, "Constant1");
+
+}; // namespace Atrc::Editor

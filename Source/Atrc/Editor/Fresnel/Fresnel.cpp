@@ -4,6 +4,9 @@
 #include <Atrc/Editor/Fresnel/Dielectric.h>
 #include <Atrc/Editor/Fresnel/Schlick.h>
 
+namespace Atrc::Editor
+{
+
 void RegisterBuiltinFresnelCreators(FresnelFactory &factory)
 {
     static const ConductorCreator iConductorCreator;
@@ -13,3 +16,5 @@ void RegisterBuiltinFresnelCreators(FresnelFactory &factory)
     factory.AddCreator(&iDielectricCreator);
     factory.AddCreator(&iSchlickCreator);
 }
+
+}; // namespace Atrc::Editor

@@ -2,6 +2,9 @@
 
 #include <Atrc/Editor/FilmFilter/FilmFilter.h>
 
+namespace Atrc::Editor
+{
+
 class Box : public IFilmFilter
 {
     float sidelen_ = 1;
@@ -22,3 +25,5 @@ public:
 };
 
 DEFINE_DEFAULT_RESOURCE_CREATOR(IFilmFilterCreator, Box, "Box");
+
+}; // namespace Atrc::Editor

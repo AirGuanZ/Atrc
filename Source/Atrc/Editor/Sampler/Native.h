@@ -2,6 +2,9 @@
 
 #include <Atrc/Editor/Sampler/Sampler.h>
 
+namespace Atrc::Editor
+{
+
 class Native : public ISampler
 {
     bool withSeed_ = false;
@@ -25,3 +28,5 @@ public:
 };
 
 DEFINE_DEFAULT_RESOURCE_CREATOR(ISamplerCreator, Native, "Native");
+
+}; // namespace Atrc::Editor

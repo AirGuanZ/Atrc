@@ -14,7 +14,7 @@ namespace
     }
 }
 
-std::string SH2DLightScriptExporter::Export(const ILight *light, SceneExportingContext &ctx, int SHOrder, int N) const
+std::string SH2DLightScriptExporter::Export(const Atrc::Editor::ILight *light, SceneExportingContext &ctx, int SHOrder, int N) const
 {
     ctx.ClearString();
 

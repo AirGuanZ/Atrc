@@ -1,6 +1,9 @@
 #include <Atrc/Editor/Fresnel/Schlick.h>
 #include <Atrc/Editor/GL.h>
 
+namespace Atrc::Editor
+{
+
 std::string Schlick::Save() const
 {
     static const AGZ::Fmt fmt(
@@ -36,3 +39,5 @@ bool Schlick::IsMultiline() const noexcept
 {
     return true;
 }
+
+}; // namespace Atrc::Editor

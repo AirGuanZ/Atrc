@@ -3,6 +3,9 @@
 #include <Atrc/Editor/Fresnel/Fresnel.h>
 #include <Atrc/Editor/GL.h>
 
+namespace Atrc::Editor
+{
+
 class Conductor : public IFresnel
 {
     Vec3f etaOut_ = Vec3f(1);
@@ -25,3 +28,5 @@ public:
 };
 
 DEFINE_DEFAULT_RESOURCE_CREATOR(IFresnelCreator, Conductor, "Conductor");
+
+}; // namespace Atrc::Editor

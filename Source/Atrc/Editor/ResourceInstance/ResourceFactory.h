@@ -9,6 +9,9 @@
 #include <Atrc/Editor/Sampler/Sampler.h>
 #include <Atrc/Editor/Texture/Texture.h>
 
+namespace Atrc::Editor
+{
+
 class ResourceFactoryList
 {
     using Tuple = std::tuple<
@@ -42,3 +45,5 @@ public:
 extern ResourceFactoryList RF;
 
 void RegisterBuiltinResourceCreators();
+
+}; // namespace Atrc::Editor

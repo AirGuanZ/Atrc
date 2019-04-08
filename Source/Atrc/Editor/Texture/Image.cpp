@@ -2,6 +2,9 @@
 #include <Atrc/Editor/Texture/Image.h>
 #include <Atrc/Editor/Global.h>
 
+namespace Atrc::Editor
+{
+
 bool Image::SetGLTextureFilename(const std::filesystem::path &filename)
 {
     struct V2K
@@ -98,3 +101,5 @@ bool Image::IsMultiline() const noexcept
 {
     return false;
 }
+
+}; // namespace Atrc::Editor

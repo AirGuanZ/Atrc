@@ -4,6 +4,9 @@
 #include <Atrc/Editor/Material/Material.h>
 #include <Atrc/Editor/Texture/Texture.h>
 
+namespace Atrc::Editor
+{
+
 class IdealDiffuse : public IMaterial
 {
     ResourceSlot<TextureFactory> albedo_;
@@ -24,3 +27,5 @@ public:
 };
 
 DEFINE_DEFAULT_RESOURCE_CREATOR(IMaterialCreator, IdealDiffuse, "IdealDiffuse");
+
+}; // namespace Atrc::Editor

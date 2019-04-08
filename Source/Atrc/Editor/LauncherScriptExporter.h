@@ -13,9 +13,9 @@ public:
     std::string Export(
         ResourceManager &rscMgr, SceneExportingContext &ctx,
         const RendererInstance *renderer,
-        const IFilmFilter *filmFilter,
-        const ISampler    *sampler,
-        const ILight *envLight,
+        const Atrc::Editor::IFilmFilter *filmFilter,
+        const Atrc::Editor::ISampler    *sampler,
+        const Atrc::Editor::ILight *envLight,
         const Vec2i &outputFilmSize,
         const std::string &outputFilename) const;
 };

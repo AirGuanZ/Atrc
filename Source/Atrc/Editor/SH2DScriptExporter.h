@@ -15,6 +15,6 @@ public:
         ResourceManager &rscMgr, SceneExportingContext &ctx,
         int workerCount, int taskGridSize, int SHOrder,
         const Vec2i &outputFilmSize,
-        const IFilmFilter *filmFilter,
-        const ISampler *sampler) const;
+        const Atrc::Editor::IFilmFilter *filmFilter,
+        const Atrc::Editor::ISampler *sampler) const;
 };

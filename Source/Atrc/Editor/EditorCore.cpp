@@ -29,16 +29,14 @@ void EditorCore::Initialize()
     sState_ = std::make_unique<WithinFrameState>();
     lState_ = std::make_unique<BetweenFrameState>();
 
-    RegisterBuiltinResourceCreators();
-    data_->envLight = std::make_unique<ResourceSlot<LightFactory>>();
-    data_->filmFilter = std::make_unique<ResourceSlot<FilmFilterFactory>>();
-    data_->sampler = std::make_unique<ResourceSlot<SamplerFactory>>();
-
-    //data_->mat = std::make_unique<ResourceSlot<MaterialFactory>>();
+    Atrc::Editor::RegisterBuiltinResourceCreators();
+    data_->envLight = std::make_unique<Atrc::Editor::LightSlot>();
+    data_->filmFilter = std::make_unique<Atrc::Editor::FilmFilterSlot>();
+    data_->sampler = std::make_unique<Atrc::Editor::SamplerSlot>();
 
     RegisterResourceCreators(data_->rscMgr);
 
-    data_->sampler->SetResource(RF.Get<ISampler>()["Native"].Create());
+    data_->sampler->SetResource(Atrc::Editor::RF.Get<Atrc::Editor::ISampler>()["Native"].Create());
     data_->rendererSlot.SetInstance(data_->rscMgr.Create<RendererInstance>("PathTracing", ""));
 
     data_->scriptFilename.SetFilename(std::filesystem::current_path() / "scene.txt");

@@ -4,6 +4,9 @@
 #include <Atrc/Editor/FileSelector.h>
 #include <Atrc/Editor/GL.h>
 
+namespace Atrc::Editor
+{
+
 class Image : public ITexture
 {
 public:
@@ -36,3 +39,5 @@ private:
 };
 
 DEFINE_DEFAULT_RESOURCE_CREATOR(ITextureCreator, Image, "Image");
+
+}; // namespace Atrc::Editor

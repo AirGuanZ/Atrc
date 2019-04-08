@@ -5,6 +5,9 @@
 #include <AGZUtils/Utils/Config.h>
 #include <Atrc/Editor/ResourceInstance/ResourceInstance.h>
 
+namespace Atrc::Editor
+{
+
 class IFresnel : public IResource, public ExportAsConfigGroup
 {
 public:
@@ -25,3 +28,5 @@ public:
 DEFINE_DEFAULT_RESOURCE_CREATOR_INTERFACE(IFresnel);
 
 void RegisterBuiltinFresnelCreators(FresnelFactory &factory);
+
+}; // namespace Atrc::Editor

@@ -2,6 +2,9 @@
 #include <Atrc/Editor/Texture/HDR.h>
 #include <Atrc/Editor/Global.h>
 
+namespace Atrc::Editor
+{
+
 bool HDR::SetGLTextureFilename(const std::filesystem::path &filename)
 {
     struct V2K
@@ -103,3 +106,5 @@ bool HDR::IsMultiline() const noexcept
 {
     return false;
 }
+
+}; // namespace Atrc::Editor

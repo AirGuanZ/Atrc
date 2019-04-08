@@ -1,5 +1,8 @@
 #include <Atrc/Editor/Light/Environment.h>
 
+namespace Atrc::Editor
+{
+
 std::string Environment::Save(const std::filesystem::path &relPath) const
 {
     static const AGZ::Fmt fmt(
@@ -37,3 +40,5 @@ bool Environment::IsMultiline() const noexcept
         return tex_.GetResource()->IsMultiline();
     return false;
 }
+
+}; // namespace Atrc::Editor

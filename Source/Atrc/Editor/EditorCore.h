@@ -22,9 +22,9 @@ struct EditorData
     Vec2i filmSize = { 640, 480 };
     RendererSlot   rendererSlot;
 
-    std::unique_ptr<ResourceSlot<LightFactory>> envLight;
-    std::unique_ptr<ResourceSlot<FilmFilterFactory>> filmFilter;
-    std::unique_ptr<ResourceSlot<SamplerFactory>> sampler;
+    std::unique_ptr<Atrc::Editor::LightSlot> envLight;
+    std::unique_ptr<Atrc::Editor::FilmFilterSlot> filmFilter;
+    std::unique_ptr<Atrc::Editor::SamplerSlot> sampler;
 
     //std::unique_ptr<ResourceSlot<MaterialFactory>> mat;
 

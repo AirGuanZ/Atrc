@@ -2,6 +2,9 @@
 
 #include <Atrc/Editor/ResourceInstance/ResourceCreatorSelector.h>
 
+namespace Atrc::Editor
+{
+
 template<typename TResourceFactory>
 class ResourceSlot
 {
@@ -100,3 +103,5 @@ private:
         return CallIsMultilineAux<Resource, HasIsMultiline<Resource>::value>::Call(t);
     }
 };
+
+}; // namespace Atrc::Editor

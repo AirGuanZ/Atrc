@@ -2,6 +2,9 @@
 
 #include <Atrc/Editor/Fresnel/Fresnel.h>
 
+namespace Atrc::Editor
+{
+
 class Dielectric : public IFresnel
 {
     float etaOut_ = 1;
@@ -23,3 +26,5 @@ public:
 };
 
 DEFINE_DEFAULT_RESOURCE_CREATOR(IFresnelCreator, Dielectric, "Dielectric");
+
+}; // namespace Atrc::Editor

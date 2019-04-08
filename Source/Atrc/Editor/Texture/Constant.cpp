@@ -1,6 +1,9 @@
 #include <Atrc/Core/Utility/ConfigConvert.h>
 #include <Atrc/Editor/Texture/Constant.h>
 
+namespace Atrc::Editor
+{
+
 std::string Constant::Save(const std::filesystem::path &relPath) const
 {
     static const AGZ::Fmt fmt(
@@ -53,3 +56,5 @@ bool Constant::IsMultiline() const noexcept
 {
     return false;
 }
+
+}; // namespace Atrc::Editor

@@ -5,6 +5,9 @@
 #include <AGZUtils/Utils/Config.h>
 #include <Atrc/Editor/ResourceInstance/ResourceInstance.h>
 
+namespace Atrc::Editor
+{
+
 class IFilmFilter : public IResource, public ExportAsConfigGroup
 {
 public:
@@ -25,3 +28,5 @@ public:
 DEFINE_DEFAULT_RESOURCE_CREATOR_INTERFACE(IFilmFilter);
 
 void RegisterBuiltinFilmFilterCreators(FilmFilterFactory &factory);
+
+}; // namespace Atrc::Editor

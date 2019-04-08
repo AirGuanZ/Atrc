@@ -3,6 +3,9 @@
 #include <Atrc/Editor/Light/Light.h>
 #include <Atrc/Editor/ResourceInstance/ResourceSlot.h>
 
+namespace Atrc::Editor
+{
+
 class Sky : public ILight
 {
     Vec3f top_;
@@ -24,3 +27,5 @@ public:
 };
 
 DEFINE_DEFAULT_RESOURCE_CREATOR(ILightCreator, Sky, "Sky");
+
+}; // namespace Atrc::Editor

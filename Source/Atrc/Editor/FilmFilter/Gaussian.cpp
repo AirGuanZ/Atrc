@@ -1,6 +1,9 @@
 #include <Atrc/Editor/FilmFilter/Gaussian.h>
 #include <Atrc/Editor/GL.h>
 
+namespace Atrc::Editor
+{
+
 std::string Gaussian::Save() const
 {
     return Export();
@@ -56,3 +59,5 @@ bool Gaussian::IsMultiline() const noexcept
 {
     return true;
 }
+
+}; // namespace Atrc::Editor

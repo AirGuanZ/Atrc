@@ -1,6 +1,9 @@
 #include <Atrc/Editor/FilmFilter/Box.h>
 #include <Atrc/Editor/GL.h>
 
+namespace Atrc::Editor
+{
+
 std::string Box::Save() const
 {
     return Export();
@@ -41,3 +44,5 @@ bool Box::IsMultiline() const noexcept
 {
     return false;
 }
+
+}; // namespace Atrc::Editor

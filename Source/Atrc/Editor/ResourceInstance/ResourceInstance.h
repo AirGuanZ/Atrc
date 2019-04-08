@@ -7,6 +7,9 @@
 
 #include <AGZUtils/Utils/Exception.h>
 
+namespace Atrc::Editor
+{
+
 class HasName
 {
     std::string name_;
@@ -141,20 +144,31 @@ private:
         } \
     }
 
+template<typename TResourceFactory>
+class ResourceSlot;
+
 class IFilmFilterCreator;
 using FilmFilterFactory = ResourceFactory<IFilmFilterCreator>;
+using FilmFilterSlot = ResourceSlot<FilmFilterFactory>;
 
 class IFresnelCreator;
 using FresnelFactory = ResourceFactory<IFresnelCreator>;
+using FresnelSlot = ResourceSlot<FresnelFactory>;
 
 class ILightCreator;
 using LightFactory = ResourceFactory<ILightCreator>;
+using LightSlot = ResourceSlot<LightFactory>;
 
 class IMaterialCreator;
 using MaterialFactory = ResourceFactory<IMaterialCreator>;
+using MaterialSlot = ResourceSlot<MaterialFactory>;
 
 class ISamplerCreator;
 using SamplerFactory = ResourceFactory<ISamplerCreator>;
+using SamplerSlot = ResourceSlot<SamplerFactory>;
 
 class ITextureCreator;
 using TextureFactory = ResourceFactory<ITextureCreator>;
+using TextureSlot = ResourceSlot<TextureFactory>;
+
+}; // namespace Atrc::Editor

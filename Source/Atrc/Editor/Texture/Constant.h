@@ -3,6 +3,9 @@
 #include <Atrc/Editor/Texture/Texture.h>
 #include <Atrc/Editor/GL.h>
 
+namespace Atrc::Editor
+{
+
 class Constant : public ITexture
 {
     bool asColor_ = true;
@@ -24,3 +27,5 @@ public:
 };
 
 DEFINE_DEFAULT_RESOURCE_CREATOR(ITextureCreator, Constant, "Constant");
+
+}; // namespace Atrc::Editor

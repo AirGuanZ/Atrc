@@ -1,9 +1,0 @@
-workspace = "@Scene";
-
-SHOrder = 4;
-N = 100000;
-
-light = {type = Environment;tex = {
-        type = HDR;
-        filename = Asset\SH2D\Light\gray_pier_4k.hdr;
-    };};

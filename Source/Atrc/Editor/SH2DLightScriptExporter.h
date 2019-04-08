@@ -9,5 +9,5 @@ class SH2DLightScriptExporter
 public:
 
     std::string Export(
-        const ILight *light, SceneExportingContext &ctx, int SHOrder, int N) const;
+        const Atrc::Editor::ILight *light, SceneExportingContext &ctx, int SHOrder, int N) const;
 };

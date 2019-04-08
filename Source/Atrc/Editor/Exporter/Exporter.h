@@ -2,6 +2,9 @@
 
 #include <sstream>
 
+namespace Atrc::Editor
+{
+
 class Exporter
 {
     std::stringstream sst_;
@@ -46,3 +49,5 @@ public:
         return sst_.str();
     }
 };
+
+}; // namespace Atrc::Editor
