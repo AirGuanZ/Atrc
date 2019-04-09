@@ -6,14 +6,14 @@
 namespace Atrc::Editor
 {
 
-class Sky : public ILight
+class Sky : public ResourceCommonImpl<ILight, Sky>
 {
     Vec3f top_;
     Vec3f bottom_;
 
 public:
 
-    using ILight::ILight;
+    using ResourceCommonImpl<ILight, Sky>::ResourceCommonImpl;
 
     std::string Save(const std::filesystem::path &relPath) const override;
 

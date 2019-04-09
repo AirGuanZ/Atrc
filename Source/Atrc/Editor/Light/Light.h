@@ -8,11 +8,13 @@
 namespace Atrc::Editor
 {
 
-class ILight : public IResource, public ExportAsConfigGroup
+class ILight : public ResourceCommon<ILight>
 {
 public:
 
-    using IResource::IResource;
+    using ResourceCommon<ILight>::ResourceCommon;
+
+    static const char *StrID() noexcept { return "light"; }
 
     virtual std::string Save(const std::filesystem::path &relPath) const = 0;
 

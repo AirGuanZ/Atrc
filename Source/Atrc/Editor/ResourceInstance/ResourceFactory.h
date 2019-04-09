@@ -12,18 +12,34 @@
 namespace Atrc::Editor
 {
 
+class ResourceDnDSlots
+{
+    template<typename...TResources>
+    using TSlots = std::tuple<std::shared_ptr<TResources>...>;
+    using Slots = TSlots<TRESOURCE_LIST>;
+
+    Slots slots_;
+
+public:
+
+    template<typename TResource>
+    void Set(std::shared_ptr<TResource> p)
+    {
+        std::get<std::shared_ptr<TResource>>(slots_) = std::move(p);
+    }
+
+    template<typename TResource>
+    std::shared_ptr<TResource> Get() const
+    {
+        return std::get<std::shared_ptr<TResource>>(slots_);
+    }
+};
+
 class ResourceFactoryList
 {
-    using Tuple = std::tuple<
-        FilmFilterFactory,
-        FresnelFactory,
-        LightFactory,
-        MaterialFactory,
-        SamplerFactory,
-        TextureFactory
-    >;
+    using Tuple = std::tuple<TRESOURCE_FACTORY_LIST>;
 
-     Tuple facs_;
+    Tuple facs_;
 
     template<typename TResource, int I>
     static constexpr int Rsc2Idx()
@@ -34,6 +50,8 @@ class ResourceFactoryList
     template<typename TResource, int I> struct Rsc2IdxAux<TResource, I, true> { static constexpr int Value() { return I; } };
 
 public:
+
+    ResourceDnDSlots DnDSlots;
 
     template<typename TResource>
     auto &Get() noexcept

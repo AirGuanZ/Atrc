@@ -6,6 +6,7 @@
 #include <type_traits>
 
 #include <AGZUtils/Utils/Exception.h>
+#include <Atrc/Editor/GL.h>
 
 namespace Atrc::Editor
 {
@@ -62,6 +63,16 @@ public:
     const std::string &GetType() const noexcept
     {
         return creator_->GetName();
+    }
+
+    const HasName *GetCreator() const noexcept
+    {
+        return creator_;
+    }
+
+    virtual void DisplayOnDnD() const
+    {
+        ImGui::Text("type: %s", GetType().c_str());
     }
 };
 
@@ -144,6 +155,32 @@ private:
         } \
     }
 
+template<typename TResourceBase>
+class ResourceCommon :
+    public IResource,
+    public ExportAsConfigGroup
+{
+public:
+
+    using IResource::IResource;
+
+    virtual std::shared_ptr<TResourceBase> Clone() const = 0;
+};
+
+template<typename TResourceBase, typename TResource>
+class ResourceCommonImpl : public TResourceBase
+{
+public:
+
+    using TResourceBase::TResourceBase;
+
+    std::shared_ptr<TResourceBase> Clone() const override
+    {
+        auto pThis = dynamic_cast<const TResource*>(this);
+        return std::make_shared<TResource>(*pThis);
+    }
+};
+
 template<typename TResourceFactory>
 class ResourceSlot;
 
@@ -170,5 +207,8 @@ using SamplerSlot = ResourceSlot<SamplerFactory>;
 class ITextureCreator;
 using TextureFactory = ResourceFactory<ITextureCreator>;
 using TextureSlot = ResourceSlot<TextureFactory>;
+
+#define TRESOURCE_LIST IFilmFilter, IFresnel, ILight, IMaterial, ISampler, ITexture
+#define TRESOURCE_FACTORY_LIST FilmFilterFactory, FresnelFactory, LightFactory, MaterialFactory, SamplerFactory, TextureFactory
 
 }; // namespace Atrc::Editor

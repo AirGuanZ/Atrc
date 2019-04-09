@@ -7,11 +7,13 @@
 namespace Atrc::Editor
 {
 
-class HDR : public ITexture
+class HDR : public ResourceCommonImpl<ITexture, HDR>
 {
 public:
 
-    using ITexture::ITexture;
+    using ResourceCommonImpl<ITexture, HDR>::ResourceCommonImpl;
+
+    HDR(const HDR &copyFrom);
 
     std::string Save(const std::filesystem::path &relPath) const override;
 

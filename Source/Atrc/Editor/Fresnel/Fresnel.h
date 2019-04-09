@@ -8,11 +8,13 @@
 namespace Atrc::Editor
 {
 
-class IFresnel : public IResource, public ExportAsConfigGroup
+class IFresnel : public ResourceCommon<IFresnel>
 {
 public:
 
-    using IResource::IResource;
+    using ResourceCommon<IFresnel>::ResourceCommon;
+
+    static const char *StrID() noexcept { return "fresnel"; }
 
     virtual std::string Save() const = 0;
 

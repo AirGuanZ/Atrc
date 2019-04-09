@@ -7,7 +7,7 @@
 namespace Atrc::Editor
 {
 
-class IdealDiffuse : public IMaterial
+class IdealDiffuse : public ResourceCommonImpl<IMaterial, IdealDiffuse>
 {
     ResourceSlot<TextureFactory> albedo_;
 

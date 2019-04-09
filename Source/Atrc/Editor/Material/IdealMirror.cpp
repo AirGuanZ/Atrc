@@ -4,7 +4,7 @@ namespace Atrc::Editor
 {
 
 IdealMirror::IdealMirror(const HasName *creator)
-    : IMaterial(creator)
+    : ResourceCommonImpl(creator)
 {
     rc_.SetResource(RF.Get<ITexture>()["Constant"].Create());
     fresnel_.SetResource(RF.Get<IFresnel>()["Schlick"].Create());

@@ -6,13 +6,13 @@
 namespace Atrc::Editor
 {
 
-class Environment : public ILight
+class Environment : public ResourceCommonImpl<ILight, Environment>
 {
     ResourceSlot<TextureFactory> tex_;
 
 public:
 
-    using ILight::ILight;
+    using ResourceCommonImpl<ILight, Environment>::ResourceCommonImpl;
 
     std::string Save(const std::filesystem::path &relPath) const override;
 

@@ -5,14 +5,14 @@
 namespace Atrc::Editor
 {
 
-class Schlick : public IFresnel
+class Schlick : public ResourceCommonImpl<IFresnel, Schlick>
 {
     float etaOut_ = 1;
     float etaIn_ = 1.5f;
 
 public:
 
-    using IFresnel::IFresnel;
+    using ResourceCommonImpl<IFresnel, Schlick>::ResourceCommonImpl;
 
     std::string Save() const override;
 

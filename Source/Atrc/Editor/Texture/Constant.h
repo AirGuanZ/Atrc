@@ -6,14 +6,14 @@
 namespace Atrc::Editor
 {
 
-class Constant : public ITexture
+class Constant : public ResourceCommonImpl<ITexture, Constant>
 {
     bool asColor_ = true;
     Vec3f texel_ = Vec3f();
 
 public:
 
-    using ITexture::ITexture;
+    using ResourceCommonImpl<ITexture, Constant>::ResourceCommonImpl;
 
     std::string Save(const std::filesystem::path &relPath) const override;
 

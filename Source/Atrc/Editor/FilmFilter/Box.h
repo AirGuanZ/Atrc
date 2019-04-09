@@ -5,13 +5,13 @@
 namespace Atrc::Editor
 {
 
-class Box : public IFilmFilter
+class Box : public ResourceCommonImpl<IFilmFilter, Box>
 {
     float sidelen_ = 1;
 
 public:
 
-    using IFilmFilter::IFilmFilter;
+    using ResourceCommonImpl<IFilmFilter, Box>::ResourceCommonImpl;
 
     std::string Save() const override;
 

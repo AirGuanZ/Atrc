@@ -5,14 +5,14 @@
 namespace Atrc::Editor
 {
 
-class Gaussian : public IFilmFilter
+class Gaussian : public ResourceCommonImpl<IFilmFilter, Gaussian>
 {
     float radius_ = 0.7f;
     float alpha_ = 2;
 
 public:
 
-    using IFilmFilter::IFilmFilter;
+    using ResourceCommonImpl<IFilmFilter, Gaussian>::ResourceCommonImpl;
 
     std::string Save() const override;
 

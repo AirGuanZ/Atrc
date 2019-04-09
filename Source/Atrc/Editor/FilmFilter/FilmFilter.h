@@ -8,11 +8,13 @@
 namespace Atrc::Editor
 {
 
-class IFilmFilter : public IResource, public ExportAsConfigGroup
+class IFilmFilter : public ResourceCommon<IFilmFilter>
 {
 public:
 
-    using IResource::IResource;
+    using ResourceCommon<IFilmFilter>::ResourceCommon;
+
+    static const char *StrID() noexcept { return "film-filter"; }
 
     virtual std::string Save() const = 0;
 

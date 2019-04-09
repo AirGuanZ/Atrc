@@ -7,11 +7,13 @@
 namespace Atrc::Editor
 {
 
-class Image : public ITexture
+class Image : public ResourceCommonImpl<ITexture, Image>
 {
 public:
 
-    using ITexture::ITexture;
+    using ResourceCommonImpl<ITexture, Image>::ResourceCommonImpl;
+
+    Image(const Image &copyFrom);
 
     std::string Save(const std::filesystem::path &relPath) const override;
 

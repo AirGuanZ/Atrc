@@ -8,11 +8,13 @@
 namespace Atrc::Editor
 {
 
-class ITexture : public IResource, public ExportAsConfigGroup
+class ITexture : public ResourceCommon<ITexture>
 {
 public:
 
-    using IResource::IResource;
+    using ResourceCommon<ITexture>::ResourceCommon;
+
+    static const char *StrID() noexcept { return "texture"; }
 
     virtual std::string Save(const std::filesystem::path &relPath) const = 0;
 

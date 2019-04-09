@@ -44,6 +44,13 @@ bool HDR::SetGLTextureFilename(const std::filesystem::path &filename)
     return glTex_ != nullptr;
 }
 
+HDR::HDR(const HDR &copyFrom)
+    : HDR(copyFrom.GetCreator())
+{
+    glTex_ = copyFrom.glTex_;
+    fileSelector_.SetFilename(copyFrom.fileSelector_.GetFilename());
+}
+
 std::string HDR::Save(const std::filesystem::path &relPath) const
 {
     AGZ_HIERARCHY_TRY
@@ -93,12 +100,15 @@ void HDR::Display()
         }
     }
 
-    if(ImGui::IsItemHovered())
+    if(glTex_)
     {
-        ImGui::BeginTooltip();
-        ImGui::Text("%s", fileSelector_.GetFilename().c_str());
-        ImGui::Image(ImTextureID(size_t(glTex_->tex.GetHandle())), ImVec2(200 * glTex_->WOverH, 200));
-        ImGui::EndTooltip();
+        if(ImGui::IsItemHovered())
+        {
+            ImGui::BeginTooltip();
+            ImGui::Text("%s", fileSelector_.GetFilename().c_str());
+            ImGui::Image(ImTextureID(size_t(glTex_->tex.GetHandle())), ImVec2(200 * glTex_->WOverH, 200));
+            ImGui::EndTooltip();
+        }
     }
 }
 

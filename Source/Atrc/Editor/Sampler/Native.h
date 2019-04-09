@@ -5,7 +5,7 @@
 namespace Atrc::Editor
 {
 
-class Native : public ISampler
+class Native : public ResourceCommonImpl<ISampler, Native>
 {
     bool withSeed_ = false;
     int seed_ = 42;
@@ -14,7 +14,7 @@ class Native : public ISampler
 
 public:
 
-    using ISampler::ISampler;
+    using ResourceCommonImpl<ISampler, Native>::ResourceCommonImpl;
 
     std::string Save() const override;
 

@@ -39,6 +39,13 @@ bool Image::SetGLTextureFilename(const std::filesystem::path &filename)
     return glTex_ != nullptr;
 }
 
+Image::Image(const Image &copyFrom)
+    : Image(copyFrom.GetCreator())
+{
+    glTex_ = copyFrom.glTex_;
+    fileSelector_.SetFilename(copyFrom.fileSelector_.GetFilename());
+}
+
 std::string Image::Save(const std::filesystem::path &relPath) const
 {
     AGZ_HIERARCHY_TRY
@@ -88,12 +95,15 @@ void Image::Display()
         }
     }
 
-    if(ImGui::IsItemHovered())
+    if(glTex_)
     {
-        ImGui::BeginTooltip();
-        ImGui::Text("%s", fileSelector_.GetFilename().c_str());
-        ImGui::Image(ImTextureID(size_t(glTex_->tex.GetHandle())), ImVec2(200 * glTex_->WOverH, 200));
-        ImGui::EndTooltip();
+        if(ImGui::IsItemHovered())
+        {
+            ImGui::BeginTooltip();
+            ImGui::Text("%s", fileSelector_.GetFilename().c_str());
+            ImGui::Image(ImTextureID(size_t(glTex_->tex.GetHandle())), ImVec2(200 * glTex_->WOverH, 200));
+            ImGui::EndTooltip();
+        }
     }
 }
 

@@ -8,11 +8,13 @@
 namespace Atrc::Editor
 {
 
-class ISampler : public IResource, public ExportAsConfigGroup
+class ISampler : public ResourceCommon<ISampler>
 {
 public:
 
-    using IResource::IResource;
+    using ResourceCommon<ISampler>::ResourceCommon;
+
+    static const char *StrID() noexcept { return "sampler"; }
 
     virtual std::string Save() const = 0;
 

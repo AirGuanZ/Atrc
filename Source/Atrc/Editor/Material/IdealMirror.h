@@ -8,7 +8,7 @@
 namespace Atrc::Editor
 {
 
-class IdealMirror : public IMaterial
+class IdealMirror : public ResourceCommonImpl<IMaterial, IdealMirror>
 {
     FresnelSlot fresnel_;
     TextureSlot rc_;

@@ -6,14 +6,14 @@
 namespace Atrc::Editor
 {
 
-class Constant1 : public ITexture
+class Constant1 : public ResourceCommonImpl<ITexture, Constant1>
 {
     float texel_ = 0;
     float low_ = 1, high_ = 0;
 
 public:
 
-    using ITexture::ITexture;
+    using ResourceCommonImpl<ITexture, Constant1>::ResourceCommonImpl;
 
     std::string Save(const std::filesystem::path &relPath) const override;
 

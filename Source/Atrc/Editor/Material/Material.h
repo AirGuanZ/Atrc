@@ -8,11 +8,13 @@
 namespace Atrc::Editor
 {
 
-class IMaterial : public IResource, public ExportAsConfigGroup
+class IMaterial : public ResourceCommon<IMaterial>
 {
 public:
 
-    using IResource::IResource;
+    using ResourceCommon<IMaterial>::ResourceCommon;
+
+    static const char *StrID() noexcept { return "material"; }
 
     virtual std::string Save(const std::filesystem::path &relPath) const = 0;
 

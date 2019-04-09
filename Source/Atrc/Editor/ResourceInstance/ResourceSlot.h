@@ -15,6 +15,7 @@ public:
     using Resource = typename Creator::Resource;
 
     ResourceSlot()
+        : asDnDSource_(true), asDnDShareTarget_(false), asDnDCloneTarget_(true)
     {
         if(auto c = selector_.GetSelectedCreator())
             rsc_ = c->Create();
@@ -41,16 +42,18 @@ public:
         rscChangedCallback_ = nullptr;
     }
 
-    template<typename...RscDisplayArgs>
-    void Display(RscDisplayArgs&&...rscDisplayArgs)
+    void Display()
     {
-        bool useMiniWidth = rsc_ ? !CallIsMultiline(*rsc_) : false;
+        bool useMiniWidth = true; //rsc_ ? !CallIsMultiline(*rsc_) : false;
         if(selector_.Display(useMiniWidth))
         {
             rsc_ = selector_.GetSelectedCreator()->Create();
             if(rscChangedCallback_)
                 rscChangedCallback_(*rsc_);
         }
+        
+        AsDnDSource();
+        AsDnDTarget();
 
         if(rsc_)
         {
@@ -58,7 +61,7 @@ public:
                 ImGui::SameLine();
             ImGui::PushID(rsc_.get());
             AGZ_SCOPE_GUARD({ ImGui::PopID(); });
-            rsc_->Display(std::forward<RscDisplayArgs>(rscDisplayArgs)...);
+            rsc_->Display();
         }
     }
 
@@ -79,12 +82,63 @@ public:
         return rsc_ ? CallIsMultiline(*rsc_) : false;
     }
 
+    void AsDnDSource(bool asDnDSource) noexcept { asDnDSource_ = asDnDSource; }
+    void AsDnDShareTarget(bool asDnDTarget) noexcept { if((asDnDShareTarget_ = asDnDTarget)) asDnDCloneTarget_ = false; }
+    void AsDnDCloneTarget(bool asDnDTarget) noexcept { if((asDnDCloneTarget_ = asDnDTarget)) asDnDShareTarget_ = false; }
+
+    bool IsDnDSource() const noexcept { return asDnDSource_; }
+    bool IsDnDShareTarget() const noexcept { return asDnDShareTarget_; }
+    bool IsDnDCloneTarget() const noexcept { return asDnDCloneTarget_; }
+
 private:
 
     ResourceCreatorSelector<Factory> selector_;
     std::shared_ptr<Resource> rsc_;
 
     std::function<void(Resource&)> rscChangedCallback_;
+
+    bool asDnDSource_;
+    bool asDnDShareTarget_;
+    bool asDnDCloneTarget_;
+
+    void AsDnDSource()
+    {
+        if(!asDnDSource_ || !ImGui::BeginDragDropSource(ImGuiDragDropFlags_None))
+            return;
+        AGZ_SCOPE_GUARD({ ImGui::EndDragDropSource(); });
+        auto pRsc = &rsc_;
+        ImGui::SetDragDropPayload(Resource::StrID(), &pRsc, sizeof(pRsc));
+
+        if(rsc_)
+            rsc_->DisplayOnDnD();
+        else
+            ImGui::Text("null");
+    }
+
+    void AsDnDTarget()
+    {
+        if(!asDnDShareTarget_ && !asDnDCloneTarget_)
+            return;
+        if(!ImGui::BeginDragDropTarget())
+            return;
+        AGZ_SCOPE_GUARD({ ImGui::EndDragDropTarget(); });
+
+        auto payload = ImGui::AcceptDragDropPayload(Resource::StrID());
+        if(!payload)
+            return;
+
+        AGZ_ASSERT(payload->Data);
+
+        std::shared_ptr<Resource> *pRsc;
+        AGZ_ASSERT(payload->DataSize == sizeof(pRsc));
+        std::memcpy(&pRsc, payload->Data, sizeof(pRsc));
+
+        auto rsc = *pRsc;
+        if(rsc && asDnDCloneTarget_)
+            SetResource(rsc->Clone());
+        else
+            SetResource(rsc);
+    }
 
     template<typename T, typename = void>
     struct HasIsMultiline : std::false_type { };

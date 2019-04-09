@@ -4,7 +4,7 @@ namespace Atrc::Editor
 {
 
 IdealDiffuse::IdealDiffuse(const HasName *creator)
-    : IMaterial(creator)
+    : ResourceCommonImpl(creator)
 {
     albedo_.SetResource(RF.Get<ITexture>()["Constant"].Create());
 }

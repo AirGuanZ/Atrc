@@ -35,6 +35,7 @@ void EditorCore::Initialize()
     data_->sampler = std::make_unique<Atrc::Editor::SamplerSlot>();
 
     data_->mat = std::make_unique<Atrc::Editor::MaterialSlot>();
+    data_->mat2 = std::make_unique<Atrc::Editor::MaterialSlot>();
 
     RegisterResourceCreators(data_->rscMgr);
 
@@ -478,6 +479,7 @@ void EditorCore::ShowRenderingSettings()
         ImGui::BeginChild("");
         data_->filmFilter->Display();
         data_->mat->Display();
+        data_->mat2->Display();
         ImGui::EndChild();
     }
 

@@ -5,14 +5,14 @@
 namespace Atrc::Editor
 {
 
-class Dielectric : public IFresnel
+class Dielectric : public ResourceCommonImpl<IFresnel, Dielectric>
 {
     float etaOut_ = 1;
     float etaIn_ = 1.5f;
 
 public:
 
-    using IFresnel::IFresnel;
+    using ResourceCommonImpl<IFresnel, Dielectric>::ResourceCommonImpl;
 
     std::string Save() const override;
 
