@@ -2,7 +2,6 @@
 
 #include <Atrc/Editor/ResourceInstance/ResourceSlot.h>
 #include <Atrc/Editor/Material/Material.h>
-#include <Atrc/Editor/Texture/Texture.h>
 
 namespace Atrc::Editor
 {
@@ -13,7 +12,7 @@ class IdealDiffuse : public ResourceCommonImpl<IMaterial, IdealDiffuse>
 
 public:
 
-    IdealDiffuse(const HasName *creator);
+    explicit IdealDiffuse(const HasName *creator);
 
     std::string Save(const std::filesystem::path &relPath) const override;
 

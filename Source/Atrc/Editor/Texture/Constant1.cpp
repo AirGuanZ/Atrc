@@ -44,8 +44,6 @@ void Constant1::Display()
 {
     if(low_ < high_)
     {
-        ImGui::Text("texel"); ImGui::SameLine();
-
         ImGui::PushID(0);
         ImGui::PushItemWidth(-1);
         AGZ_SCOPE_GUARD({ ImGui::PopItemWidth(); ImGui::PopID(); });
@@ -58,7 +56,7 @@ void Constant1::Display()
         ImGui::PushItemWidth(-1);
         AGZ_SCOPE_GUARD({ ImGui::PopItemWidth(); ImGui::PopID(); });
 
-        ImGui::InputFloat("texel", &texel_);
+        ImGui::InputFloat("", &texel_);
     }
 }
 

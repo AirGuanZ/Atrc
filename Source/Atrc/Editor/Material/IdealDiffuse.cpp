@@ -1,4 +1,5 @@
 #include <Atrc/Editor/Material/IdealDiffuse.h>
+#include <Atrc/Editor/Texture/Texture.h>
 
 namespace Atrc::Editor
 {

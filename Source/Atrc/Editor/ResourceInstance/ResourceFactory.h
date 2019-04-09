@@ -59,11 +59,17 @@ public:
         return std::get<Rsc2Idx<TResource, 0>()>(facs_);
     }
 
+    template<typename TResource>
+    std::shared_ptr<TResource> Create(const std::string &type) const
+    {
+        return std::get<Rsc2Idx<TResource, 0>()>(facs_)[type].Create();
+    }
+
     template<typename TResource, typename...LoadArgs>
-    auto CreateAndLoad(const AGZ::ConfigNode &params, LoadArgs&&...loadArgs)
+    auto CreateAndLoad(const AGZ::ConfigNode &params, LoadArgs&&...loadArgs) const
     {
         auto &group = params.AsGroup();
-        auto ret = Get<TResource>()[group["type"].AsValue()].Create();
+        auto ret = std::get<Rsc2Idx<TResource, 0>()>(facs_)[group["type"].AsValue()].Create();
         ret->Load(group, std::forward<LoadArgs>(loadArgs)...);
         return ret;
     }
