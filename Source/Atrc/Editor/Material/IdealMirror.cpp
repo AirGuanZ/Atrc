@@ -1,3 +1,4 @@
+#include <AGZUtils/Utils/Exception.h>
 #include <Atrc/Editor/Material/IdealMirror.h>
 
 namespace Atrc::Editor

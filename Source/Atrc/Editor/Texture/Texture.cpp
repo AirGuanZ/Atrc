@@ -1,3 +1,4 @@
+#include <Atrc/Editor/ResourceInstance/ResourceFactory.h>
 #include <Atrc/Editor/Texture/Constant.h>
 #include <Atrc/Editor/Texture/Constant1.h>
 #include <Atrc/Editor/Texture/HDR.h>

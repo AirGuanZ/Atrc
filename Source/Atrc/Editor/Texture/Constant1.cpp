@@ -1,3 +1,4 @@
+#include <AGZUtils/Utils/Exception.h>
 #include <Atrc/Editor/Texture/Constant1.h>
 
 namespace Atrc::Editor

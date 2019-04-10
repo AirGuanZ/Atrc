@@ -1,4 +1,5 @@
 #include <AGZUtils/Container/SharedPtrPool.h>
+#include <AGZUtils/Utils/Exception.h>
 #include <Atrc/Editor/Texture/HDR.h>
 #include <Atrc/Editor/Global.h>
 

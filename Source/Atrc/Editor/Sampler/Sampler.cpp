@@ -1,3 +1,4 @@
+#include <Atrc/Editor/ResourceInstance/ResourceFactory.h>
 #include <Atrc/Editor/Sampler/Sampler.h>
 
 #include <Atrc/Editor/Sampler/Native.h>

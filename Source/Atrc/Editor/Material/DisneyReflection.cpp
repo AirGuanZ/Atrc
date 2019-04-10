@@ -1,3 +1,4 @@
+#include <AGZUtils/Utils/Exception.h>
 #include <Atrc/Editor/Material/DisneyReflection.h>
 
 namespace Atrc::Editor

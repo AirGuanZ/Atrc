@@ -1,5 +1,6 @@
 #pragma once
 
+#include <AGZUtils/Utils/Exception.h>
 #include <Atrc/Editor/ResourceInstance/ResourceInstance.h>
 
 #include <Atrc/Editor/FilmFilter/FilmFilter.h>
@@ -35,6 +36,52 @@ public:
     }
 };
 
+template<typename TResourceCreatorCategory>
+class ResourceFactory
+{
+public:
+
+    using Resource = typename TResourceCreatorCategory::Resource;
+    using Creator = TResourceCreatorCategory;
+
+    void AddCreator(const Creator *creator)
+    {
+        AGZ_HIERARCHY_TRY
+
+            auto it = name2Creator_.find(creator->GetName());
+        if(it != name2Creator_.end())
+            throw std::runtime_error("repeated creator name: " + creator->GetName());
+        name2Creator_[creator->GetName()] = creator;
+
+        AGZ_HIERARCHY_WRAP("in registering resource creator")
+    }
+
+    const Creator &operator[](const std::string &name) const
+    {
+        AGZ_HIERARCHY_TRY
+
+            auto it = name2Creator_.find(name);
+        if(it == name2Creator_.end())
+            throw std::runtime_error("unknown creator name: " + name);
+        return *it->second;
+
+        AGZ_HIERARCHY_WRAP("in getting creator from creator factory")
+    }
+
+    auto begin() const { return name2Creator_.begin(); }
+    auto end()   const { return name2Creator_.end(); }
+
+    auto begin() { return name2Creator_.begin(); }
+    auto end() { return name2Creator_.end(); }
+
+private:
+
+    static_assert(std::is_base_of_v<IResource, Resource>);
+    static_assert(std::is_base_of_v<IResourceCreator, TResourceCreatorCategory>);
+
+    std::map<std::string, const TResourceCreatorCategory*> name2Creator_;
+};
+
 class ResourceFactoryList
 {
     using Tuple = std::tuple<TRESOURCE_FACTORY_LIST>;
@@ -50,8 +97,6 @@ class ResourceFactoryList
     template<typename TResource, int I> struct Rsc2IdxAux<TResource, I, true> { static constexpr int Value() { return I; } };
 
 public:
-
-    ResourceDnDSlots DnDSlots;
 
     template<typename TResource>
     auto &Get() noexcept

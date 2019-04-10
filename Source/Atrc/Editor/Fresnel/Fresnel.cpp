@@ -1,3 +1,4 @@
+#include <Atrc/Editor/ResourceInstance/ResourceFactory.h>
 #include <Atrc/Editor/Fresnel/Fresnel.h>
 
 #include <Atrc/Editor/Fresnel/Conductor.h>

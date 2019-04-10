@@ -5,7 +5,6 @@
 #include <string>
 #include <type_traits>
 
-#include <AGZUtils/Utils/Exception.h>
 #include <Atrc/Editor/GL.h>
 
 namespace Atrc::Editor
@@ -89,52 +88,6 @@ public:
     virtual ~IResourceCreator() = default;
 };
 
-template<typename TResourceCreatorCategory>
-class ResourceFactory
-{
-public:
-
-    using Resource = typename TResourceCreatorCategory::Resource;
-    using Creator = TResourceCreatorCategory;
-
-    void AddCreator(const Creator *creator)
-    {
-        AGZ_HIERARCHY_TRY
-
-        auto it = name2Creator_.find(creator->GetName());
-        if(it != name2Creator_.end())
-            throw std::runtime_error("repeated creator name: " + creator->GetName());
-        name2Creator_[creator->GetName()] = creator;
-
-        AGZ_HIERARCHY_WRAP("in registering resource creator")
-    }
-
-    const Creator &operator[](const std::string &name) const
-    {
-        AGZ_HIERARCHY_TRY
-
-        auto it = name2Creator_.find(name);
-        if(it == name2Creator_.end())
-            throw std::runtime_error("unknown creator name: " + name);
-        return *it->second;
-
-        AGZ_HIERARCHY_WRAP("in getting creator from creator factory")
-    }
-
-    auto begin() const { return name2Creator_.begin(); }
-    auto end()   const { return name2Creator_.end(); }
-
-    auto begin() { return name2Creator_.begin(); }
-    auto end()   { return name2Creator_.end(); }
-
-private:
-
-    static_assert(std::is_base_of_v<IResource, Resource>);
-    static_assert(std::is_base_of_v<IResourceCreator, TResourceCreatorCategory>);
-
-    std::map<std::string, const TResourceCreatorCategory*> name2Creator_;
-};
-
 #define DEFINE_DEFAULT_RESOURCE_CREATOR_INTERFACE(RESOURCE) \
     class RESOURCE##Creator : public IResourceCreator \
     { \
@@ -180,6 +133,9 @@ public:
         return std::make_shared<TResource>(*pThis);
     }
 };
+
+template<typename TResource>
+class ResourceFactory;
 
 template<typename TResourceFactory>
 class ResourceSlot;

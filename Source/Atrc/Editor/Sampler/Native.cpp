@@ -1,3 +1,4 @@
+#include <AGZUtils/Utils/Exception.h>
 #include <Atrc/Editor/Sampler/Native.h>
 #include <Atrc/Editor/GL.h>
 

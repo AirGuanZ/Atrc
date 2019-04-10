@@ -1,3 +1,5 @@
+#include <Atrc/Editor/ResourceInstance/ResourceFactory.h>
+
 #include <Atrc/Editor/FilmFilter/Box.h>
 #include <Atrc/Editor/FilmFilter/Gaussian.h>
 #include <Atrc/Editor/FilmFilter/FilmFilter.h>
