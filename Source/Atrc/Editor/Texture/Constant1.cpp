@@ -43,22 +43,14 @@ std::string Constant1::Export(const std::filesystem::path &relPath) const
 
 void Constant1::Display()
 {
+    ImGui::PushID(0);
+    ImGui::PushItemWidth(-1);
+    AGZ_SCOPE_GUARD({ ImGui::PopItemWidth(); ImGui::PopID(); });
+
     if(low_ < high_)
-    {
-        ImGui::PushID(0);
-        ImGui::PushItemWidth(-1);
-        AGZ_SCOPE_GUARD({ ImGui::PopItemWidth(); ImGui::PopID(); });
-
         ImGui::SliderFloat("", &texel_, low_, high_);
-    }
     else
-    {
-        ImGui::PushID(0);
-        ImGui::PushItemWidth(-1);
-        AGZ_SCOPE_GUARD({ ImGui::PopItemWidth(); ImGui::PopID(); });
-
         ImGui::InputFloat("", &texel_);
-    }
 }
 
 bool Constant1::IsMultiline() const noexcept
