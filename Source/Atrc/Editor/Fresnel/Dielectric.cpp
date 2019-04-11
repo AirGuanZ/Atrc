@@ -1,3 +1,4 @@
+#include <AGZUtils/Utils/Exception.h>
 #include <Atrc/Editor/Fresnel/Dielectric.h>
 #include <Atrc/Editor/GL.h>
 

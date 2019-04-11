@@ -1,3 +1,4 @@
+#include <AGZUtils/Utils/Exception.h>
 #include <Atrc/Editor/FilmFilter/Box.h>
 #include <Atrc/Editor/GL.h>
 
