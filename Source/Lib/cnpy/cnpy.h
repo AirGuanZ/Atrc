@@ -150,13 +150,13 @@ namespace cnpy {
             //below, we will write the the new data at the start of the global header then append the global header and footer below it
             size_t global_header_size;
             parse_zip_footer(fp,nrecs,global_header_size,global_header_offset);
-            fseek(fp,global_header_offset,SEEK_SET);
+            fseek(fp,long(global_header_offset),SEEK_SET);
             global_header.resize(global_header_size);
             size_t res = fread(&global_header[0],sizeof(char),global_header_size,fp);
             if(res != global_header_size){
                 throw std::runtime_error("npz_save: header read error while adding to existing zip");
             }
-            fseek(fp,global_header_offset,SEEK_SET);
+            fseek(fp,long(global_header_offset),SEEK_SET);
         }
         else {
             fp = fopen(zipname.c_str(),"wb");
@@ -164,12 +164,12 @@ namespace cnpy {
 
         std::vector<char> npy_header = create_npy_header<T>(shape);
 
-        size_t nels = std::accumulate(shape.begin(),shape.end(),1,std::multiplies<size_t>());
+        size_t nels = std::accumulate(shape.begin(),shape.end(),size_t(1),std::multiplies<size_t>());
         size_t nbytes = nels*sizeof(T) + npy_header.size();
 
         //get the CRC of the data to be added
-        uint32_t crc = crc32(0L,(uint8_t*)&npy_header[0],npy_header.size());
-        crc = crc32(crc,(uint8_t*)data,nels*sizeof(T));
+        uint32_t crc = crc32(0L,(uint8_t*)&npy_header[0],uInt(npy_header.size()));
+        crc = crc32(crc,(uint8_t*)data,uInt(nels*sizeof(T)));
 
         //build the local header
         std::vector<char> local_header;

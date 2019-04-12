@@ -2,13 +2,9 @@
 
 #include <AGZUtils/Utils/Config.h>
 #include <AGZUtils/Utils/Texture.h>
-#include <Atrc/Core/Core/TFilm.h>
-#include <Atrc/Mgr/BuiltinCreatorRegister.h>
-#include <Atrc/Mgr/Context.h>
-#include <Atrc/Mgr/Parser.h>
 #include <Atrc/Mgr/SceneBuilder.h>
-#include <Atrc/SH2D/Scene2SH.h>
-#include <Atrc/SH2D/Light2SH.h>
+#include <Atrc/SH2D/ProjectLight.h>
+#include <Atrc/SH2D/ProjectScene.h>
 
 Atrc::Image Gamma(const Atrc::Image &img, Atrc::Real gamma)
 {
@@ -19,130 +15,6 @@ Atrc::Image Gamma(const Atrc::Image &img, Atrc::Real gamma)
             return AGZ::Math::Pow(c, gamma);
         });
     });
-}
-
-void ProjectScene(const AGZ::Config &config, const std::string &configPath, const std::string &outputDir)
-{
-    using namespace Atrc;
-
-    auto &root = config.Root();
-    Mgr::Context ctx(root, configPath);
-    Mgr::RegisterBuiltinCreators(ctx);
-
-    auto sampler = ctx.Create<Sampler>(root["sampler"]);
-    auto filter  = ctx.Create<FilmFilter>(root["film.filter"]);
-    auto scene   = Mgr::SceneBuilder::Build(root, ctx);
-
-    Vec2i filmSize = Mgr::Parser::ParseVec2i(root["film.size"]);
-
-    int SHOrder = root["SHOrder"].Parse<int>();
-    int workerCount = root["workerCount"].Parse<int>();
-    int taskGridSize = root["taskGridSize"].Parse<int>();
-
-    if(SHOrder < 0 || SHOrder > 4)
-    {
-        std::cout << "Invalid SHOrder value: " << SHOrder << std::endl;
-        return;
-    }
-
-    if(taskGridSize <= 0)
-    {
-        std::cout << "Invalid taskGridSize value: " << taskGridSize << std::endl;
-        return;
-    }
-
-    int SHC = (SHOrder + 1) * (SHOrder + 1);
-    std::vector<Film> coefs;
-    coefs.reserve(SHC);
-    for(int i = 0; i < SHC; ++i)
-        coefs.emplace_back(filmSize, *filter);
-    
-    Film binary(filmSize, *filter);
-    Film albedo(filmSize, *filter);
-    Film normal(filmSize, *filter);
-
-    Scene2SHResult result =
-    {
-        coefs.data(),
-        &binary,
-        &albedo,
-        &normal
-    };
-
-    Scene2SH(workerCount, taskGridSize, SHOrder, scene, sampler, &result);
-
-    auto saveToFile = [&](const std::string &filename, const Film &film)
-    {
-        auto img = film.GetImage().Map([](const Spectrum &pixel) { return pixel.ToFloats(); });
-        std::ofstream fout(filename, std::ofstream::trunc | std::ofstream::binary);
-        if(!fout)
-            throw AGZ::Exception("Failed to open file: " + filename);
-        AGZ::BinaryOStreamSerializer s(fout);
-        if(!s.Serialize(img))
-            throw AGZ::Exception("Failed to serialize into: " + filename);
-    };
-
-    auto outDir = std::filesystem::path(outputDir);
-
-    for(int i = 0; i < SHC; ++i)
-        saveToFile((outDir / ("coef" + std::to_string(i) + ".sh2d")).string(), coefs[i]);
-
-    saveToFile((outDir / "binary.sh2d").string(), binary);
-    AGZ::TextureFile::WriteRGBToHDR(
-        (std::filesystem::path(outputDir) / "binary.hdr").string(),
-        Gamma(binary.GetImage().Map([](const Spectrum &s) { return s.ToFloats(); }), Real(2.2)));
-
-    saveToFile((outDir / "albedo.sh2d").string(), albedo);
-    AGZ::TextureFile::WriteRGBToHDR(
-        (std::filesystem::path(outputDir) / "albedo.hdr").string(),
-        Gamma(albedo.GetImage().Map([](const Spectrum &s) { return s.ToFloats(); }), Real(2.2)));
-
-    saveToFile((outDir / "normal.sh2d").string(), normal);
-    AGZ::TextureFile::WriteRGBToHDR(
-        (std::filesystem::path(outputDir) / "normal.hdr").string(),
-        Gamma(normal.GetImage().Map([](const Spectrum &s) { return s.ToFloats(); }), Real(2.2)));
-}
-
-void ProjectLight(const AGZ::Config &config, const std::string &configPath, const std::string &outputFilename)
-{
-    using namespace Atrc;
-
-    auto &root = config.Root();
-    Mgr::Context ctx(root, configPath);
-    Mgr::RegisterBuiltinCreators(ctx);
-
-    auto light = ctx.Create<Light>(root["light"]);
-    int N = root["N"].Parse<int>();
-
-    int SHOrder = root["SHOrder"].Parse<int>();
-    int SHC = (SHOrder + 1) * (SHOrder + 1);
-
-    if(SHOrder < 0 || SHOrder > 4)
-    {
-        std::cout << "Invalid SHOrder value: " << SHOrder << std::endl;
-        return;
-    }
-
-    std::vector<Spectrum> coefs(SHC);
-    Light2SH(light, SHOrder, N, coefs.data());
-
-    std::ofstream fout(outputFilename);
-    if(!fout)
-    {
-        std::cout << "Failed to open output file " << outputFilename << std::endl;
-        return;
-    }
-
-    fout << SHOrder << " ";
-    for(int i = 0; i < SHC; ++i)
-    {
-        fout << coefs[i].r << " ";
-        fout << coefs[i].g << " ";
-        fout << coefs[i].b << " ";
-    }
-
-    if(!fout)
-        std::cout << "Failed to save light coefs to " << outputFilename << std::endl;
 }
 
 void ReconstructImage(
@@ -302,7 +174,7 @@ int main(int argc, char *argv[])
                 return -1;
             }
 
-            ProjectScene(config, absolute(std::filesystem::path(filename)).parent_path().string(), outputDir);
+            ProjectScene(config, absolute(std::filesystem::path(filename)).parent_path().string(), { outputDir, true, true, true });
         }
         else if(argv[1] == std::string("pl") || argv[1] == std::string("project_light"))
         {
