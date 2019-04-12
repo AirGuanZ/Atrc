@@ -6,7 +6,3 @@
 	path = Source/Lib/ImFileBrowser
 	url = https://github.com/AirGuanZ/imgui-filebrowser.git
 	shallow = true
-[submodule "Source/Lib/ImWinLayout"]
-	path = Source/Lib/ImWinLayout
-	url = https://github.com/AirGuanZ/imgui-windowlayout
-	shallow = true
