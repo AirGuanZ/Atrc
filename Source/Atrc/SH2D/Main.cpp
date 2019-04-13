@@ -14,7 +14,7 @@ int main(int argc, char *argv[])
         static const char USAGE_MSG[] = R"___(
     SH2D ps/project_scene scene_desc_filename output_dir_name
     SH2D pl/project_light light_desc_filename output_filename
-    SH2D rc/reconstruct   SH_order(0 to 4) light_coef_filename scene_coef_dir output_filename
+    SH2D rc/reconstruct   SH_order(0 to 4) light_coef_filename scene_coef_dir output_filename [rotateDegree]
 )___";
 
         if(argc < 2)
@@ -47,7 +47,8 @@ int main(int argc, char *argv[])
                 return -1;
             }
 
-            ProjectScene(config, absolute(std::filesystem::path(filename)).parent_path().string(), { outputDir, true, true, true });
+            ProjectScene(config, absolute(std::filesystem::path(filename)).parent_path().string(),
+                { outputDir, true, true, true });
         }
         else if(argv[1] == std::string("pl") || argv[1] == std::string("project_light"))
         {
@@ -78,7 +79,7 @@ int main(int argc, char *argv[])
         }
         else if(argv[1] == std::string("rc") || argv[1] == std::string("reconstruct"))
         {
-            if(argc != 6)
+            if(argc != 6 && argc != 7)
             {
                 std::cout << USAGE_MSG << std::endl;
                 return 0;
@@ -102,7 +103,11 @@ int main(int argc, char *argv[])
 
             std::string albedoFilename = (std::filesystem::path(argv[4]) / "albedo.sh2d").string();
 
-            ReconstructImage(SHOrder, lightFilename, sceneCoefFilenames.data(), albedoFilename, outputFilename, 0);
+            float rotateDeg = 0;
+            if(argc == 7)
+                rotateDeg = AGZ::Parse<float>(argv[6]);
+
+            ReconstructImage(SHOrder, lightFilename, sceneCoefFilenames.data(), albedoFilename, outputFilename, rotateDeg);
         }
         else
             std::cout << USAGE_MSG << std::endl;
