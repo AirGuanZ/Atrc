@@ -1,5 +1,6 @@
 #include <Atrc/Core/Light/CubeEnvironmentLight.h>
 #include <Atrc/Core/Light/EnvironmentLight.h>
+#include <Atrc/Core/Light/SHEnvironment.h>
 #include <Atrc/Core/Light/SkyLight.h>
 #include <Atrc/Mgr/BuiltinCreator/LightCreator.h>
 #include <Atrc/Mgr/Parser.h>
@@ -11,9 +12,11 @@ void RegisterBuiltinLightCreators(Context &context)
 {
     static const CubeEnvironmentLightCreator cubeEnvironmentLight;
     static const EnvironmentLightCreator environmentLightCreator;
+    static const SHEnvLightCreator iSHEnvLightCreator;
     static const SkyLightCreator skyLightCreator;
     context.AddCreator(&cubeEnvironmentLight);
     context.AddCreator(&environmentLightCreator);
+    context.AddCreator(&iSHEnvLightCreator);
     context.AddCreator(&skyLightCreator);
 }
 
@@ -54,6 +57,29 @@ Light *EnvironmentLightCreator::Create(const ConfigGroup &group, Context &contex
         return arena.Create<EnvironmentLight>(tex, transform);
     }
     AGZ_HIERARCHY_WRAP("In creating environment light: " + group.ToString())
+}
+
+Light *SHEnvLightCreator::Create(const ConfigGroup &group, Context &context, Arena &arena) const
+{
+    AGZ_HIERARCHY_TRY
+
+    int SHOrder = group["SHOrder"].Parse<int>();
+    if(SHOrder < 1 || SHOrder > 5)
+        throw Exception("invalid SHOrder value: " + std::to_string(SHOrder));
+
+    int SHC = SHOrder * SHOrder;
+    std::vector<Spectrum> coefs(SHC);
+    auto &coefArr = group["coefs"].AsArray();
+    for(int i = 0; i < SHC; ++i)
+        coefs[i] = Parser::ParseSpectrum(*coefArr.At(i));
+
+    Real rotateDeg = 0;
+    if(auto *rotNode = group.Find("rotateAngle"))
+        rotateDeg = Deg(Parser::ParseAngle(*rotNode)).value;
+
+    return arena.Create<SHEnvLight>(SHOrder, coefs.data(), rotateDeg);
+
+    AGZ_HIERARCHY_WRAP("in creating sh environment light: " + group.ToString())
 }
 
 Light *SkyLightCreator::Create(const ConfigGroup &group, [[maybe_unused]] Context &context, Arena &arena) const

@@ -1,15 +1,19 @@
-#include <Atrc/Editor/Light/Environment.h>
+#include <Atrc/Editor/Light/Env.h>
 
 namespace Atrc::Editor
 {
 
 std::string Environment::Save(const std::filesystem::path &relPath) const
 {
+    AGZ_HIERARCHY_TRY
+
     static const AGZ::Fmt fmt(
         "type = {};"
         "tex = {};"
     );
     return Wrap(fmt.Arg(GetType(), tex_.GetNoneNullResource()->Save(relPath)));
+
+    AGZ_HIERARCHY_WRAP("in saving environment light")
 }
 
 void Environment::Load(const AGZ::ConfigGroup &params, const std::filesystem::path &relPath)

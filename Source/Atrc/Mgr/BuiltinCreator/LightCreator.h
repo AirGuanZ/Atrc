@@ -38,6 +38,22 @@ public:
 };
 
 /*
+    type = SHEnv
+
+    SHOrder = int
+    coefs = (Spectrum...)
+    rotateDeg = Angle | Null
+ */
+class SHEnvLightCreator : public Creator<Light>
+{
+public:
+
+    std::string GetTypeName() const override { return "SHEnv"; }
+
+    Light *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
+};
+
+/*
     type = Sky
 
     top    = Spectrum
