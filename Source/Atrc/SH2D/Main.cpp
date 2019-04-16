@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
     {
         static const char USAGE_MSG[] = R"___(
     SH2D ps/project_scene scene_desc_filename output_dir_name
-    SH2D pl/project_light light_desc_filename output_filename
+    SH2D pl/project_light light_desc_filename output_dir_name
     SH2D rc/reconstruct   SH_order(0 to 4) light_coef_filename scene_coef_dir output_filename [rotateDegree]
 )___";
 
@@ -59,8 +59,7 @@ int main(int argc, char *argv[])
             }
 
             std::string filename = argv[2];
-            std::string outputFilename = argv[3];
-            auto outputDir = std::filesystem::path(outputFilename).parent_path();
+            auto outputDir = std::filesystem::path(argv[3]);
 
             AGZ::Config config;
             if(!config.LoadFromFile(filename))
@@ -75,7 +74,7 @@ int main(int argc, char *argv[])
                 return -1;
             }
 
-            ProjectLight(config, absolute(std::filesystem::path(filename)).parent_path().string(), outputFilename);
+            ProjectLight(config, absolute(std::filesystem::path(filename)).parent_path().string(), { outputDir, true, true });
         }
         else if(argv[1] == std::string("rc") || argv[1] == std::string("reconstruct"))
         {

@@ -11,7 +11,7 @@ void DisneyReflection::LimitRange(ITexture &tex)
 
 void DisneyReflection::DisplayTexture(const char *attribName, TextureSlot &slot)
 {
-    ImGui::Text(attribName);
+    ImGui::TextUnformatted(attribName);
     if(slot.IsMultiline())
     {
         ImGui::Indent();

@@ -3,8 +3,9 @@
 #include <Atrc/Mgr/Context.h>
 #include <Atrc/SH2D/Light2SH.h>
 #include <Atrc/SH2D/ProjectLight.h>
+#include <Lib/cnpy/cnpy.h>
 
-void ProjectLight(const AGZ::Config &config, const std::string &configPath, const std::string &outputFilename)
+void ProjectLight(const AGZ::Config &config, const std::string &configPath, const ProjectLightOutputArgs &outputArgs)
 {
     using namespace Atrc;
 
@@ -27,21 +28,32 @@ void ProjectLight(const AGZ::Config &config, const std::string &configPath, cons
     std::vector<Spectrum> coefs(SHC);
     Light2SH(light, SHOrder, N, coefs.data());
 
-    std::ofstream fout(outputFilename);
-    if(!fout)
+    if(outputArgs.outputTXT)
     {
-        std::cout << "Failed to open output file " << outputFilename << std::endl;
-        return;
+        auto filename = outputArgs.dir / "light.txt";
+
+        std::ofstream fout(filename);
+        if(!fout)
+        {
+            std::cout << "Failed to open output file " << filename.string() << std::endl;
+            return;
+        }
+
+        fout << SHOrder << " ";
+        for(int i = 0; i < SHC; ++i)
+        {
+            fout << coefs[i].r << " ";
+            fout << coefs[i].g << " ";
+            fout << coefs[i].b << " ";
+        }
+
+        if(!fout)
+            std::cout << "Failed to save light coefs to " << filename.string() << std::endl;
     }
 
-    fout << SHOrder << " ";
-    for(int i = 0; i < SHC; ++i)
+    if(outputArgs.outputNPZ)
     {
-        fout << coefs[i].r << " ";
-        fout << coefs[i].g << " ";
-        fout << coefs[i].b << " ";
+        auto filename = outputArgs.dir / "light.npz";
+        cnpy::npz_save(filename.string(), "light", &coefs[0][0], { size_t(SHC), 3 });
     }
-
-    if(!fout)
-        std::cout << "Failed to save light coefs to " << outputFilename << std::endl;
 }
