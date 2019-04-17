@@ -69,7 +69,7 @@ public:
     {
         if(attribName)
             ImGui::TextUnformatted(attribName);
-        if(slot.IsMultiline())
+        if(IsMultiline())
         {
             if(attribName)
                 ImGui::Indent();
@@ -80,7 +80,7 @@ public:
         else
         {
             ImGui::SameLine();
-            slot.Display();
+            Display();
         }
     }
 
