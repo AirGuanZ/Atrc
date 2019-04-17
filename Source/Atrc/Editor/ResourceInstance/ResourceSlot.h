@@ -65,6 +65,25 @@ public:
         }
     }
 
+    void DisplayAsSubresource(const char *attribName)
+    {
+        if(attribName)
+            ImGui::TextUnformatted(attribName);
+        if(slot.IsMultiline())
+        {
+            if(attribName)
+                ImGui::Indent();
+            Display();
+            if(attribName)
+                ImGui::Unindent();
+        }
+        else
+        {
+            ImGui::SameLine();
+            slot.Display();
+        }
+    }
+
     std::shared_ptr<Resource> GetResource() const noexcept
     {
         return rsc_;

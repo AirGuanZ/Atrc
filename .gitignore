@@ -38,6 +38,7 @@ sh2d.txt
 white-test.txt
 Output.png
 
+*.sh2d
 *.o
 *.d
 *.dtmp
