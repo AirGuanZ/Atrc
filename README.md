@@ -7,6 +7,7 @@ Atrc是[Z Guan](https://github.com/AirGuanZ)的渲染实验室，主要以C++编
 - [x] Launcher 渲染器启动器
 - [x] SH2D 将场景、灯光投影到1~5阶球谐函数系数，以及旋转球谐系数、根据球谐系数重建图像的工具
 - [x] Editor 场景编辑器，相当于Launcher的前端
+- [ ] EnvLight 倒腾环境光的工具，如各种映射间的转换等（施工中）
 
 Atrc已/将实现以下特性：
 
@@ -23,7 +24,7 @@ Atrc已/将实现以下特性：
 - [x] [Editor] 导出和加载可被Launcher读取并用于渲染的场景描述脚本，也可在编辑器中直接进行渲染
 - [x] [SH2D] 将场景/环境光投影到1~5阶球谐函数上
 - [x] [SH2D] 从场景和环境光的球谐函数系数重建出图像，支持环境光系数的旋转
-- [ ] [Editor] 重构Editor
+- [ ] [Editor] 重构Editor（施工中）
 - [ ] [Core] Progressive Photon Mapping（学习中）
 - [ ] [Core] Bidirectional Path Tracing
 - [ ] [Core] Disney Pincipled BSDF
