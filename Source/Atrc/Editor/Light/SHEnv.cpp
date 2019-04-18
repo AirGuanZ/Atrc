@@ -1,6 +1,7 @@
 #include <Atrc/Core/Utility/ConfigConvert.h>
 #include <Atrc/Editor/Light/SHEnv.h>
-#include "Atrc/Editor/Global.h"
+#include <Atrc/Editor/Global.h>
+#include <Lib/cnpy/cnpy.h>
 
 namespace Atrc::Editor
 {
@@ -61,33 +62,65 @@ void SHEnv::Display()
             auto filename = fileBrowser_.GetSelected();
             fileBrowser_.ClearSelected();
 
-            std::ifstream fin(filename);
-            if(!fin)
-                throw Exception("failed to open file " + filename.string());
-
-            int SHOrder;
-            fin >> SHOrder;
-            ++SHOrder;
-
-            if(!fin || SHOrder_ < 1 || SHOrder_ > 5)
-                throw Exception("invalid SHOrder value: " + std::to_string(SHOrder));
-
-            std::vector<Spectrum> coefs;
-            int SHC = SHOrder * SHOrder;
-            for(int i = 0; i < SHC; ++i)
+            if(AGZ::EndsWith(filename.string(), ".npy"))
             {
-                Spectrum s;
-                fin >> s.r;
-                fin >> s.g;
-                fin >> s.b;
-                coefs.push_back(s);
+                auto arr = cnpy::npy_load(filename.string());
+                auto data = arr.data<float>();
+                if(arr.shape.size() != 2 || arr.shape[1] != 3)
+                    throw Exception("invalid npy SH light file");
+                
+                int SHOrder = 0;
+                switch(arr.shape[0])
+                {
+                case 1:  SHOrder = 1; break;
+                case 4:  SHOrder = 2; break;
+                case 9:  SHOrder = 3; break;
+                case 16: SHOrder = 4; break;
+                case 25: SHOrder = 5; break;
+                default: throw Exception("invalid npy SH light file");
+                }
+
+                int SHC = SHOrder * SHOrder;
+                std::vector<Spectrum> coefs;
+                for(int i = 0, j = 0; i < SHC; ++i, j += 3)
+                {
+                    Spectrum s(data[j], data[j + 1], data[j + 2]);
+                    coefs.push_back(s);
+                }
+
+                SHOrder_ = SHOrder;
+                coefs_ = std::move(coefs);
             }
+            else
+            {
+                std::ifstream fin(filename);
+                if(!fin)
+                    throw Exception("failed to open file " + filename.string());
 
-            if(!fin)
-                throw Exception("failed to load sh coefs from file");
+                int SHOrder;
+                fin >> SHOrder;
+                ++SHOrder;
 
-            SHOrder_ = SHOrder;
-            coefs_ = std::move(coefs);
+                if(!fin || SHOrder_ < 1 || SHOrder_ > 5)
+                    throw Exception("invalid SHOrder value: " + std::to_string(SHOrder));
+
+                std::vector<Spectrum> coefs;
+                int SHC = SHOrder * SHOrder;
+                for(int i = 0; i < SHC; ++i)
+                {
+                    Spectrum s;
+                    fin >> s.r;
+                    fin >> s.g;
+                    fin >> s.b;
+                    coefs.push_back(s);
+                }
+
+                if(!fin)
+                    throw Exception("failed to load sh coefs from file");
+
+                SHOrder_ = SHOrder;
+                coefs_ = std::move(coefs);
+            }
         }
     }
     catch(const std::exception &err)

@@ -110,7 +110,37 @@ void ProjectScene(const AGZ::Config &config, const std::string &configPath, cons
 
         AGZ::TextureFile::WriteRGBToHDR(
             (dir / "normal.hdr").string(),
-            Gamma(normal.GetImage().Map([](const Spectrum &s) { return s.ToFloats(); }), Real(2.2)));
+            Gamma(normal.GetImage().Map([](const Spectrum &s) { return ((s + Spectrum(1)) * Atrc::Real(0.5)).ToFloats(); }), Real(2.2)));
+
+        AGZ::TextureFile::WriteRGBToPNG(
+            (dir / "binary.png").string(), binary.GetImage().Map([](const Spectrum &s)
+            {
+                return s.Map([](Atrc::Real c)
+                {
+                    return uint8_t(AGZ::Math::Clamp<Atrc::Real>(c * Atrc::Real(255), 0, 255));
+                });
+            })
+        );
+
+        AGZ::TextureFile::WriteRGBToPNG(
+            (dir / "albedo.png").string(), albedo.GetImage().Map([](const Spectrum &s)
+            {
+                return s.Map([](Atrc::Real c)
+                {
+                    return uint8_t(AGZ::Math::Clamp<Atrc::Real>(c * Atrc::Real(255), 0, 255));
+                });
+            })
+        );
+
+        AGZ::TextureFile::WriteRGBToPNG(
+            (dir / "normal.png").string(), normal.GetImage().Map([](const Spectrum &s)
+            {
+                return s.Map([](Atrc::Real c)
+                {
+                    return uint8_t(AGZ::Math::Clamp<Atrc::Real>((c + 1) / 2 * Atrc::Real(255), 0, 255));
+                });
+            })
+        );
 
         for(int i = 0; i < SHC; ++i)
         {
@@ -147,18 +177,17 @@ void ProjectScene(const AGZ::Config &config, const std::string &configPath, cons
         }
 
         {
-            std::vector<AGZ::Math::Vec3d> data(SHC * w * h);
-            for(int i = 0; i < SHC; ++i)
+            std::vector<float> data;
+            data.reserve(w * h * SHC);
+            for(uint32_t y = 0; y < h; ++y)
             {
-                auto iBase = i * w * h;
-                for(uint32_t y = 0; y < h; ++y)
+                for(uint32_t x = 0; x < w; ++x)
                 {
-                    auto yBase = y * w;
-                    for(uint32_t x = 0; x < w; ++x)
-                        data[iBase + yBase + x] = imgs[i](x, y).ToDoubles();
+                    for(int i = 0; i < SHC; ++i)
+                        data.push_back(imgs[i](x, y).ToFloats().r);
                 }
             }
-            cnpy::npz_save((dir / "coefs.npz").string(), "coefs", &data[0][0], { static_cast<size_t>(SHC), h, w, 3 });
+            cnpy::npz_save((dir / "coefs.npz").string(), "coefs", &data[0], { h, w, static_cast<size_t>(SHC) });
         }
     }
 }
