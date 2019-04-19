@@ -61,6 +61,7 @@ namespace
     class ImageTextureInstance : public TextureInstance
     {
         FileSelector filename_;
+        bool reverseV_ = false;
 
     protected:
 
@@ -68,6 +69,7 @@ namespace
         {
             ctx.AddLine("type = Image;");
             ctx.AddLine("filename = \"", filename_.RelativeTo(ctx.workspaceDirectory).string(), "\";");
+            ctx.AddLine("reverseV = ", reverseV_ ? "True" : "False", ";");
         }
         
     public:
@@ -76,12 +78,21 @@ namespace
 
         void Display([[maybe_unused]] ResourceManager &rscMgr) override
         {
+            ImGui::PushID(0);
+            ImGui::Checkbox("", &reverseV_);
+            ImGui::PopID();
+            ImGui::ShowTooltipForLastItem("flip vertically");
+            ImGui::SameLine();
             filename_.Display();
         }
 
         void Import(ResourceManager &rscMgr, const AGZ::ConfigGroup &root, const AGZ::ConfigGroup &params, const ImportContext &ctx) override
         {
             filename_.SetFilename(std::filesystem::path(ctx.workspacePath) / params["filename"].AsValue());
+            if(auto *n = params.Find("reverseV"))
+                reverseV_ = Atrc::Mgr::Parser::ParseBool(*n);
+            else
+                reverseV_ = false;
         }
     };
 
