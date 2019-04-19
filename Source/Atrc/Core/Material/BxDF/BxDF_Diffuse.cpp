@@ -29,8 +29,8 @@ Spectrum BxDF_Diffuse::EvalUncolored(const Vec3 &wi, const Vec3 &wo, [[maybe_unu
 
 std::optional<BxDF::SampleWiResult> BxDF_Diffuse::SampleWi(const Vec3 &wo, [[maybe_unused]] bool star, const Vec3 &sample) const noexcept
 {
-    if(wo.z <= 0)
-        return std::nullopt;
+    /*if(wo.z <= 0)
+        return std::nullopt;*/
 
     auto [sam, pdf] = AGZ::Math::DistributionTransform
         ::ZWeightedOnUnitHemisphere<Real>::Transform(sample.xy());
