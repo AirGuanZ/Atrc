@@ -11,15 +11,15 @@ std::string Sky::Save(const std::filesystem::path &relPath) const
         "top = {};"
         "bottom = {};"
     );
-    return Wrap(fmt.Arg(GetType(), Atrc::Vec3fToCS(top_), Atrc::Vec3fToCS(bottom_)));
+    return Wrap(fmt.Arg(GetType(), Vec3fToCS(top_), Vec3fToCS(bottom_)));
 }
 
 void Sky::Load(const AGZ::ConfigGroup &params, const std::filesystem::path &relPath)
 {
     AGZ_HIERARCHY_TRY
 
-    top_ = Atrc::Node2Vec3f(params["top"]);
-    bottom_ = Atrc::Node2Vec3f(params["bottom"]);
+    top_ = Node2Vec3f(params["top"]);
+    bottom_ = Node2Vec3f(params["bottom"]);
 
     AGZ_HIERARCHY_WRAP("in loading sky light with " + params.ToString())
 }

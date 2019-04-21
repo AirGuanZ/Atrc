@@ -6,6 +6,8 @@ namespace Atrc::Editor
 
 std::string Constant::Save(const std::filesystem::path &relPath) const
 {
+    AGZ_HIERARCHY_TRY
+
     static const AGZ::Fmt fmt(
         "type = {};"
         "asColor = {};"
@@ -13,8 +15,10 @@ std::string Constant::Save(const std::filesystem::path &relPath) const
     );
     return Wrap(fmt.Arg(
         GetType(),
-        Atrc::BoolToCS(asColor_),
-        Atrc::Vec3fToCS(texel_)));
+        BoolToCS(asColor_),
+        Vec3fToCS(texel_)));
+
+    AGZ_HIERARCHY_WRAP("in saving constant texture")
 }
 
 void Constant::Load(const AGZ::ConfigGroup &params, const std::filesystem::path &relPath)
@@ -29,11 +33,15 @@ void Constant::Load(const AGZ::ConfigGroup &params, const std::filesystem::path 
 
 std::string Constant::Export(const std::filesystem::path &relPath) const
 {
+    AGZ_HIERARCHY_TRY
+
     static const AGZ::Fmt fmt(
         "type = Constant;"
         "texel = {};"
     );
-    return Wrap(fmt.Arg(Atrc::Vec3fToCS(texel_)));
+    return Wrap(fmt.Arg(Vec3fToCS(texel_)));
+
+    AGZ_HIERARCHY_WRAP("in exporting constant texture")
 }
 
 void Constant::Display()

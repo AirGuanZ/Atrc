@@ -81,7 +81,18 @@ void Image::Load(const AGZ::ConfigGroup &params, const std::filesystem::path &re
 
 std::string Image::Export(const std::filesystem::path &relPath) const
 {
-    return Save(relPath);
+    AGZ_HIERARCHY_TRY
+
+    if(!glTex_)
+        throw std::runtime_error("empty image object");
+
+    const AGZ::Fmt fmt(R"___(
+        type = {};
+        filename = {};
+    )___");
+    return Wrap(fmt.Arg(GetType(), RelPath(fileSelector_.GetFilename(), relPath).string()));
+
+    AGZ_HIERARCHY_WRAP("in exporting image texture")
 }
 
 void Image::Display()
@@ -101,7 +112,7 @@ void Image::Display()
         if(ImGui::IsItemHovered())
         {
             ImGui::BeginTooltip();
-            ImGui::Text("%s", fileSelector_.GetFilename().c_str());
+            ImGui::Text("%s", fileSelector_.GetFilename().string().c_str());
             ImGui::Image(ImTextureID(size_t(glTex_->tex.GetHandle())), ImVec2(200 * glTex_->WOverH, 200));
             ImGui::EndTooltip();
         }

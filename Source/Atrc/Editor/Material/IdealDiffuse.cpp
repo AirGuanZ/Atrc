@@ -12,6 +12,8 @@ IdealDiffuse::IdealDiffuse(const HasName *creator)
 
 std::string IdealDiffuse::Save(const std::filesystem::path &relPath) const
 {
+    AGZ_HIERARCHY_TRY
+
     static const AGZ::Fmt fmt(
         "type = {};"
         "albedo = {};"
@@ -19,6 +21,8 @@ std::string IdealDiffuse::Save(const std::filesystem::path &relPath) const
     return Wrap(fmt.Arg(
         GetType(),
         albedo_.GetNoneNullResource()->Save(relPath)));
+
+    AGZ_HIERARCHY_WRAP("in saving ideal diffuse material")
 }
 
 void IdealDiffuse::Load(const AGZ::ConfigGroup &params, const std::filesystem::path &relPath)
@@ -34,6 +38,8 @@ void IdealDiffuse::Load(const AGZ::ConfigGroup &params, const std::filesystem::p
 
 std::string IdealDiffuse::Export(const std::filesystem::path &relPath) const
 {
+    AGZ_HIERARCHY_TRY
+
     static const AGZ::Fmt fmt(
         "type = {};"
         "albedo = {};"
@@ -41,6 +47,8 @@ std::string IdealDiffuse::Export(const std::filesystem::path &relPath) const
     return Wrap(fmt.Arg(
         GetType(),
         albedo_.GetNoneNullResource()->Export(relPath)));
+
+    AGZ_HIERARCHY_WRAP("in exporting ideal diffuse material")
 }
 
 void IdealDiffuse::Display()

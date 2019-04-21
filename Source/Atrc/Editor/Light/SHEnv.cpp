@@ -17,8 +17,7 @@ std::string SHEnv::Save(const std::filesystem::path &relPath) const
     for(auto &s : coefs_)
         coefsStr.push_back(Vec3fToCS(s));
     return Wrap(fmt.Arg(
-        GetType(), SHOrder_,
-        AGZ::Join(",", coefsStr.begin(), coefsStr.end())));
+        GetType(), SHOrder_, AGZ::Join(",", coefsStr.begin(), coefsStr.end())));
 }
 
 void SHEnv::Load(const AGZ::ConfigGroup &params, const std::filesystem::path &relPath)

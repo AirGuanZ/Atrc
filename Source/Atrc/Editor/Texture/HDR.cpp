@@ -86,7 +86,18 @@ void HDR::Load(const AGZ::ConfigGroup &params, const std::filesystem::path &relP
 
 std::string HDR::Export(const std::filesystem::path &relPath) const
 {
-    return Save(relPath);
+    AGZ_HIERARCHY_TRY
+
+    if(!glTex_)
+        throw std::runtime_error("empty hdr object");
+
+    const AGZ::Fmt fmt(R"___(
+        type = {};
+        filename = {};
+    )___");
+    return Wrap(fmt.Arg(GetType(), RelPath(fileSelector_.GetFilename(), relPath).string()));
+
+    AGZ_HIERARCHY_WRAP("in exporting hdr texture")
 }
 
 void HDR::Display()

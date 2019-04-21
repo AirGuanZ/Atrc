@@ -13,6 +13,8 @@ IdealMirror::IdealMirror(const HasName *creator)
 
 std::string IdealMirror::Save(const std::filesystem::path &relPath) const
 {
+    AGZ_HIERARCHY_TRY
+
     static const AGZ::Fmt fmt(
         "type = {};"
         "fresnel = {};"
@@ -22,6 +24,8 @@ std::string IdealMirror::Save(const std::filesystem::path &relPath) const
         GetType(),
         fresnel_.GetNoneNullResource()->Save(),
         rc_.GetNoneNullResource()->Save(relPath)));
+
+    AGZ_HIERARCHY_WRAP("in saving ideal mirror material")
 }
 
 void IdealMirror::Load(const AGZ::ConfigGroup &params, const std::filesystem::path &relPath)
@@ -39,6 +43,8 @@ void IdealMirror::Load(const AGZ::ConfigGroup &params, const std::filesystem::pa
 
 std::string IdealMirror::Export(const std::filesystem::path &relPath) const
 {
+    AGZ_HIERARCHY_TRY
+
     static const AGZ::Fmt fmt(
         "type = {};"
         "fresnel = {};"
@@ -48,6 +54,8 @@ std::string IdealMirror::Export(const std::filesystem::path &relPath) const
         GetType(),
         fresnel_.GetNoneNullResource()->Export(),
         rc_.GetNoneNullResource()->Export(relPath)));
+
+    AGZ_HIERARCHY_WRAP("in exporting ideal mirror material")
 }
 
 void IdealMirror::Display()
