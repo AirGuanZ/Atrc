@@ -109,8 +109,7 @@ void PathTracingRenderer::Join(Reporter *reporter)
         for(auto &err : dispatcher_.GetExceptions())
             reporter->Message(err.what());
     }
-    else
-        reporter->End();
+    reporter->End();
 }
 
 void PathTracingRenderer::Stop()

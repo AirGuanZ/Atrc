@@ -1,5 +1,6 @@
 #pragma once
 
+#include <AGZUtils/Utils/Console.h>
 #include <AGZUtils/Utils/Time.h>
 
 #include <Atrc/Core/Core/Reporter.h>
@@ -9,7 +10,7 @@ namespace Atrc
     
 class DefaultReporter : public Reporter
 {
-    AGZ::Clock clock_;
+    std::unique_ptr<AGZ::ProgressBarF> pbar_;
 
 public:
 

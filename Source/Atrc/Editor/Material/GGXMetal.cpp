@@ -2,7 +2,21 @@
 
 namespace Atrc::Editor
 {
-    
+
+void GGXMetal::LimitRange(ITexture &tex)
+{
+    tex.SetRange(0, 1);
+}
+
+GGXMetal::GGXMetal(const HasName *creator)
+    : ResourceCommonImpl(creator)
+{
+    rc_.SetResource(RF.Create<ITexture>("Constant"));
+    roughness_.SetResource(RF.Create<ITexture>("Constant1"));
+    roughness_.SetResourceChangedCallback(&GGXMetal::LimitRange);
+    fresnel_.SetResource(RF.Create<IFresnel>("Conductor"));
+}
+ 
 std::string GGXMetal::Save(const std::filesystem::path &relPath) const
 {
     AGZ_HIERARCHY_TRY

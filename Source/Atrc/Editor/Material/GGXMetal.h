@@ -12,6 +12,8 @@ class GGXMetal : public ResourceCommonImpl<IMaterial, GGXMetal>
     ResourceSlot<TextureSlot> roughness_;
     ResourceSlot<FresnelFactory> fresnel_;
 
+    static void LimitRange(ITexture &tex);
+
 public:
 
     explicit GGXMetal(const HasName *creator);

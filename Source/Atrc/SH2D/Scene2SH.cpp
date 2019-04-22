@@ -1,13 +1,14 @@
 #include <queue>
 
+#include <AGZUtils/Utils/Console.h>
+#include <AGZUtils/Utils/Thread.h>
+#include <AGZUtils/Utils/Time.h>
 #include <Atrc/Core/Core/Camera.h>
 #include <Atrc/Core/Core/TFilm.h>
 #include <Atrc/Core/Core/Sampler.h>
 #include <Atrc/Core/Core/Scene.h>
 #include <Atrc/Core/Utility/GridDivider.h>
 #include <Atrc/SH2D/Scene2SH.h>
-#include <AGZUtils/Utils/Thread.h>
-#include <AGZUtils/Utils/Time.h>
 
 using namespace Atrc;
 
@@ -146,6 +147,10 @@ void Scene2SH(
 
     std::mutex mergeMut;
 
+    AGZ::StaticTaskDispatcher<Grid, AGZ::NoSharedParam_t> dispatcher(workerCount);
+    
+    AGZ::ProgressBarF pbar(80, '=');
+
     auto func = [&](const Grid &task, AGZ::NoSharedParam_t)
     {
         int32_t taskID = task.low.x * int32_t(tasks.size()) + task.low.y;
@@ -175,14 +180,9 @@ void Scene2SH(
         std::lock_guard<std::mutex> lk(mergeMut);
 
         Real percent = Real(100) * ++finishedTaskCount / totalTaskCount;
-        std::cout << "Progress: " << percent << std::endl;
+        pbar.SetPercent(percent);
+        pbar.Display();
     };
-
-    AGZ::Clock clock;
-    AGZ::StaticTaskDispatcher<Grid, AGZ::NoSharedParam_t> dispatcher(workerCount);
-
-    std::cout << "Start rendering..." << std::endl;
-    clock.Restart();
 
     bool ok = dispatcher.Run(func, AGZ::NO_SHARED_PARAM, tasks);
 
@@ -192,9 +192,5 @@ void Scene2SH(
         for(auto &err : dispatcher.GetExceptions())
             std::cout << err.what() << std::endl;
     }
-    else
-    {
-        std::cout << "Complete rendering..."
-                  << "Total time: " << clock.Milliseconds() / 1000.0 << std::endl;
-    }
+    pbar.Done();
 }
