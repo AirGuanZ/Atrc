@@ -1,4 +1,4 @@
-#include <iostream>
+﻿#include <iostream>
 #include <string>
 
 #include <AGZUtils/Utils/Math.h>
@@ -29,12 +29,25 @@ namespace
         int SHC = SHOrder * SHOrder;
         auto data = arr.data<float>();
         std::vector<Vec3f> coefs;
-        coefs.reserve(SHC);
 
-        for(int i = 0, j = 0; i < SHC; ++i, j += 3)
+        if(arr.fortran_order)
         {
-            Vec3f c(data[j], data[j + 1], data[j + 2]);
-            coefs.push_back(c);
+            // 有j行，SHC列
+            coefs.resize(SHC);
+            for(int j = 0; j < 3; ++j)
+            {
+                for(int i = 0; i < SHC; ++i)
+                    coefs[i][j] = data[j * SHC + i];
+            }
+        }
+        else
+        {
+            coefs.reserve(SHC);
+            for(int i = 0, j = 0; i < SHC; ++i, j += 3)
+            {
+                Vec3f c(data[j], data[j + 1], data[j + 2]);
+                coefs.push_back(c);
+            }
         }
 
         return { SHOrder, std::move(coefs) };

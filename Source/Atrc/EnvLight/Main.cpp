@@ -1,4 +1,4 @@
-#include <filesystem>
+﻿#include <filesystem>
 #include <iostream>
 #include <string>
 
@@ -6,10 +6,13 @@
 #include <Lib/cxxopts/cxxopts.hpp>
 
 /*
-    1. ��.npy��ʽ�Ļ�������гϵ��ת��Ϊ��(theta, phi)ֱ��ӳ�䵽uv�Ļ�����ͼ
+    1. 将.npy格式的环境光球谐系数转换为以(theta, phi)直接映射到uv的环境贴图
+    2. 将图像格式的环境光转换为.npy格式的SH系数
 */
 
 void NpySHToNormal(const std::string &npyFilename, int width, int height, const std::string &outputFilename);
+
+void NormalToNpySH(const std::string &imgFilename, int SHOrder, const std::string &outputFilename);
 
 void Run(int argc, char *argv[])
 {
@@ -19,11 +22,15 @@ void Run(int argc, char *argv[])
         ("o,output", "output filename", cxxopts::value<std::string>())
         ("w,width", "output image width", cxxopts::value<int>())
         ("h,height", "output image height", cxxopts::value<int>())
+        ("s,shorder", "SH order (0 to 4)", cxxopts::value<int>())
         ("help", "print help");
     auto optRt = opt.parse(argc, argv);
 
     if(optRt.count("help"))
+    {
         std::cout << opt.help({ "" }) << std::endl;
+        return;
+    }
 
     if(!optRt.count("input"))
     {
@@ -37,7 +44,7 @@ void Run(int argc, char *argv[])
         return;
     }
 
-    auto inputFilename = optRt["input"].as<std::string>();
+    auto inputFilename  = optRt["input"].as<std::string>();
     auto outputFilename = optRt["output"].as<std::string>();
 
     auto iExt = std::filesystem::path(inputFilename).extension();
@@ -45,6 +52,8 @@ void Run(int argc, char *argv[])
 
     if(iExt == ".npy" && oExt == ".png")
         NpySHToNormal(inputFilename, optRt["width"].as<int>(), optRt["height"].as<int>(), outputFilename);
+    else if(oExt == ".npy")
+        NormalToNpySH(inputFilename, optRt["shorder"].as<int>(), outputFilename);
     else
         std::cout << "Unknown convertion type (" << iExt.string() << " -> " << oExt.string() << std::endl;
 }
