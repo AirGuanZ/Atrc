@@ -281,10 +281,6 @@ int main()
     {
         return Run(window);
     }
-    catch(const AGZ::Exception &err)
-    {
-        cout << err.what() << endl;
-    }
     catch(const std::exception &err)
     {
         cout << err.what() << endl;

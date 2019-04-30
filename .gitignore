@@ -16,6 +16,7 @@ Build32/
 Build64/
 BuildQt/
 Output/
+new_lights/
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs

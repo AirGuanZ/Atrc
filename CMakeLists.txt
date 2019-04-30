@@ -43,4 +43,5 @@ ADD_SUBDIRECTORY(Source/Atrc/Editor)
 ADD_SUBDIRECTORY(Source/Atrc/EnvLight)
 ADD_SUBDIRECTORY(Source/Atrc/SH2D)
 ADD_SUBDIRECTORY(Source/Atrc/Launcher)
+ADD_SUBDIRECTORY(Source/Atrc/RHNNViewer)
 
