@@ -29,6 +29,6 @@ void main()
         vec3 sceneCoef = texture(mSceneCoefs[i], mTexCoord).rrr;
         color += mLightCoefs[i] * sceneCoef;
     }
-    oColor = vec4(clamp(color, 0, 1), 1);
+    oColor = vec4(clamp(1.4 * color, 0, 1), 1);
 }
 )___";

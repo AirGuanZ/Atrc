@@ -14,6 +14,8 @@ void NpySHToNormal(const std::string &npyFilename, int width, int height, const 
 
 void NormalToNpySH(const std::string &imgFilename, int SHOrder, const std::string &outputFilename);
 
+void HDRToNpySH(const std::string &imgFilename, int SHOrder, const std::string &outputFilename);
+
 void Run(int argc, char *argv[])
 {
     cxxopts::Options opt("Atrc::EnvLight");
@@ -52,8 +54,10 @@ void Run(int argc, char *argv[])
 
     if(iExt == ".npy" && oExt == ".png")
         NpySHToNormal(inputFilename, optRt["width"].as<int>(), optRt["height"].as<int>(), outputFilename);
-    else if(oExt == ".npy")
+    else if((iExt == ".jpg" || iExt == ".png") && oExt == ".npy")
         NormalToNpySH(inputFilename, optRt["shorder"].as<int>(), outputFilename);
+    else if(iExt == ".hdr" && oExt == ".npy")
+        HDRToNpySH(inputFilename, optRt["shorder"].as<int>(), outputFilename);
     else
         std::cout << "Unknown convertion type (" << iExt.string() << " -> " << oExt.string() << std::endl;
 }
