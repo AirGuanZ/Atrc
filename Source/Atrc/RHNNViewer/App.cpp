@@ -69,7 +69,7 @@ App::App(GLFWwindow *window)
 
 void App::Run()
 {
-    GL::RenderContext::SetClearColor({ 0, 1, 1, 1 });
+    GL::RenderContext::SetClearColor({ 0, 0, 0, 1 });
 
     while(!glfwWindowShouldClose(window_))
     {
