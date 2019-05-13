@@ -37,4 +37,17 @@ public:
     Entity *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
 };
 
+/*
+    type     = TwoSide
+    internal = EntityDefinition
+ */
+class TwoSideEntityCreator : public Creator<Entity>
+{
+public:
+
+    std::string GetTypeName() const override { return "TwoSide"; }
+
+    Entity *Create(const ConfigGroup &group, Context &context, Arena &arena) const override;
+};
+
 } // namespace Atrc::Mgr
