@@ -226,6 +226,46 @@ namespace
             controller_.Import(params["geometry.transform"]);
         }
     };
+
+    class TwoSideEntityInstance : public EntityInstance
+    {
+        GeometricEntityInstance internal_;
+
+    protected:
+
+        void Export(const ResourceManager &rscMgr, SceneExportingContext &ctx) const override
+        {
+            ctx.AddLine("type = TwoSide;");
+            ExportSubResource<EntityInstance>("internal", rscMgr, ctx, internal_);
+        }
+
+    public:
+
+        TwoSideEntityInstance(ResourceManager &rscMgr, std::string typeName, std::string name)
+            : EntityInstance(std::move(typeName), std::move(name)), internal_(rscMgr, "Geometric", "")
+        {
+            
+        }
+
+        void Render(const Mat4f &projViewMat, const Vec3f &eyePos) override
+        {
+            internal_.Render(projViewMat, eyePos);
+        }
+
+        void DisplayEx(ResourceManager &rscMgr, const Mat4f &proj, const Mat4f &view, bool renderController) override
+        {
+            if(ImGui::TreeNodeEx("internal", ImGuiTreeNodeFlags_DefaultOpen))
+            {
+                internal_.DisplayEx(rscMgr, proj, view, renderController);
+                ImGui::TreePop();
+            }
+        }
+
+        void Import(ResourceManager& rscMgr, const AGZ::ConfigGroup &root, const AGZ::ConfigGroup &params, const ImportContext &ctx) override
+        {
+            internal_.Import(rscMgr, root, params["internal"].AsGroup(), ctx);
+        }
+    };
 }
 
 void BeginEntityRendering()
@@ -244,8 +284,10 @@ void RegisterEntityCreators(ResourceManager &rscMgr)
 {
     static const GeometricDiffuseLightCreator iGeometricDiffuseLightCreator;
     static const GeometricEntityCreator iGeometricEntityCreator;
+    static const TwoSideEntityCreator iTwoSideEntityCreator;
     rscMgr.AddCreator(&iGeometricDiffuseLightCreator);
     rscMgr.AddCreator(&iGeometricEntityCreator);
+    rscMgr.AddCreator(&iTwoSideEntityCreator);
 }
 
 std::shared_ptr<EntityInstance> GeometricDiffuseLightCreator::Create(ResourceManager &rscMgr, std::string name) const
@@ -256,4 +298,9 @@ std::shared_ptr<EntityInstance> GeometricDiffuseLightCreator::Create(ResourceMan
 std::shared_ptr<EntityInstance> GeometricEntityCreator::Create(ResourceManager &rscMgr, std::string name) const
 {
     return std::make_shared<GeometricEntityInstance>(rscMgr, GetName(), std::move(name));
+}
+
+std::shared_ptr<EntityInstance> TwoSideEntityCreator::Create(ResourceManager &rscMgr, std::string name) const
+{
+    return std::make_shared<TwoSideEntityInstance>(rscMgr, GetName(), std::move(name));
 }

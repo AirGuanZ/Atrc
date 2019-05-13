@@ -28,6 +28,8 @@ public:
     bool InPositiveHemisphere(const Vec3 &v) const noexcept;
 
     CoordSystem RotateToNewEz(Vec3 newEz) const noexcept;
+
+    CoordSystem operator-() const noexcept;
 };
 
 // ================================= Implementation
@@ -66,6 +68,11 @@ inline CoordSystem CoordSystem::World2Local(const CoordSystem &world) const noex
 inline bool CoordSystem::InPositiveHemisphere(const Vec3 &v) const noexcept
 {
     return Dot(ez, v) > 0;
+}
+
+inline CoordSystem CoordSystem::operator-() const noexcept
+{
+    return CoordSystem(-ex, -ey, -ez);
 }
 
 } // namespace Atrc

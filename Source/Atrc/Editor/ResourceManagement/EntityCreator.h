@@ -25,3 +25,12 @@ public:
 
     std::shared_ptr<EntityInstance> Create(ResourceManager &rscMgr, std::string name) const override;
 };
+
+class TwoSideEntityCreator : public EntityCreator
+{
+public:
+
+    TwoSideEntityCreator() : EntityCreator("TwoSide") { }
+
+    std::shared_ptr<EntityInstance> Create(ResourceManager &rscMgr, std::string name) const override;
+};

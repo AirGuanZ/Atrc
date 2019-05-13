@@ -1,7 +1,6 @@
-#include <map>
-
 #include <Atrc/Core/Entity/GeometricDiffuseLight.h>
 #include <Atrc/Core/Entity/GeometricEntity.h>
+#include <Atrc/Core/Entity/TwoSideEntity.h>
 #include <Atrc/Mgr/BuiltinCreator/EntityCreator.h>
 #include <Atrc/Mgr/Parser.h>
 
@@ -29,8 +28,10 @@ void RegisterBuiltinEntityCreators(Context &context)
 {
     static const GeometricDiffuseLightCreator geometricDiffuseLightCreator;
     static const GeometricEntityCreator geometricEntityCreator;
+    static const TwoSideEntityCreator iTwoSideEntityCreator;
     context.AddCreator(&geometricDiffuseLightCreator);
     context.AddCreator(&geometricEntityCreator);
+    context.AddCreator(&iTwoSideEntityCreator);
 }
 
 Entity* GeometricDiffuseLightCreator::Create(const ConfigGroup &group, Context &context, Arena &arena) const
@@ -54,6 +55,16 @@ Entity *GeometricEntityCreator::Create(const ConfigGroup &group, Context &contex
     return arena.Create<GeometricEntity>(geometry, material, mediumInterface);
 
     AGZ_HIERARCHY_WRAP("In creating geometric entity: " + group.ToString())
+}
+
+Entity *TwoSideEntityCreator::Create(const ConfigGroup &group, Context &context, Arena &arena) const
+{
+    AGZ_HIERARCHY_TRY
+
+    auto internalEntity = context.Create<Entity>(group["internal"]);
+    return arena.Create<TwoSideEntity>(internalEntity);
+
+    AGZ_HIERARCHY_WRAP("In creating two side geometry entity: " + group.ToString())
 }
 
 } // namespace Atrc::Mgr
