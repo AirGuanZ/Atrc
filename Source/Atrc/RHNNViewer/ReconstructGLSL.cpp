@@ -16,7 +16,10 @@ const char *RECONSTRUCT_FS_GLSL = R"___(
 #version 450 core
 
 uniform sampler2D mSceneCoefs[9];
+uniform sampler2D mAlbedo;
 uniform vec3      mLightCoefs[9];
+
+uniform int mWithAlbedo;
 
 in vec2 mTexCoord;
 out vec4 oColor;
@@ -29,6 +32,7 @@ void main()
         vec3 sceneCoef = texture(mSceneCoefs[i], mTexCoord).rrr;
         color += mLightCoefs[i] * sceneCoef;
     }
-    oColor = vec4(clamp(1.4 * color, 0, 1), 1);
+    vec3 albedo = mWithAlbedo != 0 ? texture(mAlbedo, mTexCoord).rgb : vec3(1);
+    oColor = vec4(clamp(1.4 * albedo * color, 0, 1), 1);
 }
 )___";

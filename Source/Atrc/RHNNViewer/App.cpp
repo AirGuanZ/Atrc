@@ -4,7 +4,7 @@
 #include <Lib/ImFileBrowser/imfilebrowser.h>
 
 App::App(GLFWwindow *window)
-    : window_(window), autoRotate_(false), rotateDeg_(0)
+    : window_(window), autoRotate_(false), rotateDeg_(0), withAlbedo_(false)
 {
     using namespace AGZ::Input;
 
@@ -60,6 +60,8 @@ App::App(GLFWwindow *window)
         uniformSceneCoefs_[i] = reconstructProg_.GetUniformVariableUnchecked<GL::Texture2DUnit>(("mSceneCoefs[" + si + "]").c_str());
         uniformLightCoefs_[i] = reconstructProg_.GetUniformVariableUnchecked<Vec3f>(("mLightCoefs[" + si + "]").c_str());
     }
+    uniformWithAlbedo_ = reconstructProg_.GetUniformVariable<GLint>("mWithAlbedo");
+    uniformAlbedo_ = reconstructProg_.GetUniformVariable<GL::Texture2DUnit>("mAlbedo");
     VAO_.InitializeHandle();
     VAO_.EnableAttrib(attribScreenPos_);
     VAO_.EnableAttrib(attribTexCoord_);
@@ -114,6 +116,7 @@ void App::ShowReconstructSettings()
                                       | ImGuiFileBrowserFlags_CloseOnEsc;
     static ImGui::FileBrowser sceneCoefFileBrowser(FILE_BROWSER_FLAGS);
     static ImGui::FileBrowser lightCoefFileBrowser(FILE_BROWSER_FLAGS);
+    static ImGui::FileBrowser albedoFileBrowser   (FILE_BROWSER_FLAGS);
 
     if(ImGui::Button("load scene"))
     {
@@ -129,8 +132,17 @@ void App::ShowReconstructSettings()
         lightCoefFileBrowser.Open();
     }
 
+    ImGui::SameLine();
+
+    if(ImGui::Button("load albedo"))
+    {
+        albedoFileBrowser.SetTitle("load albedo");
+        albedoFileBrowser.Open();
+    }
+
     sceneCoefFileBrowser.Display();
     lightCoefFileBrowser.Display();
+    albedoFileBrowser.Display();
 
     if(sceneCoefFileBrowser.HasSelected())
     {
@@ -145,6 +157,26 @@ void App::ShowReconstructSettings()
         lightCoefFileBrowser.ClearSelected();
         LoadLightCoefsFromFile(lightCoefFilename);
     }
+
+    if(albedoFileBrowser.HasSelected())
+    {
+        auto albedoFilename = albedoFileBrowser.GetSelected();
+        albedoFileBrowser.ClearSelected();
+
+        try
+        {
+            auto albedoData = AGZ::TextureFile::LoadRGBFromFile(albedoFilename.string());
+
+            albedo_ = std::make_unique<GL::Texture2D>(true);
+            albedo_->InitializeFormatAndData(1, albedoData.GetWidth(), albedoData.GetHeight(), GL_RGB8, albedoData.RawData());
+        }
+        catch(...)
+        {
+            
+        }
+    }
+
+    ImGui::Checkbox("with albedo", &withAlbedo_); ImGui::SameLine();
 
     ImGui::Checkbox("auto rot", &autoRotate_); ImGui::SameLine();
 
@@ -165,7 +197,7 @@ void App::ShowReconstructSettings()
 void App::LoadSceneCoefsFromFile(const std::filesystem::path &filename)
 {
     std::vector<float> data(SHC * COEFS_SIZE * COEFS_SIZE);
-    auto arr = cnpy::npz_load(filename.string())["coefs"];
+    auto arr = cnpy::npz_load(filename.string()).begin()->second;
 
     if(arr.shape.size() != 3 || arr.shape[0] != COEFS_SIZE || arr.shape[1] != COEFS_SIZE || arr.shape[2] != SHC)
     {
@@ -309,6 +341,15 @@ void App::RenderReconstructedScene()
         uniformSceneCoefs_[i].BindValue({ GLuint(i) });
         reconstructSceneCoefs_[i].Bind(i);
     }
+
+    if(withAlbedo_ && albedo_)
+    {
+        uniformWithAlbedo_.BindValue(1);
+        uniformAlbedo_.BindValue({ GLuint(SHC) });
+        albedo_->Bind(GLuint(SHC));
+    }
+    else
+        uniformWithAlbedo_.BindValue(0);
 
     GL::RenderContext::DrawVertices(GL_TRIANGLES, 0, 6);
 

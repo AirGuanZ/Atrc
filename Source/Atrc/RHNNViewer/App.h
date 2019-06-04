@@ -43,12 +43,17 @@ private:
     GL::AttribVariable<Vec2f> attribTexCoord_;
     GL::UniformVariable<Vec3f> uniformLightCoefs_[SHC];
     GL::UniformVariable<GL::Texture2DUnit> uniformSceneCoefs_[SHC];
+    GL::UniformVariable<GLint> uniformWithAlbedo_;
+    GL::UniformVariable<GL::Texture2DUnit> uniformAlbedo_;
 
     GL::VertexArray VAO_;
 
     GL::VertexBuffer<ReconstructVertex> reconstructVtxBuf_;
     std::unique_ptr<GL::Texture2D[]> reconstructSceneCoefs_;
     std::unique_ptr<Vec3f[]> reconstructLightCoefs_;
+
+    bool withAlbedo_;
+    std::unique_ptr<GL::Texture2D> albedo_;
 
     bool autoRotate_;
     float rotateDeg_;
