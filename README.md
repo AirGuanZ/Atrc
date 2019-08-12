@@ -61,3 +61,7 @@ Glasses:
 Volumetric Rendering (model ref [here](http://casual-effects.com/data/index.html)):
 
 ![4](./gallery/4.png)
+
+Fireplace Room (scene ref [here](http://casual-effects.com/data/index.html)):
+
+![5](./gallery/5.png)

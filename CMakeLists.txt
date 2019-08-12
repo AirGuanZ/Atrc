@@ -6,7 +6,7 @@ ENDIF()
 
 INCLUDE(ExternalProject)
 
-PROJECT(AGZ)
+PROJECT(Atrc)
 
 ############## optional submodules
 
