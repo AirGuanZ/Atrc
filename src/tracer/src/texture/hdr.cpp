@@ -58,7 +58,7 @@ hdr [Texture]
             auto data = img::load_rgb_from_hdr_file(filename);
             if(!data.is_available())
                 throw ObjectConstructionException("failed to load texture from " + filename);
-            AGZ_LOG2("hdr texture loaded from ", filename);
+            AGZ_LOG2("load hdr from ", filename);
 
             filename2tex_[filename] = std::make_unique<texture::texture2d_t<math::color3f>>(std::move(data));
             data_ = filename2tex_[filename].get();

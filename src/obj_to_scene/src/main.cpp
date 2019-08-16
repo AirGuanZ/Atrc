@@ -5,7 +5,9 @@
 
 #include <agz/utility/math.h>
 #include <agz/utility/string.h>
-#include <tiny_obj_loader/tiny_obj_loader.h>
+
+#define TINYOBJLOADER_IMPLEMENTATION
+#include <tiny_obj_loader.h>
 
 namespace fs = std::filesystem;
 using namespace tinyobj;

@@ -71,7 +71,7 @@ namespace mtl_impl
         const Spectrum color_;
         const real ns_;
 
-        Vec3 pow_cos_on_hemisphere(real e, const Sample2 &sam) const noexcept
+        Vec3 sample_pow_cos_on_hemisphere(real e, const Sample2 &sam) const noexcept
         {
             real cos_theta_h = std::pow(sam.u, 1 / (e + 1));
             real sin_theta_h = local_angle::cos_2_sin(cos_theta_h);
@@ -99,7 +99,8 @@ namespace mtl_impl
                 return Spectrum();
 
             Vec3 wh = (in_dir + out_dir).normalize();
-            return color_ * Spectrum(std::pow(wh.z, ns_));
+            real D = (ns_ + 1) / (2 * PI_r) * std::pow(wh.z, ns_);
+            return color_ * D / (4 * in_dir.z * out_dir.z);
         }
 
         real proj_wi_factor(const Vec3 &wi) const noexcept override
@@ -112,17 +113,18 @@ namespace mtl_impl
             if(out_dir.z <= 0)
                 return BSDF_SAMPLE_RESULT_INVALID;
 
-            auto wh = pow_cos_on_hemisphere(ns_, { sam.u, sam.v });
-            Vec3 wi = 2 * dot(out_dir, wh) * wh - out_dir;
+            auto wh = sample_pow_cos_on_hemisphere(ns_, { sam.u, sam.v });
+            Vec3 wi = (2 * dot(out_dir, wh) * wh - out_dir).normalize();
             if(wi.z <= 0)
                 return BSDF_SAMPLE_RESULT_INVALID;
-            
-            real pdf = pow_cos_on_hemisphere_pdf(ns_, wh.z) / (4 * dot(out_dir, wh));
+
+            real D = (ns_ + 1) / (2 * PI_r) * std::pow(wh.z, ns_);
+            real pdf = D / (4 * dot(out_dir, wh));
 
             BSDFSampleResult ret;
-            ret.f              = color_ * std::pow(wh.z, ns_);
+            ret.f              = color_ * D / (4 * wi.z * out_dir.z);
             ret.pdf            = pdf;
-            ret.dir            = wi.normalize();
+            ret.dir            = wi;
             ret.mode           = transport_mode;
             ret.is_delta       = false;
             
@@ -184,6 +186,13 @@ mtl [Material]
         Spectrum kd = kd_->sample_spectrum(inct.uv);
         Spectrum ks = ks_->sample_spectrum(inct.uv);
         real ns     = ns_->sample_real(inct.uv);
+
+        // 保证能量守恒
+        real dem = 1;
+        for(int i = 0; i < 3; ++i)
+            dem = (std::max)(kd[i] + ks[i], dem);
+        kd /= dem;
+        ks /= dem;
 
         auto bsdf     = arena.create<BSDFAggregate<2>>(inct.geometry_coord, inct.user_coord);
         auto diffuse  = arena.create<mtl_impl::DiffuseComponent>(kd);

@@ -109,24 +109,14 @@ thinlens [Camera]
 
     CameraGenerateRayResult generate_ray(const CameraSample &sam) const noexcept override
     {
-        CameraGenerateRayResult ret;
-
         auto uniform_on_disk = math::distribution::uniform_on_unit_disk(sam.aperture_sample.u, sam.aperture_sample.v);
         Vec3 pos_on_sensor = film_left_bottom_ + sam.film_coord.u * x_ori_ + sam.film_coord.v * y_ori_;
         Vec3 pos_on_lens   = lens_centre_ + uniform_on_disk.x * lens_u_ + uniform_on_disk.y * lens_v_;
 
         // TODO
 
-        return ret;
-    }
-
-    CameraSampleRayResult sample(const Vec3 &ref_pos, const Sample2 &sam) const noexcept override
-    {
-        // TODO
         return {};
     }
 };
-
-AGZT_IMPLEMENTATION(Camera, ThinlensCamera, "thinlens")
 
 AGZ_TRACER_END

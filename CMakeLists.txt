@@ -148,28 +148,14 @@ IF(USE_OIDN)
 
 ENDIF()
 
-############## assimp
+############## lua & sol2
 
-#SET(AssImp_VERSION "4.1.0")
-#ExternalProject_Add(
-#	AssImp
-#	PREFIX "${PROJECT_SOURCE_DIR}/lib/assimp"
-#	URL "https://github.com/assimp/assimp/archive/v${AssImp_VERSION}.tar.gz"
-#	CMAKE_ARGS
-#		"-DBUILD_SHARED_LIBS=OFF"
-#		"-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}"
-#		"-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
-#		"-DASSIMP_NO_EXPORT=ON"
-#		"-DASSIMP_BUILD_TESTS=OFF"
-#		"-DASSIMP_INSTALL_PDB=OFF"
-#	INSTALL_COMMAND ""
-#)
+ADD_SUBDIRECTORY(lib/lua)
 
 ############## other submodules
 
 SET(MISC_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/lib/misc/)
 
-ADD_SUBDIRECTORY(lib/tiny_obj_loader)
 ADD_SUBDIRECTORY(lib/utility/src)
 
 ADD_SUBDIRECTORY(src/tracer)

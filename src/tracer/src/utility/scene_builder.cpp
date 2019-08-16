@@ -1,3 +1,4 @@
+#include <agz/tracer/core/aggregate.h>
 #include <agz/tracer/core/camera.h>
 #include <agz/tracer/core/entity.h>
 #include <agz/tracer/core/light.h>
@@ -13,6 +14,8 @@ Scene *SceneBuilder::build(const Config &params, obj::ObjectInitContext &init_ct
     auto scene = SceneFactory.create(params, init_ctx);
     std::vector<Light*> lights;
 
+    std::vector<Entity*> entities;
+
     if(auto ent_arr = params.find_child_array("entities"))
     {
         if(ent_arr->size() == 1)
@@ -27,9 +30,12 @@ Scene *SceneBuilder::build(const Config &params, obj::ObjectInitContext &init_ct
                 continue;
 
             auto entity = EntityFactory.create(group, init_ctx);
-            scene->add_entity(entity);
+            entities.push_back(entity);
             if(auto light = entity->as_light())
+            {
                 lights.push_back(light);
+                scene->add_light(light);
+            }
         }
     }
 
@@ -50,9 +56,12 @@ Scene *SceneBuilder::build(const Config &params, obj::ObjectInitContext &init_ct
                 continue;
 
             auto entity = EntityFactory.create(group, init_ctx);
-            scene->add_entity(entity);
+            entities.push_back(entity);
             if(auto light = entity->as_light())
+            {
+                scene->add_light(light);
                 lights.push_back(light);
+            }
         }
     }
 
@@ -70,13 +79,20 @@ Scene *SceneBuilder::build(const Config &params, obj::ObjectInitContext &init_ct
             throw ObjectConstructionException("'env' must be an light source");
     }
 
-    AGZ_LOG1("creating camera");
-    auto camera = CameraFactory.create(params.child_group("camera"), init_ctx);
-    scene->set_camera(camera);
-
-    AGZ_LOG1("preprocessing light sources");
-    for(auto light : lights)
-        light->preprocess(*scene);
+    AGZ_LOG1("creating entity aggregate");
+    Aggregate *aggregate;
+    if(auto node = params.find_child_group("aggregate"))
+    {
+        aggregate = AggregateFactory.create(*node, init_ctx);
+    }
+    else
+    {
+        Config native_params;
+        native_params.insert_child("type", std::make_shared<ConfigValue>("native"));
+        aggregate = AggregateFactory.create(native_params, init_ctx);
+    }
+    aggregate->build(entities.data(), entities.size());
+    scene->set_aggregate(aggregate);
 
     return scene;
 

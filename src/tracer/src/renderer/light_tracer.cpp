@@ -130,7 +130,7 @@ class LightTracer : public Renderer
             auto bsdf_sample = shd.bsdf->sample(inct.wr, TM_Importance, sampler.sample3());
             if(!bsdf_sample.f || !bsdf_sample.pdf)
                 return;
-            coef *= bsdf_sample.f / bsdf_sample.pdf;
+            coef *= bsdf_sample.f * shd.bsdf->proj_wi_factor(bsdf_sample.dir) / bsdf_sample.pdf;
 
             Vec3 true_nor = inct.geometry_coord.z;
             if(dot(bsdf_sample.dir, inct.geometry_coord.z) < 0)
@@ -267,8 +267,6 @@ light [Renderer]
 
         executor_ = std::make_unique<thread::queue_executer_t<Task>>();
         reporter_ = &reporter;
-
-        scene.start_rendering();
 
         reporter.begin();
         reporter.new_stage();

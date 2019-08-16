@@ -39,14 +39,14 @@ protected:
 
     void init_transform(const Config &params)
     {
-        if(params.find_child("transform"))
-            transform_ = params.child_transform2("transform");
         if(auto node = params.find_child("inv_v"); node && node->as_value().as_int())
-            transform_ = Transform2::translate(0, 1) * Transform2::scale(1, -1) * transform_;
+            transform_ *= Transform2::translate(0, 1) * Transform2::scale(1, -1) * transform_;
         if(auto node = params.find_child("inv_u"); node && node->as_value().as_int())
-            transform_ = Transform2::translate(1, 0) * Transform2::scale(-1, 1) * transform_;
+            transform_ *= Transform2::translate(1, 0) * Transform2::scale(-1, 1) * transform_;
         if(auto node = params.find_child("swap_uv"); node && node->as_value().as_int())
-            transform_ = Transform2(math::tmat3_c<real>(0, 1, 0, 1, 0, 0, 0, 0, 1), math::tmat3_c<real>(0, 1, 0, 1, 0, 0, 0, 0, 1));
+            transform_ *= Transform2(math::tmat3_c<real>(0, 1, 0, 1, 0, 0, 0, 0, 1));
+        if(params.find_child("transform"))
+            transform_ *= params.child_transform2("transform");
 
         if(auto node = params.find_child("wrap_u"))
         {

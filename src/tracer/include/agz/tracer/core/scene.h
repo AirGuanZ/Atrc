@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include <agz/tracer/core/aggregate.h>
 #include <agz/tracer/core/scattering.h>
 #include <agz/tracer/utility/math.h>
 #include <agz/tracer/utility/object.h>
@@ -51,10 +52,13 @@ public:
     virtual const Camera *camera() const noexcept = 0;
 
     /** @brief 在场景中添加一个新的实体 */
-    virtual void add_entity(const Entity *entity) = 0;
+    virtual void add_light(Light *light) = 0;
+
+    /** @brief 设置entity aggregate */
+    virtual void set_aggregate(const Aggregate *aggregate) = 0;
 
     /** @brief 设置环境光源 */
-    virtual void set_env_light(const Entity *env_light) = 0;
+    virtual void set_env_light(Entity *env_light) = 0;
 
     /** @brief 场景中光源的数量 */
     virtual size_t light_count() const noexcept = 0;

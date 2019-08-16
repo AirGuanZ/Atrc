@@ -392,7 +392,6 @@ sppm [Renderer]
 
         // perform pm iterations
 
-        scene.start_rendering();
         reporter.begin();
         reporter.message("iterating");
         reporter.new_stage();

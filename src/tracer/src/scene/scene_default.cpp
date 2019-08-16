@@ -1,3 +1,4 @@
+#include <agz/tracer/core/aggregate.h>
 #include <agz/tracer/core/camera.h>
 #include <agz/tracer/core/entity.h>
 #include <agz/tracer/core/light.h>
@@ -13,10 +14,10 @@ class DefaultScene : public Scene
 {
     const Camera *camera_ = nullptr;
 
-    std::vector<const Light*> lights_;
-    const Entity *env_lht_ent_ = nullptr;
+    std::vector<Light*> lights_;
+    Entity *env_lht_ent_ = nullptr;
 
-    std::vector<const Entity*> entities_;
+    const Aggregate *aggregate_ = nullptr;
     AABB world_bound_;
 
     math::distribution::alias_sampler_t<real, size_t> light_selector_;
@@ -57,7 +58,6 @@ default [Scene]
     void set_camera(const Camera *camera) override
     {
         camera_ = camera;
-        world_bound_ |= camera_->world_bound();
     }
 
     const Camera *camera() const noexcept override
@@ -65,16 +65,12 @@ default [Scene]
         return camera_;
     }
 
-    void add_entity(const Entity *entity) override
+    void add_light(Light *light) override
     {
-        assert(entity);
-        entities_.push_back(entity);
-        world_bound_ |= entity->world_bound();
-        if(auto light = entity->as_light())
-            lights_.push_back(light);
+        lights_.push_back(light);
     }
 
-    void set_env_light(const Entity *env_light) override
+    void set_env_light(Entity *env_light) override
     {
         assert(env_light);
         env_lht_ent_ = env_light;
@@ -82,6 +78,12 @@ default [Scene]
             lights_.push_back(light);
         else
             throw ObjectConstructionException("env_light must be a light source");
+    }
+
+    void set_aggregate(const Aggregate *aggregate) override
+    {
+        assert(aggregate);
+        aggregate_ = aggregate;
     }
 
     size_t light_count() const noexcept override
@@ -126,33 +128,15 @@ default [Scene]
 
     bool has_intersection(const Ray &r) const noexcept override
     {
-        for(auto ent : entities_)
-        {
-            if(ent->has_intersection(r))
-                return true;
-        }
+        if(aggregate_->has_intersection(r))
+            return true;
         return env_lht_ent_ && env_lht_ent_->has_intersection(r);
     }
 
     bool closest_intersection(const Ray &r, EntityIntersection *inct) const noexcept override
     {
-        assert(inct);
-
-        real t_ray = std::numeric_limits<real>::infinity();
-
-        EntityIntersection tmp;
-        for(auto ent : entities_)
-        {
-            if(ent->closest_intersection(r, &tmp) && tmp.t < t_ray)
-            {
-                *inct = tmp;
-                t_ray = tmp.t;
-            }
-        }
-
-        if(!std::isinf(t_ray))
+        if(aggregate_->closest_intersection(r, inct))
             return true;
-
         return env_lht_ent_ && env_lht_ent_->closest_intersection(r, inct);
     }
 
@@ -226,6 +210,13 @@ default [Scene]
 
     void start_rendering() override
     {
+        world_bound_ = AABB();
+        world_bound_ |= aggregate_->world_bound();
+        world_bound_ |= camera_->world_bound();
+
+        for(auto light : lights_)
+            light->preprocess(*this);
+
         construct_light_sampler();
     }
 };

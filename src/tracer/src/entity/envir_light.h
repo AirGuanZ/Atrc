@@ -10,10 +10,12 @@ AGZ_TRACER_BEGIN
 class EnvironmentLightImpl : public InfiniteLightImpl
 {
     const Texture *tex_ = nullptr;
+    Vec3 up_ = Vec3(0, 0, 1);
 
     Spectrum radiance(const Vec3 &ref_to_light) const noexcept
     {
-        Vec3 dir = ref_to_light.normalize();
+        Vec3 dir = Coord::from_z(up_).global_to_local(ref_to_light).normalize();
+        //Vec3 dir = ref_to_light.normalize();
         real phi = local_angle::phi(dir);
         real theta = local_angle::theta(dir);
         real u = math::clamp<real>(phi / (2 * PI_r), 0, 1);
@@ -28,6 +30,7 @@ public:
         return R"___(
 env [(Nonarea)Light]
     tex [Spectrum] environment texture
+    up  [Vec3]     (optional; defaultly set to +z) up directory
 )___";
     }
 
@@ -36,6 +39,8 @@ env [(Nonarea)Light]
         AGZ_HIERARCHY_TRY
 
         tex_ = TextureFactory.create(params.child_group("tex"), init_ctx);
+        if(params.find_child("up"))
+            up_ = params.child_vec3("up");
 
         AGZ_HIERARCHY_WRAP("in initializing native sky light")
     }

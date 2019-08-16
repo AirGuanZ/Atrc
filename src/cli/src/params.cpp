@@ -2,6 +2,7 @@
 
 #include <agz/cli/cli.h>
 
+#include <agz/tracer/core/aggregate.h>
 #include <agz/tracer/core/camera.h>
 #include <agz/tracer/core/entity.h>
 #include <agz/tracer/core/film_filter.h>
@@ -54,6 +55,7 @@ std::optional<Params> parse_opts(int argc, char *argv[])
     if(parse_result.count("list"))
     {
         using namespace agz::tracer;
+        print_object_params("EntityAggregate",             AggregateFactory);                   std::cout << std::endl;
         print_object_params("Camera",                      CameraFactory);                      std::cout << std::endl;
         print_object_params("Entity",                      EntityFactory);                      std::cout << std::endl;
         print_object_params("FilmFilter",                  FilmFilterFactory);                  std::cout << std::endl;

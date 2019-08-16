@@ -7,7 +7,6 @@
 
 #include "../material/ideal_black.h"
 #include "./medium_interface.h"
-#include <rpc.h>
 
 AGZ_TRACER_BEGIN
 

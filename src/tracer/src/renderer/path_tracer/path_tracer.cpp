@@ -159,8 +159,6 @@ pt [Renderer]
         executer_ = std::make_unique<thread::queue_executer_t<Grid>>();
         reporter_ = &reporter;
 
-        scene.start_rendering();
-
         reporter.begin();
         reporter.new_stage();
 

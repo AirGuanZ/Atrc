@@ -306,7 +306,6 @@ guided_pt [Renderer]
         reporter_          = &reporter;
         film_              = film;
 
-        scene_->start_rendering();
         reporter_->begin();
 
         scheduler_thread_ = std::thread(async_scheduler, this);

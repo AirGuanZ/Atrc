@@ -23,8 +23,7 @@ public:
      * @brief 找到给定射线与该几何体最近的交点
      * 
      * @param r 射线
-     * @param inct 交点信息，其每个成员有效当且仅当返回值为true
-     * @param t 输出交点处的射线参数
+     * @param inct 交点信息，其每个成员有效当且仅当返回值为true；若返回false，则inct必然未被修改
      * 
      * @return 存在交点时返回true，否则返回false
      */

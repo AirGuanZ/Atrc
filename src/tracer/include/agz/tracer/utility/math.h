@@ -204,6 +204,28 @@ public:
                low.y <= pnt.y && pnt.y <= high.y &&
                low.z <= pnt.z && pnt.z <= high.z;
     }
+
+    /** @brief 是否同某条参数射线有交点 */
+    bool intersect(const Vec3 &ori, const Vec3 &inv_dir, real t_min, real t_max) const noexcept
+    {
+        real nx = inv_dir[0] * (low[0] - ori[0]);
+        real ny = inv_dir[1] * (low[1] - ori[1]);
+        real nz = inv_dir[2] * (low[2] - ori[2]);
+
+        real fx = inv_dir[0] * (high[0] - ori[0]);
+        real fy = inv_dir[1] * (high[1] - ori[1]);
+        real fz = inv_dir[2] * (high[2] - ori[2]);
+
+        t_min = (std::max)(t_min, (std::min)(nx, fx));
+        t_min = (std::max)(t_min, (std::min)(ny, fy));
+        t_min = (std::max)(t_min, (std::min)(nz, fz));
+
+        t_max = (std::min)(t_max, (std::max)(nx, fx));
+        t_max = (std::min)(t_max, (std::max)(ny, fy));
+        t_max = (std::min)(t_max, (std::max)(nz, fz));
+
+        return t_min <= t_max;
+    }
 };
 
 /** @beif 求两个包围盒的并 */

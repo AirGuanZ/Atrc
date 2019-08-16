@@ -3,7 +3,9 @@
 #include <agz/utility/string.h>
 
 #include <stl_reader.h>
-#include <tiny_obj_loader/tiny_obj_loader.h>
+
+#define TINYOBJLOADER_IMPLEMENTATION
+#include <tiny_obj_loader.h>
 
 #include "./loader.h"
 
@@ -102,7 +104,7 @@ static std::vector<Triangle> load_obj(const std::string &filename)
     if(has_invalid_normal)
         AGZ_LOG1("invalid normal value found");
 
-    AGZ_LOG2("wavefront obj loaded from ", filename);
+    AGZ_LOG2("load obj from ", filename);
     AGZ_LOG2("triangle count: ", build_triangles.size());
 
     return build_triangles;
@@ -134,7 +136,7 @@ static std::vector<Triangle> load_stl(const std::string &filename)
         ret.push_back(tri);
     }
 
-    AGZ_LOG2("stl mesh loaded from ", filename);
+    AGZ_LOG2("load stl from ", filename);
     AGZ_LOG2("triangle count: ", ret.size());
 
     return ret;
