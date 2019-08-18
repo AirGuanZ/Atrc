@@ -4,9 +4,9 @@
 #include <memory>
 #include <type_traits>
 
-#include <agz/tracer/common.h>
-#include <agz/tracer/utility/config.h>
-#include <agz/tracer/utility/path_manager.h>
+#include <agz/tracer_utility/common.h>
+#include <agz/tracer_utility/config.h>
+#include <agz/tracer_utility/path_manager.h>
 #include <agz/utility/misc.h>
 #include <agz/utility/string.h>
 

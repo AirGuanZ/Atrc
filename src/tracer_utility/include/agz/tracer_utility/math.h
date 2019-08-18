@@ -2,7 +2,7 @@
 
 #include <limits>
 
-#include <agz/tracer/common.h>
+#include <agz/tracer_utility/common.h>
 #include <agz/utility/math.h>
 
 AGZ_TRACER_BEGIN

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <agz/tracer/core/medium.h>
-#include <agz/tracer/utility/config.h>
+#include <agz/tracer_utility/config.h>
 #include "../medium/medium_void.h"
 
 AGZ_TRACER_BEGIN

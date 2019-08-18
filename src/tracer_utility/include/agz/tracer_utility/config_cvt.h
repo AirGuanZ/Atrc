@@ -2,7 +2,7 @@
 
 #include <json.hpp>
 
-#include <agz/tracer/utility/config.h>
+#include <agz/tracer_utility/config.h>
 
 namespace agz::tracer
 {

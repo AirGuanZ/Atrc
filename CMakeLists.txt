@@ -10,9 +10,10 @@ PROJECT(Atrc)
 
 ############## optional submodules
 
-OPTION(USE_EMBREE "use embree for finding triangle mesh intersection" OFF)
-OPTION(USE_BCD    "use bcd denoiser"                                  OFF)
-OPTION(USE_OIDN   "use oidn denoiser"                                 OFF)
+OPTION(USE_EMBREE     "use embree for finding triangle mesh intersection" OFF)
+OPTION(USE_BCD        "use bcd denoiser"                                  OFF)
+OPTION(USE_OIDN       "use oidn denoiser"                                 OFF)
+OPTION(LUA_ENABLE_JIT "use luajit instead of lua"                         OFF)
 
 ############## CXX properties
 
@@ -30,9 +31,11 @@ ENDIF()
 IF("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ -pthread")
     SET(STDFS_LD_LIB "c++fs")
+    SET(CMAKE_EXE_LINKER_FLAGS "-ldl")
 ELSEIF("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
     SET(STDFS_LD_LIB "stdc++fs")
+	MESSAGE(WARNING "g++ configuration is untested")
 ENDIF()
 
 ############## embree
@@ -148,9 +151,19 @@ IF(USE_OIDN)
 
 ENDIF()
 
-############## lua & sol2
+############## lua
 
-ADD_SUBDIRECTORY(lib/lua)
+IF(LUA_ENABLE_JIT)
+	SET(LUA_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/lib/luajit/include)
+	IF(MSVC)
+		SET(LUA_LIBRARIES ${PROJECT_SOURCE_DIR}/lib/luajit/lua51.lib)
+	ELSE()
+		SET(LUA_LIBRARIES ${PROJECT_SOURCE_DIR}/lib/luajit/lua.a)
+	ENDIF()
+ELSE()
+	ADD_SUBDIRECTORY(lib/lua)
+	SET(LUA_LIBRARIES Lua)
+ENDIF()
 
 ############## other submodules
 
@@ -158,6 +171,9 @@ SET(MISC_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/lib/misc/)
 
 ADD_SUBDIRECTORY(lib/utility/src)
 
+ADD_SUBDIRECTORY(src/tracer_utility)
 ADD_SUBDIRECTORY(src/tracer)
+ADD_SUBDIRECTORY(src/tracer_cshader)
+ADD_SUBDIRECTORY(src/c_materials/ideal_diffuse)
 ADD_SUBDIRECTORY(src/cli)
 ADD_SUBDIRECTORY(src/obj_to_scene)

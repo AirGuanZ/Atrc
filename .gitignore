@@ -3,4 +3,6 @@ build/
 asset/
 lib/embree3/
 lib/eigen3/
-lib/oidn
+lib/oidn/
+lib/luajit/
+nohup.out

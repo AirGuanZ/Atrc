@@ -3,8 +3,8 @@
 #include <mutex>
 
 #include <agz/tracer/core/gbuffer.h>
-#include <agz/tracer/utility/math.h>
-#include <agz/tracer/utility/object.h>
+#include <agz/tracer_utility/math.h>
+#include <agz/tracer_utility/object.h>
 #include <agz/utility/texture.h>
 
 AGZ_TRACER_BEGIN

@@ -16,8 +16,6 @@ public:
 
     /**
      * @brief 采样scene中沿-r.d的radiance
-     * 
-     * 返回的第二个分量表示是否击中了任何物体
      */
     virtual Spectrum eval(GBufferPixel *gpixel, const Scene &scene, const Ray &r, Sampler &sampler, Arena &arena) const = 0;
 };

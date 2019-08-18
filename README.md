@@ -22,6 +22,7 @@ Dependencies:
 * cmake (>= 3.10)
 * MSVC/clang++ with c++17 support
 * (optional) [Intel(R) Open Image Denoise library](https://github.com/OpenImageDenoise/oidn) (required when -DUSE_OIDN=ON)
+* (optional) luajit (required when -DLUA_ENABLE_JIT=ON)
 
 Other dependencies will be automatically downloaded during building.
 
@@ -62,6 +63,6 @@ Volumetric Rendering (model ref [here](http://casual-effects.com/data/index.html
 
 ![4](./gallery/4.png)
 
-Fireplace Room (scene ref [here](http://casual-effects.com/data/index.html)):
+Living Room (scene ref [here](http://casual-effects.com/data/index.html)):
 
 ![5](./gallery/5.png)

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <agz/tracer/utility/math.h>
+#include <agz/tracer_utility/math.h>
 #include <agz/utility/texture.h>
 
 AGZ_TRACER_BEGIN

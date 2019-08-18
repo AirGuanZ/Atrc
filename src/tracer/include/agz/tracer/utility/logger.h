@@ -5,7 +5,7 @@
 #include <sstream>
 #include <string_view>
 
-#include <agz/tracer/common.h>
+#include <agz/tracer_utility/common.h>
 
 AGZ_TRACER_BEGIN
 

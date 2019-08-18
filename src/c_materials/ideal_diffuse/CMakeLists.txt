@@ -1,0 +1,23 @@
+CMAKE_MINIMUM_REQUIRED(VERSION 3.10)
+
+PROJECT(Material_IdealDiffuse)
+
+SET(SRC ${TRACER_CSHADER_SRC} ${PROJECT_SOURCE_DIR}/ideal_diffuse.cpp)
+
+ADD_LIBRARY(IdealDiffuse SHARED ${SRC})
+
+SET_PROPERTY(TARGET IdealDiffuse PROPERTY FOLDER material_plugins)
+
+FOREACH(_SRC IN ITEMS ${SRC})
+    GET_FILENAME_COMPONENT(SRC "${_SRC}" PATH)
+    STRING(REPLACE "${TRACER_CSHADER_PROJECT_DIR}/include/agz/tracer_cshader" "tracer_cshader/include" _GRP_PATH "${SRC}")
+    STRING(REPLACE "${TRACER_CSHADER_PROJECT_DIR}/src" "tracer_cshader/src" _GRP_PATH "${_GRP_PATH}")
+    STRING(REPLACE "${Tracer_UTILITY_PROJECT_DIR}/include/agz/tracer_utility" "tracer_utility/include" _GRP_PATH "${_GRP_PATH}")
+    STRING(REPLACE "${Tracer_UTILITY_PROJECT_DIR}/src" "tracer_utility/src" _GRP_PATH "${_GRP_PATH}")
+    STRING(REPLACE "${PROJECT_SOURCE_DIR}" "src" _GRP_PATH "${_GRP_PATH}")
+    STRING(REPLACE "/" "\\" _GRP_PATH "${_GRP_PATH}")
+    SOURCE_GROUP("${_GRP_PATH}" FILES "${_SRC}")
+ENDFOREACH()
+
+TARGET_INCLUDE_DIRECTORIES(IdealDiffuse PRIVATE ${TRACER_CSHADER_INCLUDE_DIRS})
+TARGET_LINK_LIBRARIES(IdealDiffuse ${TRACER_CSHADER_LIBRARIES})

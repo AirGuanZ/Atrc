@@ -4,7 +4,7 @@
 
 #include <embree3/rtcore_device.h>
 
-#include <agz/tracer/common.h>
+#include <agz/tracer_utility/common.h>
 
 AGZ_TRACER_BEGIN
 

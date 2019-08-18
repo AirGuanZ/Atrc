@@ -3,8 +3,8 @@
 #include <stack>
 #include <vector>
 
-#include <agz/tracer/utility/path_manager.h>
 #include <agz/tracer/utility/triangle_aux.h>
+#include <agz/tracer_utility/path_manager.h>
 #include <agz/utility/math/math.h>
 
 #include "mesh_loader/loader.h"

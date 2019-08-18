@@ -1,6 +1,6 @@
 #include <string>
 
-#include <agz/tracer/utility/config.h>
+#include <agz/tracer_utility/config.h>
 #include <agz/utility/misc.h>
 #include <agz/utility/string.h>
 

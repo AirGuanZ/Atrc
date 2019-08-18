@@ -1,7 +1,7 @@
 #include <agz/tracer/core/bsdf.h>
 #include <agz/tracer/core/material.h>
 #include <agz/tracer/core/texture.h>
-#include <agz/tracer/utility/math.h>
+#include <agz/tracer_utility/math.h>
 
 #include "./microfacet.h"
 

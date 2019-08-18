@@ -2,8 +2,8 @@
 
 #include <agz/tracer/core/aggregate.h>
 #include <agz/tracer/core/scattering.h>
-#include <agz/tracer/utility/math.h>
-#include <agz/tracer/utility/object.h>
+#include <agz/tracer_utility/math.h>
+#include <agz/tracer_utility/object.h>
 
 AGZ_TRACER_BEGIN
 

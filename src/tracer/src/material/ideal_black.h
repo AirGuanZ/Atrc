@@ -61,8 +61,14 @@ public:
     ShadingPoint shade(const EntityIntersection &inct, Arena&) const override
     {
         ShadingPoint shd;
-        shd.bsdf      = &bsdf_;
+        shd.bsdf = IDEAL_BLACK_BSDF_INSTANCE();
         return shd;
+    }
+
+    static const BSDF *IDEAL_BLACK_BSDF_INSTANCE()
+    {
+        static const IdealBlackBSDF bsdf;
+        return &bsdf;
     }
 
     static const IdealBlack &IDEAL_BLACK_INSTANCE()

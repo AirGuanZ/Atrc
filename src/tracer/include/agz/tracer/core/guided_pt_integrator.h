@@ -2,7 +2,7 @@
 
 #include <agz/tracer/core/scene.h>
 #include <agz/tracer/core/sampler.h>
-#include <agz/tracer/utility/object.h>
+#include <agz/tracer_utility/object.h>
 
 AGZ_TRACER_BEGIN
 

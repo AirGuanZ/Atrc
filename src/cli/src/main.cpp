@@ -10,9 +10,9 @@
 #include <agz/tracer/core/renderer.h>
 #include <agz/tracer/core/reporter.h>
 #include <agz/tracer/core/sampler.h>
-#include <agz/tracer/utility/config_cvt.h>
 #include <agz/tracer/utility/logger.h>
 #include <agz/tracer/utility/scene_builder.h>
+#include <agz/tracer_utility/config_cvt.h>
 #include <agz/utility/image.h>
 #include <agz/utility/misc.h>
 

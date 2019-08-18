@@ -2,7 +2,7 @@
 
 #include <optional>
 
-#include <agz/tracer/utility/math.h>
+#include <agz/tracer_utility/math.h>
 
 AGZ_TRACER_BEGIN
 

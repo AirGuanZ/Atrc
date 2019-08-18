@@ -4,7 +4,7 @@
 #include <agz/tracer/core/intersection.h>
 #include <agz/tracer/core/material.h>
 #include <agz/tracer/core/medium.h>
-#include <agz/tracer/utility/math.h>
+#include <agz/tracer_utility/math.h>
 #include <agz/utility/misc.h>
 
 AGZ_TRACER_BEGIN

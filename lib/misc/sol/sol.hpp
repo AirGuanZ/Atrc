@@ -19686,7 +19686,7 @@ namespace sol {
 
 			template <typename Iter>
 			static detail::error_result set_associative_insert(std::false_type, lua_State*, T& self, Iter& it, K& key, stack_object) {
-				if constexpr(has_insert<T>::value) {
+				if constexpr(meta::has_insert<T>::value) {
 					self.insert(it, key);
 					return {};
 				}

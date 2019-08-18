@@ -1,10 +1,11 @@
 ﻿#pragma once
 
-#include <agz/tracer/utility/math.h>
+#include <agz/tracer_utility/math.h>
 
 extern "C"
 {
 #include <lua.h>
+#include <lualib.h>
 #include <lauxlib.h>
 }
 
@@ -14,17 +15,44 @@ AGZ_TRACER_BEGIN
 
 namespace lua
 {
-    
-/** @brief Vec3 -> table{ x, y, z } */
-inline sol::table to_table(sol::state &state, const Vec3 &vec)
+
+inline sol::table to_table(sol::state &state, const ConfigGroup &group);
+
+/**
+ * @brief 将ConfigArray转为lua table
+ */
+inline sol::table to_table(sol::state &state, const ConfigArray &arr)
 {
-    return state.create_table_with("x", vec.x, "y", vec.y, "z", vec.z);
+    auto ret = state.create_table();
+    for(size_t i = 0; i < arr.size(); ++i)
+    {
+        auto &right = arr.at(i);
+        if(right.is_group())
+            ret[i] = to_table(state, right.as_group());
+        else if(right.is_array())
+            ret[i] = to_table(state, right.as_array());
+        else
+            ret[i] = right.as_value().as_str();
+    }
+    return ret;
 }
 
-/** @brief Sample3 -> table{ u, v, w } */
-inline sol::table to_table(sol::state &state, const Sample3 &sam)
+/**
+ * @brief 将ConfigGroup转为lua table
+ */
+inline sol::table to_table(sol::state &state, const ConfigGroup &group)
 {
-    return state.create_table_with("u", sam.u, "v", sam.v, "w", sam.w);
+    auto ret = state.create_table();
+    for(auto &p : group)
+    {
+        if(p.second->is_group())
+            ret[p.first] = to_table(state, p.second->as_group());
+        else if(p.second->is_array())
+            ret[p.first] = to_table(state, p.second->as_array());
+        else
+            ret[p.first] = p.second->as_value().as_str();
+    }
+    return ret;
 }
 
 /** @brief table{ x, y, z } -> Vec3 */

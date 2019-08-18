@@ -2,7 +2,7 @@
 
 #include <atomic>
 
-#include <agz/tracer/utility/math.h>
+#include <agz/tracer_utility/math.h>
 #include <agz/utility/alloc.h>
 #include <agz/utility/misc.h>
 

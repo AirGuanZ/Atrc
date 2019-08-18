@@ -5,8 +5,8 @@
 
 #include <agz/tracer/core/intersection.h>
 #include <agz/tracer/utility/embree.h>
-#include <agz/tracer/utility/math.h>
 #include <agz/tracer/utility/triangle_aux.h>
+#include <agz/tracer_utility/math.h>
 #include <agz/utility/math.h>
 #include <agz/utility/misc.h>
 
