@@ -67,6 +67,21 @@ hdr [Texture]
 
         AGZ_HIERARCHY_WRAP("in initializing hdr texture object")
     }
+
+    int width() const noexcept override
+    {
+        return data_->width();
+    }
+
+    int height() const noexcept override
+    {
+        return data_->height();
+    }
+
+    Spectrum fetch_spectrum(int x, int y) const noexcept override
+    {
+        return data_->at(y, x);
+    }
 };
 
 AGZT_IMPLEMENTATION(Texture, HDRTexture, "hdr")

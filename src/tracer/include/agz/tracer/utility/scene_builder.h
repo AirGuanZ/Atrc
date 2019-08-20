@@ -19,7 +19,6 @@ public:
      * entities(optional)       由描述Entity的ConfigGroup构成的ConfigArray
      * named_entities(optional) 由(entity_name_string, entity ConfigGroup)构成的ConfigGroup
      * env(optional)            环境光源，包裹整个场景的光源，实际为实体类型
-     * camera                   描述摄像机的ConfigGroup
      */
     static Scene *build(const Config &params, obj::ObjectInitContext &context);
 };

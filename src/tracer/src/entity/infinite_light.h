@@ -15,7 +15,7 @@ class InfiniteLightImplToLight : public Light
 {
     static_assert(std::is_base_of_v<InfiniteLightImpl, Impl>);
     InfiniteLightCore core_;
-    Impl *impl_;
+    Impl *impl_ = nullptr;
 
     MediumInterface medium_interface_;
 
@@ -40,6 +40,8 @@ public:
 
     LightSampleResult sample(const Vec3 &ref, const Sample5 &sam) const noexcept override
     {
+        if(!core_.in_scene(ref))
+            return LIGHT_SAMPLE_RESULT_NULL;
         return impl_->sample(core_, ref, { sam.u, sam.v, sam.w, sam.r });
     }
 
@@ -60,6 +62,8 @@ public:
 
     real pdf(const Vec3 &ref, const SurfacePoint &spt) const noexcept override
     {
+        if(!core_.in_scene(ref))
+            return 0;
         Vec3 ref_to_light = spt.pos - ref;
         return impl_->pdf(core_, ref, ref_to_light);
     }
@@ -159,6 +163,9 @@ aggregate [(Nonarea)Light]
 
     LightSampleResult sample(const Vec3 &ref, const Sample5 &sam) const noexcept override
     {
+        if(!core_.in_scene(ref))
+            return LIGHT_SAMPLE_RESULT_NULL;
+
         size_t impl_idx = impl_sampler_.sample(sam.u);
         real impl_prob = impl_probs_[impl_idx];
 
@@ -201,6 +208,9 @@ aggregate [(Nonarea)Light]
 
     real pdf(const Vec3 &ref, const SurfacePoint &spt) const noexcept override
     {
+        if(!core_.in_scene(ref))
+            return 0;
+
         real ret = 0;
         Vec3 ref_to_light = (spt.pos - ref).normalize();
         for(size_t i = 0; i < impls_.size(); ++i)

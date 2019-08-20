@@ -55,16 +55,16 @@ namespace
                    real clearcoat,
                    real clearcoat_gloss) noexcept
             : LocalBSDF(geometry_coord, shading_coord),
-              base_color_     (base_color),
-              metallic_       (metallic),
-              subsurface_     (subsurface),
-              specular_       (specular),
-              specular_tint_  (specular_tint),
-              roughness_      (roughness),
-              anisotropic_    (anisotropic),
-              sheen_          (sheen),
-              sheen_tint_     (sheen_tint),
-              clearcoat_      (clearcoat)
+              base_color_   (base_color),
+              metallic_     (metallic),
+              subsurface_   (subsurface),
+              specular_     (specular),
+              specular_tint_(specular_tint),
+              roughness_    (roughness),
+              anisotropic_  (anisotropic),
+              sheen_        (sheen),
+              sheen_tint_   (sheen_tint),
+              clearcoat_    (clearcoat)
         {
             real aspect = anisotropic_ > 0 ? std::sqrt(1 - real(0.9) * anisotropic) : real(1);
             ax_ = roughness * roughness / aspect;

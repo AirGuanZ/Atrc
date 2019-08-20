@@ -26,8 +26,6 @@ public:
 native [Sampler]
     seed [int] (optional) rng seed (defautly generated with std::time)
     spp  [int] samples per pixel
-    min_spp [int] minimum spp before enabling prestop
-    stop_noinct_ratio [real] prestop threshold
 )___";
     }
 

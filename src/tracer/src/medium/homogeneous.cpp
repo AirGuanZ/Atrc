@@ -23,7 +23,7 @@ public:
 homogeneous [Medium]
     sigma_a [Spectrum] absorbtion
     sigma_s [Spectrum] scattering
-    g       [real]     e asymmetry
+    g       [real]     asymmetry
 )___";
     }
 

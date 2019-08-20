@@ -36,6 +36,26 @@ scaler [Texture]
     {
         return scale_ * internal_->sample_spectrum(uv);
     }
+
+    int width() const noexcept override
+    {
+        return internal_->width();
+    }
+
+    int height() const noexcept override
+    {
+        return internal_->height();
+    }
+
+    Spectrum fetch_spectrum(int x, int y) const noexcept override
+    {
+        return scale_ * internal_->fetch_spectrum(x, y);
+    }
+
+    real fetch_real(int x, int y) const noexcept override
+    {
+        return (scale_ * internal_->fetch_real(x, y)).lum();
+    }
 };
 
 AGZT_IMPLEMENTATION(Texture, TextureScaler, "scale")

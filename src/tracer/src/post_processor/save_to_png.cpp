@@ -22,7 +22,7 @@ save_to_png [PostProcessor]
     filename [string] saving destination
     open     [0/1] (optional) open saved file with default application (defaultly 1)
     gamma     [real] (optional) gamma value
-    inv_gamma [real] (required only when 'gamma' is not specified) 1 / gamma value
+    inv_gamma [real] (optional) 1 / gamma value
 )___";
     }
 

@@ -103,23 +103,28 @@ struct AGZTConfigNode
     };
 };
 
-// 以下函数是TracerCShader要实现的
-// Tracer通过动态库中的它们来和shader插件交互
-
-typedef int32_t AGZTTextureHandle;
+// Tracer通过以下函数来和shader插件交互
 
 typedef void* AGZT_COperationHandler;
 
-typedef AGZTTextureHandle(*AGZT_CreateTexture_FuncPtr)(AGZT_COperationHandler handler, const AGZTConfigGroup*);
-typedef agzt_real(*AGZT_SampleTextureReal_FuncPtr)(AGZT_COperationHandler handler, AGZTTextureHandle, const AGZTVec2*);
-typedef AGZTSpectrum(*AGZT_SampleTextureSpectrum_FuncPtr)(AGZT_COperationHandler handler, AGZTTextureHandle, const AGZTVec2*);
+typedef int32_t AGZTTextureHandle;
+
+typedef AGZTTextureHandle(*AGZT_CreateTexture_FuncPtr)        (AGZT_COperationHandler handler, const AGZTConfigGroup*);
+typedef agzt_real        (*AGZT_SampleTextureReal_FuncPtr)    (AGZT_COperationHandler handler, AGZTTextureHandle, const AGZTVec2*);
+typedef AGZTSpectrum     (*AGZT_SampleTextureSpectrum_FuncPtr)(AGZT_COperationHandler handler, AGZTTextureHandle, const AGZTVec2*);
 
 // 2通过C接口能让1做的事情
 struct AGZT_COperations
 {
     AGZT_COperationHandler operation_handler;
-    AGZT_CreateTexture_FuncPtr         create_texture;
-    AGZT_SampleTextureReal_FuncPtr     sample_real;
+
+    // 创建一个纹理对象，返回其句柄
+    AGZT_CreateTexture_FuncPtr create_texture;
+    
+    // 采样指定的纹理对象，得到一个浮点数
+    AGZT_SampleTextureReal_FuncPtr sample_real;
+    
+    // 采样指定的纹理对象，得到一个spectrum
     AGZT_SampleTextureSpectrum_FuncPtr sample_spectrum;
 };
 
@@ -141,7 +146,7 @@ typedef void(*AGZT_DestroyBSDF_FuncPtr)(AGZT_BSDFHandle bsdf_handle);
 // global function "bsdf_eval"
 typedef AGZTSpectrum(*AGZT_BSDF_Eval_FuncPtr)(AGZT_BSDFHandle bsdf_handle, const AGZTVec3 *wi, const AGZTVec3 *wo, bool is_importance);
 
-// global function "bsdf_wi_proj_factor"
+// global function "bsdf_proj_wi_factor"
 typedef agzt_real(*AGZT_BSDF_ProjWiFactor_FuncPtr)(AGZT_BSDFHandle bsdf_handle, const AGZTVec3 *wi);
 
 // global function "bsdf_sample"

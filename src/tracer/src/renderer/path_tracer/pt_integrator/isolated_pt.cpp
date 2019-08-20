@@ -115,7 +115,7 @@ isolated [PathTracingIntegrator]
                 return {};
 
             bool is_trans = (dot(inct.wr, inct.geometry_coord.z) > 0) != (dot(bsdf_sample.dir, inct.geometry_coord.z) > 0);
-            if(/*!bsdf_sample.is_delta && */!is_trans)
+            if(!is_trans)
                 background = false;
 
             coef *= bsdf_sample.f * shd.bsdf->proj_wi_factor(bsdf_sample.dir) / bsdf_sample.pdf;

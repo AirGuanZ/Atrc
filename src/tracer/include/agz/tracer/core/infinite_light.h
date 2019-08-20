@@ -22,6 +22,7 @@ class InfiniteLightCore
 {
     real radius_ = 1;
     Vec3 centre_;
+    const Scene *scene_;
 
     Ray to_local(const Ray &r) const noexcept
     {
@@ -36,19 +37,24 @@ public:
         real diag_len = (high - low).length();
         radius_ = real(1.1) * diag_len / 2;
         centre_ = real(0.5) * (low + high);
+
+        scene_ = &scene;
+    }
+
+    bool in_scene(const Vec3 &pos) const noexcept
+    {
+        return scene_->world_bound().contains(pos);
     }
 
     bool has_intersection(const Ray &r) const
     {
         Ray local_r = to_local(r);
-        assert(local_r.o.length() < radius_);
         return sphere::has_intersection(local_r, radius_);
     }
 
     bool intersection(const Ray &r, GeometryIntersection *inct) const
     {
         Ray local_r = to_local(r);
-        assert(local_r.o.length() < radius_);
 
         real t;
         if(!sphere::closest_intersection(local_r, &t, radius_))

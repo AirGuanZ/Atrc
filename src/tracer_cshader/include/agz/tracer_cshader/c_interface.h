@@ -67,6 +67,7 @@ public:
     virtual CShaderBSDF *shade(const Intersection &inct) const = 0;
 };
 
+// 用户通过实现该函数来实现材质
 CShaderMaterial *new_material();
 
 AGZ_TRACER_END

@@ -89,7 +89,7 @@ mis [PathTracingIntegrator]
                 gpixel->depth    = r.d.length() * inct.t;
                 gpixel->normal   = inct.user_coord.z;
             }
-            
+
             if(sample_all_lights_)
             {
                 for(size_t j = 0; j < scene.light_count(); ++j)

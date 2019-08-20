@@ -19,7 +19,7 @@ class DefaultScene : public Scene
 
     const Aggregate *aggregate_ = nullptr;
     AABB world_bound_;
-
+    
     math::distribution::alias_sampler_t<real, size_t> light_selector_;
     std::vector<real> light_pdf_table_;
 
@@ -213,6 +213,11 @@ default [Scene]
         world_bound_ = AABB();
         world_bound_ |= aggregate_->world_bound();
         world_bound_ |= camera_->world_bound();
+
+        // 避免数值问题导致某些场景中的点不在world bound中
+        Vec3 delta = world_bound_.high - world_bound_.low;
+        world_bound_.low  -= real(0.02) * delta;
+        world_bound_.high += real(0.02) * delta;
 
         for(auto light : lights_)
             light->preprocess(*this);

@@ -57,6 +57,21 @@ checker_board [Texture]
 
         AGZ_HIERARCHY_WRAP("in initializing checker_board texture object")
     }
+
+    int width() const noexcept override
+    {
+        return 1;
+    }
+
+    int height() const noexcept override
+    {
+        return 1;
+    }
+
+    Spectrum fetch_spectrum(int x, int y) const noexcept override
+    {
+        return real(0.5) * (color_1_ + color_2_);
+    }
 };
 
 AGZT_IMPLEMENTATION(Texture, CheckerBoard, "checker_board")

@@ -34,6 +34,21 @@ constant [Texture]
 
         AGZ_HIERARCHY_WRAP("in initializing constant texture")
     }
+
+    int width() const noexcept override
+    {
+        return 1;
+    }
+
+    int height() const noexcept override
+    {
+        return 1;
+    }
+
+    Spectrum fetch_spectrum(int x, int y) const noexcept override
+    {
+        return texel_;
+    }
 };
 
 class StaticConstantTexture : public Texture
@@ -47,7 +62,7 @@ class StaticConstantTexture : public Texture
 
 public:
 
-    StaticConstantTexture(const Spectrum &texel) noexcept
+    explicit StaticConstantTexture(const Spectrum &texel) noexcept
         : texel_(texel)
     {
         
@@ -60,6 +75,21 @@ public:
         init_transform(params);
 
         AGZ_HIERARCHY_WRAP("in initializing static constant texture")
+    }
+
+    int width() const noexcept override
+    {
+        return 1;
+    }
+
+    int height() const noexcept override
+    {
+        return 1;
+    }
+
+    Spectrum fetch_spectrum(int x, int y) const noexcept override
+    {
+        return texel_;
     }
 };
 

@@ -15,54 +15,32 @@ Offline rendering lab based on ray tracing
 - [x] (optional) integrated [OIDN](https://github.com/OpenImageDenoise/oidn) denoiser
 - [ ] bidirectional path tracing
 
-## Build
+## Documentation
 
-Dependencies:
-
-* cmake (>= 3.10)
-* MSVC/clang++ with c++17 support
-* (optional) [Intel(R) Open Image Denoise library](https://github.com/OpenImageDenoise/oidn) (required when -DUSE_OIDN=ON)
-* (optional) luajit (required when -DLUA_ENABLE_JIT=ON)
-
-Other dependencies will be automatically downloaded during building.
-
-```shell
-git clone --recursive https://github.com/AirGuanZ/Atrc
-cd Atrc
-mkdir build
-cd build
-cmake ..
-```
-
-CMake options:
-
-* `-DUSE_EMBREE=ON/OFF` (defaultly set to OFF)
-* `-DUSE_BCD=ON/OFF` (defaultly set to OFF)
-* `-DUSE_OIDN=ON/OFF` (defaultly set to OFF)
-* `-DOIDN_PATH="where OIDN's cmake config is"` (need only when USE_OIDN=ON)
+See [doc.md](./doc/doc.md).
 
 ## Gallery
 
 Materials:
 
-![0](./gallery/0.png)
+![0](./doc/gallery/0.png)
 
 Breakfast Room (scene ref [here](http://casual-effects.com/data/index.html)):
 
-![1](./gallery/1.png)
+![1](./doc/gallery/1.png)
 
 G-Buffer & Denoiser (model ref [here](http://graphics.stanford.edu/data/3Dscanrep/)):
 
-![2](./gallery/2.png)
+![2](./doc/gallery/2.png)
 
 Glasses:
 
-![3](./gallery/3.png)
+![3](./doc/gallery/3.png)
 
 Volumetric Rendering (model ref [here](http://casual-effects.com/data/index.html)):
 
-![4](./gallery/4.png)
+![4](./doc/gallery/4.png)
 
 Living Room (scene ref [here](http://casual-effects.com/data/index.html)):
 
-![5](./gallery/5.png)
+![5](./doc/gallery/5.png)

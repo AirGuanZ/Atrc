@@ -17,9 +17,9 @@ extern "C"
 
 AGZTTextureHandle agzt_create_texture_impl(AGZT_COperationHandler handler, const AGZTConfigGroup *params);
 
-agzt_real agzt_sample_texture_real_impl(AGZT_COperationHandler handler, const AGZTTextureHandle tex, const AGZTVec2 *uv);
+agzt_real agzt_sample_texture_real_impl(AGZT_COperationHandler handler, AGZTTextureHandle tex, const AGZTVec2 *uv);
 
-AGZTSpectrum agzt_sample_texture_spectrum_impl(AGZT_COperationHandler handler, const AGZTTextureHandle tex, const AGZTVec2 *uv);
+AGZTSpectrum agzt_sample_texture_spectrum_impl(AGZT_COperationHandler handler, AGZTTextureHandle tex, const AGZTVec2 *uv);
 
 } // extern "C"
 
@@ -311,7 +311,7 @@ AGZTTextureHandle agzt_create_texture_impl(AGZT_COperationHandler handler, const
     return mat->create_texture(*cpp_params);
 }
 
-agzt_real agzt_sample_texture_real_impl(AGZT_COperationHandler handler, const AGZTTextureHandle tex, const AGZTVec2 *uv)
+agzt_real agzt_sample_texture_real_impl(AGZT_COperationHandler handler, AGZTTextureHandle tex, const AGZTVec2 *uv)
 {
     auto mat = static_cast<agz::tracer::CShaderMaterial*>(handler);
     auto texture = mat->get_texture(tex);
@@ -320,7 +320,7 @@ agzt_real agzt_sample_texture_real_impl(AGZT_COperationHandler handler, const AG
     return texture->sample_real(agz::tracer::c_to_cpp(*uv));
 }
 
-AGZTSpectrum agzt_sample_texture_spectrum_impl(AGZT_COperationHandler handler, const AGZTTextureHandle tex, const AGZTVec2 *uv)
+AGZTSpectrum agzt_sample_texture_spectrum_impl(AGZT_COperationHandler handler, AGZTTextureHandle tex, const AGZTVec2 *uv)
 {
     auto mat = static_cast<agz::tracer::CShaderMaterial*>(handler);
     auto texture = mat->get_texture(tex);
