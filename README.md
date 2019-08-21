@@ -17,7 +17,7 @@ Offline rendering lab based on ray tracing
 
 ## Documentation
 
-See [doc.md](./doc/doc.md).
+See [doc](https://airguanz.github.io/atrc_doc/doc.html).
 
 ## Gallery
 
