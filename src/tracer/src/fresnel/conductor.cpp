@@ -90,11 +90,11 @@ conductor [Fresnel]
         AGZ_HIERARCHY_WRAP("in initializing conductor fresnel object")
     }
 
-    FresnelPoint *get_point(const EntityIntersection &inct, Arena &arena) const override
+    FresnelPoint *get_point(const Vec2 &uv, Arena &arena) const override
     {
-        Spectrum eta_out = eta_out_->sample_spectrum(inct.uv);
-        Spectrum eta_in  = eta_in_->sample_spectrum(inct.uv);
-        Spectrum k       = k_->sample_spectrum(inct.uv);
+        Spectrum eta_out = eta_out_->sample_spectrum(uv);
+        Spectrum eta_in  = eta_in_->sample_spectrum(uv);
+        Spectrum k       = k_->sample_spectrum(uv);
 
         return arena.create<ConductorPoint>(eta_out, eta_in, k);
     }

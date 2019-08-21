@@ -40,11 +40,6 @@ namespace
             return Spectrum();
         }
 
-        real proj_wi_factor(const Vec3 &wi) const noexcept override
-        {
-            return 1;
-        }
-
         BSDFSampleResult sample(const Vec3 &out_dir, TransportMode transport_mode, const Sample3 &sam) const noexcept override
         {
             Vec3 nwo = shading_coord_.global_to_local(out_dir).normalize();
@@ -56,11 +51,12 @@ namespace
                 BSDFSampleResult ret;
                 Vec3 local_in = Vec3(-nwo.x, -nwo.y, nwo.z);
                 ret.dir      = shading_coord_.local_to_global(local_in);
-                ret.f        = color_ * fr;
+                ret.f        = color_ * fr / std::abs(local_in.z);
                 ret.pdf      = fr.r;
                 ret.mode     = transport_mode;
                 ret.is_delta = true;
 
+                ret.f *= local_angle::normal_corr_factor(geometry_coord_, shading_coord_, ret.dir);
                 if(has_inf(ret.f))
                     return BSDF_SAMPLE_RESULT_INVALID;
                 return ret;
@@ -79,11 +75,12 @@ namespace
 
             BSDFSampleResult ret;
             ret.dir      = shading_coord_.local_to_global(nwi);
-            ret.f        = corr_factor * color_ * (1 - fr.r);
+            ret.f        = corr_factor * color_ * (1 - fr.r) / std::abs(nwi.z);
             ret.pdf      = 1 - fr.r;
             ret.is_delta = true;
             ret.mode     = transport_mode;
 
+            ret.f *= local_angle::normal_corr_factor(geometry_coord_, shading_coord_, ret.dir);
             if(has_inf(ret.f))
                 return BSDF_SAMPLE_RESULT_INVALID;
             return ret;
@@ -138,7 +135,7 @@ glass [Material]
     {
         ShadingPoint ret;
 
-        auto fresnel_point = fresnel_->get_point(inct, arena);
+        auto fresnel_point = fresnel_->get_point(inct.uv, arena);
         auto color = color_map_->sample_spectrum(inct.uv);
         ret.bsdf = arena.create<GlassBSDF>(inct.geometry_coord, inct.user_coord, fresnel_point, color);
 

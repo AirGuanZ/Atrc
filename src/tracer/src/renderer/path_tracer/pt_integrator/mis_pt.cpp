@@ -107,10 +107,10 @@ mis [PathTracingIntegrator]
             BSDFSampleResult bsdf_sample;
             EntityIntersection new_inct;
             ret += coef * mis_sample_bsdf<true>(scene, inct, shd, sampler.sample3(), &bsdf_sample, &new_inct, &has_inct);
+            coef *= bsdf_sample.f * std::abs(cos(bsdf_sample.dir, inct.geometry_coord.z)) / bsdf_sample.pdf;
+
             if(has_inct)
                 inct = new_inct;
-
-            coef *= bsdf_sample.f * shd.bsdf->proj_wi_factor(bsdf_sample.dir) / bsdf_sample.pdf;
         }
 
         return ret;

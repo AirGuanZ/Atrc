@@ -1,6 +1,4 @@
-﻿#pragma once
-
-#include <agz/tracer/core/renderer.h>
+﻿#include <agz/tracer/core/renderer.h>
 
 AGZ_TRACER_BEGIN
 
@@ -33,18 +31,18 @@ public:
     Vec3 wr;
     Vec3 wsam;
 
-    Spectrum f; // eval(wsam, wr)
+    Spectrum accumulated_f; // bsdf(wsam, wr)
 
     real pdf_proj_radiance   = 0;
     real pdf_proj_importance = 0;
-    bool is_delta       = false;
+    bool is_delta            = false;
 };
 
 class BDPT : public Renderer
 {
 public:
 
-
+    using Renderer::Renderer;
 };
 
 } // namespace bdpt

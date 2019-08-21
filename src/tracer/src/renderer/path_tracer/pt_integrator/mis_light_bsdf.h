@@ -30,7 +30,7 @@ inline Spectrum mis_sample_light(
     if(!bsdf_f)
         return Spectrum();
 
-    Spectrum f = light_sample.radiance * bsdf_f * shd.bsdf->proj_wi_factor(inct_to_light);
+    Spectrum f = light_sample.radiance * bsdf_f * std::abs(cos(inct_to_light, inct.geometry_coord.z));
 
     if(light_sample.is_delta)
         return f / light_sample.pdf;
@@ -73,7 +73,7 @@ Spectrum mis_sample_bsdf(
             if(!light_f)
                 return Spectrum();
 
-            Spectrum f = light_f * bsdf_sample.f * shd.bsdf->proj_wi_factor(bsdf_sample.dir);
+            Spectrum f = light_f * bsdf_sample.f * std::abs(cos(inct.geometry_coord.z, bsdf_sample.dir));
             if(bsdf_sample.is_delta)
                 return f / bsdf_sample.pdf;
 

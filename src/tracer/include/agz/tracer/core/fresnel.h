@@ -32,7 +32,7 @@ public:
 
     using Object::Object;
 
-    virtual FresnelPoint *get_point(const EntityIntersection &inct, Arena &arena) const = 0;
+    virtual FresnelPoint *get_point(const Vec2 &uv, Arena &arena) const = 0;
 };
 
 AGZT_INTERFACE(Fresnel)

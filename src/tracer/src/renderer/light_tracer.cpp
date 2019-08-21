@@ -120,7 +120,7 @@ class LightTracer : public Renderer
                         TM_Importance);
                     if(!f.is_black())
                     {
-                        real proj_factor = shd.bsdf->proj_wi_factor(camera_sample.ref_to_cam);
+                        real proj_factor = std::abs(cos(camera_sample.ref_to_cam, inct.geometry_coord.z));
                         Spectrum path_contrib = coef * f * proj_factor * camera_sample.importance / camera_sample.pdf;
                         full_film_grid->add_sample(to_pixel(camera_sample.film_coord), path_contrib, GBufferPixel(), 1);
                     }
@@ -130,7 +130,7 @@ class LightTracer : public Renderer
             auto bsdf_sample = shd.bsdf->sample(inct.wr, TM_Importance, sampler.sample3());
             if(!bsdf_sample.f || !bsdf_sample.pdf)
                 return;
-            coef *= bsdf_sample.f * shd.bsdf->proj_wi_factor(bsdf_sample.dir) / bsdf_sample.pdf;
+            coef *= bsdf_sample.f * std::abs(cos(bsdf_sample.dir, inct.geometry_coord.z)) / bsdf_sample.pdf;
 
             Vec3 true_nor = inct.geometry_coord.z;
             if(dot(bsdf_sample.dir, inct.geometry_coord.z) < 0)

@@ -107,16 +107,43 @@ struct AGZTConfigNode
 
 typedef void* AGZT_COperationHandler;
 
-typedef int32_t AGZTTextureHandle;
+typedef void* AGZT_FresnelHandle;
+typedef void* AGZT_FresnelPointHandle;
+typedef void *AGZT_TextureHandle;
 
-typedef AGZTTextureHandle(*AGZT_CreateTexture_FuncPtr)        (AGZT_COperationHandler handler, const AGZTConfigGroup*);
-typedef agzt_real        (*AGZT_SampleTextureReal_FuncPtr)    (AGZT_COperationHandler handler, AGZTTextureHandle, const AGZTVec2*);
-typedef AGZTSpectrum     (*AGZT_SampleTextureSpectrum_FuncPtr)(AGZT_COperationHandler handler, AGZTTextureHandle, const AGZTVec2*);
+typedef void* AGZT_MaterialHandle;
+typedef void* AGZT_BSDFHandle;
+
+typedef void* AGZT_InitContextHandle;
+typedef void* AGZT_ArenaHandle;
+
+typedef AGZT_FresnelHandle     (*AGZT_CreateFresnel_FuncPtr)     (const AGZTConfigGroup*, AGZT_InitContextHandle init_ctx);
+typedef AGZT_FresnelPointHandle(*AGZT_CreateFresnelPoint_FuncPtr)(AGZT_FresnelHandle, const AGZTVec2 *uv, AGZT_ArenaHandle arena);
+typedef AGZTSpectrum           (*AGZT_EvalFresnelPoint_FuncPtr)  (AGZT_FresnelPointHandle, agzt_real cos_theta_i);
+typedef agzt_real              (*AGZT_GetFresnelPointEtaI)       (AGZT_FresnelPointHandle);
+typedef agzt_real              (*AGZT_GetFresnelPointEtaO)       (AGZT_FresnelPointHandle);
+
+typedef AGZT_TextureHandle(*AGZT_CreateTexture_FuncPtr)        (const AGZTConfigGroup*, AGZT_InitContextHandle init_ctx);
+typedef agzt_real         (*AGZT_SampleTextureReal_FuncPtr)    (AGZT_TextureHandle, const AGZTVec2*);
+typedef AGZTSpectrum      (*AGZT_SampleTextureSpectrum_FuncPtr)(AGZT_TextureHandle, const AGZTVec2*);
 
 // 2通过C接口能让1做的事情
 struct AGZT_COperations
 {
-    AGZT_COperationHandler operation_handler;
+    // 创建一个fresnel对象，返回其句柄
+    AGZT_CreateFresnel_FuncPtr create_fresnel;
+    
+    // 让指定的fresnel对象产生一个fresnel point
+    AGZT_CreateFresnelPoint_FuncPtr create_fresnel_point;
+    
+    // 用指定的frensel point求特定入射角处的fresnel值
+    AGZT_EvalFresnelPoint_FuncPtr eval_fresnel_point;
+
+    // 取得某个fresnel point的内折射率
+    AGZT_GetFresnelPointEtaI get_fresnel_eta_i;
+
+    // 取得某个fresnel point的外折射率
+    AGZT_GetFresnelPointEtaO get_fresnel_eta_o;
 
     // 创建一个纹理对象，返回其句柄
     AGZT_CreateTexture_FuncPtr create_texture;
@@ -128,26 +155,20 @@ struct AGZT_COperations
     AGZT_SampleTextureSpectrum_FuncPtr sample_spectrum;
 };
 
-typedef void* AGZT_MaterialHandle;
-typedef void* AGZT_BSDFHandle;
-
 // global function "create_material"
-typedef AGZT_MaterialHandle(*AGZT_CreateMaterial_FuncPtr)(const AGZTConfigGroup *params, const AGZT_COperations *oprs);
+typedef AGZT_MaterialHandle(*AGZT_CreateMaterial_FuncPtr)(const AGZTConfigGroup *params, const AGZT_COperations *oprs, AGZT_InitContextHandle init_ctx);
 
 // global function "destroy_material"
 typedef void(*AGZT_DestroyMaterial_FuncPtr)(AGZT_MaterialHandle material_handle);
 
 // global function "create_bsdf"
-typedef AGZT_BSDFHandle(*AGZT_CreateBSDF_FuncPtr)(AGZT_MaterialHandle material_handle, const AGZTIntersection *intity);
+typedef AGZT_BSDFHandle(*AGZT_CreateBSDF_FuncPtr)(AGZT_MaterialHandle material_handle, const AGZTIntersection *intity, AGZT_ArenaHandle arena);
 
 // global function "destroy_bsdf"
 typedef void(*AGZT_DestroyBSDF_FuncPtr)(AGZT_BSDFHandle bsdf_handle);
 
 // global function "bsdf_eval"
 typedef AGZTSpectrum(*AGZT_BSDF_Eval_FuncPtr)(AGZT_BSDFHandle bsdf_handle, const AGZTVec3 *wi, const AGZTVec3 *wo, bool is_importance);
-
-// global function "bsdf_proj_wi_factor"
-typedef agzt_real(*AGZT_BSDF_ProjWiFactor_FuncPtr)(AGZT_BSDFHandle bsdf_handle, const AGZTVec3 *wi);
 
 // global function "bsdf_sample"
 typedef void(*AGZT_BSDF_Sample_FuncPtr)(AGZT_BSDFHandle bsdf_handle, const AGZTVec3 *wo, bool is_importance, const AGZTSample3 *sam,

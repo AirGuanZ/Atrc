@@ -56,10 +56,10 @@ dielectric [Fresnel]
         AGZ_HIERARCHY_WRAP("in initializing dielectric fresnel object")
     }
 
-    FresnelPoint *get_point(const EntityIntersection &inct, Arena &arena) const override
+    FresnelPoint *get_point(const Vec2 &uv, Arena &arena) const override
     {
-        real eta_i = eta_i_->sample_real(inct.uv);
-        real eta_o = eta_o_->sample_real(inct.uv);
+        real eta_i = eta_i_->sample_real(uv);
+        real eta_o = eta_o_->sample_real(uv);
         return arena.create<DielectricFresnelPoint>(eta_i, eta_o);
     }
 };

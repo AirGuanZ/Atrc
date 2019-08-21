@@ -19,7 +19,7 @@ struct BSDFSampleResult
     TransportMode mode;     // 传输模式
     bool          is_delta; // pdf和f是否是delta函数
 
-    bool is_invalid() const noexcept
+    bool invalid() const noexcept
     {
         return !dir;
     }
@@ -39,8 +39,6 @@ public:
     virtual ~BSDF() = default;
 
     virtual Spectrum eval(const Vec3 &wi, const Vec3 &wo, TransportMode mode) const noexcept = 0;
-
-    virtual real proj_wi_factor(const Vec3 &wi) const noexcept = 0;
 
     virtual BSDFSampleResult sample(const Vec3 &wo, TransportMode mode, const Sample3 &sam) const noexcept = 0;
 

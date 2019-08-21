@@ -173,6 +173,17 @@ ENDIF()
 
 ############## other submodules
 
+MACRO(SUBDIRLIST result curdir)
+  FILE(GLOB children RELATIVE ${curdir} ${curdir}/*)
+  SET(dirlist "")
+  FOREACH(child ${children})
+    IF(IS_DIRECTORY ${curdir}/${child})
+      LIST(APPEND dirlist ${child})
+    ENDIF()
+  ENDFOREACH()
+  SET(${result} ${dirlist})
+ENDMACRO()
+
 SET(MISC_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/lib/misc/)
 
 ADD_SUBDIRECTORY(lib/utility/src)
@@ -180,6 +191,12 @@ ADD_SUBDIRECTORY(lib/utility/src)
 ADD_SUBDIRECTORY(src/tracer_utility)
 ADD_SUBDIRECTORY(src/tracer)
 ADD_SUBDIRECTORY(src/tracer_cshader)
-ADD_SUBDIRECTORY(src/c_materials/oren_nayar)
 ADD_SUBDIRECTORY(src/cli)
 ADD_SUBDIRECTORY(src/obj_to_scene)
+
+SUBDIRLIST(PLUGINS ${PROJECT_SOURCE_DIR}/src/c_materials)
+MESSAGE("add material plugins: ${PLUGINS}")
+
+FOREACH(subdir ${PLUGINS})
+  ADD_SUBDIRECTORY(${PROJECT_SOURCE_DIR}/src/c_materials/${subdir})
+ENDFOREACH()

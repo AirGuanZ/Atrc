@@ -32,11 +32,6 @@ public:
         return sigma_s_ * Spectrum(phase_func(u));
     }
 
-    real proj_wi_factor(const Vec3 &wi) const noexcept override
-    {
-        return 1;
-    }
-
     BSDFSampleResult sample(const Vec3 &wo, TransportMode mode, const Sample3 &sam) const noexcept override
     {
         real s = 2 * sam.u - 1;

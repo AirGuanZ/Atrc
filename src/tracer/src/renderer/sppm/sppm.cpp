@@ -131,7 +131,7 @@ class SPPMRenderer : public Renderer
             auto bsdf_sample = shd.bsdf->sample(inct.wr, TM_Radiance, sampler.sample3());
             if(!bsdf_sample.f || bsdf_sample.pdf < EPS)
                 return;
-            coef *= bsdf_sample.f * shd.bsdf->proj_wi_factor(bsdf_sample.dir) / bsdf_sample.pdf;
+            coef *= bsdf_sample.f * std::abs(cos(bsdf_sample.dir, inct.geometry_coord.z)) / bsdf_sample.pdf;
             r = Ray(inct.pos, bsdf_sample.dir.normalize(), EPS);
         }
     }
@@ -184,7 +184,7 @@ class SPPMRenderer : public Renderer
             if(!bsdf_sample.f || bsdf_sample.pdf < EPS)
                 return;
 
-            coef *= bsdf_sample.f * shd.bsdf->proj_wi_factor(bsdf_sample.dir) / bsdf_sample.pdf;
+            coef *= bsdf_sample.f * std::abs(cos(bsdf_sample.dir, inct.geometry_coord.z)) / bsdf_sample.pdf;
             r = Ray(inct.pos, bsdf_sample.dir.normalize(), EPS);
         }
     }

@@ -68,15 +68,6 @@ public:
         
     }
 
-    void initialize(const Config &params, obj::ObjectInitContext &) override
-    {
-        AGZ_HIERARCHY_TRY
-
-        init_transform(params);
-
-        AGZ_HIERARCHY_WRAP("in initializing static constant texture")
-    }
-
     int width() const noexcept override
     {
         return 1;

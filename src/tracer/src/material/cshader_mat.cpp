@@ -4,6 +4,7 @@
 #include <string>
 
 #include <agz/tracer/core/bsdf.h>
+#include <agz/tracer/core/fresnel.h>
 #include <agz/tracer/core/material.h>
 #include <agz/tracer/core/texture.h>
 #include <agz/tracer/utility/logger.h>
@@ -15,11 +16,21 @@
 extern "C"
 {
 
-AGZTTextureHandle agzt_create_texture_impl(AGZT_COperationHandler handler, const AGZTConfigGroup *params);
+AGZT_FresnelHandle agzt_create_fresnel_impl(const AGZTConfigGroup *params, AGZT_InitContextHandle init_ctx);
 
-agzt_real agzt_sample_texture_real_impl(AGZT_COperationHandler handler, AGZTTextureHandle tex, const AGZTVec2 *uv);
+AGZT_FresnelPointHandle agzt_create_fresnel_point_impl(AGZT_FresnelHandle, const AGZTVec2 *uv, AGZT_ArenaHandle arena);
 
-AGZTSpectrum agzt_sample_texture_spectrum_impl(AGZT_COperationHandler handler, AGZTTextureHandle tex, const AGZTVec2 *uv);
+AGZTSpectrum agzt_eval_fresnel_point(AGZT_FresnelPointHandle fresnel_point, agzt_real cos_theta_i);
+
+agzt_real agzt_get_fresnel_point_eta_i(AGZT_FresnelPointHandle fresnel_point);
+
+agzt_real agzt_get_fresnel_point_eta_o(AGZT_FresnelPointHandle fresnel_point);
+
+AGZT_TextureHandle agzt_create_texture_impl(const AGZTConfigGroup *params, AGZT_InitContextHandle init_ctx);
+
+agzt_real agzt_sample_texture_real_impl(AGZT_TextureHandle tex, const AGZTVec2 *uv);
+
+AGZTSpectrum agzt_sample_texture_spectrum_impl(AGZT_TextureHandle tex, const AGZTVec2 *uv);
 
 } // extern "C"
 
@@ -36,7 +47,6 @@ namespace
         AGZT_DestroyBSDF_FuncPtr destroy_bsdf;
 
         AGZT_BSDF_Eval_FuncPtr         bsdf_eval;
-        AGZT_BSDF_ProjWiFactor_FuncPtr bsdf_proj_wi_factor;
         AGZT_BSDF_Sample_FuncPtr       bsdf_sample;
         AGZT_BSDF_PDF_FuncPtr          bsdf_pdf;
         AGZT_BSDF_Albedo_FuncPtr       bsdf_albedo;
@@ -61,7 +71,6 @@ namespace
         GET_METHOD(destroy_bsdf);
 
         GET_METHOD(bsdf_eval);
-        GET_METHOD(bsdf_proj_wi_factor);
         GET_METHOD(bsdf_sample);
         GET_METHOD(bsdf_pdf);
         GET_METHOD(bsdf_albedo);
@@ -104,7 +113,7 @@ namespace
         auto ret = lib.get();
         filename2lib[filename] = std::move(lib);
 
-        AGZ_LOG1("load material from shared library " + filename);
+        AGZ_LOG1("load material plugin from " + filename);
 
         return ret;
     }
@@ -133,12 +142,6 @@ namespace
             auto cwi = cpp_to_c(wi), cwo = cpp_to_c(wo);
             auto c_spectrum = c_api_->bsdf_eval(bsdf_handle_, &cwi, &cwo, mode == TM_Importance);
             return c_to_cpp(c_spectrum);
-        }
-
-        real proj_wi_factor(const Vec3 &wi) const noexcept override
-        {
-            auto cwi = cpp_to_c(wi);
-            return c_api_->bsdf_proj_wi_factor(bsdf_handle_, &cwi);
         }
 
         BSDFSampleResult sample(const Vec3 &wo, TransportMode mode, const Sample3 &sam) const noexcept override
@@ -194,9 +197,6 @@ class CShaderMaterial : public Material
     AGZT_MaterialHandle material_handle_ = nullptr;
     CAPI c_api_ = {};
 
-    obj::ObjectInitContext *internal_init_ctx_ = nullptr;
-    std::vector<const Texture*> textures_;
-
     AGZT_COperations c_oprs_ = {};
 
 public:
@@ -221,8 +221,6 @@ lib [Material]
     {
         AGZ_HIERARCHY_TRY
 
-        internal_init_ctx_ = &init_ctx;
-
         auto raw_filename = params.child_str("filename");
         auto filename = init_ctx.path_mgr->get(raw_filename);
         auto lib = load_dynamic_library(filename);
@@ -233,15 +231,19 @@ lib [Material]
         AGZTConfigGroup c_params{};
         cpp_to_c(params, c_params_arena, &c_params);
 
-        c_oprs_.operation_handler = this;
+        c_oprs_.create_fresnel       = agzt_create_fresnel_impl;
+        c_oprs_.create_fresnel_point = agzt_create_fresnel_point_impl;
+        c_oprs_.eval_fresnel_point   = agzt_eval_fresnel_point;
+        c_oprs_.get_fresnel_eta_i    = agzt_get_fresnel_point_eta_i;
+        c_oprs_.get_fresnel_eta_o    = agzt_get_fresnel_point_eta_o;
+
         c_oprs_.create_texture    = agzt_create_texture_impl;
         c_oprs_.sample_real       = agzt_sample_texture_real_impl;
         c_oprs_.sample_spectrum   = agzt_sample_texture_spectrum_impl;
-        material_handle_ = c_api_.create_material(&c_params, &c_oprs_);
+
+        material_handle_ = c_api_.create_material(&c_params, &c_oprs_, &init_ctx);
         if(!material_handle_)
             throw ObjectConstructionException("failed to create dynamic library material handle");
-
-        internal_init_ctx_ = nullptr;
 
         AGZ_HIERARCHY_WRAP("in initializing dynamic library material")
     }
@@ -256,44 +258,12 @@ lib [Material]
         cinct.t              = inct.t;
         cinct.wr             = cpp_to_c(inct.wr);
 
-        auto bsdf_handle = c_api_.create_bsdf(material_handle_, &cinct);
+        auto bsdf_handle = c_api_.create_bsdf(material_handle_, &cinct, &arena);
         if(!bsdf_handle)
             return { IdealBlack::IDEAL_BLACK_BSDF_INSTANCE() };
 
         auto bsdf = arena.create<CShaderBSDF>(bsdf_handle, &c_api_);
         return { bsdf };
-    }
-
-    AGZTTextureHandle create_texture(const ConfigGroup &params)
-    {
-        if(!internal_init_ctx_)
-        {
-            AGZ_LOG0("invalid initialization");
-            return -1;
-        }
-
-        try
-        {
-            AGZTTextureHandle ret = static_cast<int>(textures_.size());
-            textures_.push_back(TextureFactory.create(params, *internal_init_ctx_));
-            return ret;
-        }
-        catch(const std::exception &err)
-        {
-            AGZ_LOG0(err.what());
-            return -1;
-        }
-        catch(...)
-        {
-            return -1;
-        }
-    }
-
-    const Texture *get_texture(AGZTTextureHandle tex)
-    {
-        if(tex < 0 || tex >= static_cast<int>(textures_.size()))
-            return nullptr;
-        return textures_[tex];
     }
 };
 
@@ -304,29 +274,57 @@ AGZ_TRACER_END
 extern "C"
 {
 
-AGZTTextureHandle agzt_create_texture_impl(AGZT_COperationHandler handler, const AGZTConfigGroup *params)
+AGZT_FresnelHandle agzt_create_fresnel_impl(const AGZTConfigGroup *params, AGZT_InitContextHandle init_ctx)
 {
-    auto mat = static_cast<agz::tracer::CShaderMaterial*>(handler);
+    auto ctx = static_cast<agz::tracer::obj::ObjectInitContext*>(init_ctx);
     auto cpp_params = agz::tracer::c_to_cpp(params);
-    return mat->create_texture(*cpp_params);
+    return agz::tracer::FresnelFactory.create(*cpp_params, *ctx);
 }
 
-agzt_real agzt_sample_texture_real_impl(AGZT_COperationHandler handler, AGZTTextureHandle tex, const AGZTVec2 *uv)
+AGZT_FresnelPointHandle agzt_create_fresnel_point_impl(AGZT_FresnelHandle fresnel_handle, const AGZTVec2 *uv, AGZT_ArenaHandle arena_handle)
 {
-    auto mat = static_cast<agz::tracer::CShaderMaterial*>(handler);
-    auto texture = mat->get_texture(tex);
-    if(!texture)
-        return 0;
+    auto &arena = *static_cast<agz::tracer::Arena*>(arena_handle);
+    auto fresnel = static_cast<agz::tracer::Fresnel*>(fresnel_handle);
+    auto cpp_uv = agz::tracer::c_to_cpp(*uv);
+    return fresnel->get_point(cpp_uv, arena);
+}
+
+AGZTSpectrum agzt_eval_fresnel_point(AGZT_FresnelPointHandle fresnel_point, agzt_real cos_theta_i)
+{
+    auto fp = static_cast<agz::tracer::FresnelPoint*>(fresnel_point);
+    auto spec = fp->eval(cos_theta_i);
+    return agz::tracer::cpp_to_c(spec);
+}
+
+agzt_real agzt_get_fresnel_point_eta_i(AGZT_FresnelPointHandle fresnel_point)
+{
+    auto fp = static_cast<agz::tracer::FresnelPoint*>(fresnel_point);
+    return fp->eta_i();
+}
+
+agzt_real agzt_get_fresnel_point_eta_o(AGZT_FresnelPointHandle fresnel_point)
+{
+    auto fp = static_cast<agz::tracer::FresnelPoint*>(fresnel_point);
+    return fp->eta_o();
+}
+
+AGZT_TextureHandle agzt_create_texture_impl(const AGZTConfigGroup *params, AGZT_InitContextHandle init_ctx_handle)
+{
+    auto init_ctx = static_cast<agz::tracer::obj::ObjectInitContext*>(init_ctx_handle);
+    auto cpp_params = agz::tracer::c_to_cpp(params);
+    return agz::tracer::TextureFactory.create(*cpp_params, *init_ctx);
+}
+
+agzt_real agzt_sample_texture_real_impl(AGZT_TextureHandle tex, const AGZTVec2 *uv)
+{
+    auto texture = static_cast<agz::tracer::Texture*>(tex);
     return texture->sample_real(agz::tracer::c_to_cpp(*uv));
 }
 
-AGZTSpectrum agzt_sample_texture_spectrum_impl(AGZT_COperationHandler handler, AGZTTextureHandle tex, const AGZTVec2 *uv)
+AGZTSpectrum agzt_sample_texture_spectrum_impl(AGZT_TextureHandle tex, const AGZTVec2 *uv)
 {
-    auto mat = static_cast<agz::tracer::CShaderMaterial*>(handler);
-    auto texture = mat->get_texture(tex);
-    if(!texture)
-        return { 0, 0, 0 };
-    auto spec = texture->sample_spectrum(agz::tracer::c_to_cpp(*uv));
+    auto texture = static_cast<agz::tracer::Texture*>(tex);
+    auto spec =  texture->sample_spectrum(agz::tracer::c_to_cpp(*uv));
     return agz::tracer::cpp_to_c(spec);
 }
 

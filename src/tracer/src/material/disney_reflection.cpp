@@ -150,12 +150,7 @@ namespace
             Spectrum val = (1 - metallic_) * (base_color_ / PI_r * math::mix(f_d, f_ss, subsurface_) + f_sh)
                            + Fs * Gs * Ds * microfacet_dem
                            + clearcoat_ * Fc * Gc * Dc * microfacet_dem;
-            return val;
-        }
-
-        real proj_wi_factor(const Vec3 &wi) const noexcept override
-        {
-            return std::abs(cos(wi, shading_coord_.z));
+            return val * local_angle::normal_corr_factor(geometry_coord_, shading_coord_, in_dir);
         }
 
         BSDFSampleResult sample(const Vec3 &out_dir, TransportMode transport_mode, const Sample3 &sam) const noexcept override

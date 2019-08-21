@@ -121,12 +121,9 @@ namespace
                 return {};
 
             bool is_reflection = lwi.z * lwo.z > 0;
-            return is_reflection ? eval_reflection(lwi, lwo) : eval_refraction(lwi, lwo, mode);
-        }
-
-        real proj_wi_factor(const Vec3 &wi) const noexcept override
-        {
-            return std::abs(cos(wi, shading_coord_.z));
+            auto ret = is_reflection ? eval_reflection(lwi, lwo) : eval_refraction(lwi, lwo, mode);
+            ret *= local_angle::normal_corr_factor(geometry_coord_, shading_coord_, wi);
+            return ret;
         }
 
         BSDFSampleResult sample(const Vec3 &wo, TransportMode mode, const Sample3 &sam) const noexcept override
@@ -163,6 +160,7 @@ namespace
                 if(cause_black_fringes(ret.dir) || !ret.f.is_finite() || ret.pdf < EPS)
                     return BSDF_SAMPLE_RESULT_INVALID;
 
+                ret.f *= local_angle::normal_corr_factor(geometry_coord_, shading_coord_, ret.dir);
                 return ret;
             }
 
@@ -205,6 +203,7 @@ namespace
             if(cause_black_fringes(ret.dir) || !ret.f.is_finite() || ret.pdf < EPS)
                 return BSDF_SAMPLE_RESULT_INVALID;
 
+            ret.f *= local_angle::normal_corr_factor(geometry_coord_, shading_coord_, ret.dir);
             return ret;
         }
 
@@ -302,7 +301,7 @@ frosted_glass [Material]
     ShadingPoint shade(const EntityIntersection &inct, Arena &arena) const override
     {
         auto color     = color_map_->sample_spectrum(inct.uv);
-        auto fresnel   = fresnel_->get_point(inct, arena);
+        auto fresnel   = fresnel_->get_point(inct.uv, arena);
         auto roughness = roughness_->sample_real(inct.uv);
         auto bsdf = arena.create<FrostedGlassBSDF>(
             inct.geometry_coord, inct.user_coord, color, roughness, fresnel);

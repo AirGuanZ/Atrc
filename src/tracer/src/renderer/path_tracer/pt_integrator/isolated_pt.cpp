@@ -118,7 +118,7 @@ isolated [PathTracingIntegrator]
             if(!is_trans)
                 background = false;
 
-            coef *= bsdf_sample.f * shd.bsdf->proj_wi_factor(bsdf_sample.dir) / bsdf_sample.pdf;
+            coef *= bsdf_sample.f * std::abs(cos(bsdf_sample.dir, inct.geometry_coord.z)) / bsdf_sample.pdf;
             r = Ray(inct.pos, bsdf_sample.dir.normalize(), EPS);
         }
 

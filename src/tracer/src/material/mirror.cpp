@@ -26,11 +26,6 @@ namespace
             return Spectrum();
         }
 
-        real proj_wi_factor(const Vec3 &wi) const noexcept override
-        {
-            return 1;
-        }
-
         BSDFSampleResult sample(const Vec3 &out_dir, TransportMode transport_mode, const Sample3 &sam) const noexcept override
         {
             Vec3 local_out = shading_coord_.global_to_local(out_dir);
@@ -41,10 +36,11 @@ namespace
             BSDFSampleResult ret;
             ret.dir      = shading_coord_.local_to_global(Vec3(0, 0, 2 * nwo.z) - nwo);
             ret.pdf      = 1;
-            ret.f        = fresnel_point_->eval(nwo.z) * rc_;
+            ret.f        = fresnel_point_->eval(nwo.z) * rc_ / std::abs(nwo.z);
             ret.mode     = transport_mode;
             ret.is_delta = true;
 
+            ret.f *= local_angle::normal_corr_factor(geometry_coord_, shading_coord_, ret.dir);
             return ret;
         }
 
@@ -95,7 +91,7 @@ mirror [Material]
 
     ShadingPoint shade(const EntityIntersection &inct, Arena &arena) const override
     {
-        auto fresnel_point = fresnel_->get_point(inct, arena);
+        auto fresnel_point = fresnel_->get_point(inct.uv, arena);
         auto rc = rc_map_->sample_spectrum(inct.uv);
 
         ShadingPoint ret;

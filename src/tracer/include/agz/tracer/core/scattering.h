@@ -74,9 +74,17 @@ public:
         return bsdf_->eval(wi, wo, mode);
     }
 
-    real proj_wi_factor(const Vec3 &wi) const noexcept
+    real proj_wi_factor(const Vec3 &wi) const
     {
-        return bsdf_->proj_wi_factor(wi);
+        return match_variant(inct_,
+            [&](const EntityIntersection &inct)
+        {
+            return std::abs(cos(inct.geometry_coord.z, wi));
+        },
+            [](const MediumIntersection &inct)
+        {
+            return real(1);
+        });
     }
 
     BSDFSampleResult sample(const Vec3 &wo, const Sample3 &sam, TransportMode mode) const noexcept

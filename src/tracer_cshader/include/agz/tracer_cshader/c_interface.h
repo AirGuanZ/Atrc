@@ -6,6 +6,26 @@ AGZ_TRACER_BEGIN
 
 class CShaderBSDF : public misc::uncopyable_t
 {
+protected:
+
+    const AGZT_COperations *c_oprs_ = nullptr;
+
+    AGZT_TextureHandle create_texture(const ConfigGroup &params, AGZT_InitContextHandle init_ctx);
+
+    real sample_real(AGZT_TextureHandle tex, const Vec2 &uv) const;
+
+    Spectrum sample_spectrum(AGZT_TextureHandle tex, const Vec2 &uv) const;
+
+    AGZT_FresnelHandle create_fresnel(const ConfigGroup &params, AGZT_InitContextHandle init_ctx);
+
+    AGZT_FresnelPointHandle create_fresnel_point(AGZT_FresnelHandle fresnel, const Vec2 &uv, AGZT_ArenaHandle arena) const;
+
+    Spectrum eval_fresnel_point(AGZT_FresnelPointHandle fresnel_point, real cos_theta_i) const;
+
+    real get_fresnel_point_eta_i(AGZT_FresnelPointHandle fresnel_point) const;
+
+    real get_fresnel_point_eta_o(AGZT_FresnelPointHandle fresnel_point) const;
+
 public:
 
     struct SampleResult
@@ -17,11 +37,15 @@ public:
         bool is_delta      = false;
     };
 
+    explicit CShaderBSDF(const AGZT_COperations *c_oprs) noexcept
+        : c_oprs_(c_oprs)
+    {
+        
+    }
+
     virtual ~CShaderBSDF() = default;
 
     virtual Spectrum eval(const Vec3 &wi, const Vec3 &wo, bool is_importance) const noexcept = 0;
-
-    virtual real proj_wi_factor(const Vec3 &wi) const noexcept = 0;
 
     virtual SampleResult sample(const Vec3 &wo, bool is_importance, const Sample3 &sam) const noexcept = 0;
 
@@ -36,19 +60,29 @@ public:
 
 class CShaderMaterial : public misc::uncopyable_t
 {
-    AGZT_COperations *c_oprs_ = nullptr;
-
 protected:
 
-    AGZTTextureHandle create_texture(const ConfigGroup &params);
+    const AGZT_COperations *c_oprs_ = nullptr;
 
-    real sample_real(AGZTTextureHandle tex, const Vec2 &uv) const;
+    AGZT_TextureHandle create_texture(const ConfigGroup &params, AGZT_InitContextHandle init_ctx);
 
-    Spectrum sample_spectrum(AGZTTextureHandle tex, const Vec2 &uv) const;
+    real sample_real(AGZT_TextureHandle tex, const Vec2 &uv) const;
+
+    Spectrum sample_spectrum(AGZT_TextureHandle tex, const Vec2 &uv) const;
+
+    AGZT_FresnelHandle create_fresnel(const ConfigGroup &params, AGZT_InitContextHandle init_ctx);
+
+    AGZT_FresnelPointHandle create_fresnel_point(AGZT_FresnelHandle fresnel, const Vec2 &uv, AGZT_ArenaHandle arena) const;
+
+    Spectrum eval_fresnel_point(AGZT_FresnelPointHandle fresnel_point, real cos_theta_i) const;
+
+    real get_fresnel_point_eta_i(AGZT_FresnelPointHandle fresnel_point) const;
+
+    real get_fresnel_point_eta_o(AGZT_FresnelPointHandle fresnel_point) const;
 
 public:
 
-    void _set_c_oprs(AGZT_COperations *c_oprs) noexcept { c_oprs_ = c_oprs; }
+    void _set_c_oprs(const AGZT_COperations *c_oprs) noexcept { c_oprs_ = c_oprs; }
 
     struct Intersection
     {
@@ -62,9 +96,9 @@ public:
 
     virtual ~CShaderMaterial() = default;
 
-    virtual void initialize(const ConfigGroup &params) = 0;
+    virtual void initialize(const ConfigGroup &params, AGZT_InitContextHandle init_ctx) = 0;
 
-    virtual CShaderBSDF *shade(const Intersection &inct) const = 0;
+    virtual CShaderBSDF *shade(const Intersection &inct, AGZT_ArenaHandle arena) const = 0;
 };
 
 // 用户通过实现该函数来实现材质

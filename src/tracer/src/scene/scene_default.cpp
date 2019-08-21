@@ -1,4 +1,4 @@
-#include <agz/tracer/core/aggregate.h>
+ï»¿#include <agz/tracer/core/aggregate.h>
 #include <agz/tracer/core/camera.h>
 #include <agz/tracer/core/entity.h>
 #include <agz/tracer/core/light.h>
@@ -214,7 +214,7 @@ default [Scene]
         world_bound_ |= aggregate_->world_bound();
         world_bound_ |= camera_->world_bound();
 
-        // ±ÜÃâÊıÖµÎÊÌâµ¼ÖÂÄ³Ğ©³¡¾°ÖĞµÄµã²»ÔÚworld boundÖĞ
+        // é¿å…æ•°å€¼é—®é¢˜å¯¼è‡´æŸäº›åœºæ™¯ä¸­çš„ç‚¹ä¸åœ¨world boundä¸­
         Vec3 delta = world_bound_.high - world_bound_.low;
         world_bound_.low  -= real(0.02) * delta;
         world_bound_.high += real(0.02) * delta;

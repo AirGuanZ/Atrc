@@ -25,12 +25,7 @@ namespace
             Vec3 local_out = shading_coord_.global_to_local(out_dir);
             if(local_in.z <= 0 || local_out.z <= 0)
                 return { };
-            return albedo_ / PI_r;
-        }
-
-        real proj_wi_factor(const Vec3 &wi) const noexcept override
-        {
-            return std::abs(cos(wi, shading_coord_.z));
+            return albedo_ / PI_r * local_angle::normal_corr_factor(geometry_coord_, shading_coord_, in_dir);
         }
 
         BSDFSampleResult sample(const Vec3 &dir, TransportMode transport_mode, const Sample3 &sam) const noexcept override
@@ -44,7 +39,7 @@ namespace
 
             BSDFSampleResult ret;
             ret.dir      = shading_coord_.local_to_global(local_in).normalize();
-            ret.f        = albedo_ / PI_r;
+            ret.f        = albedo_ / PI_r * local_angle::normal_corr_factor(geometry_coord_, shading_coord_, ret.dir);
             ret.pdf      = pdf;
             ret.mode     = transport_mode;
             ret.is_delta = false;

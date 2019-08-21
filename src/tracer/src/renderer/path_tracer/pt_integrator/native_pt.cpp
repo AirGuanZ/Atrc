@@ -82,7 +82,7 @@ native [PathTracingIntegrator]
             if(!bsdf_sample.f)
                 return ret;
 
-            coef *= bsdf_sample.f * shd.bsdf->proj_wi_factor(bsdf_sample.dir) / bsdf_sample.pdf;
+            coef *= bsdf_sample.f * std::abs(cos(bsdf_sample.dir, inct.geometry_coord.z)) / bsdf_sample.pdf;
 
             Vec3 true_nor = inct.geometry_coord.z;
             if(dot(bsdf_sample.dir, inct.geometry_coord.z) < 0)

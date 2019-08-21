@@ -31,7 +31,7 @@ public:
         return "always_one [Fresnel]";
     }
 
-    FresnelPoint *get_point(const EntityIntersection &inct, Arena &arena) const override
+    FresnelPoint *get_point(const Vec2 &uv, Arena &arena) const override
     {
         return arena.create<AlwaysOnePoint>();
     }

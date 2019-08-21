@@ -64,7 +64,7 @@ class NativeGuidedPathTracingIntegrator : public GuidedPathTracingIntegrator
             auto [dir, guider_pdf] = guider.dsampler(inct.pos)->sample(sampler.sample4());
             new_dir = dir.normalize();
 
-            new_f = bsdf->eval(new_dir, inct.wr, TM_Radiance) * bsdf->proj_wi_factor(new_dir);
+            new_f = bsdf->eval(new_dir, inct.wr, TM_Radiance) * std::abs(cos(new_dir, inct.geometry_coord.z));
             if(!new_f)
                 return commit(ret);
 
@@ -80,7 +80,7 @@ class NativeGuidedPathTracingIntegrator : public GuidedPathTracingIntegrator
                 return commit(ret);
 
             new_dir = bsdf_sample.dir.normalize();
-            new_f = bsdf_sample.f * bsdf->proj_wi_factor(new_dir);
+            new_f = bsdf_sample.f * std::abs(cos(new_dir, inct.geometry_coord.z));
 
             real guider_pdf = sample_guider && !bsdf_sample.is_delta ? guider.dsampler(inct.pos)->pdf(new_dir) : 0;
             new_f /= (guider_pdf + bsdf_sample.pdf) * sample_bsdf_prob;

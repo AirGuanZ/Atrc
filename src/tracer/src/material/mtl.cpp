@@ -2,13 +2,128 @@
 #include <agz/tracer/core/material.h>
 #include <agz/tracer/core/texture.h>
 
-#include "./bsdf_aggregate.h"
 #include "./microfacet.h"
 
 AGZ_TRACER_BEGIN
 
 namespace mtl_impl
 {
+
+    // IMPROVE: handle black fringes
+    template<int MAX_BSDF_CNT>
+    class BSDFAggregate : public LocalBSDF
+    {
+        const BSDF *bsdfs_[MAX_BSDF_CNT];
+        int bsdf_count_;
+
+    public:
+
+        BSDFAggregate(const Coord &geometry_coord, const Coord &shading_coord) noexcept
+            : LocalBSDF(geometry_coord, shading_coord),
+            bsdfs_{ nullptr }, bsdf_count_(0)
+        {
+
+        }
+
+        void add(const BSDF *bsdf)
+        {
+            assert(bsdf_count_ < MAX_BSDF_CNT);
+            bsdfs_[bsdf_count_++] = bsdf;
+        }
+
+        Spectrum eval(const Vec3 &in_dir, const Vec3 &out_dir, TransportMode transport_mode) const noexcept override
+        {
+            assert(bsdf_count_ > 0);
+
+            Vec3 local_in = shading_coord_.global_to_local(in_dir).normalize();
+            Vec3 local_out = shading_coord_.global_to_local(out_dir).normalize();
+
+            Spectrum ret;
+            for(int i = 0; i < bsdf_count_; ++i)
+                ret += bsdfs_[i]->eval(local_in, local_out, transport_mode);
+
+            ret *= local_angle::normal_corr_factor(geometry_coord_, shading_coord_, in_dir);
+            return ret;
+        }
+
+        BSDFSampleResult sample(const Vec3 &out_dir, TransportMode transport_mode, const Sample3 &sam) const noexcept override
+        {
+            assert(bsdf_count_ > 0);
+
+            auto[bsdf_idx, new_sam_u] = math::distribution::extract_uniform_int(sam.u, 0, bsdf_count_);
+            auto bsdf = bsdfs_[bsdf_idx];
+
+            Vec3 local_out = shading_coord_.global_to_local(out_dir).normalize();
+            auto ret = bsdf->sample(local_out, transport_mode, { new_sam_u, sam.v, sam.w });
+
+            if(!ret.dir)
+                return BSDF_SAMPLE_RESULT_INVALID;
+
+            ret.dir = ret.dir.normalize();
+
+            if(ret.is_delta)
+            {
+                ret.pdf /= bsdf_count_;
+                ret.dir = shading_coord_.local_to_global(ret.dir).normalize();
+                ret.f *= local_angle::normal_corr_factor(geometry_coord_, shading_coord_, ret.dir);
+                return ret;
+            }
+
+            for(int i = 0; i < bsdf_count_; ++i)
+            {
+                if(i == bsdf_idx)
+                    continue;
+                ret.f += bsdfs_[i]->eval(ret.dir, local_out, transport_mode);
+                ret.pdf += bsdfs_[i]->pdf(ret.dir, local_out, transport_mode);
+            }
+            ret.pdf /= bsdf_count_;
+            ret.dir = shading_coord_.local_to_global(ret.dir).normalize();
+
+            ret.f *= local_angle::normal_corr_factor(geometry_coord_, shading_coord_, ret.dir);
+            return ret;
+        }
+
+        real pdf(const Vec3 &in_dir, const Vec3 &out_dir, TransportMode transport_mode) const noexcept override
+        {
+            assert(bsdf_count_ > 0);
+
+            Vec3 local_in = shading_coord_.global_to_local(in_dir).normalize();
+            Vec3 local_out = shading_coord_.global_to_local(out_dir).normalize();
+
+            real ret = 0;
+            for(int i = 0; i < bsdf_count_; ++i)
+                ret += bsdfs_[i]->pdf(local_in, local_out, transport_mode);
+            return ret / bsdf_count_;
+        }
+
+        bool is_delta() const noexcept override
+        {
+            for(int i = 0; i < bsdf_count_; ++i)
+            {
+                if(!bsdfs_[i]->is_delta())
+                    return false;
+            }
+            return true;
+        }
+
+        Spectrum albedo() const noexcept override
+        {
+            Spectrum ret;
+            for(int i = 0; i < bsdf_count_; ++i)
+                ret += bsdfs_[i]->albedo();
+            return ret;
+        }
+
+        bool is_black() const noexcept override
+        {
+            for(int i = 0; i < bsdf_count_; ++i)
+            {
+                if(!bsdfs_[i]->is_black())
+                    return false;
+            }
+            return true;
+        }
+    };
     
     class DiffuseComponent : public InternalBSDF
     {
@@ -27,11 +142,6 @@ namespace mtl_impl
             if(in_dir.z <= 0 || out_dir.z <= 0)
                 return Spectrum();
             return albedo_ / PI_r;
-        }
-
-        real proj_wi_factor(const Vec3 &wi) const noexcept override
-        {
-            return std::abs(wi.z);
         }
 
         BSDFSampleResult sample(const Vec3 &out_dir, TransportMode transport_mode, const Sample3 &sam) const noexcept override
@@ -101,11 +211,6 @@ namespace mtl_impl
             Vec3 wh = (in_dir + out_dir).normalize();
             real D = (ns_ + 1) / (2 * PI_r) * std::pow(wh.z, ns_);
             return color_ * D / (4 * in_dir.z * out_dir.z);
-        }
-
-        real proj_wi_factor(const Vec3 &wi) const noexcept override
-        {
-            return std::abs(wi.z);
         }
 
         BSDFSampleResult sample(const Vec3 &out_dir, TransportMode transport_mode, const Sample3& sam) const noexcept override
@@ -194,7 +299,7 @@ mtl [Material]
         kd /= dem;
         ks /= dem;
 
-        auto bsdf     = arena.create<BSDFAggregate<2>>(inct.geometry_coord, inct.user_coord);
+        auto bsdf     = arena.create<mtl_impl::BSDFAggregate<2>>(inct.geometry_coord, inct.user_coord);
         auto diffuse  = arena.create<mtl_impl::DiffuseComponent>(kd);
         auto specular = arena.create<mtl_impl::SpecularComponent>(ks, ns);
         bsdf->add(diffuse);

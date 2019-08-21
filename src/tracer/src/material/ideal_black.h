@@ -16,11 +16,6 @@ class IdealBlack : public Material
             return Spectrum();
         }
 
-        real proj_wi_factor(const Vec3 &wi) const noexcept override
-        {
-            return 1;
-        }
-
         BSDFSampleResult sample(const Vec3&, TransportMode mode, const Sample3&) const noexcept override
         {
             return BSDF_SAMPLE_RESULT_INVALID;

@@ -1,0 +1,23 @@
+CMAKE_MINIMUM_REQUIRED(VERSION 3.10)
+
+PROJECT(Material_SunglassesMirror)
+
+SET(SRC ${TRACER_CSHADER_SRC} ${PROJECT_SOURCE_DIR}/sunglasses_mirror.cpp)
+
+ADD_LIBRARY(SunglassesMirror SHARED ${SRC})
+
+SET_PROPERTY(TARGET SunglassesMirror PROPERTY FOLDER agz_material_plugins)
+
+FOREACH(_SRC IN ITEMS ${SRC})
+    GET_FILENAME_COMPONENT(SRC "${_SRC}" PATH)
+    STRING(REPLACE "${TRACER_CSHADER_PROJECT_DIR}/include/agz/tracer_cshader" "tracer_cshader" _GRP_PATH "${SRC}")
+    STRING(REPLACE "${TRACER_CSHADER_PROJECT_DIR}/src" "tracer_cshader" _GRP_PATH "${_GRP_PATH}")
+    STRING(REPLACE "${Tracer_UTILITY_PROJECT_DIR}/include/agz/tracer_utility" "tracer_utility/include" _GRP_PATH "${_GRP_PATH}")
+    STRING(REPLACE "${Tracer_UTILITY_PROJECT_DIR}/src" "tracer_utility/src" _GRP_PATH "${_GRP_PATH}")
+    STRING(REPLACE "${PROJECT_SOURCE_DIR}" "src" _GRP_PATH "${_GRP_PATH}")
+    STRING(REPLACE "/" "\\" _GRP_PATH "${_GRP_PATH}")
+    SOURCE_GROUP("${_GRP_PATH}" FILES "${_SRC}")
+ENDFOREACH()
+
+TARGET_INCLUDE_DIRECTORIES(SunglassesMirror PRIVATE ${TRACER_CSHADER_INCLUDE_DIRS})
+TARGET_LINK_LIBRARIES(SunglassesMirror ${TRACER_CSHADER_LIBRARIES})

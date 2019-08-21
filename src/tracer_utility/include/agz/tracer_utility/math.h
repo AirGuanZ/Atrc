@@ -131,6 +131,20 @@ namespace local_angle
         return std::acos(math::clamp<real>(cos_theta(w), -1, 1));
     }
 
+    /**
+     * @brief shading normal的proj factor校正因子
+     */
+    inline real normal_corr_factor(const Vec3 &geo, const Vec3 &shd, const Vec3 &wi) noexcept
+    {
+        real dem = std::abs(cos(geo, wi));
+        return  dem < EPS ? 1 : std::abs(cos(shd, wi) / dem);
+    }
+
+    inline real normal_corr_factor(const Coord &geo, const Coord &shd, const Vec3 &wi) noexcept
+    {
+        return normal_corr_factor(geo.z, shd.z, wi);
+    }
+
 } // namespace local_angle
 
 class Medium;

@@ -13,7 +13,7 @@
  * 编写lutmat shader的过程：
  *  1. 编写initialize，输入为config params，输出material params
  *  2. 编写shade，输入为material params和intersection，输出bsdf params
- *  3. 编写eval, proj_wi_factor, sample, pdf, albedo, is_delta, is_black系列函数
+ *  3. 编写eval, sample, pdf, albedo, is_delta, is_black系列函数
  */
 
 AGZ_TRACER_BEGIN
@@ -91,27 +91,6 @@ namespace
             catch(...)
             {
                 return {};
-            }
-        }
-
-        /**
-         * proj_wi_factor params
-         *  wi: table{ x, y, z }
-         * return
-         *  real
-         */
-        real proj_wi_factor(const Vec3 &wi) const noexcept override
-        {
-            try
-            {
-                auto wi_tab = to_table(wi, state_);
-                
-                real ret = state_.state["proj_wi_factor"](params_, wi_tab);
-                return ret;
-            }
-            catch(...)
-            {
-                return 0;
             }
         }
 
