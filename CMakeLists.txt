@@ -11,7 +11,6 @@ PROJECT(Atrc)
 ############## optional submodules
 
 OPTION(USE_EMBREE     "use embree for finding triangle mesh intersection" OFF)
-OPTION(USE_BCD        "use bcd denoiser"                                  OFF)
 OPTION(USE_OIDN       "use oidn denoiser"                                 OFF)
 OPTION(LUA_ENABLE_JIT "use luajit instead of lua"                         OFF)
 
@@ -120,27 +119,6 @@ IF(USE_EMBREE)
 			)
 	ENDIF()
 	
-ENDIF()
-
-############## bcd & eigen
-
-IF(USE_BCD)
-	ADD_DEFINITIONS(-DUSE_BCD)
-	
-	SET(Eigen3_VERSION "3.3.7" )
-	ExternalProject_Add(
-		Eigen3
-		PREFIX "${PROJECT_SOURCE_DIR}/lib/eigen3"
-		URL "https://github.com/eigenteam/eigen-git-mirror/archive/${Eigen3_VERSION}.tar.gz"
-		URL_MD5 77a2c934eaf35943c43ee600a83b72df
-		UPDATE_COMMAND ""
-		CONFIGURE_COMMAND ""
-		BUILD_COMMAND ""
-		INSTALL_COMMAND ""
-	)
-	SET(EIGEN3_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/lib/eigen3/src/Eigen3)
-	
-	ADD_SUBDIRECTORY(lib/bcd)
 ENDIF()
 
 ############## oidn

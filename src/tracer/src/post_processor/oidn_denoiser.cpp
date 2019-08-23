@@ -9,6 +9,8 @@ AGZ_TRACER_BEGIN
 
 class OIDNDenoiser : public PostProcessor
 {
+    bool clamp_color_ = false;
+
 public:
 
     using PostProcessor::PostProcessor;
@@ -17,7 +19,17 @@ public:
     {
         return R"___(
 oidn_denoiser [PostProcessor]
+    clamp [0/1] clamp color to [0, 1] before denoising
 )___";
+    }
+
+    void initialize(const Config &params, obj::ObjectInitContext&) override
+    {
+        AGZ_HIERARCHY_TRY
+
+        clamp_color_ = params.child_int_or("clamp", 0) != 0;
+
+        AGZ_HIERARCHY_WRAP("in initializing oidn denoiser")
     }
 
     void process(ImageBuffer &image, GBuffer &gbuffer) override
@@ -30,7 +42,11 @@ oidn_denoiser [PostProcessor]
         ImageBuffer output(image.height(), image.width());
 
         oidn::FilterRef filter = device.newFilter("RT");
-        filter.setImage("color", image.get_data().raw_data(), oidn::Format::Float3, image.width(), image.height());
+
+        auto clamped_data = image.get_data();
+        if(clamp_color_)
+            clamped_data = clamped_data.map([](const Spectrum &c) { return c.clamp(0, 1); });
+        filter.setImage("color", clamped_data.raw_data(), oidn::Format::Float3, image.width(), image.height());
 
         AlbedoBuffer::data_t clamped_albedo;
         if(gbuffer.albedo)

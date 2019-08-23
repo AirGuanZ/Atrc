@@ -10,6 +10,7 @@ class NativeSampler : public Sampler
     using rng_t = std::mt19937;
     using seed_t = rng_t::result_type;
 
+    seed_t seed_;
     rng_t rng_;
     std::uniform_real_distribution<real> dis_;
 
@@ -39,6 +40,7 @@ native [Sampler]
         else
             seed = static_cast<seed_t>(std::time(nullptr));
         rng_ = rng_t(seed);
+        seed_ = seed;
 
         dis_ = std::uniform_real_distribution<real>();
 
@@ -58,10 +60,17 @@ native [Sampler]
     {
         auto *ret = arena.create<NativeSampler>();
 
+        seed_t new_seed;
+        {
+            std::seed_seq seed_gen = { seed_, seed_t(seed) };
+            seed_gen.generate(&new_seed, &new_seed + 1);
+        }
+
         if(seed < 0)
             ret->rng_ = rng_;
         else
-            ret->rng_ = rng_t(static_cast<seed_t>(seed));
+            ret->rng_ = rng_t(static_cast<seed_t>(new_seed));
+        ret->seed_ = new_seed;
 
         ret->dis_ = dis_;
         ret->spp_ = spp_;

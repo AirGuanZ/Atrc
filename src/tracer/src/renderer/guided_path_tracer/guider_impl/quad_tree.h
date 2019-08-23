@@ -133,7 +133,7 @@ class QuadTree : public misc::uncopyable_t
             uint32_t new_count = interior.children[0]->as<Leaf>().count
                                + interior.children[1]->as<Leaf>().count
                                + interior.children[2]->as<Leaf>().count
-                               + interior.children[3]->as<Leaf>().count;;
+                               + interior.children[3]->as<Leaf>().count;
             real new_sum = ret * new_count / area;
 
             *node = Leaf{ new_sum, new_count };

@@ -63,11 +63,51 @@ protected:
 
     // w位于shading_coord和geometry_coord的z=0平面的夹缝中间的情况
     // 此时bsdf是未定义的
-    bool cause_black_fringes(const Vec3 &w) const
+    bool cause_black_fringes(const Vec3 &w) const noexcept
     {
         bool shading_posi  = shading_coord_.in_positive_z_hemisphere(w);
         bool geometry_posi = geometry_coord_.in_positive_z_hemisphere(w);
         return shading_posi != geometry_posi;
+    }
+
+    bool cause_black_fringes(const Vec3 &w1, const Vec3 &w2) const noexcept
+    {
+        return cause_black_fringes(w1) || cause_black_fringes(w2);
+    }
+
+    Spectrum eval_for_black_fringes(const Vec3 &in, const Vec3 &out) const noexcept
+    {
+        if(!geometry_coord_.in_positive_z_hemisphere(in) ||
+           !geometry_coord_.in_positive_z_hemisphere(out))
+            return Spectrum();
+        return albedo() / PI_r;
+    }
+
+    BSDFSampleResult sample_for_black_fringes(const Vec3 &out, TransportMode mode, const Sample3 &sam) const noexcept
+    {
+        if(!geometry_coord_.in_positive_z_hemisphere(out))
+            return BSDF_SAMPLE_RESULT_INVALID;
+
+        auto [local_in, pdf] = math::distribution::zweighted_on_hemisphere(sam.u, sam.v);
+        if(pdf < EPS)
+            return BSDF_SAMPLE_RESULT_INVALID;
+
+        BSDFSampleResult ret;
+        ret.dir      = geometry_coord_.local_to_global(local_in).normalize();
+        ret.f        = albedo() / PI_r * local_angle::normal_corr_factor(geometry_coord_, shading_coord_, ret.dir);
+        ret.pdf      = pdf;
+        ret.mode     = mode;
+        ret.is_delta = false;
+
+        return ret;
+    }
+
+    real pdf_for_black_fringes(const Vec3 &in, const Vec3 &out) const noexcept
+    {
+        if(geometry_coord_.in_positive_z_hemisphere(in) != geometry_coord_.in_positive_z_hemisphere(out))
+            return false;
+        Vec3 local_in = geometry_coord_.global_to_local(in).normalize();
+        return math::distribution::zweighted_on_hemisphere_pdf(local_in.z);
     }
 
 public:

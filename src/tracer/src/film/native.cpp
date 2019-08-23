@@ -198,6 +198,26 @@ native [Film]
         }
     }
 
+    void add_grid(FilmGrid &&grid, const Spectrum &weight) override
+    {
+        auto &tgrid = dynamic_cast<const NativeFilmGrid&>(grid);
+        std::lock_guard<std::mutex> lk(mut_);
+
+        for(int y = tgrid.grid_y_beg_; y < tgrid.grid_y_end_; ++y)
+        {
+            int ly = y - tgrid.grid_y_beg_;
+            for(int x = tgrid.grid_x_beg_; x < tgrid.grid_x_end_; ++x)
+            {
+                int lx = x - tgrid.grid_x_beg_;
+
+                real rhs_w = tgrid.weights_(ly, lx);
+                Spectrum rhs = rhs_w ? weight * tgrid.values_(ly, lx) / rhs_w : Spectrum(0);
+
+                values_(y, x) += weights_(y, x) * rhs;
+            }
+        }
+    }
+
     std::unique_ptr<FilmGrid> new_grid(int x_beg, int x_end, int y_beg, int y_end) const override
     {
         return std::make_unique<NativeFilmGrid>(x_beg, x_end, y_beg, y_end, film_filter_);

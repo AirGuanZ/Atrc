@@ -120,7 +120,6 @@ void run(int argc, char *argv[])
         AGZ_LOG0("initializing embree device");
         agz::tracer::init_embree_device();
         AGZ_SCOPE_GUARD({
-            AGZ_LOG0("destroying embree device");
             agz::tracer::destroy_embree_device();
         });
 #endif
@@ -152,10 +151,8 @@ void run(int argc, char *argv[])
     if(rendering_config.is_group())
     {
         render(*scene, rendering_config.as_group(), obj_init_ctx);
-        return;
     }
-
-    if(rendering_config.is_array())
+    else if(rendering_config.is_array())
     {
         auto &arr = rendering_config.as_array();
         for(size_t i = 0; i < arr.size(); ++i)
@@ -163,10 +160,11 @@ void run(int argc, char *argv[])
             AGZ_LOG0("processing rendering config [", i, "]");
             render(*scene, arr.at_group(i), obj_init_ctx);
         }
-        return;
     }
+    else
+        throw agz::tracer::ObjectConstructionException("invalid rendering_config type");
 
-    throw agz::tracer::ObjectConstructionException("invalid rendering_config type");
+    AGZ_LOG0("destroying embree device");
 }
 
 #if defined(_WIN32) && defined(_DEBUG)

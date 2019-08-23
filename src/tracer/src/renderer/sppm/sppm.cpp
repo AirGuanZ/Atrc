@@ -87,8 +87,9 @@ class SPPMRenderer : public Renderer
         };
         CameraSample cam_sam = { film_coord, sampler.sample2() };
         auto cam_ray = scene.camera()->generate_ray(cam_sam);
-        
-        Spectrum coef = Spectrum(cam_ray.importance / (cam_ray.pdf_pos * cam_ray.pdf_dir));
+
+        real we_cos = std::abs(cos(cam_ray.r.d, cam_ray.nor));
+        Spectrum coef = Spectrum(we_cos * cam_ray.importance / (cam_ray.pdf_pos * cam_ray.pdf_dir));
         Ray r = cam_ray.r;
 
         // trace camera subpath

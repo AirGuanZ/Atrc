@@ -44,6 +44,8 @@ public:
 
     virtual void merge_grid(FilmGrid &&grid) = 0;
 
+    virtual void add_grid(FilmGrid &&grid, const Spectrum &weight = Spectrum(1)) = 0;
+
     /**
      * @brief 生成一块新grid
      * 

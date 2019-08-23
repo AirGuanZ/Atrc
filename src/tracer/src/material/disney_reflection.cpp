@@ -4,6 +4,7 @@
 #include <agz/tracer_utility/math.h>
 
 #include "./microfacet.h"
+#include "./normal_mapper.h"
 
 AGZ_TRACER_BEGIN
 
@@ -80,6 +81,9 @@ namespace
 
         Spectrum eval(const Vec3 &in_dir, const Vec3 &out_dir, TransportMode) const noexcept override
         {
+            if(cause_black_fringes(in_dir, out_dir))
+                return eval_for_black_fringes(in_dir, out_dir);
+
             Vec3 wi = shading_coord_.global_to_local(in_dir).normalize();
             Vec3 wo = shading_coord_.global_to_local(out_dir).normalize();
             if(wi.z <= 0 || wo.z <= 0)
@@ -155,8 +159,10 @@ namespace
 
         BSDFSampleResult sample(const Vec3 &out_dir, TransportMode transport_mode, const Sample3 &sam) const noexcept override
         {
-            Vec3 wo = shading_coord_.global_to_local(out_dir).normalize();
+            if(cause_black_fringes(out_dir))
+                return sample_for_black_fringes(out_dir, transport_mode, sam);
 
+            Vec3 wo = shading_coord_.global_to_local(out_dir).normalize();
             if(wo.z <= 0)
                 return BSDF_SAMPLE_RESULT_INVALID;
 
@@ -212,6 +218,9 @@ namespace
 
         real pdf(const Vec3 &in_dir, const Vec3 &out_dir, TransportMode) const noexcept override
         {
+            if(cause_black_fringes(in_dir, out_dir))
+                return pdf_for_black_fringes(in_dir, out_dir);
+
             Vec3 wi = shading_coord_.global_to_local(in_dir).normalize();
             Vec3 wo = shading_coord_.global_to_local(out_dir).normalize();
 
@@ -250,6 +259,8 @@ class DisneyReflection : public Material
     const Texture *sheen_tint_      = nullptr;
     const Texture *clearcoat_       = nullptr;
     const Texture *clearcoat_gloss_ = nullptr;
+
+    NormalMapper normal_mapper_;
 
 public:
 
@@ -302,6 +313,8 @@ disney_reflection [Material]
         clearcoat_       = defaulty_all_zero("clearcoat");
         clearcoat_gloss_ = defaulty_all_zero("clearcoat_gloss");
 
+        normal_mapper_.initialize(params, init_ctx);
+
         AGZ_HIERARCHY_WRAP("in initializing disney reflection material")
     }
 
@@ -319,7 +332,8 @@ disney_reflection [Material]
         real     clearcoat       = clearcoat_      ->sample_real(inct.uv);
         real     clearcoat_gloss = clearcoat_gloss_->sample_real(inct.uv);
 
-        auto bsdf = arena.create<DisneyBRDF>(inct.geometry_coord, inct.user_coord,
+        Coord shading_coord = normal_mapper_.reorient(inct.uv, inct.user_coord);
+        auto bsdf = arena.create<DisneyBRDF>(inct.geometry_coord, shading_coord,
                                              base_color,
                                              metallic,
                                              subsurface,

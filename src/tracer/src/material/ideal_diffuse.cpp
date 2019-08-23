@@ -2,6 +2,8 @@
 #include <agz/tracer/core/material.h>
 #include <agz/tracer/core/texture.h>
 
+#include "./normal_mapper.h"
+
 AGZ_TRACER_BEGIN
 
 namespace
@@ -20,7 +22,9 @@ namespace
 
         Spectrum eval(const Vec3 &in_dir, const Vec3 &out_dir, TransportMode) const noexcept override
         {
-            // IMPROVE: fix black fringes
+            if(cause_black_fringes(in_dir, out_dir))
+                return eval_for_black_fringes(in_dir, out_dir);
+
             Vec3 local_in  = shading_coord_.global_to_local(in_dir);
             Vec3 local_out = shading_coord_.global_to_local(out_dir);
             if(local_in.z <= 0 || local_out.z <= 0)
@@ -30,6 +34,9 @@ namespace
 
         BSDFSampleResult sample(const Vec3 &dir, TransportMode transport_mode, const Sample3 &sam) const noexcept override
         {
+            if(cause_black_fringes(dir))
+                return sample_for_black_fringes(dir, transport_mode, sam);
+
             if(!shading_coord_.in_positive_z_hemisphere(dir))
                 return BSDF_SAMPLE_RESULT_INVALID;
 
@@ -49,6 +56,9 @@ namespace
 
         real pdf(const Vec3 &in_dir, const Vec3 &out_dir, TransportMode) const noexcept override
         {
+            if(cause_black_fringes(in_dir, out_dir))
+                return pdf_for_black_fringes(in_dir, out_dir);
+
             if(!shading_coord_.in_positive_z_hemisphere(in_dir) || !shading_coord_.in_positive_z_hemisphere(out_dir))
                 return 0;
             Vec3 local_in = shading_coord_.global_to_local(in_dir).normalize();
@@ -65,6 +75,7 @@ namespace
 class IdealDiffuse : public Material
 {
     const Texture *albedo_ = nullptr;
+    NormalMapper normal_mapper_;
 
 public:
 
@@ -81,14 +92,16 @@ ideal_diffuse [Material]
     void initialize(const Config &params, obj::ObjectInitContext &context) override
     {
         albedo_ = TextureFactory.create(params.child_group("albedo"), context);
+        normal_mapper_.initialize(params, context);
     }
 
     ShadingPoint shade(const EntityIntersection &inct, Arena &arena) const override
     {
         auto albedo = albedo_->sample_spectrum(inct.uv);
+        Coord shading_coord = normal_mapper_.reorient(inct.uv, inct.user_coord);
 
         ShadingPoint shd;
-        shd.bsdf = arena.create<IdealDiffuseBRDF>(inct.geometry_coord, inct.user_coord, albedo);
+        shd.bsdf = arena.create<IdealDiffuseBRDF>(inct.geometry_coord, shading_coord, albedo);
 
         return shd;
     }

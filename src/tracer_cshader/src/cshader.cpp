@@ -1,7 +1,7 @@
-#include <agz/tracer_cshader/c_interface.h>
+#include <agz/tracer_cshader/cshader.h>
 
 #ifdef _WIN32
-#  define AGZT_DLL_EXPORTIT __declspec( dllexport )
+#  define AGZT_DLL_EXPORTIT __declspec(dllexport)
 #else
 #  define AGZT_DLL_EXPORTIT
 #endif

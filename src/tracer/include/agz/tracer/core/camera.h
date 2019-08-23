@@ -27,6 +27,8 @@ struct CameraGenerateRayResult
 
     real pdf_dir;
     bool is_dir_delta;
+
+    Vec3 nor;
 };
 
 /**
@@ -37,9 +39,11 @@ struct CameraSampleRayResult
     Vec3 ref_to_cam;         // 参考点到摄像机的射线方向
     Vec3 film_pos;           // world space中的摄像机镜头上的点的位置
     Vec2 film_coord;         // 对应于film上的什么位置（整个film是[0, 1]^2）
-    real importance = 1;     // We * cos值
+    real importance = 1;     // We值
     real pdf        = 1;     // w.r.t. solid angle at ref
     bool is_delta   = false; // pdf是否是delta function
+
+    Vec3 nor;
 
     bool is_invalid() const noexcept
     {

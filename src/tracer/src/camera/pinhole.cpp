@@ -99,6 +99,7 @@ pinhole [Camera]
         ret.pdf_dir      = dist_ * dist_ / (cos_v * cos_v * cos_v);
         ret.is_dir_delta = true;
         ret.importance   = dist_ * dist_ / (film_area_in_world_space_ * cos_v * cos_v * cos_v * cos_v);
+        ret.nor          = dir_;
 
         return ret;
     }
@@ -124,6 +125,7 @@ pinhole [Camera]
         ret.importance = dist_ * dist_ / (film_area_in_world_space_ * cos_v * cos_v * cos_v * cos_v);
         ret.pdf        = (ref_pos - pos_).length_square() / cos(dref, dir_);
         ret.is_delta   = true;
+        ret.nor        = dir_;
 
         return ret;
     }

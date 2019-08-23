@@ -107,7 +107,8 @@ class GuidedPathTracer : public Renderer
                     auto value = integrator_->eval(
                         scene, cam_ray.r, sampler, arena,
                         batch_builder, guider, TrainGuider, SampleGuider);
-                    value *= cam_ray.importance / (cam_ray.pdf_pos * cam_ray.pdf_dir);
+                    real we_cos = std::abs(cos(cam_ray.r.d, cam_ray.nor));
+                    value *= we_cos * cam_ray.importance / (cam_ray.pdf_pos * cam_ray.pdf_dir);
 
                     if constexpr(!TrainGuider)
                         film_grid->add_sample({ pixel_x, pixel_y }, value, GBufferPixel(), 1);

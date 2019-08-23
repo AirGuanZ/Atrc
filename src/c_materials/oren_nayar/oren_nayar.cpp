@@ -1,4 +1,4 @@
-#include <agz/tracer_cshader/c_interface.h>
+#include <agz/tracer_cshader/cshader.h>
 
 AGZ_TRACER_BEGIN
 

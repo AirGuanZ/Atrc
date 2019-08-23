@@ -30,7 +30,7 @@ public:
 
     BSDFSampleResult sample(const Vec3 &wo, TransportMode mode, const Sample3 &sam) const noexcept override
     {
-        assert(bsdf_count_ > 0);
+        assert(!bsdfs_.empty());
 
         auto [bsdf_idx, new_sam_u] = math::distribution::extract_uniform_int(sam.u, 0, int(bsdfs_.size()));
         const BSDF *bsdf = bsdfs_[bsdf_idx];
@@ -62,7 +62,7 @@ public:
 
     real pdf(const Vec3 &wi, const Vec3 &wo, TransportMode mode) const noexcept override
     {
-        assert(bsdf_count_ > 0);
+        assert(!bsdfs_.empty());
 
         real ret = 0;
         for(size_t i = 0; i < bsdfs_.size(); ++i)
