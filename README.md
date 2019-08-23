@@ -11,7 +11,6 @@ Offline rendering lab based on ray tracing
 - [x] Materials: Disney BRDF, frosted glass, mirror, varnish, MTL...
 - [x] HDR texture
 - [x] (optional) integrated [Embree](https://github.com/embree/embree) engine
-- [x] (optional) integrated [BCD](https://github.com/superboubek/bcd) denoiser
 - [x] (optional) integrated [OIDN](https://github.com/OpenImageDenoise/oidn) denoiser
 - [ ] bidirectional path tracing
 
