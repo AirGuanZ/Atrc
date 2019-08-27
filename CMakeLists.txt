@@ -12,7 +12,6 @@ PROJECT(Atrc)
 
 OPTION(USE_EMBREE     "use embree for finding triangle mesh intersection" OFF)
 OPTION(USE_OIDN       "use oidn denoiser"                                 OFF)
-OPTION(LUA_ENABLE_JIT "use luajit instead of lua"                         OFF)
 
 ############## CXX properties
 
@@ -133,20 +132,6 @@ IF(USE_OIDN)
 
 	FIND_PACKAGE(OpenImageDenoise PATHS ${OIDN_PATH})
 
-ENDIF()
-
-############## lua
-
-IF(LUA_ENABLE_JIT)
-	SET(LUA_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/lib/luajit/include)
-	IF(MSVC)
-		SET(LUA_LIBRARIES ${PROJECT_SOURCE_DIR}/lib/luajit/lua51.lib)
-	ELSE()
-		SET(LUA_LIBRARIES ${PROJECT_SOURCE_DIR}/lib/luajit/libluajit.so)
-	ENDIF()
-ELSE()
-	ADD_SUBDIRECTORY(lib/lua)
-	SET(LUA_LIBRARIES Lua)
 ENDIF()
 
 ############## other submodules

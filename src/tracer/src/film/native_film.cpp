@@ -1,26 +1,18 @@
 #include <agz/tracer/core/film.h>
-#include <agz/tracer/core/film_filter.h>
 
 AGZ_TRACER_BEGIN
+
+using value_data_t  = texture::texture2d_t<Spectrum>;
+using weight_data_t = texture::texture2d_t<real>;
 
 class NativeFilmGrid : public FilmGrid
 {
     friend class NativeFilm;
 
-    using value_data_t  = texture::texture2d_t<Spectrum>;
-    using weight_data_t = texture::texture2d_t<real>;
-
     int grid_x_beg_;
     int grid_x_end_;
     int grid_y_beg_;
     int grid_y_end_;
-
-    int sample_x_beg_;
-    int sample_x_end_;
-    int sample_y_beg_;
-    int sample_y_end_;
-
-    const FilmFilter *film_filter_;
 
     value_data_t values_;
     weight_data_t weights_;
@@ -32,8 +24,7 @@ class NativeFilmGrid : public FilmGrid
 
 public:
 
-    NativeFilmGrid(int x_beg, int x_end, int y_beg, int y_end, const FilmFilter *film_filter)
-        : film_filter_(film_filter)
+    NativeFilmGrid(int x_beg, int x_end, int y_beg, int y_end)
     {
         int x_size = x_end - x_beg;
         int y_size = y_end - y_beg;
@@ -50,86 +41,52 @@ public:
         grid_y_beg_ = y_beg;
         grid_x_end_ = x_end;
         grid_y_end_ = y_end;
-
-        real radius = film_filter->radius();
-        sample_x_beg_ = static_cast<int>(std::floor(grid_x_beg_ + real(0.5) - radius));
-        sample_y_beg_ = static_cast<int>(std::floor(grid_y_beg_ + real(0.5) - radius));
-        sample_x_end_ = static_cast<int>(std::ceil(grid_x_end_ - real(0.5) + radius));
-        sample_y_end_ = static_cast<int>(std::ceil(grid_y_end_ - real(0.5) + radius));
     }
 
     int sample_x_beg() const noexcept override
     {
-        return sample_x_beg_;
+        return grid_x_beg_;
     }
 
     int sample_x_end() const noexcept override
     {
-        return sample_x_end_;
+        return grid_x_end_;
     }
 
     int sample_y_beg() const noexcept override
     {
-        return sample_y_beg_;
+        return grid_y_beg_;
     }
 
     int sample_y_end() const noexcept override
     {
-        return sample_y_end_;
+        return grid_y_end_;
     }
 
     void add_sample(const Vec2 &pos, const Spectrum &value, const GBufferPixel &gpixel, real w) override
     {
-        real radius = film_filter_->radius();
+        int x = static_cast<int>(std::floor(pos.x));
+        int y = static_cast<int>(std::floor(pos.y));
 
-        int x_beg = static_cast<int>(std::ceil(pos.x - radius - real(0.5)));
-        int y_beg = static_cast<int>(std::ceil(pos.y - radius - real(0.5)));
-        int x_end = static_cast<int>(std::floor(pos.x + radius - real(0.5))) + 1;
-        int y_end = static_cast<int>(std::floor(pos.y + radius - real(0.5))) + 1;
+        if(x < grid_x_beg_ || x >= grid_x_end_ || y < grid_y_beg_ || y >= grid_y_end_)
+            return;
 
-        x_beg = std::max(grid_x_beg_, x_beg);
-        y_beg = std::max(grid_y_beg_, y_beg);
-        x_end = std::min(grid_x_end_, x_end);
-        y_end = std::min(grid_y_end_, y_end);
-
-        for(int y = y_beg; y < y_end; ++y)
-        {
-            int ly = y - grid_y_beg_;
-            real y_cen = y + real(0.5);
-            real y_rel = std::abs(pos.y - y_cen);
-            if(y_rel > radius)
-                continue;
-
-            for(int x = x_beg; x < x_end; ++x)
-            {
-                int lx = x - grid_x_beg_;
-                real x_cen = x + real(0.5);
-                real x_rel = std::abs(pos.x - x_cen);
-                if(x_rel > radius)
-                    continue;
-
-                real weight = w * film_filter_->eval(x_rel, y_rel);
-                values_(ly, lx) += weight * value;
-                weights_(ly, lx) += weight;
-
-                albedo_(ly, lx)   += weight * gpixel.albedo;
-                position_(ly, lx) += weight * gpixel.position;
-                normal_(ly, lx)   += weight * gpixel.normal;
-                depth_(ly, lx)    += weight * gpixel.depth;
-            }
-        }
+        int lx = x - grid_x_beg_, ly = y - grid_y_beg_;
+        values_(ly, lx)   += w * value;
+        albedo_(ly, lx)   += w * gpixel.albedo;
+        position_(ly, lx) += w * gpixel.position;
+        normal_(ly, lx)   += w * gpixel.normal;
+        depth_(ly, lx)    += w * gpixel.depth;
+        weights_(ly, lx)  += w;
     }
 };
 
 class NativeFilm : public Film
 {
     int h_ = 0, w_ = 0;
-    const FilmFilter *film_filter_ = nullptr;
 
-    texture::texture2d_t<Spectrum> values_;
-    texture::texture2d_t<real> weights_;
-
-    // gbuffer attributes
+    value_data_t  values_;
+    weight_data_t weights_;
 
     AlbedoBuffer   albedo_;
     PositionBuffer position_;
@@ -148,12 +105,11 @@ public:
 native [Film]
     height [int] framebuffer height
     width  [int] framebuffer width
-    filter [FilmFilter] film filter
         
     gbuffer is supported
         )__";
     }
-
+    
     void initialize(const Config &params, obj::ObjectInitContext &init_ctx) override
     {
         AGZ_HIERARCHY_TRY
@@ -163,9 +119,7 @@ native [Film]
         if(h_ <= 0 || w_ <= 0)
             throw ObjectConstructionException("invalid film size");
 
-        film_filter_ = FilmFilterFactory.create(params.child_group("filter"), init_ctx);
-
-        values_ = texture::texture2d_t<Spectrum>(h_, w_);
+        values_  = texture::texture2d_t<Spectrum>(h_, w_);
         weights_ = texture::texture2d_t<real>(h_, w_);
 
         albedo_   = AlbedoBuffer(h_, w_);
@@ -220,7 +174,7 @@ native [Film]
 
     std::unique_ptr<FilmGrid> new_grid(int x_beg, int x_end, int y_beg, int y_end) const override
     {
-        return std::make_unique<NativeFilmGrid>(x_beg, x_end, y_beg, y_end, film_filter_);
+        return std::make_unique<NativeFilmGrid>(x_beg, x_end, y_beg, y_end);
     }
 
     texture::texture2d_t<Spectrum> image() const override
@@ -246,10 +200,10 @@ native [Film]
             {
                 real w = weights_(y, x);
                 real ratio = w ? 1 / w : 0;
-                ret.albedo->at(y, x)   = ratio * albedo_(y, x);
+                ret.albedo  ->at(y, x) = ratio * albedo_(y, x);
                 ret.position->at(y, x) = ratio * position_(y, x);
-                ret.normal->at(y, x)   = ratio * normal_(y, x);
-                ret.depth->at(y, x)    = ratio * depth_(y, x);
+                ret.normal  ->at(y, x) = ratio * normal_(y, x);
+                ret.depth  ->at(y, x)  = ratio * depth_(y, x);
             }
         }
         return ret;

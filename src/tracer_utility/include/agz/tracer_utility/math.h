@@ -76,6 +76,14 @@ namespace local_angle
     }
 
     /**
+     * @brief cos_theta的绝对值
+     */
+    inline real abs_cos_theta(const Vec3 &w) noexcept
+    {
+        return std::abs(cos_theta(w));
+    }
+
+    /**
      * @brief 将某角度的cos值转为其sin正值
      */
     inline real cos_2_sin(real cos)

@@ -14,8 +14,6 @@
 已经由项目文件自带的依赖项如下：
 
 * [agz-utils](https://github.com/AirGuanZ/agz-utils)，提供数学计算、图像加载等基本功能
-* [lua](http://www.lua.org/)，用于编写材质的脚本语言
-* [sol2](https://github.com/ThePhD/sol2)，提供lua和C++间的友好接口
 * [cxxopts](https://github.com/jarro2783/cxxopts)，用于命令行参数解析
 * [nlohmann json](https://github.com/nlohmann/json)，用于JSON配置文件的解析
 * [stl reader](https://github.com/sreiter/stl_reader)，用于解析STL模型文件
@@ -27,23 +25,21 @@
 
 可选的、需额外准备的依赖项如下：
 
-* [luajit 2.05](http://luajit.org/)，替代原来的lua实现
 * [oidn](https://openimagedenoise.github.io/)，基于机器学习的降噪滤波器
 
 ### CMake Options
 
-| 选项名         | 默认值 | 含义                                                         |
-| -------------- | ------ | ------------------------------------------------------------ |
-| USE_EMBREE     | OFF    | 启用Embree加速器，这会使得项目在构建时自动下载Embree库       |
-| LUA_ENABLE_JIT | OFF    | 使用jit版本的lua实现，这需要预先在外部准备luajit库           |
-| USE_OIDN       | OFF    | 启用OIDN降噪器，这需要预先在外部准备OIDN库                   |
-| OIDN_PATH      | 无     | 在USE_OIDN为ON时必须，指向包含OIDN的CMake Config文件的绝对路径 |
+| 选项名     | 默认值 | 含义                                                         |
+| ---------- | ------ | ------------------------------------------------------------ |
+| USE_EMBREE | OFF    | 启用Embree加速器，这会使得项目在构建时自动下载Embree库       |
+| USE_OIDN   | OFF    | 启用OIDN降噪器，这需要预先在外部准备OIDN库                   |
+| OIDN_PATH  | 无     | 在USE_OIDN为ON时必须，指向包含OIDN的CMake Config文件的绝对路径 |
 
 注意到OIDN只支持64位程序，因此若启用了OIDN库，必须以64位模式构建程序。
 
 ### Example
 
-以Windows环境为例，若启用Embree、LuaJIT、OIDN等可选功能，典型的构建过程如下：
+以Windows环境为例，若启用Embree、OIDN等可选功能，典型的构建过程如下：
 
 1. 在`PowerShell`中运行命令：
 
@@ -51,19 +47,17 @@
    git clone --recursive --depth=1 https://github.com/AirGuanZ/Atrc
    ```
 
-2. 将LuaJIT编译为动态库，将其头文件拷贝到`Atrc/lib/luajit/include`下，将其库文件拷贝到`Atrc/lib/luajit`下
-
-3. 编译OIDN或在[此处](https://github.com/OpenImageDenoise/oidn/releases)下载预先编译好的版本，设包含其`CMake Config`的文件路径为`XXXXX`
+3. 编译OIDN或在[此处](https://github.com/OpenImageDenoise/oidn/releases)下载预先编译好的版本，设包含其`CMake Config`的文件路径为`X`
 
 4. 在`PowerShell`中继续运行命令：
 
    ```powershell
    mkdir build
    cd build
-   cmake -DUSE_EMBREE=ON -DLUA_ENABLE_JIT=ON -DUSE_OIDN=ON -DOIDN_PATH="XXXXX" -G "Visual Studio 15 2017 Win64" ..
+   cmake -DUSE_EMBREE=ON -DUSE_OIDN=ON -DOIDN_PATH="X" -G "Visual Studio 15 2017 Win64" ..
    ```
 
-这会在`Atrc/build`下生成`Visual Studio 2017`的解决方案文件。第一次编译时会从网络上下载Eigen库和Embree库，此时应保持网络良好。
+这会在`Atrc/build`下生成`Visual Studio 2017`的解决方案文件。第一次编译时会从网络上Embree库，此时应保持网络良好。
 
 ## Usage
 
@@ -426,7 +420,16 @@ Gaussian滤波函数。
 
 #### native
 
-最基本的点阵存储，支持位置、深度、材质颜色和法线等属性构成的G-Buffer。
+最基础的的点阵存储，支持位置、深度、材质颜色和法线等属性构成的G-Buffer。
+
+| 字段名 | 类型 | 默认值 | 含义               |
+| ------ | ---- | ------ | ------------------ |
+| width  | int  |        | 以像素为单位的宽度 |
+| height | int  |        | 以像素为单位的高度 |
+
+#### filtered
+
+支持任意重建滤波函数的点阵存储，支持位置、深度、材质颜色和法线等属性构成的G-Buffer。
 
 | 字段名 | 类型       | 默认值 | 含义                   |
 | ------ | ---------- | ------ | ---------------------- |
@@ -665,17 +668,6 @@ Disney Principled BRDF的完整实现，有的参数含义我不知道怎么翻�
 | eta_out  | Texture  |        | 清漆外部的折射率 |
 | color    | Texture  |        | 清漆颜色         |
 
-#### luamat
-
-用lua脚本语言编写的材质，详情请见后文。
-
-| 字段名          | 类型   | 默认值 | 含义         |
-| --------------- | ------ | ------ | ------------ |
-| script_filename | string |        | 脚本文件路径 |
-| script          | string |        | 脚本内容     |
-
-`script_filename`和`script`只需给出其中一项即可。
-
 #### lib
 
 以外部共享库形式存在的材质，详情请见后文。
@@ -691,6 +683,14 @@ Disney Principled BRDF的完整实现，有的参数含义我不知道怎么翻�
 #### void
 
 真空，也就是什么介质也没有。
+
+#### absorbtion
+
+无散射的介质。
+
+| 字段名  | 类型     | 默认值 | 含义   |
+| ------- | -------- | ------ | ------ |
+| sigma_a | Spectrum |        | 吸收率 |
 
 #### homogeneous
 
@@ -795,39 +795,6 @@ Adjoint Particle Tracer的实现，收敛很慢，主要为学习用途。
 
 在追踪一条路径时，有三个追踪参数`min_depth`，`max_depth`和`cont_prob`值得注意。当追踪深度超过`min_depth`后，将以`cont_prob`为通过概率使用Russian Roulette策略来终止路径；而在路径深度超过`max_depth`时，它将被无条件终止。
 
-#### guided_pt
-
-参数含义太难说清，请参考论文[Practical Path Guiding for Efficient Light-Transport Simulation](http://drz.disneyresearch.com/~jnovak/publications/PathGuide/index.html)。
-
-| 字段名                 | 类型                        | 默认值 | 含义                                     |
-| ---------------------- | --------------------------- | ------ | ---------------------------------------- |
-| record_batch_size      | int                         | 10000  | 提交radiance缓存记录的批次大小           |
-| k0                     | int                         |        | 初始训练spp                              |
-| c                      | real                        |        | 细分空间二叉树时的阈值比例参数$c$        |
-| rho                    | real                        |        | 细分方向四叉树时的叶节点最大能量比$\rho$ |
-| training_count         | int                         |        | 训练轮数                                 |
-| task_grid_size         | int                         |        | 图像子任务边长                           |
-| rendering_worker_count | int                         |        | 工作线程数                               |
-| integrator             | GuidedPathTracingIntegrator |        | 路径追踪策略                             |
-| rendering_spp          | int                         | 无     | 最终渲染时的spp，默认为末轮训练spp的两倍 |
-| sampler                | Sampler                     |        | 随机数采样器                             |
-
-#### sppm
-
-详情请见论文[Stochastic Progressive Photon Mapping](https://www.ci.i.u-tokyo.ac.jp/~hachisuka/sppm.pdf)。
-
-| 字段名           | 类型    | 默认值 | 含义                           |
-| ---------------- | ------- | ------ | ------------------------------ |
-| init_radius      | real    |        | 每个像素的初始搜索半径         |
-| iteration_count  | int     |        | 进行多少轮参数迭代             |
-| iteration_count  | int     |        | 每轮迭代使用多少光子           |
-| max_cam_depth    | int     |        | 最大摄像机路径深度             |
-| min_photon_depth | int     |        | 使用RR策略前的最小光子路径深度 |
-| photon_cont_prob | real    |        | 追踪光子时RR策略的通过概率     |
-| alpha            | real    |        | 更新像素半径时的增长因子       |
-| worker_count     | int     |        | 工作线程数                     |
-| sampler          | Sampler |        | 随机数采样器                   |
-
 ### PathTracingIntegrator
 
 `PathTracingIntegrator`用于描述path tracing算法中追踪何种路径。
@@ -886,31 +853,6 @@ Adjoint Particle Tracer的实现，收敛很慢，主要为学习用途。
 #### mis_vol
 
 使用Multiple Importance Sampling技术优化的路径追踪，支持介质渲染。
-
-| 字段名            | 类型 | 默认值 | 含义                                             |
-| ----------------- | ---- | ------ | ------------------------------------------------ |
-| min_depth         | int  |        | 使用RR策略前的最小路径深度                       |
-| max_depth         | int  |        | 路径的最大截断深度                               |
-| cont_prob         | real |        | 追踪时使用RR策略的通过概率                       |
-| sample_all_lights | bool |        | 每次采样时是遍历所有光源还是随机抽取一个进行采样 |
-
-### GuidedPathTracingIntegrator
-
-用来描述`guided_pt`类型的Renderer的路径追踪策略。
-
-#### native
-
-使用Multiple Importance Sampling技术结合BSDF和之前的训练结果进行采样。
-
-| 字段名    | 类型 | 默认值 | 含义                       |
-| --------- | ---- | ------ | -------------------------- |
-| min_depth | int  |        | 使用RR策略前的最小路径深度 |
-| max_depth | int  |        | 路径的最大截断深度         |
-| cont_prob | real |        | 追踪时使用RR策略的通过概率 |
-
-#### mis
-
-使用Multiple Importance Sampling技术结合BSDF、训练结果、光源三者进行采样。
 
 | 字段名            | 类型 | 默认值 | 含义                                             |
 | ----------------- | ---- | ------ | ------------------------------------------------ |
@@ -1090,12 +1032,6 @@ Adjoint Particle Tracer的实现，收敛很慢，主要为学习用途。
 | 字段名 | 类型 | 默认值 | 含义   |
 | ------ | ---- | ------ | ------ |
 | ratio  | real |        | 缩放比 |
-
-## lua材质脚本
-
-TODO
-
-**还是别用这玩意儿了**，实在太慢了（
 
 ## 共享库材质插件
 

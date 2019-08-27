@@ -71,7 +71,7 @@ namespace
                 return BSDF_SAMPLE_RESULT_INVALID;
             Vec3 nwi = opt_wi->normalize();
 
-            real corr_factor = transport_mode == TM_Radiance ? 1 / (eta * eta) : real(1);
+            real corr_factor = transport_mode == TM_Radiance ? eta * eta : real(1);
 
             BSDFSampleResult ret;
             ret.dir      = shading_coord_.local_to_global(nwi);

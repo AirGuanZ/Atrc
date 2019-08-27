@@ -42,8 +42,14 @@ public:
 
     using Object::Object;
 
+    /**
+     * 要求实现是线程安全的
+     */
     virtual void merge_grid(FilmGrid &&grid) = 0;
 
+    /**
+     * 要求实现是线程安全的
+     */
     virtual void add_grid(FilmGrid &&grid, const Spectrum &weight = Spectrum(1)) = 0;
 
     /**

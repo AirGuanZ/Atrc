@@ -1,5 +1,6 @@
 #include <agz/tracer/core/post_processor.h>
 #include <agz/tracer/utility/logger.h>
+#include <agz/utility/file.h>
 #include <agz/utility/image.h>
 
 AGZ_TRACER_BEGIN
@@ -12,12 +13,14 @@ class SaveGBufferToPNG : public PostProcessor
 
     static void save_albedo(const std::string &filename, AlbedoBuffer &albedo)
     {
+        file::create_directory_for_file(filename);
         AGZ_LOG0("saving gbuffer::albedo to ", filename);
         img::save_rgb_to_png_file(filename, albedo.get_data().map(math::to_color3b<real>));
     }
 
     static void save_normal(const std::string &filename, NormalBuffer &normal)
     {
+        file::create_directory_for_file(filename);
         texture::texture2d_t<Spectrum> imgf(normal.height(), normal.width());
         for(int y = 0; y < imgf.height(); ++y)
         {
@@ -34,6 +37,7 @@ class SaveGBufferToPNG : public PostProcessor
 
     static void save_depth(const std::string &filename, DepthBuffer &depth)
     {
+        file::create_directory_for_file(filename);
         real min_depth = std::numeric_limits<real>::max(), max_depth = std::numeric_limits<real>::min();
         for(int y = 0; y < depth.height(); ++y)
         {

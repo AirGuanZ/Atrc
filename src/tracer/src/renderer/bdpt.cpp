@@ -4,7 +4,9 @@
 #include <random>
 #include <thread>
 
+#include <agz/tracer/core/bsdf.h>
 #include <agz/tracer/core/camera.h>
+#include <agz/tracer/core/light.h>
 #include <agz/tracer/core/material.h>
 #include <agz/tracer/core/reporter.h>
 #include <agz/tracer/core/renderer.h>
@@ -13,42 +15,102 @@
 #include <agz/tracer/utility/grid_divider.h>
 #include <agz/utility/thread.h>
 
+/*
+generate cam subpath c1, c2, ..., cs
+generate lht subpath l1, l2, ..., lt
+
+ret = black
+
+for ci = 1 to cs
+    for li = 0 to lt
+
+        // path长度
+        k = ci + li
+
+        if k < 2
+            continue
+        if k == 2
+            // 对len == 2的情况单独处理：只算cam ray的contribution，不使用cam sampling，当然也就谈不上mis
+            if ci == 2
+                ret += unweighted contribution
+            continue
+
+        // 构建一条contribution不为0的路径
+        if ci == 1
+            p = sample camera to construct a path
+            if p is out of film
+                continue
+            use_cam_sam = true
+            recompute we
+        else if li == 0
+            p = c1...ci
+            if ci is not a light source
+                continue
+            use_cam_sam = false
+            recompute le
+        else if li == 1
+            p = c1...ci li
+            use_cam_sam = false
+            recompute le
+        else
+            p = c1...ci, li...l1
+            if ci and li are not visible
+                continue
+            use_cam_sam = false
+
+        throughput = we * ... * bsdf * G * bsdf * ... * le
+
+        cur_pdf = (cam.pdf / cam.cos) * (pdf / cos) * ... * (lht.pdf / lht.cos)
+        wht_dem = 1
+
+        tpdf = 1
+        for i = ci; i >= 2; --i
+            tpdf *= (pdf{i+1 to i} / cos) / (pdf{i-1 to i} / cos)
+            tpdf *= G(i, i+1) / G(i-1, i)
+            if i-1 is not specular
+                wht_dem += tpdf * tpdf
+
+        tpdf = 1
+        for i = ci+1; i <= k-1; ++i
+            tpdf *= (pdf{i-1 to i} / cos) / (pdf{i+1 to i} / cos)
+            tpdf *= G(i-1, i) / G(i, i+1)
+            if i+1 is not specular
+                wht_dem += tpdf * tpdf
+
+        if li >= 1
+            tpdf *= (pdf{k-1 to k} / cos) / lht.pdf_area
+            tpdf *= G(k-2, k-1)
+            wht_dem += tpdf * tpdf
+
+        mis_weight = 1 / wht_dem
+        contrib = mis_weight * throughput / cur_pdf
+
+        if use_cam_sam
+            add contrib to full_film_grid
+        else
+            ret += contrib
+*/
+
 AGZ_TRACER_BEGIN
 
 namespace bdpt
 {
 
-class BDPTEndPoint
+struct Vertex
 {
-public:
-
     Vec3 pos;
     Vec3 nor;
-    real pdf_area = 0;
 
-    Spectrum f;
-    real pdf_dir  = 0;
-    bool is_delta = false;
+    const BSDF *bsdf = nullptr;
+    bool is_specular = false;
 
-    virtual ~BDPTEndPoint() = default;
+    Spectrum accu_f; // 从cam we开始，一直到这个顶点，中间所有的bsdf值的乘积；注意该顶点的bsdf也算进去
+                              // 对subpath末端的顶点而言，该成员无意义
 
-    // return (emission, pdf)
-    virtual std::pair<Spectrum, real> eval(const Vec3 &next_pos) const noexcept = 0;
-};
+    real pdf_right = -1; // 该顶点向lht方向被采样到的pdf，也就是p(i to i+1)存放在i.pdf_right中
+    real pdf_left  = -1; // 该顶点向cam方向被采样到的pdf，也就是p(i+1 to i)存放在i.pdf_left中
 
-class Vertex
-{
-public:
-
-    Vec3 pos;
-    Vec3 wr;
-    Vec3 wsam;
-
-    Spectrum accumulated_f; // bsdf(wsam, wr)
-
-    real pdf_proj_radiance   = 0;
-    real pdf_proj_importance = 0;
-    bool is_delta            = false;
+    const Entity *entity = nullptr;
 };
 
 class BDPT : public Renderer
@@ -88,14 +150,8 @@ class BDPT : public Renderer
         int task_grid_size = 24;
         int worker_count   = -1;
 
-        int cam_min_depth = 4;
-        int lht_min_depth = 4;
-
         int cam_max_depth = 10;
         int lht_max_depth = 10;
-
-        real cam_cont_prob = real(0.9);
-        real lht_cont_prob = real(0.9);
 
     } params_;
 
@@ -136,10 +192,107 @@ class BDPT : public Renderer
         return ret;
     }
 
-    Spectrum eval(const Ray &cam_ray, Sampler &sampler, GBufferPixel *gpixel, Arena &arena, FilmGrid *full_film_grid, const Vec2i &full_res)
+    static void gen_subpath(
+        Ray r, const Scene &scene, Sampler &sampler,
+        const Spectrum &init_accu_f, real init_pdf,
+        std::vector<Vertex> *output, GBufferPixel *gpixel,
+        TransportMode mode, Arena &arena, int max_subpath_depth)
     {
+        Spectrum accu_f = init_accu_f;
+        real last_to_this_pdf = init_pdf;
+
+        for(int depth = 1; depth <= max_subpath_depth; ++depth)
+        {
+            EntityIntersection inct;
+            if(!scene.closest_intersection(r, &inct))
+                break;
+
+            auto shd = inct.material->shade(inct, arena);
+            if(depth == 1 && gpixel)
+            {
+                gpixel->albedo   = shd.bsdf->albedo();
+                gpixel->depth    = r.d.length() * inct.t;
+                gpixel->position = inct.pos;
+                gpixel->normal   = inct.user_coord.z;
+            }
+
+            auto bsdf_sample = shd.bsdf->sample(inct.wr, mode, sampler.sample3());
+            accu_f *= bsdf_sample.f;
+
+            Vertex vtx;
+            vtx.pos         = inct.pos;
+            vtx.nor         = inct.geometry_coord.z;
+            vtx.bsdf        = shd.bsdf;
+            vtx.is_specular = shd.bsdf->is_delta();
+            vtx.accu_f      = accu_f;
+            vtx.entity      = inct.entity;
+            if(mode == TM_Radiance)
+            {
+                vtx.pdf_right    = last_to_this_pdf;
+                vtx.pdf_left     = -1;
+                last_to_this_pdf = bsdf_sample.pdf;
+            }
+            else
+            {
+                vtx.pdf_right    = -1;
+                vtx.pdf_left     = last_to_this_pdf;
+                last_to_this_pdf = bsdf_sample.pdf;
+            }
+            output->push_back(vtx);
+
+            if(!accu_f)
+                break;
+        }
+    }
+
+    Spectrum eval(const CameraGenerateRayResult &cam_ray, Sampler &sampler, GBufferPixel *gpixel,
+                  Arena &arena, FilmGrid *full_film_grid, const Vec2i &full_res)
+    {
+        auto &scene = *input_.scene;
+        Spectrum ret;
+
+        // sample light source
+
+        auto [light, select_light_pdf] = scene.sample_light(sampler.sample1());
+        if(!light)
+            return Spectrum();
+
+        auto emit_ret = light->emit(sampler.sample5());
+        if(!emit_ret.radiance)
+            return Spectrum();
+
+        // generate light subpath
+
+        // lht_subpath[0]是个dummy vertex
+        std::vector<Vertex> lht_subpath(2);
+
+        // lht_subpath[1]是light vertex
+        auto &lht_vtx = lht_subpath.back();
+        lht_vtx.pos      = emit_ret.spt.pos;
+        lht_vtx.nor      = emit_ret.spt.geometry_coord.z;
+        lht_vtx.accu_f   = emit_ret.radiance;
+        lht_vtx.pdf_left = emit_ret.pdf_pos;
+
+        Ray emit_ray(emit_ret.spt.pos, emit_ret.dir.normalize(), EPS);
+        gen_subpath(emit_ray, scene, sampler, emit_ret.radiance, emit_ret.pdf_dir,
+                    &lht_subpath, nullptr, TM_Importance, arena, params_.lht_max_depth);
+
         // TODO
-        return {};
+        //std::vector<Vertex> lht_subpath = generate_subpath(
+        //    Ray(emit_ret.spt.pos, emit_ret.dir.normalize(), EPS),
+        //    scene, emit_ret.radiance, sampler, nullptr, arena, params_.lht_max_depth);
+
+        // generate camera subpath
+
+        // TODO
+        //std::vector<Vertex> cam_subpath = generate_subpath(
+        //    cam_ray.r, scene, Spectrum(cam_ray.importance), sampler, gpixel, arena, params_.cam_max_depth);
+
+        // connect subpaths
+
+        // TODO
+
+        return ret;
     }
 
     void render_pixel_once(int px, int py, Sampler &sampler, FilmGrid *film_grid, FilmGrid *full_film_grid, const Vec2i &full_res, Arena &arena)
@@ -157,7 +310,7 @@ class BDPT : public Renderer
         real we_factor = we_cos * cam_ray.importance / (cam_ray.pdf_pos * cam_ray.pdf_dir);
 
         GBufferPixel gpixel;
-        auto f = eval(cam_ray.r, sampler, &gpixel, arena, full_film_grid, full_res);
+        auto f = eval(cam_ray, sampler, &gpixel, arena, full_film_grid, full_res);
 
         film_grid->add_sample({ pixel_x, pixel_y }, we_factor * f, gpixel, 1);
         ++statistics.N;
@@ -222,29 +375,13 @@ public:
 
         params_.worker_count = params.child_int_or("worker_count", params_.worker_count);
 
-        params_.cam_min_depth = params.child_int_or("cam_min_depth", params_.cam_min_depth);
-        if(params_.cam_min_depth < 1)
-            throw ObjectConstructionException("invalid cam_min_depth value: " + std::to_string(params_.cam_min_depth));
-
         params_.cam_max_depth = params.child_int_or("cam_max_depth", params_.cam_max_depth);
-        if(params_.cam_max_depth < params_.cam_min_depth)
+        if(params_.cam_max_depth < 1)
             throw ObjectConstructionException("invalid cam_max_depth value: " + std::to_string(params_.cam_max_depth));
 
-        params_.lht_min_depth = params.child_int_or("lht_min_depth", params_.lht_min_depth);
-        if(params_.lht_min_depth < 1)
-            throw ObjectConstructionException("invalid lht_min_depth value: " + std::to_string(params_.lht_min_depth));
-
         params_.lht_max_depth = params.child_int_or("lht_max_depth", params_.lht_max_depth);
-        if(params_.lht_max_depth < params_.lht_min_depth)
+        if(params_.lht_max_depth < 1)
             throw ObjectConstructionException("invalid lht_max_depth value: " + std::to_string(params_.lht_max_depth));
-
-        params_.cam_cont_prob = params.child_real_or("cam_cont_prob", params_.cam_cont_prob);
-        if(params_.cam_cont_prob < 0 || params_.cam_cont_prob > 1)
-            throw ObjectConstructionException("invalid cam_cont_prob value: " + std::to_string(params_.cam_cont_prob));
-
-        params_.lht_cont_prob = params.child_real_or("lht_cont_prob", params_.lht_cont_prob);
-        if(params_.lht_cont_prob < 0 || params_.lht_cont_prob > 1)
-            throw ObjectConstructionException("invalid lht_cont_prob value: " + std::to_string(params_.lht_cont_prob));
 
         AGZ_HIERARCHY_WRAP("in initializing bdpt renderer")
     }

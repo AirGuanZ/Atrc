@@ -38,6 +38,12 @@ inline std::optional<Vec3> refract(const Vec3 &w, const Vec3 &n, real eta) noexc
     return ((eta * cos_theta_i - cos_theta_t) * n - eta * w).normalize();
 }
 
+/**
+ * @brief 电介质fresnel项计算
+ * 
+ * @param eta_i 内部IOR
+ * @param eta_o 外部IOR
+ */
 inline real dielectric_fresnel(real eta_i, real eta_o, real cos_theta_i) noexcept
 {
     if(cos_theta_i < 0)

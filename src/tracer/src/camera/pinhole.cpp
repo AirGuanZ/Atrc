@@ -127,6 +127,9 @@ pinhole [Camera]
         ret.is_delta   = true;
         ret.nor        = dir_;
 
+        ret.gen_pdf_pos = 1 / film_area_in_world_space_;
+        ret.gen_pdf_dir = dist_ * dist_ / (cos_v * cos_v * cos_v);
+
         return ret;
     }
 };

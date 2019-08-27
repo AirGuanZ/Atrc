@@ -1,5 +1,6 @@
 #include <agz/tracer/core/post_processor.h>
 #include <agz/tracer/utility/logger.h>
+#include <agz/utility/file.h>
 #include <agz/utility/image.h>
 #include <agz/utility/system.h>
 
@@ -53,6 +54,9 @@ save_to_png [PostProcessor]
                 return static_cast<uint8_t>(math::clamp<real>(std::pow(c, gamma), 0, 1) * 255);
             });
         });
+
+        file::create_directory_for_file(filename_);
+
         AGZ_LOG0("saving image to ", filename_);
         img::save_rgb_to_png_file(filename_, img_u8);
 
