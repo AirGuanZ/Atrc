@@ -3,6 +3,7 @@
 #include <queue>
 #include <random>
 #include <thread>
+#include <unordered_map>
 
 #include <agz/tracer/core/bsdf.h>
 #include <agz/tracer/core/camera.h>

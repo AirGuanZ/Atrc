@@ -83,7 +83,7 @@ namespace disney_impl
 
         Spectrum f_sheen(real cos_theta_d) const noexcept
         {
-            return sheen_ * mix(Spectrum(1), Ctint_, sheen_tint_) * one_minus_5(cos_theta_d);
+            return 4 * sheen_ * mix(Spectrum(1), Ctint_, sheen_tint_) * one_minus_5(cos_theta_d);
         }
 
         Spectrum f_clearcoat(
