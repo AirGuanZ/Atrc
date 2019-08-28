@@ -118,6 +118,8 @@ mis_vol [PathTracingIntegrator]
 
             r = Ray(pnt.pos(), bsdf_sample.dir.normalize(), EPS);
             coef *= bsdf_sample.f * pnt.proj_wi_factor(bsdf_sample.dir) / bsdf_sample.pdf;
+            if((std::max)({ coef.r, coef.g, coef.b }) < real(0.001))
+                break;
         }
 
         return ret;

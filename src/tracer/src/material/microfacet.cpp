@@ -51,17 +51,17 @@ namespace microfacet
         return 1 / (1 + lambda);
     }
 
-    Vec3 sample_anisotropic_gtr2(real ax, real ay, const Vec2 &sample) noexcept
+    Vec3 sample_anisotropic_gtr2(real ax, real ay, const Sample2 &sample) noexcept
     {
-        real sin_phi_h = ay * std::sin(2 * PI_r * sample.x);
-        real cos_phi_h = ax * std::cos(2 * PI_r * sample.x);
+        real sin_phi_h = ay * std::sin(2 * PI_r * sample.u);
+        real cos_phi_h = ax * std::cos(2 * PI_r * sample.u);
 
         real nor = 1 / std::sqrt(sqr(sin_phi_h) + sqr(cos_phi_h));
         sin_phi_h *= nor;
         cos_phi_h *= nor;
 
         real A = compute_a(sin_phi_h, cos_phi_h, ax, ay);
-        real cos_theta_h = std::sqrt(A * (1 - sample.y) / ((1 - A) * sample.y + A));
+        real cos_theta_h = std::sqrt(A * (1 - sample.v) / ((1 - A) * sample.v + A));
         real sin_theta_h = std::sqrt((std::max<real>)(0, 1 - sqr(cos_theta_h)));
 
         return Vec3(sin_theta_h * cos_phi_h, sin_theta_h * sin_phi_h, cos_theta_h).normalize();
@@ -75,10 +75,10 @@ namespace microfacet
         return U / (LD * RD);
     }
 
-    Vec3 sample_gtr1(real alpha, const Vec2 &sample) noexcept
+    Vec3 sample_gtr1(real alpha, const Sample2 &sample) noexcept
     {
-        real phi = 2 * PI_r * sample.x;
-        real cos_theta = std::sqrt((std::pow(alpha, 2 - 2 * sample.y) - 1) / (sqr(alpha) - 1));
+        real phi = 2 * PI_r * sample.u;
+        real cos_theta = std::sqrt((std::pow(alpha, 2 - 2 * sample.v) - 1) / (sqr(alpha) - 1));
         real sin_theta = local_angle::cos_2_sin(cos_theta);
         return Vec3(sin_theta * std::cos(phi), sin_theta * std::sin(phi), cos_theta).normalize();
     }

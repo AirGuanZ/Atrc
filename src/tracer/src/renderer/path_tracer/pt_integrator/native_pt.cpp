@@ -83,6 +83,8 @@ native [PathTracingIntegrator]
                 return ret;
 
             coef *= bsdf_sample.f * std::abs(cos(bsdf_sample.dir, inct.geometry_coord.z)) / bsdf_sample.pdf;
+            if((std::max)({ coef.r, coef.g, coef.b }) < real(0.001))
+                break;
 
             Vec3 true_nor = inct.geometry_coord.z;
             if(dot(bsdf_sample.dir, inct.geometry_coord.z) < 0)

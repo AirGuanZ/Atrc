@@ -578,6 +578,26 @@ Disney Principled BRDF的完整实现，有的参数含义我不知道怎么翻�
 | clearcoat       | Texture | all_zero | 清漆强度                                   |
 | clearcoat_gloss | Texture | all_zero | 清漆光泽度                                 |
 
+#### disney
+
+![pic](./pictures/disney_bsdf.png)
+
+不带BSSRDF的Disney Principled BSDF，具体可参考[原文](https://blog.selfshadow.com/publications/s2015-shading-course/#course_content)。
+
+| 字段名          | 类型    | 默认值    | 含义                                   |
+| --------------- | ------- | --------- | -------------------------------------- |
+| base_color      | Texture |           | 基本颜色，取值范围为$[0, 1]^3$         |
+| metallic        | Texture |           | 金属度，取值范围为$[0,1]$              |
+| roughness       | Texture |           | 粗糙度，取值范围为$[0.01,1]$           |
+| specular_tint   | Texture | all_zero  | 高光颜色一致性，取值范围为$[0,1]$      |
+| anisotropic     | Texture | all_zero  | 各向异性度，取值范围为$[0,1]$          |
+| sheen           | Texture | all_zero  | 边缘光泽度，取值范围为$[0,4]$          |
+| sheen_tint      | Texture | all_zero  | 边缘光泽颜色一致性，取值范围为$[0,1]$  |
+| clearcoat       | Texture | all_zero  | 清漆强度，取值范围为$[0,1]$            |
+| clearcoat_gloss | Texture | all_zero  | 清漆光泽度，取值范围为$[0,1]$          |
+| transmission    | Texture | all_zero  | 透明度，取值范围为$[0,1]$              |
+| ior             | Texture | all_{1.5} | 内外折射率之比，取值范围为$[0,\infty]$ |
+
 #### frosted_glass
 
 ![pic](./pictures/frosted_glass.png)

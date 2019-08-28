@@ -19,11 +19,11 @@ namespace microfacet
 
     real smith_anisotropic_gtr2(real cos_phi, real sin_phi, real ax, real ay, real tan_theta) noexcept;
 
-    Vec3 sample_anisotropic_gtr2(real ax, real ay, const Vec2 &sample) noexcept;
+    Vec3 sample_anisotropic_gtr2(real ax, real ay, const Sample2 &sample) noexcept;
 
     real gtr1(real sin_theta_h, real cos_theta_h, real alpha) noexcept;
 
-    Vec3 sample_gtr1(real alpha, const Vec2 &sample) noexcept;
+    Vec3 sample_gtr1(real alpha, const Sample2 &sample) noexcept;
 
 } // namespace microfacet
 

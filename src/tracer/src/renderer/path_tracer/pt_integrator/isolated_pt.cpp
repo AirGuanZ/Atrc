@@ -119,6 +119,9 @@ isolated [PathTracingIntegrator]
                 background = false;
 
             coef *= bsdf_sample.f * std::abs(cos(bsdf_sample.dir, inct.geometry_coord.z)) / bsdf_sample.pdf;
+            if((std::max)({ coef.r, coef.g, coef.b }) < real(0.001))
+                break;
+            
             r = Ray(inct.pos, bsdf_sample.dir.normalize(), EPS);
         }
 
