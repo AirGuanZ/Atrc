@@ -22,18 +22,14 @@
 可选的、在构建时由项目自动下载的依赖项如下：
 
 * [Embree 3.5.2](https://www.embree.org/)，用于加速射线与几何体的求交
-
-可选的、需额外准备的依赖项如下：
-
 * [oidn](https://openimagedenoise.github.io/)，基于机器学习的降噪滤波器
 
 ### CMake Options
 
-| 选项名     | 默认值 | 含义                                                         |
-| ---------- | ------ | ------------------------------------------------------------ |
-| USE_EMBREE | OFF    | 启用Embree加速器，这会使得项目在构建时自动下载Embree库       |
-| USE_OIDN   | OFF    | 启用OIDN降噪器，这需要预先在外部准备OIDN库                   |
-| OIDN_PATH  | 无     | 在USE_OIDN为ON时必须，指向包含OIDN的CMake Config文件的绝对路径 |
+| 选项名     | 默认值 | 含义                                                   |
+| ---------- | ------ | ------------------------------------------------------ |
+| USE_EMBREE | OFF    | 启用Embree加速器，这会使得项目在构建时自动下载Embree库 |
+| USE_OIDN   | OFF    | 启用OIDN降噪器，这需要预先在外部准备OIDN库             |
 
 注意到OIDN只支持64位程序，因此若启用了OIDN库，必须以64位模式构建程序。
 
@@ -47,17 +43,15 @@
    git clone --recursive --depth=1 https://github.com/AirGuanZ/Atrc
    ```
 
-3. 编译OIDN或在[此处](https://github.com/OpenImageDenoise/oidn/releases)下载预先编译好的版本，设包含其`CMake Config`的文件路径为`X`
-
 4. 在`PowerShell`中继续运行命令：
 
    ```powershell
    mkdir build
    cd build
-   cmake -DUSE_EMBREE=ON -DUSE_OIDN=ON -DOIDN_PATH="X" -G "Visual Studio 15 2017 Win64" ..
+   cmake -DUSE_EMBREE=ON -DUSE_OIDN=ON -G "Visual Studio 15 2017 Win64" ..
    ```
 
-这会在`Atrc/build`下生成`Visual Studio 2017`的解决方案文件。第一次编译时会从网络上Embree库，此时应保持网络良好。
+这会在`Atrc/build`下生成`Visual Studio 2017`的解决方案文件。第一次运行时会自动从网络上下载Embree和OIDN，此时应保持网络良好。
 
 ## Usage
 

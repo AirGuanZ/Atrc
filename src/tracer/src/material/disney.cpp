@@ -404,6 +404,8 @@ namespace disney_impl
             
             if(lwi.z * lwo.z < 0)
             {
+                if(!transmission_)
+                    return {};
                 Spectrum value = f_trans(lwi, lwo, mode);
                 return value * local_angle::normal_corr_factor(geometry_coord_, shading_coord_, wi);
             }
@@ -412,6 +414,8 @@ namespace disney_impl
 
             if(lwi.z < 0 && lwo.z < 0)
             {
+                if(!transmission_)
+                    return {};
                 Spectrum value = f_inner_refl(lwi, lwo);
                 return value * local_angle::normal_corr_factor(geometry_coord_, shading_coord_, wi);
             }
@@ -465,6 +469,9 @@ namespace disney_impl
 
             if(lwo.z < 0)
             {
+                if(!transmission_)
+                    return BSDF_SAMPLE_RESULT_INVALID;
+
                 Vec3 lwi;
                 real macro_F = refl_aux::dielectric_fresnel(IOR_, 1, lwo.z);
                 macro_F = math::clamp(macro_F, real(0.1), real(0.9));
@@ -534,6 +541,8 @@ namespace disney_impl
 
             if(lwo.z < 0)
             {
+                if(!transmission_)
+                    return 0;
                 real macro_F = refl_aux::dielectric_fresnel(IOR_, 1, lwo.z);
                 macro_F = math::clamp(macro_F, real(0.1), real(0.9));
                 if(lwi.z > 0)

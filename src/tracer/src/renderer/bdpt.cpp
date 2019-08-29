@@ -14,6 +14,7 @@
 #include <agz/tracer/core/sampler.h>
 #include <agz/tracer/core/scene.h>
 #include <agz/tracer/utility/grid_divider.h>
+#include <agz/utility/misc.h>
 #include <agz/utility/thread.h>
 
 /*
@@ -105,14 +106,143 @@ struct Vertex
     const BSDF *bsdf = nullptr;
     bool is_specular = false;
 
-    Spectrum accu_f; // 从cam we开始，一直到这个顶点，中间所有的bsdf值的乘积；注意该顶点的bsdf也算进去
-                              // 对subpath末端的顶点而言，该成员无意义
+    Spectrum throughput; // 从cam we开始，一直到这个顶点，中间的throughput值的乘积；注意该顶点的bsdf也算进去
+                         // 对subpath末端的顶点而言，该成员无意义
 
-    real pdf_right = -1; // 该顶点向lht方向被采样到的pdf，也就是p(i to i+1)存放在i.pdf_right中
-    real pdf_left  = -1; // 该顶点向cam方向被采样到的pdf，也就是p(i+1 to i)存放在i.pdf_left中
-
-    const Entity *entity = nullptr;
+    real pdf_fwd = -1; // 该顶点向lht方向被采样到的pdf，也就是p(i to i+1)存放在i.pdf_right中
+    real pdf_rev = -1; // 该顶点向cam方向被采样到的pdf，也就是p(i+1 to i)存放在i.pdf_left中
 };
+
+real solid_angle_to_area_pdf(const Vertex &from, const Vertex &to, real solid_angle_pdf) noexcept
+{
+    Vec3 vec = from.pos - to.pos;
+    real dist2 = vec.length_square();
+    if(dist2 < EPS)
+        return 0;
+    real dist = std::sqrt(dist2);
+    real cos = std::abs(dot(vec / dist, to.nor));
+    return solid_angle_pdf * cos / dist2;
+}
+
+void gen_subpath(const Scene &scene, Sampler &sampler, Ray r, Spectrum throughput, real pdf,
+                 int max_depth, TransportMode mode, std::vector<Vertex> &output, GBufferPixel *gpixel, Arena &arena)
+{
+    assert(!output.empty() && max_depth >= 1);
+
+    TransportMode rev_mode = mode == TM_Radiance ? TM_Importance : TM_Radiance;
+    
+    real pdf_fwd = pdf;
+    int depth = 1;
+    while(depth <= max_depth)
+    {
+        EntityIntersection inct;
+        if(!scene.closest_intersection(r, &inct))
+            break;
+
+        ShadingPoint shd = inct.material->shade(inct, arena);
+        if(depth == 1 && mode == TM_Radiance && gpixel)
+        {
+            gpixel->position = inct.pos;
+            gpixel->normal   = inct.user_coord.z;
+            gpixel->depth    = r.d.length() * inct.t;
+            gpixel->albedo   = shd.bsdf->albedo();
+        }
+
+        output.emplace_back();
+        assert(output.size() >= 2);
+        Vertex &cur_vtx = output.back(), &last_vtx = output[output.size() - 2];
+
+        cur_vtx.pos         = inct.pos;
+        cur_vtx.nor         = inct.geometry_coord.z;
+        cur_vtx.bsdf        = shd.bsdf;
+        cur_vtx.pdf_fwd     = solid_angle_to_area_pdf(last_vtx, cur_vtx, pdf_fwd);
+        cur_vtx.pdf_rev     = 0;
+
+        auto bsdf_sample = shd.bsdf->sample(inct.wr, mode, sampler.sample3());
+        if(!bsdf_sample.f || bsdf_sample.pdf < EPS)
+            break;
+
+        real pdf_rev;
+        throughput *= bsdf_sample.f * std::abs(cos(inct.geometry_coord.z, bsdf_sample.dir)) / bsdf_sample.pdf;
+        if(bsdf_sample.is_delta)
+        {
+            pdf_fwd = 0;
+            pdf_rev = 0;
+            cur_vtx.is_specular = true;
+        }
+        else
+        {
+            pdf_fwd = bsdf_sample.pdf;
+            pdf_rev = shd.bsdf->pdf(inct.wr, bsdf_sample.dir, rev_mode);
+            cur_vtx.is_specular = false;
+        }
+
+        last_vtx.pdf_rev = solid_angle_to_area_pdf(cur_vtx, last_vtx, pdf_rev);
+        r = Ray(inct.pos, bsdf_sample.dir, EPS);
+    }
+}
+
+std::vector<Vertex> gen_cam_subpath(
+    const Scene &scene, Sampler &sampler,
+    const CameraGenerateRayResult &cam_ray, int max_depth,
+    GBufferPixel *gpixel, Arena &arena)
+{
+    std::vector<Vertex> ret(1);
+    auto &cam_vtx = ret.front();
+    cam_vtx.pos         = cam_ray.r.o;
+    cam_vtx.nor         = cam_ray.nor;
+    cam_vtx.bsdf        = nullptr;
+    cam_vtx.is_specular = false;
+    cam_vtx.throughput  = Spectrum(cam_ray.importance / (cam_ray.pdf_pos * cam_ray.pdf_dir));
+    cam_vtx.pdf_fwd     = 0;
+    cam_vtx.pdf_rev     = 0;
+
+    gen_subpath(scene, sampler, cam_ray.r, cam_vtx.throughput, cam_ray.pdf_dir,
+                max_depth, TM_Radiance, ret, gpixel, arena);
+
+    return ret;
+}
+
+std::vector<Vertex> gen_lht_subpath(
+    const Scene &scene, Sampler &sampler, real select_lht_pdf,
+    const LightEmitResult &emit_result, int max_depth, Arena &arena)
+{
+    std::vector<Vertex> ret(1);
+    auto &lht_vtx = ret.front();
+    lht_vtx.pos         = emit_result.spt.pos;
+    lht_vtx.nor         = emit_result.spt.geometry_coord.z;
+    lht_vtx.bsdf        = nullptr;
+    lht_vtx.is_specular = false;
+    lht_vtx.throughput  = emit_result.radiance * std::abs(cos(lht_vtx.nor, emit_result.dir)) / (select_lht_pdf * emit_result.pdf_pos * emit_result.pdf_dir);
+    lht_vtx.pdf_fwd     = select_lht_pdf * emit_result.pdf_pos;
+    lht_vtx.pdf_rev     = 0;
+
+    Ray r(emit_result.spt.pos, emit_result.dir.normalize(), EPS);
+    gen_subpath(scene, sampler, r, lht_vtx.throughput, emit_result.pdf_dir,
+                max_depth, TM_Importance, ret, nullptr, arena);
+
+    return ret;
+}
+
+real G(const Scene &scene, const Vertex &a, const Vertex &b) noexcept
+{
+    if(!scene.visible(a.pos, b.pos))
+        return 0;
+    
+    Vec3 v = a.pos - b.pos;
+    real inv_d2 = 1 / v.length_square();
+    real inv_d = std::sqrt(inv_d2);
+    v *= inv_d;
+
+    real cos1 = std::abs(cos(a.nor, v));
+    real cos2 = std::abs(cos(b.nor, v));
+    return cos1 * cos2 * inv_d2;
+}
+
+real delta_pdf(real p) noexcept
+{
+    return p > 0 ? p : 1;
+}
 
 class BDPT : public Renderer
 {
@@ -193,59 +323,6 @@ class BDPT : public Renderer
         return ret;
     }
 
-    static void gen_subpath(
-        Ray r, const Scene &scene, Sampler &sampler,
-        const Spectrum &init_accu_f, real init_pdf,
-        std::vector<Vertex> *output, GBufferPixel *gpixel,
-        TransportMode mode, Arena &arena, int max_subpath_depth)
-    {
-        Spectrum accu_f = init_accu_f;
-        real last_to_this_pdf = init_pdf;
-
-        for(int depth = 1; depth <= max_subpath_depth; ++depth)
-        {
-            EntityIntersection inct;
-            if(!scene.closest_intersection(r, &inct))
-                break;
-
-            auto shd = inct.material->shade(inct, arena);
-            if(depth == 1 && gpixel)
-            {
-                gpixel->albedo   = shd.bsdf->albedo();
-                gpixel->depth    = r.d.length() * inct.t;
-                gpixel->position = inct.pos;
-                gpixel->normal   = inct.user_coord.z;
-            }
-
-            auto bsdf_sample = shd.bsdf->sample(inct.wr, mode, sampler.sample3());
-            accu_f *= bsdf_sample.f;
-
-            Vertex vtx;
-            vtx.pos         = inct.pos;
-            vtx.nor         = inct.geometry_coord.z;
-            vtx.bsdf        = shd.bsdf;
-            vtx.is_specular = shd.bsdf->is_delta();
-            vtx.accu_f      = accu_f;
-            vtx.entity      = inct.entity;
-            if(mode == TM_Radiance)
-            {
-                vtx.pdf_right    = last_to_this_pdf;
-                vtx.pdf_left     = -1;
-                last_to_this_pdf = bsdf_sample.pdf;
-            }
-            else
-            {
-                vtx.pdf_right    = -1;
-                vtx.pdf_left     = last_to_this_pdf;
-                last_to_this_pdf = bsdf_sample.pdf;
-            }
-            output->push_back(vtx);
-
-            if(!accu_f)
-                break;
-        }
-    }
-
     Spectrum eval(const CameraGenerateRayResult &cam_ray, Sampler &sampler, GBufferPixel *gpixel,
                   Arena &arena, FilmGrid *full_film_grid, const Vec2i &full_res)
     {
@@ -264,34 +341,16 @@ class BDPT : public Renderer
 
         // generate light subpath
 
-        // lht_subpath[0]是个dummy vertex
-        std::vector<Vertex> lht_subpath(2);
 
-        // lht_subpath[1]是light vertex
-        auto &lht_vtx = lht_subpath.back();
-        lht_vtx.pos      = emit_ret.spt.pos;
-        lht_vtx.nor      = emit_ret.spt.geometry_coord.z;
-        lht_vtx.accu_f   = emit_ret.radiance;
-        lht_vtx.pdf_left = emit_ret.pdf_pos;
-
-        Ray emit_ray(emit_ret.spt.pos, emit_ret.dir.normalize(), EPS);
-        gen_subpath(emit_ray, scene, sampler, emit_ret.radiance, emit_ret.pdf_dir,
-                    &lht_subpath, nullptr, TM_Importance, arena, params_.lht_max_depth);
-
-        // TODO
-        //std::vector<Vertex> lht_subpath = generate_subpath(
-        //    Ray(emit_ret.spt.pos, emit_ret.dir.normalize(), EPS),
-        //    scene, emit_ret.radiance, sampler, nullptr, arena, params_.lht_max_depth);
 
         // generate camera subpath
 
-        // TODO
-        //std::vector<Vertex> cam_subpath = generate_subpath(
-        //    cam_ray.r, scene, Spectrum(cam_ray.importance), sampler, gpixel, arena, params_.cam_max_depth);
+
 
         // connect subpaths
 
-        // TODO
+
+
 
         return ret;
     }

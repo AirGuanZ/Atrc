@@ -83,7 +83,7 @@ IF(USE_EMBREE)
 	SET(EMBREE_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/lib/embree3/src/Embree3/include/")
 
 	# 下面的一系列embree的静态库必须按此顺序链接
-	IF(MSVC)
+	IF(WIN32)
 		SET(EMBREE_LIBRARIES
 			optimized "${PROJECT_SOURCE_DIR}/lib/embree3/src/Embree3-build/Release/embree3.lib"
 			optimized "${PROJECT_SOURCE_DIR}/lib/embree3/src/Embree3-build/Release/embree_sse42.lib"
@@ -125,12 +125,39 @@ ENDIF()
 IF(USE_OIDN)
 	ADD_DEFINITIONS(-DUSE_OIDN)
 
-	IF(NOT DEFINED OIDN_PATH)
-		MESSAGE(FATAL_ERROR "oidn path unspecified")
-		EXIT()
-	ENDIF()
+	SET(OIDN_TRIGGER_CONTENT "
+CMAKE_MINIMUM_REQUIRED(VERSION 3.10)
+INCLUDE(ExternalProject)
+PROJECT(OIDNDownloader)
+SET(OIDN_VERSION \"1.0.0\")
+IF(WIN32)
+	SET(OIDN_URL https://github.com/OpenImageDenoise/oidn/releases/download/v1.0.0/oidn-1.0.0.x64.vc14.windows.zip)
+	SET(OIDN_URL_MD5 0e9bbcd03239777dd46d0f79f5da7d8a)
+ELSE()
+	SET(OIDN_URL https://github.com/OpenImageDenoise/oidn/releases/download/v1.0.0/oidn-1.0.0.x86_64.linux.tar.gz)
+	SET(OIDN_URL_MD5 aa4e637391b55cb711199a24d844d9d2)
+ENDIF()
+ExternalProject_Add(
+	OIDN
+	PREFIX \"${PROJECT_SOURCE_DIR}/lib/oidn\"
+	URL \"\${OIDN_URL}\"
+	URL_MD5 \"\${OIDN_URL_MD5}\"
+	UPDATE_COMMAND	  \"\"
+	CONFIGURE_COMMAND \"\"
+	BUILD_COMMAND	  \"\"
+	INSTALL_COMMAND	  \"\"
+)
+ADD_CUSTOM_TARGET(OIDNTrigger)
+ADD_DEPENDENCIES(OIDNTrigger OIDN)
+	")
 
-	FIND_PACKAGE(OpenImageDenoise PATHS ${OIDN_PATH})
+	FILE(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/OIDNTrigger ${CMAKE_BINARY_DIR}/OIDNTrigger/build)
+	FILE(WRITE ${CMAKE_BINARY_DIR}/OIDNTrigger/CMakeLists.txt "${OIDN_TRIGGER_CONTENT}")
+	EXECUTE_PROCESS(COMMAND ${CMAKE_COMMAND} .. WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/OIDNTrigger/build)
+    EXECUTE_PROCESS(COMMAND ${CMAKE_COMMAND} --build . WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/OIDNTrigger/build)
+		
+	SET(OIDN_FIND_PATH "${PROJECT_SOURCE_DIR}/lib/oidn/src/OIDN/lib/cmake/OpenImageDenoise")
+	FIND_PACKAGE(OpenImageDenoise PATHS ${OIDN_FIND_PATH})
 
 ENDIF()
 

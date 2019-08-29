@@ -8,7 +8,7 @@ Offline rendering lab based on ray tracing
 - [x] guided path tracing (ref [here](http://drz.disneyresearch.com/~jnovak/publications/PathGuide/index.html))
 - [x] light tracing
 - [x] stochastic progressive photon mapping
-- [x] Materials: Disney BRDF, frosted glass, mirror, varnish, MTL...
+- [x] Materials: Disney BSDF, mirror, varnish, MTL...
 - [x] HDR texture
 - [x] (optional) integrated [Embree](https://github.com/embree/embree) engine
 - [x] (optional) integrated [OIDN](https://github.com/OpenImageDenoise/oidn) denoiser
