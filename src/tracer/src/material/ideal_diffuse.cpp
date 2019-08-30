@@ -2,7 +2,7 @@
 #include <agz/tracer/core/material.h>
 #include <agz/tracer/core/texture.h>
 
-#include "./normal_mapper.h"
+#include "./utility/normal_mapper.h"
 
 AGZ_TRACER_BEGIN
 

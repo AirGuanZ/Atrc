@@ -1,17 +1,18 @@
-#pragma once
+ï»¿#pragma once
 
 #include <agz/tracer_utility/math.h>
 
 AGZ_TRACER_BEGIN
 
 class BSDF;
+class BSSRDF;
 class Entity;
 class Geometry;
 class Material;
 class Medium;
 
 /**
- * @brief ¼¸ºÎÌå±íÃæÉÏµÄÒ»µã
+ * @brief å‡ ä½•ä½“è¡¨é¢ä¸Šçš„ä¸€ç‚¹
  */
 struct SurfacePoint
 {
@@ -22,7 +23,7 @@ struct SurfacePoint
 };
 
 /**
- * @brief ½éÖÊÖĞµÄÒ»µã
+ * @brief ä»‹è´¨ä¸­çš„ä¸€ç‚¹
  */
 struct MediumPoint
 {
@@ -36,7 +37,7 @@ struct GeometryIntersection : SurfacePoint
 };
 
 /**
- * @brief ÉäÏßÓëÊµÌå±íÃæµÄ½»µã
+ * @brief å°„çº¿ä¸å®ä½“è¡¨é¢çš„äº¤ç‚¹
  */
 struct EntityIntersection : GeometryIntersection
 {
@@ -57,7 +58,7 @@ struct EntityIntersection : GeometryIntersection
 };
 
 /**
- * @brief ÉäÏßÔÚ½éÖÊÖĞµÄÉ¢Éäµã
+ * @brief å°„çº¿åœ¨ä»‹è´¨ä¸­çš„æ•£å°„ç‚¹
  */
 struct MediumIntersection : MediumPoint
 {
@@ -73,7 +74,8 @@ struct MediumIntersection : MediumPoint
 
 struct ShadingPoint
 {
-    const BSDF *bsdf = nullptr;
+    const BSDF   *bsdf   = nullptr;
+    const BSSRDF *bssrdf = nullptr;
 };
 
 AGZ_TRACER_END

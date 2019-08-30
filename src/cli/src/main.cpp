@@ -189,10 +189,10 @@ int main(int argc, char *argv[])
         AGZ_LOG0("USE_EMBREE = OFF");
 #endif
 
-#ifdef USE_BCD
-        AGZ_LOG0("USE_BCD = ON");
+#ifdef USE_OIDN
+        AGZ_LOG0("USE_OIDN = ON");
 #else
-        AGZ_LOG0("USE_BCD = OFF");
+        AGZ_LOG0("USE_OIDN = OFF");
 #endif
 
         run(argc, argv);

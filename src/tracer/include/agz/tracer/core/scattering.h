@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <agz/tracer/core/bsdf.h>
 #include <agz/tracer/core/intersection.h>
@@ -10,12 +10,13 @@
 AGZ_TRACER_BEGIN
 
 /**
- * @brief ¿Õ¼äÖÐµÄÉ¢Éäµã
+ * @brief ç©ºé—´ä¸­çš„æ•£å°„ç‚¹
  */
 class ScatteringPoint
 {
     misc::variant_t<EntityIntersection, MediumIntersection> inct_;
-    const BSDF *bsdf_ = nullptr;
+    const BSDF *bsdf_     = nullptr;
+    const BSSRDF *bssrdf_ = nullptr;
 
 public:
 
@@ -24,8 +25,15 @@ public:
     ScatteringPoint(const EntityIntersection &inct, Arena &arena)
     {
         auto shd = inct.material->shade(inct, arena);
+        inct_   = inct;
+        bsdf_   = shd.bsdf;
+        bssrdf_ = shd.bssrdf;
+    }
+
+    ScatteringPoint(const EntityIntersection &inct, const BSDF *bsdf)
+    {
         inct_ = inct;
-        bsdf_ = shd.bsdf;
+        bsdf_ = bsdf;
     }
 
     ScatteringPoint(const MediumIntersection &inct, Arena &arena)
@@ -110,6 +118,11 @@ public:
     const BSDF *bsdf() const noexcept
     {
         return bsdf_;
+    }
+
+    const BSSRDF *bssrdf() const noexcept
+    {
+        return bssrdf_;
     }
 
     const Medium *medium(const Vec3 &wr) const

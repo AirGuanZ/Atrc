@@ -87,6 +87,40 @@ Spectrum mis_sample_bsdf(
     return Spectrum();
 }
 
+/**
+ * @brief 基于MIS对光源进行采样，MIS的对象包括BSDF和全体光源
+ */
+inline Spectrum mis_sample_bsdf(
+    const Scene &scene, const EntityIntersection &inct, const ShadingPoint &shd, const Sample3 &sam)
+{
+    auto bsdf_sample = shd.bsdf->sample(inct.wr, TM_Radiance, sam);
+    if(!bsdf_sample.f || !bsdf_sample.pdf)
+        return Spectrum();
+
+    Ray new_ray(inct.pos, bsdf_sample.dir.normalize(), EPS);
+    EntityIntersection new_inct;
+    if(scene.closest_intersection(new_ray, &new_inct))
+    {
+        if(auto light = new_inct.entity->as_light())
+        {
+            Spectrum light_f = light->radiance(new_inct, new_inct.wr);
+            if(!light_f)
+                return Spectrum();
+
+            Spectrum f = light_f * bsdf_sample.f * std::abs(cos(inct.geometry_coord.z, bsdf_sample.dir));
+            if(bsdf_sample.is_delta)
+                return f / bsdf_sample.pdf;
+
+            real light_pdf = light->pdf(inct.pos, new_inct);
+            return f / (bsdf_sample.pdf + light_pdf);
+        }
+
+        return Spectrum();
+    }
+
+    return Spectrum();
+}
+
 inline Spectrum mis_sample_light(const Scene &scene, const Light *light, const ScatteringPoint &pnt, const Sample5 sam)
 {
     Vec3 pos = pnt.pos();

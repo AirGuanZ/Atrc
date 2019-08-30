@@ -3,8 +3,8 @@
 #include <agz/tracer/core/texture.h>
 #include <agz/tracer_utility/math.h>
 
-#include "./microfacet.h"
-#include "./normal_mapper.h"
+#include "./utility/microfacet.h"
+#include "./utility/normal_mapper.h"
 
 AGZ_TRACER_BEGIN
 

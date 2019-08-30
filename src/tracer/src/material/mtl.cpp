@@ -2,7 +2,7 @@
 #include <agz/tracer/core/material.h>
 #include <agz/tracer/core/texture.h>
 
-#include "./microfacet.h"
+#include "./utility/microfacet.h"
 
 AGZ_TRACER_BEGIN
 
@@ -292,7 +292,7 @@ mtl [Material]
         Spectrum ks = ks_->sample_spectrum(inct.uv);
         real ns     = ns_->sample_real(inct.uv);
 
-        // ±£Ö¤ÄÜÁ¿ÊØºã
+        // ï¿½ï¿½Ö¤ï¿½ï¿½ï¿½ï¿½ï¿½Øºï¿½
         real dem = 1;
         for(int i = 0; i < 3; ++i)
             dem = (std::max)(kd[i] + ks[i], dem);

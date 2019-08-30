@@ -1,4 +1,5 @@
 #include <agz/tracer/core/bsdf.h>
+#include <agz/tracer/core/bssrdf.h>
 #include <agz/tracer/core/entity.h>
 #include <agz/tracer/core/light.h>
 #include <agz/tracer/core/intersection.h>
@@ -120,6 +121,43 @@ mis_vol [PathTracingIntegrator]
             coef *= bsdf_sample.f * pnt.proj_wi_factor(bsdf_sample.dir) / bsdf_sample.pdf;
             if((std::max)({ coef.r, coef.g, coef.b }) < real(0.001))
                 break;
+
+            if(auto bssrdf = pnt.bssrdf())
+            {
+                assert(pnt.is_on_surface());
+                auto &inct = pnt.as_entity_inct();
+                bool wi_up = inct.geometry_coord.in_positive_z_hemisphere(bsdf_sample.dir);
+                bool wo_up = inct.geometry_coord.in_positive_z_hemisphere(inct.wr);
+                if(wi_up == wo_up)
+                    continue;
+
+                auto bssrdf_sample = bssrdf->sample(TM_Radiance, sampler.sample4(), arena);
+                if(!bssrdf_sample.valid() || !bssrdf_sample.f)
+                    break;
+                coef *= bssrdf_sample.f / bssrdf_sample.pdf;
+
+                auto new_pnt = ScatteringPoint(bssrdf_sample.inct, bssrdf_sample.bsdf);
+                if(sample_all_lights_)
+                {
+                    for(auto light : scene.lights())
+                        ret += coef * mis_sample_light(scene, light, new_pnt, sampler.sample5());
+                }
+                else
+                {
+                    auto [light, pdf] = scene.sample_light(sampler.sample1());
+                    ret += coef * mis_sample_light(scene, light, new_pnt, sampler.sample5()) / pdf;
+                }
+                ret += coef * mis_sample_scattering(scene, new_pnt, sampler.sample3());
+
+                BSDFSampleResult new_bsdf_sample = new_pnt.sample(new_pnt.wr(), sampler.sample3(), TM_Radiance);
+                if(!new_bsdf_sample.f || new_bsdf_sample.pdf < EPS)
+                    break;
+
+                r = Ray(new_pnt.pos(), new_bsdf_sample.dir.normalize(), EPS);
+                coef *= new_bsdf_sample.f * new_pnt.proj_wi_factor(new_bsdf_sample.dir) / new_bsdf_sample.pdf;
+                if((std::max)({ coef.r, coef.g, coef.b }) < real(0.001))
+                    break;
+            }
         }
 
         return ret;

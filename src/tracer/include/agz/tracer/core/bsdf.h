@@ -13,11 +13,11 @@ enum TransportMode
 
 struct BSDFSampleResult
 {
-    Vec3          dir;      // 采样得到的散射方向
-    Spectrum      f;        // bsdf值
-    real          pdf;      // 采样的概率密度函数值,w.r.t. solid angle
-    TransportMode mode;     // 传输模式
-    bool          is_delta; // pdf和f是否是delta函数
+    Vec3          dir;                    // 采样得到的散射方向
+    Spectrum      f;                      // bsdf值
+    real          pdf      = 0;           // 采样的概率密度函数值,w.r.t. solid angle
+    TransportMode mode     = TM_Radiance; // 传输模式
+    bool          is_delta = false;       // pdf和f是否是delta函数
 
     bool invalid() const noexcept
     {
@@ -25,7 +25,7 @@ struct BSDFSampleResult
     }
 };
 
-inline BSDFSampleResult BSDF_SAMPLE_RESULT_INVALID = { {}, {}, 0, TM_Radiance, false };
+inline const BSDFSampleResult BSDF_SAMPLE_RESULT_INVALID = { {}, {}, 0, TM_Radiance, false };
 
 /**
  * @brief 双向散射分布函数（bidirectional scattering distribution function）接口

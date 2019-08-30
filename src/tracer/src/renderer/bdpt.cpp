@@ -244,6 +244,31 @@ real delta_pdf(real p) noexcept
     return p > 0 ? p : 1;
 }
 
+Spectrum connect(
+    const Scene &scene, Sampler &sampler, const Camera &camera,
+    Vertex *cam_subpath, int t,
+    Vertex *lht_subpath, int s,
+    FilmGrid *full_film_grid)
+{
+    int k = t + s;
+    if(k < 2)
+        return {};
+
+    // t == 1对应摄像机采样，这需要单独进行摄像机采样
+    misc::scope_assignment_t<Vertex> cam_sample_assignment;
+    if(t == 1)
+    {
+        assert(s >= 1);
+        auto &lht_end = lht_subpath[s - 1];
+        auto cam_sam = camera.sample(lht_end.pos, sampler.sample2());
+        if(!cam_sam.importance)
+            return {};
+    }
+
+    // TODO
+    return {};
+}
+
 class BDPT : public Renderer
 {
     using GridDivider = GridDivider<int>;
@@ -366,13 +391,10 @@ class BDPT : public Renderer
         CameraSample cam_sam = { { film_cube_x, film_cube_y }, sampler.sample2() };
         auto cam_ray = input_.camera->generate_ray(cam_sam);
 
-        real we_cos = std::abs(cos(cam_ray.r.d, cam_ray.nor));
-        real we_factor = we_cos * cam_ray.importance / (cam_ray.pdf_pos * cam_ray.pdf_dir);
-
         GBufferPixel gpixel;
         auto f = eval(cam_ray, sampler, &gpixel, arena, full_film_grid, full_res);
 
-        film_grid->add_sample({ pixel_x, pixel_y }, we_factor * f, gpixel, 1);
+        film_grid->add_sample({ pixel_x, pixel_y }, f, gpixel, 1);
         ++statistics.N;
     }
 

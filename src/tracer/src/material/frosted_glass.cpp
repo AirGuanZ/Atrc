@@ -5,7 +5,7 @@
 #include <agz/tracer/core/material.h>
 #include <agz/tracer/core/texture.h>
 
-#include "./microfacet.h"
+#include "./utility/microfacet.h"
 
 AGZ_TRACER_BEGIN
 
