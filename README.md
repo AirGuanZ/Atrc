@@ -6,7 +6,7 @@ Offline rendering lab based on ray tracing
 
 - [x] volumetric path tracing
 - [x] light tracing
-- [x] materials: disney bsdf, mirror, varnish...
+- [x] materials: disney bsdf with subsurface scattering, mirror, varnish...
 - [x] hdr texture
 - [x] (optional) integrated [Embree](https://github.com/embree/embree) engine
 - [x] (optional) integrated [OIDN](https://github.com/OpenImageDenoise/oidn) denoiser
