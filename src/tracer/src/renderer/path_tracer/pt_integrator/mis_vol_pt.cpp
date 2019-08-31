@@ -24,7 +24,7 @@ public:
     static std::string description()
     {
         return R"___(
-mis_vol [PathTracingIntegrator]
+mis [PathTracingIntegrator]
     min_depth [int]         minimum path length before applying Russian Roulette
     max_depth [int]         maximal path length
     cont_prob [real]        continuing probability in Russian Roulette
@@ -70,7 +70,7 @@ mis_vol [PathTracingIntegrator]
             bool has_ent_inct;  EntityIntersection ent_inct;
             SampleScatteringResult scattering_sample;
             scattering_sample.p_has_inct = &has_ent_inct;
-            scattering_sample.p_inct     = &ent_inct;
+            scattering_sample.p_inct = &ent_inct;
             if(!scene.next_scattering_point(r, &scattering_sample, sampler.sample1(), arena))
                 return ret;
             auto &pnt = scattering_sample.pnt;
@@ -100,18 +100,19 @@ mis_vol [PathTracingIntegrator]
                 }
             }
 
+            Spectrum ld;
             if(sample_all_lights_)
             {
                 for(auto light : scene.lights())
-                    ret += coef * mis_sample_light(scene, light, pnt, sampler.sample5());
+                    ld += coef * mis_sample_light(scene, light, pnt, sampler.sample5());
             }
             else
             {
                 auto [light, pdf] = scene.sample_light(sampler.sample1());
-                ret += coef * mis_sample_light(scene, light, pnt, sampler.sample5()) / pdf;
+                ld += coef * mis_sample_light(scene, light, pnt, sampler.sample5()) / pdf;
             }
-
-            ret += coef * mis_sample_scattering(scene, pnt, sampler.sample3());
+            ld += coef * mis_sample_scattering(scene, pnt, sampler.sample3());
+            ret += ld;
 
             BSDFSampleResult bsdf_sample = pnt.sample(pnt.wr(), sampler.sample3(), TM_Radiance);
             if(!bsdf_sample.f || bsdf_sample.pdf < EPS)
@@ -122,15 +123,19 @@ mis_vol [PathTracingIntegrator]
             if((std::max)({ coef.r, coef.g, coef.b }) < real(0.001))
                 break;
 
-            if(auto bssrdf = pnt.bssrdf())
+            bool use_bssrdf = false;
+            if(pnt.is_on_surface() && pnt.bssrdf())
             {
-                assert(pnt.is_on_surface());
                 auto &inct = pnt.as_entity_inct();
                 bool wi_up = inct.geometry_coord.in_positive_z_hemisphere(bsdf_sample.dir);
                 bool wo_up = inct.geometry_coord.in_positive_z_hemisphere(inct.wr);
-                if(wi_up == wo_up)
-                    continue;
+                if(wo_up && !wi_up)
+                    use_bssrdf = true;
+            }
 
+            if(use_bssrdf)
+            {
+                auto bssrdf = pnt.bssrdf();
                 auto bssrdf_sample = bssrdf->sample(TM_Radiance, sampler.sample4(), arena);
                 if(!bssrdf_sample.valid() || !bssrdf_sample.f)
                     break;
@@ -164,6 +169,6 @@ mis_vol [PathTracingIntegrator]
     }
 };
 
-AGZT_IMPLEMENTATION(PathTracingIntegrator, VolumetricPathTracingIntegrator, "mis_vol");
+AGZT_IMPLEMENTATION(PathTracingIntegrator, VolumetricPathTracingIntegrator, "mis");
 
 AGZ_TRACER_END

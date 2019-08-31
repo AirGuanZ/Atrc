@@ -31,8 +31,6 @@ namespace disney_impl
         real transmission_;
         real IOR_; // inner IOR / outer IOR
 
-        real scatter_distance_lum_;
-
         real ax_, ay_;
         real clearcoat_roughness_;
 
@@ -74,9 +72,6 @@ namespace disney_impl
 
         Spectrum f_diffuse(real cos_theta_i, real cos_theta_o, real cos_theta_d) const noexcept
         {
-            if(scatter_distance_lum_ > 0)
-                return {};
-
             Spectrum f_lambert = C_ / PI_r;
 
             real FL = one_minus_5(cos_theta_i);
@@ -108,40 +103,6 @@ namespace disney_impl
         Spectrum f_trans(const Vec3 &lwi, const Vec3 &lwo, TransportMode mode) const noexcept
         {
             assert(lwi.z * lwo.z < 0);
-
-            if(scatter_distance_lum_ > 0)
-            {
-                if(lwo.z <= 0)
-                    return {};
-
-                real cos_theta_i = local_angle::cos_theta(lwi);
-                real cos_theta_o = local_angle::cos_theta(lwo);
-
-                real eta = cos_theta_o > 0 ? IOR_ : 1 / IOR_;
-                Vec3 lwh = (lwo + eta * lwi).normalize();
-                if(lwh.z < 0)
-                    lwh = -lwh;
-
-                real cos_theta_d = dot(lwo, lwh);
-                real F = refl_aux::dielectric_fresnel(IOR_, 1, cos_theta_d);
-
-                real cos_theta_h = local_angle::cos_theta(lwh);
-                real D = microfacet::gtr2(cos_theta_h, real(0.01));
-
-                real tan_theta_i = local_angle::tan_theta(lwi);
-                real tan_theta_o = local_angle::tan_theta(lwo);
-                real G = microfacet::smith_gtr2(tan_theta_i, real(0.01))
-                       * microfacet::smith_gtr2(tan_theta_o, real(0.01));
-
-                real sdem = cos_theta_d + eta * dot(lwi, lwh);
-                real corr_factor = mode == TM_Radiance ? (1 / eta) : 1;
-
-                real val = (1 - F) * D * G * eta * eta * dot(lwi, lwh) * dot(lwo, lwh)
-                         * corr_factor * corr_factor
-                         / (cos_theta_i * cos_theta_o * sdem * sdem);
-
-                return (1 - transmission_) * (1 - metallic_) * C_ * std::abs(val);
-            }
 
             real cos_theta_i = local_angle::cos_theta(lwi);
             real cos_theta_o = local_angle::cos_theta(lwo);
@@ -186,9 +147,6 @@ namespace disney_impl
 
         Spectrum f_inner_refl(const Vec3 &lwi, const Vec3 &lwo) const noexcept
         {
-            if(scatter_distance_lum_ > 0)
-                return {};
-
             assert(lwi.z < 0 && lwo.z < 0);
             Vec3 lwh = -(lwi + lwo).normalize();
             assert(lwh.z > 0);
@@ -253,8 +211,6 @@ namespace disney_impl
 
         Vec3 sample_diffuse(const Sample2 &sam) const noexcept
         {
-            if(scatter_distance_lum_ > 0)
-                return {};
             return math::distribution::zweighted_on_hemisphere(sam.u, sam.v).first;
         }
 
@@ -286,31 +242,6 @@ namespace disney_impl
 
         Vec3 sample_transmission(const Vec3 &lwo, const Sample2 &sam) const noexcept
         {
-            if(scatter_distance_lum_ > 0)
-            {
-                if(lwo.z <= 0)
-                    return {};
-
-                Vec3 lwh = microfacet::sample_gtr2(real(0.01), sam);
-                if(lwh.z <= 0)
-                    return {};
-
-                if((lwo.z > 0) != (dot(lwh, lwo) > 0))
-                    return {};
-
-                real eta = 1 / IOR_;
-                Vec3 owh = dot(lwh, lwo) > 0 ? lwh : -lwh;
-                auto opt_lwi = refl_aux::refract(lwo, owh, eta);
-                if(!opt_lwi)
-                    return {};
-
-                Vec3 lwi = opt_lwi->normalize();
-                if(lwi.z * lwo.z > 0 || ((lwi.z > 0) != (dot(lwh, lwi) > 0)))
-                    return {};
-
-                return lwi;
-            }
-
             Vec3 lwh = microfacet::sample_anisotropic_gtr2(ax_, ay_, sam);
             if(lwh.z <= 0)
                 return {};
@@ -335,9 +266,6 @@ namespace disney_impl
         {
             assert(lwo.z < 0);
 
-            if(scatter_distance_lum_ > 0)
-                return {};
-
             Vec3 lwh = microfacet::sample_anisotropic_gtr2(ax_, ay_, sam);
             if(lwh.z <= 0)
                 return {};
@@ -351,8 +279,6 @@ namespace disney_impl
         real pdf_diffuse(const Vec3 &lwi, const Vec3 &lwo) const noexcept
         {
             assert(lwi.z > 0 && lwo.z > 0);
-            if(scatter_distance_lum_ > 0)
-                return 0;
             return math::distribution::zweighted_on_hemisphere_pdf(lwi.z);
         }
 
@@ -381,28 +307,6 @@ namespace disney_impl
         {
             assert(lwi.z * lwo.z < 0);
 
-            if(scatter_distance_lum_ > 0)
-            {
-                if(lwo.z <= 0)
-                    return 0;
-
-                real eta = IOR_;
-                Vec3 lwh = (lwo + eta * lwi).normalize();
-                if(lwh.z < 0)
-                    lwh = -lwh;
-
-                if(((lwo.z > 0) != (dot(lwh, lwo) > 0)) ||
-                    ((lwi.z > 0) != (dot(lwh, lwi) > 0)))
-                    return 0;
-
-                real sdem = dot(lwo, lwh) + eta * dot(lwi, lwh);
-                real dwh_to_dwi = eta * eta * dot(lwi, lwh) / (sdem * sdem);
-
-                real cos_theta_h = local_angle::cos_theta(lwh);
-                real D = microfacet::gtr2(cos_theta_h, real(0.01));
-                return std::abs(dot(lwi, lwh) * D * dwh_to_dwi);
-            }
-
             real eta = lwo.z > 0 ? IOR_ : 1 / IOR_;
             Vec3 lwh = (lwo + eta * lwi).normalize();
             if(lwh.z < 0)
@@ -429,9 +333,6 @@ namespace disney_impl
         {
             assert(lwi.z < 0 && lwo.z < 0);
 
-            if(scatter_distance_lum_ > 0)
-                return 0;
-
             Vec3 lwh = -(lwi + lwo).normalize();
             real phi_h       = local_angle::phi(lwh);
             real sin_phi_h   = std::sin(phi_h);
@@ -457,8 +358,7 @@ namespace disney_impl
                    real clearcoat,
                    real clearcoat_gloss,
                    real transmission,
-                   real IOR,
-                   real scatter_distance_lum)
+                   real IOR)
             : LocalBSDF(geometry_coord, shading_coord)
         {
             C_     = base_color;
@@ -474,8 +374,6 @@ namespace disney_impl
             transmission_  = transmission;
             IOR_           = IOR;
 
-            scatter_distance_lum_ = scatter_distance_lum;
-
             real aspect = anisotropic > 0 ? std::sqrt(1 - real(0.9) * anisotropic) : real(1);
             ax_ = std::max(real(0.001), sqr(roughness) / aspect);
             ay_ = std::max(real(0.001), sqr(roughness) * aspect);
@@ -488,11 +386,6 @@ namespace disney_impl
 
             sample_w.diffuse      = A * (1 - transmission_);
             sample_w.transmission = A * transmission_;
-            if(scatter_distance_lum > 0)
-            {
-                sample_w.diffuse = 0;
-                sample_w.transmission = A;
-            }
             sample_w.specular     = B * 2 / (2 + clearcoat_);
             sample_w.clearcoat    = B * clearcoat_ / (2 + clearcoat_);
         }
@@ -512,7 +405,7 @@ namespace disney_impl
             
             if(lwi.z * lwo.z < 0)
             {
-                if(!transmission_ && !scatter_distance_lum_)
+                if(!transmission_)
                     return {};
                 Spectrum value = f_trans(lwi, lwo, mode);
                 return value * local_angle::normal_corr_factor(geometry_coord_, shading_coord_, wi);
@@ -577,14 +470,12 @@ namespace disney_impl
 
             if(lwo.z < 0)
             {
-                if(!transmission_ && !scatter_distance_lum_)
+                if(!transmission_)
                     return BSDF_SAMPLE_RESULT_INVALID;
 
                 Vec3 lwi;
                 real macro_F = refl_aux::dielectric_fresnel(IOR_, 1, lwo.z);
                 macro_F = math::clamp(macro_F, real(0.1), real(0.9));
-                if(scatter_distance_lum_ > 0)
-                    macro_F = 0;
                 if(sam.u >= macro_F)
                     lwi = sample_transmission(lwo, { sam.v, sam.w });
                 else
@@ -651,12 +542,10 @@ namespace disney_impl
 
             if(lwo.z < 0)
             {
-                if(!transmission_ && !scatter_distance_lum_)
+                if(!transmission_)
                     return 0;
                 real macro_F = refl_aux::dielectric_fresnel(IOR_, 1, lwo.z);
                 macro_F = math::clamp(macro_F, real(0.1), real(0.9));
-                if(scatter_distance_lum_ > 0)
-                    macro_F = 0;
                 if(lwi.z > 0)
                     return (1 - macro_F) * pdf_transmission(lwi, lwo);
                 if(!macro_F)
@@ -707,7 +596,6 @@ class Disney : public Material
     const Texture *clearcoat_gloss_  = nullptr;
     const Texture *transmission_     = nullptr;
     const Texture *IOR_              = nullptr;
-    const Texture *scatter_distance_ = nullptr;
 
     NormalMapper normal_mapper_;
 
@@ -730,7 +618,6 @@ disney [Material]
     sheen_tint       [Texture] (optional; defaultly set to all_zero)
     clearcoat        [Texture] (optional; defaultly set to all_zero)
     clearcoat_gloss  [Texture] (optional; defaultly set to all_{0.5})
-    scatter_distance [Texture] (optional; defaultly set to all_zero)
 
     disney principled bsdf
     see https://blog.selfshadow.com/publications/s2015-shading-course/#course_content
@@ -767,7 +654,6 @@ disney [Material]
         sheen_tint_       = defaultly_all("sheen_tint", 0);
         clearcoat_        = defaultly_all("clearcoat", 0);
         clearcoat_gloss_  = defaultly_all("clearcoat_gloss", real(0.5));
-        scatter_distance_ = defaultly_all("scatter_distance", 0);
 
         normal_mapper_.initialize(params, init_ctx);
 
@@ -788,8 +674,6 @@ disney [Material]
         real     sheen_tint       = sheen_tint_      ->sample_real(uv);
         real     clearcoat        = clearcoat_       ->sample_real(uv);
         real     clearcoat_gloss  = clearcoat_gloss_ ->sample_real(uv);
-        Spectrum scatter_distance = scatter_distance_->sample_spectrum(uv);
-        real scatter_distance_lum = scatter_distance.lum();
 
         Coord shading_coord = normal_mapper_.reorient(uv, inct.user_coord);
         auto bsdf = arena.create<disney_impl::DisneyBSDF>(
@@ -804,16 +688,9 @@ disney [Material]
             clearcoat,
             clearcoat_gloss,
             transmission,
-            ior,
-            scatter_distance_lum);
+            ior);
 
         ShadingPoint shd = { bsdf };
-        if(scatter_distance_lum > 0)
-        {
-            Spectrum A = base_color * (1 - transmission) * (1 - metallic);
-            if(!!A)
-                shd.bssrdf = arena.create<NormalizedDiffusionBSSRDF>(inct, inct.geometry_coord, shading_coord, ior, A, scatter_distance);
-        }
         return shd;
     }
 };

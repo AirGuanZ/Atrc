@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <agz/tracer/core/intersection.h>
 #include <agz/tracer_utility/object.h>
@@ -8,7 +8,7 @@ AGZ_TRACER_BEGIN
 class Entity;
 
 /**
- * @brief ÊµÌå¾ÛºÏ½Ó¿Ú£¬±íÊ¾Õë¶ÔÒ»×éÊµÌåÊµÏÖµÄÇó½»¼ÓËÙÊı¾İ½á¹¹
+ * @brief å®ä½“èšåˆæ¥å£ï¼Œè¡¨ç¤ºé’ˆå¯¹ä¸€ç»„å®ä½“å®ç°çš„æ±‚äº¤åŠ é€Ÿæ•°æ®ç»“æ„
  */
 class Aggregate : public obj::Object
 {
@@ -17,9 +17,9 @@ public:
     using Object::Object;
 
     /**
-     * @brief ½¨Á¢¾²Ì¬¼ÓËÙÊı¾İ½á¹¹
+     * @brief å»ºç«‹é™æ€åŠ é€Ÿæ•°æ®ç»“æ„
      * 
-     * Ìí¼ÓÍêËùÓĞÊµÌåºó¡¢¿ªÊ¼äÖÈ¾Ç°µ÷ÓÃ
+     * æ·»åŠ å®Œæ‰€æœ‰å®ä½“åã€å¼€å§‹æ¸²æŸ“å‰è°ƒç”¨
      */
     virtual void build(const Entity *const*entities, size_t entity_count) = 0;
 

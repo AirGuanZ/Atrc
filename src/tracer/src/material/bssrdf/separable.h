@@ -8,7 +8,7 @@ class SeparableBSSRDF : public BSSRDF
 {
     friend class SeparableBSDF;
 
-    real sw(const Vec3 &wi) const noexcept;
+    real sw(real cos_theta_i) const noexcept;
 
 protected:
 

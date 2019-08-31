@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <agz/tracer_utility/math.h>
 #include <agz/tracer_utility/object.h>
@@ -6,9 +6,9 @@
 AGZ_TRACER_BEGIN
 
 /**
- * @brief Í¼ÏñÖØ½¨ÂË²¨Æ÷
+ * @brief å›¾åƒé‡å»ºæ»¤æ³¢å™¨
  * 
- * ²Î¼û http://alvyray.com/Memos/CG/Microsoft/6_pixel.pdf
+ * å‚è§ http://alvyray.com/Memos/CG/Microsoft/6_pixel.pdf
  */
 class FilmFilter : public obj::Object
 {
@@ -17,12 +17,12 @@ public:
     using Object::Object;
 
     /**
-     * @brief ×î´óÓĞĞ§°ë¾¶£¬ÒÔpixelÎªµ¥Î»
+     * @brief æœ€å¤§æœ‰æ•ˆåŠå¾„ï¼Œä»¥pixelä¸ºå•ä½
      */
     virtual real radius() const noexcept = 0;
 
     /**
-     * @brief ÇóÂË²¨Æ÷Öµ
+     * @brief æ±‚æ»¤æ³¢å™¨å€¼
      */
     virtual real eval(real x, real y) const noexcept = 0;
 };

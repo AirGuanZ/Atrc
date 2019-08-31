@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <agz/tracer_utility/math.h>
 #include <agz/utility/texture.h>

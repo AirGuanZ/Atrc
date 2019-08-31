@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <agz/tracer/core/intersection.h>
 #include <agz/tracer_utility/object.h>
@@ -6,9 +6,9 @@
 AGZ_TRACER_BEGIN
 
 /**
- * @brief ²»Í¬ÀàĞÍ½éÖÊ·Ö½çÃæ¼äµÄ²ÄÖÊÄ£ĞÍ½Ó¿Ú
+ * @brief ä¸åŒç±»å‹ä»‹è´¨åˆ†ç•Œé¢é—´çš„æè´¨æ¨¡å‹æ¥å£
  *
- * ¸ºÔğ ½»µã -> ShadingPoint£¬½ö´Ë¶øÒÑ
+ * è´Ÿè´£ äº¤ç‚¹ -> ShadingPointï¼Œä»…æ­¤è€Œå·²
  */
 class Material : public obj::Object
 {
@@ -16,7 +16,7 @@ public:
 
     using Object::Object;
 
-    /** @brief ½«ÉäÏßÓëÊµÌåµÄ½»µã×ª»»Îªshading point */
+    /** @brief å°†å°„çº¿ä¸å®ä½“çš„äº¤ç‚¹è½¬æ¢ä¸ºshading point */
     virtual ShadingPoint shade(const EntityIntersection &inct, Arena &arena) const = 0;
 };
 

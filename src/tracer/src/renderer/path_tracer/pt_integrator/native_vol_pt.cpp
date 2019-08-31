@@ -1,4 +1,5 @@
 #include <agz/tracer/core/bsdf.h>
+#include <agz/tracer/core/bssrdf.h>
 #include <agz/tracer/core/entity.h>
 #include <agz/tracer/core/light.h>
 #include <agz/tracer/core/intersection.h>
@@ -21,7 +22,7 @@ public:
     static std::string description()
     {
         return R"___(
-native_vol [PathTracingIntegrator]
+native [PathTracingIntegrator]
     min_depth [int]         minimum path length before applying Russian Roulette
     max_depth [int]         maximal path length
     cont_prob [real]        continuing probability in Russian Roulette
@@ -99,12 +100,41 @@ native_vol [PathTracingIntegrator]
             coef *= bsdf_sample.f * pnt.proj_wi_factor(bsdf_sample.dir) / bsdf_sample.pdf;
             if((std::max)({ coef.r, coef.g, coef.b }) < real(0.001))
                 break;
+
+            bool use_bssrdf = false;
+            if(pnt.is_on_surface() && pnt.bssrdf())
+            {
+                auto &inct = pnt.as_entity_inct();
+                bool wi_up = inct.geometry_coord.in_positive_z_hemisphere(bsdf_sample.dir);
+                bool wo_up = inct.geometry_coord.in_positive_z_hemisphere(inct.wr);
+                if(wo_up && !wi_up)
+                    use_bssrdf = true;
+            }
+
+            if(use_bssrdf)
+            {
+                auto bssrdf = pnt.bssrdf();
+                auto bssrdf_sample = bssrdf->sample(TM_Radiance, sampler.sample4(), arena);
+                if(!bssrdf_sample.valid() || !bssrdf_sample.f)
+                    break;
+                coef *= bssrdf_sample.f / bssrdf_sample.pdf;
+
+                auto new_pnt = ScatteringPoint(bssrdf_sample.inct, bssrdf_sample.bsdf);
+                BSDFSampleResult new_bsdf_sample = new_pnt.sample(new_pnt.wr(), sampler.sample3(), TM_Radiance);
+                if(!new_bsdf_sample.f || new_bsdf_sample.pdf < EPS)
+                    break;
+
+                r = Ray(new_pnt.pos(), new_bsdf_sample.dir.normalize(), EPS);
+                coef *= new_bsdf_sample.f * new_pnt.proj_wi_factor(new_bsdf_sample.dir) / new_bsdf_sample.pdf;
+                if((std::max)({ coef.r, coef.g, coef.b }) < real(0.001))
+                    break;
+            }
         }
 
         return ret;
     }
 };
 
-AGZT_IMPLEMENTATION(PathTracingIntegrator, NativeVolumetricPathTracingIntegrator, "native_vol");
+AGZT_IMPLEMENTATION(PathTracingIntegrator, NativeVolumetricPathTracingIntegrator, "native");
 
 AGZ_TRACER_END

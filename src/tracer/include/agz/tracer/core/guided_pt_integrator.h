@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <agz/tracer/core/scene.h>
 #include <agz/tracer/core/sampler.h>

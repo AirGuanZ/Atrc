@@ -46,9 +46,13 @@ public:
 
     Spectrum eval(const Vec3 &wi, const Vec3 &wo, TransportMode mode) const noexcept override
     {
-        real fi = bssrdf_->sw(wi);
-        //if(mode == TM_Radiance)
-        //    fi *= math::sqr(bssrdf_->eta_);
+        if(shading_coord_.in_positive_z_hemisphere(wo) || !shading_coord_.in_positive_z_hemisphere(wi))
+            return {};
+
+        real cos_theta_i = cos(wi, shading_coord_.z);
+        real fi = bssrdf_->sw(-cos_theta_i);
+        if(mode == TM_Radiance)
+            fi *= math::sqr(bssrdf_->eta_);
         return Spectrum(fi) * local_angle::normal_corr_factor(geometry_coord_, shading_coord_, wi);
     }
 
@@ -57,7 +61,7 @@ public:
         if(cause_black_fringes(wo))
             return sample_for_black_fringes(wo, mode, sam);
 
-        if(!shading_coord_.in_positive_z_hemisphere(wo))
+        if(shading_coord_.in_positive_z_hemisphere(wo))
             return BSDF_SAMPLE_RESULT_INVALID;
 
         auto [local_in, pdf] = math::distribution::zweighted_on_hemisphere(sam.u, sam.v);
@@ -70,6 +74,9 @@ public:
         ret.pdf      = pdf;
         ret.mode     = mode;
         ret.is_delta = false;
+
+        if(!ret.f.is_finite() || ret.pdf < EPS)
+            return BSDF_SAMPLE_RESULT_INVALID;
         
         return ret;
     }
@@ -78,8 +85,7 @@ public:
     {
         if(cause_black_fringes(in_dir, out_dir))
             return pdf_for_black_fringes(in_dir, out_dir);
-
-        if(!shading_coord_.in_positive_z_hemisphere(in_dir) || !shading_coord_.in_positive_z_hemisphere(out_dir))
+        if(shading_coord_.in_positive_z_hemisphere(out_dir) || !shading_coord_.in_positive_z_hemisphere(in_dir))
             return 0;
         Vec3 local_in = shading_coord_.global_to_local(in_dir).normalize();
         return math::distribution::zweighted_on_hemisphere_pdf(local_in.z);
@@ -101,10 +107,10 @@ public:
     }
 };
 
-real SeparableBSSRDF::sw(const Vec3 &wi) const noexcept
+real SeparableBSSRDF::sw(real cos_theta_i) const noexcept
 {
     real fi_nor_factor = 1 / ((1 - 2 * separable_bssrdf_impl::fresnel_moment(1 / eta_)) * PI_r);
-    real fi = 1 - refl_aux::dielectric_fresnel(eta_, 1, std::abs(cos(shading_coord_.z, wi)));
+    real fi = 1 - refl_aux::dielectric_fresnel(eta_, 1, std::abs(cos_theta_i));
     return fi * fi_nor_factor;
 }
 
@@ -126,12 +132,13 @@ BSSRDFSampleResult SeparableBSSRDF::sample(TransportMode mode, const Sample4 &sa
     else
         sample_axis = 1;
 
-    Vec3 sample_coord_up(0, 0, 0);
-    sample_coord_up[sample_axis] = 1;
-    Coord sample_coord = Coord::from_z(sample_coord_up);
-    sample_coord.x = geometry_coord_.local_to_global(sample_coord.x);
-    sample_coord.y = geometry_coord_.local_to_global(sample_coord.y);
-    sample_coord.z = geometry_coord_.local_to_global(sample_coord.z);
+    Coord sample_coord;
+    if(sample_axis == 0)
+        sample_coord = Coord(geometry_coord_.y, geometry_coord_.z, geometry_coord_.x);
+    else if(sample_axis == 1)
+        sample_coord = Coord(geometry_coord_.z, geometry_coord_.x, geometry_coord_.y);
+    else
+        sample_coord = Coord(geometry_coord_.x, geometry_coord_.y, geometry_coord_.z);
 
     // choose sampling channel
 
@@ -140,7 +147,7 @@ BSSRDFSampleResult SeparableBSSRDF::sample(TransportMode mode, const Sample4 &sa
     // sample distance and phi
 
     real r = sample_distance(channel, { new_v });
-    real r_end = sample_distance(channel, { real(0.999f) });
+    real r_end = sample_distance(channel, { real(0.997) });
     if(r < 0 || r >= r_end)
         return BSSRDF_SAMPLE_RESULT_INVALID;
     real phi = 2 * PI_r * sam.w;
@@ -149,7 +156,7 @@ BSSRDFSampleResult SeparableBSSRDF::sample(TransportMode mode, const Sample4 &sa
 
     real l = 2 * std::sqrt(r_end * r_end - r * r);
     Vec3 ray_o = xo_.pos + r * (sample_coord.x * std::cos(phi) + sample_coord.y * std::sin(phi)) - real(0.5) * l * sample_coord.z;
-    Ray ray(ray_o, sample_coord.z.normalize(), 0, l - EPS);
+    Ray ray(ray_o, sample_coord.z, 0, l - EPS);
 
     struct IntersectionListNode
     {
@@ -172,7 +179,7 @@ BSSRDFSampleResult SeparableBSSRDF::sample(TransportMode mode, const Sample4 &sa
         ray.t_min = cur_node->inct.t + EPS;
 
         ++list_len;
-        IntersectionListNode *new_node = arena.create<IntersectionListNode>();
+        auto *new_node = arena.create<IntersectionListNode>();
         cur_node->next = new_node;
         cur_node = new_node;
     }
@@ -187,10 +194,15 @@ BSSRDFSampleResult SeparableBSSRDF::sample(TransportMode mode, const Sample4 &sa
     int xi_idx = math::distribution::extract_uniform_int(sam.r, 0, list_len).first;
     while(xi_idx-- > 0)
         list = list->next;
-    ret.inct = list->inct;
-    ret.f    = distance_factor(r);
-    ret.pdf  = pdf(ret.inct, mode) / list_len;
-    ret.bsdf = arena.create<SeparableBSDF>(ret.inct.geometry_coord, ret.inct.geometry_coord, this);
+    ret.inct    = list->inct;
+    ret.inct.wr = -ret.inct.geometry_coord.z;
+    ret.f       = distance_factor(r);
+    //ret.pdf     = pdf(ret.inct, mode) / list_len; // TODO: what's wrong with the mis pdf?
+    ret.pdf     = pdf_distance(channel, r) / (2 * PI_r * (std::max)(r, EPS)) / list_len;
+    ret.bsdf    = arena.create<SeparableBSDF>(ret.inct.geometry_coord, ret.inct.geometry_coord, this);
+
+    if(!ret.f.is_finite() || ret.pdf < EPS)
+        return BSSRDF_SAMPLE_RESULT_INVALID;
 
     return ret;
 }
@@ -198,8 +210,8 @@ BSSRDFSampleResult SeparableBSSRDF::sample(TransportMode mode, const Sample4 &sa
 real SeparableBSSRDF::pdf(const SurfacePoint &xi, TransportMode mode) const noexcept
 {
     Vec3 d  = xo_.pos - xi.pos;
-    Vec3 ld = xo_.geometry_coord.global_to_local(d);
-    Vec3 ln = xo_.geometry_coord.global_to_local(xi.geometry_coord.z);
+    Vec3 ld = geometry_coord_.global_to_local(d);
+    Vec3 ln = geometry_coord_.global_to_local(xi.geometry_coord.z);
 
     real axis_prob[3] = { real(0.25), real(0.25), real(0.5) };
     real channel_prob = real(1) / SPECTRUM_COMPONENT_COUNT;
@@ -210,13 +222,13 @@ real SeparableBSSRDF::pdf(const SurfacePoint &xi, TransportMode mode) const noex
     {
         for(int channel = 0; channel < SPECTRUM_COMPONENT_COUNT; ++channel)
         {
-            ret += pdf_distance(channel, r_proj[axis])
-                 * std::abs(ln[axis]) * channel_prob * axis_prob[axis];
+            real r = std::max(r_proj[axis], EPS);
+            ret += pdf_distance(channel, r)
+                 * std::abs(ln[axis]) * channel_prob * axis_prob[axis] / (2 * PI_r * r);
         }
     }
 
     return ret;
-
 }
 
 AGZ_TRACER_END
