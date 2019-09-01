@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <agz/tracer/core/texture.h>
 #include <agz/utility/texture.h>
@@ -21,10 +21,11 @@ namespace env_impl
         explicit EnvironmentLightSampler(const Texture *tex)
         {
             int width = tex->width(), height = tex->height();
+            // FIXME: too bright when new_width > 1 || new_height > 1
             int new_width = (std::min)(width, 1);
             int new_height = (std::min)(height, 1);
 
-            // µÃµ½ÄÜÁ¿·Ö²¼Í¼
+            // å¾—åˆ°èƒ½é‡åˆ†å¸ƒå›¾
             real lum_sum = 0;
             probs_.initialize(new_height, new_width);
             for(int y = 0; y < new_height; ++y)
@@ -63,7 +64,7 @@ namespace env_impl
                 }
             }
 
-            // ¹éÒ»»¯
+            // å½’ä¸€åŒ–
             if(lum_sum > EPS)
             {
                 real ratio = 1 / lum_sum;
@@ -74,7 +75,7 @@ namespace env_impl
                 }
             }
 
-            // ÏßĞÔ»¯
+            // çº¿æ€§åŒ–
             std::vector<real> linear_probs(probs_.size().product());
             for(int y = 0; y < new_height; ++y)
             {
@@ -86,7 +87,7 @@ namespace env_impl
                 }
             }
 
-            // ¹¹Ôìsampler
+            // æ„é€ sampler
             sampler_.initialize(linear_probs.data(), int(linear_probs.size()));
         }
 
@@ -106,7 +107,7 @@ namespace env_impl
             real v0 = real(patch_y)     / probs_.height();
             real v1 = real(patch_y + 1) / probs_.height();
 
-            auto [cvmin, cvmax] = std::minmax(std::cos(PI_r * v1), std::cos(PI_r * v0));
+            auto [cvmin, cvmax] = math::minmax(std::cos(PI_r * v1), std::cos(PI_r * v0));
 
             real cos_theta = cvmin + sam.w * (cvmax - cvmin);
             real sin_theta = local_angle::cos_2_sin(cos_theta);
@@ -138,7 +139,7 @@ namespace env_impl
             real v0 = real(patch_y)     / probs_.height();
             real v1 = real(patch_y + 1) / probs_.height();
 
-            auto [cvmin, cvmax] = std::minmax(std::cos(PI_r * v1), std::cos(PI_r * v0));
+            auto [cvmin, cvmax] = math::minmax(std::cos(PI_r * v1), std::cos(PI_r * v0));
             real in_patch_pdf = 1 / (2 * PI_r * ((u1 - u0) * (cvmax - cvmin)));
 
             return patch_pdf * in_patch_pdf;

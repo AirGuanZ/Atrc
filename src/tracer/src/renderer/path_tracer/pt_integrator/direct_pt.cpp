@@ -67,7 +67,7 @@ direct [PathTracingIntegrator]
             ret += mis_sample_light(scene, light, inct, shd, sampler.sample5()) / pdf;
         }
 
-        ret += mis_sample_bsdf<false>(scene, inct, shd, sampler.sample3(), nullptr, nullptr, nullptr);
+        ret += mis_sample_bsdf(scene, inct, shd, sampler.sample3());
 
         return ret;
     }
