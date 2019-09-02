@@ -29,6 +29,7 @@ class FilteredFilmGrid : public FilmGrid
     PositionBuffer position_;
     NormalBuffer   normal_;
     DepthBuffer    depth_;
+    BinaryBuffer   binary_;
 
 public:
 
@@ -45,6 +46,7 @@ public:
         normal_   = NormalBuffer(y_size, x_size);
         position_ = PositionBuffer(y_size, x_size);
         depth_    = DepthBuffer(y_size, x_size);
+        binary_   = BinaryBuffer(y_size, x_size);
 
         grid_x_beg_ = x_beg;
         grid_y_beg_ = y_beg;
@@ -116,6 +118,7 @@ public:
                 position_(ly, lx) += weight * gpixel.position;
                 normal_(ly, lx)   += weight * gpixel.normal;
                 depth_(ly, lx)    += weight * gpixel.depth;
+                binary_(ly, lx)   += weight * gpixel.binary;
             }
         }
     }
@@ -135,6 +138,7 @@ class FilteredFilm : public Film
     PositionBuffer position_;
     NormalBuffer   normal_;
     DepthBuffer    depth_;
+    BinaryBuffer   binary_;
 
     std::mutex mut_;
 
@@ -172,6 +176,7 @@ filtered [Film]
         normal_   = NormalBuffer(h_, w_);
         position_ = PositionBuffer(h_, w_);
         depth_    = DepthBuffer(h_, w_);
+        binary_   = BinaryBuffer(h_, w_);
 
         AGZ_HIERARCHY_WRAP("in initializing native film object")
     }
@@ -194,6 +199,7 @@ filtered [Film]
                 position_(y, x) += tgrid.position_(ly, lx);
                 normal_(y, x)   += tgrid.normal_(ly, lx);
                 depth_(y, x)    += tgrid.depth_(ly, lx);
+                binary_(y, x)   += tgrid.binary_(ly, lx);
             }
         }
     }
@@ -250,6 +256,7 @@ filtered [Film]
                 ret.position->at(y, x) = ratio * position_(y, x);
                 ret.normal->at(y, x)   = ratio * normal_(y, x);
                 ret.depth->at(y, x)    = ratio * depth_(y, x);
+                ret.binary->at(y, x)   = ratio * binary_(y, x);
             }
         }
         return ret;

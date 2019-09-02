@@ -310,6 +310,11 @@ public:
     {
         return light_;
     }
+
+    EntityProperty entity_property() const noexcept override
+    {
+        return ENTITY_PROPERTY_ENVIRONMENT_LIGHT;
+    }
 };
 
 AGZ_TRACER_END

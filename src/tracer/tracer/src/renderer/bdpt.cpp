@@ -263,9 +263,9 @@ Spectrum connect(
         auto cam_sam = camera.sample(lht_end.pos, sampler.sample2());
         if(!cam_sam.importance)
             return {};
+        // TODO
     }
 
-    // TODO
     return {};
 }
 

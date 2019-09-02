@@ -43,9 +43,6 @@ struct CameraSampleRayResult
     real pdf        = 1;     // w.r.t. solid angle at ref
     bool is_delta   = false; // pdf是否是delta function
 
-    real gen_pdf_pos = 1; // 由摄像机主动生成此射线时所对应的pos pdf
-    real gen_pdf_dir = 1; // 由摄像机主动生成此射线时所对应的dir pdf
-
     Vec3 nor;
 
     bool is_invalid() const noexcept

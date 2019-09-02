@@ -52,6 +52,7 @@ direct [PathTracingIntegrator]
         gpixel->position = inct.pos;
         gpixel->depth    = r.d.length() * inct.t;
         gpixel->normal   = inct.user_coord.z;
+        gpixel->binary   = inct.entity->entity_property() & ENTITY_PROPERTY_ENVIRONMENT_LIGHT ? real(0) : real(1);
         
         if(sample_all_lights_)
         {

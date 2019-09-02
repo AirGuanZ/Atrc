@@ -10,6 +10,7 @@ class SaveGBufferToPNG : public PostProcessor
     std::string albedo_filename_;
     std::string normal_filename_;
     std::string depth_filename_;
+    std::string binary_filename_;
 
     static void save_albedo(const std::string &filename, AlbedoBuffer &albedo)
     {
@@ -33,6 +34,23 @@ class SaveGBufferToPNG : public PostProcessor
 
         AGZ_LOG0("saving gbuffer::normal to ", filename);
         img::save_rgb_to_png_file(filename, imgf.get_data().map(math::to_color3b<real>));
+    }
+
+    static void save_binary(const std::string &filename, BinaryBuffer &binary)
+    {
+        file::create_directory_for_file(filename);
+        texture::texture2d_t<uint8_t> imgu8(binary.height(), binary.width());
+        for(int y = 0; y < imgu8.height(); ++y)
+        {
+            for(int x = 0; x < imgu8.width(); ++x)
+            {
+                real f = math::clamp<real>(binary(y, x), 0, 1);
+                imgu8(y, x) = static_cast<uint8_t>(f * 255);
+            }
+        }
+
+        AGZ_LOG0("saving gbuffer::depth to ", filename);
+        img::save_gray_to_png_file(filename, imgu8.get_data());
     }
 
     static void save_depth(const std::string &filename, DepthBuffer &depth)
@@ -88,6 +106,7 @@ save_gbuffer_to_png [PostProcessor]
     albedo [string] (optional; defaultly set to "") save albedo to ?
     normal [string] (optional; defaultly set to "") save normal to ?
     depth  [string] (optional; defaultly set to "") save depth  to ?
+    binary [string] (optional; defaultly set to "") save binary to ?
 )___";
     }
 
@@ -101,6 +120,8 @@ save_gbuffer_to_png [PostProcessor]
             normal_filename_ = init_ctx.path_mgr->get(node->as_value().as_str());
         if(auto node = params.find_child("depth"))
             depth_filename_ = init_ctx.path_mgr->get(node->as_value().as_str());
+        if(auto node = params.find_child("binary"))
+            binary_filename_ = init_ctx.path_mgr->get(node->as_value().as_str());
 
         AGZ_HIERARCHY_WRAP("in initializing save_gbuffer_to_image post processor")
     }
@@ -113,6 +134,8 @@ save_gbuffer_to_png [PostProcessor]
             save_normal(normal_filename_, *gbuffer.normal);
         if(!depth_filename_.empty() && gbuffer.depth)
             save_depth(depth_filename_, *gbuffer.depth);
+        if(!binary_filename_.empty() && gbuffer.binary)
+            save_binary(binary_filename_, *gbuffer.binary);
     }
 };
 

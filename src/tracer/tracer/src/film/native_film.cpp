@@ -21,6 +21,7 @@ class NativeFilmGrid : public FilmGrid
     PositionBuffer position_;
     NormalBuffer   normal_;
     DepthBuffer    depth_;
+    BinaryBuffer   binary_;
 
 public:
 
@@ -36,6 +37,7 @@ public:
         normal_   = NormalBuffer(y_size, x_size);
         position_ = PositionBuffer(y_size, x_size);
         depth_    = DepthBuffer(y_size, x_size);
+        binary_   = BinaryBuffer(y_size, x_size);
 
         grid_x_beg_ = x_beg;
         grid_y_beg_ = y_beg;
@@ -77,6 +79,7 @@ public:
         position_(ly, lx) += w * gpixel.position;
         normal_(ly, lx)   += w * gpixel.normal;
         depth_(ly, lx)    += w * gpixel.depth;
+        binary_(ly, lx)   += w * gpixel.binary;
         weights_(ly, lx)  += w;
     }
 };
@@ -92,6 +95,7 @@ class NativeFilm : public Film
     PositionBuffer position_;
     NormalBuffer   normal_;
     DepthBuffer    depth_;
+    BinaryBuffer   binary_;
 
     std::mutex mut_;
 
@@ -126,6 +130,7 @@ native [Film]
         normal_   = NormalBuffer(h_, w_);
         position_ = PositionBuffer(h_, w_);
         depth_    = DepthBuffer(h_, w_);
+        binary_   = BinaryBuffer(h_, w_);
 
         AGZ_HIERARCHY_WRAP("in initializing native film object")
     }
@@ -148,6 +153,7 @@ native [Film]
                 position_(y, x) += tgrid.position_(ly, lx);
                 normal_(y, x)   += tgrid.normal_(ly, lx);
                 depth_(y, x)    += tgrid.depth_(ly, lx);
+                binary_(y, x)   += tgrid.binary_(ly, lx);
             }
         }
     }
@@ -203,7 +209,8 @@ native [Film]
                 ret.albedo  ->at(y, x) = ratio * albedo_(y, x);
                 ret.position->at(y, x) = ratio * position_(y, x);
                 ret.normal  ->at(y, x) = ratio * normal_(y, x);
-                ret.depth  ->at(y, x)  = ratio * depth_(y, x);
+                ret.depth   ->at(y, x) = ratio * depth_(y, x);
+                ret.binary  ->at(y, x) = ratio * binary_(y, x);
             }
         }
         return ret;

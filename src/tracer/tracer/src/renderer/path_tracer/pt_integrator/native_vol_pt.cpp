@@ -81,8 +81,9 @@ native [PathTracingIntegrator]
                 else
                     gpixel->albedo = ent_inct.material->shade(ent_inct, arena).bsdf->albedo();
                 gpixel->position = ent_inct.pos;
-                gpixel->normal = ent_inct.user_coord.z;
-                gpixel->depth = r.d.length() * ent_inct.t;
+                gpixel->normal   = ent_inct.user_coord.z;
+                gpixel->depth    = r.d.length() * ent_inct.t;
+                gpixel->binary   = ent_inct.entity->entity_property() & ENTITY_PROPERTY_ENVIRONMENT_LIGHT ? real(0) : real(1);
             }
 
             if(pnt.is_on_surface())

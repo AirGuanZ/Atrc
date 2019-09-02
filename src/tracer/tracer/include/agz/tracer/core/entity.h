@@ -7,6 +7,10 @@ AGZ_TRACER_BEGIN
 
 class Light;
 
+using EntityProperty = uint8_t;
+
+constexpr EntityProperty ENTITY_PROPERTY_ENVIRONMENT_LIGHT = 1;
+
 /**
  * @brief 实体接口，表示场景中的可渲染物体
  * 
@@ -45,6 +49,11 @@ public:
      * @brief 返回自身作为area_light的接口。若并非光源，则返回nullptr。
      */
     virtual Light *as_light() noexcept = 0;
+
+    /**
+     * @brief 环境光以及本身无实体的光源返回false，其他返回true
+     */
+    virtual EntityProperty entity_property() const noexcept { return 0; }
 };
 
 AGZT_INTERFACE(Entity)
