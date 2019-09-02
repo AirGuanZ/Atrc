@@ -67,11 +67,6 @@ checker_board [Texture]
     {
         return 1;
     }
-
-    Spectrum fetch_spectrum(int x, int y) const noexcept override
-    {
-        return real(0.5) * (color_1_ + color_2_);
-    }
 };
 
 AGZT_IMPLEMENTATION(Texture, CheckerBoard, "checker_board")

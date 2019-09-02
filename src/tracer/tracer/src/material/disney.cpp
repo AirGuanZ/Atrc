@@ -3,6 +3,7 @@
 #include <agz/tracer/core/texture.h>
 #include <agz/tracer/utility/reflection.h>
 
+#include "./bssrdf/constant_bssrdf.h"
 #include "./bssrdf/normalized_diffusion.h"
 #include "./utility/microfacet.h"
 #include "./utility/normal_mapper.h"
@@ -91,7 +92,7 @@ namespace disney_impl
 
         Spectrum f_sheen(real cos_theta_d) const noexcept
         {
-            return 4 * sheen_ * mix(Spectrum(1), Ctint_, sheen_tint_) * one_minus_5(cos_theta_d);
+            return 16 * sheen_ * mix(Spectrum(1), Ctint_, sheen_tint_) * one_minus_5(cos_theta_d);
         }
 
         Spectrum f_clearcoat(
@@ -830,7 +831,7 @@ disney [Material]
         ShadingPoint shd = { bsdf };
         if(has_subsurface)
         {
-            shd.bssrdf = arena.create<NormalizedDiffusionBSSRDF>(
+            shd.bssrdf = arena.create<ConstantBSSRDF>(
                 inct, inct.geometry_coord, inct.geometry_coord,
                 ior, base_color * (1 - metallic) * (1 - transmission), scatter_distance);
         }

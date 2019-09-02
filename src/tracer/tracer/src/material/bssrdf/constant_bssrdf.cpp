@@ -25,6 +25,7 @@ real ConstantBSSRDF::pdf_distance(int channel, real dist) const noexcept
 {
     if(dist > d_[channel])
         return 0;
+    dist = (std::max)(dist, EPS);
     return 2 * dist / math::sqr(d_[channel]);
 }
 

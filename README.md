@@ -19,7 +19,7 @@ See [doc](https://airguanz.github.io/atrc_doc/doc.html).
 
 Materials:
 
-![0](./doc/gallery/0.png)
+![0](./doc/pictures/disney_bsdf.png)
 
 Breakfast Room (scene ref [here](http://casual-effects.com/data/index.html)):
 

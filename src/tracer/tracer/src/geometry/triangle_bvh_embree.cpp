@@ -308,7 +308,7 @@ class TriangleBVHEmbree : public TransformedGeometry
         ret->initialize(build_triangles.data(), build_triangles.size());
         return ret;
 
-        AGZ_HIERARCHY_WRAP("in load mesh from " + filename)
+        AGZ_HIERARCHY_WRAP("in loading mesh from " + filename)
     }
 
 public:

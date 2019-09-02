@@ -4,7 +4,6 @@
 #include <agz/utility/texture.h>
 
 #include "./infinite_light.h"
-#include <random>
 
 AGZ_TRACER_BEGIN
 
@@ -21,9 +20,8 @@ namespace env_impl
         explicit EnvironmentLightSampler(const Texture *tex)
         {
             int width = tex->width(), height = tex->height();
-            // FIXME: too bright when new_width > 1 || new_height > 1
-            int new_width = (std::min)(width, 1);
-            int new_height = (std::min)(height, 1);
+            int new_width = (std::min)(width, 200);
+            int new_height = (std::min)(height, 200);
 
             // 得到能量分布图
             real lum_sum = 0;
@@ -54,7 +52,11 @@ namespace env_impl
                     for(int y_src = y_src_beg; y_src <= y_src_lst; ++y_src)
                     {
                         for(int x_src = x_src_beg; x_src <= x_src_lst; ++x_src)
-                            pixel_lum += tex->fetch_spectrum(x_src, y_src).lum();
+                        {
+                            real src_u = (x_src + real(0.5)) / width;
+                            real src_v = (y_src + real(0.5)) / height;
+                            pixel_lum += tex->sample_spectrum({ src_u, src_v }).lum();
+                        }
                     }
 
                     real delta_area = std::abs(2 * PI_r * (x1 - x0) * (std::cos(PI_r * y1) - std::cos(PI_r * y0)));
@@ -96,7 +98,7 @@ namespace env_impl
         {
             int patch_idx = sampler_.sample(sam.u);
             int patch_y = patch_idx / probs_.width();
-            int patch_x = patch_idx & probs_.width();
+            int patch_x = patch_idx % probs_.width();
             assert(patch_y < probs_.height());
             assert(patch_x < probs_.width());
 
@@ -229,7 +231,8 @@ env [(Nonarea)Light]
                 real u1 = real(x + 1) / tex_width;
 
                 real delta_area = std::abs(2 * PI_r * (u1 - u0) * (std::cos(PI_r * v1) - std::cos(PI_r * v0)));
-                ret += PI_r * delta_area * tex_->fetch_spectrum(x, y);
+                real u = (u0 + u1) / 2, v = (v0 + v1) / 2;
+                ret += PI_r * delta_area * tex_->sample_spectrum({ u, v });
             }
         }
 

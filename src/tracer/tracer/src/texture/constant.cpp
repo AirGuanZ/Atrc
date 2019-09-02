@@ -44,11 +44,6 @@ constant [Texture]
     {
         return 1;
     }
-
-    Spectrum fetch_spectrum(int x, int y) const noexcept override
-    {
-        return texel_;
-    }
 };
 
 class StaticConstantTexture : public Texture
@@ -76,11 +71,6 @@ public:
     int height() const noexcept override
     {
         return 1;
-    }
-
-    Spectrum fetch_spectrum(int x, int y) const noexcept override
-    {
-        return texel_;
     }
 };
 

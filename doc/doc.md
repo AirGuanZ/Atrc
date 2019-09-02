@@ -552,9 +552,7 @@ Gaussian滤波函数。
 
 材质描述了物体表面与光的交互过程，本节介绍类型为`Material`的字段可取的类型值。
 
-#### disney_reflection
-
-![pic](./pictures/disney_reflection.png)
+#### disney_reflection (deprecated)
 
 Disney Principled BRDF的完整实现，有的参数含义我不知道怎么翻译比较合适，所以最好参考[原文](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf)。
 
@@ -571,6 +569,8 @@ Disney Principled BRDF的完整实现，有的参数含义我不知道怎么翻�
 | sheen_tint      | Texture | all_zero | 边缘光泽颜色一致性                         |
 | clearcoat       | Texture | all_zero | 清漆强度                                   |
 | clearcoat_gloss | Texture | all_zero | 清漆光泽度                                 |
+
+**NOTE**：`disney_reflection`对材质的表现范围基本是`disney`的子集，故建议使用后者。
 
 #### disney
 

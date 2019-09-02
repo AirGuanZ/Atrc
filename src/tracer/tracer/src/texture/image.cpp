@@ -8,15 +8,15 @@
 
 AGZ_TRACER_BEGIN
 
-class HDRTexture : public Texture
+class ImageTexture : public Texture
 {
-    const texture::texture2d_t<math::color3f> *data_ = nullptr;
+    const texture::texture2d_t<math::color3b> *data_ = nullptr;
 
 protected:
-    
+
     Spectrum sample_spectrum_impl(const Vec2 &uv) const noexcept override
     {
-        auto tex = [&t = *data_](int x, int y) { return t(y, x); };
+        auto tex = [&t = *data_](int x, int y) { return math::from_color3b<real>(t(y, x)); };
         return texture::linear_sample(uv, tex, data_->width(), data_->height());
     }
 
@@ -27,8 +27,8 @@ public:
     static std::string description()
     {
         return R"___(
-hdr [Texture]
-    filename [string] .hdr filename
+image [Texture]
+    filename [string] image filename
     inv_u    [0/1] (optional; defaultly set to 0) inverse u coord
     inv_v    [0/1] (optional; defaultly set to 0) inverse v coord
     swap_uv  [0/1] (optional; defaultly set to 0) swap uv coord; executed before inv_u/v 
@@ -46,26 +46,26 @@ hdr [Texture]
         std::string raw_filename = params.child_str("filename");
         std::string filename = init_ctx.path_mgr->get(raw_filename);
 
-        static std::unordered_map<std::string, std::unique_ptr<texture::texture2d_t<math::color3f>>> filename2tex_;
+        static std::unordered_map<std::string, std::unique_ptr<texture::texture2d_t<math::color3b>>> filename2tex_;
 
         if(auto it = filename2tex_.find(filename); it != filename2tex_.end())
         {
             data_ = it->second.get();
-            AGZ_LOG2("use cached hdr texture of ", filename);
+            AGZ_LOG2("use cached image texture of ", filename);
         }
         else
         {
-            auto data = img::load_rgb_from_hdr_file(filename);
+            auto data = img::load_rgb_from_file(filename);
             if(!data.is_available())
                 throw ObjectConstructionException("failed to load texture from " + filename);
-            AGZ_LOG2("load hdr from ", filename);
+            AGZ_LOG2("load image from ", filename);
 
-            filename2tex_[filename] = std::make_unique<texture::texture2d_t<math::color3f>>(std::move(data));
+            filename2tex_[filename] = std::make_unique<texture::texture2d_t<math::color3b>>(std::move(data));
             data_ = filename2tex_[filename].get();
             assert(data_->is_available());
         }
 
-        AGZ_HIERARCHY_WRAP("in initializing hdr texture object")
+        AGZ_HIERARCHY_WRAP("in initializing image texture object")
     }
 
     int width() const noexcept override
@@ -77,14 +77,8 @@ hdr [Texture]
     {
         return data_->height();
     }
-
-    Spectrum fetch_spectrum(int x, int y) const noexcept override
-    {
-        return data_->at(y, x);
-    }
 };
 
-AGZT_IMPLEMENTATION(Texture, HDRTexture, "hdr")
+AGZT_IMPLEMENTATION(Texture, ImageTexture, "image")
 
 AGZ_TRACER_END
-

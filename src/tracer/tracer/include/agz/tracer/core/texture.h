@@ -126,16 +126,6 @@ public:
     virtual int width() const noexcept = 0;
 
     virtual int height() const noexcept = 0;
-
-    virtual Spectrum fetch_spectrum(int x, int y) const noexcept
-    {
-        return Spectrum(fetch_real(x, y));
-    }
-
-    virtual real fetch_real(int x, int y) const noexcept
-    {
-        return fetch_spectrum(x, y).lum();
-    }
 };
 
 AGZT_INTERFACE(Texture)

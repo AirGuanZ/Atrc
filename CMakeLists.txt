@@ -178,9 +178,9 @@ SET(MISC_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/lib/misc/)
 
 ADD_SUBDIRECTORY(lib/utility/src)
 
-ADD_SUBDIRECTORY(src/tracer_utility)
-ADD_SUBDIRECTORY(src/tracer)
-ADD_SUBDIRECTORY(src/tracer_cshader)
+ADD_SUBDIRECTORY(src/tracer/utility)
+ADD_SUBDIRECTORY(src/tracer/tracer)
+ADD_SUBDIRECTORY(src/tracer/cshader)
 ADD_SUBDIRECTORY(src/cli)
 ADD_SUBDIRECTORY(src/obj_to_scene)
 

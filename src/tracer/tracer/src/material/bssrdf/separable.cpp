@@ -197,8 +197,7 @@ BSSRDFSampleResult SeparableBSSRDF::sample(TransportMode mode, const Sample4 &sa
     ret.inct    = list->inct;
     ret.inct.wr = -ret.inct.geometry_coord.z;
     ret.f       = distance_factor(r);
-    //ret.pdf     = pdf(ret.inct, mode) / list_len; // TODO: what's wrong with the mis pdf?
-    ret.pdf     = pdf_distance(channel, r) / (2 * PI_r * (std::max)(r, EPS)) / list_len;
+    ret.pdf     = pdf(ret.inct, mode) / list_len;
     ret.bsdf    = arena.create<SeparableBSDF>(ret.inct.geometry_coord, ret.inct.geometry_coord, this);
 
     if(!ret.f.is_finite() || ret.pdf < EPS)
@@ -222,7 +221,7 @@ real SeparableBSSRDF::pdf(const SurfacePoint &xi, TransportMode mode) const noex
     {
         for(int channel = 0; channel < SPECTRUM_COMPONENT_COUNT; ++channel)
         {
-            real r = std::max(r_proj[axis], EPS);
+            real r = (std::max)(r_proj[axis], EPS);
             ret += pdf_distance(channel, r)
                  * std::abs(ln[axis]) * channel_prob * axis_prob[axis] / (2 * PI_r * r);
         }
