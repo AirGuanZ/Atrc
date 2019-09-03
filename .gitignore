@@ -2,7 +2,7 @@ build/
 .vscode/
 asset/
 lib/embree3/
-lib/eigen3/
 lib/oidn/
-lib/luajit/
+lib/glfw/
+lib/glew/
 nohup.out

@@ -1,9 +1,6 @@
-﻿#pragma once
-
+﻿#include <agz/tracer/core/envir_light.h>
 #include <agz/tracer/core/texture.h>
 #include <agz/utility/texture.h>
-
-#include "./infinite_light.h"
 
 AGZ_TRACER_BEGIN
 
@@ -150,30 +147,19 @@ namespace env_impl
 
 } // namespace env_impl
 
-// IMPROVE: add importance sampling in emitting
-class EnvironmentLightImpl : public InfiniteLightImpl
+class IBL : public EnvironmentLight
 {
     const Texture *tex_ = nullptr;
     Vec3 up_ = Vec3(0, 0, 1);
 
     std::unique_ptr<env_impl::EnvironmentLightSampler> sampler_;
 
-    Spectrum radiance(const Vec3 &ref_to_light) const noexcept
-    {
-        Vec3 dir = Coord::from_z(up_).global_to_local(ref_to_light).normalize();
-        real phi = local_angle::phi(dir);
-        real theta = local_angle::theta(dir);
-        real u = math::clamp<real>(phi / (2 * PI_r), 0, 1);
-        real v = math::clamp<real>(theta / PI_r, 0, 1);
-        return tex_->sample_spectrum({ u, v });
-    }
-
 public:
 
     static std::string description()
     {
         return R"___(
-env [(Nonarea)Light]
+env [EnvironmentLight]
     tex [Spectrum] environment texture
     up  [Vec3]     (optional; defaultly set to +z) up directory
 )___";
@@ -192,16 +178,12 @@ env [(Nonarea)Light]
         AGZ_HIERARCHY_WRAP("in initializing native sky light")
     }
 
-    LightSampleResult sample(const InfiniteLightCore &core, const Vec3 &ref, const Sample4 &sam) const noexcept override
+    EnvironmentLightSampleResult sample(const Sample3 &sam) const noexcept override
     {
         auto [dir, pdf] = sampler_->sample({ sam.u, sam.v, sam.w });
 
-        Ray global_r(ref, dir, EPS);
-        GeometryIntersection inct;
-        core.intersection(global_r, &inct);
-
-        LightSampleResult ret;
-        ret.spt      = static_cast<SurfacePoint&>(inct);
+        EnvironmentLightSampleResult ret;
+        ret.ref_to_light = dir;
         ret.radiance = radiance(dir);
         ret.pdf      = pdf;
         ret.is_delta = false;
@@ -209,14 +191,14 @@ env [(Nonarea)Light]
         return ret;
     }
 
-    real pdf(const InfiniteLightCore &core, const Vec3&, const Vec3 &ref_to_light) const noexcept override
+    real pdf(const Vec3 &ref_to_light) const noexcept override
     {
         return sampler_->pdf(ref_to_light);
     }
 
-    Spectrum power(const InfiniteLightCore &core) const noexcept override
+    Spectrum power() const noexcept override
     {
-        real radius = core.world_radius();
+        real radius = world_radius_;
         Spectrum ret;
 
         int tex_width = tex_->width(), tex_height = tex_->height();
@@ -239,36 +221,47 @@ env [(Nonarea)Light]
         return ret * radius * radius;
     }
 
-    Spectrum radiance(const InfiniteLightCore &, const Vec3 &ref_to_light) const noexcept override
+    Spectrum radiance(const Vec3 &ref_to_light) const noexcept override
     {
-        return radiance(ref_to_light);
+        Vec3 dir = Coord::from_z(up_).global_to_local(ref_to_light).normalize();
+        real phi = local_angle::phi(dir);
+        real theta = local_angle::theta(dir);
+        real u = math::clamp<real>(phi / (2 * PI_r), 0, 1);
+        real v = math::clamp<real>(theta / PI_r, 0, 1);
+        return tex_->sample_spectrum({ u, v });
     }
     
-    LightEmitResult emit(const InfiniteLightCore &core, const Sample4 &sam) const noexcept override
-    {
-        LightEmitResult ret;
+    //LightEmitResult emit(const InfiniteLightCore &core, const Sample4 &sam) const noexcept override
+    //{
+    //    LightEmitResult ret;
 
-        auto [unit_pos, unit_pos_pdf] = math::distribution::uniform_on_sphere(sam.u, sam.v);
-        ret.spt = core.unit_pos_to_spt(unit_pos);
-        ret.pdf_pos = unit_pos_pdf / (core.world_radius() * core.world_radius());
+    //    auto [unit_pos, unit_pos_pdf] = math::distribution::uniform_on_sphere(sam.u, sam.v);
+    //    ret.spt = core.unit_pos_to_spt(unit_pos);
+    //    ret.pdf_pos = unit_pos_pdf / (core.world_radius() * core.world_radius());
 
-        auto [local_dir, dir_pdf] = math::distribution::zweighted_on_hemisphere(sam.w, sam.r);
-        auto global_dir = ret.spt.geometry_coord.local_to_global(local_dir);
-        ret.dir = global_dir;
-        ret.pdf_dir = dir_pdf;
-        
-        ret.radiance = radiance(-global_dir);
+    //    auto [local_dir, dir_pdf] = math::distribution::zweighted_on_hemisphere(sam.w, sam.r);
+    //    auto global_dir = ret.spt.geometry_coord.local_to_global(local_dir);
+    //    ret.dir = global_dir;
+    //    ret.pdf_dir = dir_pdf;
+    //    
+    //    ret.radiance = radiance(-global_dir);
 
-        return ret;
-    }
+    //    return ret;
+    //}
 
-    void emit_pdf(const InfiniteLightCore &core, const SurfacePoint &spt, const Vec3 &light_to_out,
-                  real *pdf_pos, real *pdf_dir) const noexcept override
-    {
-        real z = cos(light_to_out, spt.geometry_coord.z);
-        *pdf_pos = math::distribution::uniform_on_sphere_pdf<real> / (core.world_radius() * core.world_radius());
-        *pdf_dir = math::distribution::zweighted_on_hemisphere_pdf(z);
-    }
+    //void emit_pdf(const InfiniteLightCore &core, const SurfacePoint &spt, const Vec3 &light_to_out,
+    //              real *pdf_pos, real *pdf_dir) const noexcept override
+    //{
+    //    real z = cos(light_to_out, spt.geometry_coord.z);
+    //    *pdf_pos = math::distribution::uniform_on_sphere_pdf<real> / (core.world_radius() * core.world_radius());
+    //    *pdf_dir = math::distribution::zweighted_on_hemisphere_pdf(z);
+    //}
 };
+
+AGZT_IMPLEMENTATION(EnvironmentLight, IBL, "ibl")
+
+// 为了前向兼容
+using IBL2 = IBL;
+AGZT_IMPLEMENTATION(EnvironmentLight, IBL2, "env")
 
 AGZ_TRACER_END

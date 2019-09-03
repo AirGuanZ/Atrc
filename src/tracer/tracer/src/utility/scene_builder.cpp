@@ -5,6 +5,8 @@
 #include <agz/tracer/utility/logger.h>
 #include <agz/tracer/utility/scene_builder.h>
 
+#include "../envir_light/no_env.h"
+
 AGZ_TRACER_BEGIN
 
 Scene *SceneBuilder::build(const Config &params, obj::ObjectInitContext &init_ctx)
@@ -68,16 +70,11 @@ Scene *SceneBuilder::build(const Config &params, obj::ObjectInitContext &init_ct
     if(auto group = params.find_child_group("env"))
     {
         AGZ_LOG1("creating environment light");
-
-        auto env = EntityFactory.create(*group, init_ctx);
-        if(auto light = env->as_light())
-        {
-            lights.push_back(light);
-            scene->set_env_light(env);
-        }
-        else
-            throw ObjectConstructionException("'env' must be an light source");
+        auto env = EnvironmentLightFactory.create(*group, init_ctx);
+        scene->set_env_light(env);
     }
+    else
+        scene->set_env_light(init_ctx.arena->create<NoEnv>());
 
     AGZ_LOG1("creating entity aggregate");
     Aggregate *aggregate;

@@ -10,20 +10,21 @@ PROJECT(Atrc)
 
 ############## optional submodules
 
-OPTION(USE_EMBREE     "use embree for finding triangle mesh intersection" OFF)
-OPTION(USE_OIDN       "use oidn denoiser"                                 OFF)
+OPTION(USE_EMBREE              "use embree for finding triangle mesh intersection" OFF)
+OPTION(USE_OIDN                "use oidn denoiser"                                 OFF)
+OPTION(BUILD_MATERIAL_EXPLORER "build material explorer or not"                    OFF)
 
 ############## CXX properties
 
 IF(NOT CMAKE_BUILD_TYPE)
-	SET(CMAKE_BUILD_TYPE "Release" CACHE STRING "Options: Debug Release RelWithDebInfo MinSizeRel." FORCE)
+    SET(CMAKE_BUILD_TYPE "Release" CACHE STRING "Options: Debug Release RelWithDebInfo MinSizeRel." FORCE)
 ENDIF()
 
 SET_PROPERTY(GLOBAL PROPERTY USE_FOLDERS ON)
 SET(CMAKE_CXX_STANDARD 17)
 
 IF(MSVC)
-	ADD_DEFINITIONS(-D_SILENCE_CXX17_OLD_ALLOCATOR_MEMBERS_DEPRECATION_WARNING)
+    ADD_DEFINITIONS(-D_SILENCE_CXX17_OLD_ALLOCATOR_MEMBERS_DEPRECATION_WARNING)
 ENDIF()
 
 IF("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
@@ -34,134 +35,36 @@ ELSEIF("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
     SET(STDFS_LD_LIB "stdc++fs")
     SET(CMAKE_EXE_LINKER_FLAGS "-ldl")
-	MESSAGE(WARNING "g++ configuration is untested")
+    MESSAGE(WARNING "g++ configuration is untested")
 ENDIF()
 
 ############## embree
 
 IF(USE_EMBREE)
-	ADD_DEFINITIONS(-DUSE_EMBREE)
-
-	IF(MSVC)
-		SET(EMBREE_IGNORE_CMAKE_CXX_FLAGS "")
-	ELSE()
-		SET(EMBREE_IGNORE_CMAKE_CXX_FLAGS "-DEMBREE_IGNORE_CMAKE_CXX_FLAGS=OFF")
-	ENDIF()
-	
-	IF(NOT DEFINED EMBREE_MAX_ISA)
-		SET(EMBREE_MAX_ISA AVX2)
-	ENDIF()
-
-	SET(Embree3_VERSION "3.5.2")
-	ExternalProject_Add(
-		Embree3
-		PREFIX "${PROJECT_SOURCE_DIR}/lib/embree3"
-		URL "https://github.com/embree/embree/archive/v${Embree3_VERSION}.tar.gz"
-		URL_MD5 608072dba35b09b58e0b13e59699342a
-		CMAKE_ARGS
-			"-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
-			"-DEMBREE_TUTORIALS=OFF"
-			"-DEMBREE_FILTER_FUNCTION=OFF"
-			"-DEMBREE_RAY_PACKETS=OFF"
-			"-DEMBREE_TASKING_SYSTEM=INTERNAL"
-			"-DEMBREE_GEOMETRY_QUAD=OFF"
-			"-DEMBREE_GEOMETRY_CURVE=OFF"
-			"-DEMBREE_GEOMETRY_SUBDIVISION=OFF"
-			"-DEMBREE_GEOMETRY_INSTANCE=OFF"
-			"-DEMBREE_GEOMETRY_USER=OFF"
-			"-DEMBREE_GEOMETRY_POINT=OFF"
-			"-DEMBREE_ISPC_SUPPORT=OFF"
-			"-DEMBREE_STATIC_LIB=ON"
-			"-DEMBREE_MAX_ISA=${EMBREE_MAX_ISA}"
-			"${EMBREE_IGNORE_CMAKE_CXX_FLAGS}"
-			"-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}"
-			"-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
-			"-DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}"
-		INSTALL_COMMAND ""
-	)
-	
-	SET(EMBREE_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/lib/embree3/src/Embree3/include/")
-
-	# 下面的一系列embree的静态库必须按此顺序链接
-	IF(WIN32)
-		SET(EMBREE_LIBRARIES
-			optimized "${PROJECT_SOURCE_DIR}/lib/embree3/src/Embree3-build/Release/embree3.lib"
-			optimized "${PROJECT_SOURCE_DIR}/lib/embree3/src/Embree3-build/Release/embree_sse42.lib"
-			optimized "${PROJECT_SOURCE_DIR}/lib/embree3/src/Embree3-build/Release/embree_avx.lib"
-			optimized "${PROJECT_SOURCE_DIR}/lib/embree3/src/Embree3-build/Release/embree_avx2.lib"
-			optimized "${PROJECT_SOURCE_DIR}/lib/embree3/src/Embree3-build/Release/lexers.lib"
-			optimized "${PROJECT_SOURCE_DIR}/lib/embree3/src/Embree3-build/Release/math.lib"
-			optimized "${PROJECT_SOURCE_DIR}/lib/embree3/src/Embree3-build/Release/simd.lib"
-			optimized "${PROJECT_SOURCE_DIR}/lib/embree3/src/Embree3-build/Release/tasking.lib"
-			optimized "${PROJECT_SOURCE_DIR}/lib/embree3/src/Embree3-build/Release/sys.lib"
-			debug     "${PROJECT_SOURCE_DIR}/lib/embree3/src/Embree3-build/Debug/embree3.lib"
-			debug     "${PROJECT_SOURCE_DIR}/lib/embree3/src/Embree3-build/Debug/embree_sse42.lib"
-			debug     "${PROJECT_SOURCE_DIR}/lib/embree3/src/Embree3-build/Debug/embree_avx.lib"
-			debug     "${PROJECT_SOURCE_DIR}/lib/embree3/src/Embree3-build/Debug/embree_avx2.lib"
-			debug     "${PROJECT_SOURCE_DIR}/lib/embree3/src/Embree3-build/Debug/lexers.lib"
-			debug     "${PROJECT_SOURCE_DIR}/lib/embree3/src/Embree3-build/Debug/math.lib"
-			debug     "${PROJECT_SOURCE_DIR}/lib/embree3/src/Embree3-build/Debug/simd.lib"
-			debug     "${PROJECT_SOURCE_DIR}/lib/embree3/src/Embree3-build/Debug/tasking.lib"
-			debug     "${PROJECT_SOURCE_DIR}/lib/embree3/src/Embree3-build/Debug/sys.lib"
-			)
-	ELSE()
-		SET(EMBREE_LIBRARIES
-			"${PROJECT_SOURCE_DIR}/lib/embree3/src/Embree3-build/libembree3.a"
-			"${PROJECT_SOURCE_DIR}/lib/embree3/src/Embree3-build/libembree_sse42.a"
-			"${PROJECT_SOURCE_DIR}/lib/embree3/src/Embree3-build/libembree_avx.a"
-			"${PROJECT_SOURCE_DIR}/lib/embree3/src/Embree3-build/libembree_avx2.a"
-			"${PROJECT_SOURCE_DIR}/lib/embree3/src/Embree3-build/liblexers.a"
-			"${PROJECT_SOURCE_DIR}/lib/embree3/src/Embree3-build/libmath.a"
-			"${PROJECT_SOURCE_DIR}/lib/embree3/src/Embree3-build/libsimd.a"
-			"${PROJECT_SOURCE_DIR}/lib/embree3/src/Embree3-build/libtasking.a"
-			"${PROJECT_SOURCE_DIR}/lib/embree3/src/Embree3-build/libsys.a"
-			)
-	ENDIF()
-	
+    ADD_DEFINITIONS(-DUSE_EMBREE)
+    INCLUDE("${PROJECT_SOURCE_DIR}/cmake/cmake-embree") 
 ENDIF()
 
 ############## oidn
 
 IF(USE_OIDN)
-	ADD_DEFINITIONS(-DUSE_OIDN)
-
-	SET(OIDN_TRIGGER_CONTENT "
-CMAKE_MINIMUM_REQUIRED(VERSION 3.10)
-INCLUDE(ExternalProject)
-PROJECT(OIDNDownloader)
-SET(OIDN_VERSION \"1.0.0\")
-IF(WIN32)
-	SET(OIDN_URL https://github.com/OpenImageDenoise/oidn/releases/download/v1.0.0/oidn-1.0.0.x64.vc14.windows.zip)
-	SET(OIDN_URL_MD5 0e9bbcd03239777dd46d0f79f5da7d8a)
-ELSE()
-	SET(OIDN_URL https://github.com/OpenImageDenoise/oidn/releases/download/v1.0.0/oidn-1.0.0.x86_64.linux.tar.gz)
-	SET(OIDN_URL_MD5 aa4e637391b55cb711199a24d844d9d2)
-ENDIF()
-ExternalProject_Add(
-	OIDN
-	PREFIX \"${PROJECT_SOURCE_DIR}/lib/oidn\"
-	URL \"\${OIDN_URL}\"
-	URL_MD5 \"\${OIDN_URL_MD5}\"
-	UPDATE_COMMAND	  \"\"
-	CONFIGURE_COMMAND \"\"
-	BUILD_COMMAND	  \"\"
-	INSTALL_COMMAND	  \"\"
-)
-ADD_CUSTOM_TARGET(OIDNTrigger)
-ADD_DEPENDENCIES(OIDNTrigger OIDN)
-	")
-
-	FILE(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/OIDNTrigger ${CMAKE_BINARY_DIR}/OIDNTrigger/build)
-	FILE(WRITE ${CMAKE_BINARY_DIR}/OIDNTrigger/CMakeLists.txt "${OIDN_TRIGGER_CONTENT}")
-	EXECUTE_PROCESS(COMMAND ${CMAKE_COMMAND} .. WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/OIDNTrigger/build)
-    EXECUTE_PROCESS(COMMAND ${CMAKE_COMMAND} --build . WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/OIDNTrigger/build)
-		
-	SET(OIDN_FIND_PATH "${PROJECT_SOURCE_DIR}/lib/oidn/src/OIDN/lib/cmake/OpenImageDenoise")
-	FIND_PACKAGE(OpenImageDenoise PATHS ${OIDN_FIND_PATH})
-
+    ADD_DEFINITIONS(-DUSE_OIDN)
+    INCLUDE("${PROJECT_SOURCE_DIR}/cmake/cmake-oidn")
 ENDIF()
 
-############## other submodules
+############## necessory submodules
+
+SET(MISC_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/lib/misc/)
+
+ADD_SUBDIRECTORY(lib/utility/src)
+
+ADD_SUBDIRECTORY(src/tracer/utility)
+ADD_SUBDIRECTORY(src/tracer/tracer)
+ADD_SUBDIRECTORY(src/tracer/cshader)
+ADD_SUBDIRECTORY(src/cli)
+ADD_SUBDIRECTORY(src/obj_to_scene)
+
+############## material plugins
 
 MACRO(SUBDIRLIST result curdir)
   FILE(GLOB children RELATIVE ${curdir} ${curdir}/*)
@@ -174,19 +77,18 @@ MACRO(SUBDIRLIST result curdir)
   SET(${result} ${dirlist})
 ENDMACRO()
 
-SET(MISC_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/lib/misc/)
-
-ADD_SUBDIRECTORY(lib/utility/src)
-
-ADD_SUBDIRECTORY(src/tracer/utility)
-ADD_SUBDIRECTORY(src/tracer/tracer)
-ADD_SUBDIRECTORY(src/tracer/cshader)
-ADD_SUBDIRECTORY(src/cli)
-ADD_SUBDIRECTORY(src/obj_to_scene)
-
 SUBDIRLIST(PLUGINS ${PROJECT_SOURCE_DIR}/src/c_materials)
 MESSAGE("add material plugins: ${PLUGINS}")
 
 FOREACH(subdir ${PLUGINS})
   ADD_SUBDIRECTORY(${PROJECT_SOURCE_DIR}/src/c_materials/${subdir})
 ENDFOREACH()
+
+############## glfw && material explorer
+
+IF(BUILD_MATERIAL_EXPLORER)
+    INCLUDE("${PROJECT_SOURCE_DIR}/cmake/cmake-glfw")
+	INCLUDE("${PROJECT_SOURCE_DIR}/cmake/cmake-glew")
+	FIND_PACKAGE(OpenGL REQUIRED)
+    ADD_SUBDIRECTORY(src/material_explorer)
+ENDIF()

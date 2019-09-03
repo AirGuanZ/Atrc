@@ -15,7 +15,7 @@ class DefaultScene : public Scene
     const Camera *camera_ = nullptr;
 
     std::vector<Light*> lights_;
-    Entity *env_lht_ent_ = nullptr;
+    EnvironmentLight *env_lht_ = nullptr;
 
     const Aggregate *aggregate_ = nullptr;
     AABB world_bound_;
@@ -70,14 +70,10 @@ default [Scene]
         lights_.push_back(light);
     }
 
-    void set_env_light(Entity *env_light) override
+    void set_env_light(EnvironmentLight *env_light) override
     {
         assert(env_light);
-        env_lht_ent_ = env_light;
-        if(auto light = env_light->as_light())
-            lights_.push_back(light);
-        else
-            throw ObjectConstructionException("env_light must be a light source");
+        env_lht_ = env_light;
     }
 
     void set_aggregate(const Aggregate *aggregate) override
@@ -100,6 +96,11 @@ default [Scene]
     {
         auto ptr = lights_.data();
         return misc::span<const Light* const>(ptr, lights_.size());
+    }
+
+    const EnvironmentLight *env() const noexcept override
+    {
+        return env_lht_;
     }
 
     SceneSampleLightResult sample_light(const Sample1 &sam) const noexcept override
@@ -128,16 +129,12 @@ default [Scene]
 
     bool has_intersection(const Ray &r) const noexcept override
     {
-        if(aggregate_->has_intersection(r))
-            return true;
-        return env_lht_ent_ && env_lht_ent_->has_intersection(r);
+        return aggregate_->has_intersection(r);
     }
 
     bool closest_intersection(const Ray &r, EntityIntersection *inct) const noexcept override
     {
-        if(aggregate_->closest_intersection(r, inct))
-            return true;
-        return env_lht_ent_ && env_lht_ent_->closest_intersection(r, inct);
+        return aggregate_->closest_intersection(r, inct);
     }
 
     bool next_scattering_point(const Ray &r, SampleScatteringResult *result, const Sample1 &sam, Arena &arena) const override

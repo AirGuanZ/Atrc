@@ -9,6 +9,7 @@ AGZ_TRACER_BEGIN
 
 class Camera;
 class Entity;
+class EnvironmentLight;
 class Light;
 
 struct EntityIntersection;
@@ -58,13 +59,16 @@ public:
     virtual void set_aggregate(const Aggregate *aggregate) = 0;
 
     /** @brief 设置环境光源 */
-    virtual void set_env_light(Entity *env_light) = 0;
+    virtual void set_env_light(EnvironmentLight *env_light) = 0;
 
     /** @brief 场景中光源的数量 */
     virtual size_t light_count() const noexcept = 0;
 
     /** @brief 场景中的第idx个光源 */
     virtual const Light *light(size_t idx) const noexcept = 0;
+
+    /** @brief 环境光 */
+    virtual const EnvironmentLight *env() const noexcept = 0;
 
     /** @brief 场景中的所有光源 */
     virtual misc::span<const Light* const> lights() const noexcept = 0;
@@ -89,6 +93,12 @@ public:
     {
         real dis = (A - B).length();
         Ray shadow_ray(A, (B - A).normalize(), EPS, dis - EPS);
+        return !has_intersection(shadow_ray);
+    }
+
+    virtual bool visible_inf(const Vec3 &a, const Vec3 &dir) const noexcept
+    {
+        Ray shadow_ray(a, dir.normalize(), EPS);
         return !has_intersection(shadow_ray);
     }
 

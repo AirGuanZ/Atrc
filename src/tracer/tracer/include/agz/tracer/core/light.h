@@ -20,19 +20,19 @@ struct LightSampleResult
 
 inline const LightSampleResult LIGHT_SAMPLE_RESULT_NULL = { { }, Spectrum(), 0, false };
 
-/**
- * @brief 从光源发射的粒子信息
- */
-struct LightEmitResult
-{
-    SurfacePoint spt;
-    Vec3 dir;
-    Spectrum radiance;
-    real pdf_pos = 1; // w.r.t. light source area
-    real pdf_dir = 1; // w.r.t. solid angle
-
-    const Medium *medium = nullptr;
-};
+///**
+// * @brief 从光源发射的粒子信息
+// */
+//struct LightEmitResult
+//{
+//    SurfacePoint spt;
+//    Vec3 dir;
+//    Spectrum radiance;
+//    real pdf_pos = 1; // w.r.t. light source area
+//    real pdf_dir = 1; // w.r.t. solid angle
+//
+//    const Medium *medium = nullptr;
+//};
 
 /**
  * @brief 光源接口
@@ -77,15 +77,15 @@ public:
      */
     virtual real pdf(const Vec3 &ref, const SurfacePoint &spt) const noexcept = 0;
 
-    /**
-     * @brief 采样一个从光源发射的粒子
-     */
-    virtual LightEmitResult emit(const Sample5 &sam) const noexcept = 0;
-    
-    /**
-     * @brief 采样到从给定位置发射向给定方向的粒子的概率密度函数值
-     */
-    virtual void emit_pdf(const SurfacePoint &spt, const Vec3 &light_to_out, real *pdf_pos, real *pdf_dir) const noexcept = 0;
+    ///**
+    // * @brief 采样一个从光源发射的粒子
+    // */
+    //virtual LightEmitResult emit(const Sample5 &sam) const noexcept = 0;
+    //
+    ///**
+    // * @brief 采样到从给定位置发射向给定方向的粒子的概率密度函数值
+    // */
+    //virtual void emit_pdf(const SurfacePoint &spt, const Vec3 &light_to_out, real *pdf_pos, real *pdf_dir) const noexcept = 0;
 };
 
 AGZT_INTERFACE(Light)

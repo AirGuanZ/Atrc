@@ -2,6 +2,7 @@
 
 #include <agz/tracer/core/bsdf.h>
 #include <agz/tracer/core/entity.h>
+#include <agz/tracer/core/envir_light.h>
 #include <agz/tracer/core/intersection.h>
 #include <agz/tracer/core/light.h>
 #include <agz/tracer/core/scattering.h>
@@ -99,6 +100,57 @@ inline Spectrum mis_sample_light(const Scene &scene, const Light *light, const S
     return f / (light_sample.pdf + pnt_pdf);
 }
 
+inline Spectrum mis_sample_envir(
+    const Scene &scene,
+    const EntityIntersection &inct, const ShadingPoint &shd,
+    const Sample3 &sam)
+{
+    auto env = scene.env();
+
+    auto light_sample = env->sample(sam);
+    if(!light_sample.radiance || !light_sample.pdf)
+        return Spectrum();
+
+    if(!scene.visible_inf(inct.pos, light_sample.ref_to_light))
+        return {};
+
+    auto bsdf_f = shd.bsdf->eval(light_sample.ref_to_light, inct.wr, TM_Radiance);
+    if(!bsdf_f)
+        return Spectrum();
+
+    Spectrum f = light_sample.radiance * bsdf_f * std::abs(cos(light_sample.ref_to_light, inct.geometry_coord.z));
+
+    if(light_sample.is_delta)
+        return f / light_sample.pdf;
+    real bsdf_pdf = shd.bsdf->pdf(light_sample.ref_to_light, inct.wr, TM_Radiance);
+    return f / (light_sample.pdf + bsdf_pdf);
+}
+
+inline Spectrum mis_sample_envir(const Scene &scene, const ScatteringPoint &pnt, const Sample3 sam)
+{
+    auto env = scene.env();
+    Vec3 pos = pnt.pos();
+
+    auto light_sample = env->sample(sam);
+    if(!light_sample.radiance || light_sample.pdf < EPS)
+        return {};
+
+    if(!scene.visible_inf(pos, light_sample.ref_to_light))
+        return {};
+
+    Vec3 pnt_to_light = light_sample.ref_to_light.normalize();
+    auto bsdf_f = pnt.eval(pnt_to_light, pnt.wr(), TM_Radiance);
+    if(!bsdf_f)
+        return Spectrum();
+
+    Spectrum f = light_sample.radiance * bsdf_f * pnt.proj_wi_factor(pnt_to_light);
+    if(light_sample.is_delta)
+        return f / light_sample.pdf;
+
+    real pnt_pdf = pnt.pdf(pnt_to_light, pnt.wr(), TM_Radiance);
+    return f / (light_sample.pdf + pnt_pdf);
+}
+
 inline Spectrum mis_sample_scattering(const Scene &scene, const ScatteringPoint &pnt, const Sample3 &sam)
 {
     auto pnt_sample = pnt.sample(pnt.wr(), sam, TM_Radiance);
@@ -108,7 +160,17 @@ inline Spectrum mis_sample_scattering(const Scene &scene, const ScatteringPoint 
     Ray new_ray(pnt.pos(), pnt_sample.dir.normalize(), EPS);
     EntityIntersection new_inct;
     if(!scene.closest_intersection(new_ray, &new_inct))
-        return Spectrum();
+    {
+        auto env = scene.env();
+        Spectrum light_f = env->radiance(pnt_sample.dir);
+
+        Spectrum f = light_f * pnt_sample.f * pnt.proj_wi_factor(pnt_sample.dir);
+        if(pnt_sample.is_delta)
+            return f / pnt_sample.pdf;
+
+        real light_pdf = env->pdf(pnt_sample.dir);
+        return f / (pnt_sample.pdf + light_pdf);
+    }
 
     auto light = new_inct.entity->as_light();
     if(!light)

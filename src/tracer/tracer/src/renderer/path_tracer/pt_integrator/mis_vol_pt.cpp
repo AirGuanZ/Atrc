@@ -15,8 +15,8 @@ AGZ_TRACER_BEGIN
 class VolumetricPathTracingIntegrator : public PathTracingIntegrator
 {
     int min_depth_ = 5;
-    int max_depth_ = 20;
-    real cont_prob_ = real(0.5);
+    int max_depth_ = 10;
+    real cont_prob_ = real(0.9);
     bool sample_all_lights_ = true;
 
 public:
@@ -25,10 +25,10 @@ public:
     {
         return R"___(
 mis [PathTracingIntegrator]
-    min_depth [int]         minimum path length before applying Russian Roulette
-    max_depth [int]         maximal path length
-    cont_prob [real]        continuing probability in Russian Roulette
-    sample_all_lights [0/1] sample all lights in each light sampling iteration
+    min_depth [int]         (optional; defaultly set to 5)   minimum path length before applying Russian Roulette
+    max_depth [int]         (optional; defaultly set to 10)  maximal path length
+    cont_prob [real]        (optional; defaultly set to 0.9) continuing probability in Russian Roulette
+    sample_all_lights [0/1] (optional; defaultly set to 1)   sample all lights in each light sampling iteration
 )___";
     }
 
@@ -36,19 +36,19 @@ mis [PathTracingIntegrator]
     {
         AGZ_HIERARCHY_TRY
 
-        min_depth_ = params.child_int("min_depth");
+        min_depth_ = params.child_int_or("min_depth", 5);
         if(min_depth_ < 1)
             throw ObjectConstructionException("invalid min depth value: " + std::to_string(min_depth_));
 
-        max_depth_ = params.child_int("max_depth");
+        max_depth_ = params.child_int_or("max_depth", 10);
         if(max_depth_ < min_depth_)
             throw ObjectConstructionException("invalid max depth value: " + std::to_string(max_depth_));
 
-        cont_prob_ = params.child_real("cont_prob");
+        cont_prob_ = params.child_real_or("cont_prob", real(0.9));
         if(cont_prob_ < 0 || cont_prob_ > 1)
             throw ObjectConstructionException("invalid continue prob value: " + std::to_string(cont_prob_));
 
-        sample_all_lights_ = params.child_int("sample_all_lights") != 0;
+        sample_all_lights_ = params.child_int_or("sample_all_lights", 1) != 0;
 
         AGZ_HIERARCHY_WRAP("in initializing volumetric path tracing integrator")
     }
@@ -72,7 +72,11 @@ mis [PathTracingIntegrator]
             scattering_sample.p_has_inct = &has_ent_inct;
             scattering_sample.p_inct = &ent_inct;
             if(!scene.next_scattering_point(r, &scattering_sample, sampler.sample1(), arena))
+            {
+                if(depth == 1)
+                    ret += coef * scene.env()->radiance(r.d);
                 return ret;
+            }
             auto &pnt = scattering_sample.pnt;
 
             auto medium = pnt.medium(pnt.wr());
@@ -109,6 +113,7 @@ mis [PathTracingIntegrator]
                 auto [light, pdf] = scene.sample_light(sampler.sample1());
                 ld += coef * mis_sample_light(scene, light, pnt, sampler.sample5()) / pdf;
             }
+            ld += coef * mis_sample_envir(scene, pnt, sampler.sample3());
             ld += coef * mis_sample_scattering(scene, pnt, sampler.sample3());
             ret += ld;
 
@@ -150,6 +155,7 @@ mis [PathTracingIntegrator]
                     auto [light, pdf] = scene.sample_light(sampler.sample1());
                     ret += coef * mis_sample_light(scene, light, new_pnt, sampler.sample5()) / pdf;
                 }
+                ret += coef * mis_sample_envir(scene, new_pnt, sampler.sample3());
                 ret += coef * mis_sample_scattering(scene, new_pnt, sampler.sample3());
 
                 BSDFSampleResult new_bsdf_sample = new_pnt.sample(new_pnt.wr(), sampler.sample3(), TM_Radiance);

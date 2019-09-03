@@ -253,13 +253,11 @@ Atrc使用JSON作为描述场景和渲染设置的配置文件格式。整个JSO
 
 #### default
 
-| 字段名    | 类型            | 默认值           | 含义                                         |
-| --------- | --------------- | ---------------- | -------------------------------------------- |
-| entities  | [Entity]        | []               | 场景中的实体列表，默认为空列表               |
-| env       | Entity          | null             | 表示环境光的实体，默认为无环境光             |
-| aggregate | EntityAggregate | native aggregate | 实体间的空间查询加速数据结构，默认为暴力遍历 |
-
-注意到`env`字段的类型也是实体`Entity`，这是由于在Atrc中光源也是一种特殊的实体。
+| 字段名    | 类型             | 默认值           | 含义                                         |
+| --------- | ---------------- | ---------------- | -------------------------------------------- |
+| entities  | [Entity]         | []               | 场景中的实体列表，默认为空列表               |
+| env       | EnvironmentLight | null             | 环境光，默认为空                             |
+| aggregate | EntityAggregate  | native aggregate | 实体间的空间查询加速数据结构，默认为暴力遍历 |
 
 ### EntityAggregate
 
@@ -293,6 +291,61 @@ Atrc使用JSON作为描述场景和渲染设置的配置文件格式。整个JSO
 
 小孔摄像机的渲染结果是上下颠倒的，因此通常会和类型值为“flip”的后处理器配合。
 
+### EnvironmentLight
+
+本节描述类型为`EnvironmentLight`的字段有哪些可取的类型值。
+
+#### dir
+
+![pic](./pictures/dir_range0.02.png)
+
+环境光的一种，在指定的锥形立体角范围内的方向上有值为常量的辐射亮度。
+
+| 字段名   | 类型     | 默认值 | 含义                                     |
+| -------- | -------- | ------ | ---------------------------------------- |
+| dir      | Vec3     |        | 主方向                                   |
+| radiance | Spectrum |        | 辐射亮度                                 |
+| range    | real     |        | 有效的方向范围有多大，取值范围为$(0, 1)$ |
+| med_in   | Medium   | void   | 内部介质，默认为真空                     |
+| med_out  | Medium   | void   | 外部介质，默认为真空                     |
+
+我们知道，环境光可以由方向的函数$L(d)$描述，表示沿方向向量$d$的环境光辐射亮度。设`dir`字段值为$d_0$，`radiance`字段值为$L_0$，`range`字段取值为$r$，则`dir`环境光对应的函数$L$为：
+$$
+L(d) = \begin{cases}\begin{aligned}
+	&L_0, &\cos\langle d, d_0\rangle \ge 1 - r \\
+	&0, &\text{otherwise}
+\end{aligned}\end{cases}
+$$
+
+#### ibl
+
+![pic](./pictures/env_light.png)
+
+环境光的一种，由纹理给出它在每个方向上的辐射亮度。
+
+| 字段名  | 类型    | 默认值      | 含义                                           |
+| ------- | ------- | ----------- | ---------------------------------------------- |
+| tex     | Texture |             | 描述辐射亮度的纹理对象                         |
+| up      | Vec3    | [ 0, 0, 1 ] | 描述世界空间中哪个方向为“上方”，默认为$+z$方向 |
+| med_in  | Medium  | void        | 内部介质，默认为真空                           |
+| med_out | Medium  | void        | 外部介质，默认为真空                           |
+
+`ibl`亦名`env`，这只是由兼容性问题造成的。
+
+#### native_sky
+
+![pic](./pictures/native_sky.png)
+
+环境光的一种，表示自上而下颜色渐变的天空。
+
+| 字段名 | 类型     | 默认值      | 含义                             |
+| ------ | -------- | ----------- | -------------------------------- |
+| top    | Spectrum |             | 最上方的辐射亮度                 |
+| bottom | Spectrum |             | 最下方的辐射亮度                 |
+| up     | Vec3     | [ 0, 0, 1 ] | 哪个方向为“上方”，默认为$+z$方向 |
+| med_in   | Medium   | void   | 内部介质，默认为真空 |
+| med_out  | Medium   | void   | 外部介质，默认为真空 |
+
 ### Entity
 
 本节描述类型为`Entity`的字段有哪些可取的类型值。
@@ -301,7 +354,7 @@ Atrc使用JSON作为描述场景和渲染设置的配置文件格式。整个JSO
 
 ![diffuse_light](./pictures/diffuse_light.png)
 
-几何漫射光源，即具有几何形状的光源，表面上每一点向所有方向发射相同的辐射亮度。
+几何漫射光源，即具有几何形状的光源，表面上每一点向所有方向发射相同的辐射亮度，如上图中的球形光源所示。
 
 | 字段名   | 类型     | 默认值 | 含义     |
 | -------- | -------- | ------ | -------- |
@@ -320,65 +373,6 @@ Atrc使用JSON作为描述场景和渲染设置的配置文件格式。整个JSO
 | -------- | -------- | ------ | -------------------- |
 | geometry | Geometry |        | 几何形状             |
 | material | Material |        | 实体表面材质         |
-| med_in   | Medium   | void   | 内部介质，默认为真空 |
-| med_out  | Medium   | void   | 外部介质，默认为真空 |
-
-#### dir
-
-![pic](./pictures/dir_range0.02.png)
-
-环境光的一种，在指定的锥形立体角范围内的方向上有值为常量的辐射亮度。
-
-| 字段名   | 类型     | 默认值 | 含义                                     |
-| -------- | -------- | ------ | ---------------------------------------- |
-| dir      | Vec3     |        | 主方向                                   |
-| radiance | Spectrum |        | 辐射亮度                                 |
-| range    | real     |        | 有效的方向范围有多大，取值范围为$(0, 1)$ |
-| med_in   | Medium   | void   | 内部介质，默认为真空 |
-| med_out  | Medium   | void   | 外部介质，默认为真空 |
-
-我们知道，环境光可以由方向的函数$L(d)$描述，表示沿方向向量$d$的环境光辐射亮度。设`dir`字段值为$d_0$，`radiance`字段值为$L_0$，`range`字段取值为$r$，则`dir`环境光对应的函数$L$为：
-$$
-L(d) = \begin{cases}\begin{aligned}
-	&L_0, &\cos\langle d, d_0\rangle \ge 1 - r \\
-	&0, &\text{otherwise}
-\end{aligned}\end{cases}
-$$
-
-#### env
-
-![pic](./pictures/env_light.png)
-
-环境光的一种，由纹理给出它在每个方向上的辐射亮度。
-
-| 字段名 | 类型    | 默认值      | 含义                                           |
-| ------ | ------- | ----------- | ---------------------------------------------- |
-| tex    | Texture |             | 描述辐射亮度的纹理对象                         |
-| up     | Vec3    | [ 0, 0, 1 ] | 描述世界空间中哪个方向为“上方”，默认为$+z$方向 |
-| med_in   | Medium   | void   | 内部介质，默认为真空 |
-| med_out  | Medium   | void   | 外部介质，默认为真空 |
-
-#### native_sky
-
-![pic](./pictures/native_sky.png)
-
-环境光的一种，表示自上而下颜色渐变的天空。
-
-| 字段名 | 类型     | 默认值      | 含义                             |
-| ------ | -------- | ----------- | -------------------------------- |
-| top    | Spectrum |             | 最上方的辐射亮度                 |
-| bottom | Spectrum |             | 最下方的辐射亮度                 |
-| up     | Vec3     | [ 0, 0, 1 ] | 哪个方向为“上方”，默认为$+z$方向 |
-| med_in   | Medium   | void   | 内部介质，默认为真空 |
-| med_out  | Medium   | void   | 外部介质，默认为真空 |
-
-#### aggregate
-
-环境光的一种，表示将多个其他类型的环境光叠加。
-
-| 字段名 | 类型     | 默认值 | 含义                           |
-| ------ | -------- | ------ | ------------------------------ |
-| impls  | [Entity] |        | 由其他环境光对象构成的JSON数组 |
 | med_in   | Medium   | void   | 内部介质，默认为真空 |
 | med_out  | Medium   | void   | 外部介质，默认为真空 |
 
@@ -811,21 +805,6 @@ Disney Principled BRDF的完整实现，有的参数含义我不知道怎么翻�
 | sampler        | Sampler               |        | 随机数采样器                                           |
 
 当工作线程数$n \le 0$时，设硬件线程数为$k$，则将使用$\max\{1, k+n\}$个工作线程。比如可以将`worker_count`设置为-2，表示留两个硬件线程，把其他硬件线程都用起来。
-
-#### light
-
-Adjoint Particle Tracer的实现，收敛很慢，主要为学习用途。
-
-| 字段名         | 类型    | 默认值 | 含义                           |
-| -------------- | ------- | ------ | ------------------------------ |
-| worker_count   | int     |        | 工作线程数                     |
-| min_depth      | int     |        | 使用RR策略前的最小粒子追踪深度 |
-| max_depth      | int     |        | 追踪粒子的最大截断深度         |
-| cont_prob      | real    |        | 追踪粒子时使用RR策略的通过概率 |
-| particle_count | int     |        | 共追踪多少个粒子               |
-| sampler        | Sampler |        | 随机数采样器                   |
-
-在追踪一条路径时，有三个追踪参数`min_depth`，`max_depth`和`cont_prob`值得注意。当追踪深度超过`min_depth`后，将以`cont_prob`为通过概率使用Russian Roulette策略来终止路径；而在路径深度超过`max_depth`时，它将被无条件终止。
 
 ### PathTracingIntegrator
 

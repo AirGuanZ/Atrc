@@ -78,38 +78,38 @@ namespace
             return geometry_;
         }
 
-        LightEmitResult emit(const Sample5 &sam) const noexcept override
-        {
-            real pdf_pos;
-            auto spt = geometry_->sample(&pdf_pos, { sam.u, sam.v, sam.w });
+        //LightEmitResult emit(const Sample5 &sam) const noexcept override
+        //{
+        //    real pdf_pos;
+        //    auto spt = geometry_->sample(&pdf_pos, { sam.u, sam.v, sam.w });
 
-            auto [local_dir, pdf_dir] = math::distribution::zweighted_on_hemisphere(sam.r, sam.s);
-            Vec3 global_dir = Coord::from_z(spt.geometry_coord.z).local_to_global(local_dir);
+        //    auto [local_dir, pdf_dir] = math::distribution::zweighted_on_hemisphere(sam.r, sam.s);
+        //    Vec3 global_dir = Coord::from_z(spt.geometry_coord.z).local_to_global(local_dir);
 
-            LightEmitResult ret;
-            ret.spt      = spt;
-            ret.dir      = global_dir;
-            ret.radiance = radiance_;
-            ret.pdf_pos  = pdf_pos;
-            ret.pdf_dir  = pdf_dir;
-            ret.medium   = medium_interface_.out;
+        //    LightEmitResult ret;
+        //    ret.spt      = spt;
+        //    ret.dir      = global_dir;
+        //    ret.radiance = radiance_;
+        //    ret.pdf_pos  = pdf_pos;
+        //    ret.pdf_dir  = pdf_dir;
+        //    ret.medium   = medium_interface_.out;
 
-            return ret;
-        }
+        //    return ret;
+        //}
 
-        void emit_pdf(const SurfacePoint &spt, const Vec3 &light_to_out, real *pdf_pos, real *pdf_dir) const noexcept override
-        {
-            *pdf_pos = geometry_->pdf(spt.pos);
+        //void emit_pdf(const SurfacePoint &spt, const Vec3 &light_to_out, real *pdf_pos, real *pdf_dir) const noexcept override
+        //{
+        //    *pdf_pos = geometry_->pdf(spt.pos);
 
-            auto local_dir = Coord::from_z(spt.geometry_coord.z).global_to_local(light_to_out).normalize();
-            if(local_dir.z <= 0)
-            {
-                *pdf_dir = 0;
-                return;
-            }
+        //    auto local_dir = Coord::from_z(spt.geometry_coord.z).global_to_local(light_to_out).normalize();
+        //    if(local_dir.z <= 0)
+        //    {
+        //        *pdf_dir = 0;
+        //        return;
+        //    }
 
-            *pdf_dir = math::distribution::zweighted_on_hemisphere_pdf(local_dir.z);
-        }
+        //    *pdf_dir = math::distribution::zweighted_on_hemisphere_pdf(local_dir.z);
+        //}
 
         const MediumInterface &medium_interface() const noexcept
         {

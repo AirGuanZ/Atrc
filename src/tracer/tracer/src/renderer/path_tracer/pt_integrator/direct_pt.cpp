@@ -13,7 +13,7 @@ AGZ_TRACER_BEGIN
 
 class DirectPathTracingIntegrator : public PathTracingIntegrator
 {
-    bool sample_all_lights_ = false;
+    bool sample_all_lights_ = true;
 
 public:
 
@@ -23,7 +23,7 @@ public:
     {
         return R"___(
 direct [PathTracingIntegrator]
-    sample_all_lights [0/1] sample all lights in each light sampling iteration or not
+    sample_all_lights [0/1] (optional; defaultly set to 1) sample all lights in each light sampling iteration or not
 )___";
     }
 
@@ -31,7 +31,7 @@ direct [PathTracingIntegrator]
     {
         AGZ_HIERARCHY_TRY
 
-        sample_all_lights_ = params.child_int("sample_all_lights") != 0;
+        sample_all_lights_ = params.child_int_or("sample_all_lights", 1) != 0;
 
         AGZ_HIERARCHY_WRAP("in initializing direct path tracing integrator")
     }
@@ -40,7 +40,10 @@ direct [PathTracingIntegrator]
     {
         EntityIntersection inct;
         if(!scene.closest_intersection(r, &inct))
-            return {};
+        {
+            auto env = scene.env();
+            return env->radiance(r.d);
+        }
 
         Spectrum ret;
         if(auto light = inct.entity->as_light())
@@ -67,6 +70,7 @@ direct [PathTracingIntegrator]
             auto [light, pdf] = scene.sample_light(sampler.sample1());
             ret += mis_sample_light(scene, light, inct, shd, sampler.sample5()) / pdf;
         }
+        ret += mis_sample_envir(scene, inct, shd, sampler.sample3());
 
         ret += mis_sample_bsdf(scene, inct, shd, sampler.sample3());
 
