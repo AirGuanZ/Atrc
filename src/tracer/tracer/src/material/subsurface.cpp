@@ -2,7 +2,7 @@
 #include <agz/tracer/core/material.h>
 #include <agz/tracer/core/texture.h>
 
-#include "./bssrdf/normalized_diffusion.h"
+#include "./bssrdf/constant_bssrdf.h"
 
 AGZ_TRACER_BEGIN
 
@@ -32,6 +32,8 @@ subsurface [Material]
     {
         AGZ_HIERARCHY_TRY
 
+        init_customed_flag(params);
+
         surface_ = MaterialFactory.create(params.child_group("surface"), init_ctx);
         d_       = TextureFactory.create (params.child_group("d"),       init_ctx);
         A_       = TextureFactory.create (params.child_group("A"),       init_ctx);
@@ -47,7 +49,7 @@ subsurface [Material]
         real     eta = eta_->sample_real(inct.uv);
 
         auto shd = surface_->shade(inct, arena);
-        shd.bssrdf = arena.create<NormalizedDiffusionBSSRDF>(
+        shd.bssrdf = arena.create<ConstantBSSRDF>(
             inct, inct.geometry_coord, inct.user_coord, eta, A, d);
 
         return shd;

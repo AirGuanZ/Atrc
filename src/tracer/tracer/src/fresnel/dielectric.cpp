@@ -50,6 +50,8 @@ dielectric [Fresnel]
     {
         AGZ_HIERARCHY_TRY
 
+        init_customed_flag(params);
+
         eta_i_ = TextureFactory.create(params.child_group("eta_in"), init_ctx);
         eta_o_ = TextureFactory.create(params.child_group("eta_out"), init_ctx);
 

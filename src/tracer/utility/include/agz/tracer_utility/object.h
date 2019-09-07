@@ -31,11 +31,33 @@ namespace obj
 
     class Object : public misc::uncopyable_t
     {
+        long object_customed_flag_ = 0;
+
+    protected:
+
+        void init_customed_flag(const Config &params)
+        {
+            if(auto node = params.find_child("customed_flag"))
+                object_customed_flag_ = str_to_customed_flag(node->as_value().as_str());
+        }
+
     public:
 
-        virtual void initialize(const Config&, ObjectInitContext&)
+        using CustomedFlag = long;
+
+        static CustomedFlag str_to_customed_flag(const std::string &str)
         {
-            
+            return std::stol(str);
+        }
+
+        virtual void initialize(const Config &params, ObjectInitContext&)
+        {
+            init_customed_flag(params);
+        }
+
+        virtual CustomedFlag customed_flag() const noexcept
+        {
+            return object_customed_flag_;
         }
 
         virtual ~Object() = default;

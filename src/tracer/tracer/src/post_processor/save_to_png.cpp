@@ -33,6 +33,8 @@ save_to_png [PostProcessor]
     {
         AGZ_HIERARCHY_TRY
 
+        init_customed_flag(params);
+
         std::string raw_filename = params.child_str("filename");
         filename_ = context.path_mgr->get(raw_filename);
 

@@ -29,6 +29,8 @@ constant [Texture]
     {
         AGZ_HIERARCHY_TRY
 
+        init_customed_flag(params);
+
         init_transform(params);
         texel_ = params.child_spectrum("texel");
 

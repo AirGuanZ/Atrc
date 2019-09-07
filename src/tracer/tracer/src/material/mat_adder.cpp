@@ -24,6 +24,8 @@ add [Material]
     {
         AGZ_HIERARCHY_TRY
 
+        init_customed_flag(params);
+
         auto &mats = params.child_array("mats");
         if(!mats.size())
             throw ObjectConstructionException("empty material list");

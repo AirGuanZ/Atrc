@@ -1,9 +1,9 @@
-#include <agz/tracer/core/envir_light.h>
+#include <agz/tracer/core/light.h>
 #include <agz/tracer/core/scene.h>
 
 AGZ_TRACER_BEGIN
 
-void EnvironmentLight::preprocess(const Scene &scene)
+void EnvirLight::preprocess(const Scene &scene)
 {
     auto [low, high] = scene.world_bound();
     real diag_len = (high - low).length();

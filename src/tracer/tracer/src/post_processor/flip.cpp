@@ -24,6 +24,8 @@ flip [PostProcessor]
     {
         AGZ_HIERARCHY_TRY
 
+        init_customed_flag(params);
+
         if(auto node = params.find_child("vertically"))
             vertically_ = node->as_value().as_int() != 0;
         if(auto node = params.find_child("horizontally"))

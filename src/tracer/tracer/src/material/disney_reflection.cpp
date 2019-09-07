@@ -290,6 +290,8 @@ disney_reflection [Material]
     {
         AGZ_HIERARCHY_TRY
 
+        init_customed_flag(params);
+
         ConfigGroup all_zero_group;
         all_zero_group.insert_child("type", std::make_shared<ConfigValue>("all_zero"));
 

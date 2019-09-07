@@ -46,6 +46,8 @@ void Sphere::initialize(const Config &params, obj::ObjectInitContext&)
 {
     AGZ_HIERARCHY_TRY
 
+    init_customed_flag(params);
+
     init_transform(params);
 
     radius_ = params.child_real("radius");

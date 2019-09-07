@@ -31,6 +31,8 @@ direct [PathTracingIntegrator]
     {
         AGZ_HIERARCHY_TRY
 
+        init_customed_flag(params);
+
         sample_all_lights_ = params.child_int_or("sample_all_lights", 1) != 0;
 
         AGZ_HIERARCHY_WRAP("in initializing direct path tracing integrator")
@@ -70,8 +72,6 @@ direct [PathTracingIntegrator]
             auto [light, pdf] = scene.sample_light(sampler.sample1());
             ret += mis_sample_light(scene, light, inct, shd, sampler.sample5()) / pdf;
         }
-        ret += mis_sample_envir(scene, inct, shd, sampler.sample3());
-
         ret += mis_sample_bsdf(scene, inct, shd, sampler.sample3());
 
         return ret;

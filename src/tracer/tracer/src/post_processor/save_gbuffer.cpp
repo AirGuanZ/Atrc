@@ -114,6 +114,8 @@ save_gbuffer_to_png [PostProcessor]
     {
         AGZ_HIERARCHY_TRY
 
+        init_customed_flag(params);
+
         if(auto node = params.find_child("albedo"))
             albedo_filename_ = init_ctx.path_mgr->get(node->as_value().as_str());
         if(auto node = params.find_child("normal"))

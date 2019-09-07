@@ -1,7 +1,6 @@
 #include <agz/tracer/core/bsdf.h>
 #include <agz/tracer/core/bssrdf.h>
 #include <agz/tracer/core/entity.h>
-#include <agz/tracer/core/envir_light.h>
 #include <agz/tracer/core/light.h>
 #include <agz/tracer/core/intersection.h>
 #include <agz/tracer/core/material.h>
@@ -18,6 +17,9 @@ class NativeVolumetricPathTracingIntegrator : public PathTracingIntegrator
     int max_depth_ = 20;
     real cont_prob_ = real(0.5);
 
+    Spectrum background_rad_ = Spectrum(-1);
+    bool has_background_ = false;
+
 public:
 
     static std::string description()
@@ -27,12 +29,15 @@ native [PathTracingIntegrator]
     min_depth [int]         (optional; defaultly set to 5)   minimum path length before applying Russian Roulette
     max_depth [int]         (optional; defaultly set to 10)  maximal path length
     cont_prob [real]        (optional; defaultly set to 0.9) continuing probability in Russian Roulette
+    background_rad [Spectrum]   (optional; defaultly set to -1)  background radiance; disable when set to negative value
 )___";
     }
 
     void initialize(const Config &params, obj::ObjectInitContext&) override
     {
         AGZ_HIERARCHY_TRY
+
+        init_customed_flag(params);
 
         min_depth_ = params.child_int_or("min_depth", 5);
         if(min_depth_ < 1)
@@ -45,6 +50,10 @@ native [PathTracingIntegrator]
         cont_prob_ = params.child_real_or("cont_prob", real(0.9));
         if(cont_prob_ < 0 || cont_prob_ > 1)
             throw ObjectConstructionException("invalid continue prob value: " + std::to_string(cont_prob_));
+
+        if(params.find_child("background_rad"))
+            background_rad_ = params.child_spectrum("background_rad");
+        has_background_ = background_rad_.r >= 0 && background_rad_.g >= 0 && background_rad_.b >= 0;
 
         AGZ_HIERARCHY_WRAP("in initializing volumetric path tracing integrator")
     }
@@ -70,6 +79,8 @@ native [PathTracingIntegrator]
             scattering_sample.p_inct     = &ent_inct;
             if(!scene.next_scattering_point(r, &scattering_sample, sampler.sample1(), arena))
             {
+                if(has_background_ && depth == 1)
+                    return background_rad_;
                 ret += coef * env->radiance(r.d);
                 return ret;
             }

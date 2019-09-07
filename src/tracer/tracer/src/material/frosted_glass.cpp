@@ -291,6 +291,8 @@ frosted_glass [Material]
     {
         AGZ_HIERARCHY_TRY
 
+        init_customed_flag(params);
+
         color_map_ = TextureFactory.create(params.child_group("color_map"), init_ctx);
         fresnel_   = FresnelFactory.create(params.child_group("fresnel"),   init_ctx);
         roughness_ = TextureFactory.create(params.child_group("roughness"), init_ctx);

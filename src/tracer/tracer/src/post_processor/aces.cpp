@@ -50,6 +50,8 @@ aces [PostProcessor]
     {
         AGZ_HIERARCHY_TRY
 
+        init_customed_flag(params);
+
         exposure_ = params.child_real("exposure");
 
         AGZ_HIERARCHY_WRAP("in initializing ACES tone mapper")

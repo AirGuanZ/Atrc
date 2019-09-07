@@ -34,6 +34,8 @@ void GaussianFilter::initialize(const Config &params, obj::ObjectInitContext&)
 {
     AGZ_HIERARCHY_TRY
 
+    init_customed_flag(params);
+
     real radius = params.child_real("radius");
     if(radius <= 0)
         throw ObjectConstructionException("invalid radius value: " + std::to_string(radius));

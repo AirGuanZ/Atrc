@@ -35,6 +35,8 @@ pinhole [Camera]
     {
         AGZ_HIERARCHY_TRY
 
+        init_customed_flag(params);
+
         Vec3 pos = params.child_vec3("pos");
         Vec3 dst = params.child_vec3("dst");
         Vec3 up = params.child_vec3("up").normalize();

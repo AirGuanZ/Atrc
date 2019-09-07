@@ -119,7 +119,7 @@ Atrc使用JSON作为描述场景和渲染设置的配置文件格式。整个JSO
           "transform": []
         },
         "material": {
-          "type": "disney_reflection",
+          "type": "disney",
           "base_color": {
             "type": "constant",
             "texel": [ 0.7 ]
@@ -154,10 +154,6 @@ Atrc使用JSON作为描述场景和渲染设置的配置文件格式。整个JSO
     },
     "film": {
       "type": "native",
-      "filter": {
-        "type": "box",
-        "radius": 0.5
-      },
       "width": 640,
       "height": 640
     },
@@ -166,11 +162,7 @@ Atrc使用JSON作为描述场景和渲染设置的配置文件格式。整个JSO
       "worker_count": -1,
       "task_grid_size": 16,
       "integrator": {
-        "type": "native_vol",
-        "min_depth": 5,
-        "max_depth": 20,
-        "cont_prob": 0.9,
-        "sample_all_lights": true
+        "type": "native"
       },
       "sampler": {
         "type": "native",
@@ -289,7 +281,7 @@ Atrc使用JSON作为描述场景和渲染设置的配置文件格式。整个JSO
 | width  | real |        | 摄像机传感器方阵在世界坐标系中的宽度 |
 | dist   | real |        | 小孔和传感器方阵间的距离             |
 
-小孔摄像机的渲染结果是上下颠倒的，因此通常会和类型值为“flip”的后处理器配合。
+小孔摄像机的渲染结果是上下颠倒的，因此通常会和类型为“flip”的后处理器配合。
 
 ### EnvironmentLight
 
@@ -306,8 +298,6 @@ Atrc使用JSON作为描述场景和渲染设置的配置文件格式。整个JSO
 | dir      | Vec3     |        | 主方向                                   |
 | radiance | Spectrum |        | 辐射亮度                                 |
 | range    | real     |        | 有效的方向范围有多大，取值范围为$(0, 1)$ |
-| med_in   | Medium   | void   | 内部介质，默认为真空                     |
-| med_out  | Medium   | void   | 外部介质，默认为真空                     |
 
 我们知道，环境光可以由方向的函数$L(d)$描述，表示沿方向向量$d$的环境光辐射亮度。设`dir`字段值为$d_0$，`radiance`字段值为$L_0$，`range`字段取值为$r$，则`dir`环境光对应的函数$L$为：
 $$
@@ -321,16 +311,14 @@ $$
 
 ![pic](./pictures/env_light.png)
 
-环境光的一种，由纹理给出它在每个方向上的辐射亮度。
+环境光的一种，由纹理给出它在每个方向上的辐射亮度，映射方式这里就不再赘述了。
 
-| 字段名  | 类型    | 默认值      | 含义                                           |
-| ------- | ------- | ----------- | ---------------------------------------------- |
-| tex     | Texture |             | 描述辐射亮度的纹理对象                         |
-| up      | Vec3    | [ 0, 0, 1 ] | 描述世界空间中哪个方向为“上方”，默认为$+z$方向 |
-| med_in  | Medium  | void        | 内部介质，默认为真空                           |
-| med_out | Medium  | void        | 外部介质，默认为真空                           |
+| 字段名 | 类型    | 默认值      | 含义                                           |
+| ------ | ------- | ----------- | ---------------------------------------------- |
+| tex    | Texture |             | 描述辐射亮度的纹理对象                         |
+| up     | Vec3    | [ 0, 0, 1 ] | 描述世界空间中哪个方向为“上方”，默认为$+z$方向 |
 
-`ibl`亦名`env`，这只是由兼容性问题造成的。
+`ibl`亦名`env`，这是由兼容性问题造成的。
 
 #### native_sky
 
@@ -343,8 +331,6 @@ $$
 | top    | Spectrum |             | 最上方的辐射亮度                 |
 | bottom | Spectrum |             | 最下方的辐射亮度                 |
 | up     | Vec3     | [ 0, 0, 1 ] | 哪个方向为“上方”，默认为$+z$方向 |
-| med_in   | Medium   | void   | 内部介质，默认为真空 |
-| med_out  | Medium   | void   | 外部介质，默认为真空 |
 
 ### Entity
 
@@ -528,11 +514,10 @@ Gaussian滤波函数。
 
 以BVH树组织而成的三角形网格形状，在启用了Embree时使用Embree实现，否则使用自行构建的BVH树。
 
-| 字段名       | 类型        | 默认值 | 含义                                                   |
-| ------------ | ----------- | ------ | ------------------------------------------------------ |
-| transform    | [Transform] |        | 从本地坐标系到世界坐标系中的变换序列                   |
-| pretransform | bool        | false  | 是否预先在对网格进行变换，使位于原点附近的单位立方体内 |
-| filename     | string      |        | 模型文件路径，支持OBJ文件和STL文件                     |
+| 字段名    | 类型        | 默认值 | 含义                                 |
+| --------- | ----------- | ------ | ------------------------------------ |
+| transform | [Transform] |        | 从本地坐标系到世界坐标系中的变换序列 |
+| filename  | string      |        | 模型文件路径，支持OBJ文件和STL文件   |
 
 #### triangle_bvh_embree
 
@@ -541,6 +526,18 @@ Gaussian滤波函数。
 #### triangle_bvh_noembree
 
 不使用Embree实现的三角形网格形状，参数和`triangle_bvh`相同。
+
+#### triangle_bvh_shared
+
+三角形网格形状，参数和`triangle_bvh`相同，在启用了Embree时使用Embree实现，否则使用自行构建的BVH树。它会共享存储加载了同一个模型的多个`triangle_bvh_shared`以节省内存，但会带来少许性能损失。
+
+#### triangle_bvh_embree_shared
+
+使用Embree实现的三角形网格形状，参数和`triangle_bvh`相同。它会共享存储加载了同一个模型的多个`triangle_bvh_shared`以节省内存，但会带来少许性能损失。
+
+#### triangle_bvh_noembree_shared
+
+不使用Embree实现的三角形网格形状，参数和`triangle_bvh`相同。它会共享存储加载了同一个模型的多个`triangle_bvh_shared`以节省内存，但会带来少许性能损失。
 
 ### Material
 
@@ -816,28 +813,30 @@ Disney Principled BRDF的完整实现，有的参数含义我不知道怎么翻�
 
 | 字段名            | 类型 | 默认值 | 含义                                             |
 | ----------------- | ---- | ------ | ------------------------------------------------ |
-| sample_all_lights | bool |        | 每次采样时是遍历所有光源还是随机抽取一个进行采样 |
+| sample_all_lights | bool | true   | 每次采样时是遍历所有光源还是随机抽取一个进行采样 |
 
 #### native
 
 没有任何优化技巧的暴力路径追踪，支持介质渲染。
 
-| 字段名    | 类型 | 默认值 | 含义                       |
-| --------- | ---- | ------ | -------------------------- |
-| min_depth | int  |        | 使用RR策略前的最小路径深度 |
-| max_depth | int  |        | 路径的最大截断深度         |
-| cont_prob | real |        | 追踪时使用RR策略的通过概率 |
+| 字段名         | 类型     | 默认值 | 含义                                                         |
+| -------------- | -------- | ------ | ------------------------------------------------------------ |
+| min_depth      | int      | 5      | 使用RR策略前的最小路径深度                                   |
+| max_depth      | int      | 10     | 路径的最大截断深度                                           |
+| cont_prob      | real     | 0.9    | 追踪时使用RR策略的通过概率                                   |
+| background_rad | Spectrum | [-1]   | 背景色，即无任何物体的位置所显示的颜色。含有负值时关闭背景色功能，显示环境光 |
 
 #### mis
 
 使用Multiple Importance Sampling技术优化的路径追踪，支持介质渲染。
 
-| 字段名            | 类型 | 默认值 | 含义                                             |
-| ----------------- | ---- | ------ | ------------------------------------------------ |
-| min_depth         | int  |        | 使用RR策略前的最小路径深度                       |
-| max_depth         | int  |        | 路径的最大截断深度                               |
-| cont_prob         | real |        | 追踪时使用RR策略的通过概率                       |
-| sample_all_lights | bool |        | 每次采样时是遍历所有光源还是随机抽取一个进行采样 |
+| 字段名            | 类型     | 默认值 | 含义                                                         |
+| ----------------- | -------- | ------ | ------------------------------------------------------------ |
+| min_depth         | int      | 5      | 使用RR策略前的最小路径深度                                   |
+| max_depth         | int      | 10     | 路径的最大截断深度                                           |
+| cont_prob         | real     | 0.9    | 追踪时使用RR策略的通过概率                                   |
+| sample_all_lights | bool     | true   | 每次采样时是遍历所有光源还是随机抽取一个进行采样             |
+| background_rad    | Spectrum | [-1]   | 背景色，即无任何物体的位置所显示的颜色。含有负值时关闭背景色功能，显示环境光 |
 
 ### ProgressReporter
 
@@ -846,6 +845,10 @@ Disney Principled BRDF的完整实现，有的参数含义我不知道怎么翻�
 #### stdout
 
 输出到标准输出流。
+
+#### noout
+
+无任何进度输出。
 
 ### Sampler
 

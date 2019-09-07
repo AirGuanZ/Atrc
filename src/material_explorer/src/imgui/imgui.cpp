@@ -1155,8 +1155,8 @@ ImGuiIO::ImGuiIO()
     DisplaySize = ImVec2(-1.0f, -1.0f);
     DeltaTime = 1.0f/60.0f;
     IniSavingRate = 5.0f;
-    IniFilename = "imgui.ini";
-    LogFilename = "imgui_log.txt";
+    //IniFilename = "imgui.ini";
+    //LogFilename = "imgui_log.txt";
     MouseDoubleClickTime = 0.30f;
     MouseDoubleClickMaxDist = 6.0f;
     for (int i = 0; i < ImGuiKey_COUNT; i++)
@@ -3402,16 +3402,16 @@ void ImGui::NewFrame()
     if (g.IO.ConfigWindowsResizeFromEdges && !(g.IO.BackendFlags & ImGuiBackendFlags_HasMouseCursors))
         g.IO.ConfigWindowsResizeFromEdges = false;
 
-    // Load settings on first frame (if not explicitly loaded manually before)
+    /*// Load settings on first frame (if not explicitly loaded manually before)
     if (!g.SettingsLoaded)
     {
         IM_ASSERT(g.SettingsWindows.empty());
         if (g.IO.IniFilename)
             LoadIniSettingsFromDisk(g.IO.IniFilename);
         g.SettingsLoaded = true;
-    }
+    }*/
 
-    // Save settings (with a delay after the last modification, so we don't spam disk too much)
+    /*// Save settings (with a delay after the last modification, so we don't spam disk too much)
     if (g.SettingsDirtyTimer > 0.0f)
     {
         g.SettingsDirtyTimer -= g.IO.DeltaTime;
@@ -3423,7 +3423,7 @@ void ImGui::NewFrame()
                 g.IO.WantSaveIniSettings = true;  // Let user know they can call SaveIniSettingsToMemory(). user will need to clear io.WantSaveIniSettings themselves.
             g.SettingsDirtyTimer = 0.0f;
         }
-    }
+    }*/
 
     g.Time += g.IO.DeltaTime;
     g.FrameScopeActive = true;
@@ -3618,13 +3618,13 @@ void ImGui::Shutdown(ImGuiContext* context)
         return;
 
     // Save settings (unless we haven't attempted to load them: CreateContext/DestroyContext without a call to NewFrame shouldn't save an empty file)
-    if (g.SettingsLoaded && g.IO.IniFilename != NULL)
+    /*if (g.SettingsLoaded && g.IO.IniFilename != NULL)
     {
         ImGuiContext* backup_context = GImGui;
         SetCurrentContext(context);
         SaveIniSettingsToDisk(g.IO.IniFilename);
         SetCurrentContext(backup_context);
-    }
+    }*/
 
     // Clear everything else
     for (int i = 0; i < g.Windows.Size; i++)
@@ -8928,7 +8928,7 @@ void ImGui::LogToTTY(int auto_open_depth)
 // Start logging/capturing text output to given file
 void ImGui::LogToFile(int auto_open_depth, const char* filename)
 {
-    ImGuiContext& g = *GImGui;
+    /*ImGuiContext& g = *GImGui;
     if (g.LogEnabled)
         return;
 
@@ -8947,7 +8947,7 @@ void ImGui::LogToFile(int auto_open_depth, const char* filename)
     }
 
     LogBegin(ImGuiLogType_File, auto_open_depth);
-    g.LogFile = f;
+    g.LogFile = f;*/
 }
 
 // Start logging/capturing text output to clipboard

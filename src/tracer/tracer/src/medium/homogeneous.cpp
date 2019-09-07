@@ -31,6 +31,8 @@ homogeneous [Medium]
     {
         AGZ_HIERARCHY_TRY
 
+        init_customed_flag(params);
+
         sigma_a_ = params.child_spectrum("sigma_a");
         sigma_s_ = params.child_spectrum("sigma_s");
         sigma_t_ = sigma_a_ + sigma_s_;

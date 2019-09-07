@@ -14,8 +14,6 @@ Scene *SceneBuilder::build(const Config &params, obj::ObjectInitContext &init_ct
     AGZ_HIERARCHY_TRY
 
     auto scene = SceneFactory.create(params, init_ctx);
-    std::vector<Light*> lights;
-
     std::vector<Entity*> entities;
 
     if(auto ent_arr = params.find_child_array("entities"))
@@ -34,10 +32,7 @@ Scene *SceneBuilder::build(const Config &params, obj::ObjectInitContext &init_ct
             auto entity = EntityFactory.create(group, init_ctx);
             entities.push_back(entity);
             if(auto light = entity->as_light())
-            {
-                lights.push_back(light);
                 scene->add_light(light);
-            }
         }
     }
 
@@ -60,17 +55,14 @@ Scene *SceneBuilder::build(const Config &params, obj::ObjectInitContext &init_ct
             auto entity = EntityFactory.create(group, init_ctx);
             entities.push_back(entity);
             if(auto light = entity->as_light())
-            {
                 scene->add_light(light);
-                lights.push_back(light);
-            }
         }
     }
 
     if(auto group = params.find_child_group("env"))
     {
         AGZ_LOG1("creating environment light");
-        auto env = EnvironmentLightFactory.create(*group, init_ctx);
+        auto env = EnvirLightFactory.create(*group, init_ctx);
         scene->set_env_light(env);
     }
     else

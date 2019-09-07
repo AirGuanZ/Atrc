@@ -102,6 +102,8 @@ pt [Renderer]
     {
         AGZ_HIERARCHY_TRY
 
+        init_customed_flag(params);
+
         integrator_ = PathTracingIntegratorFactory.create(params.child_group("integrator"), context);
         worker_count = params.child_int("worker_count");
 

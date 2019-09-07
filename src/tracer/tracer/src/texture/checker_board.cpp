@@ -39,6 +39,8 @@ checker_board [Texture]
     {
         AGZ_HIERARCHY_TRY
 
+        init_customed_flag(params);
+
         init_transform(params);
 
         if(auto node = params.find_child("grid_count"))

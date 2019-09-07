@@ -1,4 +1,4 @@
-﻿#include <agz/tracer/core/envir_light.h>
+﻿#include <agz/tracer/core/light.h>
 #include <agz/tracer/core/texture.h>
 #include <agz/utility/texture.h>
 
@@ -147,7 +147,7 @@ namespace env_impl
 
 } // namespace env_impl
 
-class IBL : public EnvironmentLight
+class IBL : public EnvirLight
 {
     const Texture *tex_ = nullptr;
     Vec3 up_ = Vec3(0, 0, 1);
@@ -169,6 +169,8 @@ env [EnvironmentLight]
     {
         AGZ_HIERARCHY_TRY
 
+        init_customed_flag(params);
+
         tex_ = TextureFactory.create(params.child_group("tex"), init_ctx);
         if(params.find_child("up"))
             up_ = params.child_vec3("up");
@@ -178,11 +180,11 @@ env [EnvironmentLight]
         AGZ_HIERARCHY_WRAP("in initializing native sky light")
     }
 
-    EnvironmentLightSampleResult sample(const Sample3 &sam) const noexcept override
+    EnvirLightSampleResult sample(const Sample3 &sam) const noexcept override
     {
         auto [dir, pdf] = sampler_->sample({ sam.u, sam.v, sam.w });
 
-        EnvironmentLightSampleResult ret;
+        EnvirLightSampleResult ret;
         ret.ref_to_light = dir;
         ret.radiance = radiance(dir);
         ret.pdf      = pdf;
@@ -258,10 +260,10 @@ env [EnvironmentLight]
     //}
 };
 
-AGZT_IMPLEMENTATION(EnvironmentLight, IBL, "ibl")
+AGZT_IMPLEMENTATION(EnvirLight, IBL, "ibl")
 
 // 为了前向兼容
 using IBL2 = IBL;
-AGZT_IMPLEMENTATION(EnvironmentLight, IBL2, "env")
+AGZT_IMPLEMENTATION(EnvirLight, IBL2, "env")
 
 AGZ_TRACER_END

@@ -3,6 +3,5 @@ build/
 asset/
 lib/embree3/
 lib/oidn/
-lib/glfw/
 lib/glew/
 nohup.out

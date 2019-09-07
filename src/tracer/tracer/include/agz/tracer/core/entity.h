@@ -5,7 +5,7 @@
 
 AGZ_TRACER_BEGIN
 
-class Light;
+class AreaLight;
 
 using EntityProperty = uint8_t;
 
@@ -43,12 +43,12 @@ public:
     /**
      * @brief 返回自身作为area_light的接口。若并非光源，则返回nullptr。
      */
-    virtual const Light *as_light() const noexcept = 0;
+    virtual const AreaLight *as_light() const noexcept = 0;
 
     /**
      * @brief 返回自身作为area_light的接口。若并非光源，则返回nullptr。
      */
-    virtual Light *as_light() noexcept = 0;
+    virtual AreaLight *as_light() noexcept = 0;
 
     /**
      * @brief 环境光以及本身无实体的光源返回false，其他返回true

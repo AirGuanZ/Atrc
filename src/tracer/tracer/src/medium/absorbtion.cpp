@@ -20,6 +20,8 @@ absorb [Medium]
     {
         AGZ_HIERARCHY_TRY
 
+        init_customed_flag(params);
+
         sigma_a_ = params.child_spectrum("sigma_a");
 
         AGZ_HIERARCHY_WRAP("in initializing absorbtion medium")

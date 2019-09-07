@@ -5,7 +5,6 @@
 #include <agz/tracer/core/aggregate.h>
 #include <agz/tracer/core/camera.h>
 #include <agz/tracer/core/entity.h>
-#include <agz/tracer/core/envir_light.h>
 #include <agz/tracer/core/film_filter.h>
 #include <agz/tracer/core/film.h>
 #include <agz/tracer/core/fresnel.h>
@@ -58,12 +57,11 @@ std::optional<Params> parse_opts(int argc, char *argv[])
         print_object_params("EntityAggregate",             AggregateFactory);                   std::cout << std::endl;
         print_object_params("Camera",                      CameraFactory);                      std::cout << std::endl;
         print_object_params("Entity",                      EntityFactory);                      std::cout << std::endl;
-        print_object_params("Environment",                 EnvironmentLightFactory);            std::cout << std::endl;
+        print_object_params("Environment",                 EnvirLightFactory);                  std::cout << std::endl;
         print_object_params("FilmFilter",                  FilmFilterFactory);                  std::cout << std::endl;
         print_object_params("Film",                        FilmFactory);                        std::cout << std::endl;
         print_object_params("Fresnel",                     FresnelFactory);                     std::cout << std::endl;
         print_object_params("Geometry",                    GeometryFactory);                    std::cout << std::endl;
-        print_object_params("Light",                       LightFactory);                       std::cout << std::endl;
         print_object_params("Material",                    MaterialFactory);                    std::cout << std::endl;
         print_object_params("PathTracingIntegrator",       PathTracingIntegratorFactory);       std::cout << std::endl;
         print_object_params("PostProcessor",               PostProcessorFactory);               std::cout << std::endl;
@@ -77,7 +75,7 @@ std::optional<Params> parse_opts(int argc, char *argv[])
 
     Params ret;
 
-    bool has_scene_content = parse_result.count("scene") != 0;
+    bool has_scene_content  = parse_result.count("scene") != 0;
     bool has_scene_filename = parse_result.count("scene-filename") != 0;
 
     if(has_scene_content)

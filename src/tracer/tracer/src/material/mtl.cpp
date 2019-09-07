@@ -279,6 +279,8 @@ mtl [Material]
     {
         AGZ_HIERARCHY_TRY
 
+        init_customed_flag(params);
+
         kd_ = TextureFactory.create(params.child_group("kd"), init_ctx);
         ks_ = TextureFactory.create(params.child_group("ks"), init_ctx);
         ns_ = TextureFactory.create(params.child_group("ns"), init_ctx);

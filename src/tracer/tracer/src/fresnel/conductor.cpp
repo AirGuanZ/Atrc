@@ -83,6 +83,8 @@ conductor [Fresnel]
     {
         AGZ_HIERARCHY_TRY
 
+        init_customed_flag(params);
+
         eta_out_ = TextureFactory.create(params.child_group("eta_out"), init_ctx);
         eta_in_  = TextureFactory.create(params.child_group("eta_in"), init_ctx);
         k_       = TextureFactory.create(params.child_group("k"), init_ctx);

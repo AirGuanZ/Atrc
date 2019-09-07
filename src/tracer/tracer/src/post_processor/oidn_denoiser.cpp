@@ -27,6 +27,8 @@ oidn_denoiser [PostProcessor]
     {
         AGZ_HIERARCHY_TRY
 
+        init_customed_flag(params);
+
         clamp_color_ = params.child_int_or("clamp", 0) != 0;
 
         AGZ_HIERARCHY_WRAP("in initializing oidn denoiser")

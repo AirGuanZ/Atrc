@@ -6,19 +6,44 @@
 AGZ_TRACER_BEGIN
 
 class Scene;
+class AreaLight;
+class EnvirLight;
+
+class Light
+{
+public:
+
+    virtual ~Light() = default;
+
+    virtual bool is_area() const noexcept = 0;
+
+    virtual const AreaLight *as_area() const noexcept { return nullptr; }
+
+    virtual const EnvirLight *as_envir() const noexcept { return nullptr; }
+
+    /**
+     * @brief 发射的光通量
+     */
+    virtual Spectrum power() const noexcept = 0;
+
+    /**
+     * @brief 基于场景进行预处理，在渲染开始之前、场景准备完毕之后调用一次
+     */
+    virtual void preprocess(const Scene &scene) = 0;
+};
 
 /**
  * @brief 从光源对参考点进行采样的结果
  */
-struct LightSampleResult
+struct AreaLightSampleResult
 {
     SurfacePoint spt;
     Spectrum radiance; // 从position照射向参考点的辐射亮度
-    real pdf;          // w.r.t. solid angle at ref
-    bool is_delta;
+    real pdf      = 0; // w.r.t. solid angle at ref
+    bool is_delta = false;
 };
 
-inline const LightSampleResult LIGHT_SAMPLE_RESULT_NULL = { { }, Spectrum(), 0, false };
+inline const AreaLightSampleResult AREA_LIGHT_SAMPLE_RESULT_NULL = { { }, Spectrum(), 0, false };
 
 ///**
 // * @brief 从光源发射的粒子信息
@@ -37,28 +62,20 @@ inline const LightSampleResult LIGHT_SAMPLE_RESULT_NULL = { { }, Spectrum(), 0, 
 /**
  * @brief 光源接口
  */
-class Light : public obj::Object
+class AreaLight : public Light
 {
 public:
 
-    using Object::Object;
+    bool is_area() const noexcept override { return true; }
+
+    const AreaLight *as_area() const noexcept override { return this; }
     
     /**
      * @brief 采样一条照射到ref的射线
      * @param ref 参考点
      * @param sam 采样数据
      */
-    virtual LightSampleResult sample(const Vec3 &ref, const Sample5 &sam) const noexcept = 0;
-
-    /**
-     * @brief 发射的光通量
-     */
-    virtual Spectrum power() const noexcept = 0;
-
-    /**
-     * @brief 基于场景进行预处理，在渲染开始之前、场景准备完毕之后调用一次
-     */
-    virtual void preprocess(const Scene &scene) = 0;
+    virtual AreaLightSampleResult sample(const Vec3 &ref, const Sample5 &sam) const noexcept = 0;
 
     /**
      * @brief 光源表面某点朝指定方向的辐射亮度
@@ -88,6 +105,41 @@ public:
     //virtual void emit_pdf(const SurfacePoint &spt, const Vec3 &light_to_out, real *pdf_pos, real *pdf_dir) const noexcept = 0;
 };
 
-AGZT_INTERFACE(Light)
+struct EnvirLightSampleResult
+{
+    Vec3 ref_to_light;
+    Spectrum radiance;
+    real pdf = 0;
+    bool is_delta = false;
+
+    bool valid() const noexcept
+    {
+        return !!ref_to_light;
+    }
+};
+
+class EnvirLight : public obj::Object, public Light
+{
+protected:
+
+    real world_radius_ = 1;
+    Vec3 world_centre_;
+
+public:
+
+    bool is_area() const noexcept override { return false; }
+
+    const EnvirLight *as_envir() const noexcept override { return this; }
+
+    void preprocess(const Scene &scene) override;
+
+    virtual EnvirLightSampleResult sample(const Sample3 &sam) const noexcept = 0;
+
+    virtual real pdf(const Vec3 &ref_to_light) const noexcept = 0;
+
+    virtual Spectrum radiance(const Vec3 &ref_to_light) const noexcept = 0;
+};
+
+AGZT_INTERFACE(EnvirLight)
 
 AGZ_TRACER_END

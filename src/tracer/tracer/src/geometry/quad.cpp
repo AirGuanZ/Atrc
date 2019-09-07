@@ -1,10 +1,9 @@
+#include <agz/tracer/core/geometry.h>
 #include <agz/tracer/utility/triangle_aux.h>
-
-#include "transformed_geometry.h"
 
 AGZ_TRACER_BEGIN
 
-class Quad : public TransformedGeometry
+class Quad : public Geometry
 {
     Vec3 a_;
     Vec3 b_a_, c_a_, d_a_;
@@ -19,7 +18,7 @@ class Quad : public TransformedGeometry
 
 public:
 
-    using TransformedGeometry::TransformedGeometry;
+    using Geometry::Geometry;
 
     static std::string description()
     {
@@ -43,12 +42,14 @@ quad [Geometry]
     {
         AGZ_HIERARCHY_TRY
 
-        init_transform(params);
+        init_customed_flag(params);
 
-        Vec3 a = params.child_vec3("A");
-        Vec3 b = params.child_vec3("B");
-        Vec3 c = params.child_vec3("C");
-        Vec3 d = params.child_vec3("D");
+        Transform3 local_to_world = params.child_transform3("transform");
+
+        Vec3 a = local_to_world.apply_to_point(params.child_vec3("A"));
+        Vec3 b = local_to_world.apply_to_point(params.child_vec3("B"));
+        Vec3 c = local_to_world.apply_to_point(params.child_vec3("C"));
+        Vec3 d = local_to_world.apply_to_point(params.child_vec3("D"));
 
         Vec2 t_a = params.child_vec2("tA");
         Vec2 t_b = params.child_vec2("tB");
@@ -72,12 +73,8 @@ quad [Geometry]
             throw ObjectConstructionException("four quad vertices must be on one plane");
         x_acd_ = dpdu_as_ex(c_a_, d_a_, t_c_a_, t_d_a_, z_);
 
-        Vec3 world_b_a = local_to_world_.apply_to_vector(b_a_);
-        Vec3 world_c_a = local_to_world_.apply_to_vector(c_a_);
-        Vec3 world_d_a = local_to_world_.apply_to_vector(d_a_);
-
-        real area_abc = triangle_area(world_b_a, world_c_a);
-        real area_acd = triangle_area(world_c_a, world_d_a);
+        real area_abc = triangle_area(b_a_, c_a_);
+        real area_acd = triangle_area(c_a_, d_a_);
         surface_area_ = area_abc + area_acd;
         sample_abc_prob_ = area_abc / surface_area_;
 
@@ -86,41 +83,33 @@ quad [Geometry]
 
     bool has_intersection(const Ray &r) const noexcept override
     {
-        Ray local_r = to_local(r);
-        return has_intersection_with_triangle(local_r, a_, b_a_, c_a_) ||
-               has_intersection_with_triangle(local_r, a_, c_a_, d_a_);
+        return has_intersection_with_triangle(r, a_, b_a_, c_a_) ||
+               has_intersection_with_triangle(r, a_, c_a_, d_a_);
     }
 
     bool closest_intersection(const Ray &r, GeometryIntersection *inct) const noexcept override
     {
-        Ray local_r = to_local(r);
         TriangleIntersectionRecord inct_rcd;
 
-        if(closest_intersection_with_triangle(local_r, a_, b_a_, c_a_, &inct_rcd))
+        if(closest_intersection_with_triangle(r, a_, b_a_, c_a_, &inct_rcd))
         {
-            inct->pos            = local_r.at(inct_rcd.t_ray);
+            inct->pos            = r.at(inct_rcd.t_ray);
             inct->geometry_coord = Coord(x_abc_, cross(z_, x_abc_), z_);
             inct->uv             = t_a_ + inct_rcd.uv.x * t_b_a_ + inct_rcd.uv.y * t_c_a_;
             inct->user_coord     = inct->geometry_coord;
-            inct->wr             = -local_r.d;
+            inct->wr             = -r.d;
             inct->t              = inct_rcd.t_ray;
-
-            to_world(inct);
-
             return true;
         }
         
-        if(closest_intersection_with_triangle(local_r, a_, c_a_, d_a_, &inct_rcd))
+        if(closest_intersection_with_triangle(r, a_, c_a_, d_a_, &inct_rcd))
         {
-            inct->pos            = local_r.at(inct_rcd.t_ray);
+            inct->pos            = r.at(inct_rcd.t_ray);
             inct->geometry_coord = Coord(x_acd_, cross(z_, x_acd_), z_);
             inct->uv             = t_a_ + inct_rcd.uv.x * t_c_a_ + inct_rcd.uv.y * t_d_a_;
             inct->user_coord     = inct->geometry_coord;
             inct->wr             = -r.d;
             inct->t              = inct_rcd.t_ray;
-
-            to_world(inct);
-
             return true;
         }
 
@@ -130,10 +119,10 @@ quad [Geometry]
     AABB world_bound() const noexcept override
     {
         AABB ret;
-        ret |= local_to_world_.apply_to_point(a_);
-        ret |= local_to_world_.apply_to_point(a_ + b_a_);
-        ret |= local_to_world_.apply_to_point(a_ + c_a_);
-        ret |= local_to_world_.apply_to_point(a_ + d_a_);
+        ret |= a_;
+        ret |= a_ + b_a_;
+        ret |= a_ + c_a_;
+        ret |= a_ + d_a_;
         for(int i = 0; i != 3; ++i)
         {
             if(ret.low[i] >= ret.high[i])
@@ -169,7 +158,6 @@ quad [Geometry]
             spt.user_coord = spt.geometry_coord;
         }
 
-        to_world(&spt);
         *pdf = 1 / surface_area_;
         return spt;
     }

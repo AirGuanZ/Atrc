@@ -91,8 +91,13 @@ ideal_diffuse [Material]
 
     void initialize(const Config &params, obj::ObjectInitContext &context) override
     {
+        AGZ_HIERARCHY_TRY
+
+        init_customed_flag(params);
         albedo_ = TextureFactory.create(params.child_group("albedo"), context);
         normal_mapper_.initialize(params, context);
+
+        AGZ_HIERARCHY_WRAP("in initializing ideal diffuse material")
     }
 
     ShadingPoint shade(const EntityIntersection &inct, Arena &arena) const override

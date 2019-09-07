@@ -31,6 +31,8 @@ void BoxFilter::initialize(const Config &params, obj::ObjectInitContext&)
 {
     AGZ_HIERARCHY_TRY
 
+    init_customed_flag(params);
+
     radius_ = params.child_real("radius");
     if(radius_ <= 0)
         throw ObjectConstructionException("invalid radius");

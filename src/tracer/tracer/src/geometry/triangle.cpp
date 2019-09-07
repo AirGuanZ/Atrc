@@ -32,6 +32,8 @@ triangle [Geometry]
     {
         AGZ_HIERARCHY_TRY
 
+        init_customed_flag(params);
+
         init_transform(params);
 
         auto a = params.child_vec3("A");

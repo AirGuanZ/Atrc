@@ -1,4 +1,5 @@
 #include <agz/tracer/utility/logger.h>
+#include <agz/utility/file.h>
 #include <agz/utility/misc.h>
 #include <agz/utility/string.h>
 
@@ -18,8 +19,12 @@ static std::vector<Triangle> load_obj(const std::string &filename)
 {
     AGZ_HIERARCHY_TRY
 
+    std::string src = file::read_txt_file(filename);
+    stdstr::replace_(src, "\\\n", " ");
+    stdstr::replace_(src, "\\\r\n", " ");
+
     tinyobj::ObjReader reader;
-    if(!reader.ParseFromFile(filename))
+    if(!reader.ParseFromString(src, ""))
         throw ObjectConstructionException(reader.Error());
 
     auto &attrib = reader.GetAttrib();

@@ -1,8 +1,8 @@
-#include <agz/tracer/core/envir_light.h>
+#include <agz/tracer/core/light.h>
 
 AGZ_TRACER_BEGIN
 
-class NativeSky : public EnvironmentLight
+class NativeSky : public EnvirLight
 {
     Spectrum top_;
     Spectrum bottom_;
@@ -24,6 +24,8 @@ native_sky [EnvironmentLight]
     {
         AGZ_HIERARCHY_TRY
 
+        init_customed_flag(params);
+
         top_ = params.child_spectrum("top");
         bottom_ = params.child_spectrum("bottom");
 
@@ -35,11 +37,11 @@ native_sky [EnvironmentLight]
         AGZ_HIERARCHY_WRAP("in initializing native sky light")
     }
 
-    EnvironmentLightSampleResult sample(const Sample3 &sam) const noexcept override
+    EnvirLightSampleResult sample(const Sample3 &sam) const noexcept override
     {
         auto [dir, pdf] = math::distribution::uniform_on_sphere(sam.u, sam.v);
 
-        EnvironmentLightSampleResult ret;
+        EnvirLightSampleResult ret;
         ret.ref_to_light = dir;
         ret.radiance     = radiance(dir);
         ret.pdf          = pdf;
@@ -68,6 +70,6 @@ native_sky [EnvironmentLight]
     }
 };
 
-AGZT_IMPLEMENTATION(EnvironmentLight, NativeSky, "native_sky")
+AGZT_IMPLEMENTATION(EnvirLight, NativeSky, "native_sky")
 
 AGZ_TRACER_END

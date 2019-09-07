@@ -53,9 +53,9 @@ public:
         return R"___(ideal_black [Material])___";
     }
 
-    void initialize(const Config&, obj::ObjectInitContext&) override
+    void initialize(const Config &params, obj::ObjectInitContext&) override
     {
-        // do nothing
+        init_customed_flag(params);
     }
 
     ShadingPoint shade(const EntityIntersection &inct, Arena&) const override

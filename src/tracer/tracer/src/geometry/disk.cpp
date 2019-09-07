@@ -43,6 +43,8 @@ disk [Geometry]
     {
         AGZ_HIERARCHY_TRY
 
+        init_customed_flag(params);
+
         init_transform(params);
 
         real radius = params.child_real("radius");

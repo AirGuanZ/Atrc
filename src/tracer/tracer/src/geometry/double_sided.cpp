@@ -35,6 +35,11 @@ double_sided [Geometry]
     real pdf(const Vec3 &sample) const noexcept override;
 
     real pdf(const Vec3 &ref, const Vec3 &sample) const noexcept override;
+
+    CustomedFlag customed_flag() const noexcept override
+    {
+        return internal_->customed_flag();
+    }
 };
 
 AGZT_IMPLEMENTATION(Geometry, DoubleSidedGeometry, "double_sided")
@@ -42,6 +47,8 @@ AGZT_IMPLEMENTATION(Geometry, DoubleSidedGeometry, "double_sided")
 void DoubleSidedGeometry::initialize(const Config &params, obj::ObjectInitContext &context)
 {
     AGZ_HIERARCHY_TRY
+
+    init_customed_flag(params);
 
     internal_ = GeometryFactory.create(params.child_group("internal"), context);
 

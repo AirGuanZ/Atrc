@@ -1,14 +1,14 @@
 #pragma once
 
-#include <agz/tracer/core/envir_light.h>
+#include <agz/tracer/core/light.h>
 
 AGZ_TRACER_BEGIN
 
-class NoEnv : public EnvironmentLight
+class NoEnv : public EnvirLight
 {
 public:
 
-    EnvironmentLightSampleResult sample(const Sample3 &sam) const noexcept override
+    EnvirLightSampleResult sample(const Sample3 &sam) const noexcept override
     {
         return {};
     }

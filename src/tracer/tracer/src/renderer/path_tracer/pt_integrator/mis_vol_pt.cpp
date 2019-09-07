@@ -19,6 +19,9 @@ class VolumetricPathTracingIntegrator : public PathTracingIntegrator
     real cont_prob_ = real(0.9);
     bool sample_all_lights_ = true;
 
+    Spectrum background_rad_ = Spectrum(-1);
+    bool has_background_ = false;
+
 public:
 
     static std::string description()
@@ -29,12 +32,15 @@ mis [PathTracingIntegrator]
     max_depth [int]         (optional; defaultly set to 10)  maximal path length
     cont_prob [real]        (optional; defaultly set to 0.9) continuing probability in Russian Roulette
     sample_all_lights [0/1] (optional; defaultly set to 1)   sample all lights in each light sampling iteration
+    background_rad [Spectrum]   (optional; defaultly set to -1)  background radiance; disable when set to negative value
 )___";
     }
 
     void initialize(const Config &params, obj::ObjectInitContext&) override
     {
         AGZ_HIERARCHY_TRY
+
+        init_customed_flag(params);
 
         min_depth_ = params.child_int_or("min_depth", 5);
         if(min_depth_ < 1)
@@ -49,6 +55,10 @@ mis [PathTracingIntegrator]
             throw ObjectConstructionException("invalid continue prob value: " + std::to_string(cont_prob_));
 
         sample_all_lights_ = params.child_int_or("sample_all_lights", 1) != 0;
+
+        if(params.find_child("background_rad"))
+            background_rad_ = params.child_spectrum("background_rad");
+        has_background_ = background_rad_.r >= 0 && background_rad_.g >= 0 && background_rad_.b >= 0;
 
         AGZ_HIERARCHY_WRAP("in initializing volumetric path tracing integrator")
     }
@@ -74,7 +84,11 @@ mis [PathTracingIntegrator]
             if(!scene.next_scattering_point(r, &scattering_sample, sampler.sample1(), arena))
             {
                 if(depth == 1)
+                {
+                    if(has_background_)
+                        return background_rad_;
                     ret += coef * scene.env()->radiance(r.d);
+                }
                 return ret;
             }
             auto &pnt = scattering_sample.pnt;
@@ -113,7 +127,6 @@ mis [PathTracingIntegrator]
                 auto [light, pdf] = scene.sample_light(sampler.sample1());
                 ld += coef * mis_sample_light(scene, light, pnt, sampler.sample5()) / pdf;
             }
-            ld += coef * mis_sample_envir(scene, pnt, sampler.sample3());
             ld += coef * mis_sample_scattering(scene, pnt, sampler.sample3());
             ret += ld;
 
@@ -155,7 +168,6 @@ mis [PathTracingIntegrator]
                     auto [light, pdf] = scene.sample_light(sampler.sample1());
                     ret += coef * mis_sample_light(scene, light, new_pnt, sampler.sample5()) / pdf;
                 }
-                ret += coef * mis_sample_envir(scene, new_pnt, sampler.sample3());
                 ret += coef * mis_sample_scattering(scene, new_pnt, sampler.sample3());
 
                 BSDFSampleResult new_bsdf_sample = new_pnt.sample(new_pnt.wr(), sampler.sample3(), TM_Radiance);

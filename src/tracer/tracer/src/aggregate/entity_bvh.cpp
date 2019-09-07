@@ -175,9 +175,11 @@ bvh [Aggregate]
 )___";
     }
 
-    void initialize(const Config &params, obj::ObjectInitContext&) override
+    void initialize(const Config &params, obj::ObjectInitContext &init_ctx) override
     {
         AGZ_HIERARCHY_TRY
+
+        init_customed_flag(params);
 
         max_leaf_size_ = params.child_int_or("max_leaf_size", max_leaf_size_);
 

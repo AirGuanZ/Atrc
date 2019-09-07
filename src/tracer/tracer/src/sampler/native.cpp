@@ -34,6 +34,8 @@ native [Sampler]
     {
         AGZ_HIERARCHY_TRY
 
+        init_customed_flag(params);
+
         seed_t seed;
         if(auto node = params.find_child("seed"))
             seed = static_cast<seed_t>(node->as_value().as_int());

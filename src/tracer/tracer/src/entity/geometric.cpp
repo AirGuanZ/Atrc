@@ -28,6 +28,8 @@ geometric [Entity]
     {
         AGZ_HIERARCHY_TRY
 
+        init_customed_flag(params);
+
         geometry_ = GeometryFactory.create(params.child_group("geometry"), context);
         material_ = MaterialFactory.create(params.child_group("material"), context);
         medium_interface_.initialize(params, context);
@@ -58,12 +60,12 @@ geometric [Entity]
         return geometry_->world_bound();
     }
 
-    const Light *as_light() const noexcept override
+    const AreaLight *as_light() const noexcept override
     {
         return nullptr;
     }
 
-    Light *as_light() noexcept override
+    AreaLight *as_light() noexcept override
     {
         return nullptr;
     }

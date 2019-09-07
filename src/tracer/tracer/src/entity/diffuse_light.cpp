@@ -9,7 +9,7 @@ AGZ_TRACER_BEGIN
 
 namespace
 {
-    class DiffuseLight : public Light
+    class DiffuseLight : public AreaLight
     {
         const Geometry *geometry_ = nullptr;
         Spectrum radiance_;
@@ -17,27 +17,27 @@ namespace
 
     public:
 
-        using Light::Light;
+        using AreaLight::AreaLight;
 
-        void initialize(const Config &params, obj::ObjectInitContext &init_ctx) override
+        void initialize(const Config &params, obj::ObjectInitContext &init_ctx)
         {
             geometry_ = GeometryFactory.create(params.child_group("geometry"), init_ctx);
             radiance_ = params.child_spectrum("radiance");
             medium_interface_.initialize(params, init_ctx);
         }
 
-        LightSampleResult sample(const Vec3 &ref, const Sample5 &sam) const noexcept override
+        AreaLightSampleResult sample(const Vec3 &ref, const Sample5 &sam) const noexcept override
         {
             real pdf_area;
             auto spt = geometry_->sample(ref, &pdf_area, { sam.u, sam.v, sam.r });
 
             if(dot(spt.geometry_coord.z, ref - spt.pos) <= 0)
-                return LIGHT_SAMPLE_RESULT_NULL;
+                return AREA_LIGHT_SAMPLE_RESULT_NULL;
 
             Vec3 spt_to_ref = ref - spt.pos;
             real dist2 = spt_to_ref.length_square();
 
-            LightSampleResult ret;
+            AreaLightSampleResult ret;
             ret.spt      = spt;
             ret.radiance = radiance_;
             ret.pdf      = pdf_area * dist2 / std::abs(cos(spt.geometry_coord.z, spt_to_ref));
@@ -140,6 +140,8 @@ diffuse [Entity]
     {
         AGZ_HIERARCHY_TRY
 
+        init_customed_flag(params);
+
         light_ = init_ctx.arena->create<DiffuseLight>();
         light_->initialize(params, init_ctx);
 
@@ -167,12 +169,12 @@ diffuse [Entity]
         return light_->geometry()->world_bound();
     }
 
-    const Light *as_light() const noexcept override
+    const AreaLight *as_light() const noexcept override
     {
         return light_;
     }
 
-    Light *as_light() noexcept override
+    AreaLight *as_light() noexcept override
     {
         return light_;
     }

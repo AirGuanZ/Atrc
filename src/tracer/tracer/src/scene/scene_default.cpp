@@ -1,6 +1,5 @@
 ﻿#include <agz/tracer/core/aggregate.h>
 #include <agz/tracer/core/camera.h>
-#include <agz/tracer/core/entity.h>
 #include <agz/tracer/core/light.h>
 #include <agz/tracer/core/medium.h>
 #include <agz/tracer/core/scattering.h>
@@ -15,7 +14,7 @@ class DefaultScene : public Scene
     const Camera *camera_ = nullptr;
 
     std::vector<Light*> lights_;
-    EnvironmentLight *env_lht_ = nullptr;
+    EnvirLight *env_lht_ = nullptr;
 
     const Aggregate *aggregate_ = nullptr;
     AABB world_bound_;
@@ -70,10 +69,11 @@ default [Scene]
         lights_.push_back(light);
     }
 
-    void set_env_light(EnvironmentLight *env_light) override
+    void set_env_light(EnvirLight *env_light) override
     {
         assert(env_light);
         env_lht_ = env_light;
+        lights_.push_back(env_light);
     }
 
     void set_aggregate(const Aggregate *aggregate) override
@@ -98,7 +98,7 @@ default [Scene]
         return misc::span<const Light* const>(ptr, lights_.size());
     }
 
-    const EnvironmentLight *env() const noexcept override
+    const EnvirLight *env() const noexcept override
     {
         return env_lht_;
     }
@@ -117,7 +117,7 @@ default [Scene]
         return ret;
     }
 
-    real light_pdf(const Light *light) const noexcept override
+    real light_pdf(const AreaLight *light) const noexcept override
     {
         for(size_t i = 0; i < lights_.size(); ++i)
         {
@@ -209,7 +209,7 @@ default [Scene]
     {
         world_bound_ = AABB();
         world_bound_ |= aggregate_->world_bound();
-        world_bound_ |= camera_->world_bound();
+        //world_bound_ |= camera_->world_bound();
 
         // 避免数值问题导致某些场景中的点不在world bound中
         Vec3 delta = world_bound_.high - world_bound_.low;

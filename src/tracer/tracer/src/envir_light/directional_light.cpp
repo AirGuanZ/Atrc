@@ -1,8 +1,8 @@
-﻿#include <agz/tracer/core/envir_light.h>
+﻿#include <agz/tracer/core/light.h>
 
 AGZ_TRACER_BEGIN
 
-class DirectionalEnvironmentLight : public EnvironmentLight
+class DirectionalEnvironmentLight : public EnvirLight
 {
     // local light cone总是从+z方向向-z方向照射
     Coord local_cone_space_;
@@ -35,6 +35,8 @@ dir [EnvironmentLight]
     {
         AGZ_HIERARCHY_TRY
 
+        init_customed_flag(params);
+
         Vec3 dir = params.child_vec3("dir");
 
         local_cone_space_ = Coord::from_z(-dir);
@@ -47,12 +49,12 @@ dir [EnvironmentLight]
         AGZ_HIERARCHY_WRAP("in initializing directional light object")
     }
 
-    EnvironmentLightSampleResult sample(const Sample3 &sam) const noexcept override
+    EnvirLightSampleResult sample(const Sample3 &sam) const noexcept override
     {
         auto [local_dir, pdf] = math::distribution::uniform_on_cone(max_cos_theta_, sam.u, sam.v);
         Vec3 global_dir = local_cone_space_.local_to_global(local_dir).normalize();
 
-        EnvironmentLightSampleResult ret;
+        EnvirLightSampleResult ret;
         ret.ref_to_light = global_dir;
         ret.radiance     = radiance(global_dir);
         ret.pdf          = pdf;
@@ -117,6 +119,6 @@ dir [EnvironmentLight]
     //}
 };
 
-AGZT_IMPLEMENTATION(EnvironmentLight, DirectionalEnvironmentLight, "dir")
+AGZT_IMPLEMENTATION(EnvirLight, DirectionalEnvironmentLight, "dir")
 
 AGZ_TRACER_END

@@ -83,6 +83,8 @@ mirror [Material]
     {
         AGZ_HIERARCHY_TRY
 
+        init_customed_flag(params);
+
         fresnel_ = FresnelFactory.create(params.child_group("fresnel"), init_ctx);
         rc_map_ = TextureFactory.create(params.child_group("rc_map"), init_ctx);
 

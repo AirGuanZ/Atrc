@@ -9,8 +9,9 @@ AGZ_TRACER_BEGIN
 
 class Camera;
 class Entity;
-class EnvironmentLight;
 class Light;
+class EnvirLight;
+class AreaLight;
 
 struct EntityIntersection;
 class ScatteringPoint;
@@ -59,7 +60,7 @@ public:
     virtual void set_aggregate(const Aggregate *aggregate) = 0;
 
     /** @brief 设置环境光源 */
-    virtual void set_env_light(EnvironmentLight *env_light) = 0;
+    virtual void set_env_light(EnvirLight *env_light) = 0;
 
     /** @brief 场景中光源的数量 */
     virtual size_t light_count() const noexcept = 0;
@@ -68,7 +69,7 @@ public:
     virtual const Light *light(size_t idx) const noexcept = 0;
 
     /** @brief 环境光 */
-    virtual const EnvironmentLight *env() const noexcept = 0;
+    virtual const EnvirLight *env() const noexcept = 0;
 
     /** @brief 场景中的所有光源 */
     virtual misc::span<const Light* const> lights() const noexcept = 0;
@@ -81,7 +82,7 @@ public:
      *
      * 若light不属于该场景，则返回0
      */
-    virtual real light_pdf(const Light *light) const noexcept = 0;
+    virtual real light_pdf(const AreaLight *light) const noexcept = 0;
 
     /** @brief 给定射线是否与场景中的实体有交点 */
     virtual bool has_intersection(const Ray &r) const noexcept = 0;

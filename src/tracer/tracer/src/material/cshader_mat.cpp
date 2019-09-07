@@ -221,6 +221,8 @@ lib [Material]
     {
         AGZ_HIERARCHY_TRY
 
+        init_customed_flag(params);
+
         auto raw_filename = params.child_str("filename");
         auto filename = init_ctx.path_mgr->get(raw_filename);
         auto lib = load_dynamic_library(filename);

@@ -26,6 +26,8 @@ scale [Material]
     {
         AGZ_HIERARCHY_TRY
 
+        init_customed_flag(params);
+
         internal_ = MaterialFactory.create(params.child_group("internal"), init_ctx);
         scale_ = TextureFactory.create(params.child_group("scale"), init_ctx);
 

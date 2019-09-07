@@ -41,6 +41,8 @@ image [Texture]
     {
         AGZ_HIERARCHY_TRY
 
+        init_customed_flag(params);
+
         init_transform(params);
 
         std::string raw_filename = params.child_str("filename");

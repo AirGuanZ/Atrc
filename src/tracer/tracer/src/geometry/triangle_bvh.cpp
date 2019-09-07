@@ -486,25 +486,30 @@ namespace
         {
             return prims_;
         }
-
-        const AABB &local_bound() const noexcept
-        {
-            return local_bound_;
-        }
     };
 
 }
 
-class TriangleBVH : public TransformedGeometry
+class TriangleBVHWS : public Geometry
 {
     const UntransformedTriangleBVH *untransformed_ = nullptr;
     AABB world_bound_;
 
-    static const UntransformedTriangleBVH *load(const std::string &filename, Arena &arena)
+    static const UntransformedTriangleBVH *load(const std::string &filename, const Transform3 &local_to_world, Arena &arena)
     {
         AGZ_HIERARCHY_TRY
 
         auto build_triangles = mesh::load_from_file(filename);
+        for(auto &tri : build_triangles)
+        {
+            tri.vtx[0].pos = local_to_world.apply_to_point(tri.vtx[0].pos);
+            tri.vtx[1].pos = local_to_world.apply_to_point(tri.vtx[1].pos);
+            tri.vtx[2].pos = local_to_world.apply_to_point(tri.vtx[2].pos);
+            tri.vtx[0].nor = local_to_world.apply_to_vector(tri.vtx[0].nor);
+            tri.vtx[1].nor = local_to_world.apply_to_vector(tri.vtx[1].nor);
+            tri.vtx[2].nor = local_to_world.apply_to_vector(tri.vtx[2].nor);
+        }
+
         auto ret = arena.create<UntransformedTriangleBVH>();
         ret->initialize(build_triangles.data(), static_cast<uint32_t>(build_triangles.size()));
         return ret;
@@ -514,7 +519,7 @@ class TriangleBVH : public TransformedGeometry
 
 public:
 
-    using TransformedGeometry::TransformedGeometry;
+    using Geometry::Geometry;
 
     static std::string description()
     {
@@ -530,38 +535,23 @@ triangle_bvh(_noembree) [Geometry]
     {
         AGZ_HIERARCHY_TRY
 
-        init_transform(params);
+        init_customed_flag(params);
 
-        static std::map<std::string, const UntransformedTriangleBVH*> filename2bvh;
+        Transform3 local_to_world = params.child_transform3("transform");
 
         auto raw_filename = params.child_str("filename");
         auto filename = init_ctx.path_mgr->get(raw_filename);
 
-        if(auto it = filename2bvh.find(filename); it != filename2bvh.end())
-            untransformed_ = it->second;
-        else
-        {
-            auto mesh = load(filename, *init_ctx.arena);
-            assert(mesh);
-            untransformed_ = mesh;
-            filename2bvh[filename] = mesh;
-        }
-
-        if(auto node = params.find_child("pretransform"); node && node->as_value().as_int())
-        {
-            local_to_world_ *= pretransform(untransformed_->local_bound());
-            update_ratio();
-        }
+        auto mesh = load(filename, local_to_world, *init_ctx.arena);
+        assert(mesh);
+        untransformed_ = mesh;
 
         world_bound_ = AABB();
         for(auto &prim : untransformed_->get_prims())
         {
-            Vec3 local_a = local_to_world_.apply_to_point(prim.a_);
-            Vec3 local_b = local_to_world_.apply_to_point(prim.a_ + prim.b_a_);
-            Vec3 local_c = local_to_world_.apply_to_point(prim.a_ + prim.c_a_);
-            world_bound_ |= local_a;
-            world_bound_ |= local_b;
-            world_bound_ |= local_c;
+            world_bound_ |= prim.a_;
+            world_bound_ |= prim.a_ + prim.b_a_;
+            world_bound_ |= prim.a_ + prim.c_a_;
         }
 
         for(int i = 0; i != 3; ++i)
@@ -575,17 +565,12 @@ triangle_bvh(_noembree) [Geometry]
 
     bool has_intersection(const Ray &r) const noexcept override
     {
-        Ray local_r = to_local(r);
-        return untransformed_->has_intersection(local_r);
+        return untransformed_->has_intersection(r);
     }
 
     bool closest_intersection(const Ray &r, GeometryIntersection *inct) const noexcept override
     {
-        Ray local_r = to_local(r);
-        if(!untransformed_->closest_intersection(local_r, inct))
-            return false;
-        to_world(inct);
-        return true;
+        return untransformed_->closest_intersection(r, inct);
     }
 
     AABB world_bound() const noexcept override
@@ -595,13 +580,12 @@ triangle_bvh(_noembree) [Geometry]
 
     real surface_area() const noexcept override
     {
-        return local_to_world_ratio_ * local_to_world_ratio_ * untransformed_->surface_area();
+        return untransformed_->surface_area();
     }
 
     SurfacePoint sample(real *pdf, const Sample3 &sam) const noexcept override
     {
         auto ret = untransformed_->sample(pdf, sam);
-        to_world(&ret);
         *pdf = 1 / surface_area();
         return ret;
     }
@@ -623,10 +607,10 @@ triangle_bvh(_noembree) [Geometry]
 };
 
 #ifndef USE_EMBREE
-AGZT_IMPLEMENTATION(Geometry, TriangleBVH, "triangle_bvh")
+AGZT_IMPLEMENTATION(Geometry, TriangleBVHWS, "triangle_bvh")
 #endif
 
-using TriangleBVHNOEmbree = TriangleBVH;
-AGZT_IMPLEMENTATION(Geometry, TriangleBVHNOEmbree, "triangle_bvh_noembree")
+using TriangleBVHNOEmbreeWS = TriangleBVHWS;
+AGZT_IMPLEMENTATION(Geometry, TriangleBVHNOEmbreeWS, "triangle_bvh_noembree")
 
 AGZ_TRACER_END

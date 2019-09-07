@@ -24,6 +24,8 @@ scaler [Texture]
     {
         AGZ_HIERARCHY_TRY
 
+        init_customed_flag(params);
+
         init_transform(params);
         
         scale_    = params.child_spectrum("scale");

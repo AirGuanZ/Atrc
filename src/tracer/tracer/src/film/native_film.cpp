@@ -118,6 +118,8 @@ native [Film]
     {
         AGZ_HIERARCHY_TRY
 
+        init_customed_flag(params);
+
         h_ = params.child_int("height");
         w_ = params.child_int("width");
         if(h_ <= 0 || w_ <= 0)

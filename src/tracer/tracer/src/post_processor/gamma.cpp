@@ -23,6 +23,8 @@ gamma [PostProcessor]
     {
         AGZ_HIERARCHY_TRY
 
+        init_customed_flag(params);
+
         if(auto node = params.find_child("gamma"))
             gamma_ = node->as_value().as_real();
         else if(node = params.find_child("inv_gamma"); node)
