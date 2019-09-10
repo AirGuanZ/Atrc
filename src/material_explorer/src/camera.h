@@ -7,6 +7,7 @@ class Camera : public agz::misc::uncopyable_t
     float vert_rad_;
     float hori_rad_;
     float aspect_;
+    float dist_;
 
     struct CameraParams
     {

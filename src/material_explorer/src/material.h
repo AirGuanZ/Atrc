@@ -1,7 +1,5 @@
 #pragma once
 
-#include <agz/utility/misc.h>
-
 #include "./opengl.h"
 
 class Material : agz::misc::uncopyable_t

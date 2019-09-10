@@ -23,13 +23,15 @@
 
 * [Embree 3.5.2](https://www.embree.org/)，用于加速射线与几何体的求交
 * [oidn](https://openimagedenoise.github.io/)，基于机器学习的降噪滤波器
+* [glfw](https://www.glfw.org/)，用于Material Explorer的OpenGL Context管理
 
 ### CMake Options
 
-| 选项名     | 默认值 | 含义                                                   |
-| ---------- | ------ | ------------------------------------------------------ |
-| USE_EMBREE | OFF    | 启用Embree加速器，这会使得项目在构建时自动下载Embree库 |
-| USE_OIDN   | OFF    | 启用OIDN降噪器，这需要预先在外部准备OIDN库             |
+| 选项名                  | 默认值 | 含义                                                         |
+| ----------------------- | ------ | ------------------------------------------------------------ |
+| USE_EMBREE              | OFF    | 启用Embree加速器，这会使得项目在构建时自动下载Embree库       |
+| USE_OIDN                | OFF    | 启用OIDN降噪器，这会使得项目在构建时自动下载OIDN库           |
+| BUILD_MATERIAL_EXPLORER | OFF    | 启用Material Explorer的构建，这会使得项目在构建时自动下载glfw库 |
 
 注意到OIDN只支持64位程序，因此若启用了OIDN库，必须以64位模式构建程序。
 
@@ -48,7 +50,7 @@
    ```powershell
    mkdir build
    cd build
-   cmake -DUSE_EMBREE=ON -DUSE_OIDN=ON -G "Visual Studio 15 2017 Win64" ..
+   cmake -DUSE_EMBREE=ON -DUSE_OIDN=ON -DBUILD_MATERIAL_EXPLORER=ON -G "Visual Studio 15 2017 Win64" ..
    ```
 
 这会在`Atrc/build`下生成`Visual Studio 2017`的解决方案文件。第一次运行时会自动从网络上下载Embree和OIDN，此时应保持网络良好。
@@ -61,7 +63,8 @@
 
 1. CLI，为渲染器的命令行可执行程序
 2. obj_to_scene，用于将一个带材质的obj文件转换为Atrc可用的JSON描述格式
-3. 一个或多个以共享库形式出现的材质插件
+3. material_explorer，材质参数预览器，使用GPU加速的材质效果调整工具
+4. 一个或多个以共享库形式出现的材质插件
 
 本节主要介绍CLI的使用，即其命令参数的含义和场景配置文件的编写。
 
@@ -423,20 +426,20 @@ Gaussian滤波函数。
 
 电介质的fresnel项。
 
-| 字段名  | 类型    | 默认值 | 含义       |
-| ------- | ------- | ------ | ---------- |
-| eta_out | Texture |        | 外部折射率 |
-| eta_in  | Texture |        | 内部折射率 |
+| 字段名  | 类型    | 默认值  | 含义       |
+| ------- | ------- | ------- | ---------- |
+| eta_out | Texture | all_one | 外部折射率 |
+| eta_in  | Texture |         | 内部折射率 |
 
 #### conductor
 
 导体的fresnel项
 
-| 字段名  | 类型    | 默认值 | 含义       |
-| ------- | ------- | ------ | ---------- |
-| eta_out | Texture |        | 外部折射率 |
-| eta_in  | Texture |        | 内部折射率 |
-| k       | Texture |        | 吸收率     |
+| 字段名  | 类型    | 默认值  | 含义       |
+| ------- | ------- | ------- | ---------- |
+| eta_out | Texture | all_one | 外部折射率 |
+| eta_in  | Texture |         | 内部折射率 |
+| k       | Texture |         | 吸收率     |
 
 ### Geometry
 

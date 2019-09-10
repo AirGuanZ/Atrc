@@ -1,6 +1,7 @@
 #pragma once
 
 #include "./camera.h"
+#include "./envir.h"
 #include "./material.h"
 #include "./opengl.h"
 
@@ -38,7 +39,7 @@ public:
 
     bool show_gui(GLFWwindow *window);
 
-    void render(const texture2d_t *env_tex, const Camera &camera);
+    void render(const Camera &camera, const EnvironmentLightManager &env);
 
     void restart();
 };

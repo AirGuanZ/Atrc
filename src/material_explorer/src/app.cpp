@@ -31,6 +31,16 @@ App::App(int framebuffer_width, int framebuffer_height)
 
 void App::update(GLFWwindow *window)
 {
+    if(camera_.show_gui() && mat_)
+        mat_->restart();
+
+    ImGui::Separator();
+
+    if(env_light_.update() && mat_)
+        mat_->restart();
+
+    ImGui::Separator();
+
     if(ImGui::BeginCombo("material type", current_material_name_.c_str()))
     {
         AGZ_SCOPE_GUARD({ ImGui::EndCombo(); });
@@ -61,16 +71,6 @@ void App::update(GLFWwindow *window)
 
     ImGui::Separator();
 
-    if(env_light_.update() && mat_)
-        mat_->restart();
-
-    ImGui::Separator();
-
-    if(camera_.show_gui() && mat_)
-        mat_->restart();
-    
-    ImGui::Separator();
-
     if(mat_)
         mat_->show_gui(window);
 
@@ -84,6 +84,6 @@ void App::update(GLFWwindow *window)
 void App::render()
 {
     if(mat_)
-        mat_->render(env_light_.get_tex().get(), camera_);
+        mat_->render(camera_, env_light_);
     clock_.restart();
 }

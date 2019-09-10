@@ -16,7 +16,6 @@ class App : public agz::misc::uncopyable_t
 
     EnvironmentLightManager env_light_;
 
-
     int fb_width_;
     int fb_height_;
 

@@ -82,12 +82,7 @@ bool MaterialHolder::show_gui(GLFWwindow *window)
 {
     ImGui::PushID(this);
     AGZ_SCOPE_GUARD({ ImGui::PopID(); });
-
-    if(frame_counter_ > std::numeric_limits<int>::max() / 2)
-        frame_counter_ = max_spp_;
-    ImGui::Text("spp: %d", std::min(frame_counter_, max_spp_));
-
-    ImGui::SameLine();
+    bool ret = false;
 
     if(ImGui::Button("to clipboard") && mat_)
     {
@@ -96,17 +91,24 @@ bool MaterialHolder::show_gui(GLFWwindow *window)
         glfwSetClipboardString(window, str.c_str());
     }
 
+    ImGui::SameLine();
+
+    if(frame_counter_ > std::numeric_limits<int>::max() / 2)
+        frame_counter_ = max_spp_;
+    ImGui::Text("spp: %d", std::min(frame_counter_, max_spp_));
+
     ImGui::Separator();
 
     if(mat_->show_gui())
     {
         restart();
-        return true;
+        ret = true;
     }
-    return false;
+
+    return ret;
 }
 
-void MaterialHolder::render(const texture2d_t *env_tex, const Camera &camera)
+void MaterialHolder::render(const Camera &camera, const EnvironmentLightManager &env)
 {
     this_frame_->fbo.bind();
 
@@ -116,18 +118,16 @@ void MaterialHolder::render(const texture2d_t *env_tex, const Camera &camera)
     vao_.bind();
 
     camera.set_shader_uniforms(prog_);
-
-    prog_.set_uniform_unchecked("envir_tex", 0);
-    env_tex->bind(0);
+    env.set_shader_uniforms(prog_);
 
     prog_.set_uniform_unchecked("last_frame", 1);
     last_frame_->color.bind(1);
 
     prog_.set_uniform_unchecked("frame_counter", frame_counter_++);
-    prog_.set_uniform_unchecked("start_seed", start_seed_);
-    prog_.set_uniform_unchecked("max_spp", max_spp_);
-    prog_.set_uniform_unchecked("pixel_low", pixel_low);
-    prog_.set_uniform_unchecked("pixel_delta", pixel_delta);
+    prog_.set_uniform_unchecked("start_seed",    start_seed_);
+    prog_.set_uniform_unchecked("max_spp",       max_spp_);
+    prog_.set_uniform_unchecked("pixel_low",     pixel_low);
+    prog_.set_uniform_unchecked("pixel_delta",   pixel_delta);
 
     mat_->set_shader_uniforms(prog_);
 

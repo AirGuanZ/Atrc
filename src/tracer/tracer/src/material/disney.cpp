@@ -34,6 +34,9 @@ namespace disney_impl
         real transmission_;
         real IOR_; // inner IOR / outer IOR
 
+        real transmission_roughness_;
+        real trans_ax_, trans_ay_;
+
         real ax_, ay_;
         real clearcoat_roughness_;
 
@@ -208,7 +211,7 @@ namespace disney_impl
             real cos_phi_h   = std::cos(phi_h);
             real cos_theta_h = local_angle::cos_theta(lwh);
             real sin_theta_h = local_angle::cos_2_sin(cos_theta_h);
-            real D = microfacet::anisotropic_gtr2(sin_phi_h, cos_phi_h, sin_theta_h, cos_theta_h, ax_, ay_);
+            real D = microfacet::anisotropic_gtr2(sin_phi_h, cos_phi_h, sin_theta_h, cos_theta_h, trans_ax_, trans_ay_);
 
             real phi_i       = local_angle::phi(lwi);
             real phi_o       = local_angle::phi(lwo);
@@ -216,8 +219,8 @@ namespace disney_impl
             real sin_phi_o   = std::sin(phi_o), cos_phi_o = std::cos(phi_o);
             real tan_theta_i = local_angle::tan_theta(lwi);
             real tan_theta_o = local_angle::tan_theta(lwo);
-            real G = microfacet::smith_anisotropic_gtr2(cos_phi_i, sin_phi_i, ax_, ay_, tan_theta_i)
-                   * microfacet::smith_anisotropic_gtr2(cos_phi_o, sin_phi_o, ax_, ay_, tan_theta_o);
+            real G = microfacet::smith_anisotropic_gtr2(cos_phi_i, sin_phi_i, trans_ax_, trans_ay_, tan_theta_i)
+                   * microfacet::smith_anisotropic_gtr2(cos_phi_o, sin_phi_o, trans_ax_, trans_ay_, tan_theta_o);
 
             return transmission_ * C_ * std::abs(F * D * G / (4 * lwi.z * lwo.z));
         }
@@ -296,7 +299,7 @@ namespace disney_impl
             if(has_subsurface_)
                 return {};
 
-            Vec3 lwh = microfacet::sample_anisotropic_gtr2(ax_, ay_, sam);
+            Vec3 lwh = microfacet::sample_anisotropic_gtr2(trans_ax_, trans_ay_, sam);
             if(lwh.z <= 0)
                 return {};
 
@@ -347,7 +350,7 @@ namespace disney_impl
             if(has_subsurface_)
                 return {};
 
-            Vec3 lwh = microfacet::sample_anisotropic_gtr2(ax_, ay_, sam);
+            Vec3 lwh = microfacet::sample_anisotropic_gtr2(trans_ax_, trans_ay_, sam);
             if(lwh.z <= 0)
                 return {};
 
@@ -409,7 +412,7 @@ namespace disney_impl
             real cos_theta_h = local_angle::cos_theta(lwh);
             real sin_theta_h = local_angle::cos_2_sin(cos_theta_h);
 
-            real D = microfacet::anisotropic_gtr2(sin_phi_h, cos_phi_h, sin_theta_h, cos_theta_h, ax_, ay_);
+            real D = microfacet::anisotropic_gtr2(sin_phi_h, cos_phi_h, sin_theta_h, cos_theta_h, trans_ax_, trans_ay_);
             return std::abs(dot(lwi, lwh) * D * dwh_to_dwi);
         }
 
@@ -450,7 +453,7 @@ namespace disney_impl
             real sin_theta_h = local_angle::cos_2_sin(cos_theta_h);
             real cos_theta_d = dot(lwi, lwh);
             
-            real D = microfacet::anisotropic_gtr2(sin_phi_h, cos_phi_h, sin_theta_h, cos_theta_h, ax_, ay_);
+            real D = microfacet::anisotropic_gtr2(sin_phi_h, cos_phi_h, sin_theta_h, cos_theta_h, trans_ax_, trans_ay_);
             return std::abs(cos_theta_h * D / (4 * cos_theta_d));
         }
 
@@ -467,6 +470,7 @@ namespace disney_impl
                    real clearcoat,
                    real clearcoat_gloss,
                    real transmission,
+                   real transmission_roughness,
                    real IOR,
                    bool has_subsurface)
             : LocalBSDF(geometry_coord, shading_coord)
@@ -482,6 +486,7 @@ namespace disney_impl
             sheen_tint_    = sheen_tint;
 
             transmission_  = transmission;
+            transmission_roughness_ = transmission_roughness;
             IOR_           = IOR;
 
             has_subsurface_ = has_subsurface;
@@ -489,6 +494,9 @@ namespace disney_impl
             real aspect = anisotropic > 0 ? std::sqrt(1 - real(0.9) * anisotropic) : real(1);
             ax_ = std::max(real(0.001), sqr(roughness) / aspect);
             ay_ = std::max(real(0.001), sqr(roughness) * aspect);
+
+            trans_ax_ = (std::max)(real(0.01), sqr(transmission_roughness) / aspect);
+            trans_ay_ = (std::max)(real(0.01), sqr(transmission_roughness) * aspect);
 
             clearcoat_ = clearcoat;
             clearcoat_roughness_ = mix(real(0.1), real(0.01), clearcoat_gloss);
@@ -728,6 +736,7 @@ class Disney : public Material
     const Texture *clearcoat_        = nullptr;
     const Texture *clearcoat_gloss_  = nullptr;
     const Texture *transmission_     = nullptr;
+    const Texture *transmission_roughness_ = nullptr;
     const Texture *IOR_              = nullptr;
     const Texture *scatter_distance_ = nullptr;
 
@@ -741,17 +750,18 @@ public:
     {
         return R"___(
 disney [Material]
-    base_color       [Texture]
-    metallic         [Texture]
-    roughness        [Texture]
-    transmission     [Texture] (optional; defaultly set to all_zero)
-    ior              [Texture] (optional; defaultly set to all_{1.5})
-    specular_tint    [Texture] (optional; defaultly set to all_zero)
-    anisotropic      [Texture] (optional; defaultly set to all_zero)
-    sheen            [Texture] (optional; defaultly set to all_zero)
-    sheen_tint       [Texture] (optional; defaultly set to all_zero)
-    clearcoat        [Texture] (optional; defaultly set to all_zero)
-    clearcoat_gloss  [Texture] (optional; defaultly set to all_{0.5})
+    base_color             [Texture]
+    metallic               [Texture]
+    roughness              [Texture]
+    transmission           [Texture] (optional; defaultly set to all_zero)
+    transmission_roughness [Texture] (optional; defaultly set to roughness)
+    ior                    [Texture] (optional; defaultly set to all_{1.5})
+    specular_tint          [Texture] (optional; defaultly set to all_zero)
+    anisotropic            [Texture] (optional; defaultly set to all_zero)
+    sheen                  [Texture] (optional; defaultly set to all_zero)
+    sheen_tint             [Texture] (optional; defaultly set to all_zero)
+    clearcoat              [Texture] (optional; defaultly set to all_zero)
+    clearcoat_gloss        [Texture] (optional; defaultly set to all_{0.5})
 
     disney principled bsdf
     see https://blog.selfshadow.com/publications/s2015-shading-course/#course_content
@@ -792,6 +802,11 @@ disney [Material]
         clearcoat_gloss_  = defaultly_all("clearcoat_gloss", real(0.5));
         scatter_distance_ = defaultly_all("scatter_distance", 0);
 
+        if(auto node = params.find_child_group("transmission_roughness"))
+            transmission_roughness_ = TextureFactory.create(*node, init_ctx);
+        else
+            transmission_roughness_ = roughness_;
+
         normal_mapper_.initialize(params, init_ctx);
 
         AGZ_HIERARCHY_WRAP("in initializing disney principled material")
@@ -800,18 +815,19 @@ disney [Material]
     ShadingPoint shade(const EntityIntersection &inct, Arena &arena) const override
     {
         Vec2 uv = inct.uv;
-        Spectrum base_color       = base_color_      ->sample_spectrum(uv);
-        real     metallic         = metallic_        ->sample_real(uv);
-        real     roughness        = roughness_       ->sample_real(uv);
-        real     transmission     = transmission_    ->sample_real(uv);
-        real     ior              = IOR_             ->sample_real(uv);
-        real     specular_tint    = specular_tint_   ->sample_real(uv);
-        real     anisotropic      = anisotropic_     ->sample_real(uv);
-        real     sheen            = sheen_           ->sample_real(uv);
-        real     sheen_tint       = sheen_tint_      ->sample_real(uv);
-        real     clearcoat        = clearcoat_       ->sample_real(uv);
-        real     clearcoat_gloss  = clearcoat_gloss_ ->sample_real(uv);
-        Spectrum scatter_distance = scatter_distance_->sample_spectrum(uv);
+        Spectrum base_color             = base_color_      ->sample_spectrum(uv);
+        real     metallic               = metallic_        ->sample_real(uv);
+        real     roughness              = roughness_       ->sample_real(uv);
+        real     transmission           = transmission_    ->sample_real(uv);
+        real     transmission_roughness = transmission_roughness_->sample_real(uv);
+        real     ior                    = IOR_             ->sample_real(uv);
+        real     specular_tint          = specular_tint_   ->sample_real(uv);
+        real     anisotropic            = anisotropic_     ->sample_real(uv);
+        real     sheen                  = sheen_           ->sample_real(uv);
+        real     sheen_tint             = sheen_tint_      ->sample_real(uv);
+        real     clearcoat              = clearcoat_       ->sample_real(uv);
+        real     clearcoat_gloss        = clearcoat_gloss_ ->sample_real(uv);
+        Spectrum scatter_distance       = scatter_distance_->sample_spectrum(uv);
         bool has_subsurface = scatter_distance.lum() > 0;
 
         Coord shading_coord = normal_mapper_.reorient(uv, inct.user_coord);
@@ -827,6 +843,7 @@ disney [Material]
             clearcoat,
             clearcoat_gloss,
             transmission,
+            transmission_roughness,
             ior,
             has_subsurface);
 

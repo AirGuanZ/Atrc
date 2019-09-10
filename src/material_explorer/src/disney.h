@@ -20,6 +20,10 @@ class Disney : public Material
     float transmission_;
     float ior_;
 
+    float transmission_roughness_;
+    float trans_ax_;
+    float trans_ay_;
+
     float ax_;
     float ay_;
     vec3 base_color_tint_;
@@ -36,6 +40,9 @@ class Disney : public Material
         float aspect = anisotropic_ > 0 ? std::sqrt(1 - 0.9f * anisotropic_) : 1.0f;
         ax_ = (std::max)(0.001f, roughness_ * roughness_ / aspect);
         ay_ = (std::max)(0.001f, roughness_ * roughness_ * aspect);
+
+        trans_ax_ = (std::max)(0.001f, transmission_roughness_ * transmission_roughness_ / aspect);
+        trans_ay_ = (std::max)(0.001f, transmission_roughness_ * transmission_roughness_ * aspect);
 
         clearcoat_roughness_ = agz::math::mix(0.1f, 0.01f, clearcoat_gloss_);
 
@@ -67,6 +74,7 @@ public:
         clearcoat_       = 0;
         clearcoat_gloss_ = 1;
         transmission_    = 0;
+        transmission_roughness_ = 0.2f;
         ior_             = 1.5f;
         compute_secondary_params();
     }
@@ -92,6 +100,7 @@ public:
         ret |= ImGui::SliderFloat("clearcoat",       &clearcoat_, 0, 1);
         ret |= ImGui::SliderFloat("clearcoat_gloss", &clearcoat_gloss_, 0, 1);
         ret |= ImGui::SliderFloat("transmission",    &transmission_, 0, 1);
+        ret |= ImGui::SliderFloat("transmission_roughness", &transmission_roughness_, 0, 1);
         ret |= ImGui::InputFloat("ior",              &ior_, 0.01f);
         ior_ = agz::math::clamp<float>(ior_, 1.001f, 10);
 
@@ -113,6 +122,8 @@ public:
         prog.set_uniform_unchecked("clearcoat",               clearcoat_);
         prog.set_uniform_unchecked("coearcoat_roughness",     clearcoat_roughness_);
         prog.set_uniform_unchecked("transmission",            transmission_);
+        prog.set_uniform_unchecked("trans_ax",                trans_ax_);
+        prog.set_uniform_unchecked("trans_ay",                trans_ay_);
         prog.set_uniform_unchecked("ior",                     ior_);
         prog.set_uniform_unchecked("ax",                      ax_);
         prog.set_uniform_unchecked("ay",                      ay_);
@@ -167,23 +178,28 @@ public:
         "type": "constant",
         "texel": ${TRANSMISSION}
     },
+    "transmission_roughness": {
+        "type": "constant",
+        "texel": ${TRANSMISSION_ROUGHNESS}
+    },
     "ior": {
         "type": "constant",
         "texel": ${IOR}
     }
 }
 )___";
-        agz::stdstr::replace_(template_str, "${BASE_COLOR}",      ::to_json(base_color_));
-        agz::stdstr::replace_(template_str, "${METALLIC}",        ::to_json(metallic_));
-        agz::stdstr::replace_(template_str, "${ROUGHNESS}",       ::to_json(roughness_));
-        agz::stdstr::replace_(template_str, "${SPECULAR_TINT}",   ::to_json(specular_tint_));
-        agz::stdstr::replace_(template_str, "${ANISOTROPIC}",     ::to_json(anisotropic_));
-        agz::stdstr::replace_(template_str, "${SHEEN}",           ::to_json(sheen_));
-        agz::stdstr::replace_(template_str, "${SHEEN_TINT}",      ::to_json(sheen_tint_));
-        agz::stdstr::replace_(template_str, "${CLEARCOAT}",       ::to_json(clearcoat_));
-        agz::stdstr::replace_(template_str, "${CLEARCOAT_GLOSS}", ::to_json(clearcoat_gloss_));
-        agz::stdstr::replace_(template_str, "${TRANSMISSION}",    ::to_json(transmission_));
-        agz::stdstr::replace_(template_str, "${IOR}",             ::to_json(ior_));
+        agz::stdstr::replace_(template_str, "${BASE_COLOR}",             ::to_json(base_color_));
+        agz::stdstr::replace_(template_str, "${METALLIC}",               ::to_json(metallic_));
+        agz::stdstr::replace_(template_str, "${ROUGHNESS}",              ::to_json(roughness_));
+        agz::stdstr::replace_(template_str, "${SPECULAR_TINT}",          ::to_json(specular_tint_));
+        agz::stdstr::replace_(template_str, "${ANISOTROPIC}",            ::to_json(anisotropic_));
+        agz::stdstr::replace_(template_str, "${SHEEN}",                  ::to_json(sheen_));
+        agz::stdstr::replace_(template_str, "${SHEEN_TINT}",             ::to_json(sheen_tint_));
+        agz::stdstr::replace_(template_str, "${CLEARCOAT}",              ::to_json(clearcoat_));
+        agz::stdstr::replace_(template_str, "${CLEARCOAT_GLOSS}",        ::to_json(clearcoat_gloss_));
+        agz::stdstr::replace_(template_str, "${TRANSMISSION}",           ::to_json(transmission_));
+        agz::stdstr::replace_(template_str, "${TRANSMISSION_ROUGHNESS}", ::to_json(transmission_roughness_));
+        agz::stdstr::replace_(template_str, "${IOR}",                    ::to_json(ior_));
         return template_str;
     }
 };

@@ -12,10 +12,8 @@ void Camera::update_camera_params()
     const vec3 dst(0, 0, 0);
     const vec3 up(0, 0, 1);
 
-    constexpr float dist = 0.2f;
-
     vec3 dir = (dst - pos).normalize();
-    vec3 film_centre = pos + dist * dir;
+    vec3 film_centre = pos + dist_ * dir;
 
     vec3 x_dir = cross(dir, up).normalize();
     vec3 y_dir = cross(x_dir, dir).normalize();
@@ -31,7 +29,7 @@ void Camera::update_camera_params()
 }
 
 Camera::Camera(float aspect)
-    : vert_rad_(0), hori_rad_(0), aspect_(aspect)
+    : vert_rad_(0), hori_rad_(0), aspect_(aspect), dist_(0.15f)
 {
     update_camera_params();
 }
@@ -51,6 +49,7 @@ bool Camera::show_gui()
     bool ret = false;
     ret |= ImGui::InputFloat("hori", &hori_rad_, 0, 0, "%.6f");
     ret |= ImGui::InputFloat("vert", &vert_rad_, 0, 0, "%.6f");
+    ret |= ImGui::SliderFloat("dist", &dist_, 0.03f, 0.5f);
     if(ret)
         update_camera_params();
     return ret;

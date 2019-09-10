@@ -41,7 +41,7 @@ GLFWwindow *init_opengl()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
-    GLFWwindow *window = glfwCreateWindow(1280, 720, "Material Explorer", nullptr, nullptr);
+    GLFWwindow *window = glfwCreateWindow(1440, 720, "Material Explorer", nullptr, nullptr);
     if(!window)
     {
         glfwTerminate();
@@ -87,7 +87,7 @@ void run()
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        if(ImGui::Begin("material", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+        if(ImGui::Begin("scene", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
         {
             AGZ_SCOPE_GUARD({ ImGui::End(); });
             app.update(window);

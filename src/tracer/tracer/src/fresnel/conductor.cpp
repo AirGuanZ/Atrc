@@ -73,7 +73,7 @@ public:
     {
         return R"___(
 conductor [Fresnel]
-    eta_out [Texture] outside IOR map
+    eta_out [Texture] (optional; defaultly set to 1) outside IOR map
     eta_in  [Texture] inside  IOR map
     k       [Texture] absorptivity map
 )___";
@@ -85,7 +85,22 @@ conductor [Fresnel]
 
         init_customed_flag(params);
 
-        eta_out_ = TextureFactory.create(params.child_group("eta_out"), init_ctx);
+        auto defaultly_all = [&](const char *name, real default_value)
+        {
+            if(auto node = params.find_child_group(name))
+                return TextureFactory.create(*node, init_ctx);
+
+            ConfigGroup group;
+            group.insert_child("type", std::make_shared<ConfigValue>("constant"));
+
+            auto arr = std::make_shared<ConfigArray>();
+            arr->push_back(std::make_shared<ConfigValue>(std::to_string(default_value)));
+            group.insert_child("texel", std::move(arr));
+
+            return TextureFactory.create(group, init_ctx);
+        };
+
+        eta_out_ = defaultly_all("eta_out", 1);
         eta_in_  = TextureFactory.create(params.child_group("eta_in"), init_ctx);
         k_       = TextureFactory.create(params.child_group("k"), init_ctx);
 

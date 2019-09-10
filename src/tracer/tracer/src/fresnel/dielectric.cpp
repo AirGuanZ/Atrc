@@ -42,7 +42,7 @@ public:
         return R"___(
 dielectric [Fresnel]
     eta_in  [Texture] inside  IOR map
-    eta_out [Texture] outside IOR map
+    eta_out [Texture] (optional; defaultly set to 1) outside IOR map
 )___";
     }
 
@@ -52,8 +52,23 @@ dielectric [Fresnel]
 
         init_customed_flag(params);
 
+        auto defaultly_all = [&](const char *name, real default_value)
+        {
+            if(auto node = params.find_child_group(name))
+                return TextureFactory.create(*node, init_ctx);
+
+            ConfigGroup group;
+            group.insert_child("type", std::make_shared<ConfigValue>("constant"));
+
+            auto arr = std::make_shared<ConfigArray>();
+            arr->push_back(std::make_shared<ConfigValue>(std::to_string(default_value)));
+            group.insert_child("texel", std::move(arr));
+
+            return TextureFactory.create(group, init_ctx);
+        };
+
         eta_i_ = TextureFactory.create(params.child_group("eta_in"), init_ctx);
-        eta_o_ = TextureFactory.create(params.child_group("eta_out"), init_ctx);
+        eta_o_ = defaultly_all("eta_out", 1);
 
         AGZ_HIERARCHY_WRAP("in initializing dielectric fresnel object")
     }

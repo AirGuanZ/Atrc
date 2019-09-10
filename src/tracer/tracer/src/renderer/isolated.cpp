@@ -9,6 +9,8 @@
 #include <agz/utility/misc.h>
 #include <agz/utility/thread.h>
 
+#include "./path_tracer/pt_integrator/mis_light_bsdf.h"
+
 AGZ_TRACER_BEGIN
 
 class IsolatedPathTracer : public Renderer
@@ -41,31 +43,85 @@ class IsolatedPathTracer : public Renderer
 
     ProgressReporter *reporter_ = nullptr;
 
+    static Spectrum sample_bsdf(
+        const Scene &scene, const EntityIntersection &inct, const ShadingPoint &shd, Sampler &sampler,
+        Spectrum *coef_delta, bool *has_new_inct, EntityIntersection *new_inct)
+    {
+        auto sam3 = sampler.sample3();
+
+        *has_new_inct = false;
+        auto bsdf_sample = shd.bsdf->sample(inct.wr, TM_Radiance, sam3);
+        if(!bsdf_sample.f || bsdf_sample.pdf < EPS)
+            return {};
+
+        Ray new_ray(inct.pos, bsdf_sample.dir.normalize(), EPS);
+        if(scene.closest_intersection(new_ray, new_inct))
+        {
+            *has_new_inct = true;
+            *coef_delta = bsdf_sample.f * std::abs(cos(inct.geometry_coord.z, bsdf_sample.dir)) / bsdf_sample.pdf;
+
+            if(auto light = new_inct->entity->as_light())
+            {
+                Spectrum light_f = light->radiance(*new_inct, new_inct->wr);
+                if(!light_f)
+                    return {};
+
+                Spectrum f = light_f * bsdf_sample.f * std::abs(cos(inct.geometry_coord.z, bsdf_sample.dir));
+                if(bsdf_sample.is_delta)
+                    return f / bsdf_sample.pdf;
+
+                real light_pdf = light->pdf(inct.pos, *new_inct);
+                return f / (bsdf_sample.pdf + light_pdf);
+            }
+        }
+        else
+        {
+            auto light = scene.env();
+            Spectrum light_f = light->radiance(new_ray.d);
+
+            Spectrum f = light_f * bsdf_sample.f * std::abs(cos(inct.geometry_coord.z, bsdf_sample.dir));
+            if(bsdf_sample.is_delta)
+                return f / bsdf_sample.pdf;
+
+            real light_pdf = light->pdf(bsdf_sample.dir);
+            return f / (bsdf_sample.pdf + light_pdf);
+        }
+
+        return {};
+    }
+
     Spectrum trace(const Scene &scene, EntityIntersection inct, ShadingPoint shd, Sampler &sampler, Arena &arena) const
     {
-        Spectrum coef(1);
+        Spectrum ret(0), coef(1);
+
+        if(auto lht = inct.entity->as_light())
+            ret += lht->radiance(inct, inct.wr);
 
         for(int depth = 2; depth <= max_depth_; ++depth)
         {
             if(depth > min_depth_)
             {
                 if(sampler.sample1().u > cont_prob_)
-                    return {};
+                    return ret;
                 coef /= cont_prob_;
             }
 
-            auto bsdf_sample = shd.bsdf->sample(inct.wr, TM_Radiance, sampler.sample3());
-            if(!bsdf_sample.f)
-                return {};
-            coef *= bsdf_sample.f * std::abs(dot(inct.geometry_coord.z, bsdf_sample.dir)) / bsdf_sample.pdf;
-            
-            Ray r(inct.pos, bsdf_sample.dir.normalize(), EPS);
-            if(!scene.closest_intersection(r, &inct))
-                return coef * scene.env()->radiance(r.d);
+            for(auto light : scene.lights())
+                ret += coef * mis_sample_light(scene, light, inct, shd, sampler.sample5());
+
+            EntityIntersection new_inct;
+            Spectrum coef_delta;
+            bool has_new_inct;
+            ret += coef * sample_bsdf(scene, inct, shd, sampler, &coef_delta, &has_new_inct, &new_inct);
+
+            if(!has_new_inct)
+                break;
+            coef *= coef_delta;
+            inct = new_inct;
             shd = inct.material->shade(inct, arena);
         }
 
-        return {};
+        return ret;
     }
 
     std::pair<Spectrum, bool> eval(GBufferPixel *gpixel, const Scene &scene, const Ray &ray, Sampler &sampler, Arena &arena) const
