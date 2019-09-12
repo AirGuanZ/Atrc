@@ -58,31 +58,12 @@ SET(MISC_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/lib/misc/)
 
 ADD_SUBDIRECTORY(lib/utility/src)
 
-ADD_SUBDIRECTORY(src/tracer/utility)
-ADD_SUBDIRECTORY(src/tracer/tracer)
-ADD_SUBDIRECTORY(src/tracer/cshader)
-ADD_SUBDIRECTORY(src/cli)
-ADD_SUBDIRECTORY(src/obj_to_scene)
-
-############## material plugins
-
-MACRO(SUBDIRLIST result curdir)
-  FILE(GLOB children RELATIVE ${curdir} ${curdir}/*)
-  SET(dirlist "")
-  FOREACH(child ${children})
-    IF(IS_DIRECTORY ${curdir}/${child})
-      LIST(APPEND dirlist ${child})
-    ENDIF()
-  ENDFOREACH()
-  SET(${result} ${dirlist})
-ENDMACRO()
-
-SUBDIRLIST(PLUGINS ${PROJECT_SOURCE_DIR}/src/c_materials)
-MESSAGE("add material plugins: ${PLUGINS}")
-
-FOREACH(subdir ${PLUGINS})
-  ADD_SUBDIRECTORY(${PROJECT_SOURCE_DIR}/src/c_materials/${subdir})
-ENDFOREACH()
+ADD_SUBDIRECTORY(src/core/common)
+ADD_SUBDIRECTORY(src/core/rasterizer/)
+ADD_SUBDIRECTORY(src/core/tracer)
+ADD_SUBDIRECTORY(src/app/cli)
+ADD_SUBDIRECTORY(src/app/cli_ras)
+ADD_SUBDIRECTORY(src/app/obj_to_scene)
 
 ############## glfw && material explorer
 
@@ -90,5 +71,5 @@ IF(BUILD_MATERIAL_EXPLORER)
     INCLUDE("${PROJECT_SOURCE_DIR}/cmake/cmake-glfw")
 	INCLUDE("${PROJECT_SOURCE_DIR}/cmake/cmake-glew")
 	FIND_PACKAGE(OpenGL REQUIRED)
-    ADD_SUBDIRECTORY(src/material_explorer)
+    ADD_SUBDIRECTORY(src/app/material_explorer)
 ENDIF()

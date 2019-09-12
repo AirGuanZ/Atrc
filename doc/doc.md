@@ -62,9 +62,8 @@
 编译Atrc得到的结果由以下几部分构成：
 
 1. CLI，为渲染器的命令行可执行程序
-2. obj_to_scene，用于将一个带材质的obj文件转换为Atrc可用的JSON描述格式
+2. obj_to_scene，用于将一个带材质的obj文件转换为Atrc可用的JSON实体列表
 3. material_explorer，材质参数预览器，使用GPU加速的材质效果调整工具
-4. 一个或多个以共享库形式出现的材质插件
 
 本节主要介绍CLI的使用，即其命令参数的含义和场景配置文件的编写。
 
@@ -210,6 +209,8 @@ Atrc使用JSON作为描述场景和渲染设置的配置文件格式。整个JSO
 
 除了这些类型的字段外，其他类型的字段均以JSON对象的语法出现。这些字段除了具有“类型”这一属性外，还具有“类型值”的属性。譬如，一个类型为“Entity”的字段可以出现在任何一个需要“实体”的地方，而该字段的类型值则由它的属性`type`决定，表示该字段具体是哪一种实体。
 
+特别地，每个对象都有一个可选的`customed_flag`字段。该字段shi是由用户提供的对象标志，其缺省值为0，在渲染时起到的作用由具体的情境决定。比如，在使用`isolated`类型的`Renderer`时，该字段被用于标记场景中需要被特殊对待的`Entity`。而在大多数情况下，该字段不会对渲染过程有任何影响，可以忽略不管。
+
 在后文的叙述中，我将使用简化的表格形式来表示一个对象应包含哪些字段以及这些字段的含义。以整个配置文件中最后出现的后处理器`save_to_png`为例，它的JSON表示是：
 
 ```json
@@ -322,6 +323,19 @@ $$
 | up     | Vec3    | [ 0, 0, 1 ] | 描述世界空间中哪个方向为“上方”，默认为$+z$方向 |
 
 `ibl`亦名`env`，这是由兼容性问题造成的。
+
+#### hdri
+
+![pic](./pictures/hdri.png)
+
+内侧发光的球体。
+
+| 字段名 | 类型    | 默认值      | 含义                                           |
+| ------ | ------- | ----------- | ---------------------------------------------- |
+| tex    | Texture |             | 描述辐射亮度的纹理对象                         |
+| up     | Vec3    | [ 0, 0, 1 ] | 描述世界空间中哪个方向为“上方”，默认为$+z$方向 |
+| radius | real    | 100         | 球体半径                                       |
+| offset | Vec3    | [0]         | 球心位置                                       |
 
 #### native_sky
 
@@ -572,20 +586,21 @@ Disney Principled BRDF的完整实现，有的参数含义我不知道怎么翻�
 
 不带BSSRDF的Disney Principled BSDF，具体可参考[原文](https://blog.selfshadow.com/publications/s2015-shading-course/#course_content)。
 
-| 字段名           | 类型    | 默认值    | 含义                                              |
-| ---------------- | ------- | --------- | ------------------------------------------------- |
-| base_color       | Texture |           | 基本颜色，取值范围为$[0, 1]^3$                    |
-| metallic         | Texture |           | 金属度，取值范围为$[0,1]$                         |
-| roughness        | Texture |           | 粗糙度，取值范围为$[0.01,1]$                      |
-| specular_tint    | Texture | all_zero  | 高光颜色一致性，取值范围为$[0,1]$                 |
-| anisotropic      | Texture | all_zero  | 各向异性度，取值范围为$[0,1]$                     |
-| sheen            | Texture | all_zero  | 边缘光泽度，取值范围为$[0,1]$                     |
-| sheen_tint       | Texture | all_zero  | 边缘光泽颜色一致性，取值范围为$[0,1]$             |
-| clearcoat        | Texture | all_zero  | 清漆强度，取值范围为$[0,1]$                       |
-| clearcoat_gloss  | Texture | all_zero  | 清漆光泽度，取值范围为$[0,1]$                     |
-| transmission     | Texture | all_zero  | 透明度，取值范围为$[0,1]$                         |
-| ior              | Texture | all_{1.5} | 内外折射率之比，取值范围为$[0,\infty)$            |
-| scatter_distance | Texture | all_zero  | mean free path length (for subsurface scattering) |
+| 字段名                 | 类型    | 默认值    | 含义                                              |
+| ---------------------- | ------- | --------- | ------------------------------------------------- |
+| base_color             | Texture |           | 基本颜色，取值范围为$[0, 1]^3$                    |
+| metallic               | Texture |           | 金属度，取值范围为$[0,1]$                         |
+| roughness              | Texture |           | 粗糙度，取值范围为$[0,1]$                         |
+| specular_tint          | Texture | all_zero  | 高光颜色一致性，取值范围为$[0,1]$                 |
+| anisotropic            | Texture | all_zero  | 各向异性度，取值范围为$[0,1]$                     |
+| sheen                  | Texture | all_zero  | 边缘光泽度，取值范围为$[0,1]$                     |
+| sheen_tint             | Texture | all_zero  | 边缘光泽颜色一致性，取值范围为$[0,1]$             |
+| clearcoat              | Texture | all_zero  | 清漆强度，取值范围为$[0,1]$                       |
+| clearcoat_gloss        | Texture | all_zero  | 清漆光泽度，取值范围为$[0,1]$                     |
+| transmission           | Texture | all_zero  | 透明度，取值范围为$[0,1]$                         |
+| transmission_roughness | Texture | roughness | 折射粗糙度，取值范围为$[0, 1]$                    |
+| ior                    | Texture | all_{1.5} | 内外折射率之比，取值范围为$[0,\infty)$            |
+| scatter_distance       | Texture | all_zero  | mean free path length (for subsurface scattering) |
 
 #### frosted_glass
 
@@ -689,14 +704,6 @@ Disney Principled BRDF的完整实现，有的参数含义我不知道怎么翻�
 | eta_in   | Texture  |        | 清漆内部的折射率 |
 | eta_out  | Texture  |        | 清漆外部的折射率 |
 | color    | Texture  |        | 清漆颜色         |
-
-#### lib
-
-以外部共享库形式存在的材质，详情请见后文。
-
-| 字段名   | 类型   | 默认值 | 含义           |
-| -------- | ------ | ------ | -------------- |
-| filename | string |        | 共享库文件路径 |
 
 ### Medium
 
@@ -806,6 +813,30 @@ Disney Principled BRDF的完整实现，有的参数含义我不知道怎么翻�
 
 当工作线程数$n \le 0$时，设硬件线程数为$k$，则将使用$\max\{1, k+n\}$个工作线程。比如可以将`worker_count`设置为-2，表示留两个硬件线程，把其他硬件线程都用起来。
 
+#### isolated
+
+![pic](./pictures/isolated.png)
+
+| 字段名                  | 类型     | 默认值 | 含义                                                         |
+| ----------------------- | -------- | ------ | ------------------------------------------------------------ |
+| min_depth               | int      | 5      | 使用RR策略前的最小路径深度                                   |
+| max_depth               | int      | 10     | 路径的最大截断深度                                           |
+| cont_prob               | real     | 0.9    | 追踪时使用RR策略的通过概率                                   |
+| shading_aa              | int      | 1      | 每个geometric sample对应多少个shading sample                 |
+| background_aa           | int      | 1      | 对background entity而言，每个geometric sample对应多少个shadow sample |
+| background_entity_flag  | int      | -1     | background entity的customed flag值                           |
+| background_entity_color | Spectrum | [1]    | background entity的固有颜色                                  |
+| worker_count            | int      |        | 工作线程数                                                   |
+| task_grid_size          | int      | 32     | 作为线程任务的像素方格的边长                                 |
+| sampler                 | Sampler  |        | 随机序列采样器                                               |
+
+`isolated`渲染器主要用于针对性地展示少数物体。场景中所有`customed_flag`属性等于`background_entity_flag`的`Entity`都被标记为“背景物体”。渲染器对普通物体和背景物体采用不同的渲染策略：
+
+1. 对普通物体，渲染器将会计算完整的全局光照。对每条camera ray，将进行`shading_aa`次着色采样。
+2. 对背景物体，渲染器将会计算环境光遮蔽值（Ambient Occlusion，AO），并乘以预先指定的颜色`background_entity_color`，作为其着色结果。对每条camera ray，渲染器使用`background_aa`次采样来计算AO值。
+
+上图中的地面就被标记为了背景物体，其颜色将不受灯光的影响。
+
 ### PathTracingIntegrator
 
 `PathTracingIntegrator`用于描述path tracing算法中追踪何种路径。
@@ -908,17 +939,19 @@ Disney Principled BRDF的完整实现，有的参数含义我不知道怎么翻�
 
 从.hdr文件中加载出的纹理。
 
-| 字段名   | 类型   | 默认值 | 含义        |
-| -------- | ------ | ------ | ----------- |
-| filename | string |        | hdr文件路径 |
+| 字段名   | 类型   | 默认值   | 含义                                |
+| -------- | ------ | -------- | ----------------------------------- |
+| filename | string |          | hdr文件路径                         |
+| sample   | string | "linear" | 采样策略，取值为"linear"或"nearest" |
 
 #### image
 
 从各种常见图像文件格式（.bmp，.jpg，.png，.tga等）中加载出的纹理。
 
-| 字段名   | 类型   | 默认值 | 含义         |
-| -------- | ------ | ------ | ------------ |
-| filename | string |        | 图像文件路径 |
+| 字段名   | 类型   | 默认值   | 含义                                |
+| -------- | ------ | -------- | ----------------------------------- |
+| filename | string |          | 图像文件路径                        |
+| sample   | string | "linear" | 采样策略，取值为"linear"或"nearest" |
 
 #### scale
 
@@ -1017,10 +1050,7 @@ Disney Principled BRDF的完整实现，有的参数含义我不知道怎么翻�
 | ------ | ---- | ------ | ------ |
 | ratio  | real |        | 缩放比 |
 
-## 共享库材质插件
-
-Atrc支持使用C++编写外部材质插件，以共享库的形式在渲染器运行时加载，从而在不需要重新编译渲染器的情况下加入新的材质类型。
-
 ## 对同一场景的多次渲染
 
 TODO
+
