@@ -6,12 +6,14 @@
 
 AGZ_TRACER_BEGIN
 
-class SaveToPNG : public PostProcessor
+class SaveToImage : public PostProcessor
 {
     std::string filename_;
     bool open_after_saved_ = true;
     real gamma_ = 1;
     bool with_alpha_channel_ = false;
+
+    std::string save_ext_ = "png";
 
 public:
 
@@ -20,12 +22,13 @@ public:
     static std::string description()
     {
         return R"___(
-save_to_png [PostProcessor]
+save_to_img/save_to_png [PostProcessor]
     filename           [string] saving destination
-    open               [0/1] (optional) open saved file with default application (defaultly 1)
-    gamma              [real] (optional) gamma value
-    inv_gamma          [real] (optional) 1 / gamma value
-    with_alpha_channel [0/1] (optional; defaultly set to 0) use gbuffer::binary as alpha channel
+    open               [0/1]    (optional) open saved file with default application (defaultly 1)
+    gamma              [real]   (optional) gamma value
+    inv_gamma          [real]   (optional) 1 / gamma value
+    with_alpha_channel [0/1]    (optional; defaultly set to 0) use gbuffer::binary as alpha channel
+    ext                [string] (optional; defaultly set to "png") save to png/jpg
 )___";
     }
 
@@ -48,6 +51,14 @@ save_to_png [PostProcessor]
 
         with_alpha_channel_ = params.child_int_or("with_alpha_channel", 0) != 0;
 
+        if(auto node = params.find_child_value("ext"))
+        {
+            if(node->as_str() == "png" || node->as_str() == "jpg")
+                save_ext_  = node->as_str();
+            else
+                throw ObjectConstructionException("unsupported image extension: " + node->as_str());
+        }
+
         AGZ_HIERARCHY_WRAP("in initializing save_to_png post processor")
     }
 
@@ -67,7 +78,10 @@ save_to_png [PostProcessor]
                     return static_cast<uint8_t>(math::clamp<real>(std::pow(c, gamma), 0, 1) * 255);
                 });
             });
-            img::save_rgb_to_png_file(filename_, imgu8);
+            if(save_ext_ == "png")
+                img::save_rgb_to_png_file(filename_, imgu8);
+            else if(save_ext_ == "jpg")
+                img::save_rgb_to_jpg_file(filename_, imgu8);
         }
         else
         {
@@ -88,7 +102,10 @@ save_to_png [PostProcessor]
                     imgu8(y, x).a = static_cast<uint8_t>(af * 255);
                 }
             }
-            img::save_rgba_to_png_file(filename_, imgu8.get_data());
+            if(save_ext_ == "png")
+                img::save_rgba_to_png_file(filename_, imgu8.get_data());
+            else if(save_ext_ == "jpg")
+                img::save_rgba_to_jpg_file(filename_, imgu8.get_data());
         }
 
         if(open_after_saved_)
@@ -96,6 +113,9 @@ save_to_png [PostProcessor]
     }
 };
 
+using SaveToPNG = SaveToImage;
+
+AGZT_IMPLEMENTATION(PostProcessor, SaveToImage, "save_to_img")
 AGZT_IMPLEMENTATION(PostProcessor, SaveToPNG, "save_to_png")
 
 AGZ_TRACER_END

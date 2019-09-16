@@ -139,8 +139,10 @@ class IsolatedPathTracer : public Renderer
             Spectrum ret(0);
             for(int i = 0; i < background_aa_; ++i)
             {
-                auto bsdf_sample = shd.bsdf->sample(inct.wr, TM_Radiance, sampler.sample3());
-                Ray r(inct.pos, bsdf_sample.dir.normalize(), EPS);
+                Sample2 sam2 = sampler.sample2();
+                Vec3 local_dir = math::distribution::zweighted_on_hemisphere(sam2.u, sam2.v).first;
+                Vec3 global_dir = inct.geometry_coord.local_to_global(local_dir).normalize();
+                Ray r(inct.pos, global_dir, EPS);
                 if(!scene.has_intersection(r))
                     ret += Spectrum(1);
             }

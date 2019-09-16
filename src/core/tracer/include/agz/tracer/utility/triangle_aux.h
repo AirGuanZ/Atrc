@@ -3,6 +3,7 @@
 #include <cassert>
 
 #include <agz/common/math.h>
+#include <agz/tracer/common.h>
 
 AGZ_TRACER_BEGIN
 

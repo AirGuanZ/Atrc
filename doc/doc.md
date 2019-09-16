@@ -782,9 +782,9 @@ Disney Principled BRDF的完整实现，有的参数含义我不知道怎么翻�
 
 当使用的`Film`或`Renderer`不支持G-Buffer时，保存的结果是无意义的。
 
-#### save_to_png
+#### save_to_img
 
-将图像保存至png文件。
+将图像保存至文件。
 
 | 字段名             | 类型   | 默认值 | 含义                                    |
 | ------------------ | ------ | ------ | --------------------------------------- |
@@ -793,8 +793,11 @@ Disney Principled BRDF的完整实现，有的参数含义我不知道怎么翻�
 | gamma              | real   | 1      | 保存前进行gamma校正时使用的$\gamma$值   |
 | inv_gamma          | real   | 1      | 保存前进行gamma校正时使用的$1/\gamma$值 |
 | with_alpha_channel | bool   | false  | 将gbuffer::binary作为alpha通道保存      |
+| ext                | string | png    | 保存文件类型，取值范围为"png"或"jpg"    |
 
 `gamma`和`inv_gamma`只需给出其中一个即可，若都未指定，则不进行gamma校正。
+
+该`PostProcessor`亦名`save_to_png`，这只是由兼容性问题造成的，不建议使用此名。
 
 ### Renderer
 

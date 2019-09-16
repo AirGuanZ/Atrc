@@ -4,7 +4,7 @@
 #include <memory>
 #include <type_traits>
 
-#include <agz/common/common.h>
+#include <agz/tracer/common.h>
 #include <agz/tracer/utility/config.h>
 #include <agz/tracer/utility/path_manager.h>
 #include <agz/utility/misc.h>

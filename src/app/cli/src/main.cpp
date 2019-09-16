@@ -32,8 +32,7 @@ struct RenderingSettings
 RenderingSettings parse_rendering_settings(agz::tracer::Config &rendering_config, agz::tracer::obj::ObjectInitContext &obj_init_ctx)
 {
     using namespace agz::tracer;
-
-    using namespace agz::tracer;
+    using namespace agz;
 
     auto &film_params = rendering_config.child_group("film");
     int film_width = film_params.child_int("width");

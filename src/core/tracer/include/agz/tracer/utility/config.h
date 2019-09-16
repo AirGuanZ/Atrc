@@ -4,7 +4,7 @@
 #include <stdexcept>
 #include <string>
 
-#include <agz/common/math.h>
+#include <agz/tracer/common.h>
 
 AGZ_TRACER_BEGIN
 
