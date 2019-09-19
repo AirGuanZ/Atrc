@@ -7,7 +7,7 @@
 #include <agz/utility/string.h>
 
 #define TINYOBJLOADER_IMPLEMENTATION
-#include <tiny_obj_loader.h>
+#include <agz/obj_to_scene/tiny_obj_loader.h>
 
 namespace fs = std::filesystem;
 using namespace tinyobj;

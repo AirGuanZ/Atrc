@@ -2,6 +2,8 @@
 
 ![pic](./gallery/5.png)
 
+[TOC]
+
 ## Building
 
 ### Dependencies
@@ -64,6 +66,7 @@
 1. CLI，为渲染器的命令行可执行程序
 2. obj_to_scene，用于将一个带材质的obj文件转换为Atrc可用的JSON实体列表
 3. material_explorer，材质参数预览器，使用GPU加速的材质效果调整工具
+4. CLI_RAS，开发中的纯软件光栅化渲染管线，拟在未来用于光线追踪渲染器的加速
 
 本节主要介绍CLI的使用，即其命令参数的含义和场景配置文件的编写。
 
@@ -670,7 +673,7 @@ Disney Principled BRDF的完整实现，有的参数含义我不知道怎么翻�
 | ------- | ---------- | ------ | ---------------- |
 | mats    | [Material] |        | 被叠加的材质数组 |
 
-#### scaler
+#### scale
 
 线性地缩放一个材质的反射/折射亮度。
 
@@ -1053,7 +1056,32 @@ Disney Principled BRDF的完整实现，有的参数含义我不知道怎么翻�
 | ------ | ---- | ------ | ------ |
 | ratio  | real |        | 缩放比 |
 
-## 对同一场景的多次渲染
+## Shared Scene Description
 
-TODO
+Atrc支持连续用不同的渲染参数去渲染同一个场景，如用多个摄像机视角渲染同一场景等，比起使用多个配置文件，该方案避免了重复加载场景数据和建立加速数据结构的开销。
+
+设渲染配置文件的内容如下：
+
+```json
+{
+    "scene": { SceneDescription },
+    "rendering": { RenderingDescription }
+}
+```
+
+现需要使用多个不同的`RenderDescription`渲染同一个`SceneDescription`，则可以把配置文件写作：
+
+```json
+{
+    "scene": { SceneDescription },
+    "rendering": [
+        { RenderingDescription0 },
+        { RenderingDescription1 },
+        ...,
+        { RenderingDescriptionN }
+    ]
+}
+```
+
+渲染器会从上到下依次使用各`RenderingDescription`的设置来渲染`SceneDescription`所描述的场景。
 

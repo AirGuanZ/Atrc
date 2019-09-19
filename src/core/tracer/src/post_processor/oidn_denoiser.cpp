@@ -19,7 +19,7 @@ public:
     {
         return R"___(
 oidn_denoiser [PostProcessor]
-    clamp [0/1] clamp color to [0, 1] before denoising
+    clamp [0/1] (optional; defaultly set to 0) clamp color to [0, 1] before denoising
 )___";
     }
 

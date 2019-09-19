@@ -13,8 +13,8 @@ protected:
 
     Spectrum sample_spectrum_impl(const Vec2& uv) const noexcept override
     {
-        int u_idx = static_cast<int>(uv.x / grid_size_);
-        int v_idx = static_cast<int>(uv.y / grid_size_);
+        int u_idx = static_cast<int>(math::saturate(uv.x) / grid_size_);
+        int v_idx = static_cast<int>(math::saturate(uv.y) / grid_size_);
         if((u_idx + v_idx) & 1)
             return color_1_;
         return color_2_;

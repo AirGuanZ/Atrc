@@ -31,7 +31,7 @@ protected:
     
     Spectrum sample_spectrum_impl(const Vec2 &uv) const noexcept override
     {
-        return sample_impl_(data_, uv);
+        return sample_impl_(data_, uv.saturate());
     }
 
 public:

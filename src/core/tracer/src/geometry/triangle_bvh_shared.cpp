@@ -5,9 +5,9 @@
 
 #include <agz/tracer/utility/triangle_aux.h>
 #include <agz/tracer/utility/path_manager.h>
-#include <agz/utility/math/math.h>
+#include <agz/utility/math.h>
+#include <agz/utility/mesh.h>
 
-#include "./mesh_loader/loader.h"
 #include "./transformed_geometry.h"
 
 AGZ_TRACER_BEGIN
@@ -104,7 +104,7 @@ namespace
     // 建立triangle bvh中临时使用的三角形信息
     struct BuildingTriangle
     {
-        const mesh::Vertex *vtx = nullptr;
+        const mesh::vertex_t *vtx = nullptr;
         Vec3 centroid;
     };
 
@@ -140,9 +140,9 @@ namespace
             for(uint32_t i = task.start; i < task.end; ++i)
             {
                 auto &tri = triangles[i];
-                all_bound |= tri.vtx[0].pos;
-                all_bound |= tri.vtx[1].pos;
-                all_bound |= tri.vtx[2].pos;
+                all_bound |= tri.vtx[0].position;
+                all_bound |= tri.vtx[1].position;
+                all_bound |= tri.vtx[2].position;
                 centroid_bound |= tri.centroid;
             }
 
@@ -260,21 +260,21 @@ namespace
                     auto &prim      = prim_arr[i];
                     auto &prim_info = prim_info_arr[i];
 
-                    prim.a_   = tri.vtx[0].pos;
-                    prim.b_a_ = tri.vtx[1].pos - tri.vtx[0].pos;
-                    prim.c_a_ = tri.vtx[2].pos - tri.vtx[0].pos;
+                    prim.a_   = tri.vtx[0].position;
+                    prim.b_a_ = tri.vtx[1].position - tri.vtx[0].position;
+                    prim.c_a_ = tri.vtx[2].position - tri.vtx[0].position;
 
-                    Vec3 n_a = tri.vtx[0].nor.normalize();
-                    Vec3 n_b = tri.vtx[1].nor.normalize();
-                    Vec3 n_c = tri.vtx[2].nor.normalize();
+                    Vec3 n_a = tri.vtx[0].normal.normalize();
+                    Vec3 n_b = tri.vtx[1].normal.normalize();
+                    Vec3 n_c = tri.vtx[2].normal.normalize();
 
                     prim_info.n_a_   = n_a;
                     prim_info.n_b_a_ = n_b - n_a;
                     prim_info.n_c_a_ = n_c - n_a;
 
-                    prim_info.t_a_   = tri.vtx[0].uv;
-                    prim_info.t_b_a_ = tri.vtx[1].uv - tri.vtx[0].uv;
-                    prim_info.t_c_a_ = tri.vtx[2].uv - tri.vtx[0].uv;
+                    prim_info.t_a_   = tri.vtx[0].tex_coord;
+                    prim_info.t_b_a_ = tri.vtx[1].tex_coord - tri.vtx[0].tex_coord;
+                    prim_info.t_c_a_ = tri.vtx[2].tex_coord - tri.vtx[0].tex_coord;
 
                     prim_info.z_ = cross(prim.b_a_, prim.c_a_).normalize();
                     auto mean_nor = n_a + n_b + n_c;
@@ -303,7 +303,7 @@ namespace
 
     public:
 
-        void initialize(const mesh::Triangle *triangles, uint32_t triangle_count)
+        void initialize(const mesh::triangle_t *triangles, uint32_t triangle_count)
         {
             assert(triangles && triangle_count);
 
@@ -313,12 +313,15 @@ namespace
             std::vector<BuildingTriangle> build_triangles(triangle_count);
             for(uint32_t i = 0; i < triangle_count; ++i)
             {
-                build_triangles[i].vtx = triangles[i].vtx;
-                build_triangles[i].centroid = (triangles[i].vtx[0].pos + triangles[i].vtx[1].pos + triangles[i].vtx[2].pos) / real(3);
-                surface_area_ += triangle_area(triangles[i].vtx[1].pos - triangles[i].vtx[0].pos, triangles[i].vtx[2].pos - triangles[i].vtx[0].pos);
-                local_bound_ |= triangles[i].vtx[0].pos;
-                local_bound_ |= triangles[i].vtx[1].pos;
-                local_bound_ |= triangles[i].vtx[2].pos;
+                build_triangles[i].vtx = triangles[i].vertices;
+                build_triangles[i].centroid =
+                    (triangles[i].vertices[0].position + triangles[i].vertices[1].position + triangles[i].vertices[2].position) / real(3);
+                surface_area_ += triangle_area(
+                    triangles[i].vertices[1].position - triangles[i].vertices[0].position,
+                    triangles[i].vertices[2].position - triangles[i].vertices[0].position);
+                local_bound_ |= triangles[i].vertices[0].position;
+                local_bound_ |= triangles[i].vertices[1].position;
+                local_bound_ |= triangles[i].vertices[2].position;
             }
 
             Arena arena;

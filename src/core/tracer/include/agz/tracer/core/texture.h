@@ -21,18 +21,18 @@ class Texture : public obj::Object
 
     static real wrap_clamp(real x) noexcept
     {
-        return x;
+        return math::clamp<real>(x, 0, 1);
     }
 
     static real wrap_repeat(real x) noexcept
     {
-        return x - std::floor(x);
+        return math::clamp<real>(x - std::floor(x), 0, 1);
     }
 
     static real wrap_mirror(real x) noexcept
     {
         int intp = static_cast<int>(x >= 0 ? x : std::floor(x));
-        return intp & 1 ? 1 - x + intp : x - intp;
+        return math::clamp<real>(intp & 1 ? 1 - x + intp : x - intp, 0, 1);
     }
 
 protected:
@@ -101,8 +101,8 @@ public:
     virtual Spectrum sample_spectrum(const Vec2 &uv) const noexcept
     {
         Vec2 uv1 = transform_.apply_to_point(uv);
-        real u = math::clamp<real>(wrapper_u_(uv1.x), 0, 1);
-        real v = math::clamp<real>(wrapper_v_(uv1.y), 0, 1);
+        real u = wrapper_u_(uv1.x);
+        real v = wrapper_v_(uv1.y);
         auto ret = sample_spectrum_impl({ u, v });
         if(inv_gamma_ != 1)
         {
@@ -118,8 +118,8 @@ public:
     virtual real sample_real(const Vec2 &uv) const noexcept
     {
         Vec2 uv1 = transform_.apply_to_point(uv);
-        real u = math::clamp<real>(wrapper_u_(uv1.x), 0, 1);
-        real v = math::clamp<real>(wrapper_v_(uv1.y), 0, 1);
+        real u = wrapper_u_(uv1.x);
+        real v = wrapper_v_(uv1.y);
         auto ret = sample_real_impl({ u, v });
         if(inv_gamma_ != 1)
             ret = std::pow(ret, inv_gamma_);

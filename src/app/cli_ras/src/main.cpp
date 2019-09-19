@@ -1,172 +1,63 @@
 ﻿#include <filesystem>
 #include <iostream>
 
+#include <agz/rasterizer/depth_tester.h>
 #include <agz/rasterizer/pipeline.h>
 #include <agz/rasterizer/rasterizer.h>
 #include <agz/utility/image.h>
+#include <agz/utility/mesh.h>
 #include <agz/utility/system.h>
+#include <agz/utility/time.h>
 
-AGZ_RASTERIZER_BEGIN
-
-void save_color_buffer(const std::string &filename, const ImageBuffer<RGB> &buffer)
+void save_color_buffer(const std::string &filename, const agz::ras::ImageBuffer<agz::ras::RGB> &buffer, bool open_after_save = true)
 {
     assert(buffer.is_available());
+
+    agz::ras::ImageBuffer<agz::ras::RGB> flipped(buffer.height(), buffer.width());
+    for(int y = 0; y < flipped.height(); ++y)
+    {
+        for(int x = 0; x < flipped.width(); ++x)
+        {
+            int ty = flipped.height() - 1 - y;
+            flipped(y, x) = buffer(ty, x);
+        }
+    }
+
+    auto imgu8 = flipped.map(&agz::math::to_color3b<agz::real>);
     auto abs_filename = absolute(std::filesystem::path(filename)).string();
-    auto imgu8 = buffer.map(&agz::math::to_color3b<agz::real>);
     agz::img::save_rgb_to_png_file(abs_filename, imgu8.raw_data(), imgu8.width(), imgu8.height());
-    agz::sys::open_with_default_app(abs_filename);
+    if(open_after_save)
+        agz::sys::open_with_default_app(abs_filename);
 }
-
-void draw_line(ImageBuffer<RGB> &buffer, int x0, int y0, int x1, int y1, const RGB &color)
-{
-    bool steep = false;
-
-    if(std::abs(x0 - x1) < std::abs(y0 - y1))
-    {
-        std::swap(x0, y0);
-        std::swap(x1, y1);
-        steep = true;
-    }
-
-    if(x0 > x1)
-    {
-        std::swap(x0, x1);
-        std::swap(y0, y1);
-    }
-
-    int dx = x1 - x0, dy = y1 - y0;
-    int derr = 2 * std::abs(dy);
-    int err = 0;
-    int y = y0;
-    if(steep)
-    {
-        if(y1 > y0)
-        {
-            for(int x = x0; x <= x1; ++x)
-            {
-                buffer(x, y) = color;
-                err += derr;
-                if(err > dx)
-                {
-                    ++y;;
-                    err -= 2 * dx;
-                }
-            }
-        }
-        else
-        {
-            for(int x = x0; x <= x1; ++x)
-            {
-                buffer(x, y) = color;
-                err += derr;
-                if(err > dx)
-                {
-                    --y;
-                    err -= 2 * dx;
-                }
-            }
-        }
-    }
-    else
-    {
-        if(y1 > y0)
-        {
-            for(int x = x0; x <= x1; ++x)
-            {
-                buffer(y, x) = color;
-                err += derr;
-                if(err > dx)
-                {
-                    ++y;
-                    err -= 2 * dx;
-                }
-            }
-        }
-        else
-        {
-            for(int x = x0; x <= x1; ++x)
-            {
-                buffer(y, x) = color;
-                err += derr;
-                if(err > dx)
-                {
-                    --y;
-                    err -= 2 * dx;
-                }
-            }
-        }
-    }
-}
-
-void draw_triangle(ImageBuffer<RGB> &buffer, const Vec2 &v0, const Vec2 &v1, const Vec2 &v2, const RGB &color)
-{
-    // compute bounding box
-
-    float min_x_f = std::min(v0.x, std::min(v1.x, v2.x));
-    float min_y_f = std::min(v0.y, std::min(v1.y, v2.y));
-    float max_x_f = std::max(v0.x, std::max(v1.x, v2.x));
-    float max_y_f = std::max(v0.y, std::max(v1.y, v2.y));
-
-    int min_x = agz::math::clamp<int>(int(std::floor(min_x_f)), 0, buffer.width() - 1);
-    int min_y = agz::math::clamp<int>(int(std::floor(min_y_f)), 0, buffer.height() - 1);
-    int max_x = agz::math::clamp<int>(int(std::ceil(max_x_f)), 0, buffer.width() - 1);
-    int max_y = agz::math::clamp<int>(int(std::ceil(max_y_f)), 0, buffer.height() - 1);
-
-    // construct edge function
-
-    Vec2 v1_v0 = v1 - v0;
-    Vec2 v2_v1 = v2 - v1;
-    Vec2 v0_v2 = v0 - v2;
-
-    Vec2 edge_factor_01 = Vec2(-v1_v0.y, v1_v0.x);
-    Vec2 edge_factor_12 = Vec2(-v2_v1.y, v2_v1.x);
-    Vec2 edge_factor_20 = Vec2(-v0_v2.y, v0_v2.x);
-
-    bool top_left_01 = (v1.y > v0.y) || ((v1.y == v0.y && v1.x > v0.x));
-    bool top_left_12 = (v2.y > v1.y) || ((v2.y == v1.y && v2.x > v1.x));
-    bool top_left_20 = (v0.y > v2.y) || ((v0.y == v2.y && v0.x > v2.x));
-
-    // triversal pixels in bbox
-
-    for(int y = min_y; y <= max_y; ++y)
-    {
-        for(int x = min_x; x <= max_x; ++x)
-        {
-            Vec2 pixel_centre(x + 0.5f, y + 0.5f);
-            
-            real edge_value_01 = dot(edge_factor_01, pixel_centre - v0);
-            real edge_value_12 = dot(edge_factor_12, pixel_centre - v1);
-            real edge_value_20 = dot(edge_factor_20, pixel_centre - v2);
-
-            edge_value_01 += (edge_value_01 == 0 && top_left_01) ? -1 : 0;
-            edge_value_12 += (edge_value_12 == 0 && top_left_12) ? -1 : 0;
-            edge_value_20 += (edge_value_20 == 0 && top_left_20) ? -1 : 0;
-
-            if(edge_value_01 < 0 && edge_value_12 < 0 && edge_value_20 < 0)
-                buffer(y, x) += color;
-        }
-    }
-}
-
-AGZ_RASTERIZER_END
 
 void run()
 {
     using namespace agz;
     using namespace ras;
 
-    using Vertex = Vec2;
+    struct Vertex
+    {
+        Vec3 pos;
+        Vec3 nor;
+    };
 
-    struct Varying : VaryingBase { };
+    struct Varying : VaryingBase
+    {
+        Vec3 normal;
+    };
 
     struct VertexShader
     {
         using Input  = Vertex;
         using Output = Varying;
 
+        Mat4 WVP;
+        Mat4 world;
+
         void process(const Input &v, Output *output) const noexcept
         {
-            output->agz_position = Vec4(v.x, v.y, real(0.5), 1);
+            output->agz_position = WVP * Vec4(v.pos.x, v.pos.y, v.pos.z, 1);
+            output->normal = (world * Vec4(v.nor.x, v.nor.y, v.nor.z, 0)).xyz();
         }
     };
 
@@ -175,14 +66,16 @@ void run()
         using Input  = Varying;
         using Output = Varying;
 
-        void preprocess(Input *input) const
+        void lerp(const Input &a, const Input &b, real t, Output *output) const
         {
-            
+            output->normal = ((1 - t) * a.normal + t * b.normal).normalize();
         }
 
-        void postprocess(const Input *input, const real *weight, const real *corrected_weight, Output *output) const
+        void process(const Input *input, const real *weight, const real *corrected_weight, Output *output) const
         {
-            
+            output->normal = corrected_weight[0] * input[0].normal
+                           + corrected_weight[1] * input[1].normal
+                           + corrected_weight[2] * input[2].normal;
         }
     };
 
@@ -193,7 +86,9 @@ void run()
 
         bool process(const Input &input, Output *output) const
         {
-            *output = RGB(0, 0.5f, 0.5f);
+            Vec3 light_dir(1, 1, -2);
+            float light_factor = std::max(0.0f, dot(-light_dir.normalize(), input.normal.normalize()));
+            *output = RGB(light_factor);
             return true;
         }
     };
@@ -201,39 +96,54 @@ void run()
     struct OutputMerger
     {
         using Input = RGB;
-        using Frame = Framebuffer<RGB>;
 
-        void process(const Input &input, Frame *frame, int x, int y) const
+        ImageBuffer<RGB> *color_buffer;
+
+        void process(int x, int y, const Input &input) const
         {
-            frame->color_buffer<0>().at(y, x) += input;
+            color_buffer->at(y, x) = input;
         }
     };
 
-    VertexShader   vertex_shader;
-    Interpolator   interpolator;
-    FragmentShader fragment_shader;
-    OutputMerger   output_merger;
-
-    using Rasterizer = TriangleRasterizer<Interpolator, FragmentShader, OutputMerger>;
-
-    TriangleRasterizer rasterizer(&interpolator, &fragment_shader, &output_merger);
-    Pipeline<VertexShader, Rasterizer> pipeline(&vertex_shader, &rasterizer);
-
-    constexpr int FB_W = 640, FB_H = 480;
+    constexpr int FB_W = 1024, FB_H = 768;
     ImageBuffer<RGB>  color_buffer(FB_H, FB_W);
     ImageBuffer<real> depth_buffer(FB_H, FB_W, 1);
-    Framebuffer<RGB>  framebuffer(&color_buffer, &depth_buffer);
 
-    Vertex vertices[] =
+    VertexShader       vertex_shader;
+    Interpolator       interpolator;
+    FragmentShader     fragment_shader;
+    DefaultDepthTester depth_tester  = { &depth_buffer };
+    OutputMerger       output_merger = { &color_buffer };
+
+    vertex_shader.world = Mat4::scale(Vec3(0.06f))
+                        * Mat4::rotate_x(math::deg2rad(90.0f));
+    vertex_shader.WVP = Mat4::perspective(math::deg2rad(30.0f), float(FB_W) / FB_H, 0.01f, 100.0f)
+                      * Mat4::look_at({ -2, -10, 2 }, { 0, 0, 0 }, { 0, 0, 1 })
+                      * vertex_shader.world;
+
+    TriangleRasterizer rasterizer(interpolator, fragment_shader, depth_tester, output_merger);
+    rasterizer.framebuffer_size = { FB_W, FB_H };
+    Pipeline pipeline(vertex_shader, rasterizer);
+
+    auto mesh = mesh::load_from_file("./bunny.obj");
+    std::vector<Vertex> vertices(mesh.size() * 3);
+    for(size_t i = 0, j = 0; i < vertices.size(); i += 3, ++j)
     {
-        { -1, -1 },
-        { -1, 1 },
-        { 1, 1 },
-        { -1, -1 },
-        { 1, 1 },
-        { 1, -1 }
-    };
-    run_pipeline(pipeline, &framebuffer, misc::span<const Vertex>(vertices, 6));
+        vertices[i].pos     = mesh[j].vertices[0].position;
+        vertices[i + 1].pos = mesh[j].vertices[1].position;
+        vertices[i + 2].pos = mesh[j].vertices[2].position;
+        vertices[i].nor     = mesh[j].vertices[0].normal;
+        vertices[i + 1].nor = mesh[j].vertices[1].normal;
+        vertices[i + 2].nor = mesh[j].vertices[2].normal;
+    }
+    mesh.clear();
+
+    time::clock_t clock;
+    clock.restart();
+    color_buffer.clear({});
+    depth_buffer.clear(1);
+    run_pipeline(pipeline, misc::span<Vertex>(vertices.data(), vertices.size()));
+    std::cout << clock.us() / 1000.0f << "ms" << std::endl;
 
     save_color_buffer("./output.png", color_buffer);
 }

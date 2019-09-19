@@ -134,7 +134,7 @@ namespace disney_impl
             real cos_phi_h   = std::cos(phi_h);
             real cos_theta_h = local_angle::cos_theta(lwh);
             real sin_theta_h = local_angle::cos_2_sin(cos_theta_h);
-            real D = microfacet::anisotropic_gtr2(sin_phi_h, cos_phi_h, sin_theta_h, cos_theta_h, ax_, ay_);
+            real D = microfacet::anisotropic_gtr2(sin_phi_h, cos_phi_h, sin_theta_h, cos_theta_h, trans_ax_, trans_ay_);
 
             real phi_i       = local_angle::phi(lwi);
             real phi_o       = local_angle::phi(lwo);
@@ -142,8 +142,8 @@ namespace disney_impl
             real sin_phi_o   = std::sin(phi_o), cos_phi_o = std::cos(phi_o);
             real tan_theta_i = local_angle::tan_theta(lwi);
             real tan_theta_o = local_angle::tan_theta(lwo);
-            real G = microfacet::smith_anisotropic_gtr2(cos_phi_i, sin_phi_i, ax_, ay_, tan_theta_i)
-                   * microfacet::smith_anisotropic_gtr2(cos_phi_o, sin_phi_o, ax_, ay_, tan_theta_o);
+            real G = microfacet::smith_anisotropic_gtr2(cos_phi_i, sin_phi_i, trans_ax_, trans_ay_, tan_theta_i)
+                   * microfacet::smith_anisotropic_gtr2(cos_phi_o, sin_phi_o, trans_ax_, trans_ay_, tan_theta_o);
 
             real sdem = cos_theta_d + eta * dot(lwi, lwh);
             real corr_factor = mode == TM_Radiance ? (1 / eta) : 1;
@@ -495,8 +495,8 @@ namespace disney_impl
             ax_ = std::max(real(0.001), sqr(roughness) / aspect);
             ay_ = std::max(real(0.001), sqr(roughness) * aspect);
 
-            trans_ax_ = (std::max)(real(0.01), sqr(transmission_roughness) / aspect);
-            trans_ay_ = (std::max)(real(0.01), sqr(transmission_roughness) * aspect);
+            trans_ax_ = (std::max)(real(0.001), sqr(transmission_roughness) / aspect);
+            trans_ay_ = (std::max)(real(0.001), sqr(transmission_roughness) * aspect);
 
             clearcoat_ = clearcoat;
             clearcoat_roughness_ = mix(real(0.1), real(0.01), clearcoat_gloss);

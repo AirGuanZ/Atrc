@@ -8,9 +8,9 @@
 #include <agz/tracer/utility/triangle_aux.h>
 #include <agz/common/math.h>
 #include <agz/utility/math.h>
+#include <agz/utility/mesh.h>
 #include <agz/utility/misc.h>
 
-#include "./mesh_loader/loader.h"
 #include "./transformed_geometry.h"
 
 AGZ_TRACER_BEGIN
@@ -100,7 +100,7 @@ public:
             rtcReleaseScene(scene_);
     }
 
-    void initialize(const mesh::Triangle *triangles, size_t triangle_count)
+    void initialize(const mesh::triangle_t *triangles, size_t triangle_count)
     {
         assert(triangles && triangle_count > 0);
         assert(!scene_);
@@ -139,41 +139,41 @@ public:
 
         for(size_t i = 0, j = 0; i < triangle_count; ++i, j += 3)
         {
-            auto &triangle = triangles[i].vtx;
+            auto &triangle = triangles[i].vertices;
 
             for(int k = 0; k < 3; ++k)
             {
-                vertices[j + k].x = triangle[k].pos.x;
-                vertices[j + k].y = triangle[k].pos.y;
-                vertices[j + k].z = triangle[k].pos.z;
+                vertices[j + k].x = triangle[k].position.x;
+                vertices[j + k].y = triangle[k].position.y;
+                vertices[j + k].z = triangle[k].position.z;
                 vertices[j + k].r = 1;
             }
 
             prims_.push_back({
-                triangle[0].pos,
-                triangle[1].pos - triangle[0].pos,
-                triangle[2].pos - triangle[0].pos
+                triangle[0].position,
+                triangle[1].position - triangle[0].position,
+                triangle[2].position - triangle[0].position
             });
 
             indices[i].v0 = static_cast<uint32_t>(j + 0);
             indices[i].v1 = static_cast<uint32_t>(j + 1);
             indices[i].v2 = static_cast<uint32_t>(j + 2);
 
-            Vec3 n_a = triangle[0].nor.normalize();
-            Vec3 n_b = triangle[1].nor.normalize();
-            Vec3 n_c = triangle[2].nor.normalize();
+            Vec3 n_a = triangle[0].normal.normalize();
+            Vec3 n_b = triangle[1].normal.normalize();
+            Vec3 n_c = triangle[2].normal.normalize();
 
             PrimitiveInfo info;
             info.n_a   = n_a;
             info.n_b_a = n_b - n_a;
             info.n_c_a = n_c - n_a;
 
-            info.t_a   = triangle[0].uv;
-            info.t_b_a = triangle[1].uv - triangle[0].uv;
-            info.t_c_a = triangle[2].uv - triangle[0].uv;
+            info.t_a   = triangle[0].tex_coord;
+            info.t_b_a = triangle[1].tex_coord - triangle[0].tex_coord;
+            info.t_c_a = triangle[2].tex_coord - triangle[0].tex_coord;
 
-            Vec3 b_a = triangle[1].pos - triangle[0].pos;
-            Vec3 c_a = triangle[2].pos - triangle[0].pos;
+            Vec3 b_a = triangle[1].position - triangle[0].position;
+            Vec3 c_a = triangle[2].position - triangle[0].position;
             info.z = cross(b_a, c_a).normalize();
             Vec3 mean_nor = n_a + n_b + n_c;
             if(dot(info.z, mean_nor) < 0)
@@ -186,9 +186,9 @@ public:
             areas.push_back(area);
             surface_area_ += area;
 
-            local_bound_ |= triangle[0].pos;
-            local_bound_ |= triangle[1].pos;
-            local_bound_ |= triangle[2].pos;
+            local_bound_ |= triangle[0].position;
+            local_bound_ |= triangle[1].position;
+            local_bound_ |= triangle[2].position;
         }
 
         prim_sampler_.initialize(areas.data(), static_cast<int>(areas.size()));

@@ -14,6 +14,8 @@ using RGBA = math::tcolor4<real>;
 template<typename Pixel>
 using ImageBuffer = texture::texture2d_t<Pixel>;
 
+using DepthBuffer = ImageBuffer<real>;
+
 using Vec2 = math::tvec2<real>;
 using Vec3 = math::tvec3<real>;
 using Vec4 = math::tvec4<real>;
