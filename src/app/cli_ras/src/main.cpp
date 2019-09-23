@@ -2,8 +2,7 @@
 #include <iostream>
 
 #include <agz/rasterizer/depth_tester.h>
-#include <agz/rasterizer/pipeline.h>
-#include <agz/rasterizer/rasterizer.h>
+#include <agz/rasterizer/triangle_pipeline.h>
 #include <agz/utility/image.h>
 #include <agz/utility/mesh.h>
 #include <agz/utility/system.h>
@@ -66,16 +65,9 @@ void run()
         using Input  = Varying;
         using Output = Varying;
 
-        void lerp(const Input &a, const Input &b, real t, Output *output) const
+        void process(const Input &a, const Input &b, real t, real corr_t, Output *output) const
         {
-            output->normal = ((1 - t) * a.normal + t * b.normal).normalize();
-        }
-
-        void process(const Input *input, const real *weight, const real *corrected_weight, Output *output) const
-        {
-            output->normal = corrected_weight[0] * input[0].normal
-                           + corrected_weight[1] * input[1].normal
-                           + corrected_weight[2] * input[2].normal;
+            output->normal = (1 - corr_t) * a.normal + corr_t * b.normal;
         }
     };
 
@@ -121,9 +113,16 @@ void run()
                       * Mat4::look_at({ -2, -10, 2 }, { 0, 0, 0 }, { 0, 0, 1 })
                       * vertex_shader.world;
 
-    TriangleRasterizer rasterizer(interpolator, fragment_shader, depth_tester, output_merger);
-    rasterizer.framebuffer_size = { FB_W, FB_H };
-    Pipeline pipeline(vertex_shader, rasterizer);
+    RasterizerScheduler scheduler(4);
+
+    TrianglePipeline<VertexShader, Interpolator, FragmentShader, DefaultDepthTester, OutputMerger> pipeline;
+    pipeline.set_vertex_shader(&vertex_shader);
+    pipeline.set_fragment_shader(&fragment_shader);
+    pipeline.set_interpolator(&interpolator);
+    pipeline.set_depth_tester(&depth_tester);
+    pipeline.set_output_merger(&output_merger);
+    pipeline.set_scheduler(&scheduler);
+    pipeline.set_framebuffer_size({ FB_W, FB_H });
 
     auto mesh = mesh::load_from_file("./bunny.obj");
     std::vector<Vertex> vertices(mesh.size() * 3);
@@ -140,9 +139,11 @@ void run()
 
     time::clock_t clock;
     clock.restart();
-    color_buffer.clear({});
+    color_buffer.clear({ 0, 1, 1 });
     depth_buffer.clear(1);
-    run_pipeline(pipeline, misc::span<Vertex>(vertices.data(), vertices.size()));
+    //run_pipeline(pipeline, misc::span<Vertex>(vertices.data(), vertices.size()));
+    pipeline.process(vertices.data(), vertices.size());
+    scheduler.sync();
     std::cout << clock.us() / 1000.0f << "ms" << std::endl;
 
     save_color_buffer("./output.png", color_buffer);

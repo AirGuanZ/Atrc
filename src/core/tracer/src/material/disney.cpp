@@ -487,7 +487,7 @@ namespace disney_impl
 
             transmission_  = transmission;
             transmission_roughness_ = transmission_roughness;
-            IOR_           = IOR;
+            IOR_           = (std::max)(real(1.01), IOR);
 
             has_subsurface_ = has_subsurface;
 

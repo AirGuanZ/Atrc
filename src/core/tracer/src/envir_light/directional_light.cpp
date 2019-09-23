@@ -86,37 +86,6 @@ dir [EnvironmentLight]
             return radiance_;
         return {};
     }
-
-    //LightEmitResult emit(const InfiniteLightCore &core, const Sample4 &sam) const noexcept override
-    //{
-    //    LightEmitResult ret;
-
-    //    auto [unit_pos, unit_pos_pdf] = math::distribution::uniform_on_sphere(sam.u, sam.v);
-    //    ret.spt = core.unit_pos_to_spt(unit_pos);
-    //    ret.pdf_pos = unit_pos_pdf / (core.world_radius() * core.world_radius());
-
-    //    auto [local_dir, dir_pdf] = math::distribution::uniform_on_cone(max_cos_theta_, sam.w, sam.r);
-    //    auto global_dir = -local_cone_space_.local_to_global(local_dir);
-    //    ret.dir = global_dir;
-    //    ret.pdf_dir = dir_pdf;
-    //    
-    //    ret.radiance = radiance(-global_dir);
-
-    //    return ret;
-    //}
-
-    //void emit_pdf(const InfiniteLightCore &core, const SurfacePoint &spt, const Vec3 &light_to_out,
-    //              real *pdf_pos, real *pdf_dir) const noexcept override
-    //{
-    //    *pdf_pos = math::distribution::uniform_on_sphere_pdf<real> / (core.world_radius() * core.world_radius());
-    //    Vec3 global_ref_to_light = -light_to_out;
-    //    Vec3 local_ref_to_light = local_cone_space_.global_to_local(global_ref_to_light);
-    //    real cos_theta = local_ref_to_light.normalize().z;
-    //    if(cos_theta >= max_cos_theta_)
-    //        *pdf_dir = math::distribution::uniform_on_cone_pdf(max_cos_theta_);
-    //    else
-    //        *pdf_dir = 0;
-    //}
 };
 
 AGZT_IMPLEMENTATION(EnvirLight, DirectionalEnvironmentLight, "dir")

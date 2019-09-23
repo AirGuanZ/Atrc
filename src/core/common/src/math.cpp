@@ -3,6 +3,6 @@
 namespace agz
 {
 
-real EPS = real(1e-4);
+real EPS = real(3e-4);
 
 }

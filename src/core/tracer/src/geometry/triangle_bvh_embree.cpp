@@ -6,6 +6,7 @@
 #include <agz/tracer/core/geometry.h>
 #include <agz/tracer/core/intersection.h>
 #include <agz/tracer/utility/embree.h>
+#include <agz/tracer/utility/logger.h>
 #include <agz/tracer/utility/triangle_aux.h>
 #include <agz/common/math.h>
 #include <agz/utility/math.h>
@@ -152,7 +153,7 @@ namespace tri_bvh_embree_ws
                     triangle[0].position,
                     triangle[1].position - triangle[0].position,
                     triangle[2].position - triangle[0].position
-                    });
+                });
 
                 indices[i].v0 = static_cast<uint32_t>(j + 0);
                 indices[i].v1 = static_cast<uint32_t>(j + 1);
@@ -291,7 +292,7 @@ namespace tri_bvh_embree_ws
 
 } // namespace tri_bvh_embree
 
-class TriangleBVHEmbreeWS : public Geometry
+class TriangleBVHEmbree : public Geometry
 {
     const tri_bvh_embree_ws::UntransformedTriangleBVH *untransformed_ = nullptr;
     AABB world_bound_;
@@ -315,6 +316,9 @@ class TriangleBVHEmbreeWS : public Geometry
 
         auto ret = arena.create<tri_bvh_embree_ws::UntransformedTriangleBVH>();
         ret->initialize(build_triangles.data(), build_triangles.size());
+
+        AGZ_LOG2("load triangle mesh from ", filename);
+        AGZ_LOG2("triangle count: ", build_triangles.size());
         return ret;
 
         AGZ_HIERARCHY_WRAP("in loading mesh from " + filename)
@@ -409,10 +413,10 @@ triangle_bvh(_embree) [Geometry]
     }
 };
 
-using TriangleBVHEmbreeWS2 = TriangleBVHEmbreeWS;
+using TriangleBVHEmbree2 = TriangleBVHEmbree;
 
-AGZT_IMPLEMENTATION(Geometry, TriangleBVHEmbreeWS, "triangle_bvh")
-AGZT_IMPLEMENTATION(Geometry, TriangleBVHEmbreeWS2, "triangle_bvh_embree")
+AGZT_IMPLEMENTATION(Geometry, TriangleBVHEmbree, "triangle_bvh")
+AGZT_IMPLEMENTATION(Geometry, TriangleBVHEmbree2, "triangle_bvh_embree")
 
 AGZ_TRACER_END
 

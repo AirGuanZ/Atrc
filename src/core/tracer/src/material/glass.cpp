@@ -59,6 +59,7 @@ namespace
                 ret.f *= local_angle::normal_corr_factor(geometry_coord_, shading_coord_, ret.dir);
                 if(has_inf(ret.f))
                     return BSDF_SAMPLE_RESULT_INVALID;
+
                 return ret;
             }
 
@@ -83,6 +84,7 @@ namespace
             ret.f *= local_angle::normal_corr_factor(geometry_coord_, shading_coord_, ret.dir);
             if(has_inf(ret.f))
                 return BSDF_SAMPLE_RESULT_INVALID;
+
             return ret;
         }
 

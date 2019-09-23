@@ -53,4 +53,4 @@ inline bool has_inf(const Spectrum &s) noexcept
     return std::isinf(s.r) || std::isinf(s.g) || std::isinf(s.b);
 }
 
-}
+} // namespace agz

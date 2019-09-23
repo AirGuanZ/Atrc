@@ -3,8 +3,10 @@
 #include <stack>
 #include <vector>
 
-#include <agz/tracer/utility/triangle_aux.h>
+#include <agz/tracer/utility/logger.h>
 #include <agz/tracer/utility/path_manager.h>
+#include <agz/tracer/utility/triangle_aux.h>
+
 #include <agz/utility/math.h>
 #include <agz/utility/mesh.h>
 
@@ -491,9 +493,9 @@ namespace
         }
     };
 
-}
+} // namespace anonymous
 
-class TriangleBVHWS : public Geometry
+class TriangleBVH : public Geometry
 {
     const UntransformedTriangleBVH *untransformed_ = nullptr;
     AABB world_bound_;
@@ -515,6 +517,9 @@ class TriangleBVHWS : public Geometry
 
         auto ret = arena.create<UntransformedTriangleBVH>();
         ret->initialize(build_triangles.data(), static_cast<uint32_t>(build_triangles.size()));
+
+        AGZ_LOG2("load triangle mesh from ", filename);
+        AGZ_LOG2("triangle count: ", build_triangles.size());
         return ret;
 
         AGZ_HIERARCHY_WRAP("in loading mesh from " + filename)
@@ -610,10 +615,10 @@ triangle_bvh(_noembree) [Geometry]
 };
 
 #ifndef USE_EMBREE
-AGZT_IMPLEMENTATION(Geometry, TriangleBVHWS, "triangle_bvh")
+AGZT_IMPLEMENTATION(Geometry, TriangleBVH, "triangle_bvh")
 #endif
 
-using TriangleBVHNOEmbreeWS = TriangleBVHWS;
-AGZT_IMPLEMENTATION(Geometry, TriangleBVHNOEmbreeWS, "triangle_bvh_noembree")
+using TriangleBVHNOEmbree = TriangleBVH;
+AGZT_IMPLEMENTATION(Geometry, TriangleBVHNOEmbree, "triangle_bvh_noembree")
 
 AGZ_TRACER_END
