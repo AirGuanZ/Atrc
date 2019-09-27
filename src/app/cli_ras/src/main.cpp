@@ -115,12 +115,8 @@ void run()
 
     RasterizerScheduler scheduler(4);
 
-    TrianglePipeline<VertexShader, Interpolator, FragmentShader, DefaultDepthTester, OutputMerger> pipeline;
-    pipeline.set_vertex_shader(&vertex_shader);
-    pipeline.set_fragment_shader(&fragment_shader);
-    pipeline.set_interpolator(&interpolator);
-    pipeline.set_depth_tester(&depth_tester);
-    pipeline.set_output_merger(&output_merger);
+    TrianglePipeline pipeline(&vertex_shader, &interpolator, &fragment_shader, &depth_tester, &output_merger);
+
     pipeline.set_scheduler(&scheduler);
     pipeline.set_framebuffer_size({ FB_W, FB_H });
 
@@ -139,11 +135,12 @@ void run()
 
     time::clock_t clock;
     clock.restart();
+
     color_buffer.clear({ 0, 1, 1 });
     depth_buffer.clear(1);
-    //run_pipeline(pipeline, misc::span<Vertex>(vertices.data(), vertices.size()));
     pipeline.process(vertices.data(), vertices.size());
     scheduler.sync();
+
     std::cout << clock.us() / 1000.0f << "ms" << std::endl;
 
     save_color_buffer("./output.png", color_buffer);

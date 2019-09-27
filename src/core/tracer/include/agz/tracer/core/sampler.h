@@ -1,6 +1,5 @@
 ﻿#pragma once
 
-#include <agz/common/math.h>
 #include <agz/tracer/core/object.h>
 
 AGZ_TRACER_BEGIN
@@ -74,7 +73,7 @@ inline Sample5 Sampler::sample5() noexcept
 template<int N>
 SampleN<N> Sampler::SampleN() noexcept
 {
-    ::agz::tracer::SampleN<N> ret;
+    tracer::SampleN<N> ret;
     for(int i = 0; i < N; ++i)
         ret.u[i] = sample1().u;
     return ret;

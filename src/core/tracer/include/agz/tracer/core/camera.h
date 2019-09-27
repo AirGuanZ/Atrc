@@ -31,31 +31,6 @@ struct CameraGenerateRayResult
 };
 
 /**
- * @brief particle tracing中由摄像机对light ray进行采样的返回结果
- */
-struct CameraSampleRayResult
-{
-    Vec3 ref_to_cam;         // 参考点到摄像机的射线方向
-    Vec3 film_pos;           // world space中的摄像机镜头上的点的位置
-    Vec2 film_coord;         // 对应于film上的什么位置（整个film是[0, 1]^2）
-    real importance = 1;     // We值
-    real pdf        = 1;     // w.r.t. solid angle at ref
-    bool is_delta   = false; // pdf是否是delta function
-
-    Vec3 nor;
-
-    bool is_invalid() const noexcept
-    {
-        return !ref_to_cam;
-    }
-};
-
-/**
- * @brief 采样摄像机失败时的返回结果
- */
-inline const CameraSampleRayResult CAMERA_SAMPLE_RAY_RESULT_INVALID = { Vec3(), Vec3(), Vec2(), 0, 0, false };
-
-/**
  * @brief 摄像机接口
  * 
  * 支持以下操作：
@@ -77,11 +52,6 @@ public:
      * @brief 生成一条射线
      */
     virtual CameraGenerateRayResult generate_ray(const CameraSample &sam) const noexcept = 0;
-
-    /**
-     * @brief 采样一条外部某点到camera的射线
-     */
-    virtual CameraSampleRayResult sample(const Vec3 &ref_pos, const Sample2 &sam) const noexcept = 0;
 };
 
 AGZT_INTERFACE(Camera)

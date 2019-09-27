@@ -31,9 +31,9 @@ namespace obj
 
     class Object : public misc::uncopyable_t
     {
-        long object_customed_flag_ = 0;
-
     protected:
+
+        long object_customed_flag_ = DEFAULT_CUSTOMED_FLAG;
 
         void init_customed_flag(const Config &params)
         {
@@ -44,6 +44,8 @@ namespace obj
     public:
 
         using CustomedFlag = long;
+
+        static constexpr CustomedFlag DEFAULT_CUSTOMED_FLAG = 0;
 
         static CustomedFlag str_to_customed_flag(const std::string &str)
         {

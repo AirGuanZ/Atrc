@@ -259,10 +259,33 @@ public:
         fragment_shader_ = nullptr;
         depth_tester_    = nullptr;
         output_merger_   = nullptr;
+
         scheduler_       = nullptr;
 
-        vertex_shader_batch_size_ = 512 * 3;
-        rasterizer_batch_size_    = 256;
+        vertex_shader_batch_size_ = 1024 * 3;
+        rasterizer_batch_size_    = 512;
+
+        worker_ = std::make_shared<Worker>();
+        worker_->pipeline = this;
+    }
+
+    TrianglePipeline(
+        const VertexShader   *vertex_shader,
+        const Interpolator   *interpolator,
+        const FragmentShader *fragment_shader,
+        const DepthTester    *depth_tester,
+        const OutputMerger   *output_merger)
+    {
+        vertex_shader_   = vertex_shader;
+        interpolator_    = interpolator;
+        fragment_shader_ = fragment_shader;
+        depth_tester_    = depth_tester;
+        output_merger_   = output_merger;
+
+        scheduler_ = nullptr;
+
+        vertex_shader_batch_size_ = 1024 * 3;
+        rasterizer_batch_size_ = 512;
 
         worker_ = std::make_shared<Worker>();
         worker_->pipeline = this;
@@ -318,6 +341,18 @@ public:
     void set_framebuffer_size(const Vec2i &framebuffer_size)
     {
         framebuffer_size_ = framebuffer_size;
+    }
+
+    void set_vertex_shader_batch_size(size_t size)
+    {
+        assert(size);
+        vertex_shader_batch_size_ = size * 3;
+    }
+
+    void set_rasterizer_batch_size(size_t size)
+    {
+        assert(size);
+        rasterizer_batch_size_ = size;
     }
 };
 

@@ -4,6 +4,49 @@
 
 AGZ_TRACER_BEGIN
 
+struct TextureCommonParams
+{
+    bool inv_u   = false;
+    bool inv_v   = false;
+    bool swap_uv = false;
+    Transform2 transform;
+
+    std::string wrap_u = "clamp";
+    std::string wrap_v = "clamp";
+
+    real inv_gamma = 1;
+
+    Transform2 full_transform() const noexcept
+    {
+        Transform2 ret;
+
+        if(inv_v)
+            ret *= Transform2::translate(0, 1) * Transform2::scale(1, -1);
+        if(inv_u)
+            ret *= Transform2::translate(1, 0) * Transform2::scale(-1, 1);
+        if(swap_uv)
+            ret *= Transform2(math::tmat3_c<real>(0, 1, 0, 1, 0, 0, 0, 0, 1));
+        return ret * transform;
+    }
+
+    void from_params(const ConfigGroup &params)
+    {
+        inv_u = params.child_int_or("inv_u", 0) != 0;
+        inv_v = params.child_int_or("inv_v", 0) != 0;
+        swap_uv = params.child_int_or("swap_uv", 0) != 0;
+
+        if(params.find_child("transform"))
+            transform = params.child_transform2("transform");
+        else
+            transform = Transform2();
+
+        wrap_u = params.child_str_or("wrap_u", "clamp");
+        wrap_v = params.child_str_or("wrap_v", "clamp");
+
+        inv_gamma = params.child_real_or("inv_gamma", 1);
+    }
+};
+
 /**
  * @brief 纹理接口
  * 
@@ -37,15 +80,40 @@ class Texture : public obj::Object
 
 protected:
 
+    void init_common_params(const TextureCommonParams &params)
+    {
+        transform_ = params.full_transform();
+
+        if(params.wrap_u == "clamp")
+            wrapper_u_ = &wrap_clamp;
+        else if(params.wrap_u == "repeat")
+            wrapper_u_ = &wrap_repeat;
+        else if(params.wrap_u == "mirror")
+            wrapper_u_ = &wrap_mirror;
+        else
+            throw ObjectConstructionException("invalid wrap_u value: " + params.wrap_u + " (expect clamp/repeat/mirror)");
+
+        if(params.wrap_v == "clamp")
+            wrapper_v_ = &wrap_clamp;
+        else if(params.wrap_v == "repeat")
+            wrapper_v_ = &wrap_repeat;
+        else if(params.wrap_v == "mirror")
+            wrapper_v_ = &wrap_mirror;
+        else
+            throw ObjectConstructionException("invalid wrap_v value: " + params.wrap_v + " (expect clamp/repeat/mirror)");
+
+        inv_gamma_ = params.inv_gamma;
+    }
+
     /**
      * @brief 初始化纹理坐标变换和gamma校正
      */
-    void init_transform(const Config &params)
+    void init_common_params(const Config &params)
     {
-        if(auto node = params.find_child("inv_v"); node && node->as_value().as_int())
-            transform_ *= Transform2::translate(0, 1) * Transform2::scale(1, -1) * transform_;
+        /*if(auto node = params.find_child("inv_v"); node && node->as_value().as_int())
+            transform_ *= Transform2::translate(0, 1) * Transform2::scale(1, -1);
         if(auto node = params.find_child("inv_u"); node && node->as_value().as_int())
-            transform_ *= Transform2::translate(1, 0) * Transform2::scale(-1, 1) * transform_;
+            transform_ *= Transform2::translate(1, 0) * Transform2::scale(-1, 1);
         if(auto node = params.find_child("swap_uv"); node && node->as_value().as_int())
             transform_ *= Transform2(math::tmat3_c<real>(0, 1, 0, 1, 0, 0, 0, 0, 1));
         if(params.find_child("transform"))
@@ -78,7 +146,11 @@ protected:
         }
 
         if(auto node = params.find_child("inv_gamma"))
-            inv_gamma_ = node->as_value().as_real();
+            inv_gamma_ = node->as_value().as_real();*/
+
+        TextureCommonParams common_params;
+        common_params.from_params(params);
+        init_common_params(common_params);
     }
 
     virtual Spectrum sample_spectrum_impl(const Vec2 &uv) const noexcept

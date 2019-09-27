@@ -52,11 +52,6 @@ public:
      * @brief 采样入射点xi
      */
     virtual BSSRDFSampleResult sample(TransportMode mode, const Sample4 &sam, Arena &arena) const = 0;
-
-    /**
-     * @brief 求采样到给定入射点的概率密度函数值
-     */
-    virtual real pdf(const SurfacePoint &xi, TransportMode mode) const noexcept = 0;
 };
 
 AGZ_TRACER_END
