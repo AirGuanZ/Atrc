@@ -1,18 +1,17 @@
 ﻿#pragma once
 
 #include <agz/tracer/core/intersection.h>
-#include <agz/tracer/core/object.h>
 
 AGZ_TRACER_BEGIN
 
 /**
  * @brief 世界坐标系中的几何形状
  */
-class Geometry : public obj::Object
+class Geometry
 {
 public:
 
-    using Object::Object;
+    virtual ~Geometry() = default;
 
     /**
      * @brief 给定射线是否与该几何体有交点
@@ -65,7 +64,5 @@ public:
      */
     virtual real pdf(const Vec3 &ref, const Vec3 &pos) const noexcept = 0;
 };
-
-AGZT_INTERFACE(Geometry)
 
 AGZ_TRACER_END

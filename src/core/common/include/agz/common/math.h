@@ -16,8 +16,6 @@ constexpr real REAL_INF = std::numeric_limits<real>::infinity();
 constexpr real REAL_MAX = std::numeric_limits<real>::max();
 constexpr real REAL_MIN = std::numeric_limits<real>::lowest();
 
-extern real EPS;
-
 using Vec2 = math::tvec2<real>;
 using Vec3 = math::tvec3<real>;
 using Vec4 = math::tvec4<real>;

@@ -61,6 +61,7 @@ ADD_SUBDIRECTORY(lib/utility/src)
 ADD_SUBDIRECTORY(src/core/common)
 ADD_SUBDIRECTORY(src/core/rasterizer/)
 ADD_SUBDIRECTORY(src/core/tracer)
+
 ADD_SUBDIRECTORY(src/app/cli)
 ADD_SUBDIRECTORY(src/app/cli_ras)
 ADD_SUBDIRECTORY(src/app/obj_to_scene)

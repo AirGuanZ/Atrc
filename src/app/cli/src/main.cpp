@@ -9,27 +9,52 @@
 #include <agz/tracer/core/post_processor.h>
 #include <agz/tracer/core/renderer.h>
 #include <agz/tracer/core/reporter.h>
-#include <agz/tracer/core/sampler.h>
+#include <agz/tracer/core/scene.h>
+#include <agz/tracer/factory/factory.h>
+#include <agz/tracer/factory/creator/scene_creators.h>
 #include <agz/tracer/utility/logger.h>
-#include <agz/tracer/utility/scene_builder.h>
 #include <agz/tracer/utility/config_cvt.h>
 #include <agz/utility/image.h>
 #include <agz/utility/misc.h>
+#include <agz/utility/string.h>
 
 #ifdef USE_EMBREE
 #   include <agz/tracer/utility/embree.h>
-#endif // #ifdef USE_EMBREE
+#endif
+
+#define WORKING_DIR_PATH_NAME "${working-directory}"
+#define SCENE_DESC_PATH_NAME  "${scene-directory}"
+
+class PathMapper : public agz::tracer::factory::PathMapper
+{
+    std::map<std::string, std::string> replacers_;
+
+public:
+
+    void add_replacer(const std::string &key, const std::string &value)
+    {
+        replacers_[key] = value;
+    }
+
+    std::string map(const std::string &s) const override
+    {
+        std::string ret(s);
+        for(auto &p : replacers_)
+            agz::stdstr::replace_(ret, p.first, p.second);
+        return absolute(std::filesystem::path(ret)).lexically_normal().string();
+    }
+};
 
 struct RenderingSettings
 {
-    agz::tracer::Camera                     *camera   = nullptr;
-    agz::tracer::Film                       *film     = nullptr;
-    agz::tracer::Renderer                   *renderer = nullptr;
-    agz::tracer::ProgressReporter           *reporter = nullptr;
-    std::vector<agz::tracer::PostProcessor*> post_processors;
+    std::shared_ptr<agz::tracer::Camera>                     camera;
+    std::shared_ptr<agz::tracer::Film>                       film;
+    std::shared_ptr<agz::tracer::Renderer>                   renderer;
+    std::shared_ptr<agz::tracer::ProgressReporter>           reporter;
+    std::vector<std::shared_ptr<agz::tracer::PostProcessor>> post_processors;
 };
 
-RenderingSettings parse_rendering_settings(agz::tracer::Config &rendering_config, agz::tracer::obj::ObjectInitContext &obj_init_ctx)
+RenderingSettings parse_rendering_settings(agz::tracer::Config &rendering_config, agz::tracer::factory::CreatingContext &context)
 {
     using namespace agz::tracer;
     using namespace agz;
@@ -47,18 +72,18 @@ RenderingSettings parse_rendering_settings(agz::tracer::Config &rendering_config
 
     AGZ_LOG1("creating camera");
     auto &camera_params = rendering_config.child_group("camera");
-    settings.camera = CameraFactory.create(camera_params, obj_init_ctx);
+    settings.camera = context.create<Camera>(camera_params);
 
     AGZ_LOG1("creating renderer");
     auto &renderer_params = rendering_config.child_group("renderer");
-    settings.renderer = RendererFactory.create(renderer_params, obj_init_ctx);
+    settings.renderer = context.create<Renderer>(renderer_params);
 
     AGZ_LOG1("creating progress reporter");
     auto &reporter_params = rendering_config.child_group("reporter");
-    settings.reporter = ProgressReporterFactory.create(reporter_params, obj_init_ctx);
+    settings.reporter = context.create<ProgressReporter>(reporter_params);
 
     AGZ_LOG1("creating render target");
-    settings.film = FilmFactory.create(film_params, obj_init_ctx);
+    settings.film = context.create<Film>(film_params);
     AGZ_LOG1("resolution: (", film_width, ", ", film_height, ")");
 
     if(auto node = rendering_config.find_child("post_processors"))
@@ -69,9 +94,9 @@ RenderingSettings parse_rendering_settings(agz::tracer::Config &rendering_config
         for(size_t i = 0; i != arr.size(); ++i)
         {
             auto &group = arr.at(i).as_group();
-            if(agz::stdstr::ends_with(group.child_str("type"), "//"))
+            if(stdstr::ends_with(group.child_str("type"), "//"))
                 continue;
-            auto elem = PostProcessorFactory.create(group, obj_init_ctx);
+            auto elem = context.create<PostProcessor>(group);
             settings.post_processors.push_back(elem);
         }
     }
@@ -81,18 +106,14 @@ RenderingSettings parse_rendering_settings(agz::tracer::Config &rendering_config
     return settings;
 }
 
-void render(agz::tracer::Scene &scene, agz::tracer::Config &rendering_settings, const agz::tracer::obj::ObjectInitContext &obj_init_ctx)
+void render(agz::tracer::Scene &scene, agz::tracer::Config &rendering_settings, agz::tracer::factory::CreatingContext &context)
 {
-    agz::tracer::Arena arena;
-    auto init_ctx = obj_init_ctx;
-    init_ctx.arena = &arena;
-
-    auto settings = parse_rendering_settings(rendering_settings, init_ctx);
+    auto settings = parse_rendering_settings(rendering_settings, context);
 
     AGZ_LOG0("start rendering");
     scene.set_camera(settings.camera);
     scene.start_rendering();
-    settings.renderer->render(scene, *settings.reporter, settings.film);
+    settings.renderer->render(scene, *settings.reporter, settings.film.get());
 
     auto img     = settings.film->image();
     auto gbuffer = settings.film->gbuffer();
@@ -121,14 +142,14 @@ void run(int argc, char *argv[])
         });
 #endif
 
-    PathManager path_mgr;
+    PathMapper path_mapper;
     {
         auto working_dir = absolute(fs::current_path()).lexically_normal().string();
-        path_mgr.add_replacer(WORKING_DIR_PATH_NAME, working_dir);
+        path_mapper.add_replacer(WORKING_DIR_PATH_NAME, working_dir);
         AGZ_LOG0("working directory: ", working_dir);
 
         auto scene_dir = absolute(fs::path(params->scene_filename)).parent_path().lexically_normal().string();
-        path_mgr.add_replacer(SCENE_DESC_PATH_NAME, scene_dir);
+        path_mapper.add_replacer(SCENE_DESC_PATH_NAME, scene_dir);
         AGZ_LOG0("scene directory: ", scene_dir);
     }
 
@@ -136,18 +157,16 @@ void run(int argc, char *argv[])
     auto &scene_config       = scene_config_parent.child_group("scene");
     auto &rendering_config   = scene_config_parent.child("rendering");
 
-    Arena arena;
-    obj::ObjectInitContext obj_init_ctx;
-    obj_init_ctx.path_mgr       = &path_mgr;
-    obj_init_ctx.arena          = &arena;
-    obj_init_ctx.reference_root = &scene_config;
+    factory::CreatingContext context;
+    context.path_mapper = &path_mapper;
+    context.reference_root = &scene_config;
 
     AGZ_LOG0("creating scene");
-    Scene *scene = SceneBuilder::build(scene_config, obj_init_ctx);
+    auto scene = factory::build_scene(scene_config, context);
 
     if(rendering_config.is_group())
     {
-        render(*scene, rendering_config.as_group(), obj_init_ctx);
+        render(*scene, rendering_config.as_group(), context);
     }
     else if(rendering_config.is_array())
     {
@@ -155,7 +174,7 @@ void run(int argc, char *argv[])
         for(size_t i = 0; i < arr.size(); ++i)
         {
             AGZ_LOG0("processing rendering config [", i, "]");
-            render(*scene, arr.at_group(i), obj_init_ctx);
+            render(*scene, arr.at_group(i), context);
         }
     }
     else

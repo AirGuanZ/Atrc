@@ -54,7 +54,7 @@ public:
           ConfigGroup& as_group()       override;
     const ConfigGroup& as_group() const override;
 
-    const ConfigNode *find_child(const std::string &name) const;
+    const ConfigNode  *find_child(const std::string &name) const;
     const ConfigGroup *find_child_group(const std::string &name) const;
     const ConfigArray *find_child_array(const std::string &name) const;
     const ConfigValue *find_child_value(const std::string &name) const;
@@ -73,7 +73,12 @@ public:
     Vec3 child_vec3(const std::string &name) const;
     Vec4 child_vec4(const std::string &name) const;
 
-    Spectrum   child_spectrum (const std::string &name) const;
+    Vec2 child_vec2_or(const std::string &name, const Vec2 &default_val) const;
+    Vec3 child_vec3_or(const std::string &name, const Vec3 &default_val) const;
+
+    Spectrum   child_spectrum   (const std::string &name) const;
+    Spectrum   child_spectrum_or(const std::string &name, const Spectrum &default_val) const;
+
     Transform2 child_transform2(const std::string &name) const;
     Transform3 child_transform3(const std::string &name) const;
 

@@ -10,8 +10,8 @@ AGZ_TRACER_BEGIN
  */
 struct BSSRDFSampleResult
 {
-    EntityIntersection inct; // 入射点
-    BSDF *bsdf = nullptr;    // bsdf at wi; only transmission is considered
+    EntityIntersection inct;    // 入射点
+    const BSDF *bsdf = nullptr; // bsdf at wi; only transmission is considered
 
     Spectrum f;              // throughput
     real pdf   = 0;          // pdf w.r.t area
@@ -37,7 +37,7 @@ class BSSRDF : public misc::uncopyable_t
 protected:
 
     EntityIntersection xo_;
-
+    
 public:
 
     explicit BSSRDF(const EntityIntersection &inct) noexcept
@@ -51,7 +51,7 @@ public:
     /**
      * @brief 采样入射点xi
      */
-    virtual BSSRDFSampleResult sample(TransportMode mode, const Sample4 &sam, Arena &arena) const = 0;
+    virtual BSSRDFSampleResult sample(const Vec3 &xo_wi, TransportMode mode, const Sample4 &sam, Arena &arena) const = 0;
 };
 
 AGZ_TRACER_END

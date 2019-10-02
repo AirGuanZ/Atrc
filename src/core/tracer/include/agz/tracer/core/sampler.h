@@ -1,17 +1,17 @@
 ﻿#pragma once
 
-#include <agz/tracer/core/object.h>
+#include <agz/tracer/common.h>
 
 AGZ_TRACER_BEGIN
 
 /**
  * @brief 采样器接口，用于在渲染过程中提供随机数
  */
-class Sampler : public obj::Object
+class Sampler
 {
 public:
 
-    using Object::Object;
+    virtual ~Sampler() = default;
 
     virtual Sample1 sample1() noexcept = 0;
 
@@ -29,8 +29,6 @@ public:
 
     virtual bool next_sample() = 0;
 };
-
-AGZT_INTERFACE(Sampler)
 
 inline Sample2 Sampler::sample2() noexcept
 {

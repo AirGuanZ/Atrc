@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include <agz/tracer/core/intersection.h>
-#include <agz/tracer/core/object.h>
 
 AGZ_TRACER_BEGIN
 
@@ -36,9 +35,11 @@ inline const SampleMediumResult SAMPLE_MEDIUM_RESULT_INVALID = { { }, 0 };
 /**
  * @brief 介质接口
  */
-class Medium : public obj::Object
+class Medium
 {
 public:
+
+    virtual ~Medium() = default;
 
     /**
      * @brief a与b点间的透射比
@@ -55,7 +56,5 @@ public:
      */
     virtual ShadingPoint shade(const MediumIntersection &inct, Arena &arena) const noexcept = 0;
 };
-
-AGZT_INTERFACE(Medium)
 
 AGZ_TRACER_END

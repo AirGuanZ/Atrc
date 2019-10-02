@@ -212,8 +212,6 @@ Atrc使用JSON作为描述场景和渲染设置的配置文件格式。整个JSO
 
 除了这些类型的字段外，其他类型的字段均以JSON对象的语法出现。这些字段除了具有“类型”这一属性外，还具有“类型值”的属性。譬如，一个类型为“Entity”的字段可以出现在任何一个需要“实体”的地方，而该字段的类型值则由它的属性`type`决定，表示该字段具体是哪一种实体。
 
-特别地，每个对象都有一个可选的`customed_flag`字段。该字段是由用户提供的对象标志，其缺省值为0，在渲染时起到的作用由具体的情境决定。比如，在使用`isolated`类型的`Renderer`时，该字段被用于标记场景中需要被特殊对待的`Entity`。而在大多数情况下，该字段不会对渲染过程有任何影响，可以忽略不管。
-
 在后文的叙述中，我将使用简化的表格形式来表示一个对象应包含哪些字段以及这些字段的含义。以整个配置文件中最后出现的后处理器`save_to_png`为例，它的JSON表示是：
 
 ```json
@@ -290,6 +288,10 @@ Atrc使用JSON作为描述场景和渲染设置的配置文件格式。整个JSO
 | up     | Vec3 |        | 用于指定摄像机侧向翻转方向           |
 | width  | real |        | 摄像机传感器方阵在世界坐标系中的宽度 |
 | dist   | real |        | 小孔和传感器方阵间的距离             |
+| height | real |        | 摄像机传感器方阵在世界坐标系中的高度 |
+| aspect | real |        | width/height                         |
+
+`height`与`aspect`参数只需给出一个即可。
 
 小孔摄像机的渲染结果是上下颠倒的，因此通常会和类型为“flip”的后处理器配合。
 
@@ -327,8 +329,6 @@ $$
 | ------ | ------- | ----------- | ---------------------------------------------- |
 | tex    | Texture |             | 描述辐射亮度的纹理对象                         |
 | up     | Vec3    | [ 0, 0, 1 ] | 描述世界空间中哪个方向为“上方”，默认为$+z$方向 |
-
-`ibl`亦名`env`，这是由兼容性问题造成的。
 
 **hdri**
 
@@ -378,12 +378,13 @@ $$
 
 普通的物体，可指定其几何形状、材质和内外介质。
 
-| 字段名   | 类型     | 默认值 | 含义                 |
-| -------- | -------- | ------ | -------------------- |
-| geometry | Geometry |        | 几何形状             |
-| material | Material |        | 实体表面材质         |
-| med_in   | Medium   | void   | 内部介质，默认为真空 |
-| med_out  | Medium   | void   | 外部介质，默认为真空 |
+| 字段名         | 类型     | 默认值 | 含义                             |
+| -------------- | -------- | ------ | -------------------------------- |
+| geometry       | Geometry |        | 几何形状                         |
+| material       | Material |        | 实体表面材质                     |
+| med_in         | Medium   | void   | 内部介质，默认为真空             |
+| med_out        | Medium   | void   | 外部介质，默认为真空             |
+| shadow_catcher | bool     | false  | 是否被标记为shadow catcher类实体 |
 
 ### FilmFilter
 
@@ -499,10 +500,10 @@ Gaussian滤波函数。
 | B         | Vec3        |        | 顶点B的坐标                          |
 | C         | Vec3        |        | 顶点C的坐标                          |
 | D         | Vec3        |        | 顶点D的坐标                          |
-| tA        | Vec2        |        | 顶点A的纹理坐标                      |
-| tB        | Vec2        |        | 顶点B的纹理坐标                      |
-| tC        | Vec2        |        | 顶点C的纹理坐标                      |
-| tD        | Vec2        |        | 顶点D的纹理坐标                      |
+| tA        | Vec2        | (0, 0) | 顶点A的纹理坐标                      |
+| tB        | Vec2        | (0, 0) | 顶点B的纹理坐标                      |
+| tC        | Vec2        | (0, 0) | 顶点C的纹理坐标                      |
+| tD        | Vec2        | (0, 0) | 顶点D的纹理坐标                      |
 
 **sphere**
 
@@ -527,9 +528,9 @@ Gaussian滤波函数。
 | A         | Vec3        |        | 顶点A的坐标                          |
 | B         | Vec3        |        | 顶点B的坐标                          |
 | C         | Vec3        |        | 顶点C的坐标                          |
-| tA        | Vec2        |        | 顶点A的纹理坐标                      |
-| tB        | Vec2        |        | 顶点B的纹理坐标                      |
-| tC        | Vec2        |        | 顶点C的纹理坐标                      |
+| tA        | Vec2        | (0, 0) | 顶点A的纹理坐标                      |
+| tB        | Vec2        | (0, 0) | 顶点B的纹理坐标                      |
+| tC        | Vec2        | (0, 0) | 顶点C的纹理坐标                      |
 
 **triangle_bvh**
 
@@ -570,7 +571,7 @@ Disney Principled BRDF的完整实现，有的参数含义我不知道怎么翻�
 | sheen           | Texture | all_zero | 边缘光泽度                                 |
 | sheen_tint      | Texture | all_zero | 边缘光泽颜色一致性                         |
 | clearcoat       | Texture | all_zero | 清漆强度                                   |
-| clearcoat_gloss | Texture | all_zero | 清漆光泽度                                 |
+| clearcoat_gloss | Texture | all_one  | 清漆光泽度                                 |
 
 *NOTE*：`disney_reflection`对材质的表现范围基本是`disney`的子集，故建议使用后者。
 
@@ -590,7 +591,7 @@ Disney Principled BRDF的完整实现，有的参数含义我不知道怎么翻�
 | sheen                  | Texture | all_zero  | 边缘光泽度，取值范围为$[0,1]$                     |
 | sheen_tint             | Texture | all_zero  | 边缘光泽颜色一致性，取值范围为$[0,1]$             |
 | clearcoat              | Texture | all_zero  | 清漆强度，取值范围为$[0,1]$                       |
-| clearcoat_gloss        | Texture | all_zero  | 清漆光泽度，取值范围为$[0,1]$                     |
+| clearcoat_gloss        | Texture | all_one   | 清漆光泽度，取值范围为$[0,1]$                     |
 | transmission           | Texture | all_zero  | 透明度，取值范围为$[0,1]$                         |
 | transmission_roughness | Texture | roughness | 折射粗糙度，取值范围为$[0, 1]$                    |
 | ior                    | Texture | all_{1.5} | 内外折射率之比，取值范围为$[0,\infty)$            |
@@ -692,12 +693,12 @@ Disney Principled BRDF的完整实现，有的参数含义我不知道怎么翻�
 
 表面绝对光滑的清漆，其内部必须是不透明材质。
 
-| 字段名   | 类型     | 默认值 | 含义             |
-| -------- | -------- | ------ | ---------------- |
-| internal | Material |        | 清漆内部的材质   |
-| eta_in   | Texture  |        | 清漆内部的折射率 |
-| eta_out  | Texture  |        | 清漆外部的折射率 |
-| color    | Texture  |        | 清漆颜色         |
+| 字段名   | 类型     | 默认值  | 含义             |
+| -------- | -------- | ------- | ---------------- |
+| internal | Material |         | 清漆内部的材质   |
+| eta_in   | Texture  |         | 清漆内部的折射率 |
+| eta_out  | Texture  | all_one | 清漆外部的折射率 |
+| color    | Texture  |         | 清漆颜色         |
 
 ### Medium
 
@@ -821,17 +822,16 @@ Disney Principled BRDF的完整实现，有的参数含义我不知道怎么翻�
 | cont_prob               | real     | 0.9    | 追踪时使用RR策略的通过概率                                   |
 | shading_aa              | int      | 1      | 每个geometric sample对应多少个shading sample                 |
 | background_aa           | int      | 1      | 对background entity而言，每个geometric sample对应多少个shadow sample |
-| background_entity_flag  | int      | -1     | background entity的customed flag值                           |
 | background_entity_color | Spectrum | [1]    | background entity的固有颜色                                  |
 | hide_background_entity  | bool     | false  | 将背景物体的颜色用对应方向的环境光替代，仅保留阴影           |
 | worker_count            | int      |        | 工作线程数                                                   |
 | task_grid_size          | int      | 32     | 作为线程任务的像素方格的边长                                 |
 | sampler                 | Sampler  |        | 随机序列采样器                                               |
 
-`isolated`渲染器主要用于针对性地展示少数物体。场景中所有`customed_flag`属性等于`background_entity_flag`的`Entity`都被标记为“背景物体”。渲染器对普通物体和背景物体采用不同的渲染策略：
+`isolated`渲染器主要用于针对性地展示少数物体。场景中所有具有`shadow_catcher`属性的`Entity`都被标记为“背景物体”。渲染器对普通物体和背景物体采用不同的渲染策略：
 
 1. 对普通物体，渲染器将会计算完整的全局光照。对每条camera ray，将进行`shading_aa`次着色采样。
-2. 对背景物体，渲染器将会计算环境光遮蔽值（Ambient Occlusion，AO），并乘以预先指定的颜色`background_entity_color`，作为其着色结果。对每条camera ray，渲染器使用`background_aa`次采样来计算AO值。当开启`hide_background_entity`时，背景物体的颜色会由对应方向的环境光替代。
+2. 对背景物体，渲染器将会计算环境光遮蔽值（Ambient Occlusion，AO），然后乘上预先给定的颜色`background_entity_color`作为着色结果；当`hide_background_entity`开启时，背景物体本身将被隐藏，而其他物体投射到它上面的阴影会被保留
 
 上图中的地面就被标记为了背景物体，其颜色将不受灯光的影响。
 
@@ -839,36 +839,25 @@ Disney Principled BRDF的完整实现，有的参数含义我不知道怎么翻�
 
 `PathTracingIntegrator`用于描述path tracing算法中追踪何种路径。
 
-**direct**
-
-使用Multiple Importance Sampling技术计算直接光照。
-
-| 字段名            | 类型 | 默认值 | 含义                                             |
-| ----------------- | ---- | ------ | ------------------------------------------------ |
-| sample_all_lights | bool | true   | 每次采样时是遍历所有光源还是随机抽取一个进行采样 |
-
 **native**
 
 没有任何优化技巧的暴力路径追踪，支持介质渲染。
 
-| 字段名         | 类型     | 默认值 | 含义                                                         |
-| -------------- | -------- | ------ | ------------------------------------------------------------ |
-| min_depth      | int      | 5      | 使用RR策略前的最小路径深度                                   |
-| max_depth      | int      | 10     | 路径的最大截断深度                                           |
-| cont_prob      | real     | 0.9    | 追踪时使用RR策略的通过概率                                   |
-| background_rad | Spectrum | [-1]   | 背景色，即无任何物体的位置所显示的颜色。含有负值时关闭背景色功能，显示环境光 |
+| 字段名    | 类型 | 默认值 | 含义                       |
+| --------- | ---- | ------ | -------------------------- |
+| min_depth | int  | 5      | 使用RR策略前的最小路径深度 |
+| max_depth | int  | 10     | 路径的最大截断深度         |
+| cont_prob | real | 0.9    | 追踪时使用RR策略的通过概率 |
 
 **mis**
 
 使用Multiple Importance Sampling技术优化的路径追踪，支持介质渲染。
 
-| 字段名            | 类型     | 默认值 | 含义                                                         |
-| ----------------- | -------- | ------ | ------------------------------------------------------------ |
-| min_depth         | int      | 5      | 使用RR策略前的最小路径深度                                   |
-| max_depth         | int      | 10     | 路径的最大截断深度                                           |
-| cont_prob         | real     | 0.9    | 追踪时使用RR策略的通过概率                                   |
-| sample_all_lights | bool     | true   | 每次采样时是遍历所有光源还是随机抽取一个进行采样             |
-| background_rad    | Spectrum | [-1]   | 背景色，即无任何物体的位置所显示的颜色。含有负值时关闭背景色功能，显示环境光 |
+| 字段名    | 类型 | 默认值 | 含义                       |
+| --------- | ---- | ------ | -------------------------- |
+| min_depth | int  | 5      | 使用RR策略前的最小路径深度 |
+| max_depth | int  | 10     | 路径的最大截断深度         |
+| cont_prob | real | 0.9    | 追踪时使用RR策略的通过概率 |
 
 ### ProgressReporter
 
@@ -916,14 +905,11 @@ Disney Principled BRDF的完整实现，有的参数含义我不知道怎么翻�
 
 棋盘网格纹理，主要用于测试uv。
 
-| 字段名     | 类型     | 默认值 | 含义                              |
-| ---------- | -------- | ------ | --------------------------------- |
-| grid_count | real     |        | 棋盘上一条边上被分了多少格        |
-| grid_size  | real     |        | $[0, 1]^2$ uv平面上单个格子的边长 |
-| color_1    | Spectrum | [ 0 ]  | 一种格子的颜色                    |
-| color_2    | Spectrum | [ 1 ]  | 另一种各自的颜色                  |
-
-`grid_count`和`grid_size`中只需给出一个即可，在语义上它们满足`grid_count * grid_size = 1`。
+| 字段名     | 类型     | 默认值 | 含义                       |
+| ---------- | -------- | ------ | -------------------------- |
+| grid_count | real     |        | 棋盘上一条边上被分了多少格 |
+| color1     | Spectrum | [ 0 ]  | 一种格子的颜色             |
+| color2     | Spectrum | [ 1 ]  | 另一种各自的颜色           |
 
 **constant**
 

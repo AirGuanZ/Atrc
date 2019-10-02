@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include <agz/tracer/core/intersection.h>
-#include <agz/tracer/core/object.h>
 
 AGZ_TRACER_BEGIN
 
@@ -27,18 +26,16 @@ public:
 /**
  * @brief 材质中的fresnel项，用于接受uv以得到特定点的FresnelPoint
  */
-class Fresnel : public obj::Object
+class Fresnel
 {
 public:
 
-    using Object::Object;
+    virtual ~Fresnel() = default;
 
     /**
      * @brief 取得指定点处的fresnel point对象
      */
     virtual FresnelPoint *get_point(const Vec2 &uv, Arena &arena) const = 0;
 };
-
-AGZT_INTERFACE(Fresnel)
 
 AGZ_TRACER_END

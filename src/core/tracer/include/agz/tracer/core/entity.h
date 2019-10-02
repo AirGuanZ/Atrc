@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include <agz/tracer/core/intersection.h>
-#include <agz/tracer/core/object.h>
 
 AGZ_TRACER_BEGIN
 
@@ -12,11 +11,11 @@ class AreaLight;
  * 
  * 所有的实体都被定义在世界坐标系中，原则上不允许实体间出现任何直接或间接的嵌套结构
  */
-class Entity : public obj::Object
+class Entity
 {
 public:
 
-    using Object::Object;
+    virtual ~Entity() = default;
 
     /** @brief 判断给定射线是否与该实体有交点 */
     virtual bool has_intersection(const Ray &r) const noexcept = 0;
@@ -45,8 +44,13 @@ public:
      * @brief 返回自身作为area_light的接口。若并非光源，则返回nullptr。
      */
     virtual AreaLight *as_light() noexcept = 0;
-};
 
-AGZT_INTERFACE(Entity)
+    /**
+     * @brief 是否是shadow catcher
+     * 
+     * shadow catcher效果需要renderer方面的支持
+     */
+    virtual bool is_shadow_catcher() const noexcept { return false; }
+};
 
 AGZ_TRACER_END

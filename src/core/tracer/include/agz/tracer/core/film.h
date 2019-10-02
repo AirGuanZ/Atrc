@@ -4,7 +4,6 @@
 
 #include <agz/tracer/core/gbuffer.h>
 #include <agz/common/math.h>
-#include <agz/tracer/core/object.h>
 #include <agz/utility/texture.h>
 
 AGZ_TRACER_BEGIN
@@ -36,11 +35,11 @@ public:
     virtual void add_sample(const Vec2 &pos, const Spectrum &value, const GBufferPixel &gpixel, real w = 1) = 0;
 };
 
-class Film : public obj::Object
+class Film
 {
 public:
 
-    using Object::Object;
+    virtual ~Film() = default;
 
     /**
      * 要求实现是线程安全的
@@ -76,7 +75,5 @@ public:
      */
     virtual Vec2i resolution() const noexcept = 0;
 };
-
-AGZT_INTERFACE(Film)
 
 AGZ_TRACER_END

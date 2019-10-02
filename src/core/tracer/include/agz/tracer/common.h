@@ -10,7 +10,12 @@
 #define AGZ_ANONYMOUS_NAMESPACE_BEGIN namespace {
 #define AGZ_ANONYMOUS_NAMESPACE_END   }
 
+#define AGZ_TRACER_FACTORY_BEGIN namespace agz::tracer::factory {
+#define AGZ_TRACER_FACTORY_END   }
+
 AGZ_TRACER_BEGIN
+
+extern real EPS;
 
 using Arena = alloc::releaser_t;
 

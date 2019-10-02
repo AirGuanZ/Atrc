@@ -183,7 +183,7 @@ class TrianglePipeline
 
                     Varying t_varying;
                     t_varying.agz_depth = interpolated_varying.agz_depth;
-                    if(gamma > EPS)
+                    if(gamma > real(0.0001))
                     {
                         real lerp_weight = alpha / (gamma + alpha);
                         real corr_lerp_weight = corrected_alpha / (corrected_gamma + corrected_alpha);

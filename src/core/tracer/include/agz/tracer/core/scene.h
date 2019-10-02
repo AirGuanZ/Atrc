@@ -3,7 +3,6 @@
 #include <agz/tracer/core/aggregate.h>
 #include <agz/tracer/core/scattering.h>
 #include <agz/common/math.h>
-#include <agz/tracer/core/object.h>
 
 AGZ_TRACER_BEGIN
 
@@ -31,7 +30,7 @@ struct SceneSampleLightResult
 struct SampleScatteringResult
 {
     ScatteringPoint pnt;                  // 散射点
-    real pdf;                             // 采样到该点的pdf
+    real pdf = 0;                         // 采样到该点的pdf
     bool *p_has_inct           = nullptr; // 用于输出该r与场景实体是否有交点，可为nullptr
     EntityIntersection *p_inct = nullptr; // 用于输出该r与场景实体的首个交点，在p_has_inct不为空时必须不为空
 };
@@ -41,26 +40,29 @@ struct SampleScatteringResult
  *
  * 除非专门指明，否则Scene不拥有任何传递给它的Object的所有权
  */
-class Scene : public obj::Object
+class Scene
 {
 public:
 
-    using Object::Object;
+    virtual ~Scene() = default;
 
     /** @brief 设置当前使用的摄像机 */
-    virtual void set_camera(const Camera *camera) = 0;
+    virtual void set_camera(std::shared_ptr<const Camera> camera) = 0;
 
     /** @brief 当前使用的摄像机，若未设置过则返回nullptr */
     virtual const Camera *camera() const noexcept = 0;
 
-    /** @brief 在场景中添加一个新的实体 */
+    /** @brief 在场景中添加一个新的光源，并持有其所有权 */
+    virtual void add_light(std::shared_ptr<Light> light) = 0;
+
+    /** @brief 在场景中添加一个新的光源 */
     virtual void add_light(Light *light) = 0;
 
     /** @brief 设置entity aggregate */
-    virtual void set_aggregate(const Aggregate *aggregate) = 0;
+    virtual void set_aggregate(std::shared_ptr<const Aggregate> aggregate) = 0;
 
     /** @brief 设置环境光源 */
-    virtual void set_env_light(EnvirLight *env_light) = 0;
+    virtual void set_env_light(std::shared_ptr<EnvirLight> env_light) = 0;
 
     /** @brief 场景中光源的数量 */
     virtual size_t light_count() const noexcept = 0;
@@ -133,7 +135,5 @@ public:
     /** @brief 开始渲染前的回调，用于做各种必要的初始化 */
     virtual void start_rendering() = 0;
 };
-
-AGZT_INTERFACE(Scene)
 
 AGZ_TRACER_END

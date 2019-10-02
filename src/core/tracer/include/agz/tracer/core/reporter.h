@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include <agz/tracer/core/film.h>
-#include <agz/tracer/core/object.h>
 
 AGZ_TRACER_BEGIN
 
@@ -15,11 +14,11 @@ AGZ_TRACER_BEGIN
  *  { reporter.new_stage(); reporter.end_stage(); }*
  *  reporter.end();
  */
-class ProgressReporter : public obj::Object
+class ProgressReporter
 {
 public:
 
-    using Object::Object;
+    virtual ~ProgressReporter() = default;
 
     /**
      * @brief 汇报进度数据
@@ -70,7 +69,5 @@ public:
      */
     virtual double last_stage_seconds() = 0;
 };
-
-AGZT_INTERFACE(ProgressReporter)
 
 AGZ_TRACER_END

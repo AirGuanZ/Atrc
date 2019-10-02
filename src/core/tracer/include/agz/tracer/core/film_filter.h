@@ -1,7 +1,6 @@
 ﻿#pragma once
 
-#include <agz/common/math.h>
-#include <agz/tracer/core/object.h>
+#include <agz/tracer/common.h>
 
 AGZ_TRACER_BEGIN
 
@@ -10,11 +9,11 @@ AGZ_TRACER_BEGIN
  * 
  * 参见 http://alvyray.com/Memos/CG/Microsoft/6_pixel.pdf
  */
-class FilmFilter : public obj::Object
+class FilmFilter
 {
 public:
 
-    using Object::Object;
+    virtual ~FilmFilter() = default;
 
     /**
      * @brief 最大有效半径，以pixel为单位
@@ -26,7 +25,5 @@ public:
      */
     virtual real eval(real x, real y) const noexcept = 0;
 };
-
-AGZT_INTERFACE(FilmFilter)
 
 AGZ_TRACER_END

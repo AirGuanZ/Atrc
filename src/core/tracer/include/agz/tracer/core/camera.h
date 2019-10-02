@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include <agz/tracer/core/object.h>
+#include <agz/tracer/common.h>
 
 AGZ_TRACER_BEGIN
 
@@ -37,11 +37,11 @@ struct CameraGenerateRayResult
  * - 给定film坐标，生成一条radiance ray，带有We值和pdf
  * - 给定ref点，给一条从ref点到camera的采样射线，附带We值和pdf
  */
-class Camera : public obj::Object
+class Camera
 {
 public:
 
-    using Object::Object;
+    virtual ~Camera() = default;
 
     /**
      * @brief 摄像机在world space中的bounding box
@@ -53,7 +53,5 @@ public:
      */
     virtual CameraGenerateRayResult generate_ray(const CameraSample &sam) const noexcept = 0;
 };
-
-AGZT_INTERFACE(Camera)
 
 AGZ_TRACER_END

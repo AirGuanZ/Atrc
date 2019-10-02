@@ -1,6 +1,7 @@
 ﻿#pragma once
 
-#include <agz/tracer/core/object.h>
+#include <agz/tracer/common.h>
+#include <agz/tracer/utility/config.h>
 
 AGZ_TRACER_BEGIN
 
@@ -52,7 +53,7 @@ struct TextureCommonParams
  * 
  * sample_spectrum和sample_real中至少要实现一个
  */
-class Texture : public obj::Object
+class Texture
 {
     Transform2 transform_;
 
@@ -105,54 +106,6 @@ protected:
         inv_gamma_ = params.inv_gamma;
     }
 
-    /**
-     * @brief 初始化纹理坐标变换和gamma校正
-     */
-    void init_common_params(const Config &params)
-    {
-        /*if(auto node = params.find_child("inv_v"); node && node->as_value().as_int())
-            transform_ *= Transform2::translate(0, 1) * Transform2::scale(1, -1);
-        if(auto node = params.find_child("inv_u"); node && node->as_value().as_int())
-            transform_ *= Transform2::translate(1, 0) * Transform2::scale(-1, 1);
-        if(auto node = params.find_child("swap_uv"); node && node->as_value().as_int())
-            transform_ *= Transform2(math::tmat3_c<real>(0, 1, 0, 1, 0, 0, 0, 0, 1));
-        if(params.find_child("transform"))
-            transform_ *= params.child_transform2("transform");
-
-        if(auto node = params.find_child("wrap_u"))
-        {
-            auto &wrapper = node->as_value().as_str();
-            if(wrapper == "clamp")
-                wrapper_u_ = &wrap_clamp;
-            else if(wrapper == "repeat")
-                wrapper_u_ = &wrap_repeat;
-            else if(wrapper == "mirror")
-                wrapper_u_ = &wrap_mirror;
-            else
-                throw ObjectConstructionException("invalid wrap_u value: " + wrapper + " (expect clamp/repeat/mirror)");
-        }
-
-        if(auto node = params.find_child("wrap_v"))
-        {
-            auto &wrapper = node->as_value().as_str();
-            if(wrapper == "clamp")
-                wrapper_v_ = &wrap_clamp;
-            else if(wrapper == "repeat")
-                wrapper_v_ = &wrap_repeat;
-            else if(wrapper == "mirror")
-                wrapper_v_ = &wrap_mirror;
-            else
-                throw ObjectConstructionException("invalid wrap_v value: " + wrapper + " (expect clamp/repeat/mirror)");
-        }
-
-        if(auto node = params.find_child("inv_gamma"))
-            inv_gamma_ = node->as_value().as_real();*/
-
-        TextureCommonParams common_params;
-        common_params.from_params(params);
-        init_common_params(common_params);
-    }
-
     virtual Spectrum sample_spectrum_impl(const Vec2 &uv) const noexcept
     {
         return Spectrum(sample_real_impl(uv));
@@ -165,7 +118,7 @@ protected:
 
 public:
 
-    using Object::Object;
+    virtual ~Texture() = default;
 
     /**
      * @brief 采样特定uv点处的Spectrum
@@ -208,7 +161,5 @@ public:
      */
     virtual int height() const noexcept = 0;
 };
-
-AGZT_INTERFACE(Texture)
 
 AGZ_TRACER_END

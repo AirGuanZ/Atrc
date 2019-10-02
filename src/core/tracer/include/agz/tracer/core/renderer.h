@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include <agz/tracer/core/film.h>
-#include <agz/tracer/core/object.h>
 
 AGZ_TRACER_BEGIN
 
@@ -11,11 +10,11 @@ class Scene;
 /**
  * @brief 渲染器接口，负责将场景转换为图像
  */
-class Renderer : public obj::Object
+class Renderer
 {
 public:
 
-    using Object::Object;
+    virtual ~Renderer() = default;
 
     /**
      * @brief 阻塞式渲染
@@ -50,7 +49,5 @@ public:
         throw std::runtime_error("Renderer::async rendering is unimplemented");
     }
 };
-
-AGZT_INTERFACE(Renderer)
 
 AGZ_TRACER_END

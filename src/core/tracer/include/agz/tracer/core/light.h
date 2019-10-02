@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include <agz/tracer/core/intersection.h>
-#include <agz/tracer/core/object.h>
 
 AGZ_TRACER_BEGIN
 
@@ -118,7 +117,7 @@ struct EnvirLightSampleResult
 /**
  * @brief 环境光源接口
  */
-class EnvirLight : public obj::Object, public Light
+class EnvirLight : public Light
 {
 protected:
 
@@ -153,7 +152,5 @@ public:
      */
     virtual Spectrum radiance(const Vec3 &ref, const Vec3 &ref_to_light) const noexcept = 0;
 };
-
-AGZT_INTERFACE(EnvirLight)
 
 AGZ_TRACER_END

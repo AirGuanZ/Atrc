@@ -35,14 +35,14 @@ class TriangleClipper
             return pos.z <= pos.w;
         if constexpr(CLIP_PLANE == ClipPlane::NegZ)
             return pos.z >= -pos.w;
-        return pos.w >= EPS;
+        return pos.w >= real(0.0001);
     }
 
     template<ClipPlane CLIP_PLANE>
     static real inct_ratio(const Vec4 &last, const Vec4 &curr) noexcept
     {
         if(CLIP_PLANE == ClipPlane::PosW)
-            return (last.w - EPS) / (last.w - curr.w);
+            return (last.w - real(0.0001)) / (last.w - curr.w);
         if(CLIP_PLANE == ClipPlane::PosX)
             return (last.w - last.x) / ((last.w - last.x) - (curr.w - curr.x));
         if(CLIP_PLANE == ClipPlane::NegX)
