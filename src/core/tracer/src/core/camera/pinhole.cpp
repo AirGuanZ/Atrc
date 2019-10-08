@@ -62,21 +62,12 @@ public:
 
     CameraGenerateRayResult generate_ray(const CameraSample &sam) const noexcept override
     {
-        CameraGenerateRayResult ret;
-
         Vec3 dst = film_left_bottom_ + sam.film_coord.u * x_ori_ + sam.film_coord.v * y_ori_;
         Vec3 dir = (dst - pos_).normalize();
 
-        real cos_v = cos(dir, dir_);
-
-        ret.r            = Ray(pos_, dir);
-        ret.pdf_pos      = 1 / film_area_in_world_space_;
-        ret.is_pos_delta = false;
-        ret.pdf_dir      = dist_ * dist_ / (cos_v * cos_v * cos_v);
-        ret.is_dir_delta = true;
-        ret.importance   = dist_ * dist_ / (film_area_in_world_space_ * cos_v * cos_v * cos_v * cos_v);
-        ret.nor          = dir_;
-
+        CameraGenerateRayResult ret;
+        ret.r          = Ray(pos_, dir);
+        ret.throughput = Spectrum(1);
         return ret;
     }
 };

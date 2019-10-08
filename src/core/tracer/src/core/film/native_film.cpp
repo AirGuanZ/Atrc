@@ -75,6 +75,21 @@ public:
         gbuffer_.binary  ->at(ly, lx) += w * gpixel.binary;
         weights_(ly, lx)  += w;
     }
+
+    int x_size() const noexcept { return grid_x_end_ - grid_x_beg_; }
+
+    int y_size() const noexcept { return grid_y_end_ - grid_y_beg_; }
+
+    void clear()
+    {
+        values_.clear({});
+        weights_.clear(0);
+        gbuffer_.albedo->clear({});
+        gbuffer_.position->clear({});
+        gbuffer_.normal->clear({});
+        gbuffer_.depth->clear(0);
+        gbuffer_.binary->clear(0);
+    }
 };
 
 class NativeFilm : public Film
@@ -85,8 +100,6 @@ class NativeFilm : public Film
     weight_data_t weights_;
 
     GBuffer gbuffer_;
-
-    std::mutex mut_;
 
 public:
 
@@ -107,10 +120,9 @@ public:
         AGZ_HIERARCHY_WRAP("in initializing native film")
     }
 
-    void merge_grid(FilmGrid &&grid) override
+    void merge_grid(const FilmGrid &grid) override
     {
         auto &tgrid = dynamic_cast<const NativeFilmGrid&>(grid);
-        std::lock_guard<std::mutex> lk(mut_);
 
         for(int y = tgrid.grid_y_beg_; y < tgrid.grid_y_end_; ++y)
         {
@@ -130,29 +142,25 @@ public:
         }
     }
 
-    void add_grid(FilmGrid &&grid, const Spectrum &weight) override
-    {
-        auto &tgrid = dynamic_cast<const NativeFilmGrid&>(grid);
-        std::lock_guard<std::mutex> lk(mut_);
-
-        for(int y = tgrid.grid_y_beg_; y < tgrid.grid_y_end_; ++y)
-        {
-            int ly = y - tgrid.grid_y_beg_;
-            for(int x = tgrid.grid_x_beg_; x < tgrid.grid_x_end_; ++x)
-            {
-                int lx = x - tgrid.grid_x_beg_;
-
-                real rhs_w = tgrid.weights_(ly, lx);
-                Spectrum rhs = rhs_w ? weight * tgrid.values_(ly, lx) / rhs_w : Spectrum(0);
-
-                values_(y, x) += weights_(y, x) * rhs;
-            }
-        }
-    }
-
     std::unique_ptr<FilmGrid> new_grid(int x_beg, int x_end, int y_beg, int y_end) const override
     {
         return std::make_unique<NativeFilmGrid>(x_beg, x_end, y_beg, y_end);
+    }
+
+    std::unique_ptr<FilmGrid> renew_grid(int x_beg, int x_end, int y_beg, int y_end, std::unique_ptr<FilmGrid>&& old_grid) const override
+    {
+        auto *old = dynamic_cast<NativeFilmGrid*>(old_grid.get());
+        int x_size = x_end - x_beg, y_size = y_end - y_beg;
+        
+        if(x_size != old->x_size() || y_size != old->y_size())
+            return new_grid(x_beg, x_end, y_beg, y_end);
+
+        old->clear();
+        old->grid_x_beg_ = x_beg;
+        old->grid_x_end_ = x_end;
+        old->grid_y_beg_ = y_beg;
+        old->grid_y_end_ = y_end;
+        return std::move(old_grid);
     }
 
     texture::texture2d_t<Spectrum> image() const override

@@ -13,7 +13,7 @@ AGZ_TRACER_BEGIN
 class Aggregate;
 class Camera;
 class Entity;
-class EnvirLight;
+class NonareaLight;
 class Film;
 class FilmFilter;
 class Fresnel;
@@ -89,7 +89,7 @@ class CreatingContext
         Aggregate,
         Camera,
         Entity,
-        EnvirLight,
+        NonareaLight,
         Film,
         FilmFilter,
         Fresnel,

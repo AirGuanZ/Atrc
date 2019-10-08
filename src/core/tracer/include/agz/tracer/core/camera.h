@@ -19,15 +19,7 @@ struct CameraSample
 struct CameraGenerateRayResult
 {
     Ray r;
-    real importance = 1;
-
-    real pdf_pos;
-    bool is_pos_delta;
-
-    real pdf_dir;
-    bool is_dir_delta;
-
-    Vec3 nor;
+    Spectrum throughput;
 };
 
 /**

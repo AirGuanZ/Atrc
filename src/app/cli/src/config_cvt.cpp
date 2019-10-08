@@ -1,7 +1,7 @@
-#include <agz/tracer/utility/config_cvt.h>
+#include <agz/cli/config_cvt.h>
 
-namespace agz::tracer
-{
+using namespace agz;
+using namespace tracer;
 
 namespace
 {
@@ -100,5 +100,3 @@ Config json_to_config(const JSON &json)
     assert(json.is_object());
     return from_json_impl(json)->as_group();
 }
-
-} // namespace agz::tracer

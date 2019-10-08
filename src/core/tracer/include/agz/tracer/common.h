@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdexcept>
+
 #include <agz/common/math.h>
 #include <agz/utility/common/common.h>
 #include <agz/utility/alloc.h>

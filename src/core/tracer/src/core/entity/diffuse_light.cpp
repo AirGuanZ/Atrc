@@ -25,19 +25,20 @@ namespace
             medium_interface_ = med;
         }
 
-        AreaLightSampleResult sample(const Vec3 &ref, const Sample5 &sam) const noexcept override
+        LightSampleResult sample(const Vec3 &ref, const Sample5 &sam) const noexcept override
         {
             real pdf_area;
             auto spt = geometry_->sample(ref, &pdf_area, { sam.u, sam.v, sam.r });
 
             if(dot(spt.geometry_coord.z, ref - spt.pos) <= 0)
-                return AREA_LIGHT_SAMPLE_RESULT_NULL;
+                return LIGHT_SAMPLE_RESULT_NULL;
 
             Vec3 spt_to_ref = ref - spt.pos;
             real dist2 = spt_to_ref.length_square();
 
-            AreaLightSampleResult ret;
-            ret.spt      = spt;
+            LightSampleResult ret;
+            ret.pos      = spt.pos;
+            ret.ref      = ref;
             ret.radiance = radiance_;
             ret.pdf      = pdf_area * dist2 / std::abs(cos(spt.geometry_coord.z, spt_to_ref));
             ret.is_delta = false;

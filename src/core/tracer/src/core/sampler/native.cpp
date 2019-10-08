@@ -8,7 +8,7 @@ AGZ_TRACER_BEGIN
 
 class NativeSampler : public Sampler
 {
-    using rng_t = std::mt19937;
+    using rng_t = std::minstd_rand;
     using seed_t = rng_t::result_type;
 
     seed_t seed_ = 42;

@@ -135,9 +135,27 @@ namespace material
 
         std::shared_ptr<Material> create(const ConfigGroup &params, CreatingContext &context) const override
         {
-            auto color_map = context.create<Texture>(params.child_group("color_map"));
             auto fresnel = context.create<Fresnel>(params.child_group("fresnel"));
-            return create_glass(std::move(color_map), std::move(fresnel));
+
+            std::shared_ptr<Texture> color_reflection_map, color_refraction_map;
+
+            if(auto color_map_node = params.find_child_group("color_map"))
+            {
+                auto color_map = context.create<Texture>(*color_map_node);
+                color_reflection_map = color_map;
+                color_refraction_map = color_map;
+            }
+
+            if(auto color_reflection_map_node = params.find_child_group("color_reflection_map"))
+                color_reflection_map = context.create<Texture>(*color_reflection_map_node);
+
+            if(auto color_refraction_map_node = params.find_child_group("color_refraction_map"))
+                color_refraction_map = context.create<Texture>(*color_refraction_map_node);
+
+            if(!color_reflection_map || !color_refraction_map)
+                throw CreatingObjectException("empty color reflection/refraction map");
+
+            return create_glass(std::move(color_reflection_map), std::move(color_refraction_map), std::move(fresnel));
         }
     };
 

@@ -6,16 +6,17 @@
 #include <agz/tracer/core/material.h>
 #include <agz/tracer/core/path_tracing_integrator.h>
 #include <agz/tracer/core/sampler.h>
-#include <agz/tracer/core/scattering.h>
 #include <agz/tracer/core/scene.h>
 #include <agz/utility/misc.h>
 
+#include "./mis_light_bsdf.h"
+
 AGZ_TRACER_BEGIN
 
-class NativeVolumetricPathTracingIntegrator : public PathTracingIntegrator
+class VolumetricPathTracingIntegrator : public PathTracingIntegrator
 {
     int min_depth_ = 5;
-    int max_depth_ = 20;
+    int max_depth_ = 10;
     real cont_prob_ = real(0.9);
 
 public:
@@ -24,7 +25,7 @@ public:
     {
         AGZ_HIERARCHY_TRY
 
-            min_depth_ = min_depth;
+        min_depth_ = min_depth;
         if(min_depth_ < 1)
             throw ObjectConstructionException("invalid min depth value: " + std::to_string(min_depth_));
 
@@ -36,12 +37,11 @@ public:
         if(cont_prob_ < 0 || cont_prob_ > 1)
             throw ObjectConstructionException("invalid continue prob value: " + std::to_string(cont_prob_));
 
-        AGZ_HIERARCHY_WRAP("in initializing volumetric path tracing integrator")
+        AGZ_HIERARCHY_WRAP("in initializing volumetric mis path tracing integrator")
     }
 
     Spectrum eval(GBufferPixel *gpixel, const Scene &scene, const Ray &ray, Sampler &sampler, Arena &arena) const override
     {
-        auto env = scene.env();
         Spectrum ret, coef(1);
         Ray r = ray;
 
@@ -54,13 +54,21 @@ public:
                 coef /= cont_prob_;
             }
 
-            bool has_ent_inct; EntityIntersection ent_inct;
+            bool has_ent_inct;  EntityIntersection ent_inct;
             SampleScatteringResult scattering_sample;
             scattering_sample.p_has_inct = &has_ent_inct;
-            scattering_sample.p_inct     = &ent_inct;
+            scattering_sample.p_inct = &ent_inct;
             if(!scene.next_scattering_point(r, &scattering_sample, sampler.sample1(), arena))
             {
-                ret += coef * env->radiance(r.o, r.d);
+                if(depth == 1)
+                {
+                    for(auto light : scene.nonarea_lights())
+                    {
+                        // 没有scattering point时必然没有medium，因此不需要乘上tr
+                        Spectrum light_f = light->radiance(r.o, r.d);
+                        ret += coef * light_f;
+                    }
+                }
                 return ret;
             }
             auto &pnt = scattering_sample.pnt;
@@ -69,24 +77,30 @@ public:
             Spectrum tr = medium->tr(r.o, pnt.pos());
             coef *= tr / scattering_sample.pdf;
 
-            if(depth == 1 && has_ent_inct)
+            if(depth == 1)
             {
+                if(has_ent_inct)
+                {
+                    gpixel->albedo   = ent_inct.material->shade(ent_inct, arena).bsdf->albedo();
+                    gpixel->position = ent_inct.pos;
+                    gpixel->normal   = ent_inct.user_coord.z;
+                    gpixel->depth    = r.d.length() * ent_inct.t;
+                    gpixel->binary   = 1;
+                }
+
                 if(pnt.is_on_surface())
-                    gpixel->albedo = pnt.bsdf()->albedo();
-                else
-                    gpixel->albedo = ent_inct.material->shade(ent_inct, arena).bsdf->albedo();
-                gpixel->position = ent_inct.pos;
-                gpixel->normal   = ent_inct.user_coord.z;
-                gpixel->depth    = r.d.length() * ent_inct.t;
-                gpixel->binary   = 1;
+                {
+                    auto inct = pnt.as_entity_inct();
+                    if(auto light = inct.entity->as_light())
+                        ret += coef * light->radiance(inct, inct.wr);
+                }
             }
 
-            if(pnt.is_on_surface())
-            {
-                auto inct = pnt.as_entity_inct();
-                if(auto light = inct.entity->as_light())
-                    ret += coef * light->radiance(inct, inct.wr);
-            }
+            Spectrum ld;
+            for(auto light : scene.lights())
+                ld += coef * mis_sample_light(scene, light, pnt, sampler.sample5());
+            ld += coef * mis_sample_scattering(scene, pnt, sampler.sample3());
+            ret += ld;
 
             BSDFSampleResult bsdf_sample = pnt.sample(pnt.wr(), sampler.sample3(), TM_Radiance);
             if(!bsdf_sample.f || bsdf_sample.pdf < EPS)
@@ -116,6 +130,11 @@ public:
                 coef *= bssrdf_sample.f / bssrdf_sample.pdf;
 
                 auto new_pnt = ScatteringPoint(bssrdf_sample.inct, bssrdf_sample.bsdf);
+
+                for(auto light : scene.lights())
+                    ret += coef * mis_sample_light(scene, light, new_pnt, sampler.sample5());
+                ret += coef * mis_sample_scattering(scene, new_pnt, sampler.sample3());
+
                 BSDFSampleResult new_bsdf_sample = new_pnt.sample(new_pnt.wr(), sampler.sample3(), TM_Radiance);
                 if(!new_bsdf_sample.f || new_bsdf_sample.pdf < EPS)
                     break;
@@ -131,10 +150,10 @@ public:
     }
 };
 
-std::shared_ptr<PathTracingIntegrator> create_native_integrator(
+std::shared_ptr<PathTracingIntegrator> create_mis_integrator(
     int min_depth, int max_depth, real cont_prob)
 {
-    auto ret = std::make_shared<NativeVolumetricPathTracingIntegrator>();
+    auto ret = std::make_shared<VolumetricPathTracingIntegrator>();
     ret->initialize(min_depth, max_depth, cont_prob);
     return ret;
 }

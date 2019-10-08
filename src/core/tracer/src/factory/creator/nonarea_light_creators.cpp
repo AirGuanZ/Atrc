@@ -1,12 +1,12 @@
-#include <agz/tracer/factory/creator/envir_light_creators.h>
-#include <agz/tracer/factory/raw/envir_light.h>
+#include <agz/tracer/factory/creator/nonarea_light_creators.h>
+#include <agz/tracer/factory/raw/nonarea_light.h>
 
 AGZ_TRACER_FACTORY_BEGIN
 
 namespace envir_light
 {
     
-    class DirectionalEnvirLightCreator : public Creator<EnvirLight>
+    class DirectionalEnvirLightCreator : public Creator<NonareaLight>
     {
     public:
 
@@ -15,7 +15,7 @@ namespace envir_light
             return "dir";
         }
 
-        std::shared_ptr<EnvirLight> create(const ConfigGroup &params, CreatingContext &context) const override
+        std::shared_ptr<NonareaLight> create(const ConfigGroup &params, CreatingContext &context) const override
         {
             auto dir = params.child_vec3("dir");
             auto rad = params.child_spectrum("radiance");
@@ -24,7 +24,7 @@ namespace envir_light
         }
     };
 
-    class HDRIEnvirLightCreator : public Creator<EnvirLight>
+    class HDRIEnvirLightCreator : public Creator<NonareaLight>
     {
     public:
 
@@ -33,7 +33,7 @@ namespace envir_light
             return "hdri";
         }
 
-        std::shared_ptr<EnvirLight> create(const ConfigGroup &params, CreatingContext &context) const override
+        std::shared_ptr<NonareaLight> create(const ConfigGroup &params, CreatingContext &context) const override
         {
             auto tex = context.create<Texture>(params.child_group("tex"));
             auto up = params.child_vec3_or("up", Vec3(0, 0, 1));
@@ -43,7 +43,7 @@ namespace envir_light
         }
     };
 
-    class IBLEnvirLightCreator : public Creator<EnvirLight>
+    class IBLEnvirLightCreator : public Creator<NonareaLight>
     {
     public:
 
@@ -52,7 +52,7 @@ namespace envir_light
             return "ibl";
         }
 
-        std::shared_ptr<EnvirLight> create(const ConfigGroup &params, CreatingContext &context) const override
+        std::shared_ptr<NonareaLight> create(const ConfigGroup &params, CreatingContext &context) const override
         {
             auto tex = context.create<Texture>(params.child_group("tex"));
             auto up = params.child_vec3_or("up", Vec3(0, 0, 1));
@@ -60,7 +60,7 @@ namespace envir_light
         }
     };
 
-    class NativeSkyCreator : public Creator<EnvirLight>
+    class NativeSkyCreator : public Creator<NonareaLight>
     {
     public:
 
@@ -69,7 +69,7 @@ namespace envir_light
             return "native_sky";
         }
 
-        std::shared_ptr<EnvirLight> create(const ConfigGroup &params, CreatingContext &context) const override
+        std::shared_ptr<NonareaLight> create(const ConfigGroup &params, CreatingContext &context) const override
         {
             auto top = params.child_spectrum("top");
             auto bottom = params.child_spectrum("bottom");
@@ -80,7 +80,7 @@ namespace envir_light
 
 } // namespace envir_light
 
-void initialize_envir_light_factory(Factory<EnvirLight> &factory)
+void initialize_nonarea_light_factory(Factory<NonareaLight> &factory)
 {
     factory.add_creator(std::make_unique<envir_light::DirectionalEnvirLightCreator>());
     factory.add_creator(std::make_unique<envir_light::HDRIEnvirLightCreator>());

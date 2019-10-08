@@ -22,13 +22,14 @@ public:
         AGZ_HIERARCHY_WRAP("in initializing native sky")
     }
 
-    EnvirLightSampleResult sample(const Vec3 &ref, const Sample3 &sam) const noexcept override
+    LightSampleResult sample(const Vec3 &ref, const Sample5 &sam) const noexcept override
     {
         auto [dir, pdf] = math::distribution::uniform_on_sphere(sam.u, sam.v);
 
-        EnvirLightSampleResult ret;
-        ret.ref_to_light = dir;
-        ret.radiance     = radiance(ref, dir);
+        LightSampleResult ret;
+        ret.ref          = ref;
+        ret.pos          = ref + 4 * world_radius_ * dir;
+        ret.radiance     = radiance(ref, dir, nullptr);
         ret.pdf          = pdf;
         ret.is_delta     = false;
 
@@ -47,15 +48,17 @@ public:
         return 4 * PI_r * PI_r * radius * radius * mean_radiance;
     }
 
-    Spectrum radiance(const Vec3 &ref, const Vec3 &ref_to_light) const noexcept override
+    Spectrum radiance(const Vec3 &ref, const Vec3 &ref_to_light, Vec3 *light_pnt) const noexcept override
     {
+        if(light_pnt)
+            *light_pnt = ref + 4 * world_radius_ * ref_to_light.normalize();
         real cos_theta = math::clamp<real>(dot(ref_to_light.normalize(), up_), -1, 1);
         real s = (cos_theta + 1) / 2;
         return s * top_ + (1 - s) * bottom_;
     }
 };
 
-std::shared_ptr<EnvirLight>create_native_sky(
+std::shared_ptr<NonareaLight>create_native_sky(
     const Spectrum &top,
     const Spectrum &bottom,
     const Vec3 &up)

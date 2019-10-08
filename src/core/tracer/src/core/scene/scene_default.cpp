@@ -1,10 +1,12 @@
 ﻿#include <agz/tracer/core/aggregate.h>
 #include <agz/tracer/core/camera.h>
+#include <agz/tracer/core/entity.h>
 #include <agz/tracer/core/light.h>
 #include <agz/tracer/core/medium.h>
 #include <agz/tracer/core/scattering.h>
 #include <agz/tracer/core/scene.h>
 #include <agz/tracer/factory/raw/medium.h>
+#include <agz/tracer/factory/raw/scene.h>
 #include <agz/utility/misc.h>
 
 AGZ_TRACER_BEGIN
@@ -16,9 +18,8 @@ class DefaultScene : public Scene
     std::shared_ptr<const Camera> camera_;
 
     std::vector<Light*> lights_;
-    std::vector<std::shared_ptr<Light>> shared_lights_;
-    
-    std::shared_ptr<EnvirLight> env_lht_;
+    std::vector<NonareaLight*> nonarea_lights_;
+    std::vector<std::shared_ptr<NonareaLight>> owner_nonarea_lights_;
 
     std::shared_ptr<const Aggregate> aggregate_;
     AABB world_bound_;
@@ -48,6 +49,41 @@ class DefaultScene : public Scene
 
 public:
 
+    void initialize(const DefaultSceneParams &params)
+    {
+        owner_nonarea_lights_ = params.nonarea_lights_;
+        for(auto &nonarea_light : params.nonarea_lights_)
+        {
+            lights_.push_back(nonarea_light.get());
+            nonarea_lights_.push_back(nonarea_light.get());
+        }
+
+        aggregate_ = params.aggregate;
+        std::vector<std::shared_ptr<const Entity>> const_entities;
+        const_entities.reserve(params.entities.size());
+        for(auto &ent : params.entities)
+        {
+            if(auto light = ent->as_light())
+                lights_.push_back(light);
+            const_entities.push_back(ent);
+        }
+        params.aggregate->build(const_entities);
+
+        world_bound_ = AABB();
+        world_bound_ |= aggregate_->world_bound();
+
+        // 避免数值问题导致某些场景中的点不在world bound中
+
+        Vec3 delta = world_bound_.high - world_bound_.low;
+        world_bound_.low -= real(0.02) * delta;
+        world_bound_.high += real(0.02) * delta;
+
+        for(auto light : lights_)
+            light->preprocess(*this);
+
+        construct_light_sampler();
+    }
+
     void set_camera(std::shared_ptr<const Camera> camera) override
     {
         camera_ = camera;
@@ -58,50 +94,16 @@ public:
         return camera_.get();
     }
 
-    void add_light(std::shared_ptr<Light> light) override
-    {
-        lights_.push_back(light.get());
-        shared_lights_.push_back(light);
-    }
-
-    void add_light(Light *light) override
-    {
-        lights_.push_back(light);
-    }
-
-    void set_env_light(std::shared_ptr<EnvirLight> env_light) override
-    {
-        assert(env_light);
-        env_lht_ = env_light;
-        lights_.push_back(env_light.get());
-        shared_lights_.push_back(env_light);
-    }
-
-    void set_aggregate(std::shared_ptr<const Aggregate> aggregate) override
-    {
-        assert(aggregate);
-        aggregate_ = aggregate;
-    }
-
-    size_t light_count() const noexcept override
-    {
-        return lights_.size();
-    }
-
-    const Light *light(size_t idx) const noexcept override
-    {
-        return lights_[idx];
-    }
-
     misc::span<const Light* const> lights() const noexcept override
     {
         auto ptr = lights_.data();
         return misc::span<const Light* const>(ptr, lights_.size());
     }
 
-    const EnvirLight *env() const noexcept override
+    misc::span<const NonareaLight* const> nonarea_lights() const noexcept override
     {
-        return env_lht_.get();
+        auto ptr = nonarea_lights_.data();
+        return misc::span<const NonareaLight* const>(ptr, nonarea_lights_.size());
     }
 
     SceneSampleLightResult sample_light(const Sample1 &sam) const noexcept override
@@ -205,27 +207,13 @@ public:
     {
         return world_bound_;
     }
-
-    void start_rendering() override
-    {
-        world_bound_ = AABB();
-        world_bound_ |= aggregate_->world_bound();
-
-        // 避免数值问题导致某些场景中的点不在world bound中
-        Vec3 delta = world_bound_.high - world_bound_.low;
-        world_bound_.low  -= real(0.02) * delta;
-        world_bound_.high += real(0.02) * delta;
-
-        for(auto light : lights_)
-            light->preprocess(*this);
-
-        construct_light_sampler();
-    }
 };
 
-std::shared_ptr<Scene> create_default_scene()
+std::shared_ptr<Scene> create_default_scene(const DefaultSceneParams &params)
 {
-    return std::make_shared<DefaultScene>();
+    auto ret = std::make_shared<DefaultScene>();
+    ret->initialize(params);
+    return ret;
 }
 
 AGZ_TRACER_END

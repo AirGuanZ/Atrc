@@ -595,7 +595,7 @@ ConfigValue::ConfigValue(std::string value)
 
 const char *ConfigValue::type() const noexcept
 {
-    return "ConfigValye";
+    return "ConfigValue";
 }
 
 bool ConfigValue::is_value() const noexcept

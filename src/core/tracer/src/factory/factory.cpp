@@ -1,7 +1,7 @@
 #include <agz/tracer/factory/creator/aggregate_creators.h>
 #include <agz/tracer/factory/creator/camera_creators.h>
 #include <agz/tracer/factory/creator/entity_creators.h>
-#include <agz/tracer/factory/creator/envir_light_creators.h>
+#include <agz/tracer/factory/creator/nonarea_light_creators.h>
 #include <agz/tracer/factory/creator/film_creators.h>
 #include <agz/tracer/factory/creator/film_filter_creators.h>
 #include <agz/tracer/factory/creator/fresnel_creators.h>
@@ -23,7 +23,7 @@ CreatingContext::CreatingContext()
         Factory<Aggregate>            ("aggregate"),
         Factory<Camera>               ("camera"),
         Factory<Entity>               ("entity"),
-        Factory<EnvirLight>           ("envir_light"),
+        Factory<NonareaLight>         ("nonarea_light"),
         Factory<Film>                 ("film"),
         Factory<FilmFilter>           ("film_filter"),
         Factory<Fresnel>              ("fresnel"),
@@ -45,7 +45,7 @@ CreatingContext::CreatingContext()
     initialize_aggregate_factory              (factory<Aggregate>());
     initialize_camera_factory                 (factory<Camera>());
     initialize_entity_factory                 (factory<Entity>());
-    initialize_envir_light_factory            (factory<EnvirLight>());
+    initialize_nonarea_light_factory          (factory<NonareaLight>());
     initialize_film_factory                   (factory<Film>());
     initialize_film_filter_factory            (factory<FilmFilter>());
     initialize_fresnel_factory                (factory<Fresnel>());

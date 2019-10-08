@@ -13,7 +13,8 @@ namespace
     class GlassBSDF : public LocalBSDF
     {
         const FresnelPoint *fresnel_point_;
-        Spectrum color_;
+        Spectrum color_reflection_;
+        Spectrum color_refraction_;
 
         // 计算折射方向向量，发生全反射时返回std::nullopt
         static std::optional<Vec3> refr_dir(const Vec3 &nwo, const Vec3 &nor, real eta)
@@ -30,8 +31,10 @@ namespace
     public:
 
         GlassBSDF(const Coord &geometry_coord, const Coord &shading_coord,
-                  const FresnelPoint *fresnel_point, const Spectrum &color) noexcept
-            : LocalBSDF(geometry_coord, shading_coord), fresnel_point_(fresnel_point), color_(color)
+                  const FresnelPoint *fresnel_point,
+                  const Spectrum &color_reflection, const Spectrum &color_refraction) noexcept
+            : LocalBSDF(geometry_coord, shading_coord), fresnel_point_(fresnel_point),
+              color_reflection_(color_reflection), color_refraction_(color_refraction)
         {
 
         }
@@ -52,7 +55,7 @@ namespace
                 BSDFSampleResult ret;
                 Vec3 local_in = Vec3(-nwo.x, -nwo.y, nwo.z);
                 ret.dir      = shading_coord_.local_to_global(local_in);
-                ret.f        = color_ * fr / std::abs(local_in.z);
+                ret.f        = color_reflection_ * fr / std::abs(local_in.z);
                 ret.pdf      = fr.r;
                 ret.mode     = transport_mode;
                 ret.is_delta = true;
@@ -77,7 +80,7 @@ namespace
 
             BSDFSampleResult ret;
             ret.dir      = shading_coord_.local_to_global(nwi);
-            ret.f        = corr_factor * color_ * (1 - fr.r) / std::abs(nwi.z);
+            ret.f        = corr_factor * color_refraction_ * (1 - fr.r) / std::abs(nwi.z);
             ret.pdf      = 1 - fr.r;
             ret.is_delta = true;
             ret.mode     = transport_mode;
@@ -96,7 +99,7 @@ namespace
 
         Spectrum albedo() const noexcept override
         {
-            return color_;
+            return real(0.5) * (color_reflection_ + color_refraction_);;
         }
     };
 }
@@ -104,13 +107,18 @@ namespace
 class Glass : public Material
 {
     std::shared_ptr<const Fresnel> fresnel_;
-    std::shared_ptr<const Texture> color_map_;
+    std::shared_ptr<const Texture> color_reflection_map_;
+    std::shared_ptr<const Texture> color_refraction_map_;
 
 public:
 
-    void initialize(std::shared_ptr<const Texture> color_map, std::shared_ptr<const Fresnel> fresnel)
+    void initialize(
+        std::shared_ptr<const Texture> color_reflection_map,
+        std::shared_ptr<const Texture> color_refraction_map,
+        std::shared_ptr<const Fresnel> fresnel)
     {
-        color_map_ = color_map;
+        color_reflection_map_ = color_reflection_map;
+        color_refraction_map_ = color_refraction_map;
         fresnel_   = fresnel;
     }
 
@@ -119,19 +127,23 @@ public:
         ShadingPoint ret;
 
         auto fresnel_point = fresnel_->get_point(inct.uv, arena);
-        auto color = color_map_->sample_spectrum(inct.uv);
-        ret.bsdf = arena.create<GlassBSDF>(inct.geometry_coord, inct.user_coord, fresnel_point, color);
+        auto color_reflection = color_reflection_map_->sample_spectrum(inct.uv);
+        auto color_refraction = color_refraction_map_->sample_spectrum(inct.uv);
+        ret.bsdf = arena.create<GlassBSDF>(
+            inct.geometry_coord, inct.user_coord, fresnel_point,
+            color_reflection, color_refraction);
 
         return ret;
     }
 };
 
 std::shared_ptr<Material> create_glass(
-    std::shared_ptr<const Texture> color_map,
+    std::shared_ptr<const Texture> color_reflection_map,
+    std::shared_ptr<const Texture> color_refraction_map,
     std::shared_ptr<const Fresnel> fresnel)
 {
     auto ret = std::make_shared<Glass>();
-    ret->initialize(color_map, fresnel);
+    ret->initialize(color_reflection_map, color_refraction_map, fresnel);
     return ret;
 }
 

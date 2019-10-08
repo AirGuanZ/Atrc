@@ -286,6 +286,7 @@ public:
         specular_tint_   = specular_tint;
         anisotropic_     = anisotropic;
         sheen_           = sheen;
+        sheen_tint_      = sheen_tint;
         clearcoat_       = clearcoat;
         clearcoat_gloss_ = clearcoat_gloss;
         normal_mapper_   = std::move(normal_mapper);

@@ -4,6 +4,6 @@
 
 AGZ_TRACER_FACTORY_BEGIN
 
-void initialize_envir_light_factory(Factory<EnvirLight> &factory);
+void initialize_nonarea_light_factory(Factory<NonareaLight> &factory);
 
 AGZ_TRACER_FACTORY_END

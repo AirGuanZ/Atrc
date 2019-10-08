@@ -501,7 +501,7 @@ namespace disney_impl
             clearcoat_ = clearcoat;
             clearcoat_roughness_ = mix(real(0.1), real(0.01), clearcoat_gloss);
 
-            real A = (std::min)(real(0.8), 1 - metallic_);
+            real A = (math::clamp)(base_color.lum() * (1 - metallic_), real(0.3), real(0.7));
             real B = 1 - A;
 
             if(!has_subsurface)

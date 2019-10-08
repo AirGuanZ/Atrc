@@ -151,6 +151,19 @@ public:
             return inct.t;
         });
     }
+
+    Vec3 eps_offset(const Vec3 &dir) const noexcept
+    {
+        return match_variant(inct_,
+            [&](const EntityIntersection &inct)
+        {
+            return inct.eps_offset(dir);
+        },
+            [](const MediumIntersection &inct)
+        {
+            return inct.pos;
+        });
+    }
 };
 
 AGZ_TRACER_END

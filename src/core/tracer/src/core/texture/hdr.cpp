@@ -96,4 +96,3 @@ std::shared_ptr<Texture> create_hdr_texture(
 }
 
 AGZ_TRACER_END
-

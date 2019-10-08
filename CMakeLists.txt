@@ -35,7 +35,6 @@ ELSEIF("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
     SET(STDFS_LD_LIB "stdc++fs")
     SET(CMAKE_EXE_LINKER_FLAGS "-ldl")
-    MESSAGE(WARNING "g++ configuration is untested")
 ENDIF()
 
 ############## embree

@@ -8,12 +8,12 @@ IF(NOT DEFINED EMBREE_MAX_ISA)
 	SET(EMBREE_MAX_ISA AVX2)
 ENDIF()
 
-SET(Embree3_VERSION "3.5.2")
+SET(Embree3_VERSION "3.6.1")
 ExternalProject_Add(
 	Embree3
 	PREFIX "${PROJECT_SOURCE_DIR}/lib/embree3"
 	URL "https://github.com/embree/embree/archive/v${Embree3_VERSION}.tar.gz"
-	URL_MD5 608072dba35b09b58e0b13e59699342a
+	URL_MD5 d6e043321df048a427eff337eba04cf1
 	CMAKE_ARGS
 		"-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
 		"-DEMBREE_TUTORIALS=OFF"

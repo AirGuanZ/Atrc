@@ -42,7 +42,8 @@ std::shared_ptr<Material> create_frosted_glass(
     std::shared_ptr<const Fresnel> fresnel);
 
 std::shared_ptr<Material> create_glass(
-    std::shared_ptr<const Texture> color_map,
+    std::shared_ptr<const Texture> color_reflection_map,
+    std::shared_ptr<const Texture> color_refraction_map,
     std::shared_ptr<const Fresnel> fresnel);
 
 std::shared_ptr<Material> create_ideal_black();

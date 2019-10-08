@@ -6,7 +6,34 @@ AGZ_TRACER_BEGIN
 
 class Scene;
 class AreaLight;
-class EnvirLight;
+class NonareaLight;
+
+/**
+ * @brief 根据参考点采样光源得到的结果
+ */
+struct LightSampleResult
+{
+    Vec3 ref;
+    Vec3 pos;
+    Spectrum radiance;
+    real pdf = 0;
+    bool is_delta = false;
+
+    bool valid() const noexcept
+    {
+        return pdf != 0;
+    }
+
+    Vec3 ref_to_light() const noexcept
+    {
+        return (pos - ref).normalize();
+    }
+};
+
+/**
+ * @brief 采样实体光源失败时的返回值
+ */
+inline const LightSampleResult LIGHT_SAMPLE_RESULT_NULL = { { }, { }, { }, 0, false };
 
 /**
  * @brief 光源接口
@@ -31,9 +58,16 @@ public:
     virtual const AreaLight *as_area() const noexcept { return nullptr; }
 
     /**
-     * @brief 返回其环境光源接口
+     * @brief 返回其非实体光源接口
      */
-    virtual const EnvirLight *as_envir() const noexcept { return nullptr; }
+    virtual const NonareaLight *as_nonarea() const noexcept { return nullptr; }
+
+    /**
+     * @brief 采样一条照射到ref的射线
+     * @param ref 参考点
+     * @param sam 采样数据
+     */
+    virtual LightSampleResult sample(const Vec3 &ref, const Sample5 &sam) const noexcept = 0;
 
     /**
      * @brief 发射的光通量
@@ -47,38 +81,15 @@ public:
 };
 
 /**
- * @brief 从实体光源对参考点进行采样的结果
- */
-struct AreaLightSampleResult
-{
-    SurfacePoint spt;
-    Spectrum radiance; // 从position照射向参考点的辐射亮度
-    real pdf      = 0; // w.r.t. solid angle at ref
-    bool is_delta = false;
-};
-
-/**
- * @brief 采样实体光源失败时的返回值
- */
-inline const AreaLightSampleResult AREA_LIGHT_SAMPLE_RESULT_NULL = { { }, Spectrum(), 0, false };
-
-/**
  * @brief 实体光源接口
  */
 class AreaLight : public Light
 {
 public:
 
-    bool is_area() const noexcept override { return true; }
+    bool is_area() const noexcept override final { return true; }
 
-    const AreaLight *as_area() const noexcept override { return this; }
-    
-    /**
-     * @brief 采样一条照射到ref的射线
-     * @param ref 参考点
-     * @param sam 采样数据
-     */
-    virtual AreaLightSampleResult sample(const Vec3 &ref, const Sample5 &sam) const noexcept = 0;
+    const AreaLight *as_area() const noexcept override final { return this; }
 
     /**
      * @brief 光源表面某点朝指定方向的辐射亮度
@@ -99,25 +110,33 @@ public:
 };
 
 /**
- * @brief 从环境光源对参考点进行采样的结果
+ * @brief 非实体光源接口
  */
-struct EnvirLightSampleResult
+class NonareaLight : public Light
 {
-    Vec3 ref_to_light;
-    Spectrum radiance;
-    real pdf = 0;
-    bool is_delta = false;
+public:
 
-    bool valid() const noexcept
-    {
-        return !!ref_to_light;
-    }
+    bool is_area() const noexcept override final { return false; }
+
+    const NonareaLight* as_nonarea() const noexcept override final { return this; }
+
+    /**
+     * @brief 光源沿指定方向照射到空间中某点的辐射亮度
+     * 
+     * @param ref 被照射的点
+     * @param ref_to_light 沿哪个方向照射到ref点
+     * @param light_point 发射点，主要用于visibility test，可以为nullptr
+     * @return 沿ref_to_light向ref点发射的辐射亮度
+     */
+    virtual Spectrum radiance(const Vec3 &ref, const Vec3 &ref_to_light, Vec3 *light_point = nullptr) const noexcept = 0;
+
+    /**
+     * @brief 以ref点为参考点时采样入射方向采样到ref_to_light的概率密度（w.r.t. solid angle）
+     */
+    virtual real pdf(const Vec3 &ref, const Vec3 &ref_to_light) const noexcept = 0;
 };
 
-/**
- * @brief 环境光源接口
- */
-class EnvirLight : public Light
+class EnvirLight : public NonareaLight
 {
 protected:
 
@@ -126,31 +145,7 @@ protected:
 
 public:
 
-    bool is_area() const noexcept override { return false; }
-
-    const EnvirLight *as_envir() const noexcept override { return this; }
-
-    void preprocess(const Scene &scene) override;
-
-    /**
-     * @brief 采样一条照射到ref的射线
-     * @param ref 参考点
-     * @param sam 采样数据
-     */
-    virtual EnvirLightSampleResult sample(const Vec3 &ref, const Sample3 &sam) const noexcept = 0;
-
-    /**
-     * @brief 采样到某条照射ref的射线的概率密度（w.r.t. solid angle）
-     *
-     * @param ref 参考点
-     * @param ref_to_light 射线方向
-     */
-    virtual real pdf(const Vec3 &ref, const Vec3 &ref_to_light) const noexcept = 0;
-
-    /**
-     * @brief 从ref_to_light方向照射到ref点的radiance
-     */
-    virtual Spectrum radiance(const Vec3 &ref, const Vec3 &ref_to_light) const noexcept = 0;
+    void preprocess(const Scene &scene) override final;
 };
 
 AGZ_TRACER_END

@@ -27,13 +27,14 @@ public:
         AGZ_HIERARCHY_WRAP("in initializing native sky light")
     }
 
-    EnvirLightSampleResult sample(const Vec3 &ref, const Sample3 &sam) const noexcept override
+    LightSampleResult sample(const Vec3 &ref, const Sample5 &sam) const noexcept override
     {
-        auto [dir, pdf] = sampler_->sample(sam);
+        auto [dir, pdf] = sampler_->sample({ sam.u, sam.v, sam.w });
 
-        EnvirLightSampleResult ret;
-        ret.ref_to_light = dir;
-        ret.radiance = radiance(ref, dir);
+        LightSampleResult ret;
+        ret.ref      = ref;
+        ret.pos      = ref + 4 * world_radius_ * dir;
+        ret.radiance = radiance(ref, dir, nullptr);
         ret.pdf      = pdf;
         ret.is_delta = false;
 
@@ -70,8 +71,10 @@ public:
         return ret * radius * radius;
     }
 
-    Spectrum radiance(const Vec3 &ref, const Vec3 &ref_to_light) const noexcept override
+    Spectrum radiance(const Vec3 &ref, const Vec3 &ref_to_light, Vec3 *light_pnt) const noexcept override
     {
+        if(light_pnt)
+            *light_pnt = ref + 4 * world_radius_ * ref_to_light.normalize();
         Vec3 dir = Coord::from_z(up_).global_to_local(ref_to_light).normalize();
         real phi = local_angle::phi(dir);
         real theta = local_angle::theta(dir);
@@ -81,7 +84,7 @@ public:
     }
 };
 
-std::shared_ptr<EnvirLight>create_ibl_light(
+std::shared_ptr<NonareaLight>create_ibl_light(
     std::shared_ptr<const Texture> tex,
     const Vec3 &up)
 {

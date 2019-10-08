@@ -141,8 +141,6 @@ class FilteredFilm : public Film
     DepthBuffer    depth_;
     BinaryBuffer   binary_;
 
-    std::mutex mut_;
-
 public:
 
     void initialize(int width, int height, std::shared_ptr<const FilmFilter> film_filter)
@@ -167,10 +165,9 @@ public:
         AGZ_HIERARCHY_WRAP("in initializing filtered film")
     }
 
-    void merge_grid(FilmGrid &&grid) override
+    void merge_grid(const FilmGrid &grid) override
     {
         auto &tgrid = dynamic_cast<const FilteredFilmGrid&>(grid);
-        std::lock_guard<std::mutex> lk(mut_);
 
         for(int y = tgrid.grid_y_beg_; y < tgrid.grid_y_end_; ++y)
         {
@@ -186,26 +183,6 @@ public:
                 normal_(y, x)   += tgrid.normal_(ly, lx);
                 depth_(y, x)    += tgrid.depth_(ly, lx);
                 binary_(y, x)   += tgrid.binary_(ly, lx);
-            }
-        }
-    }
-
-    void add_grid(FilmGrid &&grid, const Spectrum &weight) override
-    {
-        auto &tgrid = dynamic_cast<const FilteredFilmGrid&>(grid);
-        std::lock_guard<std::mutex> lk(mut_);
-
-        for(int y = tgrid.grid_y_beg_; y < tgrid.grid_y_end_; ++y)
-        {
-            int ly = y - tgrid.grid_y_beg_;
-            for(int x = tgrid.grid_x_beg_; x < tgrid.grid_x_end_; ++x)
-            {
-                int lx = x - tgrid.grid_x_beg_;
-
-                real rhs_w = tgrid.weights_(ly, lx);
-                Spectrum rhs = rhs_w ? weight * tgrid.values_(ly, lx) / rhs_w : Spectrum(0);
-
-                values_(y, x) += weights_(y, x) * rhs;
             }
         }
     }

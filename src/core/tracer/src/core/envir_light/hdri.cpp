@@ -52,15 +52,18 @@ public:
         AGZ_HIERARCHY_WRAP("in initializing hdri environment light")
     }
 
-    EnvirLightSampleResult sample(const Vec3 &ref, const Sample3 &sam) const noexcept override
+    LightSampleResult sample(const Vec3 &ref, const Sample5 &sam) const noexcept override
     {
-        auto [npos, pdf_area] = sampler_->sample(sam);
+        auto [npos, pdf_area] = sampler_->sample({ sam.u, sam.v, sam.w });
         Vec3 pos = npos * radius_ + offset_;
 
-        EnvirLightSampleResult ret;
-        ret.ref_to_light = (pos - ref).normalize();
-        ret.radiance     = radiance(ref, ret.ref_to_light);
-        ret.pdf          = pdf_area / (radius_ * radius_) * (pos - ref).length_square() / std::abs(dot(ret.ref_to_light, npos));
+        Vec3 ref_to_light = (pos - ref).normalize();
+
+        LightSampleResult ret;
+        ret.ref          = ref;
+        ret.pos          = pos;
+        ret.radiance     = radiance(ref, ref_to_light, nullptr);
+        ret.pdf          = pdf_area / (radius_ * radius_) * (pos - ref).length_square() / std::abs(dot(ref_to_light, npos));
         ret.is_delta     = false;
 
         return ret;
@@ -100,11 +103,15 @@ public:
         return ret * radius_ * radius_;
     }
 
-    Spectrum radiance(const Vec3 &ref, const Vec3 &ref_to_light) const noexcept override
+    Spectrum radiance(const Vec3 &ref, const Vec3 &ref_to_light, Vec3 *light_pnt) const noexcept override
     {
         Vec3 npos = get_npos(ref, ref_to_light);
         if(!npos)
             return {};
+
+        if(light_pnt)
+            *light_pnt = ref + 4 * world_radius_ * ref_to_light.normalize();
+
         real phi = local_angle::phi(npos);
         real theta = local_angle::theta(npos);
         real u = math::clamp<real>(phi / (2 * PI_r), 0, 1);
@@ -113,7 +120,7 @@ public:
     }
 };
 
-std::shared_ptr<EnvirLight>create_hdri_light(
+std::shared_ptr<NonareaLight>create_hdri_light(
     std::shared_ptr<const Texture> tex,
     const Vec3 &up,
     real radius,

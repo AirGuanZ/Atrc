@@ -36,14 +36,15 @@ public:
         AGZ_HIERARCHY_WRAP("in initializing directional environment light")
     }
 
-    EnvirLightSampleResult sample(const Vec3 &ref, const Sample3 &sam) const noexcept override
+    LightSampleResult sample(const Vec3 &ref, const Sample5 &sam) const noexcept override
     {
         auto [local_dir, pdf] = math::distribution::uniform_on_cone(max_cos_theta_, sam.u, sam.v);
         Vec3 global_dir = local_cone_space_.local_to_global(local_dir).normalize();
 
-        EnvirLightSampleResult ret;
-        ret.ref_to_light = global_dir;
-        ret.radiance     = radiance(ref, global_dir);
+        LightSampleResult ret;
+        ret.ref          = ref;
+        ret.pos          = ref + 4 * world_radius_ * global_dir;
+        ret.radiance     = radiance(ref, global_dir, nullptr);
         ret.pdf          = pdf;
         ret.is_delta     = false;
 
@@ -65,8 +66,10 @@ public:
         return 4 * PI_r * PI_r * radius * radius * ((1 - max_cos_theta_) / 2 * radiance_);
     }
 
-    Spectrum radiance(const Vec3 &ref, const Vec3 &ref_to_light) const noexcept override
+    Spectrum radiance(const Vec3 &ref, const Vec3 &ref_to_light, Vec3 *light_pnt) const noexcept override
     {
+        if(light_pnt)
+            *light_pnt = ref + 4 * world_radius_ * ref_to_light.normalize();
         Vec3 local_dir = local_cone_space_.global_to_local(ref_to_light);
         real cos_theta = local_angle::cos_theta(local_dir.normalize());
         if(cos_theta >= max_cos_theta_)
@@ -75,7 +78,7 @@ public:
     }
 };
 
-std::shared_ptr<EnvirLight> create_directional_light(
+std::shared_ptr<NonareaLight> create_directional_light(
     const Vec3 &dir,
     const Spectrum &radiance,
     real range)

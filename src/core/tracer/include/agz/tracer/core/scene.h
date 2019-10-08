@@ -9,8 +9,8 @@ AGZ_TRACER_BEGIN
 class Camera;
 class Entity;
 class Light;
-class EnvirLight;
 class AreaLight;
+class NonareaLight;
 
 struct EntityIntersection;
 class ScatteringPoint;
@@ -52,29 +52,11 @@ public:
     /** @brief 当前使用的摄像机，若未设置过则返回nullptr */
     virtual const Camera *camera() const noexcept = 0;
 
-    /** @brief 在场景中添加一个新的光源，并持有其所有权 */
-    virtual void add_light(std::shared_ptr<Light> light) = 0;
-
-    /** @brief 在场景中添加一个新的光源 */
-    virtual void add_light(Light *light) = 0;
-
-    /** @brief 设置entity aggregate */
-    virtual void set_aggregate(std::shared_ptr<const Aggregate> aggregate) = 0;
-
-    /** @brief 设置环境光源 */
-    virtual void set_env_light(std::shared_ptr<EnvirLight> env_light) = 0;
-
-    /** @brief 场景中光源的数量 */
-    virtual size_t light_count() const noexcept = 0;
-
-    /** @brief 场景中的第idx个光源 */
-    virtual const Light *light(size_t idx) const noexcept = 0;
-
-    /** @brief 环境光 */
-    virtual const EnvirLight *env() const noexcept = 0;
-
     /** @brief 场景中的所有光源 */
     virtual misc::span<const Light* const> lights() const noexcept = 0;
+
+    /** @brief 场景中的所有非实体光源 */
+    virtual misc::span<const NonareaLight* const> nonarea_lights() const noexcept = 0;
 
     /** @brief 随机选择场景中的一个光源 */
     virtual SceneSampleLightResult sample_light(const Sample1 &sam) const noexcept = 0;
@@ -131,9 +113,6 @@ public:
      * @brief 最小的包含所有实体的AABB盒
      */
     virtual AABB world_bound() const noexcept = 0;
-
-    /** @brief 开始渲染前的回调，用于做各种必要的初始化 */
-    virtual void start_rendering() = 0;
 };
 
 AGZ_TRACER_END
