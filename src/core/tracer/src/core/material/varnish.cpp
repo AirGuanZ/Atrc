@@ -37,10 +37,11 @@ namespace
             if(!opt_wit || !opt_wot)
                 return {};
 
-            real Fr_i = refl_aux::dielectric_fresnel(eta_in_, eta_out_, nwi.z);
-            real Fr_o = refl_aux::dielectric_fresnel(eta_in_, eta_out_, nwo.z);
+            real Fr_i = refl_aux::dielectric_fresnel(eta_in_, eta_out_, std::abs(cos(nwi, shading_coord_.z)));
+            real Fr_o = refl_aux::dielectric_fresnel(eta_in_, eta_out_, std::abs(cos(nwo, shading_coord_.z)));
             auto ret = color_ * color_ * (1 - Fr_i) * (1 - Fr_o) * internal_->eval(-*opt_wit, -*opt_wot, mode)
-                * std::abs(cos(shading_coord_.z, -*opt_wit) / nwi.z);
+                * std::abs(cos(shading_coord_.z, -*opt_wit) / cos(shading_coord_.z, nwi));
+
             ret *= local_angle::normal_corr_factor(geometry_coord_, shading_coord_, wi);
             return ret;
         }
@@ -81,9 +82,10 @@ namespace
                 return BSDF_SAMPLE_RESULT_INVALID;
 
             real new_sam_u = (sam.u - Fr) / (1 - Fr);
-            auto internal_sample = internal_->sample(-*opt_wot, mode, { new_sam_u, sam.v, sam.w });
+            auto internal_sample = internal_->sample(-wot, mode, { new_sam_u, sam.v, sam.w });
             if(!internal_sample.f)
                 return BSDF_SAMPLE_RESULT_INVALID;
+
             internal_sample.f *= std::abs(cos(shading_coord_.z, internal_sample.dir));
 
             Vec3 internal_wi = -internal_sample.dir.normalize();
@@ -95,7 +97,7 @@ namespace
             if(cause_black_fringes(wi))
                 return BSDF_SAMPLE_RESULT_INVALID;
 
-            real Fr_o = refl_aux::dielectric_fresnel(eta_in_, eta_out_, -internal_wi.z);
+            real Fr_o = refl_aux::dielectric_fresnel(eta_in_, eta_out_, cos(shading_coord_.z, internal_wi));
             
             BSDFSampleResult ret;
             ret.dir      = wi;

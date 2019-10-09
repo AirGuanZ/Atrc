@@ -136,6 +136,9 @@ public:
     virtual real pdf(const Vec3 &ref, const Vec3 &ref_to_light) const noexcept = 0;
 };
 
+/**
+ * @brief 环境光源接口
+ */
 class EnvirLight : public NonareaLight
 {
 protected:
@@ -145,6 +148,9 @@ protected:
 
 public:
 
+    /**
+     * @brief 计算场景包围球的中心和半径，主要用于环境光采样
+     */
     void preprocess(const Scene &scene) override final;
 };
 
