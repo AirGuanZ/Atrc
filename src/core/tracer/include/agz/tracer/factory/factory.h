@@ -162,7 +162,7 @@ Factory<T>::Factory(std::string factory_name)
                 return it->second;
 
             const ConfigGroup *group = context.reference_root;
-            for(size_t i = 0; i < names.size(); ++i)
+            for(size_t i = 0; i < names.size() - 1; ++i)
                 group = &group->child_group(names[i]);
 
             auto &true_params = group->child_group(names.back());

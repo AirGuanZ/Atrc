@@ -9,8 +9,11 @@ class TextureScaler : public Texture
 
 public:
 
-    void initialize(const Spectrum &scale, std::shared_ptr<const Texture> internal)
+    void initialize(
+        const TextureCommonParams &common_params,
+        const Spectrum &scale, std::shared_ptr<const Texture> internal)
     {
+        init_common_params(common_params);
         scale_ = scale;
         internal_ = internal;
     }
@@ -32,11 +35,12 @@ public:
 };
 
 std::shared_ptr<Texture> create_texture_scaler(
+    const TextureCommonParams &common_params,
     const Spectrum &scale,
     std::shared_ptr<const Texture> internal)
 {
     auto ret = std::make_shared<TextureScaler>();
-    ret->initialize(scale, internal);
+    ret->initialize(common_params, scale, internal);
     return ret;
 }
 

@@ -32,16 +32,12 @@ namespace
                 return {};
             
             Vec3 nwi = wi.normalize(), nwo = wo.normalize();
-            auto opt_wit = refl_aux::refract(nwi, shading_coord_.z, eta_out_ / eta_in_);
             auto opt_wot = refl_aux::refract(nwo, shading_coord_.z, eta_out_ / eta_in_);
-            if(!opt_wit || !opt_wot)
+            if(!opt_wot)
                 return {};
 
-            real Fr_i = refl_aux::dielectric_fresnel(eta_in_, eta_out_, std::abs(cos(nwi, shading_coord_.z)));
             real Fr_o = refl_aux::dielectric_fresnel(eta_in_, eta_out_, std::abs(cos(nwo, shading_coord_.z)));
-            auto ret = color_ * color_ * (1 - Fr_i) * (1 - Fr_o) * internal_->eval(-*opt_wit, -*opt_wot, mode)
-                * std::abs(cos(shading_coord_.z, -*opt_wit) / cos(shading_coord_.z, nwi));
-
+            auto ret = color_ * color_ * (1 - Fr_o) * internal_->eval(nwi, -*opt_wot, mode);
             ret *= local_angle::normal_corr_factor(geometry_coord_, shading_coord_, wi);
             return ret;
         }
@@ -85,23 +81,14 @@ namespace
             auto internal_sample = internal_->sample(-wot, mode, { new_sam_u, sam.v, sam.w });
             if(!internal_sample.f)
                 return BSDF_SAMPLE_RESULT_INVALID;
-
-            internal_sample.f *= std::abs(cos(shading_coord_.z, internal_sample.dir));
-
-            Vec3 internal_wi = -internal_sample.dir.normalize();
-            auto opt_wi = refl_aux::refract(internal_wi, -shading_coord_.z, eta_in_ / eta_out_);
-            if(!opt_wi)
-                return BSDF_SAMPLE_RESULT_INVALID;
             
-            Vec3 wi = *opt_wi;
+            Vec3 wi = internal_sample.dir;
             if(cause_black_fringes(wi))
                 return BSDF_SAMPLE_RESULT_INVALID;
-
-            real Fr_o = refl_aux::dielectric_fresnel(eta_in_, eta_out_, cos(shading_coord_.z, internal_wi));
             
             BSDFSampleResult ret;
             ret.dir      = wi;
-            ret.f        = color_ * color_ * (1 - Fr) * (1 - Fr_o) * internal_sample.f / std::abs(cos(wi, shading_coord_.z));
+            ret.f        = color_ * color_ * (1 - Fr) * internal_sample.f;
             ret.pdf      = (1 - Fr) * internal_sample.pdf;
             ret.is_delta = internal_sample.is_delta;
             ret.mode     = mode;

@@ -5,24 +5,6 @@ AGZ_TRACER_FACTORY_BEGIN
 
 namespace envir_light
 {
-    
-    class DirectionalEnvirLightCreator : public Creator<NonareaLight>
-    {
-    public:
-
-        std::string name() const override
-        {
-            return "dir";
-        }
-
-        std::shared_ptr<NonareaLight> create(const ConfigGroup &params, CreatingContext &context) const override
-        {
-            auto dir = params.child_vec3("dir");
-            auto rad = params.child_spectrum("radiance");
-            real range = params.child_real("range");
-            return create_directional_light(dir, rad, range);
-        }
-    };
 
     class HDRIEnvirLightCreator : public Creator<NonareaLight>
     {
@@ -82,7 +64,6 @@ namespace envir_light
 
 void initialize_nonarea_light_factory(Factory<NonareaLight> &factory)
 {
-    factory.add_creator(std::make_unique<envir_light::DirectionalEnvirLightCreator>());
     factory.add_creator(std::make_unique<envir_light::HDRIEnvirLightCreator>());
     factory.add_creator(std::make_unique<envir_light::IBLEnvirLightCreator>());
     factory.add_creator(std::make_unique<envir_light::NativeSkyCreator>());

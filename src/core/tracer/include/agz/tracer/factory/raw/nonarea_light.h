@@ -5,11 +5,6 @@
 
 AGZ_TRACER_BEGIN
 
-std::shared_ptr<NonareaLight> create_directional_light(
-    const Vec3 &dir,
-    const Spectrum &radiance,
-    real range);
-
 std::shared_ptr<NonareaLight> create_hdri_light(
     std::shared_ptr<const Texture> tex,
     const Vec3 &up,
@@ -24,7 +19,5 @@ std::shared_ptr<NonareaLight> create_native_sky(
     const Spectrum &top,
     const Spectrum &bottom,
     const Vec3 &up);
-
-std::shared_ptr<NonareaLight> create_no_env();
 
 AGZ_TRACER_END

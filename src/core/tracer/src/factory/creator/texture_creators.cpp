@@ -128,7 +128,43 @@ namespace texture
             auto common_params = init_common_params(params);
             auto scale = params.child_spectrum("scale");
             auto internal = context.create<Texture>(params.child_group("internal"));
-            return create_texture_scaler(scale, std::move(internal));
+            return create_texture_scaler(common_params, scale, std::move(internal));
+        }
+    };
+
+    class TextureAdderCreator : public Creator<Texture>
+    {
+    public:
+
+        std::string name() const override
+        {
+            return "add";
+        }
+
+        std::shared_ptr<Texture> create(const ConfigGroup &params, CreatingContext &context) const override
+        {
+            auto common_params = init_common_params(params);
+            auto lhs = context.create<Texture>(params.child_group("lhs"));
+            auto rhs = context.create<Texture>(params.child_group("rhs"));
+            return create_texture_adder(common_params, std::move(lhs), std::move(rhs));
+        }
+    };
+
+    class TextureMultiplierCreator : public Creator<Texture>
+    {
+    public:
+
+        std::string name() const override
+        {
+            return "mul";
+        }
+
+        std::shared_ptr<Texture> create(const ConfigGroup &params, CreatingContext &context) const override
+        {
+            auto common_params = init_common_params(params);
+            auto lhs = context.create<Texture>(params.child_group("lhs"));
+            auto rhs = context.create<Texture>(params.child_group("rhs"));
+            return create_texture_multiplier(common_params, std::move(lhs), std::move(rhs));
         }
     };
 
@@ -142,6 +178,8 @@ void initialize_texture_factory(Factory<Texture> &factory)
     factory.add_creator(std::make_unique<texture::HDRCreator>());
     factory.add_creator(std::make_unique<texture::ImageCreator>());
     factory.add_creator(std::make_unique<texture::TextureScalerCreator>());
+    factory.add_creator(std::make_unique<texture::TextureAdderCreator>());
+    factory.add_creator(std::make_unique<texture::TextureMultiplierCreator>());
 }
 
 AGZ_TRACER_FACTORY_END

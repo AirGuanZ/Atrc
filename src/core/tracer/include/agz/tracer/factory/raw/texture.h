@@ -29,7 +29,18 @@ std::shared_ptr<Texture> create_image_texture(
     const std::string &filename, const std::string &sampler);
 
 std::shared_ptr<Texture> create_texture_scaler(
+    const TextureCommonParams &common_params,
     const Spectrum &scale,
     std::shared_ptr<const Texture> internal);
+
+std::shared_ptr<Texture> create_texture_adder(
+    const TextureCommonParams &common_params,
+    std::shared_ptr<const Texture> lhs,
+    std::shared_ptr<const Texture> rhs);
+
+std::shared_ptr<Texture> create_texture_multiplier(
+    const TextureCommonParams &common_params,
+    std::shared_ptr<const Texture> lhs,
+    std::shared_ptr<const Texture> rhs);
 
 AGZ_TRACER_END

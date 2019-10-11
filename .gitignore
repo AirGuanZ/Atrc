@@ -5,4 +5,5 @@ lib/embree3/
 lib/oidn/
 lib/glew/
 lib/glfw/
+doc/doc.html
 nohup.out

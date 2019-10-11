@@ -55,7 +55,7 @@ ENDIF()
 
 SET(MISC_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/lib/misc/)
 
-ADD_SUBDIRECTORY(lib/utility/src)
+ADD_SUBDIRECTORY(lib/utility)
 
 ADD_SUBDIRECTORY(src/core/common)
 ADD_SUBDIRECTORY(src/core/rasterizer/)
