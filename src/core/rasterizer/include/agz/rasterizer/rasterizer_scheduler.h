@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include <memory>
 #include <thread>
 #include <vector>
 
@@ -47,7 +48,7 @@ public:
 
     explicit RasterizerScheduler(int thread_count)
     {
-        thread_count = actual_thread_count(thread_count);
+        thread_count = thread::actual_worker_count(thread_count);
         thread_count_ = thread_count;
 
         threads_.reserve(thread_count);
@@ -155,14 +156,6 @@ private:
             worker_->run(thread_local_data, *data_);
         }
     };
-
-    static int actual_thread_count(int thread_count) noexcept
-    {
-        if(thread_count > 0)
-            return thread_count;
-        int hardware_thread_count = static_cast<int>(std::thread::hardware_concurrency());
-        return std::max(1, hardware_thread_count + thread_count);
-    }
 
     int thread_count_;
 

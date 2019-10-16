@@ -97,7 +97,7 @@ void run()
         }
     };
 
-    constexpr int FB_W = 1024, FB_H = 768;
+    constexpr int FB_W = 3840, FB_H = 2160;
     ImageBuffer<RGB>  color_buffer(FB_H, FB_W);
     ImageBuffer<real> depth_buffer(FB_H, FB_W, 1);
 
@@ -107,17 +107,19 @@ void run()
     DefaultDepthTester depth_tester  = { &depth_buffer };
     OutputMerger       output_merger = { &color_buffer };
 
-    vertex_shader.world = Mat4::scale(Vec3(0.06f))
-                        * Mat4::rotate_x(math::deg2rad(90.0f));
-    vertex_shader.WVP = Mat4::perspective(math::deg2rad(30.0f), float(FB_W) / FB_H, 0.01f, 100.0f)
-                      * Mat4::look_at({ -2, -10, 2 }, { 0, 0, 0 }, { 0, 0, 1 })
+    vertex_shader.world = Mat4::left_transform::scale(Vec3(0.07f))
+                        * Mat4::left_transform::rotate_x(math::deg2rad(90.0f));
+    vertex_shader.WVP = Mat4::left_transform::perspective(math::deg2rad(30.0f), float(FB_W) / FB_H, 0.01f, 100.0f)
+                      * Mat4::left_transform::look_at({ -2, -10, 2 }, { 0, 0, 0 }, { 0, 0, 1 })
                       * vertex_shader.world;
 
-    RasterizerScheduler scheduler(4);
+    VertexScheduler vertex_scheduler(2);
+    RasterizerScheduler rasterizer_scheduler(6);
 
     TrianglePipeline pipeline(&vertex_shader, &interpolator, &fragment_shader, &depth_tester, &output_merger);
 
-    pipeline.set_scheduler(&scheduler);
+    pipeline.set_vertex_scheduler(&vertex_scheduler);
+    pipeline.set_rasterizer_scheduler(&rasterizer_scheduler);
     pipeline.set_framebuffer_size({ FB_W, FB_H });
 
     auto mesh = mesh::load_from_file("./bunny.obj");
@@ -139,7 +141,9 @@ void run()
     color_buffer.clear({ 0, 1, 1 });
     depth_buffer.clear(1);
     pipeline.process(vertices.data(), vertices.size());
-    scheduler.sync();
+
+    vertex_scheduler.sync();
+    rasterizer_scheduler.sync();
 
     std::cout << clock.us() / 1000.0f << "ms" << std::endl;
 

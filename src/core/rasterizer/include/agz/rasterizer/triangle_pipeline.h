@@ -1,8 +1,11 @@
 #pragma once
 
+#include <agz/utility/misc.h>
+
 #include <agz/rasterizer/rasterizer_scheduler.h>
 #include <agz/rasterizer/triangle_clipper.h>
 #include <agz/rasterizer/varying.h>
+#include <agz/rasterizer/vertex_scheduler.h>
 
 AGZ_RASTERIZER_BEGIN
 
@@ -28,9 +31,26 @@ class TrianglePipeline
         real w[3] = { 0, 0, 0 };
     };
 
+    struct VertexDataBatch
+    {
+        agz::misc::span<const typename TVertexShader::Input> vertices;
+    };
+
     using VaryingDataBatch = std::vector<ClippedTriangle>;
 
-    class Worker : public RasterizerScheduler::ThreadWorker<VaryingDataBatch>
+    class VertexWorker : public VertexScheduler::ThreadWorker<VertexDataBatch>
+    {
+    public:
+
+        const Self *pipeline = nullptr;
+
+        void run(const VertexDataBatch &data) const noexcept override
+        {
+            pipeline->vertex_worker_func(data);
+        }
+    };
+
+    class RasterizeWorker : public RasterizerScheduler::ThreadWorker<VaryingDataBatch>
     {
     public:
 
@@ -38,7 +58,7 @@ class TrianglePipeline
 
         void run(const RasterizerScheduler::ThreadLocalData &thread_local_data, const VaryingDataBatch &data) const noexcept override
         {
-            return pipeline->rasterization_worker_func(thread_local_data, data);
+            pipeline->rasterization_worker_func(thread_local_data, data);
         }
     };
 
@@ -61,12 +81,6 @@ class TrianglePipeline
         int max_y = math::clamp<int>(int(std::ceil(max_y_f)), 0, framebuffer_size_.y - 1);
 
         return { { min_x, min_y }, { max_x, max_y } };
-    }
-
-    void execute_vertex_shader(const typename TVertexShader::Input *vertices, Varying *output, size_t vertex_count) const
-    {
-        for(size_t i = 0; i < vertex_count; ++i)
-            vertex_shader_->process(vertices[i], &output[i]);
     }
 
     static constexpr int CLIPPED_TRIANGLE_MAX_COUNT = Clipper::CLIPPED_TRIANGLE_MAX_COUNT;
@@ -103,14 +117,14 @@ class TrianglePipeline
 
                 if(triangle_batch->size() >= rasterizer_batch_size_)
                 {
-                    scheduler_->add_task<VaryingDataBatch>(worker_, std::move(triangle_batch));
+                    rasterizer_scheduler_->add_task<VaryingDataBatch>(rasterize_worker_, std::move(triangle_batch));
                     triangle_batch = std::make_shared<VaryingDataBatch>();
                 }
             }
         }
 
         if(!triangle_batch->empty())
-            scheduler_->add_task<VaryingDataBatch>(worker_, std::move(triangle_batch));
+            rasterizer_scheduler_->add_task<VaryingDataBatch>(rasterize_worker_, std::move(triangle_batch));
     }
 
     void rasterization_worker_func(const RasterizerScheduler::ThreadLocalData &thread_local_data, const VaryingDataBatch &data) const
@@ -225,13 +239,22 @@ class TrianglePipeline
         }
     }
 
+    void vertex_worker_func(const VertexDataBatch &data) const
+    {
+        std::vector<Varying> varyings(data.vertices.size());
+        for(size_t i = 0; i < data.vertices.size(); ++i)
+            vertex_shader_->process(data.vertices[i], &varyings[i]);
+        rasterize(varyings.data(), varyings.size());
+    }
+
     const TVertexShader   *vertex_shader_;
     const TInterpolator   *interpolator_;
     const TFragmentShader *fragment_shader_;
     const TDepthTester    *depth_tester_;
     const TOutputMerger   *output_merger_;
 
-    RasterizerScheduler *scheduler_;
+    VertexScheduler *vertex_scheduler_;
+    RasterizerScheduler *rasterizer_scheduler_;
 
     Clipper clipper_;
 
@@ -240,7 +263,8 @@ class TrianglePipeline
     size_t vertex_shader_batch_size_;
     size_t rasterizer_batch_size_;
 
-    std::shared_ptr<Worker> worker_;
+    std::shared_ptr<VertexWorker> vertex_worker_;
+    std::shared_ptr<RasterizeWorker> rasterize_worker_;
 
 public:
 
@@ -253,20 +277,9 @@ public:
     using Vertex = typename VertexShader::Input;
 
     TrianglePipeline()
+        : TrianglePipeline(nullptr, nullptr, nullptr, nullptr, nullptr)
     {
-        vertex_shader_   = nullptr;
-        interpolator_    = nullptr;
-        fragment_shader_ = nullptr;
-        depth_tester_    = nullptr;
-        output_merger_   = nullptr;
-
-        scheduler_       = nullptr;
-
-        vertex_shader_batch_size_ = 1024 * 3;
-        rasterizer_batch_size_    = 512;
-
-        worker_ = std::make_shared<Worker>();
-        worker_->pipeline = this;
+        
     }
 
     TrianglePipeline(
@@ -282,13 +295,17 @@ public:
         depth_tester_    = depth_tester;
         output_merger_   = output_merger;
 
-        scheduler_ = nullptr;
+        vertex_scheduler_ = nullptr;
+        rasterizer_scheduler_ = nullptr;
 
-        vertex_shader_batch_size_ = 1024 * 3;
+        vertex_shader_batch_size_ = 512 * 3;
         rasterizer_batch_size_ = 512;
 
-        worker_ = std::make_shared<Worker>();
-        worker_->pipeline = this;
+        vertex_worker_ = std::make_shared<VertexWorker>();
+        vertex_worker_->pipeline = this;
+
+        rasterize_worker_ = std::make_shared<RasterizeWorker>();
+        rasterize_worker_->pipeline = this;
     }
 
     void process(const Vertex *vertices, size_t vertex_count) const
@@ -296,12 +313,14 @@ public:
         assert(vertex_count && vertex_count % 3 == 0);
         assert(vertex_shader_batch_size_ && vertex_shader_batch_size_ % 3 == 0);
 
-        std::vector<Varying> varyings(vertex_shader_batch_size_);
         while(vertex_count > 0)
         {
             size_t batch_size = (std::min)(vertex_shader_batch_size_, vertex_count);
-            execute_vertex_shader(vertices, varyings.data(), batch_size);
-            rasterize(varyings.data(), batch_size);
+
+            auto vertexDataBatch = std::make_unique<VertexDataBatch>();
+            vertexDataBatch->vertices = misc::span<const Vertex>(vertices, batch_size);
+            vertex_scheduler_->add_task<VertexDataBatch>(vertex_worker_, std::move(vertexDataBatch));
+
             vertices += batch_size;
             vertex_count -= batch_size;
         }
@@ -333,9 +352,14 @@ public:
         output_merger_ = output_merger;
     }
 
-    void set_scheduler(RasterizerScheduler *scheduler)
+    void set_vertex_scheduler(VertexScheduler *scheduler)
     {
-        scheduler_ = scheduler;
+        vertex_scheduler_ = scheduler;
+    }
+
+    void set_rasterizer_scheduler(RasterizerScheduler *scheduler)
+    {
+        rasterizer_scheduler_ = scheduler;
     }
 
     void set_framebuffer_size(const Vec2i &framebuffer_size)
