@@ -37,6 +37,7 @@ namespace material
                 transmission_roughness = context.create<Texture>(*node);
             
             auto ior              = helper::child_texture_or_constant(context, params, "ior", real(1.5));
+            auto specular_scale   = helper::child_texture_or_constant(context, params, "specular_scale", 1);
             auto specular_tint    = helper::child_texture_or_constant(context, params, "specular_tint", 0);
             auto anisotropic      = helper::child_texture_or_constant(context, params, "anisotropic", 0);
             auto sheen            = helper::child_texture_or_constant(context, params, "sheen", 0);
@@ -54,6 +55,7 @@ namespace material
                 std::move(transmission),
                 std::move(transmission_roughness),
                 std::move(ior),
+                std::move(specular_scale),
                 std::move(specular_tint),
                 std::move(anisotropic),
                 std::move(sheen),

@@ -50,6 +50,8 @@ public:
 
     /**
      * @brief 采样入射点xi
+     *
+     * @param xo_wi 以xo为起点指向介质内部的方向
      */
     virtual BSSRDFSampleResult sample(const Vec3 &xo_wi, TransportMode mode, const Sample4 &sam, Arena &arena) const = 0;
 };

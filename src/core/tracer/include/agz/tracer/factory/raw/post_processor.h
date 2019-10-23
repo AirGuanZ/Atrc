@@ -26,5 +26,7 @@ std::shared_ptr<PostProcessor> create_saving_to_img(
     std::string filename, std::string ext,
     bool open, real gamma, bool with_alpha_channel);
 
-AGZ_TRACER_END
+std::shared_ptr<PostProcessor> create_img_resizer(
+    const Vec2i &target_size);
 
+AGZ_TRACER_END

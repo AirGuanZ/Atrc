@@ -75,6 +75,22 @@ namespace post_processor
         }
     };
 
+    class ResizeImageCreator : public Creator<PostProcessor>
+    {
+    public:
+
+        std::string name() const override
+        {
+            return "resize";
+        }
+
+        std::shared_ptr<PostProcessor> create(const ConfigGroup &params, CreatingContext &context) const override
+        {
+            Vec2i target_size = params.child_vec2i("size");
+            return create_img_resizer(target_size);
+        }
+    };
+
     class SaveGBufferCreator : public Creator<PostProcessor>
     {
     public:
@@ -152,6 +168,7 @@ void initialize_post_processor_factory(Factory<PostProcessor> &factory)
     factory.add_creator(std::make_unique<post_processor::FlipCreator>());
     factory.add_creator(std::make_unique<post_processor::GammaCreator>());
     factory.add_creator(std::make_unique<post_processor::OIDNDenoiserCreator>());
+    factory.add_creator(std::make_unique<post_processor::ResizeImageCreator>());
     factory.add_creator(std::make_unique<post_processor::SaveGBufferCreator>());
     factory.add_creator(std::make_unique<post_processor::SaveImgCreator>());
     factory.add_creator(std::make_unique<post_processor::SavePNGCreator>());

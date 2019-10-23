@@ -1,7 +1,6 @@
 ﻿#include <agz/tracer/core/medium.h>
+#include <agz/tracer/utility/phase_function.h>
 #include <agz/utility/misc.h>
-
-#include "./phase_function.h"
 
 AGZ_TRACER_BEGIN
 

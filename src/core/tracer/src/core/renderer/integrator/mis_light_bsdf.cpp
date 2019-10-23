@@ -198,4 +198,86 @@ Spectrum mis_sample_scattering(const Scene &scene, const ScatteringPoint &pnt, c
     return nonarea_illum + f / (pnt_sample.pdf + light_pdf);
 }
 
+Spectrum mis_sample_bsdf(
+    const Scene &scene, const EntityIntersection &inct, const ShadingPoint &shd, const Sample3 &sam,
+    BSDFSampleResult &bsdf_sample, bool &has_new_inct, EntityIntersection &new_inct)
+{
+    has_new_inct = false;
+
+    bsdf_sample = shd.bsdf->sample(inct.wr, TM_Radiance, sam);
+    if(!bsdf_sample.f)
+        return {};
+    bsdf_sample.dir = bsdf_sample.dir.normalize();
+
+    Ray new_ray(inct.eps_offset(bsdf_sample.dir), bsdf_sample.dir);
+    has_new_inct = scene.closest_intersection(new_ray, &new_inct);
+
+    Spectrum nonarea_illum;
+    const Medium *medium = inct.medium(bsdf_sample.dir);
+
+    if(has_new_inct)
+    {
+        real new_inct_dist = new_inct.t;
+        real new_inct_dist2 = new_inct_dist * new_inct_dist;
+
+        for(auto light : scene.nonarea_lights())
+        {
+            Vec3 light_pnt;
+            Spectrum light_radiance = light->radiance(new_ray.o, new_ray.d, &light_pnt);
+            if(!light_radiance || (light_pnt - new_ray.o).length_square() >= new_inct_dist2)
+                continue;
+
+            Spectrum tr = medium->tr(new_ray.o, light_pnt);
+            Spectrum f = tr * light_radiance * bsdf_sample.f * std::abs(dot(inct.geometry_coord.z, new_ray.d));
+
+            if(bsdf_sample.is_delta)
+                nonarea_illum += f / bsdf_sample.pdf;
+            else
+            {
+                real light_pdf = light->pdf(new_ray.o, new_ray.d);
+                nonarea_illum += f / (bsdf_sample.pdf + light_pdf);
+            }
+        }
+    }
+    else
+    {
+        for(auto light : scene.nonarea_lights())
+        {
+            Spectrum light_radiance = light->radiance(new_ray.o, new_ray.d);
+            if(!light_radiance)
+                continue;
+
+            Spectrum f = light_radiance * bsdf_sample.f * std::abs(dot(inct.geometry_coord.z, new_ray.d));
+
+            if(bsdf_sample.is_delta)
+                nonarea_illum += f / bsdf_sample.pdf;
+            else
+            {
+                real light_pdf = light->pdf(new_ray.o, new_ray.d);
+                nonarea_illum += f / (bsdf_sample.pdf + light_pdf);
+            }
+        }
+    }
+
+    if(!has_new_inct)
+        return nonarea_illum;
+
+    auto light = new_inct.entity->as_light();
+    if(!light)
+        return nonarea_illum;
+
+    Spectrum light_radiance = light->radiance(new_inct, new_inct.wr);
+    if(!light_radiance)
+        return nonarea_illum;
+
+    Spectrum tr = medium->tr(new_ray.o, new_inct.pos);
+    Spectrum f = tr * light_radiance * bsdf_sample.f * std::abs(dot(inct.geometry_coord.z, new_ray.d));
+
+    if(bsdf_sample.is_delta)
+        return nonarea_illum + f / bsdf_sample.pdf;
+
+    real light_pdf = light->pdf(new_ray.o, new_inct);
+    return nonarea_illum + f / (bsdf_sample.pdf + light_pdf);
+}
+
 AGZ_TRACER_END

@@ -13,10 +13,10 @@ NormalizedDiffusionBSSRDF::NormalizedDiffusionBSSRDF(
 
 Spectrum NormalizedDiffusionBSSRDF::distance_factor(real distance) const noexcept
 {
-    distance = std::max(distance, EPS);
+    distance = std::max(distance, real(1e-6));
     Spectrum a = math::exp(-Spectrum(distance) / d_);
     Spectrum b = math::exp(-Spectrum(distance) / (real(3) * d_));
-    Spectrum dem = 4 * PI_r * d_ * distance;
+    Spectrum dem = 8 * PI_r * d_ * distance;
     return A_ * (a + b) / dem;
 }
 
@@ -34,7 +34,7 @@ real NormalizedDiffusionBSSRDF::sample_distance(int channel, const Sample1 &sam)
 
 real NormalizedDiffusionBSSRDF::pdf_distance(int channel, real dist) const noexcept
 {
-    dist = (std::max)(dist, EPS);
+    dist = (std::max)(dist, real(1e-6));
     real a = std::exp(-dist / d_[channel]) / d_[channel];
     real b = std::exp(-dist / (3 * d_[channel])) / (3 * d_[channel]);
     return real(0.25) * a + real(0.75) * b;

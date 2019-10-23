@@ -23,6 +23,7 @@ namespace disney_impl
 
         real metallic_;
         real roughness_;
+        Spectrum specular_scale_;
         real specular_tint_;
         real anisotropic_;
         real sheen_;
@@ -240,7 +241,7 @@ namespace disney_impl
                 C_, metallic_);
             Spectrum dielectric_fresnel = Cspec * refl_aux::dielectric_fresnel(IOR_, 1, cos_theta_d);
             Spectrum conductor_fresnel = schlick(Cspec, cos_theta_d);
-            Spectrum F = mix(dielectric_fresnel, conductor_fresnel, metallic_);
+            Spectrum F = mix(specular_scale_ * dielectric_fresnel, conductor_fresnel, metallic_);
             
             real phi_h       = local_angle::phi(lwh);
             real sin_phi_h   = std::sin(phi_h);
@@ -463,6 +464,7 @@ namespace disney_impl
                    const Spectrum &base_color,
                    real metallic,
                    real roughness,
+                   const Spectrum &specular_scale,
                    real specular_tint,
                    real anisotropic,
                    real sheen,
@@ -478,12 +480,13 @@ namespace disney_impl
             C_     = base_color;
             Ctint_ = to_tint(base_color);
 
-            metallic_      = metallic;
-            roughness_     = roughness;
-            specular_tint_ = specular_tint;
-            anisotropic_   = anisotropic;
-            sheen_         = sheen;
-            sheen_tint_    = sheen_tint;
+            metallic_       = metallic;
+            roughness_      = roughness;
+            specular_scale_ = specular_scale;
+            specular_tint_  = specular_tint;
+            anisotropic_    = anisotropic;
+            sheen_          = sheen;
+            sheen_tint_     = sheen_tint;
 
             transmission_  = transmission;
             transmission_roughness_ = transmission_roughness;
@@ -724,6 +727,7 @@ class Disney : public Material
     std::shared_ptr<const Texture> base_color_;
     std::shared_ptr<const Texture> metallic_;
     std::shared_ptr<const Texture> roughness_;
+    std::shared_ptr<const Texture> specular_scale_;
     std::shared_ptr<const Texture> specular_tint_;
     std::shared_ptr<const Texture> anisotropic_;
     std::shared_ptr<const Texture> sheen_;
@@ -746,6 +750,7 @@ public:
         std::shared_ptr<const Texture> transmission,
         std::shared_ptr<const Texture> transmission_roughness,
         std::shared_ptr<const Texture> ior,
+        std::shared_ptr<const Texture> specular_scale,
         std::shared_ptr<const Texture> specular_tint,
         std::shared_ptr<const Texture> anisotropic,
         std::shared_ptr<const Texture> sheen,
@@ -761,6 +766,7 @@ public:
         transmission_           = transmission;
         transmission_roughness_ = transmission_roughness;
         IOR_                    = ior;
+        specular_scale_         = specular_scale;
         specular_tint_          = specular_tint;
         anisotropic_            = anisotropic;
         sheen_                  = sheen;
@@ -781,6 +787,7 @@ public:
         real     transmission           = transmission_    ->sample_real(uv);
         real     transmission_roughness = transmission_roughness_->sample_real(uv);
         real     ior                    = IOR_             ->sample_real(uv);
+        Spectrum specular_scale         = specular_scale_  ->sample_spectrum(uv);
         real     specular_tint          = specular_tint_   ->sample_real(uv);
         real     anisotropic            = anisotropic_     ->sample_real(uv);
         real     sheen                  = sheen_           ->sample_real(uv);
@@ -796,6 +803,7 @@ public:
             base_color,
             metallic,
             roughness,
+            specular_scale,
             specular_tint,
             anisotropic,
             sheen,
@@ -810,7 +818,7 @@ public:
         ShadingPoint shd = { bsdf };
         if(has_subsurface)
         {
-            shd.bssrdf = arena.create<ConstantBSSRDF>(
+            shd.bssrdf = arena.create<NormalizedDiffusionBSSRDF>(
                 inct, inct.geometry_coord, inct.geometry_coord,
                 ior, real(0), base_color * (1 - metallic) * (1 - transmission), scatter_distance);
         }
@@ -826,6 +834,7 @@ std::shared_ptr<Material> create_disney(
     std::shared_ptr<const Texture> transmission,
     std::shared_ptr<const Texture> transmission_roughness,
     std::shared_ptr<const Texture> ior,
+    std::shared_ptr<const Texture> specular_scale,
     std::shared_ptr<const Texture> specular_tint,
     std::shared_ptr<const Texture> anisotropic,
     std::shared_ptr<const Texture> sheen,
@@ -843,6 +852,7 @@ std::shared_ptr<Material> create_disney(
         transmission,
         transmission_roughness,
         ior,
+        specular_scale,
         specular_tint,
         anisotropic,
         sheen,

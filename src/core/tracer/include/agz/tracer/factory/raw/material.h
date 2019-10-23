@@ -27,6 +27,7 @@ std::shared_ptr<Material> create_disney(
     std::shared_ptr<const Texture> transmission,
     std::shared_ptr<const Texture> transmission_roughness,
     std::shared_ptr<const Texture> ior,
+    std::shared_ptr<const Texture> specular_scale,
     std::shared_ptr<const Texture> specular_tint,
     std::shared_ptr<const Texture> anisotropic,
     std::shared_ptr<const Texture> sheen,

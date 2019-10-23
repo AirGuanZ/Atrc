@@ -132,7 +132,6 @@ BSSRDFSampleResult SeparableBSSRDF::sample(const Vec3 &xo_wi, TransportMode mode
         return ret;
     }
 
-
     // choose sampling axis
 
     int sample_axis;
@@ -159,8 +158,8 @@ BSSRDFSampleResult SeparableBSSRDF::sample(const Vec3 &xo_wi, TransportMode mode
     // sample distance and phi
 
     real r = sample_distance(channel, { new_v });
-    real r_end = sample_distance(channel, { real(0.997) });
-    if(r < 0 || r >= r_end)
+    real r_end = sample_distance(channel, { real(0.998) });
+    if(r < real(1e-6) || r >= r_end)
         return BSSRDF_SAMPLE_RESULT_INVALID;
     real phi = 2 * PI_r * sam.w;
 
@@ -206,10 +205,11 @@ BSSRDFSampleResult SeparableBSSRDF::sample(const Vec3 &xo_wi, TransportMode mode
     int xi_idx = math::distribution::extract_uniform_int(sam.r, 0, list_len).first;
     while(xi_idx-- > 0)
         list = list->next;
+    real dist = (list->inct.pos - xo_.pos).length();
     ret.inct    = list->inct;
     ret.inct.wr = -ret.inct.geometry_coord.z;
-    ret.f       = (1 - transparency_) * distance_factor(r);
-    ret.pdf     = pdf(ret.inct, mode) / list_len * (1 - transparency_);
+    ret.f       = dist * (1 - transparency_) * distance_factor(dist);
+    ret.pdf     = pdf_distance(channel, r) * (1 - transparency_) / (2 * PI_r * list_len);//pdf(ret.inct, mode) / list_len * (1 - transparency_) / (2 * PI_r);
     ret.bsdf    = arena.create<SeparableBSDF>(ret.inct.geometry_coord, ret.inct.geometry_coord, this);
 
     if(!ret.f.is_finite() || ret.pdf < EPS)
@@ -233,9 +233,8 @@ real SeparableBSSRDF::pdf(const SurfacePoint &xi, TransportMode mode) const noex
     {
         for(int channel = 0; channel < SPECTRUM_COMPONENT_COUNT; ++channel)
         {
-            real r = (std::max)(r_proj[axis], EPS);
-            ret += pdf_distance(channel, r)
-                 * std::abs(ln[axis]) * channel_prob * axis_prob[axis] / (2 * PI_r * r);
+            real r = (std::max)(r_proj[axis], real(1e-6));
+            ret += pdf_distance(channel, r) * std::abs(ln[axis]) * channel_prob * axis_prob[axis];
         }
     }
 

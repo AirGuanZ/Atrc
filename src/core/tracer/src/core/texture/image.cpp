@@ -72,7 +72,7 @@ public:
         else
             throw ObjectConstructionException("invalid sample method");
 
-        AGZ_HIERARCHY_WRAP("in initializing hdr texture object")
+        AGZ_HIERARCHY_WRAP("in initializing image texture object")
     }
 
     int width() const noexcept override

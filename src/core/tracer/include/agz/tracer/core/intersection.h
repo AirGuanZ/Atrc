@@ -66,6 +66,11 @@ struct EntityIntersection : GeometryIntersection
     {
         return dot(wr, geometry_coord.z) >= 0 ? medium_in : medium_out;
     }
+
+    const Medium *medium(const Vec3 &d) const noexcept
+    {
+        return dot(d, geometry_coord.z) >= 0 ? medium_out : medium_in;
+    }
 };
 
 /**

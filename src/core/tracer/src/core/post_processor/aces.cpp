@@ -1,4 +1,5 @@
 #include <agz/tracer/core/post_processor.h>
+#include <agz/tracer/utility/logger.h>
 #include <agz/utility/misc.h>
 
 AGZ_TRACER_BEGIN
@@ -52,7 +53,8 @@ public:
 
     void process(ImageBuffer &image, GBuffer&) override
     {
-        //Spectrum lum = avg_lum(image);
+        AGZ_LOG1("aces tone mapping");
+
         for(int y = 0; y < image.height(); ++y)
         {
             for(int x = 0; x < image.width(); ++x)
