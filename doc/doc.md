@@ -949,6 +949,36 @@ Disney Principled BRDF的完整实现，有的参数含义我不知道怎么翻�
 | lhs    | Texture |        | 左乘数 |
 | rhs    | Texture |        | 右乘数 |
 
+**lum_classify**
+
+用一幅纹理在另两幅纹理间进行选择。
+
+| 字段名    | 类型    | 默认值 | 含义               |
+| --------- | ------- | ------ | ------------------ |
+| internal  | Texture |        | 用来选择的纹理     |
+| threshold | Texture |        | 表示选择阈值的纹理 |
+| high      | Texture |        | 被选择的一幅纹理   |
+| low       | Texture |        | 被选择的另一幅纹理 |
+
+对纹理$T$，用$T(u, v)$表示以纹理坐标$(u, v)$对$T$采样得到的结果，则`lum_classify`定义为：
+$$
+\mathrm{lum\_classify}(u, v) := \begin{cases}\begin{aligned}
+    &\mathrm{high}(u,v), &\mathrm{internal}(u, v) \ge \mathrm{threshold}(u, v) \\
+    &\mathrm{low}(u, v), &\text{otherwise}
+\end{aligned}\end{cases}
+$$
+**reverse**
+
+反转一幅纹理的颜色。
+
+| 字段名   | 类型    | 默认值 | 含义         |
+| -------- | ------- | ------ | ------------ |
+| internal | Texture |        | 被反转的纹理 |
+
+$$
+\mathrm{reverse}(u, v) := \mathrm{clamp}(1 - \mathrm{internal}(u, v), 0, 1)
+$$
+
 ### Transform
 
 对三维坐标的仿射变换。

@@ -43,4 +43,15 @@ std::shared_ptr<Texture> create_texture_multiplier(
     std::shared_ptr<const Texture> lhs,
     std::shared_ptr<const Texture> rhs);
 
+std::shared_ptr<Texture> create_luminance_classifier(
+    const TextureCommonParams &common_params,
+    std::shared_ptr<const Texture> internal,
+    std::shared_ptr<const Texture> thresholdTexture,
+    std::shared_ptr<const Texture> higherTexture,
+    std::shared_ptr<const Texture> lowerTexture);
+
+std::shared_ptr<Texture> create_texture_reverse(
+    const TextureCommonParams &common_params,
+    std::shared_ptr<const Texture> internal);
+
 AGZ_TRACER_END

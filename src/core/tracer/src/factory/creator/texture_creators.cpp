@@ -168,6 +168,48 @@ namespace texture
         }
     };
 
+    class TextureLuminanceClassifierCreator : public Creator<Texture>
+    {
+    public:
+
+        std::string name() const override
+        {
+            return "lum_classify";
+        }
+
+        std::shared_ptr<Texture> create(const ConfigGroup &params, CreatingContext &context) const override
+        {
+            auto common_params = init_common_params(params);
+            auto internal = context.create<Texture>(params.child_group("internal"));
+            auto threshold = context.create<Texture>(params.child_group("threshold"));
+            auto higher = context.create<Texture>(params.child_group("high"));
+            auto lower = context.create<Texture>(params.child_group("low"));
+            return create_luminance_classifier(
+                common_params,
+                std::move(internal),
+                std::move(threshold),
+                std::move(higher),
+                std::move(lower));
+        }
+    };
+
+    class TextureReverseCreator : public Creator<Texture>
+    {
+    public:
+
+        std::string name() const override
+        {
+            return "reverse";
+        }
+
+        std::shared_ptr<Texture> create(const ConfigGroup &params, CreatingContext &context) const override
+        {
+            auto common_params = init_common_params(params);
+            auto internal = context.create<Texture>(params.child_group("internal"));
+            return create_texture_reverse(common_params, std::move(internal));
+        }
+    };
+
 } // namespace texture
 
 void initialize_texture_factory(Factory<Texture> &factory)
@@ -180,6 +222,8 @@ void initialize_texture_factory(Factory<Texture> &factory)
     factory.add_creator(std::make_unique<texture::TextureScalerCreator>());
     factory.add_creator(std::make_unique<texture::TextureAdderCreator>());
     factory.add_creator(std::make_unique<texture::TextureMultiplierCreator>());
+    factory.add_creator(std::make_unique<texture::TextureLuminanceClassifierCreator>());
+    factory.add_creator(std::make_unique<texture::TextureReverseCreator>());
 }
 
 AGZ_TRACER_FACTORY_END
