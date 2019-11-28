@@ -15,12 +15,15 @@ class GeometricEntity : public Entity
 
 public:
 
-    void initialize(std::shared_ptr<const Geometry> geometry, std::shared_ptr<const Material> material, const MediumInterface &med, bool shadow_catcher)
+    void initialize(
+        std::shared_ptr<const Geometry> geometry, std::shared_ptr<const Material> material, const MediumInterface &med,
+        bool shadow_catcher, bool no_denoise)
     {
         geometry_ = std::move(geometry);
         material_ = std::move(material);
         medium_interface_ = med;
         is_shadow_catcher_ = shadow_catcher;
+        set_no_denoise_flag(no_denoise);
     }
 
     bool has_intersection(const Ray &r) const noexcept override
@@ -66,10 +69,11 @@ std::shared_ptr<Entity> create_geometric(
     std::shared_ptr<const Geometry> geometry,
     std::shared_ptr<const Material> material,
     const MediumInterface &med,
-    bool shadow_catcher)
+    bool shadow_catcher, bool no_denoise)
 {
     auto ret = std::make_shared<GeometricEntity>();
-    ret->initialize(std::move(geometry), std::move(material), med, shadow_catcher);
+    ret->initialize(std::move(geometry), std::move(material), med,
+                    shadow_catcher, no_denoise);
     return ret;
 }
 

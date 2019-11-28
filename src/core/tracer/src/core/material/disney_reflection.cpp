@@ -320,7 +320,7 @@ public:
                                              clearcoat,
                                              clearcoat_gloss);
 
-        return { bsdf };
+        return { bsdf, shading_coord.z };
     }
 };
 

@@ -91,6 +91,7 @@ public:
 
         ShadingPoint shd;
         shd.bsdf = arena.create<IdealDiffuseBRDF>(inct.geometry_coord, shading_coord, albedo);
+        shd.shading_normal = shading_coord.z;
 
         return shd;
     }

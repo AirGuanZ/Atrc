@@ -93,12 +93,13 @@ class DiffuseLightEntity : public Entity
 public:
 
     void initialize(
-        std::shared_ptr<const Geometry> geometry, const Spectrum &radiance, const MediumInterface &med)
+        std::shared_ptr<const Geometry> geometry, const Spectrum &radiance, const MediumInterface &med, bool no_denoise)
     {
         //light_ = arena.create<DiffuseLight>();
         light_ = std::make_unique<DiffuseLight>();
         light_->initialize(std::move(geometry), radiance, med);
         material_ = create_ideal_black();
+        set_no_denoise_flag(no_denoise);
     }
 
     bool has_intersection(const Ray &r) const noexcept override
@@ -136,10 +137,11 @@ public:
 std::shared_ptr<Entity> create_diffuse_light(
     std::shared_ptr<const Geometry> geometry,
     const Spectrum &radiance,
-    const MediumInterface &med)
+    const MediumInterface &med,
+    bool no_denoise)
 {
     auto ret = std::make_shared<DiffuseLightEntity>();
-    ret->initialize(geometry, radiance, med);
+    ret->initialize(geometry, radiance, med, no_denoise);
     return ret;
 }
 

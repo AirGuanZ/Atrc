@@ -303,6 +303,8 @@ Atrc使用JSON作为描述场景和渲染设置的配置文件格式。整个JSO
 
 本节描述类型为`Entity`的字段有哪些可取的类型值。
 
+所有类型的Entity都具有一个可选的字符串属性：`customed_flag`，该属性的作用在不同的渲染算法下亦不同，如非渲染算法特别指明，通常情况下均可忽略。
+
 **diffuse**
 
 ![diffuse_light](./pictures/diffuse_light.png)
@@ -315,6 +317,7 @@ Atrc使用JSON作为描述场景和渲染设置的配置文件格式。整个JSO
 | radiance | Spectrum |        | 辐射亮度 |
 | med_in   | Medium   | void   | 内部介质，默认为真空 |
 | med_out  | Medium   | void   | 外部介质，默认为真空 |
+| no_denoise | bool | false | 使得降噪器对图像上该物体所在的区域无效 |
 
 **geometric**
 
@@ -540,7 +543,6 @@ Disney Principled BRDF的完整实现，有的参数含义我不知道怎么翻�
 | transmission           | Texture | all_zero  | 透明度，取值范围为$[0,1]$                                   |
 | transmission_roughness | Texture | roughness | 折射粗糙度，取值范围为$[0, 1]$                              |
 | ior                    | Texture | all_{1.5} | 内外折射率之比，取值范围为$[0,\infty)$                      |
-| scatter_distance       | Texture | all_zero  | mean free path length (for subsurface scattering)           |
 
 **frosted_glass**
 
@@ -625,19 +627,6 @@ Disney Principled BRDF的完整实现，有的参数含义我不知道怎么翻�
 | -------- | -------- | ------ | ------------ |
 | internal | Material |        | 被缩放的材质 |
 | scale    | Texture  |        | 缩放比       |
-
-**subsurface**
-
-![pic](./pictures/subsurface.png)
-
-次表面散射材质，基于`ConstantBSSRDF`实现。
-
-| 字段名  | 类型     | 默认值 | 含义                                         |
-| ------- | -------- | ------ | -------------------------------------------- |
-| surface | Material |        | 覆盖在表面的一层材质，一般来说应包含折射分量 |
-| A       | Texture  |        | surface albedo                               |
-| d       | Texture  |        | mean free path length                        |
-| ior     | Texture  |        | inner IOR / outer IOR                        |
 
 **mirror_varnish**
 
@@ -961,12 +950,14 @@ Disney Principled BRDF的完整实现，有的参数含义我不知道怎么翻�
 | low       | Texture |        | 被选择的另一幅纹理 |
 
 对纹理$T$，用$T(u, v)$表示以纹理坐标$(u, v)$对$T$采样得到的结果，则`lum_classify`定义为：
+
 $$
 \mathrm{lum\_classify}(u, v) := \begin{cases}\begin{aligned}
     &\mathrm{high}(u,v), &\mathrm{internal}(u, v) \ge \mathrm{threshold}(u, v) \\
     &\mathrm{low}(u, v), &\text{otherwise}
 \end{aligned}\end{cases}
 $$
+
 **reverse**
 
 反转一幅纹理的颜色。

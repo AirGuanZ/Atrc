@@ -45,6 +45,7 @@ public:
     {
         ShadingPoint shd;
         shd.bsdf = IDEAL_BLACK_BSDF_INSTANCE();
+        shd.shading_normal = inct.user_coord.z;
         return shd;
     }
 

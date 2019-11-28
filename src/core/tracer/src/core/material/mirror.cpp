@@ -79,6 +79,7 @@ public:
 
         auto bsdf = arena.create<MirrorBSDF >(inct.geometry_coord, inct.user_coord, fresnel_point, rc);
         ret.bsdf = bsdf;
+        ret.shading_normal = inct.user_coord.z;
 
         return ret;
     }

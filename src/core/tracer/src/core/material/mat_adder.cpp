@@ -25,7 +25,7 @@ public:
             auto subbsdf = mat->shade(inct, arena);
             bsdf->add(subbsdf.bsdf);
         }
-        return { bsdf };
+        return { bsdf, inct.user_coord.z };
     }
 };
 

@@ -59,6 +59,18 @@ public:
         filter.commit();
         filter.execute();
 
+        if(gbuffer.denoise)
+        {
+            for(int y = 0; y < output.height(); ++y)
+            {
+                for(int x = 0; x < output.width(); ++x)
+                {
+                    if(gbuffer.denoise->at(y, x) < real(0.8))
+                        output.at(y, x) = clamped_data(y, x);
+                }
+            }
+        }
+
         const char* err;
         if(device.getError(err) != oidn::Error::None)
             AGZ_LOG0("oidn_denoiser error: ", err);

@@ -158,7 +158,7 @@ public:
         auto bsdf = arena.create<MirrorVarnishBSDF>(
             inct.geometry_coord, inct.user_coord, internal_shd.bsdf, eta_in, eta_out, color);
         
-        return { bsdf };
+        return { bsdf, inct.user_coord.z };
     }
 };
 

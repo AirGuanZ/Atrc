@@ -24,12 +24,18 @@ public:
         };
     }
 
-    SampleMediumResult sample(const Vec3 &o, const Vec3 &d, real t_min, real t_max, const Sample1 &sam) const noexcept override
+    //SampleMediumResult sample(const Vec3 &o, const Vec3 &d, real t_min, real t_max, Sampler &sampler) const noexcept override
+    //{
+    //    return SAMPLE_MEDIUM_RESULT_INVALID;
+    //}
+
+    SampleOutScatteringResult sample_scattering(const Vec3 &a, const Vec3 &b, Sampler &sampler) const noexcept override
     {
-        return SAMPLE_MEDIUM_RESULT_INVALID;
+        Spectrum tr_value = tr(a, b);
+        return { std::nullopt, tr_value };
     }
 
-    ShadingPoint shade(const MediumIntersection &inct, Arena &arena) const noexcept override
+    ShadingPoint shade(const MediumScattering &inct, Arena &arena) const noexcept override
     {
         return { nullptr };
     }

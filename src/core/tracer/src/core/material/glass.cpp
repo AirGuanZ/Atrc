@@ -132,6 +132,7 @@ public:
         ret.bsdf = arena.create<GlassBSDF>(
             inct.geometry_coord, inct.user_coord, fresnel_point,
             color_reflection, color_refraction);
+        ret.shading_normal = inct.user_coord.z;
 
         return ret;
     }

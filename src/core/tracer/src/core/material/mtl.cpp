@@ -277,7 +277,7 @@ public:
         bsdf->add(diffuse);
         bsdf->add(specular);
         
-        return { bsdf };
+        return { bsdf, inct.user_coord.z };
     }
 };
 

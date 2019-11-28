@@ -52,6 +52,7 @@ void run(int argc, char *argv[])
         AGZ_LOG0("initializing embree device");
         agz::tracer::init_embree_device();
         AGZ_SCOPE_GUARD({
+			AGZ_LOG0("destroying embree device");
             agz::tracer::destroy_embree_device();
         });
 #endif
@@ -82,8 +83,6 @@ void run(int argc, char *argv[])
             AGZ_LOG0("processing rendering session [", i, "]");
         render_sessions[i].execute();
     }
-
-    AGZ_LOG0("destroying embree device");
 }
 
 #if defined(_WIN32) && defined(_DEBUG)

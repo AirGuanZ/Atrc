@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include <string>
+
 #include <agz/tracer/core/intersection.h>
 
 AGZ_TRACER_BEGIN
@@ -13,9 +15,15 @@ class AreaLight;
  */
 class Entity
 {
+    bool no_denoise_ = false;
+
 public:
 
     virtual ~Entity() = default;
+
+    void set_no_denoise_flag(bool no_denoise) noexcept { no_denoise_ = no_denoise; }
+
+    bool get_no_denoise_flag() const noexcept { return no_denoise_; }
 
     /** @brief 判断给定射线是否与该实体有交点 */
     virtual bool has_intersection(const Ray &r) const noexcept = 0;

@@ -24,7 +24,7 @@ public:
         auto internal_shd = internal_->shade(inct, arena);
         auto scale = scale_->sample_spectrum(inct.uv);
         auto bsdf = arena.create<BSDFScaler>(scale, internal_shd.bsdf);
-        return { bsdf };
+        return { bsdf, inct.user_coord.z };
     }
 };
 

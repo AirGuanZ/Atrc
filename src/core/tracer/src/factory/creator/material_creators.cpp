@@ -44,7 +44,6 @@ namespace material
             auto sheen_tint       = helper::child_texture_or_constant(context, params, "sheen_tint", 0);
             auto clearcoat        = helper::child_texture_or_constant(context, params, "clearcoat", 0);
             auto clearcoat_gloss  = helper::child_texture_or_constant(context, params, "clearcoat_gloss", 1);
-            auto scatter_distance = helper::child_texture_or_constant(context, params, "scatter_distance", 0);
 
             auto normal_mapper = init_normal_mapper(params, context);
 
@@ -62,7 +61,6 @@ namespace material
                 std::move(sheen_tint),
                 std::move(clearcoat),
                 std::move(clearcoat_gloss),
-                std::move(scatter_distance),
                 std::move(normal_mapper));
         }
     };
@@ -266,26 +264,6 @@ namespace material
         }
     };
 
-    class SubsurfaceCreator : public Creator<Material>
-    {
-    public:
-
-        std::string name() const override
-        {
-            return "subsurface";
-        }
-
-        std::shared_ptr<Material> create(const ConfigGroup &params, CreatingContext &context) const override
-        {
-            auto surface = context.create<Material>(params.child_group("surface"));
-            auto d = context.create<Texture>(params.child_group("d"));
-            auto A = context.create<Texture>(params.child_group("A"));
-            auto ior = context.create<Texture>(params.child_group("ior"));
-            auto transparency = context.create<Texture>(params.child_group("transparency"));
-            return create_subsurface(std::move(surface), std::move(d), std::move(A), std::move(ior), std::move(transparency));
-        }
-    };
-
     class MirrorVarnishCreator : public Creator<Material>
     {
     public:
@@ -319,7 +297,6 @@ void initialize_material_factory(Factory<Material> &factory)
     factory.add_creator(std::make_unique<material::MaterialScalerCreator>());
     factory.add_creator(std::make_unique<material::MirrorCreator>());
     factory.add_creator(std::make_unique<material::MTLCreator>());
-    factory.add_creator(std::make_unique<material::SubsurfaceCreator>());
     factory.add_creator(std::make_unique<material::MirrorVarnishCreator>());
 }
 

@@ -14,8 +14,9 @@ struct GBufferPixel
     Spectrum albedo;
     Vec3 position;
     Vec3 normal;
-    real depth  = 0;
-    real binary = 0;
+    real depth   = 0;
+    real binary  = 0;
+    real denoise = 1;
 };
 
 /**
@@ -26,6 +27,7 @@ using PositionBuffer = texture::texture2d_t<Vec3>;
 using NormalBuffer   = texture::texture2d_t<Vec3>;
 using DepthBuffer    = texture::texture2d_t<real>;
 using BinaryBuffer   = texture::texture2d_t<real>;
+using DenoiseBuffer  = texture::texture2d_t<real>;
 
 /**
  * @brief 完整的gbuffer
@@ -37,6 +39,7 @@ struct GBuffer
     std::unique_ptr<NormalBuffer>   normal;
     std::unique_ptr<DepthBuffer>    depth;
     std::unique_ptr<BinaryBuffer>   binary;
+    std::unique_ptr<DenoiseBuffer>  denoise;
 
     GBuffer()                              = default;
     GBuffer(GBuffer&&)            noexcept = default;
@@ -49,6 +52,7 @@ struct GBuffer
         normal   = std::make_unique<NormalBuffer>  (*copy_from.normal);
         depth    = std::make_unique<DepthBuffer>   (*copy_from.depth);
         binary   = std::make_unique<BinaryBuffer>  (*copy_from.binary);
+        denoise  = std::make_unique<DenoiseBuffer> (*copy_from.depth);
     }
 
     GBuffer &operator=(const GBuffer &copy_from)
@@ -58,6 +62,7 @@ struct GBuffer
         normal   = std::make_unique<NormalBuffer>  (*copy_from.normal);
         depth    = std::make_unique<DepthBuffer>   (*copy_from.depth);
         binary   = std::make_unique<BinaryBuffer>  (*copy_from.binary);
+        denoise  = std::make_unique<DenoiseBuffer> (*copy_from.denoise);
         return *this;
     }
 
@@ -68,6 +73,7 @@ struct GBuffer
         normal   = std::make_unique<NormalBuffer>  (h, w);
         depth    = std::make_unique<DepthBuffer>   (h, w);
         binary   = std::make_unique<BinaryBuffer>  (h, w);
+        denoise  = std::make_unique<DenoiseBuffer> (h, w);
     }
 
     GBufferPixel get(int y, int x) const
@@ -78,6 +84,7 @@ struct GBuffer
         if(normal)   ret.normal   = normal  ->at(y, x);
         if(depth)    ret.depth    = depth   ->at(y, x);
         if(binary)   ret.binary   = binary  ->at(y, x);
+        if(denoise)  ret.denoise  = denoise ->at(y, x);
         return ret;
     }
 
@@ -88,6 +95,7 @@ struct GBuffer
         if(normal)   normal  ->at(y, x) = pixel.normal;
         if(depth)    depth   ->at(y, x) = pixel.depth;
         if(binary)   binary  ->at(y, x) = pixel.binary;
+        if(denoise)  denoise ->at(y, x) = pixel.denoise;
     }
 };
 

@@ -34,7 +34,6 @@ std::shared_ptr<Material> create_disney(
     std::shared_ptr<const Texture> sheen_tint,
     std::shared_ptr<const Texture> clearcoat,
     std::shared_ptr<const Texture> clearcoat_gloss,
-    std::shared_ptr<const Texture> scatter_distance,
     std::unique_ptr<const NormalMapper> normal_mapper);
 
 std::shared_ptr<Material> create_frosted_glass(
@@ -68,13 +67,6 @@ std::shared_ptr<Material> create_mtl(
     std::shared_ptr<const Texture> kd,
     std::shared_ptr<const Texture> ks,
     std::shared_ptr<const Texture> ns);
-
-std::shared_ptr<Material> create_subsurface(
-    std::shared_ptr<const Material> surface,
-    std::shared_ptr<const Texture> d,
-    std::shared_ptr<const Texture> A,
-    std::shared_ptr<const Texture> ior,
-    std::shared_ptr<const Texture> transparency);
 
 std::shared_ptr<Material> create_mirror_varnish(
     std::shared_ptr<const Material> internal,

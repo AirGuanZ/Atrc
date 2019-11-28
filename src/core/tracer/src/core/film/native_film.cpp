@@ -73,6 +73,7 @@ public:
         gbuffer_.normal  ->at(ly, lx) += w * gpixel.normal;
         gbuffer_.depth   ->at(ly, lx) += w * gpixel.depth;
         gbuffer_.binary  ->at(ly, lx) += w * gpixel.binary;
+        gbuffer_.denoise ->at(ly, lx) += w * gpixel.denoise;
         weights_(ly, lx)  += w;
     }
 
@@ -89,6 +90,7 @@ public:
         gbuffer_.normal->clear({});
         gbuffer_.depth->clear(0);
         gbuffer_.binary->clear(0);
+        gbuffer_.denoise->clear(0);
     }
 };
 
@@ -138,6 +140,7 @@ public:
                 gbuffer_.normal  ->at(y, x) += tgrid.gbuffer_.normal  ->at(ly, lx);
                 gbuffer_.depth   ->at(y, x) += tgrid.gbuffer_.depth   ->at(ly, lx);
                 gbuffer_.binary  ->at(y, x) += tgrid.gbuffer_.binary  ->at(ly, lx);
+                gbuffer_.denoise ->at(y, x) += tgrid.gbuffer_.denoise ->at(ly, lx);
             }
         }
     }
@@ -191,6 +194,7 @@ public:
                 ret.normal  ->at(y, x) = ratio * gbuffer_.normal  ->at(y, x);
                 ret.depth   ->at(y, x) = ratio * gbuffer_.depth   ->at(y, x);
                 ret.binary  ->at(y, x) = ratio * gbuffer_.binary  ->at(y, x);
+                ret.denoise ->at(y, x) = ratio * gbuffer_.denoise ->at(y, x);
             }
         }
         return ret;

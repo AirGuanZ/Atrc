@@ -9,12 +9,13 @@ AGZ_TRACER_BEGIN
 std::shared_ptr<Entity> create_diffuse_light(
     std::shared_ptr<const Geometry> geometry,
     const Spectrum &radiance,
-    const MediumInterface &med);
+    const MediumInterface &med,
+    bool no_denoise);
 
 std::shared_ptr<Entity> create_geometric(
     std::shared_ptr<const Geometry> geometry,
     std::shared_ptr<const Material> material,
     const MediumInterface &med,
-    bool shadow_catcher);
+    bool shadow_catcher, bool no_denoise);
 
 AGZ_TRACER_END

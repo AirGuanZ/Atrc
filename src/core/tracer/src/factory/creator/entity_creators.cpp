@@ -39,7 +39,8 @@ namespace entity
             auto geometry = context.create<Geometry>(params.child_group("geometry"), context);
             auto radiance = params.child_spectrum("radiance");
             auto med = create_medium_interface(params, context);
-            return create_diffuse_light(std::move(geometry), radiance, med);
+            auto no_denoise = params.child_int_or("no_denoise", 0);
+            return create_diffuse_light(std::move(geometry), radiance, med, no_denoise);
         }
     };
 
@@ -58,7 +59,9 @@ namespace entity
             auto material = context.create<Material>(params.child_group("material"), context);
             auto med = create_medium_interface(params, context);
             bool is_shadow_catcher = params.child_int_or("shadow_catcher", 0) != 0;
-            return create_geometric(std::move(geometry), std::move(material), med, is_shadow_catcher);
+            auto no_denoise = params.child_int_or("no_denoise", 0);
+            return create_geometric(std::move(geometry), std::move(material), med,
+                                    is_shadow_catcher, no_denoise);
         }
     };
 

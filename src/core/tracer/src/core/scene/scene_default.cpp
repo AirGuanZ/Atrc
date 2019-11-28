@@ -3,7 +3,6 @@
 #include <agz/tracer/core/entity.h>
 #include <agz/tracer/core/light.h>
 #include <agz/tracer/core/medium.h>
-#include <agz/tracer/core/scattering.h>
 #include <agz/tracer/core/scene.h>
 #include <agz/tracer/factory/raw/medium.h>
 #include <agz/tracer/factory/raw/scene.h>
@@ -138,60 +137,6 @@ public:
     bool closest_intersection(const Ray &r, EntityIntersection *inct) const noexcept override
     {
         return aggregate_->closest_intersection(r, inct);
-    }
-
-    bool next_scattering_point(const Ray &r, SampleScatteringResult *result, const Sample1 &sam, Arena &arena) const override
-    {
-        if(result->p_has_inct)
-            *result->p_has_inct = false;
-
-        if(r.t_max <= r.t_min)
-            return false;
-
-        EntityIntersection ent_inct;
-        const Medium *medium;
-        if(!closest_intersection(r, &ent_inct))
-        {
-            medium = void_medium_.get();
-            auto med_sample = medium->sample(r.o, r.d, r.t_min, r.t_max, sam);
-            if(med_sample.invalid() || med_sample.inct.invalid())
-                return false;
-            result->pdf = med_sample.pdf;
-            result->pnt = ScatteringPoint(med_sample.inct, arena);
-            return true;
-        }
-
-        if(result->p_has_inct)
-        {
-            assert(result->p_inct);
-            *result->p_has_inct = true;
-            *result->p_inct = ent_inct;
-        }
-
-        if(ent_inct.t <= r.t_min)
-        {
-            result->pdf = 1;
-            result->pnt = ScatteringPoint(ent_inct, arena);
-            return true;
-        }
-
-        medium = ent_inct.wr_medium();
-        auto med_sample = medium->sample(r.o, r.d, r.t_min, ent_inct.t, sam);
-        if(med_sample.invalid())
-            return false;
-
-        if(med_sample.inct.invalid())
-        {
-            result->pdf = med_sample.pdf;
-            result->pnt = ScatteringPoint(ent_inct, arena);
-        }
-        else
-        {
-            result->pdf = med_sample.pdf;
-            result->pnt = ScatteringPoint(med_sample.inct, arena);
-        }
-
-        return true;
     }
 
     const Medium *determine_medium(const Vec3 &o, const Vec3 &d) const noexcept override

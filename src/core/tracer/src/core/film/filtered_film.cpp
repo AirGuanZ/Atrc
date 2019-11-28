@@ -31,6 +31,7 @@ class FilteredFilmGrid : public FilmGrid
     NormalBuffer   normal_;
     DepthBuffer    depth_;
     BinaryBuffer   binary_;
+    DenoiseBuffer  denoise_;
 
 public:
 
@@ -48,6 +49,7 @@ public:
         position_ = PositionBuffer(y_size, x_size);
         depth_    = DepthBuffer(y_size, x_size);
         binary_   = BinaryBuffer(y_size, x_size);
+        denoise_  = DenoiseBuffer(y_size, x_size);
 
         grid_x_beg_ = x_beg;
         grid_y_beg_ = y_beg;
@@ -120,6 +122,7 @@ public:
                 normal_(ly, lx)   += weight * gpixel.normal;
                 depth_(ly, lx)    += weight * gpixel.depth;
                 binary_(ly, lx)   += weight * gpixel.binary;
+                denoise_(ly, lx)  += weight * gpixel.denoise;
             }
         }
     }
@@ -140,6 +143,7 @@ class FilteredFilm : public Film
     NormalBuffer   normal_;
     DepthBuffer    depth_;
     BinaryBuffer   binary_;
+    DenoiseBuffer  denoise_;
 
 public:
 
@@ -161,6 +165,7 @@ public:
         position_ = PositionBuffer(h_, w_);
         depth_    = DepthBuffer(h_, w_);
         binary_   = BinaryBuffer(h_, w_);
+        denoise_  = DenoiseBuffer(h_, w_);
 
         AGZ_HIERARCHY_WRAP("in initializing filtered film")
     }
@@ -183,6 +188,7 @@ public:
                 normal_(y, x)   += tgrid.normal_(ly, lx);
                 depth_(y, x)    += tgrid.depth_(ly, lx);
                 binary_(y, x)   += tgrid.binary_(ly, lx);
+                denoise_(y, x)  += tgrid.denoise_(ly, lx);
             }
         }
     }
@@ -220,6 +226,7 @@ public:
                 ret.normal->at(y, x)   = ratio * normal_(y, x);
                 ret.depth->at(y, x)    = ratio * depth_(y, x);
                 ret.binary->at(y, x)   = ratio * binary_(y, x);
+                ret.denoise->at(y, x)  = ratio * denoise_(y, x);
             }
         }
         return ret;

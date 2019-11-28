@@ -1,7 +1,8 @@
 ﻿#pragma once
 
+#include <agz/utility/misc.h>
+
 #include <agz/tracer/core/aggregate.h>
-#include <agz/tracer/core/scattering.h>
 #include <agz/common/math.h>
 
 AGZ_TRACER_BEGIN
@@ -22,17 +23,6 @@ struct SceneSampleLightResult
 {
     const Light *light;
     real pdf;
-};
-
-/**
- * @brief scene::next_scattering_point的输出
- */
-struct SampleScatteringResult
-{
-    ScatteringPoint pnt;                  // 散射点
-    real pdf = 0;                         // 采样到该点的pdf
-    bool *p_has_inct           = nullptr; // 用于输出该r与场景实体是否有交点，可为nullptr
-    EntityIntersection *p_inct = nullptr; // 用于输出该r与场景实体的首个交点，在p_has_inct不为空时必须不为空
 };
 
 /**
@@ -98,11 +88,6 @@ public:
      * @return 交点是否存在
      */
     virtual bool closest_intersection(const Ray &r, EntityIntersection *inct) const noexcept = 0;
-
-    /**
-     * @brief 采样下一个散射事件
-     */
-    virtual bool next_scattering_point(const Ray &r, SampleScatteringResult *result, const Sample1 &sam, Arena &arena) const = 0;
 
     /**
      * @brief 确定o所处的medium

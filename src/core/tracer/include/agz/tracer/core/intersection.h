@@ -76,7 +76,7 @@ struct EntityIntersection : GeometryIntersection
 /**
  * @brief 射线在介质中的散射点
  */
-struct MediumIntersection : MediumPoint
+struct MediumScattering : MediumPoint
 {
     const Medium *medium = nullptr;
     real t = -1;
@@ -93,8 +93,8 @@ struct MediumIntersection : MediumPoint
  */
 struct ShadingPoint
 {
-    const BSDF   *bsdf   = nullptr;
-    const BSSRDF *bssrdf = nullptr;
+    const BSDF *bsdf = nullptr;
+    Vec3 shading_normal;
 };
 
 AGZ_TRACER_END

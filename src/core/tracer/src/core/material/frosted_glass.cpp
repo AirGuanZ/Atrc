@@ -285,7 +285,7 @@ public:
         auto roughness = math::clamp<real>(roughness_->sample_real(inct.uv), real(0.01), 1);
         auto bsdf = arena.create<FrostedGlassBSDF>(
             inct.geometry_coord, inct.user_coord, color, roughness, fresnel);
-        return { bsdf };
+        return { bsdf, inct.user_coord.z };
     }
 };
 
