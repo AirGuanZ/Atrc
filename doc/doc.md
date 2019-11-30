@@ -1,6 +1,6 @@
 # Atrc Renderer Documentation
 
-![pic](./gallery/5.png)
+![pic](./gallery/0.png)
 
 [TOC]
 
@@ -8,84 +8,90 @@
 
 ### Dependencies
 
-编译Atrc时须额外准备的依赖项如下：
+**Prerequests**
 
 * [cmake](https://cmake.org/) (>=3.10)
-* 支持C++17标准主要特性的MSVC或clang++（g++理论上可用，但未经测试）
+* MSVC or clang++ (and libc++) with supporting of major features of C++ 17 (g++ should be ok but is untested)
 
-已经由项目文件自带的依赖项如下：
+**Dependencies Contained in Project Source**
 
-* [agz-utils](https://github.com/AirGuanZ/agz-utils)，提供数学计算、图像加载等基本功能
-* [cxxopts](https://github.com/jarro2783/cxxopts)，用于命令行参数解析
-* [nlohmann json](https://github.com/nlohmann/json)，用于JSON配置文件的解析
-* [stl reader](https://github.com/sreiter/stl_reader)，用于解析STL模型文件
-* [tiny obj loader](https://github.com/syoyo/tinyobjloader)，用于解析OBJ模型文件
+* [agz-utils](https://github.com/AirGuanZ/agz-utils) for mathematics and image loading
+* [cxxopts](https://github.com/jarro2783/cxxopts) for parsing command-line arguments
+* [nlohmann json](https://github.com/nlohmann/json) for parsing comfiguration file
+* [stl reader](https://github.com/sreiter/stl_reader) for parsing STL model file
+* [tiny obj loader](https://github.com/syoyo/tinyobjloader) for parsing OBJ model file
 
-可选的、在构建时由项目自动下载的依赖项如下：
+**Optional Dependencies (Automatically Downloaded in Building)**
 
-* [Embree 3.6.1](https://www.embree.org/)，用于加速射线与几何体的求交
-* [oidn](https://openimagedenoise.github.io/)，基于机器学习的降噪滤波器
-* [glfw](https://www.glfw.org/)，用于Material Explorer的OpenGL Context管理
+* [Embree 3.6.1](https://www.embree.org/) for better ray-mesh intersection test
+* [oidn](https://openimagedenoise.github.io/) for denoising
+* [glfw](https://www.glfw.org/) for managing OpenGL context of Material Explorer
 
 ### CMake Options
 
-| 选项名                  | 默认值 | 含义                                                         |
-| ----------------------- | ------ | ------------------------------------------------------------ |
-| USE_EMBREE              | OFF    | 启用Embree加速器，这会使得项目在构建时自动下载Embree库       |
-| USE_OIDN                | OFF    | 启用OIDN降噪器，这会使得项目在构建时自动下载OIDN库           |
-| BUILD_MATERIAL_EXPLORER | OFF    | 启用Material Explorer的构建，这会使得项目在构建时自动下载glfw库 |
+| 选项名                  | Default Value | Explanation                        |
+| ----------------------- | ------------- | ---------------------------------- |
+| USE_EMBREE              | OFF           | use Embree library to tracing rays |
+| USE_OIDN                | OFF           | use OIDN denoising library         |
+| BUILD_MATERIAL_EXPLORER | OFF           | build Material Explorer            |
 
-注意到OIDN只支持64位程序，因此若启用了OIDN库，必须以64位模式构建程序。
+**Note**. OIDN is 64-bit only.
 
 ### Example
 
-以Windows环境为例，若启用Embree、OIDN等可选功能，典型的构建过程如下：
+**Full-featured Building on Windows**
 
-1. 在`PowerShell`中运行命令：
+Run following command in `PowerShell`：
 
-   ```powershell
-   git clone --recursive --depth=1 https://github.com/AirGuanZ/Atrc
-   ```
+```powershell
+git clone --recursive --depth=1 https://github.com/AirGuanZ/Atrc
+cd Atrc
+mkdir build
+cd build
+cmake -DUSE_EMBREE=ON -DUSE_OIDN=ON -DBUILD_MATERIAL_EXPLORER=ON -G "Visual Studio 15 2017 Win64" ..
+```
 
-4. 在`PowerShell`中继续运行命令：
+`Embree`, `OIDN` and `glfw` will be automatically downloaded during the first build.
 
-   ```powershell
-   mkdir build
-   cd build
-   cmake -DUSE_EMBREE=ON -DUSE_OIDN=ON -DBUILD_MATERIAL_EXPLORER=ON -G "Visual Studio 15 2017 Win64" ..
-   ```
+**Full-featured Building on *nix**
 
-这会在`Atrc/build`下生成`Visual Studio 2017`的解决方案文件。第一次运行时会自动从网络上下载Embree和OIDN，此时应保持网络良好。
+```shell
+git clone --recursive --depth=1 https://github.com/AirGuanZ/Atrc
+cd Atrc
+mkdir build
+cd build
+export CC=clang
+export CXX=clang++
+cmake -DUSE_EMBREE=ON -DUSE_OIDN=ON -DBUILD_MATERIAL_EXPLORER=ON -G "Unix Makefiles" ..
+```
 
 ## Usage
 
 ### Components
 
-编译Atrc得到的结果由以下几部分构成：
-
-1. CLI，为渲染器的命令行可执行程序，是Tracer的简单应用
-2. Tracer，基于光线追踪的离线渲染库（静态库）
-3. obj_to_scene，用于将一个带材质的obj文件转换为Atrc可用的JSON实体列表
-4. material_explorer，材质参数预览器，使用GPU加速的材质效果调整工具
-5. CLI_RAS，开发中的纯软件光栅化渲染管线，拟在未来用于光线追踪渲染器的加速
-
-本节主要介绍CLI的使用，即其命令参数的含义和场景配置文件的编写。
+1. CLI, command-line interface of the off-line renderer
+2. Tracer, off-line rendering library based on ray tracing
+3. obj_to_scene, tool for converting OBJ file to Atrc entity list
+4. material_explorer, GPU-accelerated material explorer
+5. CLI_RAS, renderer with rasterization pipeline (under development)
 
 ### CLI Usage
 
-在终端中运行命令：
+Use following command to print help information:
 
 ```shell
 CLI --help
 ```
 
-可以查看CLI的命令行参数。典型的使用方法是：
+Typical usage looks like:
 
 ```shell
 CLI -d render_config.json
 ```
 
-其中`scene_config.json`是描述了场景信息和渲染设置的配置文件，其编写方法在之后详细描述。也可以查看渲染器支持的所有特性描述：
+in which `scene_config.json` is a configuration file describing scene information and rendering settings.
+
+Use following command to print all supported features:
 
 ```shell
 CLI --list
@@ -93,7 +99,7 @@ CLI --list
 
 ## Configuration
 
-Atrc使用JSON作为描述场景和渲染设置的配置文件格式。整个JSON文件由两部分构成：
+Atrc uses JSON to describe scene and rendering settings. The input JSON file must contains two parts:
 
 ```json
 {
@@ -106,11 +112,11 @@ Atrc使用JSON作为描述场景和渲染设置的配置文件格式。整个JSO
 }
 ```
 
-其中`scene`为一个类型为`Scene`的场景描述对象（见后文），描述物体、材质、光源等，`rendering`部分描述渲染配置，如摄像机、渲染算法、后处理流程等。
+where `scene` is a scene object with type `Scene` (interrupted later). `rendering` specifies rendering settings like camera, global illumination algorithm, progress reporter, and post processors.
 
 ![metal_sphere](./pictures/metal_sphere.png)
 
-一个简单的配置文件示例如下，它的渲染结果是上图所示的略粗糙的金属球：
+Here is a simple example, which results in the above image (a bit rough metal sphere):
 
 ```json
 {
@@ -195,27 +201,28 @@ Atrc使用JSON作为描述场景和渲染设置的配置文件格式。整个JSO
 }
 ```
 
-可以看到，Atrc的配置文件由一系列JSON对象嵌套构成，每个字段都有其类型和取值。下面列举一些常见的字段类型的语法（同一字段类型可能有多种写法）：
+As you can see, Atrc's configuration file consists of a series of nested JSON objects, and each field has its type and value. The syntax of some common field types is listed below:
 
-| 字段类型 | 语法示例                    | 含义                             |
-| -------- | --------------------------- | -------------------------------- |
-| int      | -1                          | 值为-1的整数                     |
-| real     | 1.2                         | 值为1.2的浮点数                  |
-| bool     | true                        | 值为真的布尔量；假对应false      |
-| string   | "minecraft"                 | 值为"minecraft"的字符串          |
-| Spectrum | [ 0.5 ]                     | 值为{ 0.5, 0.5, 0.5 }的RGB三元组 |
-| Spectrum | [ 0.1, 0.2, 0.3 ]           | 值为{ 0.1, 0.2, 0.3 }的RGB三元组 |
-| Vec2     | [ 2 ]                       | 值为{ 2, 2 }的二维向量           |
-| Vec2     | [ 1, 2 ]                    | 值为{ 1, 2 }的二维向量           |
-| Vec3     | [ 2 ]                       | 值为{ 2, 2, 2 }的三维向量        |
-| Vec3     | [ 1, 2, 3 ]                 | 值为{ 1, 2, 3 }的三维向量        |
-| [Type]   | [Instance0, Instance1, ...] | 由类型为Type的字段构成的JSON数组 |
+| field type | example                     | semantics                             |
+| ---------- | --------------------------- | ------------------------------------- |
+| int        | -1                          | integer `1`                           |
+| real       | 1.2                         | floating number `1.2`                 |
+| bool       | true                        | boolean value `true`                  |
+| bool       | false                       | boolean value `false`                 |
+| string     | "minecraft"                 | string `minecraft`                    |
+| Spectrum   | [ 0.5 ]                     | RGB value `(0.5, 0.5, 0.5)`           |
+| Spectrum   | [ 0.1, 0.2, 0.3 ]           | RGB value `(0.1, 0.2, 0.3)`           |
+| Vec2       | [ 2 ]                       | 2D vector `(2, 2)`                    |
+| Vec2       | [ 1, 2 ]                    | 2D vector `(1, 2)`                    |
+| Vec3       | [ 2 ]                       | 3D vector `(2, 2, 2)`                 |
+| Vec3       | [ 1, 2, 3 ]                 | 3D vector `(1, 2, 3)`                 |
+| [Type]     | [Instance0, Instance1, ...] | JSON array of objects with given Type |
 
-当一个字符串表示的是路径或文件名时，其中的`${scene-directory}`表示配置文件所在目录的绝对路径，`${working-directory}`则表示当前可执行程序工作目录的绝对路径。以上面示例配置文件末尾处的`${scene-directory}/output.png`为例，它表示配置文件所处目录下的`output.png`文件。
+When a string represents a path or file name, `${scene-directory}` represents the absolute path of the directory where the configuration file is located, and `${working-directory}` represents the absolute path of the working directory of the current executable program. Take `${scene-directory}/output.png` at the end of the above example configuration file as an example, it represents the `output.png` file in the directory where the configuration file is located.
 
-除了这些类型的字段外，其他类型的字段均以JSON对象的语法出现。这些字段除了具有“类型”这一属性外，还具有“类型值”的属性。譬如，一个类型为“Entity”的字段可以出现在任何一个需要“实体”的地方，而该字段的类型值则由它的属性`type`决定，表示该字段具体是哪一种实体。
+Except for above types of fields, other fields appear in the syntax of a JSON object. Each object contains a field `type`, representing its type in Atrc renderer.
 
-在后文的叙述中，我将使用简化的表格形式来表示一个对象应包含哪些字段以及这些字段的含义。以整个配置文件中最后出现的后处理器`save_to_png`为例，它的JSON表示是：
+In the following description, I will use a simplified tabular form to indicate which fields an object should contain and the meaning of these fields. Taking the last post-processor `save_to_png` in the above configuration file as an example, its JSON representation is:
 
 ```json
 {
@@ -225,117 +232,114 @@ Atrc使用JSON作为描述场景和渲染设置的配置文件格式。整个JSO
 }
 ```
 
-它对应的文档表格为：
+The corresponding tabular form is:
 
-| 字段名             | 类型   | 默认值 | 含义                                    |
-| ------------------ | ------ | ------ | --------------------------------------- |
-| filename           | string |        | 将图像保存至何处                        |
-| open               | bool   | true   | 保存完成后是否使用默认图像浏览器打开它  |
-| gamma              | real   | 1      | 保存前进行gamma校正时使用的$\gamma$值   |
-| inv_gamma          | real   | 1      | 保存前进行gamma校正时使用的$1/\gamma$值 |
-| with_alpha_channel | bool   | false  | 将gbuffer::binary作为alpha通道保存      |
-| ext                | string | png    | 保存文件类型，取值范围为"png"或"jpg"    |
+| Field Name         | Type   | Default Value | Explanation                                            |
+| ------------------ | ------ | ------------- | ------------------------------------------------------ |
+| filename           | string |               | where to save the output image                         |
+| open               | bool   | true          | whether to open it with the default image browser      |
+| inv_gamma          | real   | 1             | $1/\gamma$ for gamma correction (typical value is 2.2) |
+| with_alpha_channel | bool   | false         | save G-Buffer::binary to the alpha channel             |
+| ext                | string | png           | saved file type ("jpg" or "png")                       |
 
-表格中，“默认值”一栏为空表示这是一个必须填写的字段，不为空则表示这是一个可选的字段。
+In the form, the "default value" column is blank to indicate that this is a required field, and not blank to indicate that it is an optional field.
 
 ### Rendering Settings
 
-本节描述渲染配置文件中的`rendering`一项包含哪些字段。
+This section describes fields included in the `rendering` item.
 
-| 字段名          | 类型             | 默认值 | 含义                       |
-| --------------- | ---------------- | ------ | -------------------------- |
-| camera          | Camera           |        | 用于观察场景的摄像机       |
-| film            | Film             |        | 用于存放渲染结果           |
-| renderer        | Renderer         |        | 渲染算法                   |
-| reporter        | ProgressReporter |        | 用何种方式输出渲染进度     |
-| post_processors | [PostProcessor]  | []     | 图像后处理器，默认为空列表 |
+| Field Name      | Type             | Default Value | Explanation                      |
+| --------------- | ---------------- | ------------- | -------------------------------- |
+| camera          | Camera           |               | camera for viewing the scene     |
+| film            | Film             |               | used to store rendering results  |
+| renderer        | Renderer         |               | rendering algorithm              |
+| reporter        | ProgressReporter |               | how to output rendering progress |
+| post_processors | [PostProcessor]  | []            | image post processors            |
 
 ### Scene
 
-本节描述类型为`Scene`的字段有哪些可取的类型值。
+This section describes the possible type values for fields of type `Scene`.
 
 **default**
 
-| 字段名    | 类型            | 默认值           | 含义                                                         |
-| --------- | --------------- | ---------------- | ------------------------------------------------------------ |
-| entities  | [Entity]        | []               | 场景中的实体列表，默认为空列表                               |
-| lights    | [NonareaLight]  | []               | 场景中的非实体光源列表，默认为空列表                         |
-| env       | NonareaLight    | null             | 环境光，默认为空。该光源会被自动加入到lights列表中，它的存在只是处于兼容性考虑，不建议使用。 |
-| aggregate | EntityAggregate | native aggregate | 实体间的空间查询加速数据结构，默认为暴力遍历                 |
+| Field Name | Type            | Default Value    | Explanation                                                  |
+| ---------- | --------------- | ---------------- | ------------------------------------------------------------ |
+| entities   | [Entity]        | []               | entities in scene                                            |
+| lights     | [NonareaLight]  | []               | non-area lights in scene (ibl, for example)                  |
+| aggregate  | EntityAggregate | native aggregate | data structure for accelerating ray queries between entities (default is a brute-force one) |
+| env        | NonareaLight    | null             | environment light                                            |
+
+`env` is deprecated and exists only for compatibility. It (if presented) will be automatically added to the `lights` array.
 
 ### EntityAggregate
 
-对于射线和实体间的求交，Atrc使用两级加速数据结构（参考RTX的设计），其中实体内部为一级，实体间为一级。`EntityAggregate`就是实体间加速数据结构对应的字段类型，本节描述它有哪些可取的类型值。
+For the intersection test between rays and the entities, Atrc uses a two-level data structure (refer to the design of RTX), where the inside of the entity is one level and the one between entities is another level. `EntityAggregate` is the field type corresponding to the data structure between entities.
 
 **native**
 
-不包含任何字段。表示暴力遍历所有实体。
+`native` doesn't contain any fields, meaning to traversing all entities.
 
 **bvh**
 
-用BVH树将实体组织起来。
+Organize entities with a BVH tree.
 
-| 字段名        | 类型 | 默认值 | 含义                         |
-| ------------- | ---- | ------ | ---------------------------- |
-| max_leaf_size | int  | 5      | 一个叶节点最多包含多少个实体 |
+| Field Name    | Type | Default Value | Explanation                               |
+| ------------- | ---- | ------------- | ----------------------------------------- |
+| max_leaf_size | int  | 5             | How many entities a leaf node can contain |
 
 ### Camera
 
-本节描述类型为`Camera`的字段有哪些可取的类型值。
+This section describes the possible type values for fields of type `Camera`.
 
 **pinhole**
 
-| 字段名 | 类型 | 默认值 | 含义                                 |
-| ------ | ---- | ------ | ------------------------------------ |
-| pos    | Vec3 |        | 观察者位置                           |
-| dst    | Vec3 |        | 摄像机看向哪一点，                   |
-| up     | Vec3 |        | 用于指定摄像机侧向翻转方向           |
-| width  | real |        | 摄像机传感器方阵在世界坐标系中的宽度 |
-| dist   | real |        | 小孔和传感器方阵间的距离             |
-| height | real |        | 摄像机传感器方阵在世界坐标系中的高度 |
-| aspect | real |        | width/height                         |
+| Field Name | Type | Default Value | Explanation                                 |
+| ---------- | ---- | ------------- | ------------------------------------------- |
+| pos        | Vec3 |               | eye position                                |
+| dst        | Vec3 |               | position looked by the camera               |
+| up         | Vec3 |               | see 'lookat' matrix in 3D computer graphics |
+| width      | real |               | width of the camera sensor in world space   |
+| dist       | real |               | Distance between pinhole and sensor         |
+| height     | real |               | height of the camera sensor in world space  |
+| aspect     | real |               | width divide by height                      |
 
-`height`与`aspect`参数只需给出一个即可。
+You only need to give one for the `height` and `aspect` parameters.
 
-小孔摄像机的渲染结果是上下颠倒的，因此通常会和类型为“flip”的后处理器配合。
+The rendering result of the pinhole camera is upside down, so it usually works with a post processor of type `flip`.
 
 ### Entity
-
-本节描述类型为`Entity`的字段有哪些可取的类型值。
-
-所有类型的Entity都具有一个可选的字符串属性：`customed_flag`，该属性的作用在不同的渲染算法下亦不同，如非渲染算法特别指明，通常情况下均可忽略。
 
 **diffuse**
 
 ![diffuse_light](./pictures/diffuse_light.png)
 
-几何漫射光源，即具有几何形状的光源，表面上每一点向所有方向发射相同的辐射亮度，如上图中的球形光源。
+Geometric diffuse light source, that is, a light source with a geometric shape. Each point on the surface emits the same radiance in all directions.
 
-| 字段名   | 类型     | 默认值 | 含义     |
+| Field Name | Type  | Default Value | Explanation |
 | -------- | -------- | ------ | -------- |
-| geometry | Geometry |        | 几何形状 |
-| radiance | Spectrum |        | 辐射亮度 |
-| med_in   | Medium   | void   | 内部介质，默认为真空 |
-| med_out  | Medium   | void   | 外部介质，默认为真空 |
-| no_denoise | bool | false | 使得降噪器对图像上该物体所在的区域无效 |
+| geometry | Geometry |        | geometric shape |
+| radiance | Spectrum |        | emitted radiance |
+| med_in   | Medium   | void   | outer medium |
+| med_out  | Medium   | void   | inner medium |
+| no_denoise | bool | false | disable denoiser on this entity |
 
 **geometric**
 
 ![geometric](./pictures/geometric_entity.png)
 
-普通的物体，可指定其几何形状、材质和内外介质。
+Ordinary entity with geometry shape, material and mediums.
 
-| 字段名         | 类型     | 默认值 | 含义                             |
-| -------------- | -------- | ------ | -------------------------------- |
-| geometry       | Geometry |        | 几何形状                         |
-| material       | Material |        | 实体表面材质                     |
-| med_in         | Medium   | void   | 内部介质，默认为真空             |
-| med_out        | Medium   | void   | 外部介质，默认为真空             |
-| shadow_catcher | bool     | false  | 是否被标记为shadow catcher类实体 |
+| Field Name     | Type     | Default Value | Explanation                |
+| -------------- | -------- | ------------- | -------------------------- |
+| geometry       | Geometry |               | geometric shape            |
+| material       | Material |               | surface material           |
+| med_in         | Medium   | void          | outer medium               |
+| med_out        | Medium   | void          | inner medium               |
+| shadow_catcher | bool     | false         | marked as a shadow catcher |
 
 ### FilmFilter
 
-渲染图像的过程也是对图像平面进行采样-重建的过程，`FilmFilter`就是用于重建的滤波函数，详细可参见[此文](http://alvyray.com/Memos/CG/Microsoft/6_pixel.pdf)。若对这部分内容不甚了解，推荐使用最简单的重建滤波函数：
+The process of rendering the image is also a process of sampling-reconstructing the image plane. `FilmFilter` is the filter function used for reconstruction. For details, please refer to [this article](http://alvyray.com/Memos/CG/Microsoft/6_pixel. pdf). If you don't know much about this part, it is recommended to use the simplest (but not the best) reconstruction filter function:
 
 ```json
 "type": "box",
@@ -344,613 +348,582 @@ Atrc使用JSON作为描述场景和渲染设置的配置文件格式。整个JSO
 
 **box**
 
-最简单的正方形滤波函数，半径取为0.5时恰好和单个像素重合。
+The simplest box filter function, coincides with a single pixel with a radius of 0.5.
 
-| 字段名 | 类型 | 默认值 | 含义                         |
-| ------ | ---- | ------ | ---------------------------- |
-| radius | real |        | 滤波函数非零半径，单位为像素 |
+| Field Name | Type | Default Value | Explanation             |
+| ---------- | ---- | ------------- | ----------------------- |
+| radius     | real |               | filter radius in pixels |
 
 **gaussian**
 
-Gaussian滤波函数。
+Gaussian filter function
 
-| 字段名 | 类型 | 默认值 | 含义                         |
-| ------ | ---- | ------ | ---------------------------- |
-| radius | real |        | 滤波函数非零半径，单位为像素 |
-| alpha  | real |        | gaussian函数参数$\alpha$     |
+| Field Name | Type | Default Value | Explanation                   |
+| ---------- | ---- | ------------- | ----------------------------- |
+| radius     | real |               | filter radius in pixels       |
+| alpha      | real |               | $\alpha$ in gaussian function |
 
 ### Film
 
-用于存储渲染得到的图像。
-
 **native**
 
-最基础的的点阵存储，支持位置、深度、材质颜色和法线等属性构成的G-Buffer。
+The most basic and fastest film which doesn't support filter function other than box.
 
-| 字段名 | 类型 | 默认值 | 含义               |
-| ------ | ---- | ------ | ------------------ |
-| width  | int  |        | 以像素为单位的宽度 |
-| height | int  |        | 以像素为单位的高度 |
+| Field Name | Type | Default Value | Explanation            |
+| ---------- | ---- | ------------- | ---------------------- |
+| width      | int  |               | image width in pixels  |
+| height     | int  |               | image height in pixels |
 
 **filtered**
 
-支持任意重建滤波函数的点阵存储，支持位置、深度、材质颜色和法线等属性构成的G-Buffer。
+Film supports various types of filter function.
 
-| 字段名 | 类型       | 默认值 | 含义                   |
-| ------ | ---------- | ------ | ---------------------- |
-| width  | int        |        | 以像素为单位的宽度     |
-| height | int        |        | 以像素为单位的高度     |
-| filter | FilmFilter |        | 重建图像使用的滤波函数 |
+| Field Name | Type       | Default Value | Explanation                            |
+| ---------- | ---------- | ------------- | -------------------------------------- |
+| width      | int        |               | image width in pixels                  |
+| height     | int        |               | image height in pixels                 |
+| filter     | FilmFilter |               | filter function for constructing image |
 
 ### Fresnel
 
-表示物体表面材质中的fresnel项。
+Fresnel term in surface material BSDF
 
 **always_one**
 
-值永远为1的fresnel项，表示能量的反射/折射比为$\infty$。
+Fresnel term whose value is always 1.
 
 **dielectric**
 
-电介质的fresnel项。
+Fresnel term for dielectric
 
-| 字段名  | 类型    | 默认值  | 含义       |
-| ------- | ------- | ------- | ---------- |
-| eta_out | Texture | all_one | 外部折射率 |
-| eta_in  | Texture |         | 内部折射率 |
+| Field Name | Type    | Default Value | Explanation                     |
+| ---------- | ------- | ------------- | ------------------------------- |
+| eta_out    | Texture | all_one       | outer ior (index of refraction) |
+| eta_in     | Texture |               | inner ior                       |
 
 **conductor**
 
-导体的fresnel项
+Fresnel term of conductor
 
-| 字段名  | 类型    | 默认值  | 含义       |
-| ------- | ------- | ------- | ---------- |
-| eta_out | Texture | all_one | 外部折射率 |
-| eta_in  | Texture |         | 内部折射率 |
-| k       | Texture |         | 吸收率     |
+| Field Name | Type    | Default Value | Explanation         |
+| ---------- | ------- | ------------- | ------------------- |
+| eta_out    | Texture | all_one       | outer ior           |
+| eta_in     | Texture |               | inner ior           |
+| k          | Texture |               | index of absorption |
 
 ### Geometry
 
-用于描述物体的几何形状。
+Used to describe the geometry of an object.
 
-绝大部分几何形状都包含类型为`[Transform]`的`transform`字段，即一系列`Transform`的序列。值得注意的是，序列中后面的`Transform`先作用到物体上，前面的`Transform`后作用到物体上。
+Most geometric shapes contain a `transform` field of type `[Transform] `, which is a sequence of `Transform`. It is worth noting that the `Transform` in the back of the sequence acts on the object first, and the `Transform` in front of the sequence acts on the object later.
 
 **disk**
 
 ![pic](./pictures/disk.png)
 
-单面圆盘。
-
-| 字段名    | 类型        | 默认值 | 含义                                 |
-| --------- | ----------- | ------ | ------------------------------------ |
-| transform | [Transform] |        | 从本地坐标系到世界坐标系中的变换序列 |
-| radius    | real        |        | 圆盘半径                             |
+| Field Name | Type        | Default Value | Explanation                               |
+| ---------- | ----------- | ------------- | ----------------------------------------- |
+| transform  | [Transform] |               | transform from local space to world space |
+| radius     | real        |               | disk radius                               |
 
 **double_sided**
 
-双面适配器，它将一个单面几何形状转为双面，主要适用于圆盘、三角形等面片形式的几何形状。
+Double-sided adapter, which converts a single-sided geometry to double-sided, and is mainly suitable for geometric shape in the form of disc, quad or triangle.
 
-| 字段名   | 类型     | 默认值 | 含义                     |
-| -------- | -------- | ------ | ------------------------ |
-| internal | Geometry |        | 被从单面转为双面的几何体 |
+| Field Name | Type     | Default Value | Explanation                                       |
+| ---------- | -------- | ------------- | ------------------------------------------------- |
+| internal   | Geometry |               | geometry turned from single-sided to double-sided |
 
 **quad**
 
 ![pic](./pictures/quad.png)
 
-单面四边形$ABCD$，由两个三角形$ABC$和$ACD$构成。
+Quad $ABCD$, constructed by two triangles $ABC$ and $ACD$
 
-| 字段名    | 类型        | 默认值 | 含义                                 |
-| --------- | ----------- | ------ | ------------------------------------ |
-| transform | [Transform] |        | 从本地坐标系到世界坐标系中的变换序列 |
-| A         | Vec3        |        | 顶点A的坐标                          |
-| B         | Vec3        |        | 顶点B的坐标                          |
-| C         | Vec3        |        | 顶点C的坐标                          |
-| D         | Vec3        |        | 顶点D的坐标                          |
-| tA        | Vec2        | (0, 0) | 顶点A的纹理坐标                      |
-| tB        | Vec2        | (0, 0) | 顶点B的纹理坐标                      |
-| tC        | Vec2        | (0, 0) | 顶点C的纹理坐标                      |
-| tD        | Vec2        | (0, 0) | 顶点D的纹理坐标                      |
+| Field Name | Type        | Default Value | Explanation                               |
+| ---------- | ----------- | ------------- | ----------------------------------------- |
+| transform  | [Transform] |               | transform from local space to world space |
+| A          | Vec3        |               | position of vertex $A$                    |
+| B          | Vec3        |               | position of vertex $B$                    |
+| C          | Vec3        |               | position of vertex $C$                    |
+| D          | Vec3        |               | position of vertex $D$                    |
+| tA         | Vec2        | (0, 0)        | texture coordinate of vertex $A$          |
+| tB         | Vec2        | (0, 0)        | texture coordinate of vertex $B$          |
+| tC         | Vec2        | (0, 0)        | texture coordinate of vertex $C$          |
+| tD         | Vec2        | (0, 0)        | texture coordinate of vertex $D$          |
 
 **sphere**
 
 ![pic](./pictures/sphere.png)
 
-单面球体，面向外侧。
+Single-sided sphere
 
-| 字段名    | 类型        | 默认值 | 含义                                 |
-| --------- | ----------- | ------ | ------------------------------------ |
-| transform | [Transform] |        | 从本地坐标系到世界坐标系中的变换序列 |
-| radius    | real        |        | 球体半径                             |
+| Field Name | Type        | Default Value | Explanation                               |
+| ---------- | ----------- | ------------- | ----------------------------------------- |
+| transform  | [Transform] |               | transform from local space to world space |
+| radius     | real        |               | sphere radius                             |
 
 **triangle**
 
 ![pic](./pictures/triangle.png)
 
-单面三角形。
+Single-sided triangle
 
-| 字段名    | 类型        | 默认值 | 含义                                 |
-| --------- | ----------- | ------ | ------------------------------------ |
-| transform | [Transform] |        | 从本地坐标系到世界坐标系中的变换序列 |
-| A         | Vec3        |        | 顶点A的坐标                          |
-| B         | Vec3        |        | 顶点B的坐标                          |
-| C         | Vec3        |        | 顶点C的坐标                          |
-| tA        | Vec2        | (0, 0) | 顶点A的纹理坐标                      |
-| tB        | Vec2        | (0, 0) | 顶点B的纹理坐标                      |
-| tC        | Vec2        | (0, 0) | 顶点C的纹理坐标                      |
+| Field Name | Type        | Default Value | Explanation                               |
+| ---------- | ----------- | ------------- | ----------------------------------------- |
+| transform  | [Transform] |               | transform from local space to world space |
+| A          | Vec3        |               | position of vertex $A$                    |
+| B          | Vec3        |               | position of vertex $B$                    |
+| C          | Vec3        |               | position of vertex $C$                    |
+| tA         | Vec2        | (0, 0)        | texture coordinate of vertex $A$          |
+| tB         | Vec2        | (0, 0)        | texture coordinate of vertex $B$          |
+| tC         | Vec2        | (0, 0)        | texture coordinate of vertex $C$          |
 
 **triangle_bvh**
 
 ![pic](./pictures/triangle_bvh.png)
 
-以BVH树组织而成的三角形网格形状，在启用了Embree时使用Embree实现，否则使用自行构建的BVH树。
+Triangle mesh
 
-| 字段名    | 类型        | 默认值 | 含义                                 |
-| --------- | ----------- | ------ | ------------------------------------ |
-| transform | [Transform] |        | 从本地坐标系到世界坐标系中的变换序列 |
-| filename  | string      |        | 模型文件路径，支持OBJ文件和STL文件   |
+Embree is used when enabled, otherwise a simple BVH tree is used.
+
+| Field Name | Type        | Default Value | Explanation                               |
+| ---------- | ----------- | ------------- | ----------------------------------------- |
+| transform  | [Transform] |               | transform from local space to world space |
+| filename   | string      |               | model file path, supports OBJ/STL file    |
 
 **triangle_bvh_embree**
 
-使用Embree实现的三角形网格形状，参数和`triangle_bvh`相同。
+Triangle mesh implemented using Embree. It has the same parameters as `triangle_bvh`.
+
+Available only when cmake option `USE_EMBREE` is `ON`.
 
 **triangle_bvh_noembree**
 
-不使用Embree实现的三角形网格形状，参数和`triangle_bvh`相同。
+Triangle mesh implemented using simple BVH tree. It has the same parameters as `triangle_bvh`.
 
 ### Material
 
-材质描述了物体表面与光的交互过程，本节介绍类型为`Material`的字段可取的类型值。
-
 **disney_reflection (deprecated)**
 
-Disney Principled BRDF的完整实现，有的参数含义我不知道怎么翻译比较合适，所以最好参考[原文](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf)。
+Complete implementation of [Disney Principled BRDF](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf)
 
-| 字段名          | 类型    | 默认值   | 含义                                       |
-| --------------- | ------- | -------- | ------------------------------------------ |
-| base_color      | Texture |          | 基本颜色                                   |
-| metallic        | Texture |          | 金属度                                     |
-| roughness       | Texture |          | 粗糙度                                     |
-| subsurface      | Texture | all_zero | 次表面散射度，注意这并不是BSSRDF，只是近似 |
-| specular        | Texture | all_zero | 高光度                                     |
-| specular_tint   | Texture | all_zero | 高光颜色一致性                             |
-| anisotropic     | Texture | all_zero | 各向异性度                                 |
-| sheen           | Texture | all_zero | 边缘光泽度                                 |
-| sheen_tint      | Texture | all_zero | 边缘光泽颜色一致性                         |
-| clearcoat       | Texture | all_zero | 清漆强度                                   |
-| clearcoat_gloss | Texture | all_one  | 清漆光泽度                                 |
+| Field Name      | Type    | Default Value | Explanation                                                  |
+| --------------- | ------- | ------------- | ------------------------------------------------------------ |
+| base_color      | Texture |               | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf) |
+| metallic        | Texture |               | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf) |
+| roughness       | Texture |               | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf) |
+| subsurface      | Texture | all_zero      | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf) |
+| specular        | Texture | all_zero      | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf) |
+| specular_tint   | Texture | all_zero      | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf) |
+| anisotropic     | Texture | all_zero      | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf) |
+| sheen           | Texture | all_zero      | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf) |
+| sheen_tint      | Texture | all_zero      | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf) |
+| clearcoat       | Texture | all_zero      | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf) |
+| clearcoat_gloss | Texture | all_one       | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf) |
 
 *NOTE*：`disney_reflection`对材质的表现范围基本是`disney`的子集，故建议使用后者。
+
+*NOTE*: `disney_reflection` is basically a subset of `disney` and is already deprecated, so the latter is recommended.
 
 **disney**
 
 ![pic](./pictures/disney_bsdf.png)
 
-带BSSRDF的Disney Principled BSDF，具体可参考[原文](https://blog.selfshadow.com/publications/s2015-shading-course/#course_content)。
+see [Disney Principled BSDF](https://blog.selfshadow.com/publications/s2015-shading-course/#course_content)
 
-| 字段名                 | 类型    | 默认值    | 含义                                                        |
-| ---------------------- | ------- | --------- | ----------------------------------------------------------- |
-| base_color             | Texture |           | 基本颜色，取值范围为$[0, 1]^3$                              |
-| metallic               | Texture |           | 金属度，取值范围为$[0,1]$                                   |
-| roughness              | Texture |           | 粗糙度，取值范围为$[0,1]$                                   |
-| specular_scale         | Texture | all_one   | 高光颜色缩放因子，只对非金属高光起作用，取值范围为$[0,1]^3$ |
-| specular_tint          | Texture | all_zero  | 高光颜色一致性，取值范围为$[0,1]$                           |
-| anisotropic            | Texture | all_zero  | 各向异性度，取值范围为$[0,1]$                               |
-| sheen                  | Texture | all_zero  | 边缘光泽度，取值范围为$[0,1]$                               |
-| sheen_tint             | Texture | all_zero  | 边缘光泽颜色一致性，取值范围为$[0,1]$                       |
-| clearcoat              | Texture | all_zero  | 清漆强度，取值范围为$[0,1]$                                 |
-| clearcoat_gloss        | Texture | all_one   | 清漆光泽度，取值范围为$[0,1]$                               |
-| transmission           | Texture | all_zero  | 透明度，取值范围为$[0,1]$                                   |
-| transmission_roughness | Texture | roughness | 折射粗糙度，取值范围为$[0, 1]$                              |
-| ior                    | Texture | all_{1.5} | 内外折射率之比，取值范围为$[0,\infty)$                      |
+| Field Name             | Type    | Default Value | Explanation                                                  |
+| ---------------------- | ------- | ------------- | ------------------------------------------------------------ |
+| base_color             | Texture |               | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf); range: $[0, 1]^3$ |
+| metallic               | Texture |               | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf); range: $[0,1]$ |
+| roughness              | Texture |               | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf); range: $[0,1]$ |
+| specular_scale         | Texture | all_one       | scale factor of non-metallic specular lobe; range: $[0,1]^3$ |
+| specular_tint          | Texture | all_zero      | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf); range: $[0,1]$ |
+| anisotropic            | Texture | all_zero      | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf); range: $[0,1]$ |
+| sheen                  | Texture | all_zero      | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf); range: $[0,1]$ |
+| sheen_tint             | Texture | all_zero      | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf); range: $[0,1]$ |
+| clearcoat              | Texture | all_zero      | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf); range: $[0,1]$ |
+| clearcoat_gloss        | Texture | all_one       | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf); range: $[0,1]$ |
+| transmission           | Texture | all_zero      | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf); range: $[0,1]$ |
+| transmission_roughness | Texture | roughness     | roughness of transmitted specular lobe; range: $[0, 1]$      |
+| ior                    | Texture | all_{1.5}     | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf); range: $[0,\infty)$ |
 
 **frosted_glass**
 
 ![pic](./pictures/frosted_glass.png)
 
-磨砂玻璃材质，详情请参考[Microfacet Models for Refraction through Rough Surfaces](https://www.cs.cornell.edu/~srm/publications/EGSR07-btdf.html)。
+Frosted glass material. Please refer to [Microfacet Models for Refraction through Rough Surfaces](https://www.cs.cornell.edu/~srm/publications/EGSR07-btdf.html).
 
-| 字段名    | 类型    | 默认值 | 含义      |
-| --------- | ------- | ------ | --------- |
-| color_map | Texture |        | 表面颜色  |
-| fresnel   | Fresnel |        | Fresnel项 |
-| roughness | Texture |        | 粗糙度    |
+| Field Name | Type    | Default Value | Explanation       |
+| ---------- | ------- | ------------- | ----------------- |
+| color_map  | Texture |               | surface color     |
+| fresnel    | Fresnel |               | fresnel term      |
+| roughness  | Texture |               | surface roughness |
 
 **glass**
 
 ![pic](./pictures/glass.png)
 
-光滑玻璃材质。
+Smooth glass
 
-| 字段名               | 类型    | 默认值 | 含义      |
-| -------------------- | ------- | ------ | --------- |
-| color_map            | Texture |        | 表面颜色  |
-| color_reflection_map | Texture |        | 反射颜色  |
-| color_refraction_map | Texture |        | 折射颜色  |
-| fresnel              | Fresnel |        | Fresnel项 |
+| Field Name           | Type    | Default Value | Explanation      |
+| -------------------- | ------- | ------------- | ---------------- |
+| color_map            | Texture |               | surface color    |
+| color_reflection_map | Texture |               | reflection color |
+| color_refraction_map | Texture |               | refraction color |
+| fresnel              | Fresnel |               | fresnel term     |
 
-提供两种颜色指定方式：
+Two color assignment methods are provided:
 
-1. 只提供`color_map`，此时反射和折射的颜色都由`color_map`给出
-2. 提供`color_reflection_map`和`color_refraction_map`，它们分别给出了反射颜色和折射颜色
+1. Only provide `color_map`. Colors of reflection and refraction are given automatically filled with `color_map`.
+2. Provide `color_reflection_map` and `color_refraction_map`, which give reflection and refraction colors respectively.
 
 **ideal_black**
 
-完全吸收材质，也就是一团黑。
+A mass of black
 
 **ideal_diffuse**
 
 ![pic](./pictures/ideal_diffuse.png)
 
-理想漫反射，反射到各方向的辐射亮度均相同。
+Ideal diffuse reflection, reflects the same radiance in all directions.
 
-| 字段名 | 类型    | 默认值 | 含义     |
-| ------ | ------- | ------ | -------- |
-| albedo | Texture |        | 表面颜色 |
+| Field Name | Type    | Default Value | Explanation               |
+| ---------- | ------- | ------------- | ------------------------- |
+| albedo     | Texture |               | surface color times $\pi$ |
 
 **mirror**
 
 ![pic](./pictures/mirror.png)
 
-理想镜面。
+Ideal mirror reflection
 
-| 字段名  | 类型    | 默认值 | 含义      |
+| Field Name | Type  | Default Value | Explanation |
 | ------- | ------- | ------ | --------- |
-| color_map  | Texture |        | 表面颜色  |
-| fresnel | Fresnel |        | Fresnel项 |
+| color_map  | Texture |        | surface color |
+| fresnel | Fresnel |        | fresnel term |
 
 **mtl**
 
-由Wavefront MTL文件描述的材质，也就是标准的漫反射+高光。
+Standard reflection model, constructed with a diffuse component and a specular component.
 
-| 字段名 | 类型    | 默认值 | 含义       |
-| ------ | ------- | ------ | ---------- |
-| kd     | Texture |        | 漫反射强度 |
-| ks     | Fresnel |        | 高光强度   |
-| ns     | Texture |        | 高光光泽度 |
+| Field Name | Type    | Default Value | Explanation                           |
+| ---------- | ------- | ------------- | ------------------------------------- |
+| kd         | Texture |               | strength of diffuse component         |
+| ks         | Fresnel |               | strength of specular component        |
+| ns         | Texture |               | specular gloss; range: $(0, +\infty)$ |
 
 **add**
 
 ![pic](./pictures/adder.png)
 
-把多个材质直接叠加到一起。上图中的第三幅是使用`add`和`scale`配合，将前两幅图像中的物体材质按$1/2$的权重求和得到的效果。
+Combine multiple materials together. The third image in the figure above is the effect obtained by summing the object materials in the first two images with a weight of $ 1/2 $.
 
-| `字段名 | 类型       | 默认值 | 含义             |
-| ------- | ---------- | ------ | ---------------- |
-| mats    | [Material] |        | 被叠加的材质数组 |
+| Field Name | Type       | Default Value | Explanation             |
+| ---------- | ---------- | ------------- | ----------------------- |
+| mats       | [Material] |               | combined material array |
 
 **scale**
 
-线性地缩放一个材质的反射/折射亮度。
+Scales the reflection/refraction component of a material linearly.
 
-| 字段名   | 类型     | 默认值 | 含义         |
-| -------- | -------- | ------ | ------------ |
-| internal | Material |        | 被缩放的材质 |
-| scale    | Texture  |        | 缩放比       |
+| Field Name | Type     | Default Value | Explanation     |
+| ---------- | -------- | ------------- | --------------- |
+| internal   | Material |               | scaled material |
+| scale      | Texture  |               | scaling ratio   |
 
 **mirror_varnish**
 
 ![pic](./pictures/mirror_varnish.png)
 
-表面绝对光滑的清漆，其内部必须是不透明材质。
+Absolutely smooth varnish, where the interior material must be opaque.
 
-| 字段名   | 类型     | 默认值  | 含义             |
-| -------- | -------- | ------- | ---------------- |
-| internal | Material |         | 清漆内部的材质   |
-| eta_in   | Texture  |         | 清漆内部的折射率 |
-| eta_out  | Texture  | all_one | 清漆外部的折射率 |
-| color    | Texture  |         | 清漆颜色         |
+| Field Name | Type     | Default Value | Explanation                      |
+| ---------- | -------- | ------------- | -------------------------------- |
+| internal   | Material |               | material under the varnish layer |
+| eta_in     | Texture  |               | inner ior of varnish             |
+| eta_out    | Texture  | all_one       | outer ior of varnish             |
+| color      | Texture  |               | varnish color                    |
 
 ### Medium
 
-物体内部介质的描述。
-
 **void**
 
-真空，也就是什么介质也没有。
+Vacuum, which means nothing.
 
 **absorbtion**
 
-无散射的介质。
+Non-scattering medium.
 
-| 字段名  | 类型     | 默认值 | 含义   |
-| ------- | -------- | ------ | ------ |
-| sigma_a | Spectrum |        | 吸收率 |
+| Field Name | Type     | Default Value | Explanation     |
+| ---------- | -------- | ------------- | --------------- |
+| sigma_a    | Spectrum |               | absorption rate |
 
 **homogeneous**
 
 ![pic](./pictures/homogeneous.png)
 
-各处散射性质均相同的介质。
-
-| 字段名  | 类型     | 默认值 | 含义               |
-| ------- | -------- | ------ | ------------------ |
-| sigma_a | Spectrum |        | 吸收率             |
-| sigma_s | Spectrum |        | 散射率             |
-| g       | real     |        | 散射方向的不对称度 |
+| Field Name | Type     | Default Value | Explanation             |
+| ---------- | -------- | ------------- | ----------------------- |
+| sigma_a    | Spectrum |               | absorption rate         |
+| sigma_s    | Spectrum |               | scattering rate         |
+| g          | real     |               | asymmetry of scattering |
 
 ### NonareaLight
-
-本节描述类型为`NonareaLight`的字段有哪些可取的类型值。
 
 **ibl**
 
 ![pic](./pictures/env_light.png)
 
-环境光的一种，由纹理给出它在每个方向上的辐射亮度，映射方式这里就不再赘述了。
+Image based lighting
 
-| 字段名 | 类型    | 默认值      | 含义                                           |
-| ------ | ------- | ----------- | ---------------------------------------------- |
-| tex    | Texture |             | 描述辐射亮度的纹理对象                         |
-| up     | Vec3    | [ 0, 0, 1 ] | 描述世界空间中哪个方向为“上方”，默认为$+z$方向 |
+| Field Name | Type    | Default Value | Explanation                                                  |
+| ---------- | ------- | ------------- | ------------------------------------------------------------ |
+| tex        | Texture |               | texture object describing radiance                           |
+| up         | Vec3    | [ 0, 0, 1 ]   | describe which direction in the world space is "above", default is $+z$ |
 
 **hdri**
 
 ![pic](./pictures/hdri.png)
 
-内侧发光的球体，其外侧不可见。
+Inner glowing sphere which is not visible on the outer side
 
-| 字段名 | 类型    | 默认值      | 含义                                           |
-| ------ | ------- | ----------- | ---------------------------------------------- |
-| tex    | Texture |             | 描述辐射亮度的纹理对象                         |
-| up     | Vec3    | [ 0, 0, 1 ] | 描述世界空间中哪个方向为“上方”，默认为$+z$方向 |
-| radius | real    | 100         | 球体半径                                       |
-| offset | Vec3    | [0]         | 球心位置                                       |
+| Field Name | Type    | Default Value | Explanation                                                  |
+| ---------- | ------- | ------------- | ------------------------------------------------------------ |
+| tex        | Texture |               | texture object describing radiance                           |
+| up         | Vec3    | [ 0, 0, 1 ]   | describe which direction in the world space is "above", default is $+z$ |
+| radius     | real    | 100           | sphere radius                                                |
+| offset     | Vec3    | [0]           | sphere center position                                       |
 
 **native_sky**
 
 ![pic](./pictures/native_sky.png)
 
-环境光的一种，表示自上而下颜色渐变的天空。
+Environment light that represents a sky with a gradient of color from top to bottom.
 
-| 字段名 | 类型     | 默认值      | 含义                             |
-| ------ | -------- | ----------- | -------------------------------- |
-| top    | Spectrum |             | 最上方的辐射亮度                 |
-| bottom | Spectrum |             | 最下方的辐射亮度                 |
-| up     | Vec3     | [ 0, 0, 1 ] | 哪个方向为“上方”，默认为$+z$方向 |
+| Field Name | Type     | Default Value | Explanation                                                  |
+| ---------- | -------- | ------------- | ------------------------------------------------------------ |
+| top        | Spectrum |               | top radiance                                                 |
+| bottom     | Spectrum |               | bottom radiance                                              |
+| up         | Vec3     | [ 0, 0, 1 ]   | describe which direction in the world space is "above", default is $+z$ |
 
 ### Post Processor
 
-在渲染完成后用于图像处理的后处理器。
-
 **flip**
 
-翻转图像。
+Flip the image
 
-| 字段名       | 类型 | 默认值 | 含义                     |
-| ------------ | ---- | ------ | ------------------------ |
-| vertically   | bool | false  | 是否在垂直方向上翻转图像 |
-| horizontally | bool | false  | 是否在水平方向上翻转图像 |
+| Field Name   | Type | Default Value | Explanation                            |
+| ------------ | ---- | ------------- | -------------------------------------- |
+| vertically   | bool | false         | whether to flip the image vertically   |
+| horizontally | bool | false         | whether to flip the image horizontally |
 
 **gamma**
 
-对图像进行gamma校正。
+Perform gamma correction on the image
 
-| 字段名    | 类型 | 默认值 | 含义         |
-| --------- | ---- | ------ | ------------ |
-| gamma     | real |        | $\gamma$值   |
-| inv_gamma | real |        | $1/\gamma$值 |
+| Field Name | Type | Default Value | Explanation |
+| ---------- | ---- | ------------- | ----------- |
+| gamma      | real |               | $\gamma$    |
+| inv_gamma  | real |               | $1/\gamma$  |
 
-`gamma`和`inv_gamma`只需给出其中一个即可。
+Only one of `gamma` and `inv_gamma` need to be given.
 
 **oidn_denoiser**
 
-使用OIDN对图像进行降噪，注意最好使用支持G-Buffer的`Flim`和`Renderer`。
+Use OIDN to denoise the image
 
-| 字段名 | 类型 | 默认值 | 含义                              |
-| ------ | ---- | ------ | --------------------------------- |
-| clamp  | bool | false  | 降噪前是否将图像颜色clamp至[0, 1] |
+| Field Name | Type | Default Value | Explanation                                                  |
+| ---------- | ---- | ------------- | ------------------------------------------------------------ |
+| clamp      | bool | false         | whether to clamp the image color to $[0, 1]^3$ before denoising |
 
 **save_gbuffer_to_png**
 
 ![pic](./pictures/gbuffer.png)
 
-将G-Buffer保存至png文件。
+Save the G-Buffer to png files
 
-| 字段名 | 类型   | 默认值 | 含义                   |
-| ------ | ------ | ------ | ---------------------- |
-| albedo | string | ""     | 将材质颜色保持至何处   |
-| normal | string | ""     | 将法线保存至何处       |
-| depth  | string | ""     | 将场景深度保存至何处   |
-| binary | string | ""     | 讲物体遮罩图保存至何处 |
+| Field Name | Type   | Default Value | Explanation                           |
+| ---------- | ------ | ------------- | ------------------------------------- |
+| albedo     | string | ""            | where to save material colors         |
+| normal     | string | ""            | where to save normal image            |
+| depth      | string | ""            | where to save depth image             |
+| binary     | string | ""            | where to save binary mask of entities |
 
-物体遮罩图的每个像素指出了该像素位置是否被物体占据，为0表示无物体，为1表示有物体，中间值则表示物体占据了该像素的一部分，是抗锯齿后的结果。
-
-当使用的`Film`或`Renderer`不支持G-Buffer时，保存的结果是无意义的。
+Each pixel of the binary mask indicates whether the pixel position is occupied by an entity. 0 means no object, 1 means there is an object, and the middle value means that part of the pixel is occupied.
 
 **save_to_img**
 
-将图像保存至文件。
+Save the rendered image to a file
 
-| 字段名             | 类型   | 默认值 | 含义                                    |
-| ------------------ | ------ | ------ | --------------------------------------- |
-| filename           | string |        | 将图像保存至何处                        |
-| open               | bool   | true   | 保存完成后是否使用默认图像浏览器打开它  |
-| gamma              | real   | 1      | 保存前进行gamma校正时使用的$\gamma$值   |
-| inv_gamma          | real   | 1      | 保存前进行gamma校正时使用的$1/\gamma$值 |
-| with_alpha_channel | bool   | false  | 将gbuffer::binary作为alpha通道保存      |
-| ext                | string | png    | 保存文件类型，取值范围为"png"或"jpg"    |
-
-`gamma`和`inv_gamma`只需给出其中一个即可，若都未指定，则不进行gamma校正。
-
-该`PostProcessor`亦名`save_to_png`，这只是由兼容性问题造成的，不建议使用此名。
+| Field Name         | Type   | Default Value | Explanation                                            |
+| ------------------ | ------ | ------------- | ------------------------------------------------------ |
+| filename           | string |               | where to save the output image                         |
+| open               | bool   | true          | whether to open it with the default image browser      |
+| inv_gamma          | real   | 1             | $1/\gamma$ for gamma correction (typical value is 2.2) |
+| with_alpha_channel | bool   | false         | save G-Buffer::binary to the alpha channel             |
+| ext                | string | png           | saved file type ("jpg" or "png")                       |
 
 **resize**
 
-将图像和G-Buffer缩放至指定大小。
+Resize the image and G-Buffer to the specified resolution
 
-| 字段名 | 类型       | 默认值 | 含义           |
-| ------ | ---------- | ------ | -------------- |
-| size   | [int, int] |        | 目标图像的大小 |
+| Field Name | Type       | Default Value | Explanation       |
+| ---------- | ---------- | ------------- | ----------------- |
+| size       | [int, int] |               | target resolution |
 
 ### Renderer
 
-渲染算法。
-
 **pt**
 
-最传统的路径追踪，可以通过`integrator`来指定使用怎样的追踪策略。
+Traditional path tracing. You can specify the tracing strategy by `integrator`.
 
-| 字段名       | 类型                  | 默认值 | 含义         |
-| ------------ | --------------------- | ------ | ------------ |
-| integrator   | PathTracingIntegrator |        | 路径追踪策略 |
-| worker_count | int                   | 0      | 工作线程数   |
-| sampler      | Sampler               |        | 随机数采样器 |
+| Field Name   | Type                  | Default Value | Explanation             |
+| ------------ | --------------------- | ------------- | ----------------------- |
+| integrator   | PathTracingIntegrator |               | tracing strategy        |
+| worker_count | int                   | 0             | rendering thread count  |
+| sampler      | Sampler               |               | random number generator |
 
-当工作线程数$n \le 0$时，设硬件线程数为$k$，则将使用$\max\{1, k+n\}$个工作线程。比如可以将`worker_count`设置为-2，表示留两个硬件线程，把其他硬件线程都用起来。
+When the number of worker threads $n$ is less or equal to 0 and the number of hardware threads is $ k $, then $\max\{1, k + n \} $ worker threads will be used. For example, you can set `worker_count` to -2, which means that you leave two hardware threads and use all other hardware threads.
 
 ### PathTracingIntegrator
 
-`PathTracingIntegrator`用于描述path tracing算法中追踪何种路径。
-
 **native**
 
-没有任何优化技巧的暴力路径追踪，支持介质渲染。
+Violent path tracing without any optimization
 
-| 字段名    | 类型 | 默认值 | 含义                       |
-| --------- | ---- | ------ | -------------------------- |
-| min_depth | int  | 5      | 使用RR策略前的最小路径深度 |
-| max_depth | int  | 10     | 路径的最大截断深度         |
-| cont_prob | real | 0.9    | 追踪时使用RR策略的通过概率 |
+| Field Name | Type | Default Value | Explanation                               |
+| ---------- | ---- | ------------- | ----------------------------------------- |
+| min_depth  | int  | 5             | Minimum path depth before using RR policy |
+| max_depth  | int  | 10            | Maximum depth of the path                 |
+| cont_prob  | real | 0.9           | Pass probability when using RR strategy   |
 
 **mis**
 
-使用Multiple Importance Sampling技术优化的路径追踪，支持介质渲染。
+Path tracing with Multiple Importance Sampling
 
-| 字段名    | 类型 | 默认值 | 含义                       |
-| --------- | ---- | ------ | -------------------------- |
-| min_depth | int  | 5      | 使用RR策略前的最小路径深度 |
-| max_depth | int  | 10     | 路径的最大截断深度         |
-| cont_prob | real | 0.9    | 追踪时使用RR策略的通过概率 |
+| Field Name | Type | Default Value | Explanation                               |
+| ---------- | ---- | ------------- | ----------------------------------------- |
+| min_depth  | int  | 5             | Minimum path depth before using RR policy |
+| max_depth  | int  | 10            | Maximum depth of the path                 |
+| cont_prob  | real | 0.9           | Pass probability when using RR strategy   |
 
 ### ProgressReporter
 
-用于输出渲染进度。
-
 **stdout**
 
-输出到标准输出流。
+Print to standard output
 
 **noout**
 
-无任何进度输出。
+No progress output
 
 ### Sampler
 
-随机数采样器。
+Random number generator
 
 **native**
 
-最基本的随机数采样器，所有样本间都是独立的。
+The most basic random number sampler, where all samples are independent
 
-| 字段名 | 类型 | 默认值  | 含义                                               |
-| ------ | ---- | ------- | -------------------------------------------------- |
-| seed   | int  | by time | 种子值，默认使用时间作为种子                       |
-| spp    | int  |         | 每像素采样数，注意这一设置对一些特定的Renderer无效 |
+| Field Name | Type | Default Value | Explanation                                  |
+| ---------- | ---- | ------------- | -------------------------------------------- |
+| seed       | int  | by time       | Seed value, default seed is the running time |
+| spp        | int  |               | samples per pixel                            |
 
 ### Texture
 
 ![pic](./pictures/texture.png)
 
-所有纹理都包含以下字段（这些字段不在后面的每种纹理中列出）：
+All textures contain the following fields (these fields are not listed in the subsequent textures):
 
-| 字段名    | 类型         | 默认值  | 含义                                                         |
-| --------- | ------------ | ------- | ------------------------------------------------------------ |
-| inv_v     | bool         | false   | 将v坐标变换为1-v                                             |
-| inv_u     | bool         | false   | 将u坐标变换为1-u                                             |
-| swap_uv   | bool         | false   | 交换uv坐标                                                   |
-| transform | [Transform2] | []      | 对uv坐标实施的仿射变换序列                                   |
-| wrap_u    | string       | "clamp" | 对超出$[0, 1]$范围的u坐标的处理方法，有"clamp/repeat/mirror"三种取值 |
-| wrap_v    | string       | "clamp" | 对超出$[0, 1]$范围的u坐标的处理方法，有"clamp/repeat/mirror"三种取值 |
-| inv_gamma | real         | 1       | 用于对纹理做gamma逆校正，典型值为2.2                         |
+| Field Name | Type         | Default Value | Explanation                                                  |
+| ---------- | ------------ | ------------- | ------------------------------------------------------------ |
+| inv_v      | bool         | false         | turn $v$ to $1 - v$ (flip the texture vertically)            |
+| inv_u      | bool         | false         | turn $u$ to $1 - u$ (flip the texture horizontally)          |
+| swap_uv    | bool         | false         | swap $u$ and $v$                                             |
+| transform  | [Transform2] | []            | transform sequence applied to the texture coordinate         |
+| wrap_u     | string       | "clamp"       | ways to deal with $u$ that is out of $[0, 1]$; range: clamp/mirror/repeat |
+| wrap_v     | string       | "clamp"       | ways to deal with $v$ that is out of $[0, 1]$; range: clamp/mirror/repeat |
+| inv_gamma  | real         | 1             | used to perform inverse gamma correction to the texture; typical value is 2.2 |
 
-值得注意的是，`inv_v, inv_u, swap_uv`和`transform`都是对uv的变换，其中`transform`最先起作用，随后`swap_uv`起作用，`inv_u`和`inv_v`最后起作用。在`transform`序列中，写在前面的变换后起作用，写在后面的变换先起作用。
+Note that `inv_v, inv_u, swap_uv` and `transform` are all transformations to uv, where `transform` applies first, then `swap_uv` , and `inv_u, inv_v` applies last. In the `transform` sequence, the `Transform2` in the back of the sequence applies first, and the `Transform2` in the front of the sequence applies later.
 
 **checker_board**
 
-棋盘网格纹理，主要用于测试uv。
+checker board texture
 
-| 字段名     | 类型     | 默认值 | 含义                       |
-| ---------- | -------- | ------ | -------------------------- |
-| grid_count | real     |        | 棋盘上一条边上被分了多少格 |
-| color1     | Spectrum | [ 0 ]  | 一种格子的颜色             |
-| color2     | Spectrum | [ 1 ]  | 另一种各自的颜色           |
+| Field Name | Type     | Default Value | Explanation                         |
+| ---------- | -------- | ------------- | ----------------------------------- |
+| grid_count | real     |               | how many grids the texture contains |
+| color1     | Spectrum | [ 0 ]         | the first grid color                |
+| color2     | Spectrum | [ 1 ]         | the second grid color               |
 
 **constant**
 
-常值纹理，即在它的任何部位采样都会获得相同值。
+Constant-valued texture, that is, sampling always results in the same value.
 
-| 字段名 | 类型     | 默认值 | 含义   |
-| ------ | -------- | ------ | ------ |
-| texel  | Spectrum |        | 纹素值 |
+| Field Name | Type     | Default Value | Explanation |
+| ---------- | -------- | ------------- | ----------- |
+| texel      | Spectrum |               | texel value |
 
 **hdr**
 
-从.hdr文件中加载出的纹理。
+Texture loaed from `.hdr` file
 
-| 字段名   | 类型   | 默认值   | 含义                                |
-| -------- | ------ | -------- | ----------------------------------- |
-| filename | string |          | hdr文件路径                         |
-| sample   | string | "linear" | 采样策略，取值为"linear"或"nearest" |
+| Field Name | Type   | Default Value | Explanation                              |
+| ---------- | ------ | ------------- | ---------------------------------------- |
+| filename   | string |               | `.hdr` filename                          |
+| sample     | string | "linear"      | sampling strategy; range: linear/nearest |
 
 **image**
 
-从各种常见图像文件格式（.bmp，.jpg，.png，.tga等）中加载出的纹理。
+Textures loaded from common image file formats (`.bmp, .jpg, .png, .tga`, etc)
 
-| 字段名   | 类型   | 默认值   | 含义                                |
-| -------- | ------ | -------- | ----------------------------------- |
-| filename | string |          | 图像文件路径                        |
-| sample   | string | "linear" | 采样策略，取值为"linear"或"nearest" |
+| Field Name | Type   | Default Value | Explanation                              |
+| ---------- | ------ | ------------- | ---------------------------------------- |
+| filename   | string |               | image filename                           |
+| sample     | string | "linear"      | sampling strategy; range: linear/nearest |
 
 **scale**
 
-对另一纹理对象进行线性放缩的wrapper。
+A wrapper that linearly scales another texture
 
-| 字段名   | 类型     | 默认值 | 含义         |
-| -------- | -------- | ------ | ------------ |
-| scale    | Spectrum |        | 放缩比值     |
-| internal | Texture  |        | 被放缩的纹理 |
+| Field Name | Type     | Default Value | Explanation    |
+| ---------- | -------- | ------------- | -------------- |
+| scale      | Spectrum |               | scaling ratio  |
+| internal   | Texture  |               | scaled texture |
 
 **gradient**
 
-线性渐变纹理，沿`u`方向渐变，可通过纹理坐标变换实现其他方向的渐变。
+Linear gradient texture along the `u` direction. You can achieve gradients in other directions through texture coordinate transformation.
 
-| 字段名 | 类型     | 默认值 | 含义            |
-| ------ | -------- | ------ | --------------- |
-| color1 | Spectrum |        | `u=0`一侧的颜色 |
-| color2 | Spectrum |        | `u=1`一侧的颜色 |
+| Field Name | Type     | Default Value | Explanation    |
+| ---------- | -------- | ------------- | -------------- |
+| color1     | Spectrum |               | color at $u=0$ |
+| color2     | Spectrum |               | color at $u=1$ |
 
 **add**
 
-用于将另外两个纹理加到一起。
+Add two textures together
 
-| 字段名 | 类型    | 默认值 | 含义   |
-| ------ | ------- | ------ | ------ |
-| lhs    | Texture |        | 左加数 |
-| rhs    | Texture |        | 右加数 |
+| Field Name | Type    | Default Value | Explanation              |
+| ---------- | ------- | ------------- | ------------------------ |
+| lhs        | Texture |               | the first added texture  |
+| rhs        | Texture |               | the second added texture |
 
 **mul**
 
-用于将另外两个纹理乘到一起。
+Multiply two textures together
 
-| 字段名 | 类型    | 默认值 | 含义   |
-| ------ | ------- | ------ | ------ |
-| lhs    | Texture |        | 左乘数 |
-| rhs    | Texture |        | 右乘数 |
+| Field Name | Type    | Default Value | Explanation                   |
+| ---------- | ------- | ------------- | ----------------------------- |
+| lhs        | Texture |               | the first multiplied texture  |
+| rhs        | Texture |               | the second multiplied texture |
 
 **lum_classify**
 
-用一幅纹理在另两幅纹理间进行选择。
-
-| 字段名    | 类型    | 默认值 | 含义               |
-| --------- | ------- | ------ | ------------------ |
-| internal  | Texture |        | 用来选择的纹理     |
-| threshold | Texture |        | 表示选择阈值的纹理 |
-| high      | Texture |        | 被选择的一幅纹理   |
-| low       | Texture |        | 被选择的另一幅纹理 |
-
-对纹理$T$，用$T(u, v)$表示以纹理坐标$(u, v)$对$T$采样得到的结果，则`lum_classify`定义为：
-
+Use $T(u, v)$ to represent the result of sampling texture $T$ at $(u, v)$, then `lum_classify` is defined as:
 $$
 \mathrm{lum\_classify}(u, v) := \begin{cases}\begin{aligned}
     &\mathrm{high}(u,v), &\mathrm{internal}(u, v) \ge \mathrm{threshold}(u, v) \\
@@ -958,13 +931,20 @@ $$
 \end{aligned}\end{cases}
 $$
 
+| Field Name | Type    | Default Value | Explanation |
+| ---------- | ------- | ------------- | ----------- |
+| internal   | Texture |               |             |
+| threshold  | Texture |               |             |
+| high       | Texture |               |             |
+| low        | Texture |               |             |
+
 **reverse**
 
-反转一幅纹理的颜色。
+Invert the color of a texture
 
-| 字段名   | 类型    | 默认值 | 含义         |
-| -------- | ------- | ------ | ------------ |
-| internal | Texture |        | 被反转的纹理 |
+| Field Name | Type    | Default Value | Explanation      |
+| ---------- | ------- | ------------- | ---------------- |
+| internal   | Texture |               | inverted texture |
 
 $$
 \mathrm{reverse}(u, v) := \mathrm{clamp}(1 - \mathrm{internal}(u, v), 0, 1)
@@ -972,97 +952,95 @@ $$
 
 ### Transform
 
-对三维坐标的仿射变换。
+Affine transformation on three-dimensional coordinates
 
 **translate**
 
-| 字段名 | 类型 | 默认值 | 含义   |
-| ------ | ---- | ------ | ------ |
-| offset | Vec3 |        | 平移量 |
+| Field Name | Type | Default Value | Explanation      |
+| ---------- | ---- | ------------- | ---------------- |
+| offset     | Vec3 |               | transtion offset |
 
 **rotate**
 
-| 字段名 | 类型 | 默认值 | 含义     |
-| ------ | ---- | ------ | -------- |
-| axis   | Vec3 |        | 旋转轴   |
-| rad    | real |        | 旋转弧度 |
-| deg    | real |        | 旋转角度 |
+| Field Name | Type | Default Value | Explanation     |
+| ---------- | ---- | ------------- | --------------- |
+| axis       | Vec3 |               | rotation axis   |
+| rad        | real |               | rotation radian |
+| deg        | real |               | rotation degree |
 
-`rad`和`deg`中只能有一个。
+Only one of `rad` and `deg` can be provided.
 
 **rotate_x**
 
-绕$x$轴旋转。
+Rotate around the $x$ axis.
 
-| 字段名 | 类型 | 默认值 | 含义     |
-| ------ | ---- | ------ | -------- |
-| rad    | real |        | 旋转弧度 |
-| deg    | real |        | 旋转角度 |
+| Field Name | Type | Default Value | Explanation     |
+| ---------- | ---- | ------------- | --------------- |
+| rad        | real |               | rotation radian |
+| deg        | real |               | rotation degree |
 
-`rad`和`deg`中只能有一个。
+Only one of `rad` and `deg` can be provided.
 
 **rotate_y**
 
-绕$y$轴旋转。
+Rotate around the $y$ axis.
 
-| 字段名 | 类型 | 默认值 | 含义     |
-| ------ | ---- | ------ | -------- |
-| rad    | real |        | 旋转弧度 |
-| deg    | real |        | 旋转角度 |
+| Field Name | Type | Default Value | Explanation     |
+| ---------- | ---- | ------------- | --------------- |
+| rad        | real |               | rotation radian |
+| deg        | real |               | rotation degree |
 
-`rad`和`deg`中只能有一个。
+Only one of `rad` and `deg` can be provided.
 
 **rotate_z**
 
-绕$z$轴旋转。
+Rotate around the $z$ axis.
 
-| 字段名 | 类型 | 默认值 | 含义     |
-| ------ | ---- | ------ | -------- |
-| rad    | real |        | 旋转弧度 |
-| deg    | real |        | 旋转角度 |
+| Field Name | Type | Default Value | Explanation     |
+| ---------- | ---- | ------------- | --------------- |
+| rad        | real |               | rotation radian |
+| deg        | real |               | rotation degree |
 
-`rad`和`deg`中只能有一个。
+Only one of `rad` and `deg` can be provided.
 
 **scale**
 
-各向等比例缩放。
+Isotropic scaling
 
-| 字段名 | 类型 | 默认值 | 含义   |
-| ------ | ---- | ------ | ------ |
-| ratio  | real |        | 缩放比 |
+| Field Name | Type | Default Value | Explanation   |
+| ---------- | ---- | ------------- | ------------- |
+| ratio      | real |               | scaling ratio |
 
 ### Transform2
 
-对二维坐标的仿射变换。
+Affine transformation on two-dimensional coordinates
 
 **translate**
 
-| 字段名 | 类型 | 默认值 | 含义   |
-| ------ | ---- | ------ | ------ |
-| offset | Vec2 |        | 平移量 |
+| Field Name | Type | Default Value | Explanation        |
+| ---------- | ---- | ------------- | ------------------ |
+| offset     | Vec2 |               | translation offset |
 
 **rotate**
 
-| 字段名 | 类型 | 默认值 | 含义     |
-| ------ | ---- | ------ | -------- |
-| rad    | real |        | 旋转弧度 |
-| deg    | real |        | 旋转角度 |
+| Field Name | Type | Default Value | Explanation     |
+| ---------- | ---- | ------------- | --------------- |
+| rad        | real |               | rotation radian |
+| deg        | real |               | rotation degree |
 
-`rad`和`deg`中只能有一个。
+Only one of `rad` and `deg` can be provided.
 
 **scale**
 
-各向等比例缩放。
+Isotropic scaling
 
-| 字段名 | 类型 | 默认值 | 含义   |
-| ------ | ---- | ------ | ------ |
-| ratio  | real |        | 缩放比 |
+| Field Name | Type | Default Value | Explanation   |
+| ---------- | ---- | ------------- | ------------- |
+| ratio      | real |               | scaling ratio |
 
 ## Shared Scene Description
 
-Atrc支持连续用不同的渲染参数去渲染同一个场景，如用多个摄像机视角渲染同一场景等，比起使用多个配置文件，该方案避免了重复加载场景数据和建立加速数据结构的开销。
-
-设渲染配置文件的内容如下：
+Atrc supports rendering the same scene with different rendering parameters, such as rendering the same scene with multiple camera perspectives. Compared with using multiple configuration files, this solution avoids the overhead of repeatedly loading scene data and constructing data structures. Let the original content of rendering configuration is:
 
 ```json
 {
@@ -1071,7 +1049,7 @@ Atrc支持连续用不同的渲染参数去渲染同一个场景，如用多个�
 }
 ```
 
-现需要使用多个不同的`RenderDescription`渲染同一个`SceneDescription`，则可以把配置文件写作：
+Now we need to use multiple different `RenderDescription` to render the same `SceneDescription`. We can write the configuration file as:
 
 ```json
 {
@@ -1085,5 +1063,4 @@ Atrc支持连续用不同的渲染参数去渲染同一个场景，如用多个�
 }
 ```
 
-渲染器会从上到下依次使用各`RenderingDescription`的设置来渲染`SceneDescription`所描述的场景。
 

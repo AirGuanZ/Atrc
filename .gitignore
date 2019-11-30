@@ -6,4 +6,5 @@ lib/oidn/
 lib/glew/
 lib/glfw/
 doc/doc.html
+doc/doc-cn.html
 nohup.out
