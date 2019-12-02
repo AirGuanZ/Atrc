@@ -14,7 +14,8 @@
 #include <agz/tracer/factory/creator/reporter_creators.h>
 #include <agz/tracer/factory/creator/sampler_creators.h>
 #include <agz/tracer/factory/creator/scene_creators.h>
-#include <agz/tracer/factory/creator/texture_creators.h>
+#include <agz/tracer/factory/creator/texture2d_creators.h>
+#include <agz/tracer/factory/creator/texture3d_creators.h>
 
 AGZ_TRACER_FACTORY_BEGIN
 
@@ -36,7 +37,8 @@ CreatingContext::CreatingContext()
         Factory<ProgressReporter>     ("reporter"),
         Factory<Sampler>              ("sampler"),
         Factory<Scene>                ("scene"),
-        Factory<Texture>              ("texture")
+        Factory<Texture2D>            ("texture"),
+        Factory<Texture3D>            ("texture3d")
     }
 {
     path_mapper = nullptr;
@@ -58,7 +60,8 @@ CreatingContext::CreatingContext()
     initialize_reporter_factory               (factory<ProgressReporter>());
     initialize_sampler_factory                (factory<Sampler>());
     initialize_scene_factory                  (factory<Scene>());
-    initialize_texture_factory                (factory<Texture>());
+    initialize_texture2d_factory              (factory<Texture2D>());
+    initialize_texture3d_factory              (factory<Texture3D>());
 }
 
 AGZ_TRACER_FACTORY_END

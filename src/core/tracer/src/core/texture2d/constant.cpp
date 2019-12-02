@@ -1,8 +1,8 @@
-#include <agz/tracer/core/texture.h>
+#include <agz/tracer/core/texture2d.h>
 
 AGZ_TRACER_BEGIN
 
-class Constant : public Texture
+class Constant : public Texture2D
 {
     Spectrum texel_;
 
@@ -15,7 +15,7 @@ protected:
 
 public:
 
-    void initialize(const TextureCommonParams &common_params, const Spectrum &texel)
+    void initialize(const Texture2DCommonParams &common_params, const Spectrum &texel)
     {
         init_common_params(common_params);
         texel_ = texel;
@@ -32,8 +32,8 @@ public:
     }
 };
 
-std::shared_ptr<Texture> create_constant_texture(
-    const TextureCommonParams &common_params,
+std::shared_ptr<Texture2D> create_constant_texture(
+    const Texture2DCommonParams &common_params,
     const Spectrum &texel)
 {
     auto ret = std::make_shared<Constant>();
@@ -41,8 +41,8 @@ std::shared_ptr<Texture> create_constant_texture(
     return ret;
 }
 
-std::shared_ptr<Texture> create_constant_texture(
-    const TextureCommonParams &common_params,
+std::shared_ptr<Texture2D> create_constant_texture(
+    const Texture2DCommonParams &common_params,
     real texel)
 {
     return create_constant_texture(common_params, Spectrum(texel));

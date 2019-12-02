@@ -79,7 +79,6 @@ struct EntityIntersection : GeometryIntersection
 struct MediumScattering : MediumPoint
 {
     const Medium *medium = nullptr;
-    real t = -1;
     Vec3 wr;
 
     bool invalid() const noexcept

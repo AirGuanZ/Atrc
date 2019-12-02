@@ -26,7 +26,8 @@ class Renderer;
 class ProgressReporter;
 class Sampler;
 class Scene;
-class Texture;
+class Texture2D;
+class Texture3D;
 
 AGZ_TRACER_END
 
@@ -102,7 +103,8 @@ class CreatingContext
         ProgressReporter,
         Sampler,
         Scene,
-        Texture> factory_tuple_;
+        Texture2D,
+        Texture3D> factory_tuple_;
 
 public:
 

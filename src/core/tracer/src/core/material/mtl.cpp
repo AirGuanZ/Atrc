@@ -1,6 +1,6 @@
 ﻿#include <agz/tracer/core/bsdf.h>
 #include <agz/tracer/core/material.h>
-#include <agz/tracer/core/texture.h>
+#include <agz/tracer/core/texture2d.h>
 #include <agz/utility/misc.h>
 
 #include "./utility/microfacet.h"
@@ -245,13 +245,13 @@ namespace mtl_impl
 
 class MTL : public Material
 {
-    std::shared_ptr<const Texture> kd_;
-    std::shared_ptr<const Texture> ks_;
-    std::shared_ptr<const Texture> ns_;
+    std::shared_ptr<const Texture2D> kd_;
+    std::shared_ptr<const Texture2D> ks_;
+    std::shared_ptr<const Texture2D> ns_;
 
 public:
 
-    void initialize(std::shared_ptr<const Texture> kd, std::shared_ptr<const Texture> ks, std::shared_ptr<const Texture> ns)
+    void initialize(std::shared_ptr<const Texture2D> kd, std::shared_ptr<const Texture2D> ks, std::shared_ptr<const Texture2D> ns)
     {
         kd_ = kd;
         ks_ = ks;
@@ -282,9 +282,9 @@ public:
 };
 
 std::shared_ptr<Material> create_mtl(
-    std::shared_ptr<const Texture> kd,
-    std::shared_ptr<const Texture> ks,
-    std::shared_ptr<const Texture> ns)
+    std::shared_ptr<const Texture2D> kd,
+    std::shared_ptr<const Texture2D> ks,
+    std::shared_ptr<const Texture2D> ns)
 {
     auto ret = std::make_shared<MTL>();
     ret->initialize(kd, ks, ns);

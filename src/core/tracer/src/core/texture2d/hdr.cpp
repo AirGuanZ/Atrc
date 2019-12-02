@@ -1,7 +1,7 @@
 #include <memory>
 #include <unordered_map>
 
-#include <agz/tracer/core/texture.h>
+#include <agz/tracer/core/texture2d.h>
 #include <agz/tracer/utility/logger.h>
 #include <agz/utility/image.h>
 #include <agz/utility/misc.h>
@@ -9,7 +9,7 @@
 
 AGZ_TRACER_BEGIN
 
-class HDRTexture : public Texture
+class HDRTexture : public Texture2D
 {
     const texture::texture2d_t<math::color3f> *data_ = nullptr;
 
@@ -38,7 +38,7 @@ protected:
 public:
 
     void initialize(
-        const TextureCommonParams &common_params,
+        const Texture2DCommonParams &common_params,
         const std::string &filename,
         const std::string &sampler)
     {
@@ -86,8 +86,8 @@ public:
     }
 };
 
-std::shared_ptr<Texture> create_hdr_texture(
-    const TextureCommonParams &common_params,
+std::shared_ptr<Texture2D> create_hdr_texture(
+    const Texture2DCommonParams &common_params,
     const std::string &filename, const std::string &sampler)
 {
     auto ret = std::make_shared<HDRTexture>();

@@ -33,7 +33,7 @@ namespace fresnel
 
         std::shared_ptr<Fresnel> create(const ConfigGroup &params, CreatingContext &context) const override
         {
-            auto eta_in = context.create<Texture>(params.child_group("eta_in"));
+            auto eta_in = context.create<Texture2D>(params.child_group("eta_in"));
             auto eta_out = helper::child_texture_or_constant(context, params, "eta_out", 1);
             return create_dielectric_fresnel(std::move(eta_out), std::move(eta_in));
         }
@@ -50,9 +50,9 @@ namespace fresnel
 
         std::shared_ptr<Fresnel> create(const ConfigGroup &params, CreatingContext &context) const override
         {
-            auto eta_in = context.create<Texture>(params.child_group("eta_in"));
+            auto eta_in = context.create<Texture2D>(params.child_group("eta_in"));
             auto eta_out = helper::child_texture_or_constant(context, params, "eta_out", 1);
-            auto k = context.create<Texture>(params.child_group("k"));
+            auto k = context.create<Texture2D>(params.child_group("k"));
             return create_conductor_fresnel(std::move(eta_out), std::move(eta_in), std::move(k));
         }
     };

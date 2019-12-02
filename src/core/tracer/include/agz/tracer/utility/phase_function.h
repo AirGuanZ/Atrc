@@ -8,7 +8,6 @@ AGZ_TRACER_BEGIN
 class HenyeyGreensteinPhaseFunction : public BSDF
 {
     real g_ = 0;
-    Spectrum sigma_s_;
     Spectrum albedo_;
 
     real phase_func(real u) const noexcept
@@ -20,8 +19,8 @@ class HenyeyGreensteinPhaseFunction : public BSDF
 
 public:
 
-    HenyeyGreensteinPhaseFunction(real g, const Spectrum &sigma_s, const Spectrum &albedo) noexcept
-        : g_(g), sigma_s_(sigma_s), albedo_(albedo)
+    HenyeyGreensteinPhaseFunction(real g, const Spectrum &albedo) noexcept
+        : g_(g), albedo_(albedo)
     {
 
     }
@@ -29,7 +28,7 @@ public:
     Spectrum eval(const Vec3 &wi, const Vec3 &wo, TransportMode mode) const noexcept override
     {
         real u = -cos(wi, wo);
-        return sigma_s_ * Spectrum(phase_func(u));
+        return Spectrum(phase_func(u));
     }
 
     BSDFSampleResult sample(const Vec3 &wo, TransportMode mode, const Sample3 &sam) const noexcept override
@@ -52,7 +51,7 @@ public:
 
         BSDFSampleResult ret;
         ret.pdf      = phase_func(u);
-        ret.f        = sigma_s_ * Spectrum(ret.pdf);
+        ret.f        = Spectrum(ret.pdf);
         ret.dir      = Coord::from_z(wo).local_to_global(local_wi);
         ret.is_delta = false;
         ret.mode     = mode;
@@ -72,7 +71,7 @@ public:
 
     bool is_black() const noexcept override
     {
-        return !sigma_s_;
+        return false;
     }
 };
 

@@ -1,10 +1,10 @@
-#include <agz/tracer/core/texture.h>
+#include <agz/tracer/core/texture2d.h>
 
 AGZ_TRACER_BEGIN
 
-class TextureReverse : public Texture
+class TextureReverse : public Texture2D
 {
-    std::shared_ptr<const Texture> internal_;
+    std::shared_ptr<const Texture2D> internal_;
 
     Spectrum sample_spectrum_impl(const Vec2 &uv) const noexcept override
     {
@@ -21,8 +21,8 @@ class TextureReverse : public Texture
 public:
 
     TextureReverse(
-        const TextureCommonParams &common_params,
-        std::shared_ptr<const Texture> internal)
+        const Texture2DCommonParams &common_params,
+        std::shared_ptr<const Texture2D> internal)
     {
         init_common_params(common_params);
         internal_ = std::move(internal);
@@ -39,9 +39,9 @@ public:
     }
 };
 
-std::shared_ptr<Texture> create_texture_reverse(
-    const TextureCommonParams &common_params,
-    std::shared_ptr<const Texture> internal)
+std::shared_ptr<Texture2D> create_texture_reverse(
+    const Texture2DCommonParams &common_params,
+    std::shared_ptr<const Texture2D> internal)
 {
     return std::make_shared<TextureReverse>(common_params, std::move(internal));
 }

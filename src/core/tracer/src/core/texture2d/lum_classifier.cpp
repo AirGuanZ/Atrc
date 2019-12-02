@@ -1,13 +1,13 @@
-#include <agz/tracer/core/texture.h>
+#include <agz/tracer/core/texture2d.h>
 
 AGZ_TRACER_BEGIN
 
-class LuminanceClassifier : public Texture
+class LuminanceClassifier : public Texture2D
 {
-    std::shared_ptr<const Texture> internal_;
-    std::shared_ptr<const Texture> threshold_;
-    std::shared_ptr<const Texture> higher_;
-    std::shared_ptr<const Texture> lower_;
+    std::shared_ptr<const Texture2D> internal_;
+    std::shared_ptr<const Texture2D> threshold_;
+    std::shared_ptr<const Texture2D> higher_;
+    std::shared_ptr<const Texture2D> lower_;
 
 protected:
 
@@ -23,11 +23,11 @@ protected:
 public:
 
     LuminanceClassifier(
-        const TextureCommonParams &common_params,
-        std::shared_ptr<const Texture> internal,
-        std::shared_ptr<const Texture> threshold,
-        std::shared_ptr<const Texture> higher,
-        std::shared_ptr<const Texture> lower)
+        const Texture2DCommonParams &common_params,
+        std::shared_ptr<const Texture2D> internal,
+        std::shared_ptr<const Texture2D> threshold,
+        std::shared_ptr<const Texture2D> higher,
+        std::shared_ptr<const Texture2D> lower)
     {
         init_common_params(common_params);
         internal_  = std::move(internal);
@@ -47,12 +47,12 @@ public:
     }
 };
 
-std::shared_ptr<Texture> create_luminance_classifier(
-    const TextureCommonParams &common_params,
-    std::shared_ptr<const Texture> internal,
-    std::shared_ptr<const Texture> threshold_texture,
-    std::shared_ptr<const Texture> higher_texture,
-    std::shared_ptr<const Texture> lower_texture)
+std::shared_ptr<Texture2D> create_luminance_classifier(
+    const Texture2DCommonParams &common_params,
+    std::shared_ptr<const Texture2D> internal,
+    std::shared_ptr<const Texture2D> threshold_texture,
+    std::shared_ptr<const Texture2D> higher_texture,
+    std::shared_ptr<const Texture2D> lower_texture)
 {
     return std::make_shared<LuminanceClassifier>(
                     common_params,

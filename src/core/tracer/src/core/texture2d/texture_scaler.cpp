@@ -1,17 +1,17 @@
-#include <agz/tracer/core/texture.h>
+#include <agz/tracer/core/texture2d.h>
 
 AGZ_TRACER_BEGIN
 
-class TextureScaler : public Texture
+class TextureScaler : public Texture2D
 {
     Spectrum scale_;
-    std::shared_ptr<const Texture> internal_;
+    std::shared_ptr<const Texture2D> internal_;
 
 public:
 
     void initialize(
-        const TextureCommonParams &common_params,
-        const Spectrum &scale, std::shared_ptr<const Texture> internal)
+        const Texture2DCommonParams &common_params,
+        const Spectrum &scale, std::shared_ptr<const Texture2D> internal)
     {
         init_common_params(common_params);
         scale_ = scale;
@@ -34,10 +34,10 @@ public:
     }
 };
 
-std::shared_ptr<Texture> create_texture_scaler(
-    const TextureCommonParams &common_params,
+std::shared_ptr<Texture2D> create_texture_scaler(
+    const Texture2DCommonParams &common_params,
     const Spectrum &scale,
-    std::shared_ptr<const Texture> internal)
+    std::shared_ptr<const Texture2D> internal)
 {
     auto ret = std::make_shared<TextureScaler>();
     ret->initialize(common_params, scale, internal);

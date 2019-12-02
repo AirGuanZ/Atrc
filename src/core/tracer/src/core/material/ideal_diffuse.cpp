@@ -1,6 +1,6 @@
 #include <agz/tracer/core/bsdf.h>
 #include <agz/tracer/core/material.h>
-#include <agz/tracer/core/texture.h>
+#include <agz/tracer/core/texture2d.h>
 #include <agz/utility/misc.h>
 
 AGZ_TRACER_BEGIN
@@ -73,12 +73,12 @@ namespace
 
 class IdealDiffuse : public Material
 {
-    std::shared_ptr<const Texture> albedo_;
+    std::shared_ptr<const Texture2D> albedo_;
     std::unique_ptr<const NormalMapper> normal_mapper_;
 
 public:
 
-    void initialize(std::shared_ptr<const Texture> albedo, std::unique_ptr<const NormalMapper> normal_mapper)
+    void initialize(std::shared_ptr<const Texture2D> albedo, std::unique_ptr<const NormalMapper> normal_mapper)
     {
         albedo_ = albedo;
         normal_mapper_ = std::move(normal_mapper);
@@ -98,7 +98,7 @@ public:
 };
 
 std::shared_ptr<Material> create_ideal_diffuse(
-    std::shared_ptr<const Texture> albedo,
+    std::shared_ptr<const Texture2D> albedo,
     std::unique_ptr<const NormalMapper> normal_mapper)
 {
     auto ret = std::make_shared<IdealDiffuse>();

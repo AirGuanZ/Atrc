@@ -1,6 +1,6 @@
 #include <agz/tracer/core/bsdf.h>
 #include <agz/tracer/core/material.h>
-#include <agz/tracer/core/texture.h>
+#include <agz/tracer/core/texture2d.h>
 #include <agz/tracer/utility/reflection.h>
 #include <agz/utility/misc.h>
 
@@ -592,38 +592,38 @@ namespace disney_impl
 
 class Disney : public Material
 {
-    std::shared_ptr<const Texture> base_color_;
-    std::shared_ptr<const Texture> metallic_;
-    std::shared_ptr<const Texture> roughness_;
-    std::shared_ptr<const Texture> specular_scale_;
-    std::shared_ptr<const Texture> specular_tint_;
-    std::shared_ptr<const Texture> anisotropic_;
-    std::shared_ptr<const Texture> sheen_;
-    std::shared_ptr<const Texture> sheen_tint_;
-    std::shared_ptr<const Texture> clearcoat_;
-    std::shared_ptr<const Texture> clearcoat_gloss_;
-    std::shared_ptr<const Texture> transmission_;
-    std::shared_ptr<const Texture> transmission_roughness_;
-    std::shared_ptr<const Texture> IOR_;
+    std::shared_ptr<const Texture2D> base_color_;
+    std::shared_ptr<const Texture2D> metallic_;
+    std::shared_ptr<const Texture2D> roughness_;
+    std::shared_ptr<const Texture2D> specular_scale_;
+    std::shared_ptr<const Texture2D> specular_tint_;
+    std::shared_ptr<const Texture2D> anisotropic_;
+    std::shared_ptr<const Texture2D> sheen_;
+    std::shared_ptr<const Texture2D> sheen_tint_;
+    std::shared_ptr<const Texture2D> clearcoat_;
+    std::shared_ptr<const Texture2D> clearcoat_gloss_;
+    std::shared_ptr<const Texture2D> transmission_;
+    std::shared_ptr<const Texture2D> transmission_roughness_;
+    std::shared_ptr<const Texture2D> IOR_;
 
     std::unique_ptr<const NormalMapper> normal_mapper_;
 
 public:
 
     void initialize(
-        std::shared_ptr<const Texture> base_color,
-        std::shared_ptr<const Texture> metallic,
-        std::shared_ptr<const Texture> roughness,
-        std::shared_ptr<const Texture> transmission,
-        std::shared_ptr<const Texture> transmission_roughness,
-        std::shared_ptr<const Texture> ior,
-        std::shared_ptr<const Texture> specular_scale,
-        std::shared_ptr<const Texture> specular_tint,
-        std::shared_ptr<const Texture> anisotropic,
-        std::shared_ptr<const Texture> sheen,
-        std::shared_ptr<const Texture> sheen_tint,
-        std::shared_ptr<const Texture> clearcoat,
-        std::shared_ptr<const Texture> clearcoat_gloss,
+        std::shared_ptr<const Texture2D> base_color,
+        std::shared_ptr<const Texture2D> metallic,
+        std::shared_ptr<const Texture2D> roughness,
+        std::shared_ptr<const Texture2D> transmission,
+        std::shared_ptr<const Texture2D> transmission_roughness,
+        std::shared_ptr<const Texture2D> ior,
+        std::shared_ptr<const Texture2D> specular_scale,
+        std::shared_ptr<const Texture2D> specular_tint,
+        std::shared_ptr<const Texture2D> anisotropic,
+        std::shared_ptr<const Texture2D> sheen,
+        std::shared_ptr<const Texture2D> sheen_tint,
+        std::shared_ptr<const Texture2D> clearcoat,
+        std::shared_ptr<const Texture2D> clearcoat_gloss,
         std::unique_ptr<const NormalMapper> normal_mapper)
     {
         base_color_             = base_color;
@@ -683,19 +683,19 @@ public:
 };
 
 std::shared_ptr<Material> create_disney(
-    std::shared_ptr<const Texture> base_color,
-    std::shared_ptr<const Texture> metallic,
-    std::shared_ptr<const Texture> roughness,
-    std::shared_ptr<const Texture> transmission,
-    std::shared_ptr<const Texture> transmission_roughness,
-    std::shared_ptr<const Texture> ior,
-    std::shared_ptr<const Texture> specular_scale,
-    std::shared_ptr<const Texture> specular_tint,
-    std::shared_ptr<const Texture> anisotropic,
-    std::shared_ptr<const Texture> sheen,
-    std::shared_ptr<const Texture> sheen_tint,
-    std::shared_ptr<const Texture> clearcoat,
-    std::shared_ptr<const Texture> clearcoat_gloss,
+    std::shared_ptr<const Texture2D> base_color,
+    std::shared_ptr<const Texture2D> metallic,
+    std::shared_ptr<const Texture2D> roughness,
+    std::shared_ptr<const Texture2D> transmission,
+    std::shared_ptr<const Texture2D> transmission_roughness,
+    std::shared_ptr<const Texture2D> ior,
+    std::shared_ptr<const Texture2D> specular_scale,
+    std::shared_ptr<const Texture2D> specular_tint,
+    std::shared_ptr<const Texture2D> anisotropic,
+    std::shared_ptr<const Texture2D> sheen,
+    std::shared_ptr<const Texture2D> sheen_tint,
+    std::shared_ptr<const Texture2D> clearcoat,
+    std::shared_ptr<const Texture2D> clearcoat_gloss,
     std::unique_ptr<const NormalMapper> normal_mapper)
 {
     auto ret = std::make_shared<Disney>();

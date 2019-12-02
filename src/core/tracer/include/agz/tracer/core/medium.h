@@ -38,12 +38,14 @@ struct SampleMediumResult
  */
 struct SampleOutScatteringResult
 {
-    std::optional<MediumScattering> scattering_point;
+    MediumScattering scattering_point;
     Spectrum throughput;
+
+    const BSDF *phase_function = nullptr;
 
     bool is_scattering_happened() const noexcept
     {
-        return scattering_point != std::nullopt;
+        return phase_function != nullptr;
     }
 };
 
@@ -64,7 +66,7 @@ public:
     /**
      * @brief a与b点间的透射比
      */
-    virtual Spectrum tr(const Vec3 &a, const Vec3 &b) const noexcept = 0;
+    virtual Spectrum tr(const Vec3 &a, const Vec3 &b, Sampler &sampler) const noexcept = 0;
 
     ///**
     // * @brief 在从o向d的射线上采样一个散射点
@@ -74,12 +76,7 @@ public:
     /**
      * @brief 在从o向d的射线上采样一个散射点
      */
-    virtual SampleOutScatteringResult sample_scattering(const Vec3 &a, const Vec3 &b, Sampler &sampler) const noexcept = 0;
-
-    /**
-     * @brief 取得散射点的着色信息（phase function等）
-     */
-    virtual ShadingPoint shade(const MediumScattering &inct, Arena &arena) const noexcept = 0;
+    virtual SampleOutScatteringResult sample_scattering(const Vec3 &a, const Vec3 &b, Sampler &sampler, Arena &arena) const noexcept = 0;
 };
 
 AGZ_TRACER_END

@@ -3,7 +3,7 @@
 #include <agz/tracer/core/bsdf.h>
 #include <agz/tracer/core/fresnel.h>
 #include <agz/tracer/core/material.h>
-#include <agz/tracer/core/texture.h>
+#include <agz/tracer/core/texture2d.h>
 #include <agz/utility/misc.h>
 
 #include "./utility/microfacet.h"
@@ -266,12 +266,12 @@ namespace
 class FrostedGlass : public Material
 {
     std::shared_ptr<const Fresnel> fresnel_;
-    std::shared_ptr<const Texture> color_map_;
-    std::shared_ptr<const Texture> roughness_;
+    std::shared_ptr<const Texture2D> color_map_;
+    std::shared_ptr<const Texture2D> roughness_;
 
 public:
 
-    void initialize(std::shared_ptr<const Texture> color_map, std::shared_ptr<const Texture> roughness, std::shared_ptr<const Fresnel> fresnel)
+    void initialize(std::shared_ptr<const Texture2D> color_map, std::shared_ptr<const Texture2D> roughness, std::shared_ptr<const Fresnel> fresnel)
     {
         color_map_ = std::move(color_map);
         fresnel_   = std::move(fresnel);
@@ -290,8 +290,8 @@ public:
 };
 
 std::shared_ptr<Material> create_frosted_glass(
-    std::shared_ptr<const Texture> color_map,
-    std::shared_ptr<const Texture> roughness,
+    std::shared_ptr<const Texture2D> color_map,
+    std::shared_ptr<const Texture2D> roughness,
     std::shared_ptr<const Fresnel> fresnel)
 {
     auto ret = std::make_shared<FrostedGlass>();

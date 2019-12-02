@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include <agz/tracer/core/intersection.h>
-#include <agz/tracer/core/texture.h>
+#include <agz/tracer/core/texture2d.h>
 
 AGZ_TRACER_BEGIN
 
@@ -22,13 +22,13 @@ public:
 
 class NormalMapper : public misc::uncopyable_t
 {
-    std::shared_ptr<const Texture> normal_map_;
+    std::shared_ptr<const Texture2D> normal_map_;
 
 public:
 
     NormalMapper() = default;
 
-    explicit NormalMapper(std::shared_ptr<Texture> normal_map) noexcept
+    explicit NormalMapper(std::shared_ptr<Texture2D> normal_map) noexcept
         : normal_map_(std::move(normal_map))
     {
         

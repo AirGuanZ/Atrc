@@ -1,14 +1,14 @@
-#include <agz/tracer/factory/creator/texture_creators.h>
-#include <agz/tracer/factory/raw/texture.h>
+#include <agz/tracer/factory/creator/texture2d_creators.h>
+#include <agz/tracer/factory/raw/texture2d.h>
 
 AGZ_TRACER_FACTORY_BEGIN
 
 namespace texture
 {
 
-    TextureCommonParams init_common_params(const ConfigGroup &params)
+    Texture2DCommonParams init_common_params(const ConfigGroup &params)
     {
-        TextureCommonParams ret;
+        Texture2DCommonParams ret;
         
         ret.inv_u = params.child_int_or("inv_u", 0) != 0;
         ret.inv_v = params.child_int_or("inv_v", 0) != 0;
@@ -24,7 +24,7 @@ namespace texture
         return ret;
     }
     
-    class CheckerBoardCreator : public Creator<Texture>
+    class CheckerBoardCreator : public Creator<Texture2D>
     {
     public:
 
@@ -33,7 +33,7 @@ namespace texture
             return "checker_board";
         }
 
-        std::shared_ptr<Texture> create(const ConfigGroup &params, CreatingContext &context) const override
+        std::shared_ptr<Texture2D> create(const ConfigGroup &params, CreatingContext &context) const override
         {
             auto common_params = init_common_params(params);
             int grid_count = params.child_int("grid_count");
@@ -43,7 +43,7 @@ namespace texture
         }
     };
 
-    class ConstantCreator : public Creator<Texture>
+    class ConstantCreator : public Creator<Texture2D>
     {
     public:
 
@@ -52,7 +52,7 @@ namespace texture
             return "constant";
         }
 
-        std::shared_ptr<Texture> create(const ConfigGroup &params, CreatingContext &context) const override
+        std::shared_ptr<Texture2D> create(const ConfigGroup &params, CreatingContext &context) const override
         {
             auto common_params = init_common_params(params);
             auto texel = params.child_spectrum("texel");
@@ -60,7 +60,7 @@ namespace texture
         }
     };
 
-    class GradientCreator : public Creator<Texture>
+    class GradientCreator : public Creator<Texture2D>
     {
     public:
 
@@ -69,7 +69,7 @@ namespace texture
             return "gradient";
         }
 
-        std::shared_ptr<Texture> create(const ConfigGroup &params, CreatingContext &context) const override
+        std::shared_ptr<Texture2D> create(const ConfigGroup &params, CreatingContext &context) const override
         {
             auto common_params = init_common_params(params);
             Spectrum color1 = params.child_spectrum("color1");
@@ -78,7 +78,7 @@ namespace texture
         }
     };
 
-    class HDRCreator : public Creator<Texture>
+    class HDRCreator : public Creator<Texture2D>
     {
     public:
 
@@ -87,7 +87,7 @@ namespace texture
             return "hdr";
         }
 
-        std::shared_ptr<Texture> create(const ConfigGroup &params, CreatingContext &context) const override
+        std::shared_ptr<Texture2D> create(const ConfigGroup &params, CreatingContext &context) const override
         {
             auto common_params = init_common_params(params);
             auto filename = context.path_mapper->map(params.child_str("filename"));
@@ -96,7 +96,7 @@ namespace texture
         }
     };
 
-    class ImageCreator : public Creator<Texture>
+    class ImageCreator : public Creator<Texture2D>
     {
     public:
 
@@ -105,7 +105,7 @@ namespace texture
             return "image";
         }
 
-        std::shared_ptr<Texture> create(const ConfigGroup &params, CreatingContext &context) const override
+        std::shared_ptr<Texture2D> create(const ConfigGroup &params, CreatingContext &context) const override
         {
             auto common_params = init_common_params(params);
             auto filename = context.path_mapper->map(params.child_str("filename"));
@@ -114,7 +114,7 @@ namespace texture
         }
     };
 
-    class TextureScalerCreator : public Creator<Texture>
+    class TextureScalerCreator : public Creator<Texture2D>
     {
     public:
 
@@ -123,16 +123,16 @@ namespace texture
             return "scale";
         }
 
-        std::shared_ptr<Texture> create(const ConfigGroup &params, CreatingContext &context) const override
+        std::shared_ptr<Texture2D> create(const ConfigGroup &params, CreatingContext &context) const override
         {
             auto common_params = init_common_params(params);
             auto scale = params.child_spectrum("scale");
-            auto internal = context.create<Texture>(params.child_group("internal"));
+            auto internal = context.create<Texture2D>(params.child_group("internal"));
             return create_texture_scaler(common_params, scale, std::move(internal));
         }
     };
 
-    class TextureAdderCreator : public Creator<Texture>
+    class TextureAdderCreator : public Creator<Texture2D>
     {
     public:
 
@@ -141,16 +141,16 @@ namespace texture
             return "add";
         }
 
-        std::shared_ptr<Texture> create(const ConfigGroup &params, CreatingContext &context) const override
+        std::shared_ptr<Texture2D> create(const ConfigGroup &params, CreatingContext &context) const override
         {
             auto common_params = init_common_params(params);
-            auto lhs = context.create<Texture>(params.child_group("lhs"));
-            auto rhs = context.create<Texture>(params.child_group("rhs"));
+            auto lhs = context.create<Texture2D>(params.child_group("lhs"));
+            auto rhs = context.create<Texture2D>(params.child_group("rhs"));
             return create_texture_adder(common_params, std::move(lhs), std::move(rhs));
         }
     };
 
-    class TextureMultiplierCreator : public Creator<Texture>
+    class TextureMultiplierCreator : public Creator<Texture2D>
     {
     public:
 
@@ -159,16 +159,16 @@ namespace texture
             return "mul";
         }
 
-        std::shared_ptr<Texture> create(const ConfigGroup &params, CreatingContext &context) const override
+        std::shared_ptr<Texture2D> create(const ConfigGroup &params, CreatingContext &context) const override
         {
             auto common_params = init_common_params(params);
-            auto lhs = context.create<Texture>(params.child_group("lhs"));
-            auto rhs = context.create<Texture>(params.child_group("rhs"));
+            auto lhs = context.create<Texture2D>(params.child_group("lhs"));
+            auto rhs = context.create<Texture2D>(params.child_group("rhs"));
             return create_texture_multiplier(common_params, std::move(lhs), std::move(rhs));
         }
     };
 
-    class TextureLuminanceClassifierCreator : public Creator<Texture>
+    class TextureLuminanceClassifierCreator : public Creator<Texture2D>
     {
     public:
 
@@ -177,13 +177,13 @@ namespace texture
             return "lum_classify";
         }
 
-        std::shared_ptr<Texture> create(const ConfigGroup &params, CreatingContext &context) const override
+        std::shared_ptr<Texture2D> create(const ConfigGroup &params, CreatingContext &context) const override
         {
             auto common_params = init_common_params(params);
-            auto internal = context.create<Texture>(params.child_group("internal"));
-            auto threshold = context.create<Texture>(params.child_group("threshold"));
-            auto higher = context.create<Texture>(params.child_group("high"));
-            auto lower = context.create<Texture>(params.child_group("low"));
+            auto internal = context.create<Texture2D>(params.child_group("internal"));
+            auto threshold = context.create<Texture2D>(params.child_group("threshold"));
+            auto higher = context.create<Texture2D>(params.child_group("high"));
+            auto lower = context.create<Texture2D>(params.child_group("low"));
             return create_luminance_classifier(
                 common_params,
                 std::move(internal),
@@ -193,7 +193,7 @@ namespace texture
         }
     };
 
-    class TextureReverseCreator : public Creator<Texture>
+    class TextureReverseCreator : public Creator<Texture2D>
     {
     public:
 
@@ -202,17 +202,17 @@ namespace texture
             return "reverse";
         }
 
-        std::shared_ptr<Texture> create(const ConfigGroup &params, CreatingContext &context) const override
+        std::shared_ptr<Texture2D> create(const ConfigGroup &params, CreatingContext &context) const override
         {
             auto common_params = init_common_params(params);
-            auto internal = context.create<Texture>(params.child_group("internal"));
+            auto internal = context.create<Texture2D>(params.child_group("internal"));
             return create_texture_reverse(common_params, std::move(internal));
         }
     };
 
 } // namespace texture
 
-void initialize_texture_factory(Factory<Texture> &factory)
+void initialize_texture2d_factory(Factory<Texture2D> &factory)
 {
     factory.add_creator(std::make_unique<texture::CheckerBoardCreator>());
     factory.add_creator(std::make_unique<texture::ConstantCreator>());

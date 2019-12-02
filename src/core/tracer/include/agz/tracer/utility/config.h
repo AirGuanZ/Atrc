@@ -74,6 +74,7 @@ public:
     Vec4 child_vec4(const std::string &name) const;
 
     Vec2i child_vec2i(const std::string &name) const;
+    Vec3i child_vec3i(const std::string &name) const;
 
     Vec2 child_vec2_or(const std::string &name, const Vec2 &default_val) const;
     Vec3 child_vec3_or(const std::string &name, const Vec3 &default_val) const;

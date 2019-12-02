@@ -1,5 +1,5 @@
 #include <agz/tracer/core/fresnel.h>
-#include <agz/tracer/core/texture.h>
+#include <agz/tracer/core/texture2d.h>
 #include <agz/utility/misc.h>
 
 AGZ_TRACER_BEGIN
@@ -62,13 +62,13 @@ namespace
 
 class Conductor : public Fresnel
 {
-    std::shared_ptr<const Texture> eta_out_;
-    std::shared_ptr<const Texture> eta_in_;
-    std::shared_ptr<const Texture> k_;
+    std::shared_ptr<const Texture2D> eta_out_;
+    std::shared_ptr<const Texture2D> eta_in_;
+    std::shared_ptr<const Texture2D> k_;
 
 public:
 
-    void initialize(std::shared_ptr<const Texture> eta_out, std::shared_ptr<const Texture> eta_in, std::shared_ptr<const Texture> k)
+    void initialize(std::shared_ptr<const Texture2D> eta_out, std::shared_ptr<const Texture2D> eta_in, std::shared_ptr<const Texture2D> k)
     {
         eta_out_ = eta_out;
         eta_in_ = eta_in;
@@ -86,9 +86,9 @@ public:
 };
 
 std::shared_ptr<Fresnel> create_conductor_fresnel(
-    std::shared_ptr<const Texture> eta_out,
-    std::shared_ptr<const Texture> eta_in,
-    std::shared_ptr<const Texture> k)
+    std::shared_ptr<const Texture2D> eta_out,
+    std::shared_ptr<const Texture2D> eta_in,
+    std::shared_ptr<const Texture2D> k)
 {
     auto ret = std::make_shared<Conductor>();
     ret->initialize(eta_out, eta_in, k);

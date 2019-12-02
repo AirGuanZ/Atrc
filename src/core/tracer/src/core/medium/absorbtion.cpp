@@ -14,7 +14,7 @@ public:
         sigma_a_ = sigma_a;
     }
 
-    Spectrum tr(const Vec3 &a, const Vec3 &b) const noexcept override
+    Spectrum tr(const Vec3 &a, const Vec3 &b, Sampler &sampler) const noexcept override
     {
         Spectrum exp = -sigma_a_ * (a - b).length();
         return {
@@ -24,20 +24,10 @@ public:
         };
     }
 
-    //SampleMediumResult sample(const Vec3 &o, const Vec3 &d, real t_min, real t_max, Sampler &sampler) const noexcept override
-    //{
-    //    return SAMPLE_MEDIUM_RESULT_INVALID;
-    //}
-
-    SampleOutScatteringResult sample_scattering(const Vec3 &a, const Vec3 &b, Sampler &sampler) const noexcept override
+    SampleOutScatteringResult sample_scattering(const Vec3 &a, const Vec3 &b, Sampler &sampler, Arena &arena) const noexcept override
     {
-        Spectrum tr_value = tr(a, b);
-        return { std::nullopt, tr_value };
-    }
-
-    ShadingPoint shade(const MediumScattering &inct, Arena &arena) const noexcept override
-    {
-        return { nullptr };
+        Spectrum tr_value = tr(a, b, sampler);
+        return { { }, tr_value, nullptr };
     }
 };
 

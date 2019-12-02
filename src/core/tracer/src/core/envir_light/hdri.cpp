@@ -1,5 +1,5 @@
 #include <agz/tracer/core/light.h>
-#include <agz/tracer/core/texture.h>
+#include <agz/tracer/core/texture2d.h>
 #include <agz/utility/misc.h>
 #include <agz/utility/texture.h>
 
@@ -9,7 +9,7 @@ AGZ_TRACER_BEGIN
 
 class HDRI : public EnvirLight
 {
-    std::shared_ptr<const Texture> tex_;
+    std::shared_ptr<const Texture2D> tex_;
     Vec3 up_ = Vec3(0, 0, 1);
 
     std::unique_ptr<EnvironmentLightSampler> sampler_;
@@ -34,7 +34,7 @@ class HDRI : public EnvirLight
 
 public:
 
-    void initialize(std::shared_ptr<const Texture> tex, const Vec3 &up, real radius, const Vec3 &offset)
+    void initialize(std::shared_ptr<const Texture2D> tex, const Vec3 &up, real radius, const Vec3 &offset)
     {
         AGZ_HIERARCHY_TRY
 
@@ -121,7 +121,7 @@ public:
 };
 
 std::shared_ptr<NonareaLight>create_hdri_light(
-    std::shared_ptr<const Texture> tex,
+    std::shared_ptr<const Texture2D> tex,
     const Vec3 &up,
     real radius,
     const Vec3 &offset)

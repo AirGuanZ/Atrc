@@ -1,7 +1,7 @@
 #include <agz/common/math.h>
 #include <agz/tracer/core/bsdf.h>
 #include <agz/tracer/core/material.h>
-#include <agz/tracer/core/texture.h>
+#include <agz/tracer/core/texture2d.h>
 #include <agz/utility/misc.h>
 
 #include "./utility/microfacet.h"
@@ -248,34 +248,34 @@ namespace
 
 class DisneyReflection : public Material
 {
-    std::shared_ptr<const Texture> base_color_      ;
-    std::shared_ptr<const Texture> metallic_        ;
-    std::shared_ptr<const Texture> subsurface_      ;
-    std::shared_ptr<const Texture> specular_        ;
-    std::shared_ptr<const Texture> specular_tint_   ;
-    std::shared_ptr<const Texture> roughness_       ;
-    std::shared_ptr<const Texture> anisotropic_     ;
-    std::shared_ptr<const Texture> sheen_           ;
-    std::shared_ptr<const Texture> sheen_tint_      ;
-    std::shared_ptr<const Texture> clearcoat_       ;
-    std::shared_ptr<const Texture> clearcoat_gloss_ ;
+    std::shared_ptr<const Texture2D> base_color_      ;
+    std::shared_ptr<const Texture2D> metallic_        ;
+    std::shared_ptr<const Texture2D> subsurface_      ;
+    std::shared_ptr<const Texture2D> specular_        ;
+    std::shared_ptr<const Texture2D> specular_tint_   ;
+    std::shared_ptr<const Texture2D> roughness_       ;
+    std::shared_ptr<const Texture2D> anisotropic_     ;
+    std::shared_ptr<const Texture2D> sheen_           ;
+    std::shared_ptr<const Texture2D> sheen_tint_      ;
+    std::shared_ptr<const Texture2D> clearcoat_       ;
+    std::shared_ptr<const Texture2D> clearcoat_gloss_ ;
 
     std::unique_ptr<const NormalMapper> normal_mapper_;
 
 public:
 
     void initialize(
-        std::shared_ptr<const Texture> base_color,
-        std::shared_ptr<const Texture> metallic,
-        std::shared_ptr<const Texture> roughness,
-        std::shared_ptr<const Texture> subsurface,
-        std::shared_ptr<const Texture> specular,
-        std::shared_ptr<const Texture> specular_tint,
-        std::shared_ptr<const Texture> anisotropic,
-        std::shared_ptr<const Texture> sheen,
-        std::shared_ptr<const Texture> sheen_tint,
-        std::shared_ptr<const Texture> clearcoat,
-        std::shared_ptr<const Texture> clearcoat_gloss,
+        std::shared_ptr<const Texture2D> base_color,
+        std::shared_ptr<const Texture2D> metallic,
+        std::shared_ptr<const Texture2D> roughness,
+        std::shared_ptr<const Texture2D> subsurface,
+        std::shared_ptr<const Texture2D> specular,
+        std::shared_ptr<const Texture2D> specular_tint,
+        std::shared_ptr<const Texture2D> anisotropic,
+        std::shared_ptr<const Texture2D> sheen,
+        std::shared_ptr<const Texture2D> sheen_tint,
+        std::shared_ptr<const Texture2D> clearcoat,
+        std::shared_ptr<const Texture2D> clearcoat_gloss,
         std::unique_ptr<const NormalMapper> normal_mapper)
     {
         base_color_      = base_color;
@@ -325,17 +325,17 @@ public:
 };
 
 std::shared_ptr<Material> create_disney_reflection(
-    std::shared_ptr<const Texture> base_color,
-    std::shared_ptr<const Texture> metallic,
-    std::shared_ptr<const Texture> roughness,
-    std::shared_ptr<const Texture> subsurface,
-    std::shared_ptr<const Texture> specular,
-    std::shared_ptr<const Texture> specular_tint,
-    std::shared_ptr<const Texture> anisotropic,
-    std::shared_ptr<const Texture> sheen,
-    std::shared_ptr<const Texture> sheen_tint,
-    std::shared_ptr<const Texture> clearcoat,
-    std::shared_ptr<const Texture> clearcoat_gloss,
+    std::shared_ptr<const Texture2D> base_color,
+    std::shared_ptr<const Texture2D> metallic,
+    std::shared_ptr<const Texture2D> roughness,
+    std::shared_ptr<const Texture2D> subsurface,
+    std::shared_ptr<const Texture2D> specular,
+    std::shared_ptr<const Texture2D> specular_tint,
+    std::shared_ptr<const Texture2D> anisotropic,
+    std::shared_ptr<const Texture2D> sheen,
+    std::shared_ptr<const Texture2D> sheen_tint,
+    std::shared_ptr<const Texture2D> clearcoat,
+    std::shared_ptr<const Texture2D> clearcoat_gloss,
     std::unique_ptr<const NormalMapper> normal_mapper)
 {
     auto ret = std::make_shared<DisneyReflection>();

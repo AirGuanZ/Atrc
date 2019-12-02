@@ -14,7 +14,7 @@ void [Medium]
 )___";
     }
 
-    Spectrum tr(const Vec3 &a, const Vec3 &b) const noexcept override
+    Spectrum tr(const Vec3 &a, const Vec3 &b, Sampler &sampler) const noexcept override
     {
         return Spectrum(1);
     }
@@ -24,14 +24,9 @@ void [Medium]
     //    return { {}, 1 };
     //}
 
-    SampleOutScatteringResult sample_scattering(const Vec3 &a, const Vec3 &b, Sampler &sampler) const noexcept override
+    SampleOutScatteringResult sample_scattering(const Vec3 &a, const Vec3 &b, Sampler &sampler, Arena &arena) const noexcept override
     {
-        return { std::nullopt, Spectrum(1) };
-    }
-
-    ShadingPoint shade(const MediumScattering &inct, Arena &arena) const noexcept override
-    {
-        return { nullptr, {} };
+        return { { }, Spectrum(1), nullptr };
     }
 };
 

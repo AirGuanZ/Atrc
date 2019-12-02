@@ -1,5 +1,5 @@
 #include <agz/tracer/core/fresnel.h>
-#include <agz/tracer/core/texture.h>
+#include <agz/tracer/core/texture2d.h>
 #include <agz/tracer/utility/reflection.h>
 #include <agz/utility/misc.h>
 
@@ -31,12 +31,12 @@ namespace
 
 class DielectricFresnel : public Fresnel
 {
-    std::shared_ptr<const Texture> eta_i_;
-    std::shared_ptr<const Texture> eta_o_;
+    std::shared_ptr<const Texture2D> eta_i_;
+    std::shared_ptr<const Texture2D> eta_o_;
 
 public:
 
-    void initialize(std::shared_ptr<const Texture> eta_out, std::shared_ptr<const Texture> eta_in)
+    void initialize(std::shared_ptr<const Texture2D> eta_out, std::shared_ptr<const Texture2D> eta_in)
     {
         eta_i_ = eta_in;
         eta_o_ = eta_out;
@@ -51,8 +51,8 @@ public:
 };
 
 std::shared_ptr<Fresnel> create_dielectric_fresnel(
-    std::shared_ptr<const Texture> eta_out,
-    std::shared_ptr<const Texture> eta_in)
+    std::shared_ptr<const Texture2D> eta_out,
+    std::shared_ptr<const Texture2D> eta_in)
 {
     auto ret = std::make_shared<DielectricFresnel>();
     ret->initialize(eta_out, eta_in);

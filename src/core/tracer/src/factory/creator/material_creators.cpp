@@ -10,7 +10,7 @@ namespace material
     {
         if(auto node = params.find_child_group("normal_map"))
         {
-            auto map = context.create<Texture>(*node);
+            auto map = context.create<Texture2D>(*node);
             return std::make_unique<NormalMapper>(map);
         }
         return std::make_unique<NormalMapper>(nullptr);
@@ -27,14 +27,14 @@ namespace material
 
         std::shared_ptr<Material> create(const ConfigGroup &params, CreatingContext &context) const override
         {
-            auto base_color   = context.create<Texture>(params.child_group("base_color"));
-            auto metallic     = context.create<Texture>(params.child_group("metallic"));
-            auto roughness    = context.create<Texture>(params.child_group("roughness"));
+            auto base_color   = context.create<Texture2D>(params.child_group("base_color"));
+            auto metallic     = context.create<Texture2D>(params.child_group("metallic"));
+            auto roughness    = context.create<Texture2D>(params.child_group("roughness"));
             auto transmission = helper::child_texture_or_constant(context, params, "transmission", 0);
             
             auto transmission_roughness = roughness;
             if(auto node = params.find_child_group("transmission_roughness"))
-                transmission_roughness = context.create<Texture>(*node);
+                transmission_roughness = context.create<Texture2D>(*node);
             
             auto ior              = helper::child_texture_or_constant(context, params, "ior", real(1.5));
             auto specular_scale   = helper::child_texture_or_constant(context, params, "specular_scale", 1);
@@ -76,9 +76,9 @@ namespace material
 
         std::shared_ptr<Material> create(const ConfigGroup &params, CreatingContext &context) const override
         {
-            auto base_color      = context.create<Texture>(params.child_group("base_color"));
-            auto metallic        = context.create<Texture>(params.child_group("metallic"));
-            auto roughness       = context.create<Texture>(params.child_group("roughness"));
+            auto base_color      = context.create<Texture2D>(params.child_group("base_color"));
+            auto metallic        = context.create<Texture2D>(params.child_group("metallic"));
+            auto roughness       = context.create<Texture2D>(params.child_group("roughness"));
             auto subsurface      = helper::child_texture_or_constant(context, params, "subsurface", 0);
             auto specular        = helper::child_texture_or_constant(context, params, "specular", 0);
             auto specular_tint   = helper::child_texture_or_constant(context, params, "specular_tint", 0);
@@ -117,9 +117,9 @@ namespace material
 
         std::shared_ptr<Material> create(const ConfigGroup &params, CreatingContext &context) const override
         {
-            auto color_map = context.create<Texture>(params.child_group("color_map"));
+            auto color_map = context.create<Texture2D>(params.child_group("color_map"));
             auto fresnel = context.create<Fresnel>(params.child_group("fresnel"));
-            auto roughness = context.create<Texture>(params.child_group("roughness"));
+            auto roughness = context.create<Texture2D>(params.child_group("roughness"));
             return create_frosted_glass(std::move(color_map), std::move(roughness), std::move(fresnel));
         }
     };
@@ -137,20 +137,20 @@ namespace material
         {
             auto fresnel = context.create<Fresnel>(params.child_group("fresnel"));
 
-            std::shared_ptr<Texture> color_reflection_map, color_refraction_map;
+            std::shared_ptr<Texture2D> color_reflection_map, color_refraction_map;
 
             if(auto color_map_node = params.find_child_group("color_map"))
             {
-                auto color_map = context.create<Texture>(*color_map_node);
+                auto color_map = context.create<Texture2D>(*color_map_node);
                 color_reflection_map = color_map;
                 color_refraction_map = color_map;
             }
 
             if(auto color_reflection_map_node = params.find_child_group("color_reflection_map"))
-                color_reflection_map = context.create<Texture>(*color_reflection_map_node);
+                color_reflection_map = context.create<Texture2D>(*color_reflection_map_node);
 
             if(auto color_refraction_map_node = params.find_child_group("color_refraction_map"))
-                color_refraction_map = context.create<Texture>(*color_refraction_map_node);
+                color_refraction_map = context.create<Texture2D>(*color_refraction_map_node);
 
             if(!color_reflection_map || !color_refraction_map)
                 throw CreatingObjectException("empty color reflection/refraction map");
@@ -185,7 +185,7 @@ namespace material
 
         std::shared_ptr<Material> create(const ConfigGroup &params, CreatingContext &context) const override
         {
-            auto albedo = context.create<Texture>(params.child_group("albedo"));
+            auto albedo = context.create<Texture2D>(params.child_group("albedo"));
             auto normal_mapper = init_normal_mapper(params, context);
             return create_ideal_diffuse(std::move(albedo), std::move(normal_mapper));
         }
@@ -224,7 +224,7 @@ namespace material
         std::shared_ptr<Material> create(const ConfigGroup &params, CreatingContext &context) const override
         {
             auto internal = context.create<Material>(params.child_group("internal"));
-            auto scale = context.create<Texture>(params.child_group("texture"));
+            auto scale = context.create<Texture2D>(params.child_group("texture"));
             return create_mat_scaler(std::move(internal), std::move(scale));
         }
     };
@@ -240,7 +240,7 @@ namespace material
 
         std::shared_ptr<Material> create(const ConfigGroup &params, CreatingContext &context) const override
         {
-            auto color_map = context.create<Texture>(params.child_group("color_map"));
+            auto color_map = context.create<Texture2D>(params.child_group("color_map"));
             auto fresnel = context.create<Fresnel>(params.child_group("fresnel"));
             return create_mirror(std::move(color_map), std::move(fresnel));
         }
@@ -257,9 +257,9 @@ namespace material
 
         std::shared_ptr<Material> create(const ConfigGroup &params, CreatingContext &context) const override
         {
-            auto kd = context.create<Texture>(params.child_group("kd"));
-            auto ks = context.create<Texture>(params.child_group("ks"));
-            auto ns = context.create<Texture>(params.child_group("ns"));
+            auto kd = context.create<Texture2D>(params.child_group("kd"));
+            auto ks = context.create<Texture2D>(params.child_group("ks"));
+            auto ns = context.create<Texture2D>(params.child_group("ns"));
             return create_mtl(std::move(kd), std::move(ks), std::move(ns));
         }
     };
@@ -276,8 +276,8 @@ namespace material
         std::shared_ptr<Material> create(const ConfigGroup &params, CreatingContext &context) const override
         {
             auto internal = context.create<Material>(params.child_group("internal"));
-            auto color_map = context.create<Texture>(params.child_group("color_map"));
-            auto eta_in = context.create<Texture>(params.child_group("eta_in"));
+            auto color_map = context.create<Texture2D>(params.child_group("color_map"));
+            auto eta_in = context.create<Texture2D>(params.child_group("eta_in"));
             auto eta_out = helper::child_texture_or_constant(context, params, "eta_out", 1);
             return create_mirror_varnish(std::move(internal), std::move(eta_in), std::move(eta_out), std::move(color_map));
         }

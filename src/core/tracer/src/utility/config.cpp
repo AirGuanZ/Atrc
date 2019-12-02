@@ -107,6 +107,31 @@ namespace
         AGZ_HIERARCHY_WRAP("in config to_vec2i")
     }
 
+    Vec3i to_vec3i(const ConfigNode &node)
+    {
+        AGZ_HIERARCHY_TRY
+
+        auto &arr = node.as_array();
+
+        if(arr.size() == 1)
+        {
+            int val = arr.at_int(0);
+            return Vec3i(val);
+        }
+
+        if(arr.size() == 3)
+        {
+            int x = arr.at_int(0);
+            int y = arr.at_int(1);
+            int z = arr.at_int(2);
+            return Vec3i(x, y, z);
+        }
+
+        throw ConfigException(stdstr::cat("invalid array size (actual = ", arr.size(), ")"));
+
+        AGZ_HIERARCHY_WRAP("in config to_vec3i")
+    }
+
     Transform2 to_basic_transform2(const ConfigNode &node)
     {
         AGZ_HIERARCHY_TRY
@@ -403,6 +428,11 @@ Vec4 ConfigGroup::child_vec4(const std::string &name) const
 Vec2i ConfigGroup::child_vec2i(const std::string &name) const
 {
     return to_vec2i(child(name));
+}
+
+Vec3i ConfigGroup::child_vec3i(const std::string &name) const
+{
+    return to_vec3i(child(name));
 }
 
 Vec2 ConfigGroup::child_vec2_or(const std::string &name, const Vec2 &default_val) const

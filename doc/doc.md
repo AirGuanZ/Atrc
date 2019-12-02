@@ -29,7 +29,7 @@
 
 ### CMake Options
 
-| 选项名                  | Default Value | Explanation                        |
+| Name                    | Default Value | Explanation                        |
 | ----------------------- | ------------- | ---------------------------------- |
 | USE_EMBREE              | OFF           | use Embree library to tracing rays |
 | USE_OIDN                | OFF           | use OIDN denoising library         |
@@ -201,7 +201,7 @@ Here is a simple example, which results in the above image (a bit rough metal sp
 }
 ```
 
-As you can see, Atrc's configuration file consists of a series of nested JSON objects, and each field has its type and value. The syntax of some common field types is listed below:
+Atrc's configuration file consists of a series of nested JSON objects, and each field has its type and value. The syntax of some common field types is listed below:
 
 | field type | example                     | semantics                             |
 | ---------- | --------------------------- | ------------------------------------- |
@@ -213,9 +213,13 @@ As you can see, Atrc's configuration file consists of a series of nested JSON ob
 | Spectrum   | [ 0.5 ]                     | RGB value `(0.5, 0.5, 0.5)`           |
 | Spectrum   | [ 0.1, 0.2, 0.3 ]           | RGB value `(0.1, 0.2, 0.3)`           |
 | Vec2       | [ 2 ]                       | 2D vector `(2, 2)`                    |
-| Vec2       | [ 1, 2 ]                    | 2D vector `(1, 2)`                    |
-| Vec3       | [ 2 ]                       | 3D vector `(2, 2, 2)`                 |
-| Vec3       | [ 1, 2, 3 ]                 | 3D vector `(1, 2, 3)`                 |
+| Vec2       | [ 1.2, 2 ]                  | 2D vector `(1.2, 2)`                  |
+| Vec3       | [ 9.9 ]                     | 3D vector `(9.9, 9.9, 9.9)`           |
+| Vec3       | [ 1, 2.2, 3 ]               | 3D vector `(1, 2.2, 3)`               |
+| Vec2i      | [ 1 ]                       | 2D integer vector `(1, 1)`            |
+| Vec2i      | [ 1, 2 ]                    | 2D integer vector `(1, 2)`            |
+| Vec3i      | [ 2 ]                       | 3D integer vector `(2, 2, 2)`         |
+| Vec3i      | [ 3, 4, -6 ]                | 3D integer vector `(3, 4, -6)`        |
 | [Type]     | [Instance0, Instance1, ...] | JSON array of objects with given Type |
 
 When a string represents a path or file name, `${scene-directory}` represents the absolute path of the directory where the configuration file is located, and `${working-directory}` represents the absolute path of the working directory of the current executable program. Take `${scene-directory}/output.png` at the end of the above example configuration file as an example, it represents the `output.png` file in the directory where the configuration file is located.
@@ -396,20 +400,20 @@ Fresnel term whose value is always 1.
 
 Fresnel term for dielectric
 
-| Field Name | Type    | Default Value | Explanation                     |
-| ---------- | ------- | ------------- | ------------------------------- |
-| eta_out    | Texture | all_one       | outer ior (index of refraction) |
-| eta_in     | Texture |               | inner ior                       |
+| Field Name | Type      | Default Value | Explanation                     |
+| ---------- | --------- | ------------- | ------------------------------- |
+| eta_out    | Texture2D | all_one       | outer ior (index of refraction) |
+| eta_in     | Texture2D |               | inner ior                       |
 
 **conductor**
 
 Fresnel term of conductor
 
-| Field Name | Type    | Default Value | Explanation         |
-| ---------- | ------- | ------------- | ------------------- |
-| eta_out    | Texture | all_one       | outer ior           |
-| eta_in     | Texture |               | inner ior           |
-| k          | Texture |               | index of absorption |
+| Field Name | Type      | Default Value | Explanation         |
+| ---------- | --------- | ------------- | ------------------- |
+| eta_out    | Texture2D | all_one       | outer ior           |
+| eta_in     | Texture2D |               | inner ior           |
+| k          | Texture2D |               | index of absorption |
 
 ### Geometry
 
@@ -508,21 +512,19 @@ Triangle mesh implemented using simple BVH tree. It has the same parameters as `
 
 Complete implementation of [Disney Principled BRDF](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf)
 
-| Field Name      | Type    | Default Value | Explanation                                                  |
-| --------------- | ------- | ------------- | ------------------------------------------------------------ |
-| base_color      | Texture |               | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf) |
-| metallic        | Texture |               | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf) |
-| roughness       | Texture |               | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf) |
-| subsurface      | Texture | all_zero      | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf) |
-| specular        | Texture | all_zero      | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf) |
-| specular_tint   | Texture | all_zero      | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf) |
-| anisotropic     | Texture | all_zero      | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf) |
-| sheen           | Texture | all_zero      | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf) |
-| sheen_tint      | Texture | all_zero      | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf) |
-| clearcoat       | Texture | all_zero      | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf) |
-| clearcoat_gloss | Texture | all_one       | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf) |
-
-*NOTE*：`disney_reflection`对材质的表现范围基本是`disney`的子集，故建议使用后者。
+| Field Name      | Type      | Default Value | Explanation                                                  |
+| --------------- | --------- | ------------- | ------------------------------------------------------------ |
+| base_color      | Texture2D |               | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf) |
+| metallic        | Texture2D |               | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf) |
+| roughness       | Texture2D |               | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf) |
+| subsurface      | Texture2D | all_zero      | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf) |
+| specular        | Texture2D | all_zero      | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf) |
+| specular_tint   | Texture2D | all_zero      | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf) |
+| anisotropic     | Texture2D | all_zero      | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf) |
+| sheen           | Texture2D | all_zero      | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf) |
+| sheen_tint      | Texture2D | all_zero      | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf) |
+| clearcoat       | Texture2D | all_zero      | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf) |
+| clearcoat_gloss | Texture2D | all_one       | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf) |
 
 *NOTE*: `disney_reflection` is basically a subset of `disney` and is already deprecated, so the latter is recommended.
 
@@ -532,21 +534,21 @@ Complete implementation of [Disney Principled BRDF](https://disney-animation.s3.
 
 see [Disney Principled BSDF](https://blog.selfshadow.com/publications/s2015-shading-course/#course_content)
 
-| Field Name             | Type    | Default Value | Explanation                                                  |
-| ---------------------- | ------- | ------------- | ------------------------------------------------------------ |
-| base_color             | Texture |               | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf); range: $[0, 1]^3$ |
-| metallic               | Texture |               | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf); range: $[0,1]$ |
-| roughness              | Texture |               | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf); range: $[0,1]$ |
-| specular_scale         | Texture | all_one       | scale factor of non-metallic specular lobe; range: $[0,1]^3$ |
-| specular_tint          | Texture | all_zero      | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf); range: $[0,1]$ |
-| anisotropic            | Texture | all_zero      | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf); range: $[0,1]$ |
-| sheen                  | Texture | all_zero      | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf); range: $[0,1]$ |
-| sheen_tint             | Texture | all_zero      | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf); range: $[0,1]$ |
-| clearcoat              | Texture | all_zero      | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf); range: $[0,1]$ |
-| clearcoat_gloss        | Texture | all_one       | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf); range: $[0,1]$ |
-| transmission           | Texture | all_zero      | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf); range: $[0,1]$ |
-| transmission_roughness | Texture | roughness     | roughness of transmitted specular lobe; range: $[0, 1]$      |
-| ior                    | Texture | all_{1.5}     | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf); range: $[0,\infty)$ |
+| Field Name             | Type      | Default Value | Explanation                                                  |
+| ---------------------- | --------- | ------------- | ------------------------------------------------------------ |
+| base_color             | Texture2D |               | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf); range: $[0, 1]^3$ |
+| metallic               | Texture2D |               | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf); range: $[0,1]$ |
+| roughness              | Texture2D |               | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf); range: $[0,1]$ |
+| specular_scale         | Texture2D | all_one       | scale factor of non-metallic specular lobe; range: $[0,1]^3$ |
+| specular_tint          | Texture2D | all_zero      | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf); range: $[0,1]$ |
+| anisotropic            | Texture2D | all_zero      | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf); range: $[0,1]$ |
+| sheen                  | Texture2D | all_zero      | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf); range: $[0,1]$ |
+| sheen_tint             | Texture2D | all_zero      | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf); range: $[0,1]$ |
+| clearcoat              | Texture2D | all_zero      | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf); range: $[0,1]$ |
+| clearcoat_gloss        | Texture2D | all_one       | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf); range: $[0,1]$ |
+| transmission           | Texture2D | all_zero      | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf); range: $[0,1]$ |
+| transmission_roughness | Texture2D | roughness     | roughness of transmitted specular lobe; range: $[0, 1]$      |
+| ior                    | Texture2D | all_{1.5}     | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf); range: $[0,\infty)$ |
 
 **frosted_glass**
 
@@ -554,11 +556,11 @@ see [Disney Principled BSDF](https://blog.selfshadow.com/publications/s2015-shad
 
 Frosted glass material. Please refer to [Microfacet Models for Refraction through Rough Surfaces](https://www.cs.cornell.edu/~srm/publications/EGSR07-btdf.html).
 
-| Field Name | Type    | Default Value | Explanation       |
-| ---------- | ------- | ------------- | ----------------- |
-| color_map  | Texture |               | surface color     |
-| fresnel    | Fresnel |               | fresnel term      |
-| roughness  | Texture |               | surface roughness |
+| Field Name | Type      | Default Value | Explanation       |
+| ---------- | --------- | ------------- | ----------------- |
+| color_map  | Texture2D |               | surface color     |
+| fresnel    | Fresnel   |               | fresnel term      |
+| roughness  | Texture2D |               | surface roughness |
 
 **glass**
 
@@ -566,12 +568,12 @@ Frosted glass material. Please refer to [Microfacet Models for Refraction throug
 
 Smooth glass
 
-| Field Name           | Type    | Default Value | Explanation      |
-| -------------------- | ------- | ------------- | ---------------- |
-| color_map            | Texture |               | surface color    |
-| color_reflection_map | Texture |               | reflection color |
-| color_refraction_map | Texture |               | refraction color |
-| fresnel              | Fresnel |               | fresnel term     |
+| Field Name           | Type      | Default Value | Explanation      |
+| -------------------- | --------- | ------------- | ---------------- |
+| color_map            | Texture2D |               | surface color    |
+| color_reflection_map | Texture2D |               | reflection color |
+| color_refraction_map | Texture2D |               | refraction color |
+| fresnel              | Fresnel   |               | fresnel term     |
 
 Two color assignment methods are provided:
 
@@ -588,9 +590,9 @@ A mass of black
 
 Ideal diffuse reflection, reflects the same radiance in all directions.
 
-| Field Name | Type    | Default Value | Explanation               |
-| ---------- | ------- | ------------- | ------------------------- |
-| albedo     | Texture |               | surface color times $\pi$ |
+| Field Name | Type      | Default Value | Explanation               |
+| ---------- | --------- | ------------- | ------------------------- |
+| albedo     | Texture2D |               | surface color times $\pi$ |
 
 **mirror**
 
@@ -600,18 +602,18 @@ Ideal mirror reflection
 
 | Field Name | Type  | Default Value | Explanation |
 | ------- | ------- | ------ | --------- |
-| color_map  | Texture |        | surface color |
+| color_map  | Texture2D |        | surface color |
 | fresnel | Fresnel |        | fresnel term |
 
 **mtl**
 
 Standard reflection model, constructed with a diffuse component and a specular component.
 
-| Field Name | Type    | Default Value | Explanation                           |
-| ---------- | ------- | ------------- | ------------------------------------- |
-| kd         | Texture |               | strength of diffuse component         |
-| ks         | Fresnel |               | strength of specular component        |
-| ns         | Texture |               | specular gloss; range: $(0, +\infty)$ |
+| Field Name | Type      | Default Value | Explanation                           |
+| ---------- | --------- | ------------- | ------------------------------------- |
+| kd         | Texture2D |               | strength of diffuse component         |
+| ks         | Fresnel   |               | strength of specular component        |
+| ns         | Texture2D |               | specular gloss; range: $(0, +\infty)$ |
 
 **add**
 
@@ -627,10 +629,10 @@ Combine multiple materials together. The third image in the figure above is the 
 
 Scales the reflection/refraction component of a material linearly.
 
-| Field Name | Type     | Default Value | Explanation     |
-| ---------- | -------- | ------------- | --------------- |
-| internal   | Material |               | scaled material |
-| scale      | Texture  |               | scaling ratio   |
+| Field Name | Type      | Default Value | Explanation     |
+| ---------- | --------- | ------------- | --------------- |
+| internal   | Material  |               | scaled material |
+| scale      | Texture2D |               | scaling ratio   |
 
 **mirror_varnish**
 
@@ -638,12 +640,12 @@ Scales the reflection/refraction component of a material linearly.
 
 Absolutely smooth varnish, where the interior material must be opaque.
 
-| Field Name | Type     | Default Value | Explanation                      |
-| ---------- | -------- | ------------- | -------------------------------- |
-| internal   | Material |               | material under the varnish layer |
-| eta_in     | Texture  |               | inner ior of varnish             |
-| eta_out    | Texture  | all_one       | outer ior of varnish             |
-| color      | Texture  |               | varnish color                    |
+| Field Name | Type      | Default Value | Explanation                      |
+| ---------- | --------- | ------------- | -------------------------------- |
+| internal   | Material  |               | material under the varnish layer |
+| eta_in     | Texture2D |               | inner ior of varnish             |
+| eta_out    | Texture2D | all_one       | outer ior of varnish             |
+| color      | Texture2D |               | varnish color                    |
 
 ### Medium
 
@@ -677,10 +679,10 @@ Non-scattering medium.
 
 Image based lighting
 
-| Field Name | Type    | Default Value | Explanation                                                  |
-| ---------- | ------- | ------------- | ------------------------------------------------------------ |
-| tex        | Texture |               | texture object describing radiance                           |
-| up         | Vec3    | [ 0, 0, 1 ]   | describe which direction in the world space is "above", default is $+z$ |
+| Field Name | Type      | Default Value | Explanation                                                  |
+| ---------- | --------- | ------------- | ------------------------------------------------------------ |
+| tex        | Texture2D |               | texture object describing radiance                           |
+| up         | Vec3      | [ 0, 0, 1 ]   | describe which direction in the world space is "above", default is $+z$ |
 
 **hdri**
 
@@ -688,12 +690,12 @@ Image based lighting
 
 Inner glowing sphere which is not visible on the outer side
 
-| Field Name | Type    | Default Value | Explanation                                                  |
-| ---------- | ------- | ------------- | ------------------------------------------------------------ |
-| tex        | Texture |               | texture object describing radiance                           |
-| up         | Vec3    | [ 0, 0, 1 ]   | describe which direction in the world space is "above", default is $+z$ |
-| radius     | real    | 100           | sphere radius                                                |
-| offset     | Vec3    | [0]           | sphere center position                                       |
+| Field Name | Type      | Default Value | Explanation                                                  |
+| ---------- | --------- | ------------- | ------------------------------------------------------------ |
+| tex        | Texture2D |               | texture object describing radiance                           |
+| up         | Vec3      | [ 0, 0, 1 ]   | describe which direction in the world space is "above", default is $+z$ |
+| radius     | real      | 100           | sphere radius                                                |
+| offset     | Vec3      | [0]           | sphere center position                                       |
 
 **native_sky**
 
@@ -831,11 +833,11 @@ The most basic random number sampler, where all samples are independent
 | seed       | int  | by time       | Seed value, default seed is the running time |
 | spp        | int  |               | samples per pixel                            |
 
-### Texture
+### Texture2D
 
 ![pic](./pictures/texture.png)
 
-All textures contain the following fields (these fields are not listed in the subsequent textures):
+All 2d textures contain the following fields (these fields are not listed in the subsequent textures):
 
 | Field Name | Type         | Default Value | Explanation                                                  |
 | ---------- | ------------ | ------------- | ------------------------------------------------------------ |
@@ -869,7 +871,7 @@ Constant-valued texture, that is, sampling always results in the same value.
 
 **hdr**
 
-Texture loaed from `.hdr` file
+Texture loaded from `.hdr` file
 
 | Field Name | Type   | Default Value | Explanation                              |
 | ---------- | ------ | ------------- | ---------------------------------------- |
@@ -889,10 +891,10 @@ Textures loaded from common image file formats (`.bmp, .jpg, .png, .tga`, etc)
 
 A wrapper that linearly scales another texture
 
-| Field Name | Type     | Default Value | Explanation    |
-| ---------- | -------- | ------------- | -------------- |
-| scale      | Spectrum |               | scaling ratio  |
-| internal   | Texture  |               | scaled texture |
+| Field Name | Type      | Default Value | Explanation    |
+| ---------- | --------- | ------------- | -------------- |
+| scale      | Spectrum  |               | scaling ratio  |
+| internal   | Texture2D |               | scaled texture |
 
 **gradient**
 
@@ -907,19 +909,19 @@ Linear gradient texture along the `u` direction. You can achieve gradients in ot
 
 Add two textures together
 
-| Field Name | Type    | Default Value | Explanation              |
-| ---------- | ------- | ------------- | ------------------------ |
-| lhs        | Texture |               | the first added texture  |
-| rhs        | Texture |               | the second added texture |
+| Field Name | Type      | Default Value | Explanation               |
+| ---------- | --------- | ------------- | ------------------------- |
+| lhs        | Texture2D |               | the first added Texture2D |
+| rhs        | Texture2D |               | the second added texture  |
 
 **mul**
 
 Multiply two textures together
 
-| Field Name | Type    | Default Value | Explanation                   |
-| ---------- | ------- | ------------- | ----------------------------- |
-| lhs        | Texture |               | the first multiplied texture  |
-| rhs        | Texture |               | the second multiplied texture |
+| Field Name | Type      | Default Value | Explanation                   |
+| ---------- | --------- | ------------- | ----------------------------- |
+| lhs        | Texture2D |               | the first multiplied texture  |
+| rhs        | Texture2D |               | the second multiplied texture |
 
 **lum_classify**
 
@@ -931,24 +933,42 @@ $$
 \end{aligned}\end{cases}
 $$
 
-| Field Name | Type    | Default Value | Explanation |
-| ---------- | ------- | ------------- | ----------- |
-| internal   | Texture |               |             |
-| threshold  | Texture |               |             |
-| high       | Texture |               |             |
-| low        | Texture |               |             |
+| Field Name | Type      | Default Value | Explanation |
+| ---------- | --------- | ------------- | ----------- |
+| internal   | Texture2D |               |             |
+| threshold  | Texture2D |               |             |
+| high       | Texture2D |               |             |
+| low        | Texture2D |               |             |
 
 **reverse**
 
 Invert the color of a texture
 
-| Field Name | Type    | Default Value | Explanation      |
-| ---------- | ------- | ------------- | ---------------- |
-| internal   | Texture |               | inverted texture |
+| Field Name | Type      | Default Value | Explanation      |
+| ---------- | --------- | ------------- | ---------------- |
+| internal   | Texture2D |               | inverted texture |
 
 $$
 \mathrm{reverse}(u, v) := \mathrm{clamp}(1 - \mathrm{internal}(u, v), 0, 1)
 $$
+
+### Texture3D
+
+All 3d textures contain the following fields (these fields are not listed in the subsequent textures):
+
+| Field Name | Type         | Default Value | Explanation                                                  |
+| ---------- | ------------ | ------------- | ------------------------------------------------------------ |
+| inv_v      | bool         | false         | turn $v$ to $1 - v$                                          |
+| inv_u      | bool         | false         | turn $u$ to $1 - u$                                          |
+| inv_w      | bool         | false         | turn $w$ to $1 - w$                                          |
+| uvw_perm   | Vec3i        | [ 0, 1, 2 ]   | permutation of uvw                                           |
+| transform  | [Transform3] | []            | transform sequence applied to the texture coordinate         |
+| wrap_u     | string       | "clamp"       | wrapping method to deal with $u$ that is out of $[0, 1]$; range: clamp/mirror/repeat |
+| wrap_v     | string       | "clamp"       | wrapping method to deal with $v$ that is out of $[0, 1]$; range: clamp/mirror/repeat |
+| wrap_w     | string       | "clamp"       | wrapping method to deal with $w$ that is out of $[0, 1]$; range: clamp/mirror/repeat |
+| inv_gamma  | real         | 1             | used to perform inverse gamma correction to the texture; typical value is 2.2 |
+
+Note that `inv_v, inv_u, inv_w, uvw_perm` and `transform` are all transformations to uv, where `transform` applies first, then `uvw_perm` , and `inv_u, inv_v, inv_w` applies last. In the `transform` sequence, the `Transform3` in the back of the sequence applies first, and the `Transform3` in the front of the sequence applies later.
 
 ### Transform
 

@@ -5,7 +5,7 @@
 
 AGZ_TRACER_BEGIN
 
-struct TextureCommonParams
+struct Texture2DCommonParams
 {
     bool inv_u   = false;
     bool inv_v   = false;
@@ -25,8 +25,10 @@ struct TextureCommonParams
             ret *= Transform2::translate(0, 1) * Transform2::scale(1, -1);
         if(inv_u)
             ret *= Transform2::translate(1, 0) * Transform2::scale(-1, 1);
+
         if(swap_uv)
             ret *= Transform2(math::tmat3_c<real>(0, 1, 0, 1, 0, 0, 0, 0, 1));
+
         return ret * transform;
     }
 
@@ -53,7 +55,7 @@ struct TextureCommonParams
  * 
  * sample_spectrum和sample_real中至少要实现一个
  */
-class Texture
+class Texture2D
 {
     Transform2 transform_;
 
@@ -81,7 +83,7 @@ class Texture
 
 protected:
 
-    void init_common_params(const TextureCommonParams &params)
+    void init_common_params(const Texture2DCommonParams &params)
     {
         transform_ = params.full_transform();
 
@@ -118,7 +120,7 @@ protected:
 
 public:
 
-    virtual ~Texture() = default;
+    virtual ~Texture2D() = default;
 
     /**
      * @brief 采样特定uv点处的Spectrum

@@ -17,7 +17,7 @@ namespace envir_light
 
         std::shared_ptr<NonareaLight> create(const ConfigGroup &params, CreatingContext &context) const override
         {
-            auto tex = context.create<Texture>(params.child_group("tex"));
+            auto tex = context.create<Texture2D>(params.child_group("tex"));
             auto up = params.child_vec3_or("up", Vec3(0, 0, 1));
             auto radius = params.child_real_or("radius", 100);
             auto offset = params.child_vec3_or("offset", Vec3(0));
@@ -36,7 +36,7 @@ namespace envir_light
 
         std::shared_ptr<NonareaLight> create(const ConfigGroup &params, CreatingContext &context) const override
         {
-            auto tex = context.create<Texture>(params.child_group("tex"));
+            auto tex = context.create<Texture2D>(params.child_group("tex"));
             auto up = params.child_vec3_or("up", Vec3(0, 0, 1));
             return create_ibl_light(std::move(tex), up);
         }

@@ -4,14 +4,15 @@
 #include <agz/tracer/core/light.h>
 #include <agz/tracer/core/medium.h>
 #include <agz/tracer/core/scene.h>
-
-#include "./mis_light_bsdf.h"
+#include <agz/tracer/utility/direct_illum.h>
 
 AGZ_TRACER_BEGIN
 
 Spectrum mis_sample_area_light(
-    const Scene &scene, const AreaLight *light, const EntityIntersection &inct, const ShadingPoint &shd, const Sample5 &sam)
+    const Scene &scene, const AreaLight *light, const EntityIntersection &inct, const ShadingPoint &shd, Sampler &sampler)
 {
+    Sample5 sam = sampler.sample5();
+
     auto light_sample = light->sample(inct.pos, sam);
     if(!light_sample.radiance || !light_sample.pdf)
         return {};
@@ -37,8 +38,10 @@ Spectrum mis_sample_area_light(
 }
 
 Spectrum mis_sample_area_light(
-    const Scene &scene, const AreaLight *light, const MediumScattering &scattering, const ShadingPoint &shd, const Sample5 &sam)
+    const Scene &scene, const AreaLight *light, const MediumScattering &scattering, const BSDF *phase_function, Sampler &sampler)
 {
+    Sample5 sam = sampler.sample5();
+
     auto light_sample = light->sample(scattering.pos, sam);
     if(!light_sample.radiance || !light_sample.pdf)
         return {};
@@ -47,20 +50,22 @@ Spectrum mis_sample_area_light(
         return {};
 
     Vec3 inct_to_light = (light_sample.pos - scattering.pos).normalize();
-    auto bsdf_f = shd.bsdf->eval(inct_to_light, scattering.wr, TM_Radiance);
+    auto bsdf_f = phase_function->eval(inct_to_light, scattering.wr, TM_Radiance);
     if(!bsdf_f)
         return {};
     Spectrum f = light_sample.radiance * bsdf_f;
 
     if(light_sample.is_delta)
         return f / light_sample.pdf;
-    real bsdf_pdf = shd.bsdf->pdf(inct_to_light, scattering.wr, TM_Radiance);
+    real bsdf_pdf = phase_function->pdf(inct_to_light, scattering.wr, TM_Radiance);
     return f / (light_sample.pdf + bsdf_pdf);
 }
 
 Spectrum mis_sample_nonarea_light(
-    const Scene &scene, const NonareaLight *light, const EntityIntersection &inct, const ShadingPoint &shd, const Sample5 &sam)
+    const Scene &scene, const NonareaLight *light, const EntityIntersection &inct, const ShadingPoint &shd, Sampler &sampler)
 {
+    Sample5 sam = sampler.sample5();
+
     LightSampleResult light_sample = light->sample(inct.pos, sam);
     if(!light_sample.radiance)
         return {};
@@ -83,8 +88,10 @@ Spectrum mis_sample_nonarea_light(
 }
 
 Spectrum mis_sample_nonarea_light(
-    const Scene &scene, const NonareaLight *light, const MediumScattering &scattering, const ShadingPoint &shd, const Sample5 &sam)
+    const Scene &scene, const NonareaLight *light, const MediumScattering &scattering, const BSDF *phase_function, Sampler &sampler)
 {
+    Sample5 sam = sampler.sample5();
+
     LightSampleResult light_sample = light->sample(scattering.pos, sam);
     if(!light_sample.radiance)
         return {};
@@ -93,7 +100,7 @@ Spectrum mis_sample_nonarea_light(
         return {};
 
     Vec3 ref_to_light = light_sample.ref_to_light();
-    Spectrum bsdf_f = shd.bsdf->eval(ref_to_light, scattering.wr, TM_Radiance);
+    Spectrum bsdf_f = phase_function->eval(ref_to_light, scattering.wr, TM_Radiance);
     if(!bsdf_f)
         return {};
     Spectrum f = light_sample.radiance * bsdf_f;
@@ -101,30 +108,31 @@ Spectrum mis_sample_nonarea_light(
     if(light_sample.is_delta)
         return f / light_sample.pdf;
 
-    real bsdf_pdf = shd.bsdf->pdf(ref_to_light, scattering.wr, TM_Radiance);
+    real bsdf_pdf = phase_function->pdf(ref_to_light, scattering.wr, TM_Radiance);
     return f / (light_sample.pdf + bsdf_pdf);
 }
 
 Spectrum mis_sample_light(
-    const Scene &scene, const Light *lht, const EntityIntersection &inct, const ShadingPoint &shd, const Sample5 &sam)
+    const Scene &scene, const Light *lht, const EntityIntersection &inct, const ShadingPoint &shd, Sampler &sampler)
 {
     if(lht->is_area())
-        return mis_sample_area_light(scene, lht->as_area(), inct, shd, sam);
-    return mis_sample_nonarea_light(scene, lht->as_nonarea(), inct, shd, sam);
+        return mis_sample_area_light(scene, lht->as_area(), inct, shd, sampler);
+    return mis_sample_nonarea_light(scene, lht->as_nonarea(), inct, shd, sampler);
 }
 
 Spectrum mis_sample_light(
-    const Scene &scene, const Light *lht, const MediumScattering &scattering, const ShadingPoint &shd, const Sample5 &sam)
+    const Scene &scene, const Light *lht, const MediumScattering &scattering, const BSDF *phase_function, Sampler &sampler)
 {
     if(lht->is_area())
-        return mis_sample_area_light(scene, lht->as_area(), scattering, shd, sam);
-    return mis_sample_nonarea_light(scene, lht->as_nonarea(), scattering, shd, sam);
+        return mis_sample_area_light(scene, lht->as_area(), scattering, phase_function, sampler);
+    return mis_sample_nonarea_light(scene, lht->as_nonarea(), scattering, phase_function, sampler);
 }
 
 Spectrum mis_sample_bsdf(
-    const Scene &scene, const EntityIntersection &inct, const ShadingPoint &shd, const Sample3 &sam,
+    const Scene &scene, const EntityIntersection &inct, const ShadingPoint &shd, Sampler &sampler,
     BSDFSampleResult &bsdf_sample, bool &has_ent_inct, EntityIntersection &ent_inct)
 {
+    Sample3 sam = sampler.sample3();
     has_ent_inct = false;
 
     bsdf_sample = shd.bsdf->sample(inct.wr, TM_Radiance, sam);
@@ -150,7 +158,7 @@ Spectrum mis_sample_bsdf(
             if(!light_radiance || (light_pnt - new_ray.o).length_square() >= new_inct_dist2)
                 continue;
 
-            Spectrum tr = medium->tr(new_ray.o, light_pnt);
+            Spectrum tr = medium->tr(new_ray.o, light_pnt, sampler);
             Spectrum f = tr * light_radiance * bsdf_sample.f * std::abs(dot(inct.geometry_coord.z, new_ray.d));
 
             if(bsdf_sample.is_delta)
@@ -194,7 +202,7 @@ Spectrum mis_sample_bsdf(
     if(!light_radiance)
         return nonarea_illum;
 
-    Spectrum tr = medium->tr(new_ray.o, ent_inct.pos);
+    Spectrum tr = medium->tr(new_ray.o, ent_inct.pos, sampler);
     Spectrum f = tr * light_radiance * bsdf_sample.f * std::abs(dot(inct.geometry_coord.z, new_ray.d));
 
     if(bsdf_sample.is_delta)
@@ -205,12 +213,13 @@ Spectrum mis_sample_bsdf(
 }
 
 Spectrum mis_sample_bsdf(
-    const Scene &scene, const MediumScattering &scattering, const ShadingPoint &shd, const Sample3 &sam,
+    const Scene &scene, const MediumScattering &scattering, const BSDF *phase_function, Sampler &sampler,
     BSDFSampleResult &bsdf_sample, bool &has_ent_inct, EntityIntersection &ent_inct)
 {
+    Sample3 sam = sampler.sample3();
     has_ent_inct = false;
 
-    bsdf_sample = shd.bsdf->sample(scattering.wr, TM_Radiance, sam);
+    bsdf_sample = phase_function->sample(scattering.wr, TM_Radiance, sam);
     if(!bsdf_sample.f)
         return {};
     bsdf_sample.dir = bsdf_sample.dir.normalize();
@@ -233,7 +242,7 @@ Spectrum mis_sample_bsdf(
             if(!light_f || (light_pnt - new_ray.o).length() >= new_inct_dist2)
                 continue;
 
-            Spectrum tr = medium->tr(new_ray.o, light_pnt);
+            Spectrum tr = medium->tr(new_ray.o, light_pnt, sampler);
             Spectrum f = tr * light_f * bsdf_sample.f;
 
             if(bsdf_sample.is_delta)
@@ -277,7 +286,7 @@ Spectrum mis_sample_bsdf(
     if(!light_f)
         return nonarea_illum;
 
-    Spectrum tr = medium->tr(new_ray.o, ent_inct.pos);
+    Spectrum tr = medium->tr(new_ray.o, ent_inct.pos, sampler);
     Spectrum f = tr * light_f * bsdf_sample.f;
 
     if(bsdf_sample.is_delta)
@@ -287,20 +296,20 @@ Spectrum mis_sample_bsdf(
     return nonarea_illum + f / (bsdf_sample.pdf + light_pdf);
 }
 
-Spectrum mis_sample_bsdf(const Scene &scene, const EntityIntersection &inct, const ShadingPoint &shd, const Sample3 &sam)
+Spectrum mis_sample_bsdf(const Scene &scene, const EntityIntersection &inct, const ShadingPoint &shd, Sampler &sampler)
 {
     BSDFSampleResult bsdf_sample;
     bool has_ent_inct;
     EntityIntersection ent_inct;
-    return mis_sample_bsdf(scene, inct, shd, sam, bsdf_sample, has_ent_inct, ent_inct);
+    return mis_sample_bsdf(scene, inct, shd, sampler, bsdf_sample, has_ent_inct, ent_inct);
 }
 
-Spectrum mis_sample_bsdf(const Scene &scene, const MediumScattering &scattering, const ShadingPoint &shd, const Sample3 &sam)
+Spectrum mis_sample_bsdf(const Scene &scene, const MediumScattering &scattering, const BSDF *phase_function, Sampler &sampler)
 {
     BSDFSampleResult bsdf_sample;
     bool has_ent_inct;
     EntityIntersection ent_inct;
-    return mis_sample_bsdf(scene, scattering, shd, sam, bsdf_sample, has_ent_inct, ent_inct);
+    return mis_sample_bsdf(scene, scattering, phase_function, sampler, bsdf_sample, has_ent_inct, ent_inct);
 }
 
 AGZ_TRACER_END

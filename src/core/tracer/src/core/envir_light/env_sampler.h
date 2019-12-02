@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <vector>
 
-#include <agz/tracer/core/texture.h>
+#include <agz/tracer/core/texture2d.h>
 #include <agz/utility/texture.h>
 
 AGZ_TRACER_BEGIN
@@ -15,7 +15,7 @@ class EnvironmentLightSampler : public misc::uncopyable_t
 
 public:
 
-    explicit EnvironmentLightSampler(std::shared_ptr<const Texture> tex)
+    explicit EnvironmentLightSampler(std::shared_ptr<const Texture2D> tex)
     {
         int width = tex->width(), height = tex->height();
         int new_width = (std::min)(width, 200);

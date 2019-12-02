@@ -3,7 +3,7 @@
 #include <agz/tracer/core/bsdf.h>
 #include <agz/tracer/core/fresnel.h>
 #include <agz/tracer/core/material.h>
-#include <agz/tracer/core/texture.h>
+#include <agz/tracer/core/texture2d.h>
 #include <agz/utility/misc.h>
 
 AGZ_TRACER_BEGIN
@@ -107,14 +107,14 @@ namespace
 class Glass : public Material
 {
     std::shared_ptr<const Fresnel> fresnel_;
-    std::shared_ptr<const Texture> color_reflection_map_;
-    std::shared_ptr<const Texture> color_refraction_map_;
+    std::shared_ptr<const Texture2D> color_reflection_map_;
+    std::shared_ptr<const Texture2D> color_refraction_map_;
 
 public:
 
     void initialize(
-        std::shared_ptr<const Texture> color_reflection_map,
-        std::shared_ptr<const Texture> color_refraction_map,
+        std::shared_ptr<const Texture2D> color_reflection_map,
+        std::shared_ptr<const Texture2D> color_refraction_map,
         std::shared_ptr<const Fresnel> fresnel)
     {
         color_reflection_map_ = color_reflection_map;
@@ -139,8 +139,8 @@ public:
 };
 
 std::shared_ptr<Material> create_glass(
-    std::shared_ptr<const Texture> color_reflection_map,
-    std::shared_ptr<const Texture> color_refraction_map,
+    std::shared_ptr<const Texture2D> color_reflection_map,
+    std::shared_ptr<const Texture2D> color_refraction_map,
     std::shared_ptr<const Fresnel> fresnel)
 {
     auto ret = std::make_shared<Glass>();

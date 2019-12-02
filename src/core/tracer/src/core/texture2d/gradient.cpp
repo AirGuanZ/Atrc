@@ -1,9 +1,9 @@
-#include <agz/tracer/core/texture.h>
+#include <agz/tracer/core/texture2d.h>
 #include <agz/utility/misc.h>
 
 AGZ_TRACER_BEGIN
 
-class GradientTexture : public Texture
+class GradientTexture : public Texture2D
 {
     Spectrum color1_;
     Spectrum color2_;
@@ -18,7 +18,7 @@ protected:
 
 public:
 
-    void initialize(const TextureCommonParams &common_params, const Spectrum &color1, const Spectrum &color2)
+    void initialize(const Texture2DCommonParams &common_params, const Spectrum &color1, const Spectrum &color2)
     {
         AGZ_HIERARCHY_TRY
 
@@ -41,8 +41,8 @@ public:
     }
 };
 
-std::shared_ptr<Texture> create_gradient_texture(
-    const TextureCommonParams &common_params,
+std::shared_ptr<Texture2D> create_gradient_texture(
+    const Texture2DCommonParams &common_params,
     const Spectrum &color1, const Spectrum &color2)
 {
     auto ret = std::make_shared<GradientTexture>();

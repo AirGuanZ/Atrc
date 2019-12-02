@@ -1,9 +1,9 @@
-#include <agz/tracer/core/texture.h>
+#include <agz/tracer/core/texture2d.h>
 #include <agz/utility/misc.h>
 
 AGZ_TRACER_BEGIN
 
-class CheckerBoard : public Texture
+class CheckerBoard : public Texture2D
 {
     real grid_size_ = 1;
 
@@ -24,7 +24,7 @@ protected:
 public:
 
     void initialize(
-        const TextureCommonParams &common_params,
+        const Texture2DCommonParams &common_params,
         int grid_count, const Spectrum &color1, const Spectrum &color2)
     {
         init_common_params(common_params);
@@ -48,8 +48,8 @@ public:
     }
 };
 
-std::shared_ptr<Texture> create_checker_board(
-    const TextureCommonParams &common_params,
+std::shared_ptr<Texture2D> create_checker_board(
+    const Texture2DCommonParams &common_params,
     int grid_count, const Spectrum &color1, const Spectrum &color2)
 {
     auto ret = std::make_shared<CheckerBoard>();

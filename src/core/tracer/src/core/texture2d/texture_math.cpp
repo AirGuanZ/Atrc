@@ -1,17 +1,17 @@
-#include <agz/tracer/core/texture.h>
+#include <agz/tracer/core/texture2d.h>
 
 AGZ_TRACER_BEGIN
 
-class TextureAdder : public Texture
+class TextureAdder : public Texture2D
 {
-    std::shared_ptr<const Texture> lhs_;
-    std::shared_ptr<const Texture> rhs_;
+    std::shared_ptr<const Texture2D> lhs_;
+    std::shared_ptr<const Texture2D> rhs_;
 
 public:
 
     void initialize(
-        const TextureCommonParams &common_params,
-        std::shared_ptr<const Texture> lhs, std::shared_ptr<const Texture> rhs)
+        const Texture2DCommonParams &common_params,
+        std::shared_ptr<const Texture2D> lhs, std::shared_ptr<const Texture2D> rhs)
     {
         init_common_params(common_params);
         lhs_ = lhs;
@@ -36,16 +36,16 @@ public:
     }
 };
 
-class TextureMultiplier : public Texture
+class TextureMultiplier : public Texture2D
 {
-    std::shared_ptr<const Texture> lhs_;
-    std::shared_ptr<const Texture> rhs_;
+    std::shared_ptr<const Texture2D> lhs_;
+    std::shared_ptr<const Texture2D> rhs_;
 
 public:
 
     void initialize(
-        const TextureCommonParams &common_params,
-        std::shared_ptr<const Texture> lhs, std::shared_ptr<const Texture> rhs)
+        const Texture2DCommonParams &common_params,
+        std::shared_ptr<const Texture2D> lhs, std::shared_ptr<const Texture2D> rhs)
     {
         init_common_params(common_params);
         lhs_ = lhs;
@@ -70,20 +70,20 @@ public:
     }
 };
 
-std::shared_ptr<Texture> create_texture_adder(
-    const TextureCommonParams &common_params,
-    std::shared_ptr<const Texture> lhs,
-    std::shared_ptr<const Texture> rhs)
+std::shared_ptr<Texture2D> create_texture_adder(
+    const Texture2DCommonParams &common_params,
+    std::shared_ptr<const Texture2D> lhs,
+    std::shared_ptr<const Texture2D> rhs)
 {
     auto ret = std::make_shared<TextureAdder>();
     ret->initialize(common_params, std::move(lhs), std::move(rhs));
     return ret;
 }
 
-std::shared_ptr<Texture> create_texture_multiplier(
-    const TextureCommonParams &common_params,
-    std::shared_ptr<const Texture> lhs,
-    std::shared_ptr<const Texture> rhs)
+std::shared_ptr<Texture2D> create_texture_multiplier(
+    const Texture2DCommonParams &common_params,
+    std::shared_ptr<const Texture2D> lhs,
+    std::shared_ptr<const Texture2D> rhs)
 {
     auto ret = std::make_shared<TextureMultiplier>();
     ret->initialize(common_params, std::move(lhs), std::move(rhs));

@@ -1,7 +1,7 @@
 #include <agz/tracer/core/bsdf.h>
 #include <agz/tracer/core/fresnel.h>
 #include <agz/tracer/core/material.h>
-#include <agz/tracer/core/texture.h>
+#include <agz/tracer/core/texture2d.h>
 #include <agz/utility/misc.h>
 
 AGZ_TRACER_BEGIN
@@ -60,11 +60,11 @@ namespace
 class Mirror : public Material
 {
     std::shared_ptr<const Fresnel> fresnel_;
-    std::shared_ptr<const Texture> rc_map_;
+    std::shared_ptr<const Texture2D> rc_map_;
 
 public:
 
-    void initialize(std::shared_ptr<const Texture> color_map, std::shared_ptr<const Fresnel> fresnel)
+    void initialize(std::shared_ptr<const Texture2D> color_map, std::shared_ptr<const Fresnel> fresnel)
     {
         rc_map_ = color_map;
         fresnel_ = fresnel;
@@ -86,7 +86,7 @@ public:
 };
 
 std::shared_ptr<Material> create_mirror(
-    std::shared_ptr<const Texture> color_map,
+    std::shared_ptr<const Texture2D> color_map,
     std::shared_ptr<const Fresnel> fresnel)
 {
     auto ret = std::make_shared<Mirror>();

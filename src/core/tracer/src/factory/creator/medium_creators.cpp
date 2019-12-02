@@ -22,6 +22,26 @@ namespace medium
         }
     };
 
+    class GridMediumCreator : public Creator<Medium>
+    {
+    public:
+
+        std::string name() const override
+        {
+            return "grid";
+        }
+
+        std::shared_ptr<Medium> create(const ConfigGroup &params, CreatingContext &context) const override
+        {
+            auto local_to_world = params.child_transform3("transform");
+            auto density        = context.create<Texture3D>(params.child_group("density"));
+            real sigma_a        = params.child_real("sigma_a");
+            real sigma_s        = params.child_real("sigma_s");
+            real g              = params.child_real("g");
+            return create_grid_medium(local_to_world, std::move(density), sigma_a, sigma_s, g);
+        }
+    };
+
     class HomogeneousMediumCreator : public Creator<Medium>
     {
     public:
@@ -60,6 +80,7 @@ namespace medium
 void initialize_medium_factory(Factory<Medium> &factory)
 {
     factory.add_creator(std::make_unique<medium::AbsorbtionMediumCreator>());
+    factory.add_creator(std::make_unique<medium::GridMediumCreator>());
     factory.add_creator(std::make_unique<medium::HomogeneousMediumCreator>());
     factory.add_creator(std::make_unique<medium::VoidMediumCreator>());
 }

@@ -1,6 +1,6 @@
 #include <agz/tracer/core/bsdf.h>
 #include <agz/tracer/core/material.h>
-#include <agz/tracer/core/texture.h>
+#include <agz/tracer/core/texture2d.h>
 #include <agz/tracer/utility/reflection.h>
 #include <agz/utility/misc.h>
 
@@ -130,17 +130,17 @@ namespace
 class MirrorVarnish : public Material
 {
     std::shared_ptr<const Material> internal_;
-    std::shared_ptr<const Texture> eta_in_;
-    std::shared_ptr<const Texture> eta_out_;
-    std::shared_ptr<const Texture> color_;
+    std::shared_ptr<const Texture2D> eta_in_;
+    std::shared_ptr<const Texture2D> eta_out_;
+    std::shared_ptr<const Texture2D> color_;
 
 public:
 
     void initialize(
         std::shared_ptr<const Material> internal,
-        std::shared_ptr<const Texture> eta_in,
-        std::shared_ptr<const Texture> eta_out,
-        std::shared_ptr<const Texture> color)
+        std::shared_ptr<const Texture2D> eta_in,
+        std::shared_ptr<const Texture2D> eta_out,
+        std::shared_ptr<const Texture2D> color)
     {
         internal_ = internal;
         eta_in_ = eta_in;
@@ -164,9 +164,9 @@ public:
 
 std::shared_ptr<Material> create_mirror_varnish(
     std::shared_ptr<const Material> internal,
-    std::shared_ptr<const Texture> eta_in,
-    std::shared_ptr<const Texture> eta_out,
-    std::shared_ptr<const Texture> color)
+    std::shared_ptr<const Texture2D> eta_in,
+    std::shared_ptr<const Texture2D> eta_out,
+    std::shared_ptr<const Texture2D> color)
 {
     auto ret = std::make_shared<MirrorVarnish>();
     ret->initialize(internal, eta_in, eta_out, color);
