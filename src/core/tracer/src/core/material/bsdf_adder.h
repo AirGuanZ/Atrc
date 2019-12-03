@@ -77,16 +77,6 @@ public:
             ret += bsdfs_[i]->albedo();
         return ret;
     }
-
-    bool is_black() const noexcept override
-    {
-        for(size_t i = 0; i < bsdfs_.size(); ++i)
-        {
-            if(!bsdfs_[i]->is_black())
-                return false;
-        }
-        return true;
-    }
 };
 
 AGZ_TRACER_END

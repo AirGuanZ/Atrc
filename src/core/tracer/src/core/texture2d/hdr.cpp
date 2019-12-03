@@ -16,13 +16,13 @@ class HDRTexture : public Texture2D
     static Spectrum nearest_sample_impl(const texture::texture2d_t<math::color3f> *data, const Vec2 &uv) noexcept
     {
         auto tex = [&t = *data](int x, int y) { return t(y, x); };
-        return texture::nearest_sample(uv, tex, data->width(), data->height());
+        return texture::nearest_sample2d(uv, tex, data->width(), data->height());
     }
 
     static Spectrum linear_sample_impl(const texture::texture2d_t<math::color3f> *data, const Vec2 &uv) noexcept
     {
         auto tex = [&t = *data](int x, int y) { return t(y, x); };
-        return texture::linear_sample(uv, tex, data->width(), data->height());
+        return texture::linear_sample2d(uv, tex, data->width(), data->height());
     }
 
     using SampleImplFuncPtr = Spectrum(*)(const texture::texture2d_t<math::color3f>*, const Vec2&);

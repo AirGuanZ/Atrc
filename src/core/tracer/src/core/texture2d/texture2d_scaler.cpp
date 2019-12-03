@@ -2,7 +2,7 @@
 
 AGZ_TRACER_BEGIN
 
-class TextureScaler : public Texture2D
+class Texture2DScaler : public Texture2D
 {
     Spectrum scale_;
     std::shared_ptr<const Texture2D> internal_;
@@ -34,12 +34,12 @@ public:
     }
 };
 
-std::shared_ptr<Texture2D> create_texture_scaler(
+std::shared_ptr<Texture2D> create_texture2d_scaler(
     const Texture2DCommonParams &common_params,
     const Spectrum &scale,
     std::shared_ptr<const Texture2D> internal)
 {
-    auto ret = std::make_shared<TextureScaler>();
+    auto ret = std::make_shared<Texture2DScaler>();
     ret->initialize(common_params, scale, internal);
     return ret;
 }

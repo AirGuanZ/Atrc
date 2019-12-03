@@ -581,11 +581,6 @@ namespace disney_impl
         {
             return C_;
         }
-
-        bool is_black() const noexcept override
-        {
-            return false;
-        }
     };
 
 } // namespace disney_impl

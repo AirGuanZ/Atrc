@@ -118,11 +118,6 @@ namespace
         {
             return color_ * internal_->albedo();
         }
-
-        bool is_black() const noexcept override
-        {
-            return false;
-        }
     };
 
 } // namespace anonymous

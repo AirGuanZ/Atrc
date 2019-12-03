@@ -254,11 +254,6 @@ namespace
         {
             return color_;
         }
-
-        bool is_black() const noexcept override
-        {
-            return !color_;
-        }
     };
 
 } // namespace anonymous

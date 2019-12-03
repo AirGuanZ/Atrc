@@ -91,12 +91,6 @@ CLI -d render_config.json
 
 in which `scene_config.json` is a configuration file describing scene information and rendering settings.
 
-Use following command to print all supported features:
-
-```shell
-CLI --list
-```
-
 ## Configuration
 
 Atrc uses JSON to describe scene and rendering settings. The input JSON file must contains two parts:
@@ -653,13 +647,26 @@ Absolutely smooth varnish, where the interior material must be opaque.
 
 Vacuum, which means nothing.
 
-**absorbtion**
+**absorb**
 
 Non-scattering medium.
 
 | Field Name | Type     | Default Value | Explanation     |
 | ---------- | -------- | ------------- | --------------- |
 | sigma_a    | Spectrum |               | absorption rate |
+
+**heterogeneous**
+
+![pic](C:/Users/lenovo/Documents/Programming/Code/agz/doc/pictures/heterogeneous_medium.png)
+
+Heterogeneous media defined based on 3D textures
+
+| Field Name | Type        | Default Value | Explanation                                     |
+| ---------- | ----------- | ------------- | ----------------------------------------------- |
+| transform  | [Transform] |               | from texture space ($[0,1]^3$) to world space   |
+| density    | Texture3D   |               | medium density, i.e. $\sigma_s + \sigma_a$      |
+| albedo     | Texture3D   |               | albedo, i.e. $\sigma_s / (\sigma_s + \sigma_a)$ |
+| g          | Texture3D   |               | asymmetry of scattering                         |
 
 **homogeneous**
 
@@ -863,7 +870,7 @@ checker board texture
 
 **constant**
 
-Constant-valued texture, that is, sampling always results in the same value.
+Constant-valued texture, that is, sampling always results in the same value
 
 | Field Name | Type     | Default Value | Explanation |
 | ---------- | -------- | ------------- | ----------- |
@@ -969,6 +976,72 @@ All 3d textures contain the following fields (these fields are not listed in the
 | inv_gamma  | real         | 1             | used to perform inverse gamma correction to the texture; typical value is 2.2 |
 
 Note that `inv_v, inv_u, inv_w, uvw_perm` and `transform` are all transformations to uv, where `transform` applies first, then `uvw_perm` , and `inv_u, inv_v, inv_w` applies last. In the `transform` sequence, the `Transform3` in the back of the sequence applies first, and the `Transform3` in the front of the sequence applies later.
+
+**constant**
+
+Constant-valued texture, that is, sampling always results in the same value
+
+| Field Name | Type     | Default Value | Explanation |
+| ---------- | -------- | ------------- | ----------- |
+| texel      | Spectrum |               | texel value |
+
+**gray_grid**
+
+3D gray-scale grids. the value between grid points is obtained by trilinear interpolation
+
+| Field Name      | Type     | Default Value | Explanation                              |
+| --------------- | -------- | ------------- | ---------------------------------------- |
+| ascii_filename  | string   |               | file name of voxel data in text format   |
+| binary_filename | string   |               | file name of voxel data in binary format |
+| image_filenames | [string] |               | array of filenames for image slices      |
+
+There are three ways to provide voxel data to `gray_grid`, so you only need to fill in one of the three fields in the table above.
+
+The format of text voxel data is:
+
+```
+int32 value (texture width)
+int32 value (texture height)
+int32 value (texture depth)
+for z in 0 to texture depth
+    for y in 0 to texture height
+        for x in 0 to texture width
+            float value (voxel value at { x, y, z })
+```
+
+The data arrangement of binary voxel data is similar to the text format, except that all data is stored as binary data in little-endian order.
+
+The file name array of image slices refers to the file names of a series of two-dimensional images obtained by decomposing the voxels in the depth direction. These two-dimensional images must be the same size, the number of which corresponds to the depth value of the texture.
+
+**spectrum_grid**
+
+3D RGB grids. the value between grid points is obtained by trilinear interpolation
+
+| Field Name      | Type     | Default | Explanation                              |
+| --------------- | -------- | ------- | ---------------------------------------- |
+| ascii_filename  | string   |         | file name of voxel data in text format   |
+| binary_filename | string   |         | file name of voxel data in binary format |
+| image_filenames | [string] |         | array of filenames for image slices      |
+
+There are three ways to provide voxel data to `spectrum_grid`, so you only need to fill in one of the three fields in the table above.
+
+The format of text voxel data is:
+
+```
+int32 value (texture width)
+int32 value (texture height)
+int32 value (texture depth)
+for z in 0 to texture depth
+    for y in 0 to texture height
+        for x in 0 to texture width
+            float value (r value at { x, y, z })
+            float value (g value at { x, y, z })
+            float value (b value at { x, y, z })
+```
+
+The data arrangement of binary voxel data is similar to the text format, except that all data is stored as binary data in little-endian order.
+
+The file name array of image slices refers to the file names of a series of two-dimensional images obtained by decomposing the voxels in the depth direction. These two-dimensional images must be the same size, the number of which corresponds to the depth value of the texture.
 
 ### Transform
 

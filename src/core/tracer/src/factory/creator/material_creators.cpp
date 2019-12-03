@@ -191,6 +191,21 @@ namespace material
         }
     };
 
+    class InvisibleSurfaceCreator : public Creator<Material>
+    {
+    public:
+
+        std::string name() const override
+        {
+            return "invisible_surface";
+        }
+
+        std::shared_ptr<Material> create(const ConfigGroup &params, CreatingContext &context) const override
+        {
+            return create_invisible_surface();
+        }
+    };
+
     class MaterialAdderCreator : public Creator<Material>
     {
     public:
@@ -293,6 +308,7 @@ void initialize_material_factory(Factory<Material> &factory)
     factory.add_creator(std::make_unique<material::GlassCreator>());
     factory.add_creator(std::make_unique<material::IdealBlackCreator>());
     factory.add_creator(std::make_unique<material::IdealDiffuseCreator>());
+    factory.add_creator(std::make_unique<material::InvisibleSurfaceCreator>());
     factory.add_creator(std::make_unique<material::MaterialAdderCreator>());
     factory.add_creator(std::make_unique<material::MaterialScalerCreator>());
     factory.add_creator(std::make_unique<material::MirrorCreator>());

@@ -8,11 +8,11 @@ std::shared_ptr<Texture2D> create_checker_board(
     const Texture2DCommonParams &common_params,
     int grid_count, const Spectrum &color1, const Spectrum &color2);
 
-std::shared_ptr<Texture2D> create_constant_texture(
+std::shared_ptr<Texture2D> create_constant2d_texture(
     const Texture2DCommonParams &common_params,
     const Spectrum &texel);
 
-std::shared_ptr<Texture2D> create_constant_texture(
+std::shared_ptr<Texture2D> create_constant2d_texture(
     const Texture2DCommonParams &common_params,
     real texel);
 
@@ -28,17 +28,17 @@ std::shared_ptr<Texture2D> create_image_texture(
     const Texture2DCommonParams &common_params,
     const std::string &filename, const std::string &sampler);
 
-std::shared_ptr<Texture2D> create_texture_scaler(
+std::shared_ptr<Texture2D> create_texture2d_scaler(
     const Texture2DCommonParams &common_params,
     const Spectrum &scale,
     std::shared_ptr<const Texture2D> internal);
 
-std::shared_ptr<Texture2D> create_texture_adder(
+std::shared_ptr<Texture2D> create_texture2d_adder(
     const Texture2DCommonParams &common_params,
     std::shared_ptr<const Texture2D> lhs,
     std::shared_ptr<const Texture2D> rhs);
 
-std::shared_ptr<Texture2D> create_texture_multiplier(
+std::shared_ptr<Texture2D> create_texture2d_multiplier(
     const Texture2DCommonParams &common_params,
     std::shared_ptr<const Texture2D> lhs,
     std::shared_ptr<const Texture2D> rhs);
@@ -50,7 +50,7 @@ std::shared_ptr<Texture2D> create_luminance_classifier(
     std::shared_ptr<const Texture2D> higherTexture,
     std::shared_ptr<const Texture2D> lowerTexture);
 
-std::shared_ptr<Texture2D> create_texture_reverse(
+std::shared_ptr<Texture2D> create_texture2d_reverse(
     const Texture2DCommonParams &common_params,
     std::shared_ptr<const Texture2D> internal);
 

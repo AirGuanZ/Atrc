@@ -56,7 +56,7 @@ namespace texture
         {
             auto common_params = init_common_params(params);
             auto texel = params.child_spectrum("texel");
-            return create_constant_texture(common_params, texel);
+            return create_constant2d_texture(common_params, texel);
         }
     };
 
@@ -128,7 +128,7 @@ namespace texture
             auto common_params = init_common_params(params);
             auto scale = params.child_spectrum("scale");
             auto internal = context.create<Texture2D>(params.child_group("internal"));
-            return create_texture_scaler(common_params, scale, std::move(internal));
+            return create_texture2d_scaler(common_params, scale, std::move(internal));
         }
     };
 
@@ -146,7 +146,7 @@ namespace texture
             auto common_params = init_common_params(params);
             auto lhs = context.create<Texture2D>(params.child_group("lhs"));
             auto rhs = context.create<Texture2D>(params.child_group("rhs"));
-            return create_texture_adder(common_params, std::move(lhs), std::move(rhs));
+            return create_texture2d_adder(common_params, std::move(lhs), std::move(rhs));
         }
     };
 
@@ -164,7 +164,7 @@ namespace texture
             auto common_params = init_common_params(params);
             auto lhs = context.create<Texture2D>(params.child_group("lhs"));
             auto rhs = context.create<Texture2D>(params.child_group("rhs"));
-            return create_texture_multiplier(common_params, std::move(lhs), std::move(rhs));
+            return create_texture2d_multiplier(common_params, std::move(lhs), std::move(rhs));
         }
     };
 
@@ -206,7 +206,7 @@ namespace texture
         {
             auto common_params = init_common_params(params);
             auto internal = context.create<Texture2D>(params.child_group("internal"));
-            return create_texture_reverse(common_params, std::move(internal));
+            return create_texture2d_reverse(common_params, std::move(internal));
         }
     };
 

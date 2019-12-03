@@ -67,11 +67,6 @@ public:
      * @brief 材质反照率
      */
     virtual Spectrum albedo() const noexcept = 0;
-
-    /**
-     * @brief 是否是全黑材质
-     */
-    virtual bool is_black() const noexcept { return false; }
 };
 
 /**

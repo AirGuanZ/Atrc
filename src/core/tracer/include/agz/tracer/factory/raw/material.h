@@ -52,6 +52,8 @@ std::shared_ptr<Material> create_ideal_diffuse(
     std::shared_ptr<const Texture2D> albedo,
     std::unique_ptr<const NormalMapper> normal_mapper);
 
+std::shared_ptr<Material> create_invisible_surface();
+
 std::shared_ptr<Material> create_mat_adder(
     std::vector<std::shared_ptr<const Material>> &&mats);
 

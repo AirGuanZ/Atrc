@@ -2,7 +2,7 @@
 
 AGZ_TRACER_BEGIN
 
-class TextureAdder : public Texture2D
+class Texture2DAdder : public Texture2D
 {
     std::shared_ptr<const Texture2D> lhs_;
     std::shared_ptr<const Texture2D> rhs_;
@@ -36,7 +36,7 @@ public:
     }
 };
 
-class TextureMultiplier : public Texture2D
+class Texture2DMultiplier : public Texture2D
 {
     std::shared_ptr<const Texture2D> lhs_;
     std::shared_ptr<const Texture2D> rhs_;
@@ -70,22 +70,22 @@ public:
     }
 };
 
-std::shared_ptr<Texture2D> create_texture_adder(
+std::shared_ptr<Texture2D> create_texture2d_adder(
     const Texture2DCommonParams &common_params,
     std::shared_ptr<const Texture2D> lhs,
     std::shared_ptr<const Texture2D> rhs)
 {
-    auto ret = std::make_shared<TextureAdder>();
+    auto ret = std::make_shared<Texture2DAdder>();
     ret->initialize(common_params, std::move(lhs), std::move(rhs));
     return ret;
 }
 
-std::shared_ptr<Texture2D> create_texture_multiplier(
+std::shared_ptr<Texture2D> create_texture2d_multiplier(
     const Texture2DCommonParams &common_params,
     std::shared_ptr<const Texture2D> lhs,
     std::shared_ptr<const Texture2D> rhs)
 {
-    auto ret = std::make_shared<TextureMultiplier>();
+    auto ret = std::make_shared<Texture2DMultiplier>();
     ret->initialize(common_params, std::move(lhs), std::move(rhs));
     return ret;
 }

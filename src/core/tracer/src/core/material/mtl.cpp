@@ -103,16 +103,6 @@ namespace mtl_impl
                 ret += bsdfs_[i]->albedo();
             return ret;
         }
-
-        bool is_black() const noexcept override
-        {
-            for(int i = 0; i < bsdf_count_; ++i)
-            {
-                if(!bsdfs_[i]->is_black())
-                    return false;
-            }
-            return true;
-        }
     };
     
     class DiffuseComponent : public InternalBSDF

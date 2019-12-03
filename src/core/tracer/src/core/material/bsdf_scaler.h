@@ -38,11 +38,6 @@ public:
     {
         return scale_ * internal_->albedo();
     }
-
-    bool is_black() const noexcept override
-    {
-        return !internal_->is_black() && !!scale_;
-    }
 };
 
 AGZ_TRACER_END

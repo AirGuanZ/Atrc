@@ -39,7 +39,7 @@ public:
     }
 };
 
-std::shared_ptr<Texture2D> create_texture_reverse(
+std::shared_ptr<Texture2D> create_texture2d_reverse(
     const Texture2DCommonParams &common_params,
     std::shared_ptr<const Texture2D> internal)
 {

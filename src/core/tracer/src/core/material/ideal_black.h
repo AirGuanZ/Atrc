@@ -30,11 +30,6 @@ class IdealBlack : public Material
         {
             return Spectrum();
         }
-
-        bool is_black() const noexcept override
-        {
-            return true;
-        }
     };
 
     IdealBlackBSDF bsdf_;

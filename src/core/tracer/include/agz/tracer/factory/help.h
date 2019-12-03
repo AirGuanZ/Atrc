@@ -12,7 +12,7 @@ namespace helper
     {
         if(auto node = params.find_child_group(name))
             return context.create<Texture2D>(*node);
-        return create_constant_texture({}, texel);
+        return create_constant2d_texture({}, texel);
     }
 
 } // namespace helper

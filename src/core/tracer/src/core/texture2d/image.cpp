@@ -16,13 +16,13 @@ class ImageTexture : public Texture2D
     static Spectrum nearest_sample_impl(const texture::texture2d_t<math::color3b> *data, const Vec2 &uv) noexcept
     {
         auto tex = [&t = *data](int x, int y) { return math::from_color3b<real>(t(y, x)); };
-        return texture::nearest_sample(uv, tex, data->width(), data->height());
+        return texture::nearest_sample2d(uv, tex, data->width(), data->height());
     }
 
     static Spectrum linear_sample_impl(const texture::texture2d_t<math::color3b> *data, const Vec2 &uv) noexcept
     {
         auto tex = [&t = *data](int x, int y) { return math::from_color3b<real>(t(y, x)); };
-        return texture::linear_sample(uv, tex, data->width(), data->height());
+        return texture::linear_sample2d(uv, tex, data->width(), data->height());
     }
 
     using SampleImplFuncPtr = Spectrum(*)(const texture::texture2d_t<math::color3b>*, const Vec2&);

@@ -68,11 +68,6 @@ public:
     {
         return albedo_;
     }
-
-    bool is_black() const noexcept override
-    {
-        return false;
-    }
 };
 
 AGZ_TRACER_END
