@@ -1,0 +1,5 @@
+GL_GLU_SGI_filter4_parameters
+https://www.khronos.org/registry/OpenGL/extensions/SGI/GLU_SGI_filter4_parameters.txt
+GL_GLU_SGI_filter4_parameters
+
+	GLint gluTexFilterFuncSGI (GLenum target, GLenum filtertype, const GLfloat* parms, GLint n, GLfloat *weights)

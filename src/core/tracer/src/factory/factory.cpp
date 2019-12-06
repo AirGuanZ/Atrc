@@ -37,7 +37,7 @@ CreatingContext::CreatingContext()
         Factory<ProgressReporter>     ("reporter"),
         Factory<Sampler>              ("sampler"),
         Factory<Scene>                ("scene"),
-        Factory<Texture2D>            ("texture"),
+        Factory<Texture2D>            ("texture2d"),
         Factory<Texture3D>            ("texture3d")
     }
 {

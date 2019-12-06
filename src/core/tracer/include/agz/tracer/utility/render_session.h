@@ -26,7 +26,7 @@ public:
         std::vector<std::shared_ptr<PostProcessor>> post_processors;
     };
 
-    RenderSession(std::shared_ptr<Scene> scene, std::unique_ptr<RenderSetting> &&render_setting) noexcept;
+    RenderSession(std::shared_ptr<Scene> scene, std::unique_ptr<RenderSetting> render_setting) noexcept;
 
     void execute();
 
@@ -35,6 +35,11 @@ private:
     std::shared_ptr<Scene> scene_;
     std::unique_ptr<RenderSetting> render_settings_;
 };
+
+RenderSession create_render_session(
+    std::shared_ptr<Scene> scene,
+    const ConfigGroup &rendering_setting_config,
+    factory::CreatingContext &context);
 
 std::vector<RenderSession> parse_render_sessions(
     const ConfigGroup &scene_config,

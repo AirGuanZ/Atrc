@@ -8,32 +8,34 @@
 
 ### Dependencies
 
-编译Atrc时须额外准备的依赖项如下：
+编译Atrc时须准备的工具如下：
 
 * [cmake](https://cmake.org/) (>=3.10)
 * 支持C++17标准主要特性的MSVC或clang++（g++理论上可用，但未经测试）
 
-已经由项目文件自带的依赖项如下：
+所有依赖项均已包含在源代码中：
 
 * [agz-utils](https://github.com/AirGuanZ/agz-utils)，提供数学计算、图像加载等基本功能
 * [cxxopts](https://github.com/jarro2783/cxxopts)，用于命令行参数解析
 * [nlohmann json](https://github.com/nlohmann/json)，用于JSON配置文件的解析
 * [stl reader](https://github.com/sreiter/stl_reader)，用于解析STL模型文件
 * [tiny obj loader](https://github.com/syoyo/tinyobjloader)，用于解析OBJ模型文件
-
-可选的、在构建时由项目自动下载的依赖项如下：
-
 * [Embree 3.6.1](https://www.embree.org/)，用于加速射线与几何体的求交
-* [oidn](https://openimagedenoise.github.io/)，基于机器学习的降噪滤波器
 * [glfw](https://www.glfw.org/)，用于Material Explorer的OpenGL Context管理
+
+需额外准备的依赖项如下：
+
+* [oidn 1.1.0](https://openimagedenoise.github.io/)，基于机器学习的降噪滤波器（仅在启动了`USE_OIDN`选项时需要）
+
+在Windows下使用MSVC时，将[oidn-1.1.0.x64.vc14.windows.zip](https://github.com/OpenImageDenoise/oidn/releases/download/v1.1.0/oidn-1.1.0.x64.vc14.windows.zip)中的所有文件拷贝到`lib/oidn/vc14`中；使用linux时，将[oidn-1.1.0.x86_64.linux.tar.gz](https://github.com/OpenImageDenoise/oidn/releases/download/v1.1.0/oidn-1.1.0.x86_64.linux.tar.gz)中的所有文件拷贝到`lib/oidn/linux`中。详情可参考`cmake/cmake-oidn`。
 
 ### CMake Options
 
-| 选项名                  | 默认值 | 含义                                                         |
-| ----------------------- | ------ | ------------------------------------------------------------ |
-| USE_EMBREE              | OFF    | 启用Embree加速器，这会使得项目在构建时自动下载Embree库       |
-| USE_OIDN                | OFF    | 启用OIDN降噪器，这会使得项目在构建时自动下载OIDN库           |
-| BUILD_MATERIAL_EXPLORER | OFF    | 启用Material Explorer的构建，这会使得项目在构建时自动下载glfw库 |
+| 选项名                  | 默认值 | 含义                        |
+| ----------------------- | ------ | --------------------------- |
+| USE_EMBREE              | OFF    | 启用Embree加速器            |
+| USE_OIDN                | OFF    | 启用OIDN降噪器              |
+| BUILD_MATERIAL_EXPLORER | OFF    | 启用Material Explorer的构建 |
 
 注意到OIDN只支持64位程序，因此若启用了OIDN库，必须以64位模式构建程序。
 
@@ -65,7 +67,6 @@
 
 1. CLI，为渲染器的命令行可执行程序，是Tracer的简单应用
 2. Tracer，基于光线追踪的离线渲染库（静态库）
-3. obj_to_scene，用于将一个带材质的obj文件转换为Atrc可用的JSON实体列表
 4. material_explorer，材质参数预览器，使用GPU加速的材质效果调整工具
 5. CLI_RAS，开发中的纯软件光栅化渲染管线，拟在未来用于光线追踪渲染器的加速
 

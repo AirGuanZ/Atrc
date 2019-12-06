@@ -1,10 +1,7 @@
 build/
 .vscode/
 asset/
-lib/embree3/
-lib/oidn/
-lib/glew/
-lib/glfw/
 doc/doc.html
 doc/doc-cn.html
+lib/oidn
 nohup.out

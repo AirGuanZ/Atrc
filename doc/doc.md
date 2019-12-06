@@ -20,12 +20,14 @@
 * [nlohmann json](https://github.com/nlohmann/json) for parsing comfiguration file
 * [stl reader](https://github.com/sreiter/stl_reader) for parsing STL model file
 * [tiny obj loader](https://github.com/syoyo/tinyobjloader) for parsing OBJ model file
-
-**Optional Dependencies (Automatically Downloaded in Building)**
-
 * [Embree 3.6.1](https://www.embree.org/) for better ray-mesh intersection test
-* [oidn](https://openimagedenoise.github.io/) for denoising
 * [glfw](https://www.glfw.org/) for managing OpenGL context of Material Explorer
+
+**Dependencies Need to Be Prepared**
+
+* [oidn](https://openimagedenoise.github.io/) for denoising (only when `USE_OIDN` is `ON`)
+
+When using MSVC under Windows, copy all files in [oidn-1.1.0.x64.vc14.windows.zip](https://github.com/OpenImageDenoise/oidn/releases/download/v1.1.0/oidn-1.1.0. x64.vc14.windows.zip) to `lib/oidn/vc14`; when using linux, copy all files in [oidn-1.1.0.x86_64.linux.tar.gz](https://github.com/OpenImageDenoise/oidn/releases/download/v1.1.0/oidn-1.1.0.x86_64.linux.tar.gz) to `lib/oidn/linux`. Please refer to` cmake/ cmake-oidn` for details.
 
 ### CMake Options
 
@@ -71,7 +73,6 @@ cmake -DUSE_EMBREE=ON -DUSE_OIDN=ON -DBUILD_MATERIAL_EXPLORER=ON -G "Unix Makefi
 
 1. CLI, command-line interface of the off-line renderer
 2. Tracer, off-line rendering library based on ray tracing
-3. obj_to_scene, tool for converting OBJ file to Atrc entity list
 4. material_explorer, GPU-accelerated material explorer
 5. CLI_RAS, renderer with rasterization pipeline (under development)
 

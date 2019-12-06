@@ -60,7 +60,7 @@ namespace
     }
 }
 
-RenderSession::RenderSession(std::shared_ptr<Scene> scene, std::unique_ptr<RenderSetting> &&render_setting) noexcept
+RenderSession::RenderSession(std::shared_ptr<Scene> scene, std::unique_ptr<RenderSetting> render_setting) noexcept
     : scene_(std::move(scene)), render_settings_(std::move(render_setting))
 {
     
@@ -80,6 +80,15 @@ void RenderSession::execute()
 
     for(auto &p : render_settings_->post_processors)
         p->process(img, gbuffer);
+}
+
+RenderSession create_render_session(
+    std::shared_ptr<Scene> scene,
+    const ConfigGroup &rendering_setting_config,
+    factory::CreatingContext &context)
+{
+    auto setting = parse_rendering_settings(rendering_setting_config, context);
+    return RenderSession(std::move(scene), std::move(setting));
 }
 
 std::vector<RenderSession> parse_render_sessions(

@@ -1,9 +1,5 @@
 ﻿CMAKE_MINIMUM_REQUIRED(VERSION 3.10)
 
-IF(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
-  SET(CMAKE_TOOLCHAIN_FILE $ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake CACHE STRING "")
-ENDIF()
-
 INCLUDE(ExternalProject)
 
 PROJECT(Atrc)
@@ -59,6 +55,7 @@ ENDIF()
 SET(MISC_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/lib/misc/)
 
 ADD_SUBDIRECTORY(lib/utility)
+SET_TARGET_PROPERTIES(AGZUtils PROPERTIES FOLDER "ThirdParty")
 
 ADD_SUBDIRECTORY(src/core/common)
 ADD_SUBDIRECTORY(src/core/rasterizer/)
@@ -66,7 +63,7 @@ ADD_SUBDIRECTORY(src/core/tracer)
 
 ADD_SUBDIRECTORY(src/app/cli)
 ADD_SUBDIRECTORY(src/app/cli_ras)
-ADD_SUBDIRECTORY(src/app/obj_to_scene)
+#ADD_SUBDIRECTORY(src/app/obj_to_scene)
 
 ############## glfw && material explorer
 

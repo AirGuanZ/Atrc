@@ -76,12 +76,23 @@ void run(int argc, char *argv[])
     context.path_mapper = &path_mapper;
     context.reference_root = &scene_config;
 
-    std::vector<agz::tracer::RenderSession> render_sessions = parse_render_sessions(scene_config, rendering_config, context);
-    for(size_t i = 0; i < render_sessions.size(); ++i)
+    auto scene = context.create<agz::tracer::Scene>(scene_config);
+
+    if(rendering_config.is_array())
     {
-        if(render_sessions.size() > 1)
+        auto &rendering_config_arr = rendering_config.as_array();
+        AGZ_LOG0("there is ", rendering_config_arr.size(), " render sessions");
+        for(size_t i = 0; i < rendering_config_arr.size(); ++i)
+        {
             AGZ_LOG0("processing rendering session [", i, "]");
-        render_sessions[i].execute();
+            auto render_session = create_render_session(scene, rendering_config_arr.at_group(i), context);
+            render_session.execute();
+        }
+    }
+    else
+    {
+        auto render_session = create_render_session(scene, rendering_config.as_group(), context);
+        render_session.execute();
     }
 }
 
