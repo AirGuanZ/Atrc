@@ -110,7 +110,7 @@ public:
             }
         };
 
-        std::vector<std::thread> threads_;
+        std::vector<std::thread> threads;
         int actual_worker_count = get_actual_worker_count(worker_count_);
         Arena sampler_arena;
 
@@ -121,10 +121,10 @@ public:
         {
             auto film_grid = film->new_grid(0, 1, 0, 1);
             auto sampler = sampler_prototype_->clone(i, sampler_arena);
-            threads_.emplace_back(func, std::move(film_grid), sampler);
+            threads.emplace_back(func, std::move(film_grid), sampler);
         }
 
-        for(auto &t : threads_)
+        for(auto &t : threads)
             t.join();
 
         reporter.end_stage();
