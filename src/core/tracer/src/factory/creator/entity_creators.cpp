@@ -13,12 +13,12 @@ namespace entity
         MediumInterface ret;
 
         if(auto node = params.find_child_group("med_in"))
-            ret.in = context.create<Medium>(node->as_group(), context);
+            ret.in = context.create<Medium>(node->as_group());
         else
             ret.in = create_void();
 
         if(auto node = params.find_child_group("med_out"))
-            ret.out = context.create<Medium>(node->as_group(), context);
+            ret.out = context.create<Medium>(node->as_group());
         else
             ret.out = create_void();
 
@@ -36,7 +36,7 @@ namespace entity
 
         std::shared_ptr<Entity> create(const ConfigGroup &params, CreatingContext &context) const override
         {
-            auto geometry = context.create<Geometry>(params.child_group("geometry"), context);
+            auto geometry = context.create<Geometry>(params.child_group("geometry"));
             auto radiance = params.child_spectrum("radiance");
             auto med = create_medium_interface(params, context);
             auto no_denoise = params.child_int_or("no_denoise", 0);
@@ -55,8 +55,8 @@ namespace entity
 
         std::shared_ptr<Entity> create(const ConfigGroup &params, CreatingContext &context) const override
         {
-            auto geometry = context.create<Geometry>(params.child_group("geometry"), context);
-            auto material = context.create<Material>(params.child_group("material"), context);
+            auto geometry = context.create<Geometry>(params.child_group("geometry"));
+            auto material = context.create<Material>(params.child_group("material"));
             auto med = create_medium_interface(params, context);
             bool is_shadow_catcher = params.child_int_or("shadow_catcher", 0) != 0;
             auto no_denoise = params.child_int_or("no_denoise", 0);

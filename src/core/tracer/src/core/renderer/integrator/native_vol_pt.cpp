@@ -73,7 +73,6 @@ public:
                 gpixel->position = ent_inct.pos;
                 gpixel->normal   = ent_shd.shading_normal;
                 gpixel->albedo   = ent_shd.bsdf->albedo();
-                gpixel->binary   = 1;
                 gpixel->depth    = (r.o - ent_inct.pos).length();
                 if(ent_inct.entity->get_no_denoise_flag())
                     gpixel->denoise = 0;
@@ -106,7 +105,7 @@ public:
             // process surface scattering
 
             if(auto light = ent_inct.entity->as_light())
-                ret += coef * light->radiance(ent_inct, ent_inct.wr);
+                ret += coef * light->radiance(ent_inct.pos, ent_inct.geometry_coord.z, ent_inct.wr);
 
             auto bsdf_sample = ent_shd.bsdf->sample(ent_inct.wr, TM_Radiance, sampler.sample3());
             if(!bsdf_sample.f)

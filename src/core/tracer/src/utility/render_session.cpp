@@ -20,12 +20,20 @@ namespace
 
         auto film_width_over_height = static_cast<real>(film_width) / film_height;
 
+        auto film_width_child = std::make_shared<ConfigValue>(std::to_string(film_width));
+        auto film_height_child = std::make_shared<ConfigValue>(std::to_string(film_height));
         auto film_aspect_child = std::make_shared<ConfigValue>(std::to_string(film_width_over_height));
-        rendering_config.child_group("camera").insert_child("aspect", film_aspect_child);
+        rendering_config.child_group("camera").insert_child("film_width", film_width_child);
+        rendering_config.child_group("camera").insert_child("film_height", film_height_child);
+        rendering_config.child_group("camera").insert_child("film_aspect", film_aspect_child);
+
+        AGZ_LOG1("creating render target");
+        settings->film = context.create<Film>(film_params);
+        AGZ_LOG1("resolution: (", film_width, ", ", film_height, ")");
 
         AGZ_LOG1("creating camera");
         auto &camera_params = rendering_config.child_group("camera");
-        settings->camera = context.create<Camera>(camera_params);
+        settings->camera = context.create<Camera>(camera_params, settings->film);
 
         AGZ_LOG1("creating renderer");
         auto &renderer_params = rendering_config.child_group("renderer");
@@ -34,10 +42,6 @@ namespace
         AGZ_LOG1("creating progress reporter");
         auto &reporter_params = rendering_config.child_group("reporter");
         settings->reporter = context.create<ProgressReporter>(reporter_params);
-
-        AGZ_LOG1("creating render target");
-        settings->film = context.create<Film>(film_params);
-        AGZ_LOG1("resolution: (", film_width, ", ", film_height, ")");
 
         if(auto node = rendering_config.find_child("post_processors"))
         {

@@ -41,6 +41,8 @@ public:
 
     virtual ~Film() = default;
 
+    virtual void set_scale(real scale) = 0;
+
     /**
      * @brief 线程安全当且仅当并行合并的grid间不重合
      */
@@ -89,6 +91,16 @@ public:
      * 线程安全
      */
     virtual Vec2i resolution() const noexcept = 0;
+
+    /**
+     * @brief 采样坐标下界，单位为像素
+     */
+    virtual Vec2 sample_low() const noexcept = 0;
+
+    /**
+     * @brief 采样坐标上界，单位为像素
+     */
+    virtual Vec2 sample_high() const noexcept = 0;
 };
 
 AGZ_TRACER_END

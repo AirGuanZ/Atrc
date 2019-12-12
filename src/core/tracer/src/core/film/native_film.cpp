@@ -16,7 +16,6 @@ class NativeFilmGrid : public FilmGrid
     int grid_y_end_;
 
     value_data_t values_;
-    weight_data_t weights_;
 
     GBuffer gbuffer_;
 
@@ -28,7 +27,6 @@ public:
         int y_size = y_end - y_beg;
 
         values_  = value_data_t(y_size, x_size);
-        weights_ = weight_data_t(y_size, x_size);
 
         gbuffer_ = GBuffer(y_size, x_size);
 
@@ -72,9 +70,7 @@ public:
         gbuffer_.position->at(ly, lx) += w * gpixel.position;
         gbuffer_.normal  ->at(ly, lx) += w * gpixel.normal;
         gbuffer_.depth   ->at(ly, lx) += w * gpixel.depth;
-        gbuffer_.binary  ->at(ly, lx) += w * gpixel.binary;
         gbuffer_.denoise ->at(ly, lx) += w * gpixel.denoise;
-        weights_(ly, lx)  += w;
     }
 
     int x_size() const noexcept { return grid_x_end_ - grid_x_beg_; }
@@ -84,12 +80,10 @@ public:
     void clear()
     {
         values_.clear({});
-        weights_.clear(0);
         gbuffer_.albedo->clear({});
         gbuffer_.position->clear({});
         gbuffer_.normal->clear({});
         gbuffer_.depth->clear(0);
-        gbuffer_.binary->clear(0);
         gbuffer_.denoise->clear(0);
     }
 };
@@ -99,7 +93,8 @@ class NativeFilm : public Film
     int h_ = 0, w_ = 0;
 
     value_data_t  values_;
-    weight_data_t weights_;
+
+    real scale_ = 1;
 
     GBuffer gbuffer_;
 
@@ -115,11 +110,15 @@ public:
         h_ = height;
 
         values_ = texture::texture2d_t<Spectrum>(h_, w_);
-        weights_ = texture::texture2d_t<real>(h_, w_);
 
         gbuffer_ = GBuffer(h_, w_);
 
         AGZ_HIERARCHY_WRAP("in initializing native film")
+    }
+
+    void set_scale(real scale) override
+    {
+        scale_ = scale;
     }
 
     void merge_grid(const FilmGrid &grid) override
@@ -133,13 +132,11 @@ public:
             {
                 int lx = x - tgrid.grid_x_beg_;
                 values_(y, x)  += tgrid.values_(ly, lx);
-                weights_(y, x) += tgrid.weights_(ly, lx);
 
                 gbuffer_.albedo  ->at(y, x) += tgrid.gbuffer_.albedo  ->at(ly, lx);
                 gbuffer_.position->at(y, x) += tgrid.gbuffer_.position->at(ly, lx);
                 gbuffer_.normal  ->at(y, x) += tgrid.gbuffer_.normal  ->at(ly, lx);
                 gbuffer_.depth   ->at(y, x) += tgrid.gbuffer_.depth   ->at(ly, lx);
-                gbuffer_.binary  ->at(y, x) += tgrid.gbuffer_.binary  ->at(ly, lx);
                 gbuffer_.denoise ->at(y, x) += tgrid.gbuffer_.denoise ->at(ly, lx);
             }
         }
@@ -173,8 +170,7 @@ public:
         {
             for(int x = 0; x < w_; ++x)
             {
-                real w = weights_(y, x);
-                ret(y, x) = w ? values_(y, x) / w : Spectrum(0);
+                ret(y, x) = scale_ * values_(y, x);
             }
         }
         return ret;
@@ -187,14 +183,11 @@ public:
         {
             for(int x = 0; x < w_; ++x)
             {
-                real w = weights_(y, x);
-                real ratio = w ? 1 / w : 0;
-                ret.albedo  ->at(y, x) = ratio * gbuffer_.albedo  ->at(y, x);
-                ret.position->at(y, x) = ratio * gbuffer_.position->at(y, x);
-                ret.normal  ->at(y, x) = ratio * gbuffer_.normal  ->at(y, x);
-                ret.depth   ->at(y, x) = ratio * gbuffer_.depth   ->at(y, x);
-                ret.binary  ->at(y, x) = ratio * gbuffer_.binary  ->at(y, x);
-                ret.denoise ->at(y, x) = ratio * gbuffer_.denoise ->at(y, x);
+                ret.albedo  ->at(y, x) = scale_ * gbuffer_.albedo  ->at(y, x);
+                ret.position->at(y, x) = scale_ * gbuffer_.position->at(y, x);
+                ret.normal  ->at(y, x) = scale_ * gbuffer_.normal  ->at(y, x);
+                ret.depth   ->at(y, x) = scale_ * gbuffer_.depth   ->at(y, x);
+                ret.denoise ->at(y, x) = scale_ * gbuffer_.denoise ->at(y, x);
             }
         }
         return ret;
@@ -203,6 +196,16 @@ public:
     Vec2i resolution() const noexcept override
     {
         return { w_, h_ };
+    }
+
+    Vec2 sample_low() const noexcept override
+    {
+        return Vec2(0);
+    }
+
+    Vec2 sample_high() const noexcept override
+    {
+        return Vec2(real(w_), real(h_));
     }
 };
 

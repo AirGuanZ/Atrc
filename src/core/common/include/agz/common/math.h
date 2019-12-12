@@ -26,6 +26,8 @@ using Vec3i = math::vec3i;
 using Mat3 = math::tmat3_c<real>;
 using Mat4 = math::tmat4_c<real>;
 
+using Trans4 = Mat4::left_transform;
+
 using Coord      = math::tcoord3<real>;
 using Transform2 = math::ttransform2<real>;
 using Transform3 = math::ttransform3<real>;

@@ -198,7 +198,7 @@ Spectrum mis_sample_bsdf(
     if(!light)
         return nonarea_illum;
 
-    Spectrum light_radiance = light->radiance(ent_inct, ent_inct.wr);
+    Spectrum light_radiance = light->radiance(ent_inct.pos, ent_inct.geometry_coord.z, ent_inct.wr);
     if(!light_radiance)
         return nonarea_illum;
 
@@ -282,7 +282,7 @@ Spectrum mis_sample_bsdf(
     if(!light)
         return nonarea_illum;
 
-    Spectrum light_f = light->radiance(ent_inct, ent_inct.wr);
+    Spectrum light_f = light->radiance(ent_inct.pos, ent_inct.geometry_coord.z, ent_inct.wr);
     if(!light_f)
         return nonarea_illum;
 

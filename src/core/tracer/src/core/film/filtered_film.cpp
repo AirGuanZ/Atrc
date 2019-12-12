@@ -24,13 +24,11 @@ class FilteredFilmGrid : public FilmGrid
     const FilmFilter *film_filter_;
 
     value_data_t values_;
-    weight_data_t weights_;
 
     AlbedoBuffer   albedo_;
     PositionBuffer position_;
     NormalBuffer   normal_;
     DepthBuffer    depth_;
-    BinaryBuffer   binary_;
     DenoiseBuffer  denoise_;
 
 public:
@@ -42,13 +40,11 @@ public:
         int y_size = y_end - y_beg;
 
         values_  = value_data_t(y_size, x_size);
-        weights_ = weight_data_t(y_size, x_size);
 
         albedo_   = AlbedoBuffer(y_size, x_size);
         normal_   = NormalBuffer(y_size, x_size);
         position_ = PositionBuffer(y_size, x_size);
         depth_    = DepthBuffer(y_size, x_size);
-        binary_   = BinaryBuffer(y_size, x_size);
         denoise_  = DenoiseBuffer(y_size, x_size);
 
         grid_x_beg_ = x_beg;
@@ -115,13 +111,11 @@ public:
 
                 real weight = w * film_filter_->eval(x_rel, y_rel);
                 values_(ly, lx) += weight * value;
-                weights_(ly, lx) += weight;
 
                 albedo_(ly, lx)   += weight * gpixel.albedo;
                 position_(ly, lx) += weight * gpixel.position;
                 normal_(ly, lx)   += weight * gpixel.normal;
                 depth_(ly, lx)    += weight * gpixel.depth;
-                binary_(ly, lx)   += weight * gpixel.binary;
                 denoise_(ly, lx)  += weight * gpixel.denoise;
             }
         }
@@ -134,7 +128,6 @@ class FilteredFilm : public Film
     std::shared_ptr<const FilmFilter> film_filter_;
 
     texture::texture2d_t<Spectrum> values_;
-    texture::texture2d_t<real> weights_;
 
     // gbuffer attributes
 
@@ -142,8 +135,9 @@ class FilteredFilm : public Film
     PositionBuffer position_;
     NormalBuffer   normal_;
     DepthBuffer    depth_;
-    BinaryBuffer   binary_;
     DenoiseBuffer  denoise_;
+
+    real scale_ = 1;
 
 public:
 
@@ -158,16 +152,20 @@ public:
         film_filter_ = film_filter;
 
         values_ = texture::texture2d_t<Spectrum>(h_, w_);
-        weights_ = texture::texture2d_t<real>(h_, w_);
+        //weights_ = texture::texture2d_t<real>(h_, w_);
 
         albedo_   = AlbedoBuffer(h_, w_);
         normal_   = NormalBuffer(h_, w_);
         position_ = PositionBuffer(h_, w_);
         depth_    = DepthBuffer(h_, w_);
-        binary_   = BinaryBuffer(h_, w_);
         denoise_  = DenoiseBuffer(h_, w_);
 
         AGZ_HIERARCHY_WRAP("in initializing filtered film")
+    }
+
+    void set_scale(real scale) override
+    {
+        scale_ = scale;
     }
 
     void merge_grid(const FilmGrid &grid) override
@@ -181,13 +179,12 @@ public:
             {
                 int lx = x - tgrid.grid_x_beg_;
                 values_(y, x)  += tgrid.values_(ly, lx);
-                weights_(y, x) += tgrid.weights_(ly, lx);
+                //weights_(y, x) += tgrid.weights_(ly, lx);
 
                 albedo_(y, x)   += tgrid.albedo_(ly, lx);
                 position_(y, x) += tgrid.position_(ly, lx);
                 normal_(y, x)   += tgrid.normal_(ly, lx);
                 depth_(y, x)    += tgrid.depth_(ly, lx);
-                binary_(y, x)   += tgrid.binary_(ly, lx);
                 denoise_(y, x)  += tgrid.denoise_(ly, lx);
             }
         }
@@ -205,8 +202,9 @@ public:
         {
             for(int x = 0; x < w_; ++x)
             {
-                real w = weights_(y, x);
-                ret(y, x) = w ? values_(y, x) / w : Spectrum(0);
+                //real w = weights_(y, x);
+                //ret(y, x) = w ? values_(y, x) / w : Spectrum(0);
+                ret(y, x) = scale_ * values_(y, x);
             }
         }
         return ret;
@@ -219,14 +217,13 @@ public:
         {
             for(int x = 0; x < w_; ++x)
             {
-                real w = weights_(y, x);
-                real ratio = w ? 1 / w : 0;
-                ret.albedo->at(y, x)   = ratio * albedo_(y, x);
-                ret.position->at(y, x) = ratio * position_(y, x);
-                ret.normal->at(y, x)   = ratio * normal_(y, x);
-                ret.depth->at(y, x)    = ratio * depth_(y, x);
-                ret.binary->at(y, x)   = ratio * binary_(y, x);
-                ret.denoise->at(y, x)  = ratio * denoise_(y, x);
+                //real w = weights_(y, x);
+                //real ratio = w ? 1 / w : 0;
+                ret.albedo->at(y, x)   = scale_ * albedo_(y, x);
+                ret.position->at(y, x) = scale_ * position_(y, x);
+                ret.normal->at(y, x)   = scale_ * normal_(y, x);
+                ret.depth->at(y, x)    = scale_ * depth_(y, x);
+                ret.denoise->at(y, x)  = scale_ * denoise_(y, x);
             }
         }
         return ret;
@@ -235,6 +232,18 @@ public:
     Vec2i resolution() const noexcept override
     {
         return { w_, h_ };
+    }
+
+    Vec2 sample_low() const noexcept override
+    {
+        real filter_radius = film_filter_->radius();
+        return Vec2(-filter_radius, -filter_radius);
+    }
+
+    Vec2 sample_high() const noexcept override
+    {
+        real filter_radius = film_filter_->radius();
+        return Vec2(w_ + filter_radius, h_ + filter_radius);
     }
 };
 

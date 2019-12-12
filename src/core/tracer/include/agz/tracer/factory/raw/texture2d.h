@@ -43,7 +43,7 @@ std::shared_ptr<Texture2D> create_texture2d_multiplier(
     std::shared_ptr<const Texture2D> lhs,
     std::shared_ptr<const Texture2D> rhs);
 
-std::shared_ptr<Texture2D> create_luminance_classifier(
+std::shared_ptr<Texture2D> create_texture2d_luminance_classifier(
     const Texture2DCommonParams &common_params,
     std::shared_ptr<const Texture2D> internal,
     std::shared_ptr<const Texture2D> thresholdTexture,

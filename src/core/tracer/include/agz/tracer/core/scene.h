@@ -98,6 +98,11 @@ public:
      * @brief 最小的包含所有实体的AABB盒
      */
     virtual AABB world_bound() const noexcept = 0;
+
+    /**
+     * @brief 预处理world bound、light source等
+     */
+    virtual void start_rendering() = 0;
 };
 
 AGZ_TRACER_END

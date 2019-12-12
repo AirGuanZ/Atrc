@@ -124,7 +124,8 @@ namespace disney_impl
             real cos_phi_h   = std::cos(phi_h);
             real cos_theta_h = local_angle::cos_theta(lwh);
             real sin_theta_h = local_angle::cos_2_sin(cos_theta_h);
-            real D = microfacet::anisotropic_gtr2(sin_phi_h, cos_phi_h, sin_theta_h, cos_theta_h, trans_ax_, trans_ay_);
+            real D = microfacet::anisotropic_gtr2(
+                sin_phi_h, cos_phi_h, sin_theta_h, cos_theta_h, trans_ax_, trans_ay_);
 
             real phi_i       = local_angle::phi(lwi);
             real phi_o       = local_angle::phi(lwo);
@@ -164,7 +165,8 @@ namespace disney_impl
             real cos_phi_h   = std::cos(phi_h);
             real cos_theta_h = local_angle::cos_theta(lwh);
             real sin_theta_h = local_angle::cos_2_sin(cos_theta_h);
-            real D = microfacet::anisotropic_gtr2(sin_phi_h, cos_phi_h, sin_theta_h, cos_theta_h, trans_ax_, trans_ay_);
+            real D = microfacet::anisotropic_gtr2(
+                sin_phi_h, cos_phi_h, sin_theta_h, cos_theta_h, trans_ax_, trans_ay_);
 
             real phi_i       = local_angle::phi(lwi);
             real phi_o       = local_angle::phi(lwo);
@@ -200,7 +202,8 @@ namespace disney_impl
             real cos_phi_h   = std::cos(phi_h);
             real cos_theta_h = local_angle::cos_theta(lwh);
             real sin_theta_h = local_angle::cos_2_sin(cos_theta_h);
-            real D = microfacet::anisotropic_gtr2(sin_phi_h, cos_phi_h, sin_theta_h, cos_theta_h, ax_, ay_);
+            real D = microfacet::anisotropic_gtr2(
+                sin_phi_h, cos_phi_h, sin_theta_h, cos_theta_h, ax_, ay_);
             
             real phi_i       = local_angle::phi(lwi);
             real phi_o       = local_angle::phi(lwo);
@@ -299,7 +302,8 @@ namespace disney_impl
             real sin_theta_h = local_angle::cos_2_sin(cos_theta_h);
             real cos_theta_d = dot(lwi, lwh);
             
-            real specular_D = microfacet::anisotropic_gtr2(sin_phi_h, cos_phi_h, sin_theta_h, cos_theta_h, ax_, ay_);
+            real specular_D = microfacet::anisotropic_gtr2(
+                sin_phi_h, cos_phi_h, sin_theta_h, cos_theta_h, ax_, ay_);
             real pdf_specular = cos_theta_h * specular_D / (4 * cos_theta_d);
 
             real clearcoat_D = microfacet::gtr1(sin_theta_h, cos_theta_h, clearcoat_roughness_);
@@ -330,7 +334,8 @@ namespace disney_impl
             real cos_theta_h = local_angle::cos_theta(lwh);
             real sin_theta_h = local_angle::cos_2_sin(cos_theta_h);
 
-            real D = microfacet::anisotropic_gtr2(sin_phi_h, cos_phi_h, sin_theta_h, cos_theta_h, trans_ax_, trans_ay_);
+            real D = microfacet::anisotropic_gtr2(
+                sin_phi_h, cos_phi_h, sin_theta_h, cos_theta_h, trans_ax_, trans_ay_);
             return std::abs(dot(lwi, lwh) * D * dwh_to_dwi);
         }
 
@@ -346,7 +351,8 @@ namespace disney_impl
             real sin_theta_h = local_angle::cos_2_sin(cos_theta_h);
             real cos_theta_d = dot(lwi, lwh);
             
-            real D = microfacet::anisotropic_gtr2(sin_phi_h, cos_phi_h, sin_theta_h, cos_theta_h, trans_ax_, trans_ay_);
+            real D = microfacet::anisotropic_gtr2(
+                sin_phi_h, cos_phi_h, sin_theta_h, cos_theta_h, trans_ax_, trans_ay_);
             return std::abs(cos_theta_h * D / (4 * cos_theta_d));
         }
 
@@ -461,8 +467,9 @@ namespace disney_impl
                 real tan_theta_o = local_angle::tan_theta(lwo);
                 real cos_theta_h = local_angle::cos_theta(lwh);
                 real sin_theta_h = local_angle::cos_2_sin(cos_theta_h);
-                clearcoat = f_clearcoat(cos_theta_i, cos_theta_o, tan_theta_i, tan_theta_o,
-                                        sin_theta_h, cos_theta_h, cos_theta_d);
+                clearcoat = f_clearcoat(
+                    cos_theta_i, cos_theta_o, tan_theta_i, tan_theta_o,
+                    sin_theta_h, cos_theta_h, cos_theta_d);
             }
 
             Spectrum value = (1 - metallic_) * (1 - transmission_) * (diffuse + sheen) + specular + clearcoat;

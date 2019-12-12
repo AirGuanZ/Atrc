@@ -184,7 +184,7 @@ namespace texture
             auto threshold = context.create<Texture2D>(params.child_group("threshold"));
             auto higher = context.create<Texture2D>(params.child_group("high"));
             auto lower = context.create<Texture2D>(params.child_group("low"));
-            return create_luminance_classifier(
+            return create_texture2d_luminance_classifier(
                 common_params,
                 std::move(internal),
                 std::move(threshold),

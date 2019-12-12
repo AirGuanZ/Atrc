@@ -42,8 +42,6 @@ public:
             resize<Vec3, 3>(*gbuffer.normal);
         if(gbuffer.depth)
             resize<float, 1>(*gbuffer.depth);
-        if(gbuffer.binary)
-            resize<float, 1>(*gbuffer.binary);
     }
 };
 

@@ -36,6 +36,38 @@ struct LightSampleResult
 inline const LightSampleResult LIGHT_SAMPLE_RESULT_NULL = { { }, { }, { }, 0, false };
 
 /**
+ * @brief 采样光源发射的结果
+ */
+struct LightEmitResult
+{
+    Vec3 position;     // 发射点位置
+    Vec3 direction;    // 发射方向
+    Vec3 normal;       // 发射点法线，为0表示无法线
+    Spectrum radiance; // 辐射亮度
+    real pdf_pos = 0;  // pdf w.r.t. light surface area
+    real pdf_dir = 0;  // pdf w.r.t. solid angle at position
+
+    bool valid() const noexcept
+    {
+        return pdf_pos && pdf_dir;
+    }
+};
+
+/**
+ * @brief 采样光源发射失败时的结果
+ */
+inline const LightEmitResult LIGHT_EMIT_RESULT_INVALID = { {}, {}, {}, {}, 0, 0 };
+
+/**
+ * @brief 求光源发射pdf的结果
+ */
+struct LightEmitPDFResult
+{
+    real pdf_pos = 0;
+    real pdf_dir = 0;
+};
+
+/**
  * @brief 光源接口
  * 
  * 全体光源被分为两类：实体光源和环境光源。
@@ -70,12 +102,24 @@ public:
     virtual LightSampleResult sample(const Vec3 &ref, const Sample5 &sam) const noexcept = 0;
 
     /**
+     * @brief 采样出射光线
+     */
+    virtual LightEmitResult emit(const Sample5 &sam) const noexcept = 0;
+
+    /**
+     * @brief 采样出射光线的pdf
+     */
+    virtual LightEmitPDFResult emit_pdf(const Vec3 &position, const Vec3 &direction, const Vec3 &normal) const noexcept = 0;
+
+    /**
      * @brief 发射的光通量
      */
     virtual Spectrum power() const noexcept = 0;
 
     /**
      * @brief 基于场景进行预处理，在渲染开始之前、场景准备完毕之后调用一次
+     *
+     * 此方法应可以被多次调用，每次调用会覆盖之前的结果
      */
     virtual void preprocess(const Scene &scene) = 0;
 };
@@ -94,11 +138,12 @@ public:
     /**
      * @brief 光源表面某点朝指定方向的辐射亮度
      * 
-     * @param spt 光源表面的点
+     * @param pos 光源表面的点
+     * @param nor pos处的法线
      * @param light_to_out spt向外照射的方向
      * @return 沿该射线反方向的radiance
      */
-    virtual Spectrum radiance(const SurfacePoint &spt, const Vec3 &light_to_out) const noexcept = 0;
+    virtual Spectrum radiance(const Vec3 &pos, const Vec3 &nor, const Vec3 &light_to_out) const noexcept = 0;
 
     /**
      * @brief 采样到某条照射ref的射线的概率密度（w.r.t. solid angle）
@@ -151,7 +196,7 @@ public:
     /**
      * @brief 计算场景包围球的中心和半径，主要用于环境光采样
      */
-    void preprocess(const Scene &scene) override final;
+    void preprocess(const Scene &scene) override;
 };
 
 AGZ_TRACER_END

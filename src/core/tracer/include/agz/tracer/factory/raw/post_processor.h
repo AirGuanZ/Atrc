@@ -19,12 +19,11 @@ std::shared_ptr<PostProcessor> create_oidn_denoiser(
 std::shared_ptr<PostProcessor> create_saving_gbuffer_to_png(
     std::string albedo_filename,
     std::string normal_filename,
-    std::string depth_filename,
-    std::string binary_filename);
+    std::string depth_filename);
 
 std::shared_ptr<PostProcessor> create_saving_to_img(
     std::string filename, std::string ext,
-    bool open, real gamma, bool with_alpha_channel);
+    bool open, real gamma);
 
 std::shared_ptr<PostProcessor> create_img_resizer(
     const Vec2i &target_size);

@@ -20,8 +20,8 @@ public:
     {
         AGZ_HIERARCHY_TRY
 
-        tex_ = tex;
-        up_ = up;
+        tex_     = tex;
+        up_      = up;
         sampler_ = std::make_unique<EnvironmentLightSampler>(tex_);
 
         AGZ_HIERARCHY_WRAP("in initializing native sky light")
@@ -33,7 +33,7 @@ public:
 
         LightSampleResult ret;
         ret.ref      = ref;
-        ret.pos      = ref + 4 * world_radius_ * dir;
+        ret.pos      = ref + 2 * world_radius_ * dir;
         ret.radiance = radiance(ref, dir, nullptr);
         ret.pdf      = pdf;
         ret.is_delta = false;
@@ -44,6 +44,33 @@ public:
     real pdf(const Vec3 &ref, const Vec3 &ref_to_light) const noexcept override
     {
         return sampler_->pdf(ref_to_light);
+    }
+
+    LightEmitResult emit(const Sample5 &sam) const noexcept override
+    {
+        auto [dir, pdf_dir] = sampler_->sample({ sam.u, sam.v, sam.w });
+        dir = -dir;
+
+        auto disk_sam = math::distribution::uniform_on_unit_disk(sam.r, sam.s);
+        Coord dir_coord = Coord::from_z(dir);
+        Vec3 pos = world_centre_ + (disk_sam.x * dir_coord.x + disk_sam.y * dir_coord.y - dir) * world_radius_;
+
+        LightEmitResult ret;
+        ret.position  = pos;
+        ret.direction = dir;
+        ret.normal    = {};
+        ret.radiance  = radiance(world_centre_, -dir, nullptr);
+        ret.pdf_pos   = 1 / (PI_r * world_radius_ * world_radius_);
+        ret.pdf_dir   = pdf_dir;
+
+        return ret;
+    }
+
+    LightEmitPDFResult emit_pdf(const Vec3 &position, const Vec3 &direction, const Vec3 &normal) const noexcept override
+    {
+        real pdf_pos = 1 / (PI_r * world_radius_ * world_radius_);
+        real pdf_dir = sampler_->pdf(-direction);
+        return { pdf_pos, pdf_dir };
     }
 
     Spectrum power() const noexcept override
@@ -74,17 +101,17 @@ public:
     Spectrum radiance(const Vec3 &ref, const Vec3 &ref_to_light, Vec3 *light_pnt) const noexcept override
     {
         if(light_pnt)
-            *light_pnt = ref + 4 * world_radius_ * ref_to_light.normalize();
-        Vec3 dir = Coord::from_z(up_).global_to_local(ref_to_light).normalize();
-        real phi = local_angle::phi(dir);
+            *light_pnt = ref + 2 * world_radius_ * ref_to_light.normalize();
+        Vec3 dir   = Coord::from_z(up_).global_to_local(ref_to_light).normalize();
+        real phi   = local_angle::phi(dir);
         real theta = local_angle::theta(dir);
-        real u = math::clamp<real>(phi / (2 * PI_r), 0, 1);
-        real v = math::clamp<real>(theta / PI_r, 0, 1);
+        real u     = math::clamp<real>(phi / (2 * PI_r), 0, 1);
+        real v     = math::clamp<real>(theta / PI_r, 0, 1);
         return tex_->sample_spectrum({ u, v });
     }
 };
 
-std::shared_ptr<NonareaLight>create_ibl_light(
+std::shared_ptr<NonareaLight> create_ibl_light(
     std::shared_ptr<const Texture2D> tex,
     const Vec3 &up)
 {

@@ -154,12 +154,11 @@ Here is a simple example, which results in the above image (a bit rough metal sp
   },
   "rendering": {
     "camera": {
-      "type": "pinhole",
+      "type": "thin_lens",
       "pos": [ 0, -5, 1 ],
       "dst": [ 0, 0, 0 ],
       "up": [ 0, 0, 1 ],
-      "width": 0.2,
-      "dist": 0.16
+      "fov": 64
     },
     "film": {
       "type": "native",
@@ -290,21 +289,18 @@ Organize entities with a BVH tree.
 
 This section describes the possible type values for fields of type `Camera`.
 
-**pinhole**
+**thin_lens**
 
-| Field Name | Type | Default Value | Explanation                                 |
-| ---------- | ---- | ------------- | ------------------------------------------- |
-| pos        | Vec3 |               | eye position                                |
-| dst        | Vec3 |               | position looked by the camera               |
-| up         | Vec3 |               | see 'lookat' matrix in 3D computer graphics |
-| width      | real |               | width of the camera sensor in world space   |
-| dist       | real |               | Distance between pinhole and sensor         |
-| height     | real |               | height of the camera sensor in world space  |
-| aspect     | real |               | width divide by height                      |
+| Field Name     | Type | Default Value | Explanation                                 |
+| -------------- | ---- | ------------- | ------------------------------------------- |
+| pos            | Vec3 |               | eye position                                |
+| dst            | Vec3 |               | position looked by the camera               |
+| up             | Vec3 |               | see 'lookat' matrix in 3D computer graphics |
+| fov            | real |               | field of view (in degree)                   |
+| lens_radius    | real | 0             | lens radius (for DoF effect)                |
+| focal_distance | real | 1             | distance between focal plane and lens       |
 
-You only need to give one for the `height` and `aspect` parameters.
-
-The rendering result of the pinhole camera is upside down, so it usually works with a post processor of type `flip`.
+The rendering result of the `thin_lens` camera is upside down, so it usually works with a post processor of type `flip`.
 
 ### Entity
 
@@ -503,23 +499,30 @@ Triangle mesh implemented using simple BVH tree. It has the same parameters as `
 
 ### Material
 
+**Normal Mapping**
+
+![pic](C:/Users/lenovo/Documents/Programming/Code/agz/doc/pictures/normal_mapping.png)
+
+Some materials support normal mapping. The field list of these materials will include a `normal_map`.
+
 **disney_reflection (deprecated)**
 
 Complete implementation of [Disney Principled BRDF](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf)
 
-| Field Name      | Type      | Default Value | Explanation                                                  |
-| --------------- | --------- | ------------- | ------------------------------------------------------------ |
-| base_color      | Texture2D |               | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf) |
-| metallic        | Texture2D |               | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf) |
-| roughness       | Texture2D |               | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf) |
-| subsurface      | Texture2D | all_zero      | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf) |
-| specular        | Texture2D | all_zero      | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf) |
-| specular_tint   | Texture2D | all_zero      | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf) |
-| anisotropic     | Texture2D | all_zero      | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf) |
-| sheen           | Texture2D | all_zero      | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf) |
-| sheen_tint      | Texture2D | all_zero      | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf) |
-| clearcoat       | Texture2D | all_zero      | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf) |
-| clearcoat_gloss | Texture2D | all_one       | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf) |
+| Field Name      | Type      | Default Value   | Explanation                                                  |
+| --------------- | --------- | --------------- | ------------------------------------------------------------ |
+| base_color      | Texture2D |                 | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf) |
+| metallic        | Texture2D |                 | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf) |
+| roughness       | Texture2D |                 | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf) |
+| subsurface      | Texture2D | all_zero        | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf) |
+| specular        | Texture2D | all_zero        | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf) |
+| specular_tint   | Texture2D | all_zero        | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf) |
+| anisotropic     | Texture2D | all_zero        | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf) |
+| sheen           | Texture2D | all_zero        | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf) |
+| sheen_tint      | Texture2D | all_zero        | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf) |
+| clearcoat       | Texture2D | all_zero        | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf) |
+| clearcoat_gloss | Texture2D | all_one         | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf) |
+| normal_map      | Texture2D | all_{ 0, 0, 1 } | normal map                                                   |
 
 *NOTE*: `disney_reflection` is basically a subset of `disney` and is already deprecated, so the latter is recommended.
 
@@ -529,21 +532,22 @@ Complete implementation of [Disney Principled BRDF](https://disney-animation.s3.
 
 see [Disney Principled BSDF](https://blog.selfshadow.com/publications/s2015-shading-course/#course_content)
 
-| Field Name             | Type      | Default Value | Explanation                                                  |
-| ---------------------- | --------- | ------------- | ------------------------------------------------------------ |
-| base_color             | Texture2D |               | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf); range: $[0, 1]^3$ |
-| metallic               | Texture2D |               | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf); range: $[0,1]$ |
-| roughness              | Texture2D |               | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf); range: $[0,1]$ |
-| specular_scale         | Texture2D | all_one       | scale factor of non-metallic specular lobe; range: $[0,1]^3$ |
-| specular_tint          | Texture2D | all_zero      | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf); range: $[0,1]$ |
-| anisotropic            | Texture2D | all_zero      | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf); range: $[0,1]$ |
-| sheen                  | Texture2D | all_zero      | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf); range: $[0,1]$ |
-| sheen_tint             | Texture2D | all_zero      | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf); range: $[0,1]$ |
-| clearcoat              | Texture2D | all_zero      | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf); range: $[0,1]$ |
-| clearcoat_gloss        | Texture2D | all_one       | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf); range: $[0,1]$ |
-| transmission           | Texture2D | all_zero      | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf); range: $[0,1]$ |
-| transmission_roughness | Texture2D | roughness     | roughness of transmitted specular lobe; range: $[0, 1]$      |
-| ior                    | Texture2D | all_{1.5}     | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf); range: $[0,\infty)$ |
+| Field Name             | Type      | Default Value   | Explanation                                                  |
+| ---------------------- | --------- | --------------- | ------------------------------------------------------------ |
+| base_color             | Texture2D |                 | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf); range: $[0, 1]^3$ |
+| metallic               | Texture2D |                 | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf); range: $[0,1]$ |
+| roughness              | Texture2D |                 | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf); range: $[0,1]$ |
+| specular_scale         | Texture2D | all_one         | scale factor of non-metallic specular lobe; range: $[0,1]^3$ |
+| specular_tint          | Texture2D | all_zero        | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf); range: $[0,1]$ |
+| anisotropic            | Texture2D | all_zero        | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf); range: $[0,1]$ |
+| sheen                  | Texture2D | all_zero        | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf); range: $[0,1]$ |
+| sheen_tint             | Texture2D | all_zero        | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf); range: $[0,1]$ |
+| clearcoat              | Texture2D | all_zero        | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf); range: $[0,1]$ |
+| clearcoat_gloss        | Texture2D | all_one         | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf); range: $[0,1]$ |
+| transmission           | Texture2D | all_zero        | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf); range: $[0,1]$ |
+| transmission_roughness | Texture2D | roughness       | roughness of transmitted specular lobe; range: $[0, 1]$      |
+| ior                    | Texture2D | all_{1.5}       | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf); range: $[0,\infty)$ |
+| normal_map             | Texture2D | all_{ 0, 0, 1 } | normal map                                                   |
 
 **frosted_glass**
 
@@ -585,9 +589,10 @@ A mass of black
 
 Ideal diffuse reflection, reflects the same radiance in all directions.
 
-| Field Name | Type      | Default Value | Explanation               |
-| ---------- | --------- | ------------- | ------------------------- |
-| albedo     | Texture2D |               | surface color times $\pi$ |
+| Field Name | Type      | Default Value   | Explanation               |
+| ---------- | --------- | --------------- | ------------------------- |
+| albedo     | Texture2D |                 | surface color times $\pi$ |
+| normal_map | Texture2D | all_{ 0, 0, 1 } | normal map                |
 
 **mirror**
 
@@ -642,6 +647,10 @@ Absolutely smooth varnish, where the interior material must be opaque.
 | eta_out    | Texture2D | all_one       | outer ior of varnish             |
 | color      | Texture2D |               | varnish color                    |
 
+**invisible_surface**
+
+Surface material which is totally invisible
+
 ### Medium
 
 **void**
@@ -687,10 +696,10 @@ Heterogeneous media defined based on 3D textures
 
 Image based lighting
 
-| Field Name | Type      | Default Value | Explanation                                                  |
-| ---------- | --------- | ------------- | ------------------------------------------------------------ |
-| tex        | Texture2D |               | texture object describing radiance                           |
-| up         | Vec3      | [ 0, 0, 1 ]   | describe which direction in the world space is "above", default is $+z$ |
+| Field Name | Type      | Default Value | Explanation                                 |
+| ---------- | --------- | ------------- | ------------------------------------------- |
+| tex        | Texture2D |               | texture object describing radiance          |
+| up         | Vec3      | [ 0, 0, 1 ]   | which direction is "above", default is $+z$ |
 
 **hdri**
 
@@ -698,12 +707,14 @@ Image based lighting
 
 Inner glowing sphere which is not visible on the outer side
 
-| Field Name | Type      | Default Value | Explanation                                                  |
-| ---------- | --------- | ------------- | ------------------------------------------------------------ |
-| tex        | Texture2D |               | texture object describing radiance                           |
-| up         | Vec3      | [ 0, 0, 1 ]   | describe which direction in the world space is "above", default is $+z$ |
-| radius     | real      | 100           | sphere radius                                                |
-| offset     | Vec3      | [0]           | sphere center position                                       |
+| Field Name | Type      | Default Value | Explanation                                 |
+| ---------- | --------- | ------------- | ------------------------------------------- |
+| tex        | Texture2D |               | texture object describing radiance          |
+| up         | Vec3      | [ 0, 0, 1 ]   | which direction is "above", default is $+z$ |
+| radius     | real      | 100           | sphere radius                               |
+| offset     | Vec3      | [0]           | sphere center position                      |
+
+*NOTE*. The `hdri` light source does not support light transport algorithms requiring backward tracing at the moment. It can only be used in path tracing.
 
 **native_sky**
 
@@ -753,26 +764,22 @@ Use OIDN to denoise the image
 
 Save the G-Buffer to png files
 
-| Field Name | Type   | Default Value | Explanation                           |
-| ---------- | ------ | ------------- | ------------------------------------- |
-| albedo     | string | ""            | where to save material colors         |
-| normal     | string | ""            | where to save normal image            |
-| depth      | string | ""            | where to save depth image             |
-| binary     | string | ""            | where to save binary mask of entities |
-
-Each pixel of the binary mask indicates whether the pixel position is occupied by an entity. 0 means no object, 1 means there is an object, and the middle value means that part of the pixel is occupied.
+| Field Name | Type   | Default Value | Explanation                   |
+| ---------- | ------ | ------------- | ----------------------------- |
+| albedo     | string | ""            | where to save material colors |
+| normal     | string | ""            | where to save normal image    |
+| depth      | string | ""            | where to save depth image     |
 
 **save_to_img**
 
 Save the rendered image to a file
 
-| Field Name         | Type   | Default Value | Explanation                                            |
-| ------------------ | ------ | ------------- | ------------------------------------------------------ |
-| filename           | string |               | where to save the output image                         |
-| open               | bool   | true          | whether to open it with the default image browser      |
-| inv_gamma          | real   | 1             | $1/\gamma$ for gamma correction (typical value is 2.2) |
-| with_alpha_channel | bool   | false         | save G-Buffer::binary to the alpha channel             |
-| ext                | string | png           | saved file type ("jpg" or "png")                       |
+| Field Name | Type   | Default Value | Explanation                                            |
+| ---------- | ------ | ------------- | ------------------------------------------------------ |
+| filename   | string |               | where to save the output image                         |
+| open       | bool   | true          | whether to open it with the default image browser      |
+| inv_gamma  | real   | 1             | $1/\gamma$ for gamma correction (typical value is 2.2) |
+| ext        | string | png           | saved file type ("jpg" or "png")                       |
 
 **resize**
 
@@ -788,13 +795,35 @@ Resize the image and G-Buffer to the specified resolution
 
 Traditional path tracing. You can specify the tracing strategy by `integrator`.
 
-| Field Name   | Type                  | Default Value | Explanation             |
-| ------------ | --------------------- | ------------- | ----------------------- |
-| integrator   | PathTracingIntegrator |               | tracing strategy        |
-| worker_count | int                   | 0             | rendering thread count  |
-| sampler      | Sampler               |               | random number generator |
+| Field Name     | Type                  | Default Value | Explanation               |
+| -------------- | --------------------- | ------------- | ------------------------- |
+| integrator     | PathTracingIntegrator |               | tracing strategy          |
+| task_grid_size | int                   | 32            | rendering task pixel size |
+| worker_count   | int                   | 0             | rendering thread count    |
+| sampler        | Sampler               |               | random number generator   |
+
+The entire image is divided into multiple square pixel blocks (rendering tasks), and each pixel block is assigned to a worker thread for execution as a subtask.
 
 When the number of worker threads $n$ is less or equal to 0 and the number of hardware threads is $ k $, then $\max\{1, k + n \} $ worker threads will be used. For example, you can set `worker_count` to -2, which means that you leave two hardware threads and use all other hardware threads.
+
+**particle**
+
+Adjoint particle tracer. `particle` builds path from light source to camera, making the convergence very slow.
+
+| Field Name             | Type    | Default Value | Explanation                               |
+| ---------------------- | ------- | ------------- | ----------------------------------------- |
+| worker_count           | int     | 0             | rendering thread count                    |
+| particle_task_count    | int     |               | particle tracing task count               |
+| backward_sampler       | Sampler |               | sampler used in backward pass             |
+| min_depth              | int     | 5             | min path depth before using RR policy     |
+| max_depth              | int     | 10            | max depth of the path                     |
+| cont_prob              | real    | 0.9           | pass probability when using RR strategy   |
+| forward_task_grid_size | int     | 32            | rendering task pixel size in forward pass |
+| forward_sampler        | Sampler |               | sampler used in forward pass              |
+
+`particle` uses the strategy of starting from a light source to construct a light path, called backward pass; for paths of length 1 (that is, the light source is directly seen from the camera), however, `particle` builds them from the camera to light sources, called forward pass. The two passes are independent executed and are combined to render the final image.
+
+Backward pass consists of `particle_task_count` particle tracing tasks. Each task contains `spp` of `backward_sampler`, so a total of `particle_task_count * backward_sampler.spp` paths are traced in backward pass.
 
 ### PathTracingIntegrator
 
@@ -804,9 +833,9 @@ Violent path tracing without any optimization
 
 | Field Name | Type | Default Value | Explanation                               |
 | ---------- | ---- | ------------- | ----------------------------------------- |
-| min_depth  | int  | 5             | Minimum path depth before using RR policy |
-| max_depth  | int  | 10            | Maximum depth of the path                 |
-| cont_prob  | real | 0.9           | Pass probability when using RR strategy   |
+| min_depth  | int  | 5             | minimum path depth before using RR policy |
+| max_depth  | int  | 10            | maximum depth of the path                 |
+| cont_prob  | real | 0.9           | pass probability when using RR strategy   |
 
 **mis**
 
@@ -814,9 +843,9 @@ Path tracing with Multiple Importance Sampling
 
 | Field Name | Type | Default Value | Explanation                               |
 | ---------- | ---- | ------------- | ----------------------------------------- |
-| min_depth  | int  | 5             | Minimum path depth before using RR policy |
-| max_depth  | int  | 10            | Maximum depth of the path                 |
-| cont_prob  | real | 0.9           | Pass probability when using RR strategy   |
+| min_depth  | int  | 5             | minimum path depth before using RR policy |
+| max_depth  | int  | 10            | maximum depth of the path                 |
+| cont_prob  | real | 0.9           | pass probability when using RR strategy   |
 
 ### ProgressReporter
 
@@ -1043,6 +1072,47 @@ for z in 0 to texture depth
 The data arrangement of binary voxel data is similar to the text format, except that all data is stored as binary data in little-endian order.
 
 The file name array of image slices refers to the file names of a series of two-dimensional images obtained by decomposing the voxels in the depth direction. These two-dimensional images must be the same size, the number of which corresponds to the depth value of the texture.
+
+**add**
+
+Add two textures together
+
+| Field Name | Type      | Default Value | Explanation               |
+| ---------- | --------- | ------------- | ------------------------- |
+| lhs        | Texture3D |               | the first added Texture2D |
+| rhs        | Texture3D |               | the second added texture  |
+
+**mul**
+
+Multiply two textures together
+
+| Field Name | Type      | Default Value | Explanation                   |
+| ---------- | --------- | ------------- | ----------------------------- |
+| lhs        | Texture3D |               | the first multiplied texture  |
+| rhs        | Texture3D |               | the second multiplied texture |
+
+**scale**
+
+A wrapper that linearly scales another texture
+
+| Field Name | Type      | Default Value | Explanation    |
+| ---------- | --------- | ------------- | -------------- |
+| scale      | Spectrum  |               | scaling ratio  |
+| internal   | Texture3D |               | scaled texture |
+
+**lum_classify**
+
+| Field Name    | Type      | Default Value | Explanation |
+| ------------- | --------- | ------------- | ----------- |
+| lhs           | Texture3D |               |             |
+| rhs           | Texture3D |               |             |
+| less_or_equal | Texture3D |               |             |
+| greater       | Texture3D |               |             |
+
+Use $T(u, v)$ to represent the result of sampling texture $T$ at $(u, v)$, then `lum_classify` is defined as:
+$$
+\mathrm{lum\_classify}(u, v) := \begin{cases}\begin{aligned}    &\mathrm{less\_or\_equal}(u,v), &\mathrm{lhs}(u, v) \ge \mathrm{rhs}(u, v) \\    &\mathrm{greater}(u, v), &\text{otherwise}\end{aligned}\end{cases}
+$$
 
 ### Transform
 

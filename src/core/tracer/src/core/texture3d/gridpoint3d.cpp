@@ -7,6 +7,7 @@ class GrayGridPoint3D : public Texture3D
 {
     texture::texture3d_t<real> data_;
     real max_value_;
+    real min_value_;
 
 protected:
 
@@ -45,12 +46,16 @@ public:
         data_ = std::move(data);
 
         max_value_ = (std::numeric_limits<real>::lowest)();
+        min_value_ = (std::numeric_limits<real>::max)();
         for(int z = 0; z < data_.depth(); ++z)
         {
             for(int y = 0; y < data_.height(); ++y)
             {
                 for(int x = 0; x < data_.width(); ++x)
+                {
                     max_value_ = (std::max)(max_value_, data_(z, y, x));
+                    min_value_ = (std::min)(min_value_, data_(z, y, x));
+                }
             }
         }
     }
@@ -75,9 +80,19 @@ public:
         return Spectrum(max_value_);
     }
 
+    Spectrum min_spectrum() const noexcept override
+    {
+        return Spectrum(min_value_);
+    }
+
     real max_real() const noexcept override
     {
         return max_value_;
+    }
+
+    real min_real() const noexcept override
+    {
+        return min_value_;
     }
 };
 
@@ -85,6 +100,7 @@ class SpectrumGridPoint3D : public Texture3D
 {
     texture::texture3d_t<Spectrum> data_;
     Spectrum max_value_;
+    Spectrum min_value_;
 
 protected:
 
@@ -123,6 +139,7 @@ public:
         data_ = std::move(data);
 
         max_value_ = Spectrum((std::numeric_limits<real>::lowest)());
+        min_value_ = Spectrum((std::numeric_limits<real>::max)());
         for(int z = 0; z < data_.depth(); ++z)
         {
             for(int y = 0; y < data_.height(); ++y)
@@ -131,7 +148,10 @@ public:
                 {
                     auto &texel = data_(z, y, x);
                     for(int c = 0; c < SPECTRUM_COMPONENT_COUNT; ++c)
+                    {
                         max_value_[c] = (std::max)(max_value_[c], texel[c]);
+                        min_value_[c] = (std::min)(min_value_[c], texel[c]);
+                    }
                 }
             }
         }
@@ -157,9 +177,19 @@ public:
         return max_value_;
     }
 
+    Spectrum min_spectrum() const noexcept override
+    {
+        return min_value_;
+    }
+
     real max_real() const noexcept override
     {
         return max_spectrum()[0];
+    }
+
+    real min_real() const noexcept override
+    {
+        return min_spectrum()[0];
     }
 };
 

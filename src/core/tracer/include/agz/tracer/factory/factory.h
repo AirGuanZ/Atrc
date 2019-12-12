@@ -54,6 +54,18 @@ public:
     virtual std::shared_ptr<T> create(const ConfigGroup &params, CreatingContext &context) const = 0;
 };
 
+template<>
+class Creator<Camera>
+{
+public:
+
+    virtual ~Creator() = default;
+
+    virtual std::string name() const = 0;
+
+    virtual std::shared_ptr<Camera> create(const ConfigGroup &params, CreatingContext &context, std::shared_ptr<const Film> film) const = 0;
+};
+
 template<typename T>
 class Factory
 {
@@ -119,65 +131,99 @@ public:
     template<typename T>
     const Factory<T> &factory() const noexcept;
 
-    template<typename T>
-    std::shared_ptr<T> create(const std::string &type_name, const ConfigGroup &params, CreatingContext &context);
+    template<typename T, typename...Args>
+    std::shared_ptr<T> create(const ConfigGroup &params, Args&&...args);
+};
 
-    template<typename T>
-    std::shared_ptr<T> create(const ConfigGroup &params, CreatingContext &context);
+template<typename T>
+class ReferenceCreator : public Creator<T>
+{
+    mutable std::map<std::vector<std::string>, std::shared_ptr<T>> name2obj_;
 
-    template<typename T>
-    std::shared_ptr<T> create(const std::string &type_name, const ConfigGroup &params);
+public:
 
-    template<typename T>
-    std::shared_ptr<T> create(const ConfigGroup &params);
+    std::string name() const override
+    {
+        return "reference";
+    }
+
+    std::shared_ptr<T> create(const ConfigGroup &params, CreatingContext &context) const override
+    {
+        AGZ_HIERARCHY_TRY
+
+        auto &name_arr = params.child_array("name");
+        if(name_arr.size() < 1)
+            throw CreatingObjectException("empty reference name sequence");
+
+        std::vector<std::string> names;
+        names.reserve(name_arr.size());
+        for(size_t i = 0; i < name_arr.size(); ++i)
+            names.push_back(name_arr.at(i).as_value().as_str());
+
+        if(auto it = name2obj_.find(names); it != name2obj_.end())
+            return it->second;
+
+        const ConfigGroup *group = context.reference_root;
+        for(size_t i = 0; i < names.size() - 1; ++i)
+            group = &group->child_group(names[i]);
+
+        auto &true_params = group->child_group(names.back());
+        auto ret = context.create<T>(true_params);
+        name2obj_[names] = ret;
+
+        return ret;
+
+        AGZ_HIERARCHY_WRAP("in creating referenced object")
+    }
+};
+
+template<>
+class ReferenceCreator<Camera> : public Creator<Camera>
+{
+    mutable std::map<std::vector<std::string>, std::shared_ptr<Camera>> name2obj_;
+
+public:
+
+    std::string name() const override
+    {
+        return "reference";
+    }
+
+    std::shared_ptr<Camera> create(const ConfigGroup &params, CreatingContext &context, std::shared_ptr<const Film> film) const override
+    {
+        AGZ_HIERARCHY_TRY
+
+        auto &name_arr = params.child_array("name");
+        if(name_arr.size() < 1)
+            throw CreatingObjectException("empty reference name sequence");
+
+        std::vector<std::string> names;
+        names.reserve(name_arr.size());
+        for(size_t i = 0; i < name_arr.size(); ++i)
+            names.push_back(name_arr.at(i).as_value().as_str());
+
+        if(auto it = name2obj_.find(names); it != name2obj_.end())
+            return it->second;
+
+        const ConfigGroup *group = context.reference_root;
+        for(size_t i = 0; i < names.size() - 1; ++i)
+            group = &group->child_group(names[i]);
+
+        auto &true_params = group->child_group(names.back());
+        auto ret = context.create<Camera>(true_params, std::move(film));
+        name2obj_[names] = ret;
+
+        return ret;
+
+        AGZ_HIERARCHY_WRAP("in creating referenced object")
+    }
 };
 
 template<typename T>
 Factory<T>::Factory(std::string factory_name)
     : factory_name_(std::move(factory_name))
 {
-    class ReferenceCreator : public Creator<T>
-    {
-        mutable std::map<std::vector<std::string>, std::shared_ptr<T>> name2obj_;
-
-    public:
-
-        std::string name() const override
-        {
-            return "reference";
-        }
-
-        std::shared_ptr<T> create(const ConfigGroup &params, CreatingContext &context) const override
-        {
-            AGZ_HIERARCHY_TRY
-
-            auto &name_arr = params.child_array("name");
-            if(name_arr.size() < 1)
-                throw CreatingObjectException("empty reference name sequence");
-
-            std::vector<std::string> names;
-            names.reserve(name_arr.size());
-            for(size_t i = 0; i < name_arr.size(); ++i)
-                names.push_back(name_arr.at(i).as_value().as_str());
-
-            if(auto it = name2obj_.find(names); it != name2obj_.end())
-                return it->second;
-
-            const ConfigGroup *group = context.reference_root;
-            for(size_t i = 0; i < names.size() - 1; ++i)
-                group = &group->child_group(names[i]);
-
-            auto &true_params = group->child_group(names.back());
-            auto ret = context.create<T>(true_params, context);
-            name2obj_[names] = ret;
-
-            return ret;
-
-            AGZ_HIERARCHY_WRAP("in creating referenced object")
-        }
-    };
-
-    this->add_creator(std::make_unique<ReferenceCreator>());
+    this->add_creator(std::make_unique<ReferenceCreator<T>>());
 }
 
 template<typename T>
@@ -212,16 +258,12 @@ const Factory<T> &CreatingContext::factory() const noexcept
     return std::get<Factory<T>>(factory_tuple_);
 }
 
-template<typename T>
-std::shared_ptr<T> CreatingContext::create(const ConfigGroup &params, CreatingContext &context)
-{
-    return this->create<T>(params.child_str("type"), params, context);
-}
-
-template<typename T>
-std::shared_ptr<T> CreatingContext::create(const std::string &type_name, const ConfigGroup &params, CreatingContext &context)
+template<typename T, typename...Args>
+std::shared_ptr<T> CreatingContext::create(const ConfigGroup &params, Args&&...args)
 {
     AGZ_HIERARCHY_TRY
+
+    auto &type_name = params.child_str("type");
 
     auto creator = this->factory<T>().get_creator(type_name);
     if(!creator)
@@ -229,23 +271,11 @@ std::shared_ptr<T> CreatingContext::create(const std::string &type_name, const C
 
     {
         AGZ_HIERARCHY_TRY
-        return creator->create(params, context);
+        return creator->create(params, *this, std::forward<Args>(args)...);
         AGZ_HIERARCHY_WRAP("in creating object with creator: " + creator->name())
     }
 
     AGZ_HIERARCHY_WRAP("in creating object with factory: " + this->factory<T>().name())
-}
-
-template<typename T>
-std::shared_ptr<T> CreatingContext::create(const std::string &type_name, const ConfigGroup &params)
-{
-    return this->create<T>(type_name, params, *this);
-}
-
-template<typename T>
-std::shared_ptr<T> CreatingContext::create(const ConfigGroup &params)
-{
-    return this->create<T>(params, *this);
 }
 
 AGZ_TRACER_FACTORY_END

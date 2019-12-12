@@ -79,6 +79,18 @@ public:
         return pdf_area / (radius_ * radius_) * (pos - ref).length_square() / std::abs(cos(ref_to_light, npos));
     }
 
+    LightEmitResult emit(const Sample5 &sam) const noexcept override
+    {
+        // TODO
+        return {};
+    }
+
+    LightEmitPDFResult emit_pdf(const Vec3 &position, const Vec3 &direction, const Vec3 &normal) const noexcept override
+    {
+        // TODO
+        return {};
+    }
+
     Spectrum power() const noexcept override
     {
         Spectrum ret;
@@ -118,9 +130,18 @@ public:
         real v = math::clamp<real>(theta / PI_r, 0, 1);
         return tex_->sample_spectrum({ u, v });
     }
+
+    void preprocess(const Scene &scene) override
+    {
+        EnvirLight::preprocess(scene);
+
+        // hdri球体应包含整个场景的包围球，否则报错
+        if(distance(world_centre_, offset_) + world_radius_ > radius_)
+            throw ObjectConstructionException("invalid hdri offset/radius: cannot enclose scene");
+    }
 };
 
-std::shared_ptr<NonareaLight>create_hdri_light(
+std::shared_ptr<NonareaLight> create_hdri_light(
     std::shared_ptr<const Texture2D> tex,
     const Vec3 &up,
     real radius,

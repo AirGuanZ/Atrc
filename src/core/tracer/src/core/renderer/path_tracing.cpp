@@ -8,23 +8,17 @@
 #include <agz/tracer/core/renderer.h>
 #include <agz/tracer/factory/raw/renderer.h>
 #include <agz/tracer/factory/factory.h>
+#include <agz/utility/thread.h>
 
 AGZ_TRACER_BEGIN
 
 class PathTracingRenderer : public Renderer
 {
-    int worker_count_ = 0;
+    int worker_count_   = 0;
+    int task_grid_size_ = 32;
 
-    std::shared_ptr<const Sampler> sampler_prototype_;
+    std::shared_ptr<const Sampler>               sampler_prototype_;
     std::shared_ptr<const PathTracingIntegrator> integrator_;
-
-    static int get_actual_worker_count(int worker_count) noexcept
-    {
-        if(worker_count > 0)
-            return worker_count;
-        int hardware_worker_count = static_cast<int>(std::thread::hardware_concurrency());
-        return (std::max)(1, hardware_worker_count + worker_count);
-    }
 
     void render_grid(const Scene &scene, Sampler &sampler, FilmGrid &film_grid, const Vec2i &full_res) const
     {
@@ -49,12 +43,12 @@ class PathTracingRenderer : public Renderer
                     real film_x = pixel_x / full_res.x;
                     real film_y = pixel_y / full_res.y;
 
-                    CameraSample cam_sam = { { film_x, film_y }, sampler.sample2() };
-                    auto cam_ray = cam->generate_ray(cam_sam);
+                    auto cam_ray = cam->sample_we({ film_x, film_y }, sampler.sample2());
 
                     GBufferPixel gbuffer_pixel;
-                    Spectrum f = integrator_->eval(&gbuffer_pixel, scene, cam_ray.r, sampler, arena);
-                    Spectrum  value = cam_ray.throughput * f;
+                    Ray ray(cam_ray.pos_on_cam, cam_ray.pos_to_out);
+                    Spectrum f = integrator_->eval(&gbuffer_pixel, scene, ray, sampler, arena);
+                    Spectrum value = cam_ray.throughput * f;
 
                     film_grid.add_sample({ pixel_x, pixel_y }, value, gbuffer_pixel, 1);
 
@@ -69,13 +63,21 @@ public:
 
     void initialize(const PathTracingRendererParams &params)
     {
-        worker_count_ = params.worker_count;
+        worker_count_      = params.worker_count;
+        task_grid_size_    = params.task_grid_size;
         sampler_prototype_ = params.sampler_prototype;
-        integrator_ = params.integrator;
+        integrator_        = params.integrator;
     }
 
     void render(Scene &scene, ProgressReporter &reporter, Film *film) override
-    {   
+    {
+        film->set_scale(1 / static_cast<real>(sampler_prototype_->get_spp()));
+
+        auto [film_width, film_height] = film->resolution();
+        int x_task_count = (film_width  + task_grid_size_ - 1) / task_grid_size_;
+        int y_task_count = (film_height + task_grid_size_ - 1) / task_grid_size_;
+        int total_task_count = x_task_count * y_task_count;
+
         std::atomic<int> next_task_id = 0;
         std::mutex reporter_mutex;
         
@@ -85,43 +87,52 @@ public:
             &reporter,
             &reporter_mutex,
             &next_task_id,
-            total_task_id = film->resolution().y,
+            x_task_count,
+            total_task_count,
+            task_grid_size = task_grid_size_,
             p_this = this
-        ] (std::unique_ptr<FilmGrid> &&film_grid, Sampler *sampler)
+        ] (Sampler *sampler)
         {
             Vec2i full_res = film->resolution();
 
             for(;;)
             {
                 int my_task_id = next_task_id++;
-                if(my_task_id >= total_task_id)
+                if(my_task_id >= total_task_count)
                     return;
 
-                int x_beg = 0, x_end = full_res.x;
-                int y_beg = my_task_id, y_end = my_task_id + 1;
-                film_grid = film->renew_grid(x_beg, x_end, y_beg, y_end, std::move(film_grid));
+                int grid_y_index = my_task_id / x_task_count;
+                int grid_x_index = my_task_id % x_task_count;
+
+                int x_beg = grid_x_index * task_grid_size;
+                int y_beg = grid_y_index * task_grid_size;
+                int x_end = (std::min)(x_beg + task_grid_size, full_res.x);
+                int y_end = (std::min)(y_beg + task_grid_size, full_res.y);
+
+                auto film_grid = film->new_grid(x_beg, x_end, y_beg, y_end);
 
                 p_this->render_grid(scene, *sampler, *film_grid, full_res);
                 film->merge_grid(*film_grid);
 
-                real percent = real(100) * (my_task_id + 1) / total_task_id;
+                real percent = real(100) * (my_task_id + 1) / total_task_count;
                 std::lock_guard lk(reporter_mutex);
                 reporter.progress(percent);
             }
         };
 
         std::vector<std::thread> threads;
-        int actual_worker_count = get_actual_worker_count(worker_count_);
+        int actual_worker_count = thread::actual_worker_count(worker_count_);
         Arena sampler_arena;
+
+        scene.start_rendering();
 
         reporter.begin();
         reporter.new_stage();
 
         for(int i = 0; i < actual_worker_count; ++i)
         {
-            auto film_grid = film->new_grid(0, 1, 0, 1);
             auto sampler = sampler_prototype_->clone(i, sampler_arena);
-            threads.emplace_back(func, std::move(film_grid), sampler);
+            threads.emplace_back(func, sampler);
         }
 
         for(auto &t : threads)

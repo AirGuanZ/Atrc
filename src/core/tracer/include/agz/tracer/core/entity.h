@@ -21,8 +21,10 @@ public:
 
     virtual ~Entity() = default;
 
+    /** @brief 设置用于取消降噪功能的flag */
     void set_no_denoise_flag(bool no_denoise) noexcept { no_denoise_ = no_denoise; }
 
+    /** @brief 是否在该entity上禁用降噪功能 */
     bool get_no_denoise_flag() const noexcept { return no_denoise_; }
 
     /** @brief 判断给定射线是否与该实体有交点 */

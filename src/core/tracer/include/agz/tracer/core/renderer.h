@@ -19,35 +19,7 @@ public:
     /**
      * @brief 阻塞式渲染
      */
-    virtual void render(Scene &scene, ProgressReporter &reporter, Film *film)
-    {
-        render_async(scene, reporter, film);
-        join();
-    }
-
-    /**
-     * @brief 开始异步渲染
-     */
-    virtual void render_async(Scene&, ProgressReporter&, Film*)
-    {
-        throw std::runtime_error("Renderer::async rendering is unimplemented");
-    }
-
-    /**
-     * @brief 等待异步渲染结束
-     */
-    virtual void join()
-    {
-        throw std::runtime_error("Renderer::async rendering is unimplemented");
-    }
-
-    /**
-     * @brief 强制结束异步渲染
-     */
-    virtual void stop()
-    {
-        throw std::runtime_error("Renderer::async rendering is unimplemented");
-    }
+    virtual void render(Scene &scene, ProgressReporter &reporter, Film *film) = 0;
 };
 
 AGZ_TRACER_END

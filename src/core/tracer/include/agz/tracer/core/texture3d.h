@@ -199,9 +199,19 @@ public:
     virtual Spectrum max_spectrum() const noexcept = 0;
 
     /**
+     * @brief 逐分量spectrum最小值
+     */
+    virtual Spectrum min_spectrum() const noexcept = 0;
+
+    /**
      * @brief 最大实数值
      */
     virtual real max_real() const noexcept = 0;
+
+    /**
+     * @brief 最小实数值
+     */
+    virtual real min_real() const noexcept = 0;
 };
 
 AGZ_TRACER_END

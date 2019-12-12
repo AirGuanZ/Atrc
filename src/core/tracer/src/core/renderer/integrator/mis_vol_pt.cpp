@@ -77,7 +77,6 @@ public:
                 gpixel->position = ent_inct.pos;
                 gpixel->normal   = ent_shd.shading_normal;
                 gpixel->albedo   = ent_shd.bsdf->albedo();
-                gpixel->binary   = 1;
                 gpixel->depth    = (r.o - ent_inct.pos).length();
                 if(ent_inct.entity->get_no_denoise_flag())
                     gpixel->denoise = 0;
@@ -122,7 +121,7 @@ public:
             if(depth == 1)
             {
                 if(auto light = ent_inct.entity->as_light())
-                    ret += coef * light->radiance(ent_inct, ent_inct.wr);
+                    ret += coef * light->radiance(ent_inct.pos, ent_inct.geometry_coord.z, ent_inct.wr);
             }
 
             // direct illumination

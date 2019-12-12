@@ -58,14 +58,41 @@ namespace
             return area_pdf * area_to_solid_angle_factor;
         }
 
+        LightEmitResult emit(const Sample5 &sam) const noexcept override
+        {
+            real pdf_pos;
+            auto surface_point = geometry_->sample(&pdf_pos, { sam.u, sam.v, sam.w });
+
+            auto [local_dir, pdf_dir] = math::distribution::zweighted_on_hemisphere(sam.r, sam.s);
+            Vec3 global_dir = surface_point.geometry_coord.local_to_global(local_dir);
+
+            LightEmitResult ret;
+            ret.position  = surface_point.eps_offset(global_dir);
+            ret.direction = global_dir;
+            ret.normal    = surface_point.geometry_coord.z;
+            ret.radiance  = radiance_;
+            ret.pdf_pos   = pdf_pos;
+            ret.pdf_dir   = pdf_dir;
+
+            return ret;
+        }
+
+        LightEmitPDFResult emit_pdf(const Vec3 &position, const Vec3 &direction, const Vec3 &normal) const noexcept override
+        {
+            real local_dir_z = cos(direction, normal);
+            real pdf_pos = geometry_->pdf(position);
+            real pdf_dir = math::distribution::zweighted_on_hemisphere_pdf(local_dir_z);
+            return { pdf_pos, pdf_dir };
+        }
+
         Spectrum power() const noexcept override
         {
             return PI_r * radiance_ * geometry_->surface_area();
         }
 
-        Spectrum radiance(const SurfacePoint &spt, const Vec3 &light_to_out) const noexcept override
+        Spectrum radiance(const Vec3 &pos, const Vec3 &nor, const Vec3 &light_to_out) const noexcept override
         {
-            return dot(spt.geometry_coord.z, light_to_out) > 0 ? radiance_ : Spectrum();
+            return dot(nor, light_to_out) > 0 ? radiance_ : Spectrum();
         }
 
         void preprocess(const Scene&) override

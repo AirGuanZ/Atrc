@@ -8,6 +8,9 @@
 
 AGZ_TRACER_BEGIN
 
+/**
+ * @brief 对环境映射进行重要性采样的辅助设施
+ */
 class EnvironmentLightSampler : public misc::uncopyable_t
 {
     texture::texture2d_t<real> probs_;
@@ -22,6 +25,7 @@ public:
         int new_height = (std::min)(height, 200);
 
         // 得到能量分布图
+
         real lum_sum = 0;
         probs_.initialize(new_height, new_width);
         for(int y = 0; y < new_height; ++y)
@@ -65,6 +69,7 @@ public:
         }
 
         // 归一化
+
         if(lum_sum > EPS)
         {
             real ratio = 1 / lum_sum;
@@ -76,6 +81,7 @@ public:
         }
 
         // 线性化
+
         std::vector<real> linear_probs(probs_.size().product());
         for(int y = 0; y < new_height; ++y)
         {
@@ -88,6 +94,7 @@ public:
         }
 
         // 构造sampler
+
         sampler_.initialize(linear_probs.data(), int(linear_probs.size()));
     }
 
@@ -102,17 +109,17 @@ public:
 
         real patch_pdf = probs_(patch_y, patch_x);
 
-        real u0 = real(patch_x) / probs_.width();
+        real u0 = real(patch_x)     / probs_.width();
         real u1 = real(patch_x + 1) / probs_.width();
-        real v0 = real(patch_y) / probs_.height();
+        real v0 = real(patch_y)     / probs_.height();
         real v1 = real(patch_y + 1) / probs_.height();
 
         auto [cvmin, cvmax] = math::minmax(std::cos(PI_r * v1), std::cos(PI_r * v0));
 
         real cos_theta = cvmin + sam.w * (cvmax - cvmin);
         real sin_theta = local_angle::cos_2_sin(cos_theta);
-        real u = math::mix(u0, u1, sam.v);
-        real phi = 2 * PI_r * u;
+        real u         = math::mix(u0, u1, sam.v);
+        real phi       = 2 * PI_r * u;
 
         Vec3 dir(sin_theta * std::cos(phi), sin_theta * std::sin(phi), cos_theta);
         real in_patch_pdf = 1 / (2 * PI_r * ((u1 - u0) * (cvmax - cvmin)));
@@ -134,9 +141,9 @@ public:
         int patch_y = (std::min)(probs_.height() - 1, int(std::floor(v * probs_.height())));
         real patch_pdf = probs_(patch_y, patch_x);
 
-        real u0 = real(patch_x) / probs_.width();
+        real u0 = real(patch_x)     / probs_.width();
         real u1 = real(patch_x + 1) / probs_.width();
-        real v0 = real(patch_y) / probs_.height();
+        real v0 = real(patch_y)     / probs_.height();
         real v1 = real(patch_y + 1) / probs_.height();
 
         auto[cvmin, cvmax] = math::minmax(std::cos(PI_r * v1), std::cos(PI_r * v0));

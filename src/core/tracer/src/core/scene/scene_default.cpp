@@ -67,20 +67,6 @@ public:
             const_entities.push_back(ent);
         }
         params.aggregate->build(const_entities);
-
-        world_bound_ = AABB();
-        world_bound_ |= aggregate_->world_bound();
-
-        // 避免数值问题导致某些场景中的点不在world bound中
-
-        Vec3 delta = world_bound_.high - world_bound_.low;
-        world_bound_.low -= real(0.02) * delta;
-        world_bound_.high += real(0.02) * delta;
-
-        for(auto light : lights_)
-            light->preprocess(*this);
-
-        construct_light_sampler();
     }
 
     void set_camera(std::shared_ptr<const Camera> camera) override
@@ -151,6 +137,24 @@ public:
     AABB world_bound() const noexcept override
     {
         return world_bound_;
+    }
+
+    void start_rendering() override
+    {
+        world_bound_ = AABB();
+        world_bound_ |= aggregate_->world_bound();
+        //world_bound_ |= camera_->get_world_bound();
+
+        // 避免数值问题导致某些场景中的点不在world bound中
+
+        Vec3 delta = world_bound_.high - world_bound_.low;
+        world_bound_.low  -= real(0.02) * delta;
+        world_bound_.high += real(0.02) * delta;
+
+        for(auto light : lights_)
+            light->preprocess(*this);
+
+        construct_light_sampler();
     }
 };
 

@@ -11,7 +11,6 @@ class SaveGBufferToPNG : public PostProcessor
     std::string albedo_filename_;
     std::string normal_filename_;
     std::string depth_filename_;
-    std::string binary_filename_;
 
     static void save_albedo(const std::string &filename, AlbedoBuffer &albedo)
     {
@@ -35,23 +34,6 @@ class SaveGBufferToPNG : public PostProcessor
 
         AGZ_LOG0("saving gbuffer::normal to ", filename);
         img::save_rgb_to_png_file(filename, imgf.get_data().map(math::to_color3b<real>));
-    }
-
-    static void save_binary(const std::string &filename, BinaryBuffer &binary)
-    {
-        file::create_directory_for_file(filename);
-        texture::texture2d_t<uint8_t> imgu8(binary.height(), binary.width());
-        for(int y = 0; y < imgu8.height(); ++y)
-        {
-            for(int x = 0; x < imgu8.width(); ++x)
-            {
-                real f = math::clamp<real>(binary(y, x), 0, 1);
-                imgu8(y, x) = static_cast<uint8_t>(f * 255);
-            }
-        }
-
-        AGZ_LOG0("saving gbuffer::depth to ", filename);
-        img::save_gray_to_png_file(filename, imgu8.get_data());
     }
 
     static void save_depth(const std::string &filename, DepthBuffer &depth)
@@ -101,13 +83,11 @@ public:
     void initialize(
         std::string albedo_filename,
         std::string normal_filename,
-        std::string depth_filename,
-        std::string binary_filename)
+        std::string depth_filename)
     {
         albedo_filename_ = std::move(albedo_filename);
         normal_filename_ = std::move(normal_filename);
         depth_filename_  = std::move(depth_filename);
-        binary_filename_ = std::move(binary_filename);
     }
 
     void process(texture::texture2d_t<Spectrum> &, GBuffer &gbuffer) override
@@ -118,23 +98,19 @@ public:
             save_normal(normal_filename_, *gbuffer.normal);
         if(!depth_filename_.empty() && gbuffer.depth)
             save_depth(depth_filename_, *gbuffer.depth);
-        if(!binary_filename_.empty() && gbuffer.binary)
-            save_binary(binary_filename_, *gbuffer.binary);
     }
 };
 
 std::shared_ptr<PostProcessor> create_saving_gbuffer_to_png(
     std::string albedo_filename,
     std::string normal_filename,
-    std::string depth_filename,
-    std::string binary_filename)
+    std::string depth_filename)
 {
     auto ret = std::make_shared<SaveGBufferToPNG>();
     ret->initialize(
         std::move(albedo_filename),
         std::move(normal_filename),
-        std::move(depth_filename),
-        std::move(binary_filename));
+        std::move(depth_filename));
     return ret;
 }
 

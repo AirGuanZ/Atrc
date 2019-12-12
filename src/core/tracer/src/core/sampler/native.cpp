@@ -26,6 +26,9 @@ public:
             seed_ = static_cast<seed_t>(std::time(nullptr));
         else
             seed_ = static_cast<seed_t>(seed);
+
+        rng_ = rng_t(seed_);
+
         spp_ = spp;
         if(spp_ < 1)
             throw ObjectConstructionException("invalid spp value: " + std::to_string(spp_));
@@ -46,10 +49,7 @@ public:
             seed_gen.generate(&new_seed, &new_seed + 1);
         }
 
-        if(seed < 0)
-            ret->rng_ = rng_;
-        else
-            ret->rng_ = rng_t(static_cast<seed_t>(new_seed));
+        ret->rng_ = rng_t(static_cast<seed_t>(new_seed));
         ret->seed_ = new_seed;
 
         ret->dis_ = dis_;
@@ -66,6 +66,11 @@ public:
     bool next_sample() override
     {
         return ++finished_spp_ < spp_;
+    }
+
+    int get_spp() const noexcept override
+    {
+        return spp_;
     }
 };
 

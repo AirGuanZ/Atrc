@@ -16,6 +16,23 @@ namespace
         return ret;
     }
 
+    class Constant3DCreator : public Creator<Texture3D>
+    {
+    public:
+
+        std::string name() const override
+        {
+            return "constant";
+        }
+
+        std::shared_ptr<Texture3D> create(const ConfigGroup &params, CreatingContext &context) const override
+        {
+            auto common_params = parse_common_params(params);
+            Spectrum texel = params.child_spectrum("texel");
+            return create_constant3d_texture(common_params, texel);
+        }
+    };
+
     class GrayGridPoint3DCreator : public Creator<Texture3D>
     {
         /**
@@ -332,15 +349,9 @@ namespace
         {
             texture::texture3d_t<Spectrum> data;
             if(auto *str_child = params.find_child_value("ascii_filename"))
-            {
-                std::string filename = context.path_mapper->map(str_child->as_str());
-                data = read_from_ascii(filename);
-            }
+                data = read_from_ascii(context.path_mapper->map(str_child->as_str()));
             else if(str_child = params.find_child_value("binary_filename"); str_child)
-            {
-                std::string filename = context.path_mapper->map(str_child->as_str());
-                data = read_from_binary(filename);
-            }
+                data = read_from_binary(context.path_mapper->map(str_child->as_str()));
             else if(auto arr_child = params.find_child_array("image_filenames"))
                 data = read_from_images(*arr_child, context);
             else
@@ -350,20 +361,78 @@ namespace
         }
     };
 
-    class Constant3DCreator : public Creator<Texture3D>
+    class Texture3DAdderCreator : public Creator<Texture3D>
     {
     public:
 
         std::string name() const override
         {
-            return "constant";
+            return "add";
         }
 
         std::shared_ptr<Texture3D> create(const ConfigGroup &params, CreatingContext &context) const override
         {
             auto common_params = parse_common_params(params);
-            Spectrum texel = params.child_spectrum("texel");
-            return create_constant3d_texture(common_params, texel);
+            auto lhs = context.create<Texture3D>(params.child_group("lhs"));
+            auto rhs = context.create<Texture3D>(params.child_group("rhs"));
+            return create_texture3d_adder(common_params, std::move(lhs), std::move(rhs));
+        }
+    };
+
+    class Texture3DMultiplierCreator : public Creator<Texture3D>
+    {
+    public:
+
+        std::string name() const override
+        {
+            return "mul";
+        }
+
+        std::shared_ptr<Texture3D> create(const ConfigGroup &params, CreatingContext &context) const override
+        {
+            auto common_params = parse_common_params(params);
+            auto lhs = context.create<Texture3D>(params.child_group("lhs"));
+            auto rhs = context.create<Texture3D>(params.child_group("rhs"));
+            return create_texture3d_multiplier(common_params, std::move(lhs), std::move(rhs));
+        }
+    };
+
+    class Texture3DScaleCreator : public Creator<Texture3D>
+    {
+    public:
+
+        std::string name() const override
+        {
+            return "scale";
+        }
+
+        std::shared_ptr<Texture3D> create(const ConfigGroup &params, CreatingContext &context) const override
+        {
+            auto common_params = parse_common_params(params);
+            auto internal = context.create<Texture3D>(params.child_group("internal"));
+            auto scale    = params.child_spectrum("scale");
+            return create_texture3d_scaler(common_params, std::move(internal), scale);
+        }
+    };
+
+    class Texture3DLumClassifierCreator : public Creator<Texture3D>
+    {
+    public:
+
+        std::string name() const override
+        {
+            return "lum_classify";
+        }
+
+        std::shared_ptr<Texture3D> create(const ConfigGroup &params, CreatingContext &context) const override
+        {
+            auto common_params = parse_common_params(params);
+            auto lhs           = context.create<Texture3D>(params.child_group("lhs"));
+            auto rhs           = context.create<Texture3D>(params.child_group("rhs"));
+            auto less_or_equal = context.create<Texture3D>(params.child_group("less_or_equal"));
+            auto greater       = context.create<Texture3D>(params.child_group("greater"));
+            return create_texture3d_lum_classifier(
+                common_params, std::move(lhs), std::move(rhs), std::move(less_or_equal), std::move(greater));
         }
     };
 }
@@ -373,6 +442,10 @@ void initialize_texture3d_factory(Factory<Texture3D> &factory)
     factory.add_creator(std::make_unique<Constant3DCreator>());
     factory.add_creator(std::make_unique<GrayGridPoint3DCreator>());
     factory.add_creator(std::make_unique<SpectrumGridPoint3DCreator>());
+    factory.add_creator(std::make_unique<Texture3DAdderCreator>());
+    factory.add_creator(std::make_unique<Texture3DMultiplierCreator>());
+    factory.add_creator(std::make_unique<Texture3DScaleCreator>());
+    factory.add_creator(std::make_unique<Texture3DLumClassifierCreator>());
 }
 
 AGZ_TRACER_FACTORY_END

@@ -81,6 +81,8 @@ protected:
 
     // w位于shading_coord和geometry_coord的z=0平面的夹缝中间的情况
     // 此时bsdf是未定义的
+    // 以下的几个black fringes函数是用来快捷地判别、处理这种情况的
+
     bool cause_black_fringes(const Vec3 &w) const noexcept
     {
         bool shading_posi  = shading_coord_.in_positive_z_hemisphere(w);

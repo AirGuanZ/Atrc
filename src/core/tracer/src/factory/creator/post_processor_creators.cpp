@@ -102,7 +102,7 @@ namespace post_processor
 
         std::shared_ptr<PostProcessor> create(const ConfigGroup &params, CreatingContext &context) const override
         {
-            std::string albedo_filename, normal_filename, depth_filename, binary_filename;
+            std::string albedo_filename, normal_filename, depth_filename;
 
             if(auto node = params.find_child("albedo"))
                 albedo_filename = context.path_mapper->map(node->as_value().as_str());
@@ -110,14 +110,11 @@ namespace post_processor
                 normal_filename = context.path_mapper->map(node->as_value().as_str());
             if(auto node = params.find_child("depth"))
                 depth_filename = context.path_mapper->map(node->as_value().as_str());
-            if(auto node = params.find_child("binary"))
-                binary_filename = context.path_mapper->map(node->as_value().as_str());
             
             return create_saving_gbuffer_to_png(
                 std::move(albedo_filename),
                 std::move(normal_filename),
-                std::move(depth_filename),
-                std::move(binary_filename));
+                std::move(depth_filename));
         }
     };
 
@@ -140,13 +137,11 @@ namespace post_processor
                 gamma = node->as_real();
             else if(node = params.find_child_value("inv_gamma"); node)
                 gamma = 1 / node->as_real();
-
-            bool with_alpha_channel = params.child_int_or("with_alpha_channel", 0) != 0;
             
             std::string ext = params.child_str_or("ext", "png");
 
             return create_saving_to_img(
-                std::move(filename), std::move(ext), open, gamma, with_alpha_channel);
+                std::move(filename), std::move(ext), open, gamma);
         }
     };
 

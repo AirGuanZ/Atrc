@@ -20,6 +20,9 @@ public:
     virtual ShadingPoint shade(const EntityIntersection &inct, Arena &arena) const = 0;
 };
 
+/**
+ * @brief 法线映射辅助设施
+ */
 class NormalMapper : public misc::uncopyable_t
 {
     std::shared_ptr<const Texture2D> normal_map_;
@@ -34,6 +37,9 @@ public:
         
     }
 
+    /**
+     * @brief 利用法线贴图中的信息偏转局部坐标系的坐标轴
+     */
     Coord reorient(const Vec2 &uv, const Coord &old_user_coord) const noexcept
     {
         if(!normal_map_)
