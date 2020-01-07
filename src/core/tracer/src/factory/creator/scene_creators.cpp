@@ -28,16 +28,16 @@ namespace scene
             if(auto ent_arr = params.find_child_array("entities"))
             {
                 if(ent_arr->size() == 1)
-                    AGZ_LOG1("creating 1 entity");
+                    AGZ_INFO("creating 1 entity");
                 else
-                    AGZ_LOG1("creating ", ent_arr->size(), " entities");
+                    AGZ_INFO("creating {} entities", ent_arr->size());
 
                 for(size_t i = 0; i < ent_arr->size(); ++i)
                 {
                     auto &group = ent_arr->at_group(i);
                     if(stdstr::ends_with(group.child_str("type"), "//"))
                     {
-                        AGZ_LOG1("skip entity with type ending with //");
+                        AGZ_INFO("skip entity with type ending with //");
                         continue;
                     }
 
@@ -47,26 +47,26 @@ namespace scene
             }
 
             if(auto group = params.find_child_group("env"))
-                scene_params.nonarea_lights_.push_back(context.create<NonareaLight>(*group));
+                scene_params.nonarea_lights_.push_back(context.create<EnvirLight>(*group));
 
-            std::vector<std::shared_ptr<NonareaLight>> nonarea_lights;
+            std::vector<std::shared_ptr<EnvirLight>> nonarea_lights;
             if(auto lht_arr = params.find_child_array("lights"))
             {
                 if(lht_arr->size() == 1)
-                    AGZ_LOG1("creating 1 nonarea light");
+                    AGZ_INFO("creating 1 envir light");
                 else
-                    AGZ_LOG1("creating ", lht_arr->size(), " nonarea lights");
+                    AGZ_INFO("creating {} envir lights", lht_arr->size());
 
                 for(size_t i = 0; i < lht_arr->size(); ++i)
                 {
                     auto &group = lht_arr->at_group(i);
                     if(stdstr::ends_with(group.child_str("type"), "//"))
                     {
-                        AGZ_LOG1("skip nonarea light with type ending with //");
+                        AGZ_INFO("skip envir light with type ending with //");
                         continue;
                     }
 
-                    auto lht = context.create<NonareaLight>(group);
+                    auto lht = context.create<EnvirLight>(group);
                     scene_params.nonarea_lights_.push_back(lht);
                 }
             }

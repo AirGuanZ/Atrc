@@ -45,7 +45,7 @@ namespace
 
         static Node new_leaf(const real *low, const real *high, uint32_t start, uint32_t end)
         {
-            Node ret = {
+            const Node ret = {
                 { low[0],  low[1],  low[2] },
 				{ high[0], high[1], high[2] },
 				start, end
@@ -56,7 +56,7 @@ namespace
 
         static Node new_interior(const real *low, const real *high, uint32_t right_offset)
         {
-            Node ret = {
+            const Node ret = {
                 { low[0],  low[1],  low[2] },
 				{ high[0], high[1], high[2] },
                 std::numeric_limits<uint32_t>::max(),
@@ -73,13 +73,13 @@ namespace
 
         bool has_intersection(const real *ori, const real *inv_dir, real t_min, real t_max, real *inct_t) const noexcept
         {
-            real nx = inv_dir[0] * (low[0] - ori[0]);
-            real ny = inv_dir[1] * (low[1] - ori[1]);
-            real nz = inv_dir[2] * (low[2] - ori[2]);
+            const real nx = inv_dir[0] * (low[0] - ori[0]);
+            const real ny = inv_dir[1] * (low[1] - ori[1]);
+            const real nz = inv_dir[2] * (low[2] - ori[2]);
 
-            real fx = inv_dir[0] * (high[0] - ori[0]);
-            real fy = inv_dir[1] * (high[1] - ori[1]);
-            real fz = inv_dir[2] * (high[2] - ori[2]);
+            const real fx = inv_dir[0] * (high[0] - ori[0]);
+            const real fy = inv_dir[1] * (high[1] - ori[1]);
+            const real fz = inv_dir[2] * (high[2] - ori[2]);
 
             t_min = (std::max)(t_min, (std::min)(nx, fx));
             t_min = (std::max)(t_min, (std::min)(ny, fy));
@@ -133,7 +133,7 @@ namespace
 
         while(!tasks.empty())
         {
-            BuildingTask task = tasks.front();
+            const BuildingTask task = tasks.front();
             tasks.pop();
 
             assert(task.start < task.end);
@@ -149,7 +149,7 @@ namespace
             }
 
             // 当三角形数量足够小时构建叶节点
-            uint32_t n = task.end - task.start;
+            const uint32_t n = task.end - task.start;
             if(n <= leaf_size_threshold)
             {
                 ++ret.node_count;
@@ -167,8 +167,8 @@ namespace
             }
 
             // 选择跨度最大的坐标轴为划分方向
-            Vec3 centroid_delta = centroid_bound.high - centroid_bound.low;
-            int split_axis = centroid_delta[0] > centroid_delta[1] ?
+            const Vec3 centroid_delta = centroid_bound.high - centroid_bound.low;
+            const int split_axis = centroid_delta[0] > centroid_delta[1] ?
                 (centroid_delta[0] > centroid_delta[2] ? 0 : 2) :
                 (centroid_delta[1] > centroid_delta[2] ? 1 : 2);
 
@@ -176,7 +176,7 @@ namespace
             uint32_t split_middle;
             if(task.depth < depth_threshold)
             {
-                real split_pos = real(0.5) * (centroid_bound.high[split_axis] + centroid_bound.low[split_axis]);
+                const real split_pos = real(0.5) * (centroid_bound.high[split_axis] + centroid_bound.low[split_axis]);
                 split_middle = task.start;
                 for(uint32_t i = task.start; i < task.end; ++i)
                 {
@@ -229,7 +229,7 @@ namespace
 
         while(!tasks.empty())
         {
-            CompactingTask task = tasks.top();
+            const CompactingTask task = tasks.top();
             tasks.pop();
 
             const BuildingNode *tree = task.tree;
@@ -247,8 +247,8 @@ namespace
             }
             else
             {
-                uint32_t start = next_prim_idx;
-                uint32_t end = next_prim_idx + (tree->end - tree->start);
+                const uint32_t start = next_prim_idx;
+                const uint32_t end = next_prim_idx + (tree->end - tree->start);
 
                 auto &node = node_arr[next_node_idx++];
                 node = Node::new_leaf(
@@ -258,7 +258,7 @@ namespace
                 {
                     assert(j < tree->end);
 
-                    auto &tri       = triangles[j];
+                    const auto &tri = triangles[j];
                     auto &prim      = prim_arr[i];
                     auto &prim_info = prim_info_arr[i];
 
@@ -266,9 +266,9 @@ namespace
                     prim.b_a_ = tri.vtx[1].position - tri.vtx[0].position;
                     prim.c_a_ = tri.vtx[2].position - tri.vtx[0].position;
 
-                    Vec3 n_a = tri.vtx[0].normal.normalize();
-                    Vec3 n_b = tri.vtx[1].normal.normalize();
-                    Vec3 n_c = tri.vtx[2].normal.normalize();
+                    const Vec3 n_a = tri.vtx[0].normal.normalize();
+                    const Vec3 n_b = tri.vtx[1].normal.normalize();
+                    const Vec3 n_c = tri.vtx[2].normal.normalize();
 
                     prim_info.n_a_   = n_a;
                     prim_info.n_b_a_ = n_b - n_a;
@@ -279,7 +279,7 @@ namespace
                     prim_info.t_c_a_ = tri.vtx[2].tex_coord - tri.vtx[0].tex_coord;
 
                     prim_info.z_ = cross(prim.b_a_, prim.c_a_).normalize();
-                    auto mean_nor = n_a + n_b + n_c;
+                    const Vec3 mean_nor = n_a + n_b + n_c;
                     if(dot(mean_nor, prim_info.z_) < 0)
                         prim_info.z_ = -prim_info.z_;
 
@@ -327,7 +327,8 @@ namespace
             }
 
             Arena arena;
-            auto[root, node_count] = build_bvh(build_triangles.data(), triangle_count, 5, TRAVERSAL_STACK_SIZE / 2, arena);
+            auto [root, node_count] = build_bvh(
+                build_triangles.data(), triangle_count, 5, TRAVERSAL_STACK_SIZE / 2, arena);
 
             nodes_.resize(node_count);
             prims_.resize(triangle_count);
@@ -343,7 +344,7 @@ namespace
 
         bool has_intersection(const Ray &r) const noexcept
         {
-            real inv_dir[3] = { 1 / r.d.x, 1 / r.d.y, 1 / r.d.z };
+            const real inv_dir[3] = { 1 / r.d.x, 1 / r.d.y, 1 / r.d.z };
             real t;
 
             if(!nodes_[0].has_intersection(&r.o[0], inv_dir, r.t_min, r.t_max, &t))
@@ -354,14 +355,14 @@ namespace
 
             while(top)
             {
-                uint32_t task_node_idx = traversal_stack[--top];
+                const uint32_t task_node_idx = traversal_stack[--top];
                 const Node &node = nodes_[task_node_idx];
 
                 if(node.is_leaf())
                 {
                     for(uint32_t i = node.start; i < node.end_or_right_offset; ++i)
                     {
-                        auto &prim = prims_[i];
+                        const Primitive &prim = prims_[i];
                         if(has_intersection_with_triangle(r, prim.a_, prim.b_a_, prim.c_a_))
                             return true;
                     }
@@ -381,8 +382,8 @@ namespace
 
         bool closest_intersection(Ray r, GeometryIntersection *inct) const noexcept
         {
-            real ori[3]     = { r.o.x,     r.o.y,     r.o.z };
-            real inv_dir[3] = { 1 / r.d.x, 1 / r.d.y, 1 / r.d.z };
+            const real ori[3]     = { r.o.x,     r.o.y,     r.o.z };
+            const real inv_dir[3] = { 1 / r.d.x, 1 / r.d.y, 1 / r.d.z };
 
             int top = 0;
             real tmp_t;
@@ -397,14 +398,14 @@ namespace
 
             while(top)
             {
-                uint32_t task_node_idx = traversal_stack[--top];
+                const uint32_t task_node_idx = traversal_stack[--top];
                 const Node &node = nodes_[task_node_idx];
 
                 if(node.is_leaf())
                 {
                     for(uint32_t i = node.start; i < node.end_or_right_offset; ++i)
                     {
-                        auto &prim = prims_[i];
+                        const Primitive &prim = prims_[i];
                         if(closest_intersection_with_triangle(r, prim.a_, prim.b_a_, prim.c_a_, &tmp_rcd))
                         {
                             rcd = tmp_rcd;
@@ -417,8 +418,8 @@ namespace
                 {
                     real t_left, t_right;
 
-                    bool add_left = nodes_[task_node_idx + 1].has_intersection(ori, inv_dir, r.t_min, r.t_max, &t_left);
-                    bool add_right = nodes_[node.end_or_right_offset].has_intersection(ori, inv_dir, r.t_min, r.t_max, &t_right);
+                    const bool add_left = nodes_[task_node_idx + 1].has_intersection(ori, inv_dir, r.t_min, r.t_max, &t_left);
+                    const bool add_right = nodes_[node.end_or_right_offset].has_intersection(ori, inv_dir, r.t_min, r.t_max, &t_right);
 
                     assert(top + 2 <= TRAVERSAL_STACK_SIZE);
 
@@ -445,14 +446,14 @@ namespace
             if(std::isinf(rcd.t_ray))
                 return false;
 
-            auto &prim_info = prim_info_[final_prim_idx];
+            const PrimitiveInfo &prim_info = prim_info_[final_prim_idx];
 
             inct->pos            = r.at(rcd.t_ray);
             inct->geometry_coord = Coord(prim_info.x_, cross(prim_info.z_, prim_info.x_), prim_info.z_);
             inct->uv             = prim_info.t_a_ + rcd.uv.x * prim_info.t_b_a_ + rcd.uv.y * prim_info.t_c_a_;
             inct->t              = rcd.t_ray;
 
-            Vec3 user_z = prim_info.n_a_ + rcd.uv.x * prim_info.n_b_a_ + rcd.uv.y * prim_info.n_c_a_;
+            const Vec3 user_z = prim_info.n_a_ + rcd.uv.x * prim_info.n_b_a_ + rcd.uv.y * prim_info.n_c_a_;
             inct->user_coord = inct->geometry_coord.rotate_to_new_z(user_z);
 
             inct->wr = -r.d;
@@ -467,19 +468,19 @@ namespace
 
         SurfacePoint sample(real *pdf, const Sample3 &sam) const noexcept
         {
-            auto prim_idx = prim_sampler_.sample(sam.u);
+            const int prim_idx = prim_sampler_.sample(sam.u);
             assert(0 <= prim_idx && static_cast<size_t>(prim_idx) < prims_.size());
-            auto &prim = prims_[prim_idx];
-            auto &prim_info = prim_info_[prim_idx];
+            const Primitive &prim = prims_[prim_idx];
+            const PrimitiveInfo &prim_info = prim_info_[prim_idx];
 
-            auto uv = math::distribution::uniform_on_triangle(sam.v, sam.w);
+            const Vec2 uv = math::distribution::uniform_on_triangle(sam.v, sam.w);
 
             SurfacePoint spt;
             spt.pos            = prim.a_ + uv.x * prim.b_a_ + uv.y * prim.c_a_;
             spt.geometry_coord = Coord(prim_info.x_, cross(prim_info.z_, prim_info.x_), prim_info.z_);
             spt.uv             = prim_info.t_a_ + uv.x * prim_info.t_b_a_ + uv.y * prim_info.t_c_a_;
 
-            Vec3 user_z = prim_info.n_a_ + uv.x * prim_info.n_b_a_ + uv.y * prim_info.n_c_a_;
+            const Vec3 user_z = prim_info.n_a_ + uv.x * prim_info.n_b_a_ + uv.y * prim_info.n_c_a_;
             spt.user_coord = spt.geometry_coord.rotate_to_new_z(user_z);
 
             *pdf = 1 / surface_area_;
@@ -515,11 +516,11 @@ class TriangleBVH : public Geometry
             tri.vertices[2].normal = local_to_world.apply_to_vector(tri.vertices[2].normal);
         }
 
-        auto ret = std::make_unique<UntransformedTriangleBVH>(); //arena.create<UntransformedTriangleBVH>();
+        auto ret = std::make_unique<UntransformedTriangleBVH>();
         ret->initialize(build_triangles.data(), static_cast<uint32_t>(build_triangles.size()));
 
-        AGZ_LOG2("load triangle mesh from ", filename);
-        AGZ_LOG2("triangle count: ", build_triangles.size());
+        AGZ_INFO("load triangle mesh from {}", filename);
+        AGZ_INFO("triangle count: {}", build_triangles.size());
         return ret;
 
         AGZ_HIERARCHY_WRAP("in loading mesh from " + filename)
@@ -527,7 +528,7 @@ class TriangleBVH : public Geometry
 
 public:
 
-    void initialize(const std::string &filename, const Transform3 &local_to_world)
+    TriangleBVH(const std::string &filename, const Transform3 &local_to_world)
     {
         AGZ_HIERARCHY_TRY
 
@@ -572,9 +573,8 @@ public:
 
     SurfacePoint sample(real *pdf, const Sample3 &sam) const noexcept override
     {
-        auto ret = untransformed_->sample(pdf, sam);
         *pdf = 1 / surface_area();
-        return ret;
+        return untransformed_->sample(pdf, sam);
     }
 
     SurfacePoint sample(const Vec3&, real *pdf, const Sample3 &sam) const noexcept override
@@ -597,9 +597,7 @@ std::shared_ptr<Geometry> create_triangle_bvh_noembree(
     const std::string &filename,
     const Transform3 &local_to_world)
 {
-    auto ret = std::make_shared<TriangleBVH>();
-    ret->initialize(filename, local_to_world);
-    return ret;
+    return std::make_shared<TriangleBVH>(filename, local_to_world);
 }
 
 #ifndef USE_EMBREE
@@ -608,7 +606,7 @@ std::shared_ptr<Geometry> create_triangle_bvh(
     const std::string &filename,
     const Transform3 &local_to_world)
 {
-    return create_triangle_bvh_noembree(filename, local_to_world, customed_flag);
+    return create_triangle_bvh_noembree(filename, local_to_world);
 }
 
 #endif

@@ -32,7 +32,7 @@ public:
     {
         assert(!bsdfs_.empty());
 
-        auto [bsdf_idx, new_sam_u] = math::distribution::extract_uniform_int(sam.u, 0, int(bsdfs_.size()));
+        const auto [bsdf_idx, new_sam_u] = math::distribution::extract_uniform_int(sam.u, 0, int(bsdfs_.size()));
         const BSDF *bsdf = bsdfs_[bsdf_idx];
 
         auto ret = bsdf->sample(wo, mode, { new_sam_u, sam.v, sam.w });
@@ -50,7 +50,7 @@ public:
 
         for(size_t i = 0; i < bsdfs_.size(); ++i)
         {
-            if(i == bsdf_idx)
+            if(i == static_cast<size_t>(bsdf_idx))
                 continue;
             ret.f   += bsdfs_[i]->eval(ret.dir, wo, mode);
             ret.pdf += bsdfs_[i]->pdf(ret.dir, wo, mode);
@@ -65,17 +65,22 @@ public:
         assert(!bsdfs_.empty());
 
         real ret = 0;
-        for(size_t i = 0; i < bsdfs_.size(); ++i)
-            ret += bsdfs_[i]->pdf(wi, wo, mode);
+        for(auto bsdf : bsdfs_)
+            ret += bsdf->pdf(wi, wo, mode);
         return ret / bsdfs_.size();
     }
 
     Spectrum albedo() const noexcept override
     {
         Spectrum ret;
-        for(size_t i = 0; i < bsdfs_.size(); ++i)
-            ret += bsdfs_[i]->albedo();
+        for(auto bsdf : bsdfs_)
+            ret += bsdf->albedo();
         return ret;
+    }
+
+    bool is_delta() const noexcept override
+    {
+        return bsdfs_[0]->is_delta();
     }
 };
 

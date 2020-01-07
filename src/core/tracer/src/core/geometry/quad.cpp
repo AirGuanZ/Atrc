@@ -19,17 +19,17 @@ class Quad : public Geometry
 
 public:
 
-    void initialize(
+    Quad(
         const Vec3 &A, const Vec3 &B, const Vec3 &C, const Vec3 &D,
         const Vec2 &t_a, const Vec2 &t_b, const Vec2 &t_c, const Vec2 &t_d,
         const Transform3 &local_to_world)
     {
         AGZ_HIERARCHY_TRY
 
-        Vec3 a = local_to_world.apply_to_point(A);
-        Vec3 b = local_to_world.apply_to_point(B);
-        Vec3 c = local_to_world.apply_to_point(C);
-        Vec3 d = local_to_world.apply_to_point(D);
+        const Vec3 a = local_to_world.apply_to_point(A);
+        const Vec3 b = local_to_world.apply_to_point(B);
+        const Vec3 c = local_to_world.apply_to_point(C);
+        const Vec3 d = local_to_world.apply_to_point(D);
 
         a_ = a;
         b_a_ = b - a;
@@ -48,8 +48,8 @@ public:
             throw ObjectConstructionException("four quad vertices must be on one plane");
         x_acd_ = dpdu_as_ex(c_a_, d_a_, t_c_a_, t_d_a_, z_);
 
-        real area_abc = triangle_area(b_a_, c_a_);
-        real area_acd = triangle_area(c_a_, d_a_);
+        const real area_abc = triangle_area(b_a_, c_a_);
+        const real area_acd = triangle_area(c_a_, d_a_);
         surface_area_ = area_abc + area_acd;
         sample_abc_prob_ = area_abc / surface_area_;
 
@@ -113,7 +113,7 @@ public:
 
     SurfacePoint sample(real *pdf, const Sample3 &sam) const noexcept override
     {
-        Vec2 bi_coord = math::distribution::uniform_on_triangle(sam.u, sam.v);
+        const Vec2 bi_coord = math::distribution::uniform_on_triangle(sam.u, sam.v);
         SurfacePoint spt;
 
         if(sam.w < sample_abc_prob_)
@@ -158,9 +158,7 @@ std::shared_ptr<Geometry> create_quad(
     const Vec2 &t_a, const Vec2 &t_b, const Vec2 &t_c, const Vec2 &t_d,
     const Transform3 &local_to_world)
 {
-    auto ret = std::make_shared<Quad>();
-    ret->initialize(a, b, c, d, t_a, t_b, t_c, t_d, local_to_world);
-    return ret;
+    return std::make_shared<Quad>(a, b, c, d, t_a, t_b, t_c, t_d, local_to_world);
 }
 
 AGZ_TRACER_END

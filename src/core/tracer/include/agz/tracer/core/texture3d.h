@@ -40,9 +40,9 @@ struct Texture3DCommonParams
             row[perm] = 1;
             return row;
         };
-        Vec3 u_row = perm_to_row(uvw_perm.x);
-        Vec3 v_row = perm_to_row(uvw_perm.y);
-        Vec3 w_row = perm_to_row(uvw_perm.z);
+        const Vec3 u_row = perm_to_row(uvw_perm.x);
+        const Vec3 v_row = perm_to_row(uvw_perm.y);
+        const Vec3 w_row = perm_to_row(uvw_perm.z);
 
         ret *= Transform3(Mat4::from_rows(Vec4(u_row,          0),
                                             Vec4(v_row,          0),
@@ -105,7 +105,7 @@ class Texture3D
 
     static real wrap_mirror(real x) noexcept
     {
-        int intp = static_cast<int>(x >= 0 ? x : std::floor(x));
+        const int intp = static_cast<int>(x >= 0 ? x : std::floor(x));
         return math::clamp<real>(intp & 1 ? 1 - x + intp : x - intp, 0, 1);
     }
 

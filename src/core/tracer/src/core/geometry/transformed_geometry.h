@@ -50,8 +50,8 @@ inline void TransformedGeometry::update_ratio() noexcept
 
 inline Ray TransformedGeometry::to_local(const Ray &world_ray) const noexcept
 {
-    Vec3 local_o = local_to_world_.apply_inverse_to_point(world_ray.o);
-    Vec3 local_d = local_to_world_.apply_inverse_to_vector(world_ray.d);
+    const Vec3 local_o = local_to_world_.apply_inverse_to_point(world_ray.o);
+    const Vec3 local_d = local_to_world_.apply_inverse_to_vector(world_ray.d);
     return Ray(local_o, local_d, world_ray.t_min, world_ray.t_max);
 }
 
@@ -71,7 +71,7 @@ inline void TransformedGeometry::to_world(GeometryIntersection *inct) const noex
 
 inline AABB TransformedGeometry::to_world(const AABB &local_aabb) const noexcept
 {
-    auto [low, high] = local_aabb;
+    const auto [low, high] = local_aabb;
 
     AABB ret;
     ret |= local_to_world_.apply_to_point(low);
@@ -90,19 +90,16 @@ inline Transform3 TransformedGeometry::pretransform(const AABB &local_bound) noe
 {
     // 先挪到原点
 
-    Vec3 centre = real(0.5) * (local_bound.low + local_bound.high);
-    Transform3 translate = Transform3::translate(-centre);
+    const Vec3 centre = real(0.5) * (local_bound.low + local_bound.high);
+    const Transform3 translate = Transform3::translate(-centre);
 
     // 找出最长的一条边
 
-    Vec3 delta = local_bound.high - local_bound.low;
-    real max_l = -1;
-    for(int i = 0; i < 3; ++i)
-        max_l = (std::max)(max_l, delta[i]);
+    real max_l = (local_bound.high - local_bound.low).max_elem();
     
     // 将此边放缩到1
 
-    Transform3 scale = Transform3::scale(Vec3(1 / max_l));
+    const Transform3 scale = Transform3::scale(Vec3(1 / max_l));
 
     return scale * translate;
 }

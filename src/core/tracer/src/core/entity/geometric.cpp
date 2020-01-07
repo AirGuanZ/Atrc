@@ -1,7 +1,7 @@
 #include <agz/tracer/core/entity.h>
 #include <agz/tracer/core/geometry.h>
 #include <agz/tracer/core/material.h>
-#include <agz/tracer/core/medium_interface.h>
+#include <agz/tracer/core/medium.h>
 
 AGZ_TRACER_BEGIN
 
@@ -15,14 +15,17 @@ class GeometricEntity : public Entity
 
 public:
 
-    void initialize(
-        std::shared_ptr<const Geometry> geometry, std::shared_ptr<const Material> material, const MediumInterface &med,
+    GeometricEntity(
+        std::shared_ptr<const Geometry> geometry,
+        std::shared_ptr<const Material> material,
+        const MediumInterface &med,
         bool shadow_catcher, bool no_denoise)
     {
         geometry_ = std::move(geometry);
         material_ = std::move(material);
         medium_interface_ = med;
         is_shadow_catcher_ = shadow_catcher;
+
         set_no_denoise_flag(no_denoise);
     }
 
@@ -71,10 +74,8 @@ std::shared_ptr<Entity> create_geometric(
     const MediumInterface &med,
     bool shadow_catcher, bool no_denoise)
 {
-    auto ret = std::make_shared<GeometricEntity>();
-    ret->initialize(std::move(geometry), std::move(material), med,
-                    shadow_catcher, no_denoise);
-    return ret;
+    return std::make_shared<GeometricEntity>(
+        std::move(geometry), std::move(material), med, shadow_catcher, no_denoise);
 }
 
 AGZ_TRACER_END

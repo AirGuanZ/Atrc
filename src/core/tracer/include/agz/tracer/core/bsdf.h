@@ -1,6 +1,5 @@
 ﻿#pragma once
 
-#include <agz/common/math.h>
 #include <agz/tracer/common.h>
 #include <agz/utility/misc.h>
 
@@ -9,10 +8,10 @@ AGZ_TRACER_BEGIN
 /**
  * @brief 路径所携带的量：radiance/importance
  */
-enum TransportMode
+enum class TransportMode
 {
-    TM_Radiance = 0,   // camera -> light
-    TM_Importance = 1  // light -> camera
+    Radiance   = 0, // camera -> light
+    Importance = 1  // light -> camera
 };
 
 /**
@@ -20,11 +19,11 @@ enum TransportMode
  */
 struct BSDFSampleResult
 {
-    Vec3          dir;                    // 采样得到的散射方向
-    Spectrum      f;                      // bsdf值
-    real          pdf      = 0;           // 采样的概率密度函数值,w.r.t. solid angle
-    TransportMode mode     = TM_Radiance; // 传输模式
-    bool          is_delta = false;       // pdf和f是否是delta函数
+    Vec3          dir;                                // 采样得到的散射方向
+    Spectrum      f;                                  // bsdf值
+    real          pdf      = 0;                       // 采样的概率密度函数值,w.r.t. solid angle
+    TransportMode mode     = TransportMode::Radiance; // 传输模式
+    bool          is_delta = false;                   // pdf和f是否是delta函数
 
     bool invalid() const noexcept
     {
@@ -35,7 +34,8 @@ struct BSDFSampleResult
 /**
  * @brief bsdf采样失败时的返回值
  */
-inline const BSDFSampleResult BSDF_SAMPLE_RESULT_INVALID = { {}, {}, 0, TM_Radiance, false };
+inline const BSDFSampleResult BSDF_SAMPLE_RESULT_INVALID =
+    { {}, {}, 0, TransportMode::Radiance, false };
 
 /**
  * @brief 双向散射分布函数（bidirectional scattering distribution function）接口
@@ -67,6 +67,11 @@ public:
      * @brief 材质反照率
      */
     virtual Spectrum albedo() const noexcept = 0;
+
+    /**
+     * @brief 是否是delta函数
+     */
+    virtual bool is_delta() const noexcept = 0;
 };
 
 /**
@@ -85,8 +90,8 @@ protected:
 
     bool cause_black_fringes(const Vec3 &w) const noexcept
     {
-        bool shading_posi  = shading_coord_.in_positive_z_hemisphere(w);
-        bool geometry_posi = geometry_coord_.in_positive_z_hemisphere(w);
+        const bool shading_posi  = shading_coord_.in_positive_z_hemisphere(w);
+        const bool geometry_posi = geometry_coord_.in_positive_z_hemisphere(w);
         return shading_posi != geometry_posi;
     }
 
@@ -108,7 +113,7 @@ protected:
         if(!geometry_coord_.in_positive_z_hemisphere(out))
             return BSDF_SAMPLE_RESULT_INVALID;
 
-        auto [local_in, pdf] = math::distribution::zweighted_on_hemisphere(sam.u, sam.v);
+        const auto [local_in, pdf] = math::distribution::zweighted_on_hemisphere(sam.u, sam.v);
         if(pdf < EPS)
             return BSDF_SAMPLE_RESULT_INVALID;
 
@@ -126,7 +131,7 @@ protected:
     {
         if(geometry_coord_.in_positive_z_hemisphere(in) != geometry_coord_.in_positive_z_hemisphere(out))
             return false;
-        Vec3 local_in = geometry_coord_.global_to_local(in).normalize();
+        const Vec3 local_in = geometry_coord_.global_to_local(in).normalize();
         return math::distribution::zweighted_on_hemisphere_pdf(local_in.z);
     }
 

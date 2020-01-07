@@ -2,7 +2,7 @@
 
 #include <agz/tracer/core/entity.h>
 #include <agz/tracer/core/geometry.h>
-#include <agz/tracer/core/medium_interface.h>
+#include <agz/tracer/core/medium.h>
 
 AGZ_TRACER_BEGIN
 

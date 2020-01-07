@@ -28,20 +28,17 @@ public:
         
     }
 
-    void process(texture::texture2d_t<Spectrum> &image, GBuffer &gbuffer) override
+    void process(RenderTarget &renderer_target) override
     {
-        AGZ_LOG1("resize image to (", target_size_.x, ", ", target_size_.y, ")");
+        AGZ_INFO("resize image to ({}, {})", target_size_.x, target_size_.y);
 
-        resize<Spectrum, 3>(image);
-
-        if(gbuffer.albedo)
-            resize<Spectrum, 3>(*gbuffer.albedo);
-        if(gbuffer.position)
-            resize<Vec3, 3>(*gbuffer.position);
-        if(gbuffer.normal)
-            resize<Vec3, 3>(*gbuffer.normal);
-        if(gbuffer.depth)
-            resize<float, 1>(*gbuffer.depth);
+        resize<Spectrum, 3>(renderer_target.image);
+        if(renderer_target.albedo.is_available())
+            resize<Spectrum, 3>(renderer_target.albedo);
+        if(renderer_target.normal.is_available())
+            resize<Vec3, 3>(renderer_target.normal);
+        if(renderer_target.denoise.is_available())
+            resize<real, 1>(renderer_target.denoise);
     }
 };
 

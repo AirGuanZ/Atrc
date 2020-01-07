@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include <agz/tracer/core/film.h>
+#include <agz/tracer/core/render_target.h>
 
 AGZ_TRACER_BEGIN
 
@@ -16,7 +16,7 @@ public:
     /**
      * @brief 处理图像和gbuffer
      */
-    virtual void process(texture::texture2d_t<Spectrum> &image, GBuffer &gbuffer) = 0;
+    virtual void process(RenderTarget &render_target) = 0;
 };
 
 AGZ_TRACER_END

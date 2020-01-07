@@ -34,11 +34,6 @@ public:
      * @brief 寻找与射线起点最近的交点
      */
     virtual bool closest_intersection(const Ray &r, EntityIntersection *inct) const noexcept = 0;
-
-    /**
-     * @brief 所有实体在world space中的bounding box
-     */
-    virtual AABB world_bound() const noexcept = 0;
 };
 
 AGZ_TRACER_END

@@ -5,7 +5,7 @@
 AGZ_TRACER_BEGIN
 
 std::shared_ptr<Camera> create_thin_lens_camera(
-    std::shared_ptr<const Film> film,
+    int film_width, int film_height,
     const Vec3 &pos,
     const Vec3 &dst,
     const Vec3 &up,

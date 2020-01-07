@@ -160,18 +160,10 @@ Here is a simple example, which results in the above image (a bit rough metal sp
       "up": [ 0, 0, 1 ],
       "fov": 64
     },
-    "film": {
-      "type": "native",
-      "width": 640,
-      "height": 640
-    },
+    "width": 640,
+    "height": 640,
     "renderer": {
       "type": "pt",
-      "worker_count": -1,
-      "task_grid_size": 16,
-      "integrator": {
-        "type": "native"
-      },
       "sampler": {
         "type": "native",
         "spp": 100
@@ -246,13 +238,15 @@ In the form, the "default value" column is blank to indicate that this is a requ
 
 This section describes fields included in the `rendering` item.
 
-| Field Name      | Type             | Default Value | Explanation                      |
-| --------------- | ---------------- | ------------- | -------------------------------- |
-| camera          | Camera           |               | camera for viewing the scene     |
-| film            | Film             |               | used to store rendering results  |
-| renderer        | Renderer         |               | rendering algorithm              |
-| reporter        | ProgressReporter |               | how to output rendering progress |
-| post_processors | [PostProcessor]  | []            | image post processors            |
+| Field Name      | Type             | Default Value         | Explanation                      |
+| --------------- | ---------------- | --------------------- | -------------------------------- |
+| camera          | Camera           |                       | camera for viewing the scene     |
+| renderer        | Renderer         |                       | rendering algorithm              |
+| reporter        | ProgressReporter |                       | how to output rendering progress |
+| post_processors | [PostProcessor]  | []                    | image post processors            |
+| width           | int              |                       | image width                      |
+| height          | int              |                       | image height                     |
+| film_filter     | FilmFilter       | box with radius = 0.5 | film filter function             |
 
 ### Scene
 
@@ -357,27 +351,6 @@ Gaussian filter function
 | ---------- | ---- | ------------- | ----------------------------- |
 | radius     | real |               | filter radius in pixels       |
 | alpha      | real |               | $\alpha$ in gaussian function |
-
-### Film
-
-**native**
-
-The most basic and fastest film which doesn't support filter function other than box.
-
-| Field Name | Type | Default Value | Explanation            |
-| ---------- | ---- | ------------- | ---------------------- |
-| width      | int  |               | image width in pixels  |
-| height     | int  |               | image height in pixels |
-
-**filtered**
-
-Film supports various types of filter function.
-
-| Field Name | Type       | Default Value | Explanation                            |
-| ---------- | ---------- | ------------- | -------------------------------------- |
-| width      | int        |               | image width in pixels                  |
-| height     | int        |               | image height in pixels                 |
-| filter     | FilmFilter |               | filter function for constructing image |
 
 ### Fresnel
 
@@ -768,7 +741,6 @@ Save the G-Buffer to png files
 | ---------- | ------ | ------------- | ----------------------------- |
 | albedo     | string | ""            | where to save material colors |
 | normal     | string | ""            | where to save normal image    |
-| depth      | string | ""            | where to save depth image     |
 
 **save_to_img**
 
@@ -795,16 +767,48 @@ Resize the image and G-Buffer to the specified resolution
 
 Traditional path tracing. You can specify the tracing strategy by `integrator`.
 
-| Field Name     | Type                  | Default Value | Explanation               |
-| -------------- | --------------------- | ------------- | ------------------------- |
-| integrator     | PathTracingIntegrator |               | tracing strategy          |
-| task_grid_size | int                   | 32            | rendering task pixel size |
-| worker_count   | int                   | 0             | rendering thread count    |
-| sampler        | Sampler               |               | random number generator   |
+| Field Name     | Type    | Default Value | Explanation                               |
+| -------------- | ------- | ------------- | ----------------------------------------- |
+| task_grid_size | int     | 32            | rendering task pixel size                 |
+| worker_count   | int     | 0             | rendering thread count                    |
+| sampler        | Sampler |               | random number generator                   |
+| min_depth      | int     | 5             | minimum path depth before using RR policy |
+| max_depth      | int     | 10            | maximum depth of the path                 |
+| cont_prob      | real    | 0.9           | pass probability when using RR strategy   |
+| use_mis        | bool    | true          | use mis to computing direct illumination  |
 
 The entire image is divided into multiple square pixel blocks (rendering tasks), and each pixel block is assigned to a worker thread for execution as a subtask.
 
 When the number of worker threads $n$ is less or equal to 0 and the number of hardware threads is $ k $, then $\max\{1, k + n \} $ worker threads will be used. For example, you can set `worker_count` to -2, which means that you leave two hardware threads and use all other hardware threads.
+
+**ao**
+
+![pic](./pictures/ao.png)
+
+Ambient occlusion renderer
+
+| Field Name             | Type     | Default Value | Explanation               |
+| ---------------------- | -------- | ------------- | ------------------------- |
+| worker_count           | int      | 0             | rendering thread count    |
+| task_grid_size         | int      | 32            | rendering task pixel size |
+| ao_sample_count        | int      | 5             | samples per camera ray    |
+| low_color              | Spectrum | [ 0 ]         | occluded color            |
+| high_color             | Spectrum | [ 1 ]         | unoccluded color          |
+| max_occlusion_distance | real     | 1             | max occlusion distance    |
+| background_color       | Spectrum | [ 0 ]         | background color          |
+| sampler                | Sampler  |               | random number generator   |
+
+**bdpt**
+
+Bidirectional path tracer (without MIS)
+
+| Field Name       | Type    | Default Value | Explanation                 |
+| ---------------- | ------- | ------------- | --------------------------- |
+| worker_count     | int     | 0             | rendering thread count      |
+| task_grid_size   | int     | 32            | rendering task pixel size   |
+| camera_max_depth | int     | 10            | max depth of camera subpath |
+| light_max_depth  | int     | 10            | max depth of light subpath  |
+| sampler          | Sampler |               | sampler                     |
 
 **particle**
 
@@ -824,28 +828,6 @@ Adjoint particle tracer. `particle` builds path from light source to camera, mak
 `particle` uses the strategy of starting from a light source to construct a light path, called backward pass; for paths of length 1 (that is, the light source is directly seen from the camera), however, `particle` builds them from the camera to light sources, called forward pass. The two passes are independent executed and are combined to render the final image.
 
 Backward pass consists of `particle_task_count` particle tracing tasks. Each task contains `spp` of `backward_sampler`, so a total of `particle_task_count * backward_sampler.spp` paths are traced in backward pass.
-
-### PathTracingIntegrator
-
-**native**
-
-Violent path tracing without any optimization
-
-| Field Name | Type | Default Value | Explanation                               |
-| ---------- | ---- | ------------- | ----------------------------------------- |
-| min_depth  | int  | 5             | minimum path depth before using RR policy |
-| max_depth  | int  | 10            | maximum depth of the path                 |
-| cont_prob  | real | 0.9           | pass probability when using RR strategy   |
-
-**mis**
-
-Path tracing with Multiple Importance Sampling
-
-| Field Name | Type | Default Value | Explanation                               |
-| ---------- | ---- | ------------- | ----------------------------------------- |
-| min_depth  | int  | 5             | minimum path depth before using RR policy |
-| max_depth  | int  | 10            | maximum depth of the path                 |
-| cont_prob  | real | 0.9           | pass probability when using RR strategy   |
 
 ### ProgressReporter
 

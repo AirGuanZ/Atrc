@@ -15,7 +15,7 @@ protected:
 
 public:
 
-    void initialize(const Texture2DCommonParams &common_params, const Spectrum &texel)
+    Constant2D(const Texture2DCommonParams &common_params, const Spectrum &texel)
     {
         init_common_params(common_params);
         texel_ = texel;
@@ -36,9 +36,7 @@ std::shared_ptr<Texture2D> create_constant2d_texture(
     const Texture2DCommonParams &common_params,
     const Spectrum &texel)
 {
-    auto ret = std::make_shared<Constant2D>();
-    ret->initialize(common_params, texel);
-    return ret;
+    return std::make_shared<Constant2D>(common_params, texel);
 }
 
 std::shared_ptr<Texture2D> create_constant2d_texture(

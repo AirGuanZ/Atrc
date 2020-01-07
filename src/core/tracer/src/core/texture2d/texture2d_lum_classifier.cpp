@@ -13,8 +13,8 @@ protected:
 
     Spectrum sample_spectrum_impl(const Vec2 &uv) const noexcept override
     {
-        Spectrum origin = internal_->sample_spectrum(uv);
-        real threshold = threshold_->sample_real(uv);
+        const Spectrum origin = internal_->sample_spectrum(uv);
+        const real threshold = threshold_->sample_real(uv);
         if(origin.lum() <= threshold)
             return lower_->sample_spectrum(uv);
         return higher_->sample_spectrum(uv);

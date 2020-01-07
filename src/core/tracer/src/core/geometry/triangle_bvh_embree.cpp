@@ -8,8 +8,6 @@
 #include <agz/tracer/utility/embree.h>
 #include <agz/tracer/utility/logger.h>
 #include <agz/tracer/utility/triangle_aux.h>
-#include <agz/common/math.h>
-#include <agz/utility/math.h>
 #include <agz/utility/mesh.h>
 #include <agz/utility/misc.h>
 
@@ -72,7 +70,7 @@ namespace tri_bvh_embree_ws
      */
     [[noreturn]] void throw_embree_error()
     {
-        RTCError err = rtcGetDeviceError(embree_device());
+        const RTCError err = rtcGetDeviceError(embree_device());
         throw ObjectConstructionException(embree_err_str(err));
     }
 
@@ -121,13 +119,13 @@ namespace tri_bvh_embree_ws
                 throw_embree_error();
             AGZ_SCOPE_GUARD({ rtcReleaseGeometry(mesh); });
 
-            size_t vertex_count = triangle_count * 3;
-            auto vertices = static_cast<EmbreeVertex*>(rtcSetNewGeometryBuffer(
+            const size_t vertex_count = triangle_count * 3;
+            const auto vertices = static_cast<EmbreeVertex*>(rtcSetNewGeometryBuffer(
                 mesh, RTC_BUFFER_TYPE_VERTEX, 0, RTC_FORMAT_FLOAT3, sizeof(EmbreeVertex), vertex_count));
             if(!vertices)
                 throw_embree_error();
 
-            auto indices = static_cast<EmbreeIndex*>(rtcSetNewGeometryBuffer(
+            const auto indices = static_cast<EmbreeIndex*>(rtcSetNewGeometryBuffer(
                 mesh, RTC_BUFFER_TYPE_INDEX, 0, RTC_FORMAT_UINT3, sizeof(EmbreeIndex), triangle_count));
             if(!indices)
                 throw_embree_error();
@@ -159,9 +157,9 @@ namespace tri_bvh_embree_ws
                 indices[i].v1 = static_cast<uint32_t>(j + 1);
                 indices[i].v2 = static_cast<uint32_t>(j + 2);
 
-                Vec3 n_a = triangle[0].normal.normalize();
-                Vec3 n_b = triangle[1].normal.normalize();
-                Vec3 n_c = triangle[2].normal.normalize();
+                const Vec3 n_a = triangle[0].normal.normalize();
+                const Vec3 n_b = triangle[1].normal.normalize();
+                const Vec3 n_c = triangle[2].normal.normalize();
 
                 PrimitiveInfo info;
                 info.n_a = n_a;
@@ -172,17 +170,17 @@ namespace tri_bvh_embree_ws
                 info.t_b_a = triangle[1].tex_coord - triangle[0].tex_coord;
                 info.t_c_a = triangle[2].tex_coord - triangle[0].tex_coord;
 
-                Vec3 b_a = triangle[1].position - triangle[0].position;
-                Vec3 c_a = triangle[2].position - triangle[0].position;
+                const Vec3 b_a = triangle[1].position - triangle[0].position;
+                const Vec3 c_a = triangle[2].position - triangle[0].position;
                 info.z = cross(b_a, c_a).normalize();
-                Vec3 mean_nor = n_a + n_b + n_c;
+                const Vec3 mean_nor = n_a + n_b + n_c;
                 if(dot(info.z, mean_nor) < 0)
                     info.z = -info.z;
                 info.x = dpdu_as_ex(b_a, c_a, info.t_b_a, info.t_c_a, info.z);
 
                 prim_info_.push_back(info);
 
-                real area = triangle_area(b_a, c_a);
+                const real area = triangle_area(b_a, c_a);
                 areas.push_back(area);
                 surface_area_ += area;
 
@@ -236,17 +234,17 @@ namespace tri_bvh_embree_ws
             if(rayhit.hit.geomID == RTC_INVALID_GEOMETRY_ID)
                 return false;
 
-            real t_val = rayhit.ray.tfar;
-            real u = rayhit.hit.u;
-            real v = rayhit.hit.v;
-            auto &info = prim_info_[rayhit.hit.primID];
+            const real t_val = rayhit.ray.tfar;
+            const real u = rayhit.hit.u;
+            const real v = rayhit.hit.v;
+            const PrimitiveInfo &info = prim_info_[rayhit.hit.primID];
 
             inct->pos = r.at(t_val);
             inct->geometry_coord = Coord(info.x, cross(info.z, info.x), info.z);
             inct->uv = info.t_a + u * info.t_b_a + v * info.t_c_a;
             inct->t = t_val;
 
-            Vec3 user_z = info.n_a + u * info.n_b_a + v * info.n_c_a;
+            const Vec3 user_z = info.n_a + u * info.n_b_a + v * info.n_c_a;
             inct->user_coord = inct->geometry_coord.rotate_to_new_z(user_z);
 
             inct->wr = -r.d;
@@ -256,10 +254,10 @@ namespace tri_bvh_embree_ws
 
         SurfacePoint uniformly_sample(const Sample3 &sam) const noexcept
         {
-            int prim_idx = prim_sampler_.sample(sam.u);
+            const int prim_idx = prim_sampler_.sample(sam.u);
             assert(0 <= prim_idx && static_cast<size_t>(prim_idx) < prims_.size());
-            auto &prim = prims_[prim_idx];
-            auto &prim_info = prim_info_[prim_idx];
+            const Primitive &prim = prims_[prim_idx];
+            const PrimitiveInfo &prim_info = prim_info_[prim_idx];
 
             auto uv = math::distribution::uniform_on_triangle(sam.v, sam.w);
 
@@ -268,7 +266,7 @@ namespace tri_bvh_embree_ws
             spt.geometry_coord = Coord(prim_info.x, cross(prim_info.z, prim_info.x), prim_info.z);
             spt.uv = prim_info.t_a + uv.x * prim_info.t_b_a + uv.y * prim_info.t_c_a;
 
-            Vec3 user_z = prim_info.n_a + uv.x * prim_info.n_b_a + uv.y * prim_info.n_c_a;
+            const Vec3 user_z = prim_info.n_a + uv.x * prim_info.n_b_a + uv.y * prim_info.n_c_a;
             spt.user_coord = spt.geometry_coord.rotate_to_new_z(user_z);
 
             return spt;
@@ -314,11 +312,11 @@ class TriangleBVHEmbree : public Geometry
             tri.vertices[2].normal = local_to_world.apply_to_vector(tri.vertices[2].normal);
         }
 
-        auto ret = std::make_unique<tri_bvh_embree_ws::UntransformedTriangleBVH>();//arena.create<tri_bvh_embree_ws::UntransformedTriangleBVH>();
+        auto ret = std::make_unique<tri_bvh_embree_ws::UntransformedTriangleBVH>();
         ret->initialize(build_triangles.data(), build_triangles.size());
 
-        AGZ_LOG2("load triangle mesh from ", filename);
-        AGZ_LOG2("triangle count: ", build_triangles.size());
+        AGZ_INFO("load triangle mesh from {}", filename);
+        AGZ_INFO("triangle count: {}", build_triangles.size());
         return ret;
 
         AGZ_HIERARCHY_WRAP("in loading mesh from " + filename)
@@ -326,7 +324,7 @@ class TriangleBVHEmbree : public Geometry
 
 public:
 
-    void initialize(const std::string &filename, const Transform3 &local_to_world)
+    TriangleBVHEmbree(const std::string &filename, const Transform3 &local_to_world)
     {
         AGZ_HIERARCHY_TRY
 
@@ -373,9 +371,8 @@ public:
 
     SurfacePoint sample(real *pdf, const Sample3 &sam) const noexcept override
     {
-        auto ret = untransformed_->uniformly_sample(sam);
         *pdf = 1 / surface_area();
-        return ret;
+        return untransformed_->uniformly_sample(sam);
     }
 
     SurfacePoint sample(const Vec3&, real *pdf, const Sample3 &sam) const noexcept override
@@ -398,9 +395,7 @@ std::shared_ptr<Geometry> create_triangle_bvh_embree(
     const std::string &filename,
     const Transform3 &local_to_world)
 {
-    auto ret = std::make_shared<TriangleBVHEmbree>();
-    ret->initialize(filename, local_to_world);
-    return ret;
+    return std::make_shared<TriangleBVHEmbree>(filename, local_to_world);
 }
 
 std::shared_ptr<Geometry> create_triangle_bvh(

@@ -37,7 +37,7 @@ class Disney : public Material
 
     void compute_secondary_params()
     {
-        float aspect = anisotropic_ > 0 ? std::sqrt(1 - 0.9f * anisotropic_) : 1.0f;
+        const float aspect = anisotropic_ > 0 ? std::sqrt(1 - 0.9f * anisotropic_) : 1.0f;
         ax_ = (std::max)(0.001f, roughness_ * roughness_ / aspect);
         ay_ = (std::max)(0.001f, roughness_ * roughness_ * aspect);
 
@@ -46,14 +46,14 @@ class Disney : public Material
 
         clearcoat_roughness_ = agz::math::mix(0.1f, 0.01f, clearcoat_gloss_);
 
-        float lum = agz::math::color3f(base_color_.x, base_color_.y, base_color_.z).lum();
+        const float lum = agz::math::color3f(base_color_.x, base_color_.y, base_color_.z).lum();
         if(lum > 0)
             base_color_tint_ = base_color_ / lum;
         else
             base_color_tint_ = vec3(1);
 
-        float A = (std::min)(0.8f, 1 - metallic_);
-        float B = 1 - A;
+        const float A = (std::min)(0.8f, 1 - metallic_);
+        const float B = 1 - A;
         sample_diffuse_pdf_      = A * (1 - transmission_);
         sample_transmission_pdf_ = A * transmission_;
         sample_specular_pdf_     = B * 2 / (2 + clearcoat_);

@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include <agz/tracer/core/film.h>
+#include <agz/tracer/common.h>
 
 AGZ_TRACER_BEGIN
 

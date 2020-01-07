@@ -13,26 +13,26 @@ protected:
 
     real sample_real_impl(const Vec3 &uvw) const noexcept override
     {
-        real xf = math::saturate(uvw.x) * (data_.width()  - 1);
-        real yf = math::saturate(uvw.y) * (data_.height() - 1);
-        real zf = math::saturate(uvw.z) * (data_.depth()  - 1);
+        const real xf = math::saturate(uvw.x) * (data_.width()  - 1);
+        const real yf = math::saturate(uvw.y) * (data_.height() - 1);
+        const real zf = math::saturate(uvw.z) * (data_.depth()  - 1);
 
-        int xi = (std::min)(static_cast<int>(std::floor(xf)), data_.width()  - 2);
-        int yi = (std::min)(static_cast<int>(std::floor(yf)), data_.height() - 2);
-        int zi = (std::min)(static_cast<int>(std::floor(zf)), data_.depth()  - 2);
+        const int xi = (std::min)(static_cast<int>(std::floor(xf)), data_.width()  - 2);
+        const int yi = (std::min)(static_cast<int>(std::floor(yf)), data_.height() - 2);
+        const int zi = (std::min)(static_cast<int>(std::floor(zf)), data_.depth()  - 2);
         
-        real xt = xf - static_cast<real>(xi);
-        real yt = yf - static_cast<real>(yi);
-        real zt = zf - static_cast<real>(zi);
+        const real xt = xf - static_cast<real>(xi);
+        const real yt = yf - static_cast<real>(yi);
+        const real zt = zf - static_cast<real>(zi);
 
-        real y0z0 = math::lerp(data_(xi, yi,     zi), data_(xi + 1, yi,     zi), xt);
-        real y1z0 = math::lerp(data_(xi, yi + 1, zi), data_(xi + 1, yi + 1, zi), xt);
+        const real y0z0 = math::lerp(data_(xi, yi,     zi), data_(xi + 1, yi,     zi), xt);
+        const real y1z0 = math::lerp(data_(xi, yi + 1, zi), data_(xi + 1, yi + 1, zi), xt);
 
-        real y0z1 = math::lerp(data_(xi, yi,     zi + 1), data_(xi + 1, yi,     zi + 1), xt);
-        real y1z1 = math::lerp(data_(xi, yi + 1, zi + 1), data_(xi + 1, yi + 1, zi + 1), xt);
+        const real y0z1 = math::lerp(data_(xi, yi,     zi + 1), data_(xi + 1, yi,     zi + 1), xt);
+        const real y1z1 = math::lerp(data_(xi, yi + 1, zi + 1), data_(xi + 1, yi + 1, zi + 1), xt);
 
-        real z0 = math::lerp(y0z0, y1z0, yt);
-        real z1 = math::lerp(y0z1, y1z1, yt);
+        const real z0 = math::lerp(y0z0, y1z0, yt);
+        const real z1 = math::lerp(y0z1, y1z1, yt);
 
         return math::lerp(z0, z1, zt);
     }
@@ -106,26 +106,26 @@ protected:
 
     Spectrum sample_spectrum_impl(const Vec3 &uvw) const noexcept override
     {
-        real xf = math::saturate(uvw.x) * (data_.width() - 1);
-        real yf = math::saturate(uvw.y) * (data_.height() - 1);
-        real zf = math::saturate(uvw.z) * (data_.depth() - 1);
+        const real xf = math::saturate(uvw.x) * (data_.width() - 1);
+        const real yf = math::saturate(uvw.y) * (data_.height() - 1);
+        const real zf = math::saturate(uvw.z) * (data_.depth() - 1);
 
-        int xi = (std::min)(static_cast<int>(std::floor(xf)), data_.width() - 2);
-        int yi = (std::min)(static_cast<int>(std::floor(yf)), data_.height() - 2);
-        int zi = (std::min)(static_cast<int>(std::floor(zf)), data_.depth() - 2);
+        const int xi = (std::min)(static_cast<int>(std::floor(xf)), data_.width() - 2);
+        const int yi = (std::min)(static_cast<int>(std::floor(yf)), data_.height() - 2);
+        const int zi = (std::min)(static_cast<int>(std::floor(zf)), data_.depth() - 2);
 
-        real xt = xf - static_cast<real>(xi);
-        real yt = yf - static_cast<real>(yi);
-        real zt = zf - static_cast<real>(zi);
+        const real xt = xf - static_cast<real>(xi);
+        const real yt = yf - static_cast<real>(yi);
+        const real zt = zf - static_cast<real>(zi);
 
-        Spectrum y0z0 = lerp(data_(xi, yi,     zi), data_(xi + 1, yi,     zi), xt);
-        Spectrum y1z0 = lerp(data_(xi, yi + 1, zi), data_(xi + 1, yi + 1, zi), xt);
+        const Spectrum y0z0 = lerp(data_(xi, yi,     zi), data_(xi + 1, yi,     zi), xt);
+        const Spectrum y1z0 = lerp(data_(xi, yi + 1, zi), data_(xi + 1, yi + 1, zi), xt);
 
-        Spectrum y0z1 = lerp(data_(xi, yi,     zi + 1), data_(xi + 1, yi,     zi + 1), xt);
-        Spectrum y1z1 = lerp(data_(xi, yi + 1, zi + 1), data_(xi + 1, yi + 1, zi + 1), xt);
+        const Spectrum y0z1 = lerp(data_(xi, yi,     zi + 1), data_(xi + 1, yi,     zi + 1), xt);
+        const Spectrum y1z1 = lerp(data_(xi, yi + 1, zi + 1), data_(xi + 1, yi + 1, zi + 1), xt);
 
-        Spectrum z0 = lerp(y0z0, y1z0, yt);
-        Spectrum z1 = lerp(y0z1, y1z1, yt);
+        const Spectrum z0 = lerp(y0z0, y1z0, yt);
+        const Spectrum z1 = lerp(y0z1, y1z1, yt);
 
         return lerp(z0, z1, zt);
     }

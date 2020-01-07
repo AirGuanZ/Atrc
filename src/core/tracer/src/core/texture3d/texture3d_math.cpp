@@ -11,15 +11,15 @@ protected:
 
     Spectrum sample_spectrum_impl(const Vec3 &uvw) const noexcept override
     {
-        Spectrum lhs_spectrum = lhs_->sample_spectrum(uvw);
-        Spectrum rhs_spectrum = rhs_->sample_spectrum(uvw);
+        const Spectrum lhs_spectrum = lhs_->sample_spectrum(uvw);
+        const Spectrum rhs_spectrum = rhs_->sample_spectrum(uvw);
         return lhs_spectrum + rhs_spectrum;
     }
 
     real sample_real_impl(const Vec3 &uvw) const noexcept override
     {
-        real lhs_real = lhs_->sample_real(uvw);
-        real rhs_real = rhs_->sample_real(uvw);
+        const real lhs_real = lhs_->sample_real(uvw);
+        const real rhs_real = rhs_->sample_real(uvw);
         return lhs_real + rhs_real;
     }
 
@@ -80,15 +80,15 @@ protected:
 
     Spectrum sample_spectrum_impl(const Vec3 &uvw) const noexcept override
     {
-        Spectrum lhs_spectrum = lhs_->sample_spectrum(uvw);
-        Spectrum rhs_spectrum = rhs_->sample_spectrum(uvw);
+        const Spectrum lhs_spectrum = lhs_->sample_spectrum(uvw);
+        const Spectrum rhs_spectrum = rhs_->sample_spectrum(uvw);
         return lhs_spectrum * rhs_spectrum;
     }
 
     real sample_real_impl(const Vec3 &uvw) const noexcept override
     {
-        real lhs_real = lhs_->sample_real(uvw);
-        real rhs_real = rhs_->sample_real(uvw);
+        const real lhs_real = lhs_->sample_real(uvw);
+        const real rhs_real = rhs_->sample_real(uvw);
         return lhs_real * rhs_real;
     }
 
@@ -122,8 +122,8 @@ public:
     Spectrum max_spectrum() const noexcept override
     {
         Spectrum ret;
-        Spectrum a0 = lhs_->min_spectrum(), a1 = lhs_->max_spectrum();
-        Spectrum b0 = rhs_->min_spectrum(), b1 = rhs_->max_spectrum();
+        const Spectrum a0 = lhs_->min_spectrum(), a1 = lhs_->max_spectrum();
+        const Spectrum b0 = rhs_->min_spectrum(), b1 = rhs_->max_spectrum();
         for(int c = 0; c < SPECTRUM_COMPONENT_COUNT; ++c)
             ret[c] = (std::max)({ a0[c] * b0[c], a0[c] * b1[c], a1[c] * b0[c], a1[c] * b1[c] });
         return ret;
@@ -132,8 +132,8 @@ public:
     Spectrum min_spectrum() const noexcept override
     {
         Spectrum ret;
-        Spectrum a0 = lhs_->min_spectrum(), a1 = lhs_->max_spectrum();
-        Spectrum b0 = rhs_->min_spectrum(), b1 = rhs_->max_spectrum();
+        const Spectrum a0 = lhs_->min_spectrum(), a1 = lhs_->max_spectrum();
+        const Spectrum b0 = rhs_->min_spectrum(), b1 = rhs_->max_spectrum();
         for(int c = 0; c < SPECTRUM_COMPONENT_COUNT; ++c)
             ret[c] = (std::min)({ a0[c] * b0[c], a0[c] * b1[c], a1[c] * b0[c], a1[c] * b1[c] });
         return ret;
@@ -141,15 +141,15 @@ public:
 
     real max_real() const noexcept override
     {
-        real a0 = lhs_->min_real(), a1 = rhs_->max_real();
-        real b0 = rhs_->min_real(), b1 = rhs_->max_real();
+        const real a0 = lhs_->min_real(), a1 = rhs_->max_real();
+        const real b0 = rhs_->min_real(), b1 = rhs_->max_real();
         return (std::max)({ a0 * b0, a0 * b1, a1 * b0, a1 * b1 });
     }
 
     real min_real() const noexcept override
     {
-        real a0 = lhs_->min_real(), a1 = rhs_->max_real();
-        real b0 = rhs_->min_real(), b1 = rhs_->max_real();
+        const real a0 = lhs_->min_real(), a1 = rhs_->max_real();
+        const real b0 = rhs_->min_real(), b1 = rhs_->max_real();
         return (std::min)({ a0 * b0, a0 * b1, a1 * b0, a1 * b1 });
     }
 };
@@ -201,7 +201,7 @@ public:
     Spectrum max_spectrum() const noexcept override
     {
         Spectrum ret;
-        Spectrum i0 = internal_->min_spectrum(), i1 = internal_->max_spectrum();
+        const Spectrum i0 = internal_->min_spectrum(), i1 = internal_->max_spectrum();
         for(int c = 0; c < SPECTRUM_COMPONENT_COUNT; ++c)
             ret[c] = (std::max)(scale_[c] * i0[c], scale_[c] * i1[c]);
         return ret;
@@ -210,7 +210,7 @@ public:
     Spectrum min_spectrum() const noexcept override
     {
         Spectrum ret;
-        Spectrum i0 = internal_->min_spectrum(), i1 = internal_->max_spectrum();
+        const Spectrum i0 = internal_->min_spectrum(), i1 = internal_->max_spectrum();
         for(int c = 0; c < SPECTRUM_COMPONENT_COUNT; ++c)
             ret[c] = (std::min)(scale_[c] * i0[c], scale_[c] * i1[c]);
         return ret;

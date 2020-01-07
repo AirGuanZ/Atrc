@@ -29,11 +29,11 @@ namespace
 
         BSDFSampleResult sample(const Vec3 &out_dir, TransportMode transport_mode, const Sample3 &sam) const noexcept override
         {
-            Vec3 local_out = shading_coord_.global_to_local(out_dir);
+            const Vec3 local_out = shading_coord_.global_to_local(out_dir);
             if(local_out.z <= 0)
                 return BSDF_SAMPLE_RESULT_INVALID;
             
-            Vec3 nwo = local_out.normalize();
+            const Vec3 nwo = local_out.normalize();
             BSDFSampleResult ret;
             ret.dir      = shading_coord_.local_to_global(Vec3(0, 0, 2 * nwo.z) - nwo);
             ret.pdf      = 1;
@@ -54,6 +54,11 @@ namespace
         {
             return rc_;
         }
+
+        bool is_delta() const noexcept override
+        {
+            return true;
+        }
     };
 }
 
@@ -64,7 +69,7 @@ class Mirror : public Material
 
 public:
 
-    void initialize(std::shared_ptr<const Texture2D> color_map, std::shared_ptr<const Fresnel> fresnel)
+    Mirror(std::shared_ptr<const Texture2D> color_map, std::shared_ptr<const Fresnel> fresnel)
     {
         rc_map_ = color_map;
         fresnel_ = fresnel;
@@ -72,12 +77,12 @@ public:
 
     ShadingPoint shade(const EntityIntersection &inct, Arena &arena) const override
     {
-        auto fresnel_point = fresnel_->get_point(inct.uv, arena);
-        auto rc = rc_map_->sample_spectrum(inct.uv);
+        const FresnelPoint*fresnel_point = fresnel_->get_point(inct.uv, arena);
+        const Spectrum rc = rc_map_->sample_spectrum(inct.uv);
 
         ShadingPoint ret;
 
-        auto bsdf = arena.create<MirrorBSDF >(inct.geometry_coord, inct.user_coord, fresnel_point, rc);
+        const BSDF *bsdf = arena.create<MirrorBSDF >(inct.geometry_coord, inct.user_coord, fresnel_point, rc);
         ret.bsdf = bsdf;
         ret.shading_normal = inct.user_coord.z;
 
@@ -89,9 +94,7 @@ std::shared_ptr<Material> create_mirror(
     std::shared_ptr<const Texture2D> color_map,
     std::shared_ptr<const Fresnel> fresnel)
 {
-    auto ret = std::make_shared<Mirror>();
-    ret->initialize(color_map, fresnel);
-    return ret;
+    return std::make_shared<Mirror>(color_map, fresnel);
 }
 
 AGZ_TRACER_END

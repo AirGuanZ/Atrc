@@ -31,13 +31,13 @@ namespace
             if(cause_black_fringes(wi) || cause_black_fringes(wo))
                 return {};
             
-            Vec3 nwi = wi.normalize(), nwo = wo.normalize();
-            auto opt_wot = refl_aux::refract(nwo, shading_coord_.z, eta_out_ / eta_in_);
+            const Vec3 nwi = wi.normalize(), nwo = wo.normalize();
+            const auto opt_wot = refl_aux::refract(nwo, shading_coord_.z, eta_out_ / eta_in_);
             if(!opt_wot)
                 return {};
 
-            real Fr_o = refl_aux::dielectric_fresnel(eta_in_, eta_out_, std::abs(cos(nwo, shading_coord_.z)));
-            auto ret = color_ * color_ * (1 - Fr_o) * internal_->eval(nwi, -*opt_wot, mode);
+            const real Fr_o = refl_aux::dielectric_fresnel(eta_in_, eta_out_, std::abs(cos(nwo, shading_coord_.z)));
+            Spectrum ret = color_ * color_ * (1 - Fr_o) * internal_->eval(nwi, -*opt_wot, mode);
             ret *= local_angle::normal_corr_factor(geometry_coord_, shading_coord_, wi);
             return ret;
         }
@@ -47,15 +47,15 @@ namespace
             if(cause_black_fringes(wo))
                 return BSDF_SAMPLE_RESULT_INVALID;
 
-            Vec3 lwo = shading_coord_.global_to_local(wo).normalize();
+            const Vec3 lwo = shading_coord_.global_to_local(wo).normalize();
             if(lwo.z <= 0)
                 return BSDF_SAMPLE_RESULT_INVALID;
 
-            real Fr = refl_aux::dielectric_fresnel(eta_in_, eta_out_, local_angle::cos_theta(lwo));
+            const real Fr = refl_aux::dielectric_fresnel(eta_in_, eta_out_, local_angle::cos_theta(lwo));
             if(sam.u < Fr)
             {
-                Vec3 lwi = refl_aux::reflect(lwo, Vec3(0, 0, 1));
-                Vec3 wi = shading_coord_.local_to_global(lwi);
+                const Vec3 lwi = refl_aux::reflect(lwo, Vec3(0, 0, 1));
+                const Vec3 wi = shading_coord_.local_to_global(lwi);
                 if(cause_black_fringes(wi))
                     return BSDF_SAMPLE_RESULT_INVALID;
 
@@ -73,16 +73,16 @@ namespace
             auto opt_wot = refl_aux::refract(wo.normalize(), shading_coord_.z, eta_out_ / eta_in_);
             if(!opt_wot)
                 return BSDF_SAMPLE_RESULT_INVALID;
-            Vec3 wot = *opt_wot;
+            const Vec3 wot = *opt_wot;
             if(cause_black_fringes(wot))
                 return BSDF_SAMPLE_RESULT_INVALID;
 
-            real new_sam_u = (sam.u - Fr) / (1 - Fr);
+            const real new_sam_u = (sam.u - Fr) / (1 - Fr);
             auto internal_sample = internal_->sample(-wot, mode, { new_sam_u, sam.v, sam.w });
             if(!internal_sample.f)
                 return BSDF_SAMPLE_RESULT_INVALID;
             
-            Vec3 wi = internal_sample.dir;
+            const Vec3 wi = internal_sample.dir;
             if(cause_black_fringes(wi))
                 return BSDF_SAMPLE_RESULT_INVALID;
             
@@ -102,14 +102,14 @@ namespace
             if(cause_black_fringes(wi) || cause_black_fringes(wo))
                 return 0;
 
-            Vec3 nwi = wi.normalize(), nwo = wo.normalize();
+            const Vec3 nwi = wi.normalize(), nwo = wo.normalize();
             auto opt_wit = refl_aux::refract(nwi, shading_coord_.z, eta_out_ / eta_in_);
             auto opt_wot = refl_aux::refract(nwo, shading_coord_.z, eta_out_ / eta_in_);
             if(!opt_wit || !opt_wot)
                 return 0;
 
-            Vec3 lwo = shading_coord_.global_to_local(wo).normalize();
-            real Fr = refl_aux::dielectric_fresnel(eta_in_, eta_out_, local_angle::cos_theta(lwo));
+            const Vec3 lwo = shading_coord_.global_to_local(wo).normalize();
+            const real Fr = refl_aux::dielectric_fresnel(eta_in_, eta_out_, local_angle::cos_theta(lwo));
 
             return (1 - Fr) * internal_->pdf(-*opt_wit, -*opt_wot, mode);
         }
@@ -117,6 +117,11 @@ namespace
         Spectrum albedo() const noexcept override
         {
             return color_ * internal_->albedo();
+        }
+
+        bool is_delta() const noexcept override
+        {
+            return true;
         }
     };
 
@@ -131,26 +136,26 @@ class MirrorVarnish : public Material
 
 public:
 
-    void initialize(
+    MirrorVarnish(
         std::shared_ptr<const Material> internal,
         std::shared_ptr<const Texture2D> eta_in,
         std::shared_ptr<const Texture2D> eta_out,
         std::shared_ptr<const Texture2D> color)
     {
-        internal_ = internal;
-        eta_in_ = eta_in;
-        eta_out_ = eta_out;
-        color_ = color;
+        internal_ = std::move(internal);
+        eta_in_   = std::move(eta_in);
+        eta_out_  = std::move(eta_out);
+        color_    = std::move(color);
     }
 
     ShadingPoint shade(const EntityIntersection &inct, Arena &arena) const override
     {
-        auto internal_shd = internal_->shade(inct, arena);
+        const ShadingPoint internal_shd = internal_->shade(inct, arena);
         
-        real eta_in    = eta_in_->sample_real(inct.uv);
-        real eta_out   = eta_out_->sample_real(inct.uv);
-        Spectrum color = color_->sample_spectrum(inct.uv);
-        auto bsdf = arena.create<MirrorVarnishBSDF>(
+        const real eta_in    = eta_in_->sample_real(inct.uv);
+        const real eta_out   = eta_out_->sample_real(inct.uv);
+        const Spectrum color = color_->sample_spectrum(inct.uv);
+        const BSDF *bsdf = arena.create<MirrorVarnishBSDF>(
             inct.geometry_coord, inct.user_coord, internal_shd.bsdf, eta_in, eta_out, color);
         
         return { bsdf, inct.user_coord.z };
@@ -163,9 +168,8 @@ std::shared_ptr<Material> create_mirror_varnish(
     std::shared_ptr<const Texture2D> eta_out,
     std::shared_ptr<const Texture2D> color)
 {
-    auto ret = std::make_shared<MirrorVarnish>();
-    ret->initialize(internal, eta_in, eta_out, color);
-    return ret;
+    return std::make_shared<MirrorVarnish>(
+        std::move(internal), std::move(eta_in), std::move(eta_out), std::move(color));
 }
 
 AGZ_TRACER_END

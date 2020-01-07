@@ -9,14 +9,14 @@ class AbsorbtionMedium : public Medium
 
 public:
 
-    void initialize(const Spectrum &sigma_a)
+    explicit AbsorbtionMedium(const Spectrum &sigma_a)
     {
         sigma_a_ = sigma_a;
     }
 
     Spectrum tr(const Vec3 &a, const Vec3 &b, Sampler &sampler) const noexcept override
     {
-        Spectrum exp = -sigma_a_ * (a - b).length();
+        const Spectrum exp = -sigma_a_ * (a - b).length();
         return {
             std::exp(exp.r),
             std::exp(exp.g),
@@ -24,9 +24,9 @@ public:
         };
     }
 
-    SampleOutScatteringResult sample_scattering(const Vec3 &a, const Vec3 &b, Sampler &sampler, Arena &arena) const noexcept override
+    SampleOutScatteringResult sample_scattering(const Vec3 &a, const Vec3 &b, Sampler &sampler, Arena &arena) const override
     {
-        Spectrum tr_value = tr(a, b, sampler);
+        const Spectrum tr_value = tr(a, b, sampler);
         return { { }, tr_value, nullptr };
     }
 };
@@ -34,9 +34,7 @@ public:
 std::shared_ptr<Medium> create_absorbtion_medium(
     const Spectrum &sigma_a)
 {
-    auto ret = std::make_shared<AbsorbtionMedium>();
-    ret->initialize(sigma_a);
-    return ret;
+    return std::make_shared<AbsorbtionMedium>(sigma_a);
 }
 
 AGZ_TRACER_END

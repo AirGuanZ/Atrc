@@ -8,13 +8,13 @@ class TextureReverse : public Texture2D
 
     Spectrum sample_spectrum_impl(const Vec2 &uv) const noexcept override
     {
-        auto origin = internal_->sample_spectrum(uv);
+        const auto origin = internal_->sample_spectrum(uv);
         return (Spectrum(1) - origin).saturate();
     }
 
     real sample_real_impl(const Vec2 &uv) const noexcept override
     {
-        auto origin = internal_->sample_real(uv);
+        const auto origin = internal_->sample_real(uv);
         return agz::math::saturate<real>(1 - origin);
     }
 

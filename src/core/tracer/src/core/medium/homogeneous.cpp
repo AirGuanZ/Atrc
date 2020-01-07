@@ -18,7 +18,7 @@ class HomogeneousMedium : public Medium
 
 public:
 
-    void initialize(const Spectrum &sigma_a, const Spectrum &sigma_s, real g)
+    HomogeneousMedium(const Spectrum &sigma_a, const Spectrum &sigma_s, real g)
     {
         AGZ_HIERARCHY_TRY
 
@@ -35,7 +35,7 @@ public:
 
     Spectrum tr(const Vec3 &a, const Vec3 &b, Sampler &sampler) const noexcept override
     {
-        Spectrum exp = -sigma_t_ * (a - b).length();
+        const Spectrum exp = -sigma_t_ * (a - b).length();
         return {
             std::exp(exp.r),
             std::exp(exp.g),
@@ -43,21 +43,21 @@ public:
         };
     }
 
-    SampleOutScatteringResult sample_scattering(const Vec3 &a, const Vec3 &b, Sampler &sampler, Arena &arena) const noexcept override
+    SampleOutScatteringResult sample_scattering(const Vec3 &a, const Vec3 &b, Sampler &sampler, Arena &arena) const override
     {
-        Sample1 sam = sampler.sample1();
+        const Sample1 sam = sampler.sample1();
         if(!sigma_s_)
             return { { }, Spectrum(1), nullptr };
 
-        real t_max = (b - a).length();
-        auto[color_channel, new_sam] = math::distribution::extract_uniform_int(sam.u, 0, SPECTRUM_COMPONENT_COUNT);
-        real st = -std::log(new_sam) / sigma_t_[color_channel];
+        const real t_max = (b - a).length();
+        const auto [color_channel, new_sam] = math::distribution::extract_uniform_int(sam.u, 0, SPECTRUM_COMPONENT_COUNT);
+        const real st = -std::log(new_sam) / sigma_t_[color_channel];
 
-        bool sample_medium = st < t_max;
+        const bool sample_medium = st < t_max;
         Spectrum tr;
         for(int i = 0; i < SPECTRUM_COMPONENT_COUNT; ++i)
             tr[i] = std::exp(-sigma_t_[i] * (std::min)(st, t_max));
-        Spectrum density = sample_medium ? sigma_s_ * tr : tr;
+        const Spectrum density = sample_medium ? sigma_s_ * tr : tr;
 
         real pdf = 0;
         for(int i = 0; i < SPECTRUM_COMPONENT_COUNT; ++i)
@@ -88,9 +88,7 @@ std::shared_ptr<Medium> create_homogeneous_medium(
     const Spectrum &sigma_s,
     real g)
 {
-    auto ret = std::make_shared<HomogeneousMedium>();
-    ret->initialize(sigma_a, sigma_s, g);
-    return ret;
+    return std::make_shared<HomogeneousMedium>(sigma_a, sigma_s, g);
 }
 
 AGZ_TRACER_END

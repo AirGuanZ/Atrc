@@ -14,7 +14,7 @@ class Triangle : public TransformedGeometry
 
 public:
 
-    void initialize(
+    Triangle(
         const Vec3 &a, const Vec3 &b, const Vec3 &c,
         const Vec2 &t_a, const Vec2 &t_b, const Vec2 &t_c,
         const Transform3 &local_to_world)
@@ -34,8 +34,8 @@ public:
         z_ = cross(b_a_, c_a_).normalize();
         x_ = dpdu_as_ex(b_a_, c_a_, t_b_a_, t_c_a_, z_);
 
-        Vec3 world_b_a = local_to_world_.apply_to_vector(b_a_);
-        Vec3 world_c_a = local_to_world_.apply_to_vector(c_a_);
+        const Vec3 world_b_a = local_to_world_.apply_to_vector(b_a_);
+        const Vec3 world_c_a = local_to_world_.apply_to_vector(c_a_);
         surface_area_ = triangle_area(world_b_a, world_c_a);
 
         AGZ_HIERARCHY_WRAP("in initializing triangle geometry object")
@@ -43,13 +43,13 @@ public:
 
     bool has_intersection(const Ray &r) const noexcept override
     {
-        Ray local_r = to_local(r);
+        const Ray local_r = to_local(r);
         return has_intersection_with_triangle(local_r, a_, b_a_, c_a_);
     }
 
     bool closest_intersection(const Ray &r, GeometryIntersection *inct) const noexcept override
     {
-        Ray local_r = to_local(r);
+        const Ray local_r = to_local(r);
         TriangleIntersectionRecord inct_rcd;
         if(!closest_intersection_with_triangle(local_r, a_, b_a_, c_a_, &inct_rcd))
             return false;
@@ -87,7 +87,7 @@ public:
 
     SurfacePoint sample(real *pdf, const Sample3 &sam) const noexcept override
     {
-        Vec2 bi_coord = math::distribution::uniform_on_triangle(sam.u, sam.v);
+        const Vec2 bi_coord = math::distribution::uniform_on_triangle(sam.u, sam.v);
 
         SurfacePoint spt;
         spt.pos            = a_ + bi_coord.x * b_a_ + bi_coord.y * c_a_;
@@ -122,9 +122,7 @@ std::shared_ptr<Geometry> create_triangle(
     const Vec2 &t_a, const Vec2 &t_b, const Vec2 &t_c,
     const Transform3 &local_to_world)
 {
-    auto ret = std::make_shared<Triangle>();
-    ret->initialize(a, b, c, t_a, t_b, t_c, local_to_world);
-    return ret;
+    return std::make_shared<Triangle>(a, b, c, t_a, t_b, t_c, local_to_world);
 }
 
 AGZ_TRACER_END

@@ -9,7 +9,7 @@ class DoubleSidedGeometry : public Geometry
 
 public:
 
-    void initialize(std::shared_ptr<const Geometry> internal)
+    explicit DoubleSidedGeometry(std::shared_ptr<const Geometry> internal)
     {
         internal_ = internal;
     }
@@ -24,7 +24,7 @@ public:
         if(!internal_->closest_intersection(r, inct))
             return false;
 
-        bool backface = dot(inct->geometry_coord.z, inct->wr) < 0;
+        const bool backface = dot(inct->geometry_coord.z, inct->wr) < 0;
         if(backface)
         {
             inct->geometry_coord = -inct->geometry_coord;
@@ -47,7 +47,7 @@ public:
     SurfacePoint sample(real *pdf, const Sample3 &sam) const noexcept override
     {
         Sample3 new_sam = sam;
-        bool backface = new_sam.u < real(0.5);
+        const bool backface = new_sam.u < real(0.5);
         if(backface)
             new_sam.u = 2 * sam.u;
         else
@@ -67,7 +67,7 @@ public:
     SurfacePoint sample(const Vec3 &ref, real *pdf, const Sample3 &sam) const noexcept override
     {
         Sample3 new_sam = sam;
-        bool backface = new_sam.u < real(0.5);
+        const bool backface = new_sam.u < real(0.5);
         if(backface)
             new_sam.u = 2 * sam.u;
         else
@@ -86,13 +86,13 @@ public:
 
     real pdf(const Vec3 &sample) const noexcept override
     {
-        auto internal_pdf = internal_->pdf(sample);
+        const real internal_pdf = internal_->pdf(sample);
         return internal_pdf * real(0.5);
     }
 
     real pdf(const Vec3 &ref, const Vec3 &sample) const noexcept override
     {
-        auto internal_pdf = internal_->pdf(ref, sample);
+        const real internal_pdf = internal_->pdf(ref, sample);
         return internal_pdf * real(0.5);
     }
 };
@@ -100,9 +100,7 @@ public:
 std::shared_ptr<Geometry> create_double_sided(
     std::shared_ptr<const Geometry> internal)
 {
-    auto ret = std::make_shared<DoubleSidedGeometry>();
-    ret->initialize(internal);
-    return ret;
+    return std::make_shared<DoubleSidedGeometry>(std::move(internal));
 }
 
 AGZ_TRACER_END

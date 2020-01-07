@@ -14,19 +14,20 @@ class OIDNDenoiser : public PostProcessor
 
 public:
 
-    void initialize(bool clamp_color)
+    explicit OIDNDenoiser(bool clamp_color)
     {
         clamp_color_ = clamp_color;
     }
 
-    void process(ImageBuffer &image, GBuffer &gbuffer) override
+    void process(RenderTarget &render_target) override
     {
-        AGZ_LOG1("oidn denoising");
+        AGZ_INFO("oidn denoising");
 
         oidn::DeviceRef device = oidn::newDevice();
         device.commit();
 
-        ImageBuffer output(image.height(), image.width());
+        auto &image = render_target.image;
+        Image2D<Spectrum> output(image.height(), image.width());
 
         oidn::FilterRef filter = device.newFilter("RT");
 
@@ -35,17 +36,17 @@ public:
             clamped_data = clamped_data.map([](const Spectrum &c) { return c.clamp(0, 1); });
         filter.setImage("color", clamped_data.raw_data(), oidn::Format::Float3, image.width(), image.height());
 
-        AlbedoBuffer::data_t clamped_albedo;
-        if(gbuffer.albedo)
+        Image2D<Spectrum>::data_t clamped_albedo;
+        if(render_target.albedo.is_available())
         {
-            clamped_albedo = gbuffer.albedo->get_data().map([](const Spectrum &a) { return a.clamp(0, 1); });
+            clamped_albedo = render_target.albedo.get_data().map([](const Spectrum &a) { return a.clamp(0, 1); });
             filter.setImage("albedo", clamped_albedo.raw_data(), oidn::Format::Float3, image.width(), image.height());
         }
 
-        NormalBuffer::data_t clamped_normal;
-        if(gbuffer.normal)
+        Image2D<Vec3>::data_t clamped_normal;
+        if(render_target.normal.is_available())
         {
-            clamped_normal = gbuffer.normal->get_data().map([](const Vec3 &n)
+            clamped_normal = render_target.normal.get_data().map([](const Vec3 &n)
             {
                 if(!n)
                     return Vec3(1, 0, 0);
@@ -59,13 +60,13 @@ public:
         filter.commit();
         filter.execute();
 
-        if(gbuffer.denoise)
+        if(render_target.denoise.is_available())
         {
             for(int y = 0; y < output.height(); ++y)
             {
                 for(int x = 0; x < output.width(); ++x)
                 {
-                    if(gbuffer.denoise->at(y, x) < real(0.8))
+                    if(render_target.denoise(y, x) < real(0.8))
                         output.at(y, x) = clamped_data(y, x);
                 }
             }
@@ -73,7 +74,7 @@ public:
 
         const char* err;
         if(device.getError(err) != oidn::Error::None)
-            AGZ_LOG0("oidn_denoiser error: ", err);
+            AGZ_INFO("oidn_denoiser error: {}", err);
         else
             image = std::move(output);
     }
@@ -82,9 +83,7 @@ public:
 std::shared_ptr<PostProcessor> create_oidn_denoiser(
     bool clamp_color)
 {
-    auto ret = std::make_shared<OIDNDenoiser>();
-    ret->initialize(clamp_color);
-    return ret;
+    return std::make_shared<OIDNDenoiser>(clamp_color);
 }
 
 AGZ_TRACER_END

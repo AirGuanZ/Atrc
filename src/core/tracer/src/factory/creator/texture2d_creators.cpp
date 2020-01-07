@@ -35,10 +35,10 @@ namespace texture
 
         std::shared_ptr<Texture2D> create(const ConfigGroup &params, CreatingContext &context) const override
         {
-            auto common_params = init_common_params(params);
-            int grid_count = params.child_int("grid_count");
-            Spectrum color1 = params.child_spectrum("color1");
-            Spectrum color2 = params.child_spectrum("color2");
+            const auto common_params = init_common_params(params);
+            const int grid_count = params.child_int("grid_count");
+            const Spectrum color1 = params.child_spectrum("color1");
+            const Spectrum color2 = params.child_spectrum("color2");
             return create_checker_board(common_params, grid_count, color1, color2);
         }
     };
@@ -54,8 +54,8 @@ namespace texture
 
         std::shared_ptr<Texture2D> create(const ConfigGroup &params, CreatingContext &context) const override
         {
-            auto common_params = init_common_params(params);
-            auto texel = params.child_spectrum("texel");
+            const auto common_params = init_common_params(params);
+            const auto texel = params.child_spectrum("texel");
             return create_constant2d_texture(common_params, texel);
         }
     };
@@ -71,9 +71,9 @@ namespace texture
 
         std::shared_ptr<Texture2D> create(const ConfigGroup &params, CreatingContext &context) const override
         {
-            auto common_params = init_common_params(params);
-            Spectrum color1 = params.child_spectrum("color1");
-            Spectrum color2 = params.child_spectrum("color2");
+            const auto common_params = init_common_params(params);
+            const Spectrum color1 = params.child_spectrum("color1");
+            const Spectrum color2 = params.child_spectrum("color2");
             return create_gradient_texture(common_params, color1, color2);
         }
     };
@@ -89,9 +89,9 @@ namespace texture
 
         std::shared_ptr<Texture2D> create(const ConfigGroup &params, CreatingContext &context) const override
         {
-            auto common_params = init_common_params(params);
-            auto filename = context.path_mapper->map(params.child_str("filename"));
-            auto sample = params.child_str_or("sample", "linear");
+            const auto common_params = init_common_params(params);
+            const auto filename = context.path_mapper->map(params.child_str("filename"));
+            const auto sample = params.child_str_or("sample", "linear");
             return create_hdr_texture(common_params, filename, sample);
         }
     };
@@ -107,9 +107,9 @@ namespace texture
 
         std::shared_ptr<Texture2D> create(const ConfigGroup &params, CreatingContext &context) const override
         {
-            auto common_params = init_common_params(params);
-            auto filename = context.path_mapper->map(params.child_str("filename"));
-            auto sample = params.child_str_or("sample", "linear");
+            const auto common_params = init_common_params(params);
+            const auto filename = context.path_mapper->map(params.child_str("filename"));
+            const auto sample = params.child_str_or("sample", "linear");
             return create_image_texture(common_params, filename, sample);
         }
     };
@@ -125,9 +125,9 @@ namespace texture
 
         std::shared_ptr<Texture2D> create(const ConfigGroup &params, CreatingContext &context) const override
         {
-            auto common_params = init_common_params(params);
-            auto scale = params.child_spectrum("scale");
-            auto internal = context.create<Texture2D>(params.child_group("internal"));
+            const auto common_params = init_common_params(params);
+            const auto scale = params.child_spectrum("scale");
+            const auto internal = context.create<Texture2D>(params.child_group("internal"));
             return create_texture2d_scaler(common_params, scale, std::move(internal));
         }
     };
@@ -143,9 +143,9 @@ namespace texture
 
         std::shared_ptr<Texture2D> create(const ConfigGroup &params, CreatingContext &context) const override
         {
-            auto common_params = init_common_params(params);
-            auto lhs = context.create<Texture2D>(params.child_group("lhs"));
-            auto rhs = context.create<Texture2D>(params.child_group("rhs"));
+            const auto common_params = init_common_params(params);
+            const auto lhs = context.create<Texture2D>(params.child_group("lhs"));
+            const auto rhs = context.create<Texture2D>(params.child_group("rhs"));
             return create_texture2d_adder(common_params, std::move(lhs), std::move(rhs));
         }
     };
@@ -161,9 +161,9 @@ namespace texture
 
         std::shared_ptr<Texture2D> create(const ConfigGroup &params, CreatingContext &context) const override
         {
-            auto common_params = init_common_params(params);
-            auto lhs = context.create<Texture2D>(params.child_group("lhs"));
-            auto rhs = context.create<Texture2D>(params.child_group("rhs"));
+            const auto common_params = init_common_params(params);
+            const auto lhs = context.create<Texture2D>(params.child_group("lhs"));
+            const auto rhs = context.create<Texture2D>(params.child_group("rhs"));
             return create_texture2d_multiplier(common_params, std::move(lhs), std::move(rhs));
         }
     };
@@ -179,11 +179,11 @@ namespace texture
 
         std::shared_ptr<Texture2D> create(const ConfigGroup &params, CreatingContext &context) const override
         {
-            auto common_params = init_common_params(params);
-            auto internal = context.create<Texture2D>(params.child_group("internal"));
-            auto threshold = context.create<Texture2D>(params.child_group("threshold"));
-            auto higher = context.create<Texture2D>(params.child_group("high"));
-            auto lower = context.create<Texture2D>(params.child_group("low"));
+            const auto common_params = init_common_params(params);
+            const auto internal = context.create<Texture2D>(params.child_group("internal"));
+            const auto threshold = context.create<Texture2D>(params.child_group("threshold"));
+            const auto higher = context.create<Texture2D>(params.child_group("high"));
+            const auto lower = context.create<Texture2D>(params.child_group("low"));
             return create_texture2d_luminance_classifier(
                 common_params,
                 std::move(internal),
@@ -204,8 +204,8 @@ namespace texture
 
         std::shared_ptr<Texture2D> create(const ConfigGroup &params, CreatingContext &context) const override
         {
-            auto common_params = init_common_params(params);
-            auto internal = context.create<Texture2D>(params.child_group("internal"));
+            const auto common_params = init_common_params(params);
+            const auto internal = context.create<Texture2D>(params.child_group("internal"));
             return create_texture2d_reverse(common_params, std::move(internal));
         }
     };

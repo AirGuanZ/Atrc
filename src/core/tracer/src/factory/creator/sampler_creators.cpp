@@ -17,10 +17,10 @@ namespace sampler
 
         std::shared_ptr<Sampler> create(const ConfigGroup &params, CreatingContext &context) const override
         {
-            auto seed_node = params.find_child_value("seed");
-            bool use_seed = seed_node != nullptr;
+            const auto seed_node = params.find_child_value("seed");
+            const bool use_seed = seed_node != nullptr;
 
-            int spp = params.child_int("spp");
+            const int spp = params.child_int("spp");
 
             return create_native_sampler(spp, use_seed ? seed_node->as_int() : 0, !use_seed);
         }

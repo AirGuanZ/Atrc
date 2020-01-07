@@ -9,7 +9,7 @@ class Texture2DAdder : public Texture2D
 
 public:
 
-    void initialize(
+    Texture2DAdder(
         const Texture2DCommonParams &common_params,
         std::shared_ptr<const Texture2D> lhs, std::shared_ptr<const Texture2D> rhs)
     {
@@ -20,8 +20,8 @@ public:
 
     Spectrum sample_spectrum(const Vec2 &uv) const noexcept override
     {
-        Spectrum lhs_sample = lhs_->sample_spectrum(uv);
-        Spectrum rhs_sample = rhs_->sample_spectrum(uv);
+        const Spectrum lhs_sample = lhs_->sample_spectrum(uv);
+        const Spectrum rhs_sample = rhs_->sample_spectrum(uv);
         return lhs_sample + rhs_sample;
     }
 
@@ -43,7 +43,7 @@ class Texture2DMultiplier : public Texture2D
 
 public:
 
-    void initialize(
+    Texture2DMultiplier(
         const Texture2DCommonParams &common_params,
         std::shared_ptr<const Texture2D> lhs, std::shared_ptr<const Texture2D> rhs)
     {
@@ -54,8 +54,8 @@ public:
 
     Spectrum sample_spectrum(const Vec2 &uv) const noexcept override
     {
-        Spectrum lhs_sample = lhs_->sample_spectrum(uv);
-        Spectrum rhs_sample = rhs_->sample_spectrum(uv);
+        const Spectrum lhs_sample = lhs_->sample_spectrum(uv);
+        const Spectrum rhs_sample = rhs_->sample_spectrum(uv);
         return lhs_sample * rhs_sample;
     }
 
@@ -75,9 +75,7 @@ std::shared_ptr<Texture2D> create_texture2d_adder(
     std::shared_ptr<const Texture2D> lhs,
     std::shared_ptr<const Texture2D> rhs)
 {
-    auto ret = std::make_shared<Texture2DAdder>();
-    ret->initialize(common_params, std::move(lhs), std::move(rhs));
-    return ret;
+    return std::make_shared<Texture2DAdder>(common_params, std::move(lhs), std::move(rhs));
 }
 
 std::shared_ptr<Texture2D> create_texture2d_multiplier(
@@ -85,9 +83,7 @@ std::shared_ptr<Texture2D> create_texture2d_multiplier(
     std::shared_ptr<const Texture2D> lhs,
     std::shared_ptr<const Texture2D> rhs)
 {
-    auto ret = std::make_shared<Texture2DMultiplier>();
-    ret->initialize(common_params, std::move(lhs), std::move(rhs));
-    return ret;
+    return std::make_shared<Texture2DMultiplier>(common_params, std::move(lhs), std::move(rhs));
 }
 
 AGZ_TRACER_END

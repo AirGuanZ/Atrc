@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include <agz/tracer/core/film.h>
+#include <agz/tracer/common.h>
 
 AGZ_TRACER_BEGIN
 
@@ -11,6 +11,7 @@ struct CameraSampleWeResult
 {
     Vec3 pos_on_cam;
     Vec3 pos_to_out;
+    Vec3 nor_on_cam;
     Spectrum throughput;
 };
 
@@ -19,8 +20,8 @@ struct CameraSampleWeResult
  */
 struct CameraWePDFResult
 {
-    real pdf_pos = 0;
-    real pdf_dir = 0;
+    real pdf_pos      = 0;
+    real pdf_dir      = 0;
 };
 
 /**
@@ -35,7 +36,7 @@ struct CameraEvalWeResult
 inline const CameraEvalWeResult CAMERA_EVAL_WE_RESULT_ZERO = { {}, {} };
 
 /**
- * @breif 摄像机sample we的结果
+ * @brief 摄像机sample we的结果
  */
 struct CameraSampleWiResult
 {
@@ -47,7 +48,8 @@ struct CameraSampleWiResult
     Vec2 film_coord; // 对应于film coord上的何处
 };
 
-inline const CameraSampleWiResult CAMERA_SAMPLE_WI_RESULT_INVALID = { {}, {}, {}, {}, 0, {} };
+inline const CameraSampleWiResult CAMERA_SAMPLE_WI_RESULT_INVALID =
+    { {}, {}, {}, {}, 0, {} };
 
 /**
  * @brief 摄像机接口
@@ -60,11 +62,12 @@ class Camera
 {
 protected:
 
-    std::shared_ptr<const Film> film_;
+    int film_width_;
+    int film_height_;
 
 public:
 
-    explicit Camera(std::shared_ptr<const Film> film) noexcept : film_(std::move(film)) { }
+    explicit Camera(int film_width, int film_height) noexcept : film_width_(film_width), film_height_(film_height) { }
 
     virtual ~Camera() = default;
 
@@ -75,7 +78,7 @@ public:
      * @param aperture_sample 用于采样镜头的sample点
      */
     virtual CameraSampleWeResult sample_we(
-        const Sample2 &film_coord, const Sample2 &aperture_sample) const noexcept = 0;
+        const Vec2 &film_coord, const Sample2 &aperture_sample) const noexcept = 0;
 
     /**
      * @brief 求we值

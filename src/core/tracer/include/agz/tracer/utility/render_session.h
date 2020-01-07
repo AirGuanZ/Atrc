@@ -19,8 +19,11 @@ public:
 
     struct RenderSetting
     {
+        int width  = 1;
+        int height = 1;
+
         std::shared_ptr<Camera>                     camera;
-        std::shared_ptr<Film>                       film;
+        std::shared_ptr<FilmFilter>                 film_filter;
         std::shared_ptr<Renderer>                   renderer;
         std::shared_ptr<ProgressReporter>           reporter;
         std::vector<std::shared_ptr<PostProcessor>> post_processors;

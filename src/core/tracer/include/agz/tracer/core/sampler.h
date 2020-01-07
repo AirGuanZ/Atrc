@@ -37,35 +37,35 @@ public:
 
 inline Sample2 Sampler::sample2() noexcept
 {
-    real u = sample1().u;
-    real v = sample1().u;
+    const real u = sample1().u;
+    const real v = sample1().u;
     return { u, v };
 }
 
 inline Sample3 Sampler::sample3() noexcept
 {
-    real u = sample1().u;
-    real v = sample1().u;
-    real w = sample1().u;
+    const real u = sample1().u;
+    const real v = sample1().u;
+    const real w = sample1().u;
     return { u, v, w };
 }
 
 inline Sample4 Sampler::sample4() noexcept
 {
-    real u = sample1().u;
-    real v = sample1().u;
-    real w = sample1().u;
-    real r = sample1().u;
+    const real u = sample1().u;
+    const real v = sample1().u;
+    const real w = sample1().u;
+    const real r = sample1().u;
     return { u, v, w, r };
 }
 
 inline Sample5 Sampler::sample5() noexcept
 {
-    real u = sample1().u;
-    real v = sample1().u;
-    real w = sample1().u;
-    real r = sample1().u;
-    real s = sample1().u;
+    const real u = sample1().u;
+    const real v = sample1().u;
+    const real w = sample1().u;
+    const real r = sample1().u;
+    const real s = sample1().u;
     return { u, v, w, r, s };
 }
 

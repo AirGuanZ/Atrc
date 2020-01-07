@@ -2,9 +2,9 @@
 
 #include <stdexcept>
 
-#include <agz/common/math.h>
-#include <agz/utility/common/common.h>
 #include <agz/utility/alloc.h>
+#include <agz/utility/math.h>
+#include <agz/utility/texture.h>
 
 #define AGZ_TRACER_BEGIN namespace agz::tracer {
 #define AGZ_TRACER_END   }
@@ -17,9 +17,61 @@
 
 AGZ_TRACER_BEGIN
 
+using real = float;
+
 extern real EPS;
 
-using Arena = alloc::releaser_t;
+constexpr real PI_r = math::PI<real>;
+constexpr real invPI_r = 1 / PI_r;
+
+constexpr real REAL_INF = std::numeric_limits<real>::infinity();
+constexpr real REAL_MAX = std::numeric_limits<real>::max();
+constexpr real REAL_MIN = std::numeric_limits<real>::lowest();
+
+using Vec2 = math::tvec2<real>;
+using Vec3 = math::tvec3<real>;
+using Vec4 = math::tvec4<real>;
+
+using Rect2  = math::taabb2<real>;
+using Rect2i = math::aabb2i;
+
+using Vec2i = math::vec2i;
+using Vec3i = math::vec3i;
+
+using Mat3 = math::tmat3_c<real>;
+using Mat4 = math::tmat4_c<real>;
+
+using Trans4 = Mat4::left_transform;
+
+using Coord = math::tcoord3<real>;
+using Transform2 = math::ttransform2<real>;
+using Transform3 = math::ttransform3<real>;
+
+using Spectrum = math::tcolor3<real>;
+
+constexpr int SPECTRUM_COMPONENT_COUNT = 3;
+
+template<typename T>
+using Image2D = texture::texture2d_t<T>;
+
+/**
+ * @brief 用0-255下的rgb三分量构造0-1下的spectrum
+ */
+inline Spectrum rgb255(real r, real g, real b) noexcept
+{
+    constexpr real ratio = real(1) / 255;
+    return ratio * Spectrum(r, g, b);
+}
+
+/**
+ * @brief 某spectrum中是否含有inf成分
+ */
+inline bool has_inf(const Spectrum &s) noexcept
+{
+    return std::isinf(s.r) || std::isinf(s.g) || std::isinf(s.b);
+}
+
+using Arena = alloc::obj_arena_t;
 
 class ObjectConstructionException : public std::runtime_error
 {
@@ -64,7 +116,7 @@ namespace local_angle
      */
     inline real tan_theta(const Vec3 &w)
     {
-        real t = 1 - w.z * w.z;
+        const real t = 1 - w.z * w.z;
         if(t <= 0)
             return 0;
         return std::sqrt(t) / w.z;
@@ -77,8 +129,8 @@ namespace local_angle
      */
     inline real tan_theta_2(const Vec3 &w)
     {
-        real z2 = w.z * w.z;
-        real t = 1 - z2;
+        const real z2 = w.z * w.z;
+        const real t = 1 - z2;
         if(t <= 0)
             return 0;
         return t / z2;
@@ -91,7 +143,7 @@ namespace local_angle
     {
         if(!w.y && !w.x)
             return 0;
-        real ret = std::atan2(w.y, w.x);
+        const real ret = std::atan2(w.y, w.x);
         return ret < 0 ? (ret + 2 * PI_r) : ret;
     }
 
@@ -110,7 +162,7 @@ namespace local_angle
      */
     inline real normal_corr_factor(const Vec3 &geo, const Vec3 &shd, const Vec3 &wi) noexcept
     {
-        real dem = std::abs(cos(geo, wi));
+        const real dem = std::abs(cos(geo, wi));
         return  dem < EPS ? 1 : std::abs(cos(shd, wi) / dem);
     }
 
@@ -193,13 +245,13 @@ public:
     /** @brief 是否同某条参数射线有交点 */
     bool intersect(const Vec3 &ori, const Vec3 &inv_dir, real t_min, real t_max) const noexcept
     {
-        real nx = inv_dir[0] * (low[0] - ori[0]);
-        real ny = inv_dir[1] * (low[1] - ori[1]);
-        real nz = inv_dir[2] * (low[2] - ori[2]);
+        const real nx = inv_dir[0] * (low[0] - ori[0]);
+        const real ny = inv_dir[1] * (low[1] - ori[1]);
+        const real nz = inv_dir[2] * (low[2] - ori[2]);
 
-        real fx = inv_dir[0] * (high[0] - ori[0]);
-        real fy = inv_dir[1] * (high[1] - ori[1]);
-        real fz = inv_dir[2] * (high[2] - ori[2]);
+        const real fx = inv_dir[0] * (high[0] - ori[0]);
+        const real fy = inv_dir[1] * (high[1] - ori[1]);
+        const real fz = inv_dir[2] * (high[2] - ori[2]);
 
         t_min = (std::max)(t_min, (std::min)(nx, fx));
         t_min = (std::max)(t_min, (std::min)(ny, fy));

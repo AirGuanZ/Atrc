@@ -10,46 +10,28 @@ class Flip : public PostProcessor
 
 public:
 
-    void initialize(bool vertically, bool horizontally)
+    Flip(bool vertically, bool horizontally)
     {
         vertically_ = vertically;
         horizontally_ = horizontally;
     }
 
-    void process(texture::texture2d_t<Spectrum> &image, GBuffer &gbuffer) override
+    void process(RenderTarget &render_target) override
     {
         if(vertically_)
         {
-            texture::texture2d_t<Spectrum> t(image.height(), image.width());
-            GBuffer tgb = gbuffer;
-            for(int y = 0; y < t.height(); ++y)
-            {
-                for(int x = 0; x < t.width(); ++x)
-                {
-                    int ty = t.height() - 1 - y;
-                    t(y, x) = image(ty, x);
-                    tgb.set(y, x, gbuffer.get(ty, x));
-                }
-            }
-            image = std::move(t);
-            gbuffer = std::move(tgb);
+            render_target.image   = render_target.image  .flip_vertically();
+            render_target.albedo  = render_target.albedo .flip_vertically();
+            render_target.normal  = render_target.normal .flip_vertically();
+            render_target.denoise = render_target.denoise.flip_vertically();
         }
 
         if(horizontally_)
         {
-            texture::texture2d_t<Spectrum> t(image.height(), image.width());
-            GBuffer tgb = gbuffer;
-            for(int y = 0; y < t.height(); ++y)
-            {
-                for(int x = 0; x < t.width(); ++x)
-                {
-                    int tx = t.width() - 1 - x;
-                    t(y, x) = image(y, tx);
-                    tgb.set(y, x, gbuffer.get(y, tx));
-                }
-            }
-            image = std::move(t);
-            gbuffer = std::move(tgb);
+            render_target.image   = render_target.image  .flip_horizontally();
+            render_target.albedo  = render_target.albedo .flip_horizontally();
+            render_target.normal  = render_target.normal .flip_horizontally();
+            render_target.denoise = render_target.denoise.flip_horizontally();
         }
     }
 };
@@ -57,9 +39,7 @@ public:
 std::shared_ptr<PostProcessor> create_film_flipper(
     bool vertically, bool horizontally)
 {
-    auto ret = std::make_shared<Flip>();
-    ret->initialize(vertically, horizontally);
-    return ret;
+    return std::make_shared<Flip>(vertically, horizontally);
 }
 
 AGZ_TRACER_END

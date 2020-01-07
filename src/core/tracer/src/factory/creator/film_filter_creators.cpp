@@ -17,7 +17,7 @@ namespace film_filter
 
         std::shared_ptr<FilmFilter> create(const ConfigGroup &params, CreatingContext &context) const override
         {
-            real radius = params.child_real("radius");
+            const real radius = params.child_real("radius");
             return create_box_filter(radius);
         }
     };
@@ -33,8 +33,8 @@ namespace film_filter
 
         std::shared_ptr<FilmFilter> create(const ConfigGroup &params, CreatingContext &context) const override
         {
-            real radius = params.child_real("radius");
-            real alpha = params.child_real("alpha");
+            const real radius = params.child_real("radius");
+            const real alpha = params.child_real("alpha");
             return create_gaussian_filter(radius, alpha);
         }
     };

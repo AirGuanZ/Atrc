@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include <agz/tracer/core/reporter.h>
+#include <agz/tracer/utility/logger.h>
 #include <agz/utility/console.h>
 #include <agz/utility/misc.h>
 #include <agz/utility/time.h>
@@ -19,13 +20,6 @@ class StdOutput : public ProgressReporter
 
 public:
 
-    static std::string description()
-    {
-        return R"___(
-stdout [ProgressReporter]
-)___";
-    }
-
     void progress(double percent) override
     {
         if(percent > percent_)
@@ -38,12 +32,12 @@ stdout [ProgressReporter]
 
     void message(const std::string &msg) override
     {
-        std::cout << "[MSG] " << msg << std::endl;
+        AGZ_INFO(msg);
     }
 
     void error(const std::string &err) override
     {
-        std::cout << "[ERR] " << err << std::endl;
+        AGZ_ERROR(err);
     }
 
     void begin() override

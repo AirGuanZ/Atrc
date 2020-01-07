@@ -1,6 +1,7 @@
 #include <agz/tracer/core/post_processor.h>
 #include <agz/tracer/core/scene.h>
 #include <agz/tracer/factory/factory.h>
+#include <agz/tracer/factory/raw/film_filter.h>
 #include <agz/tracer/utility/logger.h>
 #include <agz/tracer/utility/render_session.h>
 
@@ -14,51 +15,56 @@ namespace
     {
         auto settings = std::make_unique<RenderSession::RenderSetting>();
 
-        auto &film_params = rendering_config.child_group("film");
-        int film_width = film_params.child_int("width");
-        int film_height = film_params.child_int("height");
+        const int film_width = rendering_config.child_int("width");
+        const int film_height = rendering_config.child_int("height");
 
-        auto film_width_over_height = static_cast<real>(film_width) / film_height;
+        const auto film_width_over_height = static_cast<real>(film_width) / film_height;
 
-        auto film_width_child = std::make_shared<ConfigValue>(std::to_string(film_width));
-        auto film_height_child = std::make_shared<ConfigValue>(std::to_string(film_height));
-        auto film_aspect_child = std::make_shared<ConfigValue>(std::to_string(film_width_over_height));
-        rendering_config.child_group("camera").insert_child("film_width", film_width_child);
+        const auto film_width_child = std::make_shared<ConfigValue>(std::to_string(film_width));
+        const auto film_height_child = std::make_shared<ConfigValue>(std::to_string(film_height));
+        const auto film_aspect_child = std::make_shared<ConfigValue>(std::to_string(film_width_over_height));
+        rendering_config.child_group("camera").insert_child("film_width",  film_width_child);
         rendering_config.child_group("camera").insert_child("film_height", film_height_child);
         rendering_config.child_group("camera").insert_child("film_aspect", film_aspect_child);
 
-        AGZ_LOG1("creating render target");
-        settings->film = context.create<Film>(film_params);
-        AGZ_LOG1("resolution: (", film_width, ", ", film_height, ")");
+        AGZ_INFO("creating render target");
+        settings->width  = film_width;
+        settings->height = film_height;
+        if(auto group = rendering_config.find_child_group("film_filter"))
+            settings->film_filter = context.create<FilmFilter>(*group);
+        else
+            settings->film_filter = create_box_filter(real(0.5));
+        AGZ_INFO("resolution: ({}, {})", film_width, film_height);
 
-        AGZ_LOG1("creating camera");
-        auto &camera_params = rendering_config.child_group("camera");
-        settings->camera = context.create<Camera>(camera_params, settings->film);
+        AGZ_INFO("creating camera");
+        const auto &camera_params = rendering_config.child_group("camera");
+        settings->camera = context.create<Camera>(camera_params, film_width, film_height);
 
-        AGZ_LOG1("creating renderer");
-        auto &renderer_params = rendering_config.child_group("renderer");
+        AGZ_INFO("creating renderer");
+        const auto &renderer_params = rendering_config.child_group("renderer");
         settings->renderer = context.create<Renderer>(renderer_params);
 
-        AGZ_LOG1("creating progress reporter");
-        auto &reporter_params = rendering_config.child_group("reporter");
+        AGZ_INFO("creating progress reporter");
+        const auto &reporter_params = rendering_config.child_group("reporter");
         settings->reporter = context.create<ProgressReporter>(reporter_params);
 
         if(auto node = rendering_config.find_child("post_processors"))
         {
-            AGZ_LOG1("creating post processors");
-            auto &arr = node->as_array();
+            AGZ_INFO("creating post processors");
+            const auto &arr = node->as_array();
+
             settings->post_processors.reserve(arr.size());
             for(size_t i = 0; i != arr.size(); ++i)
             {
-                auto &group = arr.at(i).as_group();
+                const auto &group = arr.at(i).as_group();
                 if(stdstr::ends_with(group.child_str("type"), "//"))
                     continue;
-                auto elem = context.create<PostProcessor>(group);
+                const auto elem = context.create<PostProcessor>(group);
                 settings->post_processors.push_back(elem);
             }
         }
         else
-            AGZ_LOG1("no post processor");
+            AGZ_INFO("no post processor");
 
         return settings;
     }
@@ -72,18 +78,16 @@ RenderSession::RenderSession(std::shared_ptr<Scene> scene, std::unique_ptr<Rende
 
 void RenderSession::execute()
 {
-    AGZ_LOG0("start rendering");
+    AGZ_INFO("start rendering");
 
     scene_->set_camera(render_settings_->camera);
-    render_settings_->renderer->render(*scene_, *render_settings_->reporter, render_settings_->film.get());
+    FilmFilterApplier filter_applier(render_settings_->width, render_settings_->height, render_settings_->film_filter);
+    RenderTarget render_target = render_settings_->renderer->render(filter_applier, *scene_, *render_settings_->reporter);
 
-    auto img = render_settings_->film->image();
-    auto gbuffer = render_settings_->film->gbuffer();
-
-    AGZ_LOG0("running post processors");
+    AGZ_INFO("running post processors");
 
     for(auto &p : render_settings_->post_processors)
-        p->process(img, gbuffer);
+        p->process(render_target);
 }
 
 RenderSession create_render_session(
@@ -101,7 +105,7 @@ std::vector<RenderSession> parse_render_sessions(
     factory::CreatingContext &context)
 {
     std::vector<RenderSession> ret;
-    auto scene = context.create<Scene>(scene_config);
+    const auto scene = context.create<Scene>(scene_config);
     
     if(rendering_setting_config.is_group())
     {

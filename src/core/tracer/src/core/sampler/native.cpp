@@ -20,7 +20,7 @@ class NativeSampler : public Sampler
 
 public:
 
-    void initialize(int spp, int seed, bool use_time_seed)
+    NativeSampler(int spp, int seed, bool use_time_seed)
     {
         if(use_time_seed)
             seed_ = static_cast<seed_t>(std::time(nullptr));
@@ -41,21 +41,12 @@ public:
 
     Sampler *clone(int seed, Arena &arena) const override
     {
-        auto *ret = arena.create<NativeSampler>();
-
         seed_t new_seed;
         {
-            std::seed_seq seed_gen = { seed_, seed_t(seed) };
+            const std::seed_seq seed_gen = { seed_, seed_t(seed) };
             seed_gen.generate(&new_seed, &new_seed + 1);
         }
-
-        ret->rng_ = rng_t(static_cast<seed_t>(new_seed));
-        ret->seed_ = new_seed;
-
-        ret->dis_ = dis_;
-        ret->spp_ = spp_;
-
-        return ret;
+        return arena.create<NativeSampler>(spp_, new_seed, false);
     }
 
     void start_pixel(int, int) override
@@ -77,9 +68,7 @@ public:
 std::shared_ptr<Sampler> create_native_sampler(
     int spp, int seed, bool use_time_seed)
 {
-    auto ret = std::make_shared<NativeSampler>();
-    ret->initialize(spp, seed, use_time_seed);
-    return ret;
+    return std::make_shared<NativeSampler>(spp, seed, use_time_seed);
 }
 
 AGZ_TRACER_END

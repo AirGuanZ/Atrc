@@ -2,7 +2,6 @@
 
 #include <cassert>
 
-#include <agz/common/math.h>
 #include <agz/tracer/common.h>
 
 AGZ_TRACER_BEGIN
@@ -10,23 +9,23 @@ AGZ_TRACER_BEGIN
 inline bool has_intersection_with_triangle(
     const Ray &r, const Vec3 &A, const Vec3 &B_A, const Vec3 &C_A) noexcept
 {
-    Vec3 s1 = cross(r.d, C_A);
-    real div = dot(s1, B_A);
+    const Vec3 s1 = cross(r.d, C_A);
+    const real div = dot(s1, B_A);
     if(!div)
         return false;
-    real inv_div = 1 / div;
+    const real inv_div = 1 / div;
 
-    Vec3 o_A = r.o - A;
-    real alpha = dot(o_A, s1) * inv_div;
+    const Vec3 o_A = r.o - A;
+    const real alpha = dot(o_A, s1) * inv_div;
     if(alpha < 0 || alpha > 1)
         return false;
 
-    Vec3 s2 = cross(o_A, B_A);
-    real beta = dot(r.d, s2) * inv_div;
+    const Vec3 s2 = cross(o_A, B_A);
+    const real beta = dot(r.d, s2) * inv_div;
     if(beta < 0 || alpha + beta > 1)
         return false;
 
-    real t = dot(C_A, s2) * inv_div;
+    const real t = dot(C_A, s2) * inv_div;
     return r.between(t);
 }
 
@@ -42,23 +41,23 @@ inline bool closest_intersection_with_triangle(
 {
     assert(record);
 
-    Vec3 s1 = cross(r.d, C_A);
-    real div = dot(s1, B_A);
+    const Vec3 s1 = cross(r.d, C_A);
+    const real div = dot(s1, B_A);
     if(!div)
         return false;
-    real inv_div = 1 / div;
+    const real inv_div = 1 / div;
 
-    Vec3 o_A = r.o - A;
-    real alpha = dot(o_A, s1) * inv_div;
+    const Vec3 o_A = r.o - A;
+    const real alpha = dot(o_A, s1) * inv_div;
     if(alpha < 0)
         return false;
 
-    Vec3 s2 = cross(o_A, B_A);
-    real beta = dot(r.d, s2) * inv_div;
+    const Vec3 s2 = cross(o_A, B_A);
+    const real beta = dot(r.d, s2) * inv_div;
     if(beta < 0 || alpha + beta > 1)
         return false;
 
-    real t = dot(C_A, s2) * inv_div;
+    const real t = dot(C_A, s2) * inv_div;
 
     if(!r.between(t))
         return false;
@@ -79,12 +78,12 @@ inline Vec3 dpdu_as_ex(
     const Vec2 &b_a, const Vec2 &c_a,
     const Vec3 &nor)
 {
-    real m00 = b_a.x, m01 = b_a.y;
-    real m10 = c_a.x, m11 = c_a.y;
-    real det = m00 * m11 - m01 * m10;
+    const real m00 = b_a.x, m01 = b_a.y;
+    const real m10 = c_a.x, m11 = c_a.y;
+    const real det = m00 * m11 - m01 * m10;
     if(!det)
         return Coord::from_z(nor).x;
-    real inv_det = 1 / det;
+    const real inv_det = 1 / det;
     return (m11 * inv_det * B_A - m01 * inv_det * C_A).normalize();
 }
 

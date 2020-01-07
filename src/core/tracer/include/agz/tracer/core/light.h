@@ -6,7 +6,7 @@ AGZ_TRACER_BEGIN
 
 class Scene;
 class AreaLight;
-class NonareaLight;
+class EnvirLight;
 
 /**
  * @brief 根据参考点采样光源得到的结果
@@ -92,7 +92,7 @@ public:
     /**
      * @brief 返回其非实体光源接口
      */
-    virtual const NonareaLight *as_nonarea() const noexcept { return nullptr; }
+    virtual const EnvirLight *as_nonarea() const noexcept { return nullptr; }
 
     /**
      * @brief 采样一条照射到ref的射线
@@ -121,7 +121,7 @@ public:
      *
      * 此方法应可以被多次调用，每次调用会覆盖之前的结果
      */
-    virtual void preprocess(const Scene &scene) = 0;
+    virtual void preprocess(const AABB &world_bound) = 0;
 };
 
 /**
@@ -155,19 +155,24 @@ public:
 };
 
 /**
- * @brief 非实体光源接口
+ * @brief 环境光源接口
  */
-class NonareaLight : public Light
+class EnvirLight : public Light
 {
+protected:
+
+    real world_radius_ = 1;
+    Vec3 world_centre_;
+
 public:
 
     bool is_area() const noexcept override final { return false; }
 
-    const NonareaLight* as_nonarea() const noexcept override final { return this; }
+    const EnvirLight *as_nonarea() const noexcept override final { return this; }
 
     /**
      * @brief 光源沿指定方向照射到空间中某点的辐射亮度
-     * 
+     *
      * @param ref 被照射的点
      * @param ref_to_light 沿哪个方向照射到ref点
      * @param light_point 发射点，主要用于visibility test，可以为nullptr
@@ -179,24 +184,11 @@ public:
      * @brief 以ref点为参考点时采样入射方向采样到ref_to_light的概率密度（w.r.t. solid angle）
      */
     virtual real pdf(const Vec3 &ref, const Vec3 &ref_to_light) const noexcept = 0;
-};
-
-/**
- * @brief 环境光源接口
- */
-class EnvirLight : public NonareaLight
-{
-protected:
-
-    real world_radius_ = 1;
-    Vec3 world_centre_;
-
-public:
 
     /**
      * @brief 计算场景包围球的中心和半径，主要用于环境光采样
      */
-    void preprocess(const Scene &scene) override;
+    void preprocess(const AABB &world_bound) override;
 };
 
 AGZ_TRACER_END

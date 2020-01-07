@@ -35,8 +35,8 @@ namespace mtl_impl
         {
             assert(bsdf_count_ > 0);
 
-            Vec3 local_in = shading_coord_.global_to_local(in_dir).normalize();
-            Vec3 local_out = shading_coord_.global_to_local(out_dir).normalize();
+            const Vec3 local_in = shading_coord_.global_to_local(in_dir).normalize();
+            const Vec3 local_out = shading_coord_.global_to_local(out_dir).normalize();
 
             Spectrum ret;
             for(int i = 0; i < bsdf_count_; ++i)
@@ -50,10 +50,10 @@ namespace mtl_impl
         {
             assert(bsdf_count_ > 0);
 
-            auto[bsdf_idx, new_sam_u] = math::distribution::extract_uniform_int(sam.u, 0, bsdf_count_);
-            auto bsdf = bsdfs_[bsdf_idx];
+            const auto [bsdf_idx, new_sam_u] = math::distribution::extract_uniform_int(sam.u, 0, bsdf_count_);
+            const BSDF *bsdf = bsdfs_[bsdf_idx];
 
-            Vec3 local_out = shading_coord_.global_to_local(out_dir).normalize();
+            const Vec3 local_out = shading_coord_.global_to_local(out_dir).normalize();
             auto ret = bsdf->sample(local_out, transport_mode, { new_sam_u, sam.v, sam.w });
 
             if(!ret.dir)
@@ -87,8 +87,8 @@ namespace mtl_impl
         {
             assert(bsdf_count_ > 0);
 
-            Vec3 local_in = shading_coord_.global_to_local(in_dir).normalize();
-            Vec3 local_out = shading_coord_.global_to_local(out_dir).normalize();
+            const Vec3 local_in = shading_coord_.global_to_local(in_dir).normalize();
+            const Vec3 local_out = shading_coord_.global_to_local(out_dir).normalize();
 
             real ret = 0;
             for(int i = 0; i < bsdf_count_; ++i)
@@ -102,6 +102,11 @@ namespace mtl_impl
             for(int i = 0; i < bsdf_count_; ++i)
                 ret += bsdfs_[i]->albedo();
             return ret;
+        }
+
+        bool is_delta() const noexcept override
+        {
+            return false;
         }
     };
     
@@ -129,7 +134,7 @@ namespace mtl_impl
             if(out_dir.z <= 0)
                 return BSDF_SAMPLE_RESULT_INVALID;
 
-            auto [local_in, pdf] = math::distribution::zweighted_on_hemisphere(sam.v, sam.w);
+            const auto [local_in, pdf] = math::distribution::zweighted_on_hemisphere(sam.v, sam.w);
             if(pdf < EPS)
                 return BSDF_SAMPLE_RESULT_INVALID;
 
@@ -154,6 +159,11 @@ namespace mtl_impl
         {
             return albedo_;
         }
+
+        bool is_delta() const noexcept override
+        {
+            return false;
+        }
     };
 
     class SpecularComponent : public InternalBSDF
@@ -163,9 +173,9 @@ namespace mtl_impl
 
         Vec3 sample_pow_cos_on_hemisphere(real e, const Sample2 &sam) const noexcept
         {
-            real cos_theta_h = std::pow(sam.u, 1 / (e + 1));
-            real sin_theta_h = local_angle::cos_2_sin(cos_theta_h);
-            real phi = 2 * PI_r * sam.v;
+            const real cos_theta_h = std::pow(sam.u, 1 / (e + 1));
+            const real sin_theta_h = local_angle::cos_2_sin(cos_theta_h);
+            const real phi = 2 * PI_r * sam.v;
 
             return Vec3(sin_theta_h * std::cos(phi), sin_theta_h * std::sin(phi), cos_theta_h).normalize();
         }
@@ -188,8 +198,8 @@ namespace mtl_impl
             if(in_dir.z <= 0 || out_dir.z <= 0)
                 return Spectrum();
 
-            Vec3 wh = (in_dir + out_dir).normalize();
-            real D = (ns_ + 1) / (2 * PI_r) * std::pow(wh.z, ns_);
+            const Vec3 wh = (in_dir + out_dir).normalize();
+            const real D = (ns_ + 1) / (2 * PI_r) * std::pow(wh.z, ns_);
             return color_ * D / (4 * in_dir.z * out_dir.z);
         }
 
@@ -198,13 +208,13 @@ namespace mtl_impl
             if(out_dir.z <= 0)
                 return BSDF_SAMPLE_RESULT_INVALID;
 
-            auto wh = sample_pow_cos_on_hemisphere(ns_, { sam.u, sam.v });
-            Vec3 wi = (2 * dot(out_dir, wh) * wh - out_dir).normalize();
+            const Vec3 wh = sample_pow_cos_on_hemisphere(ns_, { sam.u, sam.v });
+            const Vec3 wi = (2 * dot(out_dir, wh) * wh - out_dir).normalize();
             if(wi.z <= 0)
                 return BSDF_SAMPLE_RESULT_INVALID;
 
-            real D = (ns_ + 1) / (2 * PI_r) * std::pow(wh.z, ns_);
-            real pdf = D / (4 * dot(out_dir, wh));
+            const real D = (ns_ + 1) / (2 * PI_r) * std::pow(wh.z, ns_);
+            const real pdf = D / (4 * dot(out_dir, wh));
 
             BSDFSampleResult ret;
             ret.f              = color_ * D / (4 * wi.z * out_dir.z);
@@ -221,13 +231,18 @@ namespace mtl_impl
             if(in_dir.z <= 0 || out_dir.z <= 0)
                 return 0;
 
-            Vec3 wh = (in_dir + out_dir).normalize();
+            const Vec3 wh = (in_dir + out_dir).normalize();
             return pow_cos_on_hemisphere_pdf(ns_, wh.z) / (4 * dot(out_dir, wh));
         }
 
         Spectrum albedo() const noexcept override
         {
             return color_;
+        }
+
+        bool is_delta() const noexcept override
+        {
+            return false;
         }
     };
 
@@ -241,18 +256,21 @@ class MTL : public Material
 
 public:
 
-    void initialize(std::shared_ptr<const Texture2D> kd, std::shared_ptr<const Texture2D> ks, std::shared_ptr<const Texture2D> ns)
+    MTL(
+        std::shared_ptr<const Texture2D> kd,
+        std::shared_ptr<const Texture2D> ks,
+        std::shared_ptr<const Texture2D> ns)
     {
-        kd_ = kd;
-        ks_ = ks;
-        ns_ = ns;
+        kd_ = std::move(kd);
+        ks_ = std::move(ks);
+        ns_ = std::move(ns);
     }
 
     ShadingPoint shade(const EntityIntersection &inct, Arena &arena) const override
     {
         Spectrum kd = kd_->sample_spectrum(inct.uv);
         Spectrum ks = ks_->sample_spectrum(inct.uv);
-        real ns     = ns_->sample_real(inct.uv);
+        const real ns     = ns_->sample_real(inct.uv);
 
         // 能量归一化
         real dem = 1;
@@ -261,9 +279,9 @@ public:
         kd /= dem;
         ks /= dem;
 
-        auto bsdf     = arena.create<mtl_impl::BSDFAggregate<2>>(inct.geometry_coord, inct.user_coord);
-        auto diffuse  = arena.create<mtl_impl::DiffuseComponent>(kd);
-        auto specular = arena.create<mtl_impl::SpecularComponent>(ks, ns);
+        const auto bsdf     = arena.create<mtl_impl::BSDFAggregate<2>>(inct.geometry_coord, inct.user_coord);
+        const auto diffuse  = arena.create<mtl_impl::DiffuseComponent>(kd);
+        const auto specular = arena.create<mtl_impl::SpecularComponent>(ks, ns);
         bsdf->add(diffuse);
         bsdf->add(specular);
         
@@ -276,9 +294,7 @@ std::shared_ptr<Material> create_mtl(
     std::shared_ptr<const Texture2D> ks,
     std::shared_ptr<const Texture2D> ns)
 {
-    auto ret = std::make_shared<MTL>();
-    ret->initialize(kd, ks, ns);
-    return ret;
+    return std::make_shared<MTL>(std::move(kd), std::move(ks), std::move(ns));
 }
 
 AGZ_TRACER_END

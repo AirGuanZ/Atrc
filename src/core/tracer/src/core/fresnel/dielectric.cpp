@@ -36,7 +36,7 @@ class DielectricFresnel : public Fresnel
 
 public:
 
-    void initialize(std::shared_ptr<const Texture2D> eta_out, std::shared_ptr<const Texture2D> eta_in)
+    DielectricFresnel(std::shared_ptr<const Texture2D> eta_out, std::shared_ptr<const Texture2D> eta_in)
     {
         eta_i_ = eta_in;
         eta_o_ = eta_out;
@@ -44,8 +44,8 @@ public:
 
     FresnelPoint *get_point(const Vec2 &uv, Arena &arena) const override
     {
-        real eta_i = eta_i_->sample_real(uv);
-        real eta_o = eta_o_->sample_real(uv);
+        const real eta_i = eta_i_->sample_real(uv);
+        const real eta_o = eta_o_->sample_real(uv);
         return arena.create<DielectricFresnelPoint>(eta_i, eta_o);
     }
 };
@@ -54,9 +54,7 @@ std::shared_ptr<Fresnel> create_dielectric_fresnel(
     std::shared_ptr<const Texture2D> eta_out,
     std::shared_ptr<const Texture2D> eta_in)
 {
-    auto ret = std::make_shared<DielectricFresnel>();
-    ret->initialize(eta_out, eta_in);
-    return ret;
+    return std::make_shared<DielectricFresnel>(eta_out, eta_in);
 }
 
 AGZ_TRACER_END

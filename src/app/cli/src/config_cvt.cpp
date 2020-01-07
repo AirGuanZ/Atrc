@@ -23,7 +23,7 @@ namespace
 
         assert(node.is_array());
         JSON ret = JSON::array();
-        auto &arr = node.as_array();
+        const auto &arr = node.as_array();
         for(size_t i = 0; i < arr.size(); ++i)
         {
             auto &elem = arr.at(i);
@@ -53,7 +53,7 @@ namespace
             auto ret = std::make_shared<ConfigGroup>();
             for(auto it = json.begin(); it != json.end(); ++it)
             {
-                auto &val = it.value();
+                const auto &val = it.value();
                 std::shared_ptr<ConfigNode> child;
                 if(!val.is_array() && !val.is_object())
                     child = get_child(val);

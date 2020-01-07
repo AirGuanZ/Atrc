@@ -1,7 +1,7 @@
 #include <agz/tracer/core/entity.h>
 #include <agz/tracer/core/geometry.h>
 #include <agz/tracer/core/light.h>
-#include <agz/tracer/core/medium_interface.h>
+#include <agz/tracer/core/medium.h>
 #include <agz/tracer/factory/raw/material.h>
 
 AGZ_TRACER_BEGIN
@@ -16,9 +16,7 @@ namespace
 
     public:
 
-        using AreaLight::AreaLight;
-
-        void initialize(std::shared_ptr<const Geometry> geometry, const Spectrum &radiance, const MediumInterface &med)
+        DiffuseLight(std::shared_ptr<const Geometry> geometry, const Spectrum &radiance, const MediumInterface &med)
         {
             geometry_ = std::move(geometry);
             radiance_ = radiance;
@@ -95,7 +93,7 @@ namespace
             return dot(nor, light_to_out) > 0 ? radiance_ : Spectrum();
         }
 
-        void preprocess(const Scene&) override
+        void preprocess(const AABB &world_bound) override
         {
             // do nothing
         }
@@ -122,9 +120,7 @@ public:
     void initialize(
         std::shared_ptr<const Geometry> geometry, const Spectrum &radiance, const MediumInterface &med, bool no_denoise)
     {
-        //light_ = arena.create<DiffuseLight>();
-        light_ = std::make_unique<DiffuseLight>();
-        light_->initialize(std::move(geometry), radiance, med);
+        light_ = std::make_unique<DiffuseLight>(std::move(geometry), radiance, med);
         material_ = create_ideal_black();
         set_no_denoise_flag(no_denoise);
     }

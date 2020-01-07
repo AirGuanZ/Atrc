@@ -9,7 +9,7 @@ class Gamma : public PostProcessor
 
 public:
 
-    void initialize(real gamma)
+    explicit Gamma(real gamma)
     {
         AGZ_HIERARCHY_TRY
 
@@ -20,8 +20,9 @@ public:
         AGZ_HIERARCHY_WRAP("in initializing gamma correction post processor")
     }
 
-    void process(texture::texture2d_t<Spectrum> &image, GBuffer &) override
+    void process(RenderTarget &render_target) override
     {
+        auto &image = render_target.image;
         for(int y = 0; y < image.height(); ++y)
         {
             for(int x = 0; x < image.width(); ++x)
@@ -38,9 +39,7 @@ public:
 std::shared_ptr<PostProcessor> create_gamma_corrector(
     real gamma)
 {
-    auto ret = std::make_shared<Gamma>();
-    ret->initialize(gamma);
-    return ret;
+    return std::make_shared<Gamma>(gamma);
 }
 
 AGZ_TRACER_END

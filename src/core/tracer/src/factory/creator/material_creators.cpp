@@ -10,7 +10,7 @@ namespace material
     {
         if(auto node = params.find_child_group("normal_map"))
         {
-            auto map = context.create<Texture2D>(*node);
+            const auto map = context.create<Texture2D>(*node);
             return std::make_unique<NormalMapper>(map);
         }
         return std::make_unique<NormalMapper>(nullptr);
@@ -27,23 +27,23 @@ namespace material
 
         std::shared_ptr<Material> create(const ConfigGroup &params, CreatingContext &context) const override
         {
-            auto base_color   = context.create<Texture2D>(params.child_group("base_color"));
-            auto metallic     = context.create<Texture2D>(params.child_group("metallic"));
-            auto roughness    = context.create<Texture2D>(params.child_group("roughness"));
-            auto transmission = helper::child_texture_or_constant(context, params, "transmission", 0);
+            const auto base_color   = context.create<Texture2D>(params.child_group("base_color"));
+            const auto metallic     = context.create<Texture2D>(params.child_group("metallic"));
+            const auto roughness    = context.create<Texture2D>(params.child_group("roughness"));
+            const auto transmission = helper::child_texture_or_constant(context, params, "transmission", 0);
             
             auto transmission_roughness = roughness;
             if(auto node = params.find_child_group("transmission_roughness"))
                 transmission_roughness = context.create<Texture2D>(*node);
             
-            auto ior              = helper::child_texture_or_constant(context, params, "ior", real(1.5));
-            auto specular_scale   = helper::child_texture_or_constant(context, params, "specular_scale", 1);
-            auto specular_tint    = helper::child_texture_or_constant(context, params, "specular_tint", 0);
-            auto anisotropic      = helper::child_texture_or_constant(context, params, "anisotropic", 0);
-            auto sheen            = helper::child_texture_or_constant(context, params, "sheen", 0);
-            auto sheen_tint       = helper::child_texture_or_constant(context, params, "sheen_tint", 0);
-            auto clearcoat        = helper::child_texture_or_constant(context, params, "clearcoat", 0);
-            auto clearcoat_gloss  = helper::child_texture_or_constant(context, params, "clearcoat_gloss", 1);
+            const auto ior              = helper::child_texture_or_constant(context, params, "ior", real(1.5));
+            const auto specular_scale   = helper::child_texture_or_constant(context, params, "specular_scale", 1);
+            const auto specular_tint    = helper::child_texture_or_constant(context, params, "specular_tint", 0);
+            const auto anisotropic      = helper::child_texture_or_constant(context, params, "anisotropic", 0);
+            const auto sheen            = helper::child_texture_or_constant(context, params, "sheen", 0);
+            const auto sheen_tint       = helper::child_texture_or_constant(context, params, "sheen_tint", 0);
+            const auto clearcoat        = helper::child_texture_or_constant(context, params, "clearcoat", 0);
+            const auto clearcoat_gloss  = helper::child_texture_or_constant(context, params, "clearcoat_gloss", 1);
 
             auto normal_mapper = init_normal_mapper(params, context);
 
@@ -76,17 +76,17 @@ namespace material
 
         std::shared_ptr<Material> create(const ConfigGroup &params, CreatingContext &context) const override
         {
-            auto base_color      = context.create<Texture2D>(params.child_group("base_color"));
-            auto metallic        = context.create<Texture2D>(params.child_group("metallic"));
-            auto roughness       = context.create<Texture2D>(params.child_group("roughness"));
-            auto subsurface      = helper::child_texture_or_constant(context, params, "subsurface", 0);
-            auto specular        = helper::child_texture_or_constant(context, params, "specular", 0);
-            auto specular_tint   = helper::child_texture_or_constant(context, params, "specular_tint", 0);
-            auto anisotropic     = helper::child_texture_or_constant(context, params, "anisotropic", 0);
-            auto sheen           = helper::child_texture_or_constant(context, params, "sheen", 0);
-            auto sheen_tint      = helper::child_texture_or_constant(context, params, "sheen_tint", 0);
-            auto clearcoat       = helper::child_texture_or_constant(context, params, "clearcoat", 0);
-            auto clearcoat_gloss = helper::child_texture_or_constant(context, params, "clearcoat_gloss", 1);
+            const auto base_color      = context.create<Texture2D>(params.child_group("base_color"));
+            const auto metallic        = context.create<Texture2D>(params.child_group("metallic"));
+            const auto roughness       = context.create<Texture2D>(params.child_group("roughness"));
+            const auto subsurface      = helper::child_texture_or_constant(context, params, "subsurface", 0);
+            const auto specular        = helper::child_texture_or_constant(context, params, "specular", 0);
+            const auto specular_tint   = helper::child_texture_or_constant(context, params, "specular_tint", 0);
+            const auto anisotropic     = helper::child_texture_or_constant(context, params, "anisotropic", 0);
+            const auto sheen           = helper::child_texture_or_constant(context, params, "sheen", 0);
+            const auto sheen_tint      = helper::child_texture_or_constant(context, params, "sheen_tint", 0);
+            const auto clearcoat       = helper::child_texture_or_constant(context, params, "clearcoat", 0);
+            const auto clearcoat_gloss = helper::child_texture_or_constant(context, params, "clearcoat_gloss", 1);
 
             auto normal_mapper = init_normal_mapper(params, context);
 
@@ -117,9 +117,9 @@ namespace material
 
         std::shared_ptr<Material> create(const ConfigGroup &params, CreatingContext &context) const override
         {
-            auto color_map = context.create<Texture2D>(params.child_group("color_map"));
-            auto fresnel = context.create<Fresnel>(params.child_group("fresnel"));
-            auto roughness = context.create<Texture2D>(params.child_group("roughness"));
+            const auto color_map = context.create<Texture2D>(params.child_group("color_map"));
+            const auto fresnel = context.create<Fresnel>(params.child_group("fresnel"));
+            const auto roughness = context.create<Texture2D>(params.child_group("roughness"));
             return create_frosted_glass(std::move(color_map), std::move(roughness), std::move(fresnel));
         }
     };
@@ -135,7 +135,7 @@ namespace material
 
         std::shared_ptr<Material> create(const ConfigGroup &params, CreatingContext &context) const override
         {
-            auto fresnel = context.create<Fresnel>(params.child_group("fresnel"));
+            const auto fresnel = context.create<Fresnel>(params.child_group("fresnel"));
 
             std::shared_ptr<Texture2D> color_reflection_map, color_refraction_map;
 
@@ -185,7 +185,7 @@ namespace material
 
         std::shared_ptr<Material> create(const ConfigGroup &params, CreatingContext &context) const override
         {
-            auto albedo = context.create<Texture2D>(params.child_group("albedo"));
+            const auto albedo = context.create<Texture2D>(params.child_group("albedo"));
             auto normal_mapper = init_normal_mapper(params, context);
             return create_ideal_diffuse(std::move(albedo), std::move(normal_mapper));
         }

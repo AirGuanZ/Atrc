@@ -1,4 +1,4 @@
-#include <agz/tracer/core/medium_interface.h>
+#include <agz/tracer/core/medium.h>
 #include <agz/tracer/factory/creator/entity_creators.h>
 #include <agz/tracer/factory/raw/entity.h>
 #include <agz/tracer/factory/raw/medium.h>
@@ -36,10 +36,10 @@ namespace entity
 
         std::shared_ptr<Entity> create(const ConfigGroup &params, CreatingContext &context) const override
         {
-            auto geometry = context.create<Geometry>(params.child_group("geometry"));
-            auto radiance = params.child_spectrum("radiance");
-            auto med = create_medium_interface(params, context);
-            auto no_denoise = params.child_int_or("no_denoise", 0);
+            const auto geometry = context.create<Geometry>(params.child_group("geometry"));
+            const auto radiance = params.child_spectrum("radiance");
+            const auto med = create_medium_interface(params, context);
+            const auto no_denoise = params.child_int_or("no_denoise", 0);
             return create_diffuse_light(std::move(geometry), radiance, med, no_denoise);
         }
     };
@@ -55,11 +55,11 @@ namespace entity
 
         std::shared_ptr<Entity> create(const ConfigGroup &params, CreatingContext &context) const override
         {
-            auto geometry = context.create<Geometry>(params.child_group("geometry"));
-            auto material = context.create<Material>(params.child_group("material"));
-            auto med = create_medium_interface(params, context);
-            bool is_shadow_catcher = params.child_int_or("shadow_catcher", 0) != 0;
-            auto no_denoise = params.child_int_or("no_denoise", 0);
+            const auto geometry = context.create<Geometry>(params.child_group("geometry"));
+            const auto material = context.create<Material>(params.child_group("material"));
+            const auto med = create_medium_interface(params, context);
+            const bool is_shadow_catcher = params.child_int_or("shadow_catcher", 0) != 0;
+            const auto no_denoise = params.child_int_or("no_denoise", 0);
             return create_geometric(std::move(geometry), std::move(material), med,
                                     is_shadow_catcher, no_denoise);
         }

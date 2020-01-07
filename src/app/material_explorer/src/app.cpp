@@ -49,7 +49,7 @@ void App::update(GLFWwindow *window)
         std::string new_mat_name;
         for(auto &mat_name : material_names_)
         {
-            bool selected = mat_name == current_material_name_;
+            const bool selected = mat_name == current_material_name_;
             if(ImGui::Selectable(mat_name.c_str(), selected))
             {
                 changed = true;

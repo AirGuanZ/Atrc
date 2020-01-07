@@ -12,7 +12,7 @@ class MatAdder : public Material
 
 public:
 
-    void initialize(std::vector<std::shared_ptr<const Material>> &&mats)
+    explicit MatAdder(std::vector<std::shared_ptr<const Material>> &&mats)
     {
         mats_ = std::move(mats);
     }
@@ -32,9 +32,7 @@ public:
 std::shared_ptr<Material> create_mat_adder(
     std::vector<std::shared_ptr<const Material>> &&mats)
 {
-    auto ret = std::make_shared<MatAdder>();
-    ret->initialize(std::move(mats));
-    return ret;
+    return std::make_shared<MatAdder>(std::move(mats));
 }
 
 AGZ_TRACER_END

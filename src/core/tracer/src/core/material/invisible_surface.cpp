@@ -24,7 +24,7 @@ namespace
 
         BSDFSampleResult sample(const Vec3 &wo, TransportMode mode, const Sample3 &sam) const noexcept override
         {
-            real cosv = std::abs(cos(geometry_normal_, wo));
+            const real cosv = std::abs(cos(geometry_normal_, wo));
 
             BSDFSampleResult ret;
             ret.dir      = -wo;
@@ -43,6 +43,11 @@ namespace
         Spectrum albedo() const noexcept override
         {
             return Spectrum(1);
+        }
+
+        bool is_delta() const noexcept override
+        {
+            return true;
         }
     };
 }

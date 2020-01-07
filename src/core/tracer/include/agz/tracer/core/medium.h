@@ -43,7 +43,13 @@ public:
     /**
      * @brief 在从o向d的射线上采样一个散射点
      */
-    virtual SampleOutScatteringResult sample_scattering(const Vec3 &a, const Vec3 &b, Sampler &sampler, Arena &arena) const noexcept = 0;
+    virtual SampleOutScatteringResult sample_scattering(const Vec3 &a, const Vec3 &b, Sampler &sampler, Arena &arena) const = 0;
+};
+
+struct MediumInterface
+{
+    std::shared_ptr<const Medium> in;
+    std::shared_ptr<const Medium> out;
 };
 
 AGZ_TRACER_END

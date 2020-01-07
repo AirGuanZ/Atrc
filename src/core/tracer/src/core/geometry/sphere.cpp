@@ -7,12 +7,12 @@ AGZ_TRACER_BEGIN
 
 class Sphere : public TransformedGeometry
 {
-    real radius_ = 1;
-    real world_radius_ = 1;
+    real radius_;
+    real world_radius_;
 
 public:
 
-    void initialize(real radius, const Transform3 &local_to_world)
+    Sphere(real radius, const Transform3 &local_to_world)
     {
         AGZ_HIERARCHY_TRY
 
@@ -27,19 +27,19 @@ public:
 
     bool has_intersection(const Ray &r) const noexcept override
     {
-        Ray local_r = to_local(r);
+        const Ray local_r = to_local(r);
         return sphere::has_intersection(local_r, radius_);
     }
 
     bool closest_intersection(const Ray &r, GeometryIntersection *inct) const noexcept override
     {
-        Ray local_r = to_local(r);
+        const Ray local_r = to_local(r);
 
         real t;
         if(!sphere::closest_intersection(local_r, &t, radius_))
             return false;
 
-        Vec3 pos = local_r.at(t);
+        const Vec3 pos = local_r.at(t);
 
         Vec2 geometry_uv(UNINIT);
         Coord geometry_coord(UNINIT);
@@ -60,7 +60,7 @@ public:
 
     AABB world_bound() const noexcept override
     {
-        Vec3 world_origin = local_to_world_.apply_to_point(Vec3(0));
+        const Vec3 world_origin = local_to_world_.apply_to_point(Vec3(0));
         return {
             world_origin - Vec3(world_radius_ + EPS),
             world_origin + Vec3(world_radius_ + EPS)
@@ -76,9 +76,9 @@ public:
     {
         assert(pdf);
 
-        auto[unit_pos, unit_pdf] = math::distribution::uniform_on_sphere(sam.u, sam.v);
+        const auto [unit_pos, unit_pdf] = math::distribution::uniform_on_sphere(sam.u, sam.v);
         *pdf = unit_pdf / (world_radius_ * world_radius_);
-        Vec3 pos = radius_ * unit_pos;
+        const Vec3 pos = radius_ * unit_pos;
 
         Vec2 geometry_uv(UNINIT); Coord geometry_coord(UNINIT);
         sphere::local_geometry_uv_and_coord(
@@ -96,14 +96,14 @@ public:
 
     SurfacePoint sample(const Vec3 &ref, real *pdf, const Sample3 &sam) const noexcept override
     {
-        Vec3 local_ref = local_to_world_.apply_inverse_to_point(ref);
-        real d = local_ref.length();
+        const Vec3 local_ref = local_to_world_.apply_inverse_to_point(ref);
+        const real d = local_ref.length();
         if(d <= radius_)
             return sample(pdf, sam);
 
-        real cos_theta = (std::min)(radius_ / d, real(1));
-        auto[dir, l_pdf] = math::distribution::uniform_on_cone(cos_theta, sam.u, sam.v);
-        Vec3 pos = radius_ * Coord::from_z(local_ref).local_to_global(dir).normalize();
+        const real cos_theta = (std::min)(radius_ / d, real(1));
+        const auto [dir, l_pdf] = math::distribution::uniform_on_cone(cos_theta, sam.u, sam.v);
+        const Vec3 pos = radius_ * Coord::from_z(local_ref).local_to_global(dir).normalize();
 
         Vec2 geometry_uv; Coord geometry_coord;
         sphere::local_geometry_uv_and_coord(
@@ -116,7 +116,7 @@ public:
         spt.user_coord = geometry_coord;
         to_world(&spt);
 
-        real world_radius_square = world_radius_ * world_radius_;
+        const real world_radius_square = world_radius_ * world_radius_;
         *pdf = l_pdf / world_radius_square;
 
         return spt;
@@ -129,13 +129,13 @@ public:
 
     real pdf(const Vec3 &ref, const Vec3 &sample) const noexcept override
     {
-        Vec3 local_ref = local_to_world_.apply_inverse_to_point(ref);
-        real d = local_ref.length();
+        const Vec3 local_ref = local_to_world_.apply_inverse_to_point(ref);
+        const real d = local_ref.length();
         if(d <= radius_)
             return pdf(sample);
 
-        real cos_theta = (std::min)(radius_ / d, real(1));
-        real world_radius_square = world_radius_ * world_radius_;
+        const real cos_theta = (std::min)(radius_ / d, real(1));
+        const real world_radius_square = world_radius_ * world_radius_;
         return math::distribution::uniform_on_cone_pdf(cos_theta) / world_radius_square;
     }
 };
@@ -143,9 +143,7 @@ public:
 std::shared_ptr<Geometry> create_sphere(
     real radius, const Transform3 &local_to_world)
 {
-    auto ret = std::make_shared<Sphere>();
-    ret->initialize(radius, local_to_world);
-    return ret;
+    return std::make_shared<Sphere>(radius, local_to_world);
 }
 
 AGZ_TRACER_END

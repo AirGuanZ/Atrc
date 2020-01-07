@@ -1,7 +1,5 @@
 ﻿#pragma once
 
-#include <string>
-
 #include <agz/tracer/core/intersection.h>
 
 AGZ_TRACER_BEGIN

@@ -15,13 +15,13 @@ class ImageTexture : public Texture2D
 
     static Spectrum nearest_sample_impl(const texture::texture2d_t<math::color3b> *data, const Vec2 &uv) noexcept
     {
-        auto tex = [&t = *data](int x, int y) { return math::from_color3b<real>(t(y, x)); };
+        const auto tex = [&t = *data](int x, int y) { return math::from_color3b<real>(t(y, x)); };
         return texture::nearest_sample2d(uv, tex, data->width(), data->height());
     }
 
     static Spectrum linear_sample_impl(const texture::texture2d_t<math::color3b> *data, const Vec2 &uv) noexcept
     {
-        auto tex = [&t = *data](int x, int y) { return math::from_color3b<real>(t(y, x)); };
+        const auto tex = [&t = *data](int x, int y) { return math::from_color3b<real>(t(y, x)); };
         return texture::linear_sample2d(uv, tex, data->width(), data->height());
     }
 
@@ -37,7 +37,7 @@ protected:
 
 public:
 
-    void initialize(
+    ImageTexture(
         const Texture2DCommonParams &common_params,
         const std::string &filename,
         const std::string &sampler)
@@ -51,14 +51,14 @@ public:
         if(auto it = filename2tex_.find(filename); it != filename2tex_.end())
         {
             data_ = it->second.get();
-            AGZ_LOG2("use cached image texture of ", filename);
+            AGZ_INFO("use cached image texture of {}", filename);
         }
         else
         {
-            auto data = img::load_rgb_from_file(filename);
+            const auto data = img::load_rgb_from_file(filename);
             if(!data.is_available())
                 throw ObjectConstructionException("failed to load texture from " + filename);
-            AGZ_LOG2("load image from ", filename);
+            AGZ_INFO("load image from {}", filename);
 
             filename2tex_[filename] = std::make_unique<texture::texture2d_t<math::color3b>>(std::move(data));
             data_ = filename2tex_[filename].get();
@@ -90,9 +90,7 @@ std::shared_ptr<Texture2D> create_image_texture(
     const Texture2DCommonParams &common_params,
     const std::string &filename, const std::string &sampler)
 {
-    auto ret = std::make_shared<ImageTexture>();
-    ret->initialize(common_params, filename, sampler);
-    return ret;
+    return std::make_shared<ImageTexture>(common_params, filename, sampler);
 }
 
 AGZ_TRACER_END

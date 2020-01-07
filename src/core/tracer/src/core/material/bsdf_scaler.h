@@ -38,6 +38,11 @@ public:
     {
         return scale_ * internal_->albedo();
     }
+
+    bool is_delta() const noexcept override
+    {
+        return internal_->is_delta();
+    }
 };
 
 AGZ_TRACER_END

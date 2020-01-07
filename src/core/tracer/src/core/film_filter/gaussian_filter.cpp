@@ -11,7 +11,7 @@ class GaussianFilter : public FilmFilter
 
 public:
 
-    void initialize(real radius, real alpha)
+    GaussianFilter(real radius, real alpha)
     {
         AGZ_HIERARCHY_TRY
 
@@ -46,9 +46,7 @@ public:
 std::shared_ptr<FilmFilter> create_gaussian_filter(
     real radius, real alpha)
 {
-    auto ret = std::make_shared<GaussianFilter>();
-    ret->initialize(radius, alpha);
-    return ret;
+    return std::make_shared<GaussianFilter>(radius, alpha);
 }
 
 AGZ_TRACER_END

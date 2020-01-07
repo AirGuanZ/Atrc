@@ -12,13 +12,13 @@ protected:
 
     Spectrum sample_spectrum_impl(const Vec2 &uv) const noexcept override
     {
-        real t = math::saturate(uv.x);
+        const real t = math::saturate(uv.x);
         return mix(color1_, color2_, t);
     }
 
 public:
 
-    void initialize(const Texture2DCommonParams &common_params, const Spectrum &color1, const Spectrum &color2)
+    GradientTexture(const Texture2DCommonParams &common_params, const Spectrum &color1, const Spectrum &color2)
     {
         AGZ_HIERARCHY_TRY
 
@@ -45,9 +45,7 @@ std::shared_ptr<Texture2D> create_gradient_texture(
     const Texture2DCommonParams &common_params,
     const Spectrum &color1, const Spectrum &color2)
 {
-    auto ret = std::make_shared<GradientTexture>();
-    ret->initialize(common_params, color1, color2);
-    return ret;
+    return std::make_shared<GradientTexture>(common_params, color1, color2);
 }
 
 AGZ_TRACER_END

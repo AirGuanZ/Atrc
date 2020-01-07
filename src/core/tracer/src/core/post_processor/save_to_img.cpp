@@ -17,7 +17,7 @@ class SaveToImage : public PostProcessor
 
 public:
 
-    void initialize(std::string filename, std::string ext, bool open, real gamma)
+    SaveToImage(std::string filename, std::string ext, bool open, real gamma)
     {
         AGZ_HIERARCHY_TRY
 
@@ -36,13 +36,13 @@ public:
         AGZ_HIERARCHY_WRAP("in initializing save_to_png post processor")
     }
 
-    void process(texture::texture2d_t<Spectrum> &image, GBuffer &gbuffer) override
+    void process(RenderTarget &render_target) override
     {
         file::create_directory_for_file(filename_);
 
-        AGZ_LOG0("saving image to ", filename_);
+        AGZ_INFO("saving image to {}", filename_);
 
-        auto imgu8 = image.get_data().map([gamma = gamma_](const Spectrum &s)
+        const auto imgu8 = render_target.image.get_data().map([gamma = gamma_](const Spectrum &s)
         {
             return s.map([gamma = gamma](real c)
             {
@@ -63,9 +63,7 @@ std::shared_ptr<PostProcessor> create_saving_to_img(
     std::string filename, std::string ext,
     bool open, real gamma)
 {
-    auto ret = std::make_shared<SaveToImage>();
-    ret->initialize(filename, ext, open, gamma);
-    return ret;
+    return std::make_shared<SaveToImage>(filename, ext, open, gamma);
 }
 
 AGZ_TRACER_END

@@ -8,15 +8,15 @@ class ACESToneMapper : public PostProcessor
 {
     static real aces_curve(real x) noexcept
     {
-        real tA = real(2.51);
-        real tB = real(0.03);
-        real tC = real(2.43);
-        real tD = real(0.59);
-        real tE = real(0.14);
+        constexpr real tA = real(2.51);
+        constexpr real tB = real(0.03);
+        constexpr real tC = real(2.43);
+        constexpr real tD = real(0.59);
+        constexpr real tE = real(0.14);
         return math::clamp((x * (tA * x + tB)) / (x * (tC * x + tD) + tE), real(0), real(1));
     }
 
-    static Spectrum avg_lum(const ImageBuffer &img)
+    static Spectrum avg_lum(const Image2D<Spectrum> &img)
     {
         Spectrum sum;
         for(int y = 0; y < img.height(); ++y)
@@ -31,8 +31,7 @@ class ACESToneMapper : public PostProcessor
 
         return sum.map([&](real x)
         {
-            real t = std::exp(x / (img.width() * img.height()));
-            return t;
+            return std::exp(x / (img.width() * img.height()));
         });
     }
 
@@ -40,7 +39,7 @@ class ACESToneMapper : public PostProcessor
 
 public:
 
-    void initialize(real exposure)
+    explicit ACESToneMapper(real exposure)
     {
         AGZ_HIERARCHY_TRY
 
@@ -51,10 +50,11 @@ public:
         AGZ_HIERARCHY_WRAP("in initializing ACES tone mapper")
     }
 
-    void process(ImageBuffer &image, GBuffer&) override
+    void process(RenderTarget &render_target) override
     {
-        AGZ_LOG1("aces tone mapping");
+        AGZ_INFO("aces tone mapping");
 
+        auto &image = render_target.image;
         for(int y = 0; y < image.height(); ++y)
         {
             for(int x = 0; x < image.width(); ++x)
@@ -68,12 +68,9 @@ public:
     }
 };
 
-std::shared_ptr<PostProcessor> create_aces_tone_mapper(
-    real exposure)
+std::shared_ptr<PostProcessor> create_aces_tone_mapper(real exposure)
 {
-    auto ret = std::make_shared<ACESToneMapper>();
-    ret->initialize(exposure);
-    return ret;
+    return std::make_shared<ACESToneMapper>(exposure);
 }
 
 AGZ_TRACER_END

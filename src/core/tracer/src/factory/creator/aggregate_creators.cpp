@@ -17,7 +17,7 @@ namespace aggregate
 
         std::shared_ptr<Aggregate> create(const ConfigGroup &params, CreatingContext &context) const override
         {
-            int max_leaf_size = params.child_int_or("max_leaf_size", 5);
+            const int max_leaf_size = params.child_int_or("max_leaf_size", 5);
             return create_entity_bvh(max_leaf_size);
         }
     };

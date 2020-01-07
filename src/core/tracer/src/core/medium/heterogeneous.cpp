@@ -40,18 +40,19 @@ public:
     Spectrum tr(const Vec3 &a, const Vec3 &b, Sampler &sampler) const noexcept override
     {
         real result = 1;
-        real t_max = distance(a, b), t = 0;
+        real t = 0;
+        const real t_max = distance(a, b);
 
         for(;;)
         {
-            real delta_t = -std::log(1 - sampler.sample1().u) * inv_max_density_;
+            const real delta_t = -std::log(1 - sampler.sample1().u) * inv_max_density_;
             t += delta_t;
             if(t >= t_max)
                 break;
 
-            Vec3 pos = lerp(a, b, t / t_max);
-            Vec3 unit_pos = local_to_world_.apply_inverse_to_point(pos);
-            real density = density_->sample_real(unit_pos);
+            const Vec3 pos = lerp(a, b, t / t_max);
+            const Vec3 unit_pos = local_to_world_.apply_inverse_to_point(pos);
+            const real density = density_->sample_real(unit_pos);
             result *= 1 - density / max_density_;
         }
 
@@ -60,22 +61,23 @@ public:
 
     SampleOutScatteringResult sample_scattering(const Vec3 &a, const Vec3 &b, Sampler &sampler, Arena &arena) const noexcept override
     {
-        real t_max = distance(a, b), t = 0;
-        
+        const real t_max = distance(a, b);
+        real t = 0;
+
         for(;;)
         {
-            real delta_t = -std::log(1 - sampler.sample1().u) * inv_max_density_;
+            const real delta_t = -std::log(1 - sampler.sample1().u) * inv_max_density_;
             t += delta_t;
             if(t >= t_max)
                 break;
 
-            Vec3 pos = lerp(a, b, t / t_max);
-            Vec3 unit_pos = local_to_world_.apply_inverse_to_point(pos);
-            real density = density_->sample_real(unit_pos);
+            const Vec3 pos = lerp(a, b, t / t_max);
+            const Vec3 unit_pos = local_to_world_.apply_inverse_to_point(pos);
+            const real density = density_->sample_real(unit_pos);
             if(sampler.sample1().u < density / max_density_)
             {
-                Spectrum albedo = albedo_->sample_spectrum(unit_pos);
-                real     g      = g_->sample_real(unit_pos);
+                const Spectrum albedo = albedo_->sample_spectrum(unit_pos);
+                const real     g      = g_->sample_real(unit_pos);
 
                 MediumScattering scattering;
                 scattering.pos    = pos;

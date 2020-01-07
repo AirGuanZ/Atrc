@@ -20,8 +20,8 @@ std::optional<Params> parse_opts(int argc, char *argv[])
 
     Params ret;
 
-    bool has_scene_content  = parse_result.count("scene") != 0;
-    bool has_scene_filename = parse_result.count("scene-filename") != 0;
+    const bool has_scene_content  = parse_result.count("scene") != 0;
+    const bool has_scene_filename = parse_result.count("scene-filename") != 0;
 
     if(has_scene_content)
     {

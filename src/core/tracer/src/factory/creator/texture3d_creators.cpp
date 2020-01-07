@@ -27,8 +27,8 @@ namespace
 
         std::shared_ptr<Texture3D> create(const ConfigGroup &params, CreatingContext &context) const override
         {
-            auto common_params = parse_common_params(params);
-            Spectrum texel = params.child_spectrum("texel");
+            const auto common_params = parse_common_params(params);
+            const Spectrum texel = params.child_spectrum("texel");
             return create_constant3d_texture(common_params, texel);
         }
     };
@@ -130,11 +130,11 @@ namespace
             int width = -1, height = -1, depth = static_cast<int>(filename_array.size());
             for(int z = 0; z < depth; ++z)
             {
-                std::string filename = context.path_mapper->map(filename_array.at_str(z));
-                auto slice = img::load_gray_from_file(filename);
+                const std::string filename = context.path_mapper->map(filename_array.at_str(z));
+                const auto slice = img::load_gray_from_file(filename);
 
-                int new_width  = slice.shape()[1];
-                int new_height = slice.shape()[0];
+                const int new_width  = slice.shape()[1];
+                const int new_height = slice.shape()[0];
 
                 if(width < 0)
                     width = new_width;
@@ -301,11 +301,11 @@ namespace
             int width = -1, height = -1, depth = static_cast<int>(filename_array.size());
             for(int z = 0; z < depth; ++z)
             {
-                std::string filename = context.path_mapper->map(filename_array.at_str(z));
-                auto slice = img::load_rgb_from_file(filename);
+                const std::string filename = context.path_mapper->map(filename_array.at_str(z));
+                const auto slice = img::load_rgb_from_file(filename);
 
-                int new_width  = slice.shape()[1];
-                int new_height = slice.shape()[0];
+                const int new_width  = slice.shape()[1];
+                const int new_height = slice.shape()[0];
 
                 if(width < 0)
                     width = new_width;
@@ -372,9 +372,9 @@ namespace
 
         std::shared_ptr<Texture3D> create(const ConfigGroup &params, CreatingContext &context) const override
         {
-            auto common_params = parse_common_params(params);
-            auto lhs = context.create<Texture3D>(params.child_group("lhs"));
-            auto rhs = context.create<Texture3D>(params.child_group("rhs"));
+            const auto common_params = parse_common_params(params);
+            const auto lhs = context.create<Texture3D>(params.child_group("lhs"));
+            const auto rhs = context.create<Texture3D>(params.child_group("rhs"));
             return create_texture3d_adder(common_params, std::move(lhs), std::move(rhs));
         }
     };
@@ -390,9 +390,9 @@ namespace
 
         std::shared_ptr<Texture3D> create(const ConfigGroup &params, CreatingContext &context) const override
         {
-            auto common_params = parse_common_params(params);
-            auto lhs = context.create<Texture3D>(params.child_group("lhs"));
-            auto rhs = context.create<Texture3D>(params.child_group("rhs"));
+            const auto common_params = parse_common_params(params);
+            const auto lhs = context.create<Texture3D>(params.child_group("lhs"));
+            const auto rhs = context.create<Texture3D>(params.child_group("rhs"));
             return create_texture3d_multiplier(common_params, std::move(lhs), std::move(rhs));
         }
     };
@@ -408,9 +408,9 @@ namespace
 
         std::shared_ptr<Texture3D> create(const ConfigGroup &params, CreatingContext &context) const override
         {
-            auto common_params = parse_common_params(params);
-            auto internal = context.create<Texture3D>(params.child_group("internal"));
-            auto scale    = params.child_spectrum("scale");
+            const auto common_params = parse_common_params(params);
+            const auto internal = context.create<Texture3D>(params.child_group("internal"));
+            const auto scale    = params.child_spectrum("scale");
             return create_texture3d_scaler(common_params, std::move(internal), scale);
         }
     };
@@ -426,11 +426,11 @@ namespace
 
         std::shared_ptr<Texture3D> create(const ConfigGroup &params, CreatingContext &context) const override
         {
-            auto common_params = parse_common_params(params);
-            auto lhs           = context.create<Texture3D>(params.child_group("lhs"));
-            auto rhs           = context.create<Texture3D>(params.child_group("rhs"));
-            auto less_or_equal = context.create<Texture3D>(params.child_group("less_or_equal"));
-            auto greater       = context.create<Texture3D>(params.child_group("greater"));
+            const auto common_params = parse_common_params(params);
+            const auto lhs           = context.create<Texture3D>(params.child_group("lhs"));
+            const auto rhs           = context.create<Texture3D>(params.child_group("rhs"));
+            const auto less_or_equal = context.create<Texture3D>(params.child_group("less_or_equal"));
+            const auto greater       = context.create<Texture3D>(params.child_group("greater"));
             return create_texture3d_lum_classifier(
                 common_params, std::move(lhs), std::move(rhs), std::move(less_or_equal), std::move(greater));
         }

@@ -32,8 +32,7 @@ public:
 
 std::shared_ptr<Fresnel> create_always_one_fresnel()
 {
-    auto ret = std::make_shared<AlwaysOne>();
-    return ret;
+    return std::make_shared<AlwaysOne>();
 }
 
 AGZ_TRACER_END

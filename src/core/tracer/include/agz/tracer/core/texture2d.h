@@ -25,7 +25,6 @@ struct Texture2DCommonParams
             ret *= Transform2::translate(0, 1) * Transform2::scale(1, -1);
         if(inv_u)
             ret *= Transform2::translate(1, 0) * Transform2::scale(-1, 1);
-
         if(swap_uv)
             ret *= Transform2(math::tmat3_c<real>(0, 1, 0, 1, 0, 0, 0, 0, 1));
 
@@ -77,7 +76,7 @@ class Texture2D
 
     static real wrap_mirror(real x) noexcept
     {
-        int intp = static_cast<int>(x >= 0 ? x : std::floor(x));
+        const int intp = static_cast<int>(x >= 0 ? x : std::floor(x));
         return math::clamp<real>(intp & 1 ? 1 - x + intp : x - intp, 0, 1);
     }
 
@@ -127,10 +126,10 @@ public:
      */
     virtual Spectrum sample_spectrum(const Vec2 &uv) const noexcept
     {
-        Vec2 uv1 = transform_.apply_to_point(uv);
-        real u = wrapper_u_(uv1.x);
-        real v = wrapper_v_(uv1.y);
-        auto ret = sample_spectrum_impl({ u, v });
+        const Vec2 uv1 = transform_.apply_to_point(uv);
+        const real u = wrapper_u_(uv1.x);
+        const real v = wrapper_v_(uv1.y);
+        Spectrum ret = sample_spectrum_impl({ u, v });
         if(inv_gamma_ != 1)
         {
             for(int i = 0; i < SPECTRUM_COMPONENT_COUNT; ++i)
@@ -144,10 +143,10 @@ public:
      */
     virtual real sample_real(const Vec2 &uv) const noexcept
     {
-        Vec2 uv1 = transform_.apply_to_point(uv);
-        real u = wrapper_u_(uv1.x);
-        real v = wrapper_v_(uv1.y);
-        auto ret = sample_real_impl({ u, v });
+        const Vec2 uv1 = transform_.apply_to_point(uv);
+        const real u = wrapper_u_(uv1.x);
+        const real v = wrapper_v_(uv1.y);
+        real ret = sample_real_impl({ u, v });
         if(inv_gamma_ != 1)
             ret = std::pow(ret, inv_gamma_);
         return ret;

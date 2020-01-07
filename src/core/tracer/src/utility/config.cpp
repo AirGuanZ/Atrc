@@ -12,18 +12,18 @@ namespace
     {
         AGZ_HIERARCHY_TRY
 
-        auto &arr = node.as_array();
+        const auto &arr = node.as_array();
 
         if(arr.size() == 1)
         {
-            real val = arr.at_real(0);
+            const real val = arr.at_real(0);
             return Vec2(val);
         }
 
         if(arr.size() == 2)
         {
-            real x = arr.at_real(0);
-            real y = arr.at_real(1);
+            const real x = arr.at_real(0);
+            const real y = arr.at_real(1);
             return Vec2(x, y);
         }
 
@@ -36,19 +36,19 @@ namespace
     {
         AGZ_HIERARCHY_TRY
 
-        auto &arr = node.as_array();
+        const auto &arr = node.as_array();
 
         if(arr.size() == 1)
         {
-            real val = arr.at_real(0);
+            const real val = arr.at_real(0);
             return Vec3(val);
         }
 
         if(arr.size() == 3)
         {
-            real x = arr.at_real(0);
-            real y = arr.at_real(1);
-            real z = arr.at_real(2);
+            const real x = arr.at_real(0);
+            const real y = arr.at_real(1);
+            const real z = arr.at_real(2);
             return Vec3(x, y, z);
         }
 
@@ -61,20 +61,20 @@ namespace
     {
         AGZ_HIERARCHY_TRY
 
-        auto &arr = node.as_array();
+        const auto &arr = node.as_array();
 
         if(arr.size() == 1)
         {
-            real val = arr.at_real(0);
+            const real val = arr.at_real(0);
             return Vec4(val);
         }
 
         if(arr.size() == 4)
         {
-            real x = arr.at_real(0);
-            real y = arr.at_real(1);
-            real z = arr.at_real(2);
-            real w = arr.at_real(3);
+            const real x = arr.at_real(0);
+            const real y = arr.at_real(1);
+            const real z = arr.at_real(2);
+            const real w = arr.at_real(3);
             return Vec4(x, y, z, w);
         }
 
@@ -87,18 +87,18 @@ namespace
     {
         AGZ_HIERARCHY_TRY
 
-        auto &arr = node.as_array();
+        const auto &arr = node.as_array();
 
         if(arr.size() == 1)
         {
-            int val = arr.at_int(0);
+            const int val = arr.at_int(0);
             return Vec2i(val);
         }
 
         if(arr.size() == 2)
         {
-            int x = arr.at_int(0);
-            int y = arr.at_int(1);
+            const int x = arr.at_int(0);
+            const int y = arr.at_int(1);
             return Vec2i(x, y);
         }
 
@@ -111,19 +111,19 @@ namespace
     {
         AGZ_HIERARCHY_TRY
 
-        auto &arr = node.as_array();
+        const auto &arr = node.as_array();
 
         if(arr.size() == 1)
         {
-            int val = arr.at_int(0);
+            const int val = arr.at_int(0);
             return Vec3i(val);
         }
 
         if(arr.size() == 3)
         {
-            int x = arr.at_int(0);
-            int y = arr.at_int(1);
-            int z = arr.at_int(2);
+            const int x = arr.at_int(0);
+            const int y = arr.at_int(1);
+            const int z = arr.at_int(2);
             return Vec3i(x, y, z);
         }
 
@@ -136,15 +136,15 @@ namespace
     {
         AGZ_HIERARCHY_TRY
 
-        auto &group = node.as_group();
-        auto &type = group.child_str("type");
+        const auto &group = node.as_group();
+        const auto &type = group.child_str("type");
 
         if(stdstr::ends_with(type, "//"))
             return Transform2();
 
         if(type == "translate")
         {
-            Vec2 offset = group.child_vec2("offset");
+            const Vec2 offset = group.child_vec2("offset");
             return Transform2::translate(offset);
         }
 
@@ -160,7 +160,7 @@ namespace
 
         if(type == "scale")
         {
-            real ratio = group.child_real("ratio");
+            const real ratio = group.child_real("ratio");
             return Transform2::scale(ratio, ratio);
         }
 
@@ -176,7 +176,7 @@ namespace
         if(node.is_group())
             return to_basic_transform2(node);
 
-        auto &arr = node.as_array();
+        const auto &arr = node.as_array();
 
         Transform2 ret;
         for(size_t i = 0; i < arr.size(); ++i)
@@ -190,21 +190,21 @@ namespace
     {
         AGZ_HIERARCHY_TRY
 
-        auto &group = node.as_group();
-        auto &type = group.child_str("type");
+        const auto &group = node.as_group();
+        const auto &type = group.child_str("type");
 
         if(stdstr::ends_with(type, "//"))
             return Transform3();
 
         if(type == "translate")
         {
-            Vec3 offset = group.child_vec3("offset");
+            const Vec3 offset = group.child_vec3("offset");
             return Transform3::translate(offset);
         }
 
         if(type == "rotate")
         {
-            Vec3 axis = group.child_vec3("axis");
+            const Vec3 axis = group.child_vec3("axis");
             real rad;
             if(auto p_node = group.find_child("rad"))
                 rad = p_node->as_value().as_real();
@@ -245,7 +245,7 @@ namespace
 
         if(type == "scale")
         {
-            real ratio = group.child_real("ratio");
+            const real ratio = group.child_real("ratio");
             return Transform3::scale(ratio, ratio, ratio);
         }
 
@@ -261,7 +261,7 @@ namespace
         if(node.is_group())
             return to_basic_transform3(node);
 
-        auto &arr = node.as_array();
+        const auto &arr = node.as_array();
 
         Transform3 ret;
         for(size_t i = 0; i < arr.size(); ++i)
@@ -360,13 +360,13 @@ const ConfigValue *ConfigGroup::find_child_value(const std::string &name) const
 
 const ConfigNode *ConfigGroup::find_child(const std::string &name) const
 {
-    auto it = group_.find(name);
+    const auto it = group_.find(name);
     return it != group_.end() ? it->second.get() : nullptr;
 }
 
 ConfigNode &ConfigGroup::child(const std::string &name)
 {
-    auto it = group_.find(name);
+    const auto it = group_.find(name);
     if(it == group_.end())
         throw ConfigException(stdstr::cat("key not found in ConfigGroup (key = ", name, ")"));
     return *it->second;
@@ -389,7 +389,7 @@ ConfigValue &ConfigGroup::child_value(const std::string &name)
 
 const ConfigNode &ConfigGroup::child(const std::string &name) const
 {
-    auto it = group_.find(name);
+    const auto it = group_.find(name);
     if(it == group_.end())
         throw ConfigException(stdstr::cat("key not found in ConfigGroup (key = ", name, ")"));
     return *it->second;

@@ -7,7 +7,6 @@ class NativeAggregate : public Aggregate
 {
     std::vector<std::shared_ptr<const Entity>> entities_;
     std::vector<const Entity*> raw_entities_;
-    AABB world_bound_;
 
 public:
 
@@ -16,10 +15,7 @@ public:
         raw_entities_.clear();
         entities_ = entities;
         for(size_t i = 0; i < entities.size(); ++i)
-        {
             raw_entities_.push_back(entities[i].get());
-            world_bound_ |= entities[i]->world_bound();
-        }
     }
 
     bool has_intersection(const Ray &r) const noexcept override
@@ -46,17 +42,11 @@ public:
         }
         return ret;
     }
-
-    AABB world_bound() const noexcept override
-    {
-        return world_bound_;
-    }
 };
 
 std::shared_ptr<Aggregate> create_native_aggregate()
 {
-    auto ret = std::make_shared<NativeAggregate>();
-    return ret;
+    return std::make_shared<NativeAggregate>();
 }
 
 AGZ_TRACER_END

@@ -10,7 +10,7 @@ class BoxFilter : public FilmFilter
 
 public:
 
-    void initialize(real radius)
+    explicit BoxFilter(real radius)
     {
         AGZ_HIERARCHY_TRY
 
@@ -36,9 +36,7 @@ public:
 std::shared_ptr<FilmFilter> create_box_filter(
     real radius)
 {
-    auto ret = std::make_shared<BoxFilter>();
-    ret->initialize(radius);
-    return ret;
+    return std::make_shared<BoxFilter>(radius);
 }
 
 AGZ_TRACER_END

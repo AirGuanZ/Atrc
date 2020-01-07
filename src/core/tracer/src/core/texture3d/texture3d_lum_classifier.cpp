@@ -13,8 +13,8 @@ protected:
 
     Spectrum sample_spectrum_impl(const Vec3 &uvw) const noexcept override
     {
-        Spectrum lhs = lhs_->sample_spectrum(uvw);
-        Spectrum rhs = rhs_->sample_spectrum(uvw);
+        const Spectrum lhs = lhs_->sample_spectrum(uvw);
+        const Spectrum rhs = rhs_->sample_spectrum(uvw);
         if(lhs.lum() <= rhs.lum())
             return less_or_equal_->sample_spectrum(uvw);
         return greater_->sample_spectrum(uvw);
@@ -22,8 +22,8 @@ protected:
 
     real sample_real_impl(const Vec3 &uvw) const noexcept override
     {
-        real lhs = lhs_->sample_real(uvw);
-        real rhs = rhs_->sample_real(uvw);
+        const real lhs = lhs_->sample_real(uvw);
+        const real rhs = rhs_->sample_real(uvw);
         if(lhs <= rhs)
             return less_or_equal_->sample_real(uvw);
         return greater_->sample_real(uvw);
@@ -63,7 +63,7 @@ public:
     Spectrum max_spectrum() const noexcept override
     {
         Spectrum ret;
-        Spectrum less_or_equal = less_or_equal_->max_spectrum(), greater = greater_->max_spectrum();
+        const Spectrum less_or_equal = less_or_equal_->max_spectrum(), greater = greater_->max_spectrum();
         for(int c = 0; c < SPECTRUM_COMPONENT_COUNT; ++c)
             ret[c] = (std::max)(less_or_equal[c], greater[c]);
         return ret;
@@ -72,7 +72,7 @@ public:
     Spectrum min_spectrum() const noexcept override
     {
         Spectrum ret;
-        Spectrum less_or_equal = less_or_equal_->min_spectrum(), greater = greater_->min_spectrum();
+        const Spectrum less_or_equal = less_or_equal_->min_spectrum(), greater = greater_->min_spectrum();
         for(int c = 0; c < SPECTRUM_COMPONENT_COUNT; ++c)
             ret[c] = (std::min)(less_or_equal[c], greater[c]);
         return ret;

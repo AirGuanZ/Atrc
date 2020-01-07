@@ -14,10 +14,10 @@ Spectrum mis_sample_area_light(
     const Scene &scene, const AreaLight *light, const MediumScattering &scattering, const BSDF *phase_function, Sampler &sampler);
 
 Spectrum mis_sample_nonarea_light(
-    const Scene &scene, const NonareaLight *light, const EntityIntersection &inct, const ShadingPoint &shd, Sampler &sampler);
+    const Scene &scene, const EnvirLight *light, const EntityIntersection &inct, const ShadingPoint &shd, Sampler &sampler);
 
 Spectrum mis_sample_nonarea_light(
-    const Scene &scene, const NonareaLight *light, const MediumScattering &scattering, const BSDF *phase_function, Sampler &sampler);
+    const Scene &scene, const EnvirLight *light, const MediumScattering &scattering, const BSDF *phase_function, Sampler &sampler);
 
 Spectrum mis_sample_light(
     const Scene &scene, const Light *lht, const EntityIntersection &inct, const ShadingPoint &shd, Sampler &sampler);

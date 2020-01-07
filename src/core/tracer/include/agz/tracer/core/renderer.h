@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include <agz/tracer/core/film.h>
+#include <agz/tracer/core/render_target.h>
 
 AGZ_TRACER_BEGIN
 
@@ -19,7 +19,7 @@ public:
     /**
      * @brief 阻塞式渲染
      */
-    virtual void render(Scene &scene, ProgressReporter &reporter, Film *film) = 0;
+    virtual RenderTarget render(const FilmFilterApplier &filter, Scene &scene, ProgressReporter &reporter) = 0;
 };
 
 AGZ_TRACER_END

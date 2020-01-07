@@ -13,14 +13,12 @@ AGZ_TRACER_BEGIN
 class Aggregate;
 class Camera;
 class Entity;
-class NonareaLight;
-class Film;
+class EnvirLight;
 class FilmFilter;
 class Fresnel;
 class Geometry;
 class Material;
 class Medium;
-class PathTracingIntegrator;
 class PostProcessor;
 class Renderer;
 class ProgressReporter;
@@ -63,7 +61,7 @@ public:
 
     virtual std::string name() const = 0;
 
-    virtual std::shared_ptr<Camera> create(const ConfigGroup &params, CreatingContext &context, std::shared_ptr<const Film> film) const = 0;
+    virtual std::shared_ptr<Camera> create(const ConfigGroup &params, CreatingContext &context, int film_width, int film_height) const = 0;
 };
 
 template<typename T>
@@ -102,14 +100,12 @@ class CreatingContext
         Aggregate,
         Camera,
         Entity,
-        NonareaLight,
-        Film,
+        EnvirLight,
         FilmFilter,
         Fresnel,
         Geometry,
         Material,
         Medium,
-        PathTracingIntegrator,
         PostProcessor,
         Renderer,
         ProgressReporter,
@@ -151,7 +147,7 @@ public:
     {
         AGZ_HIERARCHY_TRY
 
-        auto &name_arr = params.child_array("name");
+        const ConfigArray &name_arr = params.child_array("name");
         if(name_arr.size() < 1)
             throw CreatingObjectException("empty reference name sequence");
 
@@ -167,7 +163,7 @@ public:
         for(size_t i = 0; i < names.size() - 1; ++i)
             group = &group->child_group(names[i]);
 
-        auto &true_params = group->child_group(names.back());
+        const ConfigGroup &true_params = group->child_group(names.back());
         auto ret = context.create<T>(true_params);
         name2obj_[names] = ret;
 
@@ -189,11 +185,11 @@ public:
         return "reference";
     }
 
-    std::shared_ptr<Camera> create(const ConfigGroup &params, CreatingContext &context, std::shared_ptr<const Film> film) const override
+    std::shared_ptr<Camera> create(const ConfigGroup &params, CreatingContext &context, int film_width, int film_height) const override
     {
         AGZ_HIERARCHY_TRY
 
-        auto &name_arr = params.child_array("name");
+        const ConfigArray &name_arr = params.child_array("name");
         if(name_arr.size() < 1)
             throw CreatingObjectException("empty reference name sequence");
 
@@ -209,8 +205,8 @@ public:
         for(size_t i = 0; i < names.size() - 1; ++i)
             group = &group->child_group(names[i]);
 
-        auto &true_params = group->child_group(names.back());
-        auto ret = context.create<Camera>(true_params, std::move(film));
+        const ConfigGroup &true_params = group->child_group(names.back());
+        auto ret = context.create<Camera>(true_params, film_width, film_height);
         name2obj_[names] = ret;
 
         return ret;
@@ -229,14 +225,14 @@ Factory<T>::Factory(std::string factory_name)
 template<typename T>
 void Factory<T>::add_creator(std::unique_ptr<Creator<T>> &&creator)
 {
-    auto name = creator->name();
+    const std::string name = creator->name();
     name2creator_[name] = std::move(creator);
 }
 
 template<typename T>
 const Creator<T> *Factory<T>::get_creator(const std::string &name) const
 {
-    auto it = name2creator_.find(name);
+    const auto it = name2creator_.find(name);
     return it != name2creator_.end() ? it->second.get() : nullptr;
 }
 
@@ -263,9 +259,8 @@ std::shared_ptr<T> CreatingContext::create(const ConfigGroup &params, Args&&...a
 {
     AGZ_HIERARCHY_TRY
 
-    auto &type_name = params.child_str("type");
-
-    auto creator = this->factory<T>().get_creator(type_name);
+    const std::string &type_name = params.child_str("type");
+    const Creator<T> *creator = this->factory<T>().get_creator(type_name);
     if(!creator)
         throw CreatingObjectException("unknown creator type name: " + type_name);
 

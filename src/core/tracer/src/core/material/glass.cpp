@@ -19,12 +19,12 @@ namespace
         // 计算折射方向向量，发生全反射时返回std::nullopt
         static std::optional<Vec3> refr_dir(const Vec3 &nwo, const Vec3 &nor, real eta)
         {
-            real cos_theta_i = std::abs(nwo.z);
-            real sin_theta_i_2 = (std::max)(real(0), 1 - cos_theta_i * cos_theta_i);
-            real sin_theta_t_2 = eta * eta * sin_theta_i_2;
+            const real cos_theta_i = std::abs(nwo.z);
+            const real sin_theta_i_2 = (std::max)(real(0), 1 - cos_theta_i * cos_theta_i);
+            const real sin_theta_t_2 = eta * eta * sin_theta_i_2;
             if(sin_theta_t_2 >= 1)
                 return std::nullopt;
-            real cosThetaT = std::sqrt(1 - sin_theta_t_2);
+            const real cosThetaT = std::sqrt(1 - sin_theta_t_2);
             return (eta * cos_theta_i - cosThetaT) * nor - eta * nwo;
         }
 
@@ -46,14 +46,14 @@ namespace
 
         BSDFSampleResult sample(const Vec3 &out_dir, TransportMode transport_mode, const Sample3 &sam) const noexcept override
         {
-            Vec3 nwo = shading_coord_.global_to_local(out_dir).normalize();
-            Vec3 nor = nwo.z > 0 ? Vec3(0, 0, 1) : Vec3(0, 0, -1);
+            const Vec3 nwo = shading_coord_.global_to_local(out_dir).normalize();
+            const Vec3 nor = nwo.z > 0 ? Vec3(0, 0, 1) : Vec3(0, 0, -1);
 
-            auto fr = fresnel_point_->eval(nwo.z);
+            const Spectrum fr = fresnel_point_->eval(nwo.z);
             if(sam.u < fr.r)
             {
                 BSDFSampleResult ret;
-                Vec3 local_in = Vec3(-nwo.x, -nwo.y, nwo.z);
+                const Vec3 local_in = Vec3(-nwo.x, -nwo.y, nwo.z);
                 ret.dir      = shading_coord_.local_to_global(local_in);
                 ret.f        = color_reflection_ * fr / std::abs(local_in.z);
                 ret.pdf      = fr.r;
@@ -67,16 +67,16 @@ namespace
                 return ret;
             }
 
-            real eta_i = nwo.z > 0 ? fresnel_point_->eta_o() : fresnel_point_->eta_i();
-            real eta_t = nwo.z > 0 ? fresnel_point_->eta_i() : fresnel_point_->eta_o();
-            real eta = eta_i / eta_t;
+            const real eta_i = nwo.z > 0 ? fresnel_point_->eta_o() : fresnel_point_->eta_i();
+            const real eta_t = nwo.z > 0 ? fresnel_point_->eta_i() : fresnel_point_->eta_o();
+            const real eta = eta_i / eta_t;
 
             auto opt_wi = refr_dir(nwo, nor, eta);
             if(!opt_wi)
                 return BSDF_SAMPLE_RESULT_INVALID;
-            Vec3 nwi = opt_wi->normalize();
+            const Vec3 nwi = opt_wi->normalize();
 
-            real corr_factor = transport_mode == TM_Radiance ? eta * eta : real(1);
+            const real corr_factor = transport_mode == TransportMode::Radiance ? eta * eta : real(1);
 
             BSDFSampleResult ret;
             ret.dir      = shading_coord_.local_to_global(nwi);
@@ -101,6 +101,11 @@ namespace
         {
             return real(0.5) * (color_reflection_ + color_refraction_);;
         }
+
+        bool is_delta() const noexcept override
+        {
+            return true;
+        }
     };
 }
 
@@ -112,7 +117,7 @@ class Glass : public Material
 
 public:
 
-    void initialize(
+    Glass(
         std::shared_ptr<const Texture2D> color_reflection_map,
         std::shared_ptr<const Texture2D> color_refraction_map,
         std::shared_ptr<const Fresnel> fresnel)
@@ -126,9 +131,10 @@ public:
     {
         ShadingPoint ret;
 
-        auto fresnel_point = fresnel_->get_point(inct.uv, arena);
-        auto color_reflection = color_reflection_map_->sample_spectrum(inct.uv);
-        auto color_refraction = color_refraction_map_->sample_spectrum(inct.uv);
+        const FresnelPoint *fresnel_point = fresnel_->get_point(inct.uv, arena);
+        const Spectrum color_reflection   = color_reflection_map_->sample_spectrum(inct.uv);
+        const Spectrum color_refraction   = color_refraction_map_->sample_spectrum(inct.uv);
+
         ret.bsdf = arena.create<GlassBSDF>(
             inct.geometry_coord, inct.user_coord, fresnel_point,
             color_reflection, color_refraction);
@@ -143,9 +149,7 @@ std::shared_ptr<Material> create_glass(
     std::shared_ptr<const Texture2D> color_refraction_map,
     std::shared_ptr<const Fresnel> fresnel)
 {
-    auto ret = std::make_shared<Glass>();
-    ret->initialize(color_reflection_map, color_refraction_map, fresnel);
-    return ret;
+    return std::make_shared<Glass>(color_reflection_map, color_refraction_map, fresnel);
 }
 
 AGZ_TRACER_END

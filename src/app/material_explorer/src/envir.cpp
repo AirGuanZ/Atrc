@@ -8,8 +8,8 @@ namespace
 {
     auto load_env_light(const std::string &filename)
     {
-        auto ret = std::make_shared<texture2d_t>(true);
-        auto tex_data = agz::img::load_rgb_from_hdr_file(filename);
+        const auto ret = std::make_shared<texture2d_t>(true);
+        const auto tex_data = agz::img::load_rgb_from_hdr_file(filename);
         if(!tex_data.is_available())
             std::cout << "failed to load hdr env from " << filename << std::endl;
         else
@@ -44,7 +44,7 @@ bool EnvironmentLightManager::update()
 
     if(hdr_browser_.HasSelected())
     {
-        auto filename = hdr_browser_.GetSelected();
+        const auto filename = hdr_browser_.GetSelected();
         hdr_browser_.ClearSelected();
         env_tex_ = load_env_light(filename.string());
         ret = true;

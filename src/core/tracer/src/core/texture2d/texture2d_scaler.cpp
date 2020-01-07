@@ -9,7 +9,7 @@ class Texture2DScaler : public Texture2D
 
 public:
 
-    void initialize(
+    Texture2DScaler(
         const Texture2DCommonParams &common_params,
         const Spectrum &scale, std::shared_ptr<const Texture2D> internal)
     {
@@ -39,9 +39,7 @@ std::shared_ptr<Texture2D> create_texture2d_scaler(
     const Spectrum &scale,
     std::shared_ptr<const Texture2D> internal)
 {
-    auto ret = std::make_shared<Texture2DScaler>();
-    ret->initialize(common_params, scale, internal);
-    return ret;
+    return std::make_shared<Texture2DScaler>(common_params, scale, internal);
 }
 
 AGZ_TRACER_END

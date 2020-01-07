@@ -1,6 +1,5 @@
 #pragma once
 
-#include <agz/common/math.h>
 #include <agz/tracer/common.h>
 
 AGZ_TRACER_BEGIN
@@ -10,9 +9,9 @@ namespace sphere
 
 inline std::tuple<real, real, real> get_abc(real radius_square, const Ray &r)
 {
-    real A = r.d.length_square();
-    real B = 2 * dot(r.d, r.o);
-    real C = r.o.length_square() - radius_square;
+    const real A = r.d.length_square();
+    const real B = 2 * dot(r.d, r.o);
+    const real C = r.o.length_square() - radius_square;
     return { A, B, C };
 }
 
@@ -21,8 +20,8 @@ inline void local_geometry_uv_and_coord(const Vec3 &local_pos, Vec2 *uv, Coord *
     real phi = (!local_pos.x && !local_pos.y) ? real(0) : std::atan2(local_pos.y, local_pos.x);
     if(phi < 0)
         phi += 2 * PI_r;
-    real sin_theta = math::clamp<real>(local_pos.z / radius, -1, 1);
-    real theta = std::asin(sin_theta);
+    const real sin_theta = math::clamp<real>(local_pos.z / radius, -1, 1);
+    const real theta = std::asin(sin_theta);
 
     *uv = Vec2(real(0.5) * invPI_r * phi, invPI_r * theta + real(0.5));
 
@@ -50,15 +49,15 @@ inline void local_geometry_uv_and_coord(const Vec3 &local_pos, Vec2 *uv, Coord *
 
 inline bool has_intersection(const Ray &r, real radius) noexcept
 {
-    auto [A, B, C] = sphere::get_abc(radius * radius, r);
+    const auto [A, B, C] = get_abc(radius * radius, r);
     real delta = B * B - 4 * A * C;
     if(delta < 0)
         return false;
     delta = std::sqrt(delta);
 
-    real inv2A = real(0.5) / A;
-    real t0 = (-B - delta) * inv2A;
-    real t1 = (-B + delta) * inv2A;
+    const real inv2A = real(0.5) / A;
+    const real t0 = (-B - delta) * inv2A;
+    const real t1 = (-B + delta) * inv2A;
 
     return r.between(t0) || r.between(t1);
 }

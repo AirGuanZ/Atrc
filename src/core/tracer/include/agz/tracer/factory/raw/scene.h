@@ -7,7 +7,7 @@ AGZ_TRACER_BEGIN
 struct DefaultSceneParams
 {
     std::vector<std::shared_ptr<Entity>> entities;
-    std::vector<std::shared_ptr<NonareaLight>> nonarea_lights_;
+    std::vector<std::shared_ptr<EnvirLight>> nonarea_lights_;
     std::shared_ptr<Aggregate> aggregate;
 };
 
