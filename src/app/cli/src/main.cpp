@@ -107,7 +107,7 @@ int main(int argc, char *argv[])
 
     try
     {
-        AGZ_INFO(">>> AGZ Renderer by AirGuanZ <<<");
+        AGZ_INFO(">>> Atrc Renderer by AirGuanZ <<<");
 
 #ifdef USE_EMBREE
         AGZ_INFO("USE_EMBREE = ON");

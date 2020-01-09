@@ -47,7 +47,7 @@ namespace scene
             }
 
             if(auto group = params.find_child_group("env"))
-                scene_params.nonarea_lights_.push_back(context.create<EnvirLight>(*group));
+                scene_params.envir_lights.push_back(context.create<EnvirLight>(*group));
 
             std::vector<std::shared_ptr<EnvirLight>> nonarea_lights;
             if(auto lht_arr = params.find_child_array("lights"))
@@ -67,7 +67,7 @@ namespace scene
                     }
 
                     auto lht = context.create<EnvirLight>(group);
-                    scene_params.nonarea_lights_.push_back(lht);
+                    scene_params.envir_lights.push_back(lht);
                 }
             }
 

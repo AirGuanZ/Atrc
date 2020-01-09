@@ -65,9 +65,9 @@ namespace
             Vec3 global_dir = surface_point.geometry_coord.local_to_global(local_dir);
 
             LightEmitResult ret;
-            ret.position  = surface_point.eps_offset(global_dir);
-            ret.direction = global_dir;
-            ret.normal    = surface_point.geometry_coord.z;
+            ret.pos  = surface_point.eps_offset(global_dir);
+            ret.dir = global_dir;
+            ret.nor    = surface_point.geometry_coord.z;
             ret.radiance  = radiance_;
             ret.pdf_pos   = pdf_pos;
             ret.pdf_dir   = pdf_dir;

@@ -191,8 +191,10 @@ namespace tri_bvh_embree_ws
 
             prim_sampler_.initialize(areas.data(), static_cast<int>(areas.size()));
 
+            rtcSetGeometryBuildQuality(mesh, RTC_BUILD_QUALITY_HIGH);
             rtcCommitGeometry(mesh);
             geo_id_ = rtcAttachGeometry(scene_, mesh);
+            rtcSetSceneBuildQuality(scene_, RTC_BUILD_QUALITY_HIGH);
             rtcCommitScene(scene_);
         }
 

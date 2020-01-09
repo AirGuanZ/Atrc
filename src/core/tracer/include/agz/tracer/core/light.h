@@ -40,23 +40,13 @@ inline const LightSampleResult LIGHT_SAMPLE_RESULT_NULL = { { }, { }, { }, 0, fa
  */
 struct LightEmitResult
 {
-    Vec3 position;     // 发射点位置
-    Vec3 direction;    // 发射方向
-    Vec3 normal;       // 发射点法线，为0表示无法线
+    Vec3 pos;          // 发射点位置
+    Vec3 dir;          // 发射方向
+    Vec3 nor;          // 发射点法线，为0表示无法线
     Spectrum radiance; // 辐射亮度
     real pdf_pos = 0;  // pdf w.r.t. light surface area
     real pdf_dir = 0;  // pdf w.r.t. solid angle at position
-
-    bool valid() const noexcept
-    {
-        return pdf_pos && pdf_dir;
-    }
 };
-
-/**
- * @brief 采样光源发射失败时的结果
- */
-inline const LightEmitResult LIGHT_EMIT_RESULT_INVALID = { {}, {}, {}, {}, 0, 0 };
 
 /**
  * @brief 求光源发射pdf的结果
@@ -103,6 +93,8 @@ public:
 
     /**
      * @brief 采样出射光线
+     *
+     * assert(ret.pdf_pos && ret.pdf_dir)
      */
     virtual LightEmitResult emit(const Sample5 &sam) const noexcept = 0;
 

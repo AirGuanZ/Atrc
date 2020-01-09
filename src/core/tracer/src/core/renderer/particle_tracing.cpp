@@ -90,7 +90,7 @@ private:
             return pixel;
         }
 
-        for(auto light : scene.nonarea_lights())
+        for(auto light : scene.envir_lights())
             pixel.value += light->radiance(r.o, r.d);
         return pixel;
     }
@@ -108,9 +108,9 @@ private:
         const Camera *camera = scene.get_camera();
 
         Spectrum coef = emit_result.radiance / (select_light_pdf * emit_result.pdf_pos * emit_result.pdf_dir);
-        coef *= std::abs(cos(emit_result.direction, emit_result.normal));
+        coef *= std::abs(cos(emit_result.dir, emit_result.nor));
 
-        Ray r(emit_result.position + EPS * emit_result.normal, emit_result.direction);
+        Ray r(emit_result.pos + EPS * emit_result.nor, emit_result.dir);
 
         for(int depth = 1; depth <= params_.max_depth; ++depth)
         {

@@ -21,8 +21,8 @@ class DefaultScene : public Scene
     std::shared_ptr<const Camera> camera_;
 
     std::vector<Light*>                      lights_;
-    std::vector<EnvirLight *>                nonarea_lights_;
-    std::vector<std::shared_ptr<EnvirLight>> owner_nonarea_lights_;
+    std::vector<EnvirLight *>                envir_lights_;
+    std::vector<std::shared_ptr<EnvirLight>> owner_envir_lights_;
 
     std::vector<std::shared_ptr<Entity>> entities_;
 
@@ -66,12 +66,15 @@ public:
     {
         void_medium_ = create_void();
 
-        owner_nonarea_lights_ = params.nonarea_lights_;
-        for(auto &nonarea_light : params.nonarea_lights_)
+        owner_envir_lights_ = params.envir_lights;
+        for(auto &nonarea_light : params.envir_lights)
         {
             lights_.push_back(nonarea_light.get());
-            nonarea_lights_.push_back(nonarea_light.get());
+            envir_lights_.push_back(nonarea_light.get());
         }
+
+        if(envir_lights_.size() > 1)
+            throw ObjectConstructionException("more than 1 environment lights");
 
         std::vector<std::shared_ptr<const Entity>> const_entities;
         const_entities.reserve(params.entities.size());
@@ -103,10 +106,10 @@ public:
         return misc::span<const Light* const>(ptr, lights_.size());
     }
 
-    misc::span<const EnvirLight * const> nonarea_lights() const noexcept override
+    misc::span<const EnvirLight * const> envir_lights() const noexcept override
     {
-        const auto ptr = nonarea_lights_.data();
-        return misc::span<const EnvirLight * const>(ptr, nonarea_lights_.size());
+        const auto ptr = envir_lights_.data();
+        return misc::span<const EnvirLight * const>(ptr, envir_lights_.size());
     }
 
     SceneSampleLightResult sample_light(const Sample1 &sam) const noexcept override

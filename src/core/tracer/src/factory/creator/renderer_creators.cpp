@@ -129,7 +129,7 @@ namespace renderer
 void initialize_renderer_factory(Factory<Renderer> &factory)
 {
     factory.add_creator(std::make_unique<renderer::AORendererCreator>());
-    //factory.add_creator(std::make_unique<renderer::BDPTRendererCreator>());
+    factory.add_creator(std::make_unique<renderer::BDPTRendererCreator>());
     factory.add_creator(std::make_unique<renderer::ParticleTracingRendererCreator>());
     factory.add_creator(std::make_unique<renderer::PathTracingRendererCreator>());
 }

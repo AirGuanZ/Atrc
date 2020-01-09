@@ -57,9 +57,9 @@ public:
         const Vec3 pos        = world_radius_ * (disk_sam.x * dir_coord.x + disk_sam.y * dir_coord.y - dir) + world_centre_;
 
         LightEmitResult ret;
-        ret.position  = pos;
-        ret.direction = dir;
-        ret.normal    = dir.normalize();
+        ret.pos  = pos;
+        ret.dir = dir;
+        ret.nor    = dir.normalize();
         ret.radiance  = radiance_impl(-dir);
         ret.pdf_pos   = 1 / (PI_r * world_radius_ * world_radius_);
         ret.pdf_dir   = pdf_dir;

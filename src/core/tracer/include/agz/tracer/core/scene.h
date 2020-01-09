@@ -45,9 +45,13 @@ public:
     virtual misc::span<const Light* const> lights() const noexcept = 0;
 
     /** @brief 场景中的所有非实体光源 */
-    virtual misc::span<const EnvirLight * const> nonarea_lights() const noexcept = 0;
+    virtual misc::span<const EnvirLight * const> envir_lights() const noexcept = 0;
 
-    /** @brief 随机选择场景中的一个光源 */
+    /**
+     * @brief 随机选择场景中的一个光源
+     *
+     * 除非无光源，否则绝不会返回空值
+     */
     virtual SceneSampleLightResult sample_light(const Sample1 &sam) const noexcept = 0;
 
     /**

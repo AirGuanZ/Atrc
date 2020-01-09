@@ -151,7 +151,7 @@ Spectrum mis_sample_bsdf(
         const real new_inct_dist = ent_inct.t;
         const real new_inct_dist2 = new_inct_dist * new_inct_dist;
 
-        for(auto light : scene.nonarea_lights())
+        for(auto light : scene.envir_lights())
         {
             Vec3 light_pnt;
             const Spectrum light_radiance = light->radiance(new_ray.o, new_ray.d, &light_pnt);
@@ -172,7 +172,7 @@ Spectrum mis_sample_bsdf(
     }
     else
     {
-        for(auto light : scene.nonarea_lights())
+        for(auto light : scene.envir_lights())
         {
             const Spectrum light_radiance = light->radiance(new_ray.o, new_ray.d);
             if(!light_radiance)
@@ -235,7 +235,7 @@ Spectrum mis_sample_bsdf(
         const real new_inct_dist = ent_inct.t;
         const real new_inct_dist2 = new_inct_dist * new_inct_dist;
 
-        for(auto light : scene.nonarea_lights())
+        for(auto light : scene.envir_lights())
         {
             Vec3 light_pnt;
             const Spectrum light_f = light->radiance(new_ray.o, new_ray.d, &light_pnt);
@@ -256,7 +256,7 @@ Spectrum mis_sample_bsdf(
     }
     else
     {
-        for(auto light : scene.nonarea_lights())
+        for(auto light : scene.envir_lights())
         {
             const Spectrum light_f = light->radiance(new_ray.o, new_ray.d);
             if(!light_f)
