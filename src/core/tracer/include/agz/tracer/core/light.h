@@ -15,9 +15,9 @@ struct LightSampleResult
 {
     Vec3 ref;
     Vec3 pos;
+    Vec3 nor;
     Spectrum radiance;
     real pdf = 0;
-    bool is_delta = false;
 
     bool valid() const noexcept
     {
@@ -33,7 +33,7 @@ struct LightSampleResult
 /**
  * @brief 采样实体光源失败时的返回值
  */
-inline const LightSampleResult LIGHT_SAMPLE_RESULT_NULL = { { }, { }, { }, 0, false };
+inline const LightSampleResult LIGHT_SAMPLE_RESULT_NULL = { { }, { }, { }, { }, 0 };
 
 /**
  * @brief 采样光源发射的结果
@@ -55,6 +55,15 @@ struct LightEmitPDFResult
 {
     real pdf_pos = 0;
     real pdf_dir = 0;
+};
+
+/**
+ * @brief 取得光源发射位置和法线的结果
+ */
+struct LightEmitPosResult
+{
+    Vec3 pos;
+    Vec3 nor;
 };
 
 /**
@@ -82,7 +91,7 @@ public:
     /**
      * @brief 返回其非实体光源接口
      */
-    virtual const EnvirLight *as_nonarea() const noexcept { return nullptr; }
+    virtual const EnvirLight *as_envir() const noexcept { return nullptr; }
 
     /**
      * @brief 采样一条照射到ref的射线
@@ -107,13 +116,6 @@ public:
      * @brief 发射的光通量
      */
     virtual Spectrum power() const noexcept = 0;
-
-    /**
-     * @brief 基于场景进行预处理，在渲染开始之前、场景准备完毕之后调用一次
-     *
-     * 此方法应可以被多次调用，每次调用会覆盖之前的结果
-     */
-    virtual void preprocess(const AABB &world_bound) = 0;
 };
 
 /**
@@ -160,27 +162,31 @@ public:
 
     bool is_area() const noexcept override final { return false; }
 
-    const EnvirLight *as_nonarea() const noexcept override final { return this; }
+    const EnvirLight *as_envir() const noexcept override final { return this; }
 
     /**
      * @brief 光源沿指定方向照射到空间中某点的辐射亮度
      *
      * @param ref 被照射的点
      * @param ref_to_light 沿哪个方向照射到ref点
-     * @param light_point 发射点，主要用于visibility test，可以为nullptr
      * @return 沿ref_to_light向ref点发射的辐射亮度
      */
-    virtual Spectrum radiance(const Vec3 &ref, const Vec3 &ref_to_light, Vec3 *light_point = nullptr) const noexcept = 0;
+    virtual Spectrum radiance(const Vec3 &ref, const Vec3 &ref_to_light) const noexcept = 0;
 
     /**
      * @brief 以ref点为参考点时采样入射方向采样到ref_to_light的概率密度（w.r.t. solid angle）
      */
     virtual real pdf(const Vec3 &ref, const Vec3 &ref_to_light) const noexcept = 0;
 
+    /** @brief 求发射点的位置坐标 */
+    virtual LightEmitPosResult emit_pos(const Vec3 &ref, const Vec3 &ref_to_light) const noexcept = 0;
+
     /**
-     * @brief 计算场景包围球的中心和半径，主要用于环境光采样
+     * @brief 基于场景进行预处理，在渲染开始之前、场景准备完毕之后调用一次
+     *
+     * 此方法应可以被多次调用，每次调用会覆盖之前的结果
      */
-    void preprocess(const AABB &world_bound) override;
+    void preprocess(const AABB &world_bound) noexcept;
 };
 
 AGZ_TRACER_END

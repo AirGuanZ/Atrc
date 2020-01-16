@@ -44,8 +44,8 @@ public:
     /** @brief 场景中的所有光源 */
     virtual misc::span<const Light* const> lights() const noexcept = 0;
 
-    /** @brief 场景中的所有非实体光源 */
-    virtual misc::span<const EnvirLight * const> envir_lights() const noexcept = 0;
+    /** @brief 环境光 */
+    virtual const EnvirLight *envir_light() const noexcept = 0;
 
     /**
      * @brief 随机选择场景中的一个光源
@@ -59,7 +59,7 @@ public:
      *
      * assert(light in scene)
      */
-    virtual real light_pdf(const AreaLight *light) const noexcept = 0;
+    virtual real light_pdf(const Light *light) const noexcept = 0;
 
     /** @brief 给定射线是否与场景中的实体有交点 */
     virtual bool has_intersection(const Ray &r) const noexcept = 0;

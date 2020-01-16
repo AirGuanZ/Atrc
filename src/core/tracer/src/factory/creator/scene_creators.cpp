@@ -47,29 +47,7 @@ namespace scene
             }
 
             if(auto group = params.find_child_group("env"))
-                scene_params.envir_lights.push_back(context.create<EnvirLight>(*group));
-
-            std::vector<std::shared_ptr<EnvirLight>> nonarea_lights;
-            if(auto lht_arr = params.find_child_array("lights"))
-            {
-                if(lht_arr->size() == 1)
-                    AGZ_INFO("creating 1 envir light");
-                else
-                    AGZ_INFO("creating {} envir lights", lht_arr->size());
-
-                for(size_t i = 0; i < lht_arr->size(); ++i)
-                {
-                    auto &group = lht_arr->at_group(i);
-                    if(stdstr::ends_with(group.child_str("type"), "//"))
-                    {
-                        AGZ_INFO("skip envir light with type ending with //");
-                        continue;
-                    }
-
-                    auto lht = context.create<EnvirLight>(group);
-                    scene_params.envir_lights.push_back(lht);
-                }
-            }
+                scene_params.envir_light = context.create<EnvirLight>(*group);
 
             if(auto group = params.find_child_group("aggregate"))
                 scene_params.aggregate = context.create<Aggregate>(*group);

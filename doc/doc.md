@@ -142,15 +142,13 @@ Here is a simple example, which results in the above image (a bit rough metal sp
         }
       }
     ],
-    "lights": [
-      {
-        "type": "ibl",
-        "tex": {
-          "type": "hdr",
-          "filename": "${scene-directory}/gray_pier_4k.hdr"
-        }
+    "env": {
+      "type": "ibl",
+      "tex": {
+        "type": "hdr",
+        "filename": "${scene-directory}/gray_pier_4k.hdr"
       }
-    ]
+    }
   },
   "rendering": {
     "camera": {
@@ -257,11 +255,8 @@ This section describes the possible type values for fields of type `Scene`.
 | Field Name | Type            | Default Value    | Explanation                                                  |
 | ---------- | --------------- | ---------------- | ------------------------------------------------------------ |
 | entities   | [Entity]        | []               | entities in scene                                            |
-| lights     | [NonareaLight]  | []               | non-area lights in scene (ibl, for example)                  |
 | aggregate  | EntityAggregate | native aggregate | data structure for accelerating ray queries between entities (default is a brute-force one) |
 | env        | NonareaLight    | null             | environment light                                            |
-
-`env` is deprecated and exists only for compatibility. It (if presented) will be automatically added to the `lights` array.
 
 ### EntityAggregate
 
@@ -674,21 +669,6 @@ Image based lighting
 | tex        | Texture2D |               | texture object describing radiance          |
 | up         | Vec3      | [ 0, 0, 1 ]   | which direction is "above", default is $+z$ |
 
-**hdri**
-
-![pic](./pictures/hdri.png)
-
-Inner glowing sphere which is not visible on the outer side
-
-| Field Name | Type      | Default Value | Explanation                                 |
-| ---------- | --------- | ------------- | ------------------------------------------- |
-| tex        | Texture2D |               | texture object describing radiance          |
-| up         | Vec3      | [ 0, 0, 1 ]   | which direction is "above", default is $+z$ |
-| radius     | real      | 100           | sphere radius                               |
-| offset     | Vec3      | [0]           | sphere center position                      |
-
-*NOTE*. The `hdri` light source does not support light transport algorithms requiring backward tracing at the moment. It can only be used in path tracing.
-
 **native_sky**
 
 ![pic](./pictures/native_sky.png)
@@ -751,7 +731,7 @@ Save the rendered image to a file
 | filename   | string |               | where to save the output image                         |
 | open       | bool   | true          | whether to open it with the default image browser      |
 | inv_gamma  | real   | 1             | $1/\gamma$ for gamma correction (typical value is 2.2) |
-| ext        | string | png           | saved file type ("jpg" or "png")                       |
+| ext        | string | png           | saved file type ("jpg", "png" or "hdr")                |
 
 **resize**
 
@@ -800,15 +780,16 @@ Ambient occlusion renderer
 
 **bdpt**
 
-Bidirectional path tracer (without MIS)
+Bidirectional path tracer
 
-| Field Name       | Type    | Default Value | Explanation                 |
-| ---------------- | ------- | ------------- | --------------------------- |
-| worker_count     | int     | 0             | rendering thread count      |
-| task_grid_size   | int     | 32            | rendering task pixel size   |
-| camera_max_depth | int     | 10            | max depth of camera subpath |
-| light_max_depth  | int     | 10            | max depth of light subpath  |
-| sampler          | Sampler |               | sampler                     |
+| Field Name       | Type    | Default Value | Explanation                      |
+| ---------------- | ------- | ------------- | -------------------------------- |
+| worker_count     | int     | 0             | rendering thread count           |
+| task_grid_size   | int     | 32            | rendering task pixel size        |
+| camera_max_depth | int     | 10            | max depth of camera subpath      |
+| light_max_depth  | int     | 10            | max depth of light subpath       |
+| use_mis          | bool    | true          | use multiple importance sampling |
+| sampler          | Sampler |               | sampler                          |
 
 **particle**
 

@@ -90,7 +90,7 @@ private:
             return pixel;
         }
 
-        for(auto light : scene.envir_lights())
+        if(auto light = scene.envir_light())
             pixel.value += light->radiance(r.o, r.d);
         return pixel;
     }
@@ -135,13 +135,13 @@ private:
             {
                 if(scene.visible(camera_sample.pos_on_cam, inct.pos))
                 {
-                    const Spectrum bsdf_f = shd.bsdf->eval(inct.wr, camera_sample.ref_to_pos, TransportMode::Importance);
+                    const Spectrum bsdf_f = shd.bsdf->eval(inct.wr, camera_sample.ref_to_pos, TransportMode::Radiance);
                     if(!bsdf_f.is_black())
                     {
                         const real pixel_x = camera_sample.film_coord.x * film_res.x;
                         const real pixel_y = camera_sample.film_coord.y * film_res.y;
 
-                        const Spectrum f = coef  * bsdf_f * std::abs(cos(inct.geometry_coord.z, camera_sample.ref_to_pos))
+                        const Spectrum f = coef * bsdf_f * std::abs(cos(inct.geometry_coord.z, camera_sample.ref_to_pos))
                                          * camera_sample.we / camera_sample.pdf;
                         film_grid.apply(pixel_x, pixel_y, f);
                     }

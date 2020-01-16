@@ -73,15 +73,11 @@ private:
         // 交点bsdf[e]
         const BSDF *bsdf = nullptr;
 
+        bool is_delta = false;
+
         bool is_entity() const noexcept
         {
             return entity != nullptr;
-        }
-
-        bool is_delta() const noexcept
-        {
-            assert(bsdf);
-            return bsdf->is_delta();
         }
     };
 
@@ -129,8 +125,8 @@ private:
         real select_light_pdf = 0;
         const LightEmitResult emit;
 
-        const Vertex *cam_subpath; int s;
-        const Vertex *lht_subpath; int t;
+        Vertex *cam_subpath; int s;
+        Vertex *lht_subpath; int t;
 
         Sampler &sampler;
 
@@ -138,7 +134,13 @@ private:
         const Vec2i full_res;
     };
 
+    using TmpAssign = misc::scope_assignment_t<real>;
+
     static real G(const Vec3 &a, const Vec3 &b, const Vec3 &na, const Vec3 &nb) noexcept;
+
+    static real z2o(real x) noexcept;
+
+    static real n2o(real x) noexcept;
 
     int render_grid(
         const Scene &scene, Sampler &sampler, FilmGrid &film_grid, ParticleFilm &particle_film, const Vec2i &full_res);
@@ -163,6 +165,23 @@ private:
     Spectrum contrib_sx_t1_path(const ConnectedPath &connected_path) const;
 
     Spectrum contrib_sx_tx_path(const ConnectedPath &connected_path) const;
+
+    /**
+     * @brief 计算给定路径的mis weight
+     *
+     * 保证connected_path是一条包含至少3个顶点的合法路径
+     *
+     * connected_path中所有顶点的pdf_bwd、pdf_fwd和is_delta都必须被完整填充，其他诸如pos、nor都不重要
+     */
+    real weight_common(const ConnectedPath &connected_path, real G_between_subpaths) const;
+
+    real weight_s1_tx_path(const ConnectedPath &connected_path) const;
+
+    real weight_sx_t0_path(const ConnectedPath &connected_path) const;
+
+    real weight_sx_t1_path(const ConnectedPath &connected_path, const LightSampleResult &lht_sam_wi) const;
+
+    real weight_sx_tx_path(const ConnectedPath &connected_path) const;
 
     BDPTRendererParams params_;
 };
@@ -205,7 +224,7 @@ RenderTarget BDPTRenderer::render(const FilmFilterApplier &filter, Scene &scene,
         this
     ] (Sampler *sampler, Image2D<Spectrum> *particle_image)
     {
-            const Vec2i full_res = { filter.width(), filter.height() };
+        const Vec2i full_res = { filter.width(), filter.height() };
         ParticleFilm particle_film = filter.bind_to(
             { { 0, 0 }, { filter.width(), filter.height() } }, *particle_image);
 
@@ -284,6 +303,16 @@ real BDPTRenderer::G(const Vec3 &a, const Vec3 &b, const Vec3 &na, const Vec3 &n
 {
     const Vec3 d = a - b;
     return std::abs(cos(d, na) * cos(d, nb)) / d.length_square();
+}
+
+real BDPTRenderer::z2o(real x) noexcept
+{
+    return !std::isnan(x) && x > EPS ? x : real(1);
+}
+
+real BDPTRenderer::n2o(real x) noexcept
+{
+    return std::isnan(x) ? 1 : x;
 }
 
 int BDPTRenderer::render_grid(const Scene &scene, Sampler &sampler, FilmGrid &film_grid, ParticleFilm &particle_film, const Vec2i &full_res)
@@ -386,7 +415,7 @@ BDPTRenderer::CameraSubpath BDPTRenderer::build_camera_subpath(
     subpath_space[0].accu_proj_pdf = cam_pdf.pdf_pos;
     subpath_space[0].pdf_fwd       = cam_pdf.pdf_pos;
     subpath_space[0].pdf_bwd       = 0;
-    subpath_space[0].G_with_last   = 0;
+    subpath_space[0].G_with_last   = 1;
 
     // g-buffer pixel
     GPixel gpixel;
@@ -450,6 +479,7 @@ BDPTRenderer::CameraSubpath BDPTRenderer::build_camera_subpath(
         vertex.G_with_last   = G(inct.pos, last_pos, inct.geometry_coord.z, last_nor);
         vertex.entity        = inct.entity;
         vertex.bsdf          = shd.bsdf;
+        vertex.is_delta      = shd.bsdf->is_delta();
 
         last_pos = vertex.pos;
         last_nor = vertex.nor;
@@ -473,7 +503,7 @@ BDPTRenderer::CameraSubpath BDPTRenderer::build_camera_subpath(
 
     const int max_bwd_index = subpath_space[cam_vtx_cnt - 1].is_entity() ? cam_vtx_cnt - 3 : cam_vtx_cnt - 4;
 
-    for(int i = 1; i <= max_bwd_index; ++i)
+    for(int i = 0; i <= max_bwd_index; ++i)
     {
         Vertex &a = subpath_space[i];
         const Vertex &b = subpath_space[i + 1];
@@ -482,6 +512,18 @@ BDPTRenderer::CameraSubpath BDPTRenderer::build_camera_subpath(
         // store pdf(c -> b -> a) into a.bwd_pdf
 
         const real pdf = b.bsdf->pdf(c.pos - b.pos, a.pos - b.pos, TransportMode::Importance);
+        a.pdf_bwd = pdf / std::abs(cos(b.nor, a.pos - b.pos));
+    }
+
+    if(!subpath_space[cam_vtx_cnt - 1].is_entity() && cam_vtx_cnt >= 3)
+    {
+        // .., a, b, c
+
+        Vertex &a = subpath_space[cam_vtx_cnt - 3];
+        const Vertex &b = subpath_space[cam_vtx_cnt - 2];
+        const Vertex &c = subpath_space[cam_vtx_cnt - 1];
+
+        const real pdf = b.bsdf->pdf(c.pos, a.pos - b.pos, TransportMode::Importance);
         a.pdf_bwd = pdf / std::abs(cos(b.nor, a.pos - b.pos));
     }
 
@@ -510,8 +552,8 @@ BDPTRenderer::LightSubpath BDPTRenderer::build_light_subpath(
     subpath_space[0].accu_bsdf     = Spectrum(1);
     subpath_space[0].accu_proj_pdf = select_light_pdf * light_emit.pdf_pos;
     subpath_space[0].pdf_fwd       = 0;
-    subpath_space[0].pdf_bwd       = subpath_space[0].accu_proj_pdf;
-    subpath_space[0].G_with_last   = 0;
+    subpath_space[0].pdf_bwd       = select_light_pdf * light_emit.pdf_pos;
+    subpath_space[0].G_with_last   = 1;
 
     // 从上一个顶点到这一顶点的proj pdf
     real proj_pdf = light_emit.pdf_dir / std::abs(cos(light_emit.nor, light_emit.dir));
@@ -554,6 +596,7 @@ BDPTRenderer::LightSubpath BDPTRenderer::build_light_subpath(
         vertex.G_with_last   = G(inct.pos, last_pos, inct.geometry_coord.z, last_nor);
         vertex.entity        = inct.entity;
         vertex.bsdf          = shd.bsdf;
+        vertex.is_delta      = shd.bsdf->is_delta();
 
         last_pos = vertex.pos;
         last_nor = vertex.nor;
@@ -601,9 +644,7 @@ BDPTRenderer::LightSubpath BDPTRenderer::build_light_subpath(
         a.pdf_fwd = pdf / std::abs(cos(b.nor, light_emit.dir));
     }
 
-    return LightSubpath{
-        lht_vtx_cnt, subpath_space, select_light_pdf, light, light_emit
-    };
+    return LightSubpath{ lht_vtx_cnt, subpath_space, select_light_pdf, light, light_emit };
 }
 
 Spectrum BDPTRenderer::eval_connected_subpath(const ConnectedPath &connected_path) const
@@ -621,8 +662,6 @@ Spectrum BDPTRenderer::eval_connected_subpath(const ConnectedPath &connected_pat
 
     if(path_vtx_cnt == 2)
         return s == 2 ? contrib_s2_t0_path(connected_path) : Spectrum();
-
-    // 对s == 1的路径，专门使用摄像机采样
 
     if(s == 1)
     {
@@ -663,8 +702,8 @@ Spectrum BDPTRenderer::contrib_s2_t0_path(const ConnectedPath &connected_path) c
     }
 
     Spectrum radiance;
-    for(auto light : connected_path.scene.envir_lights())
-        radiance += light->radiance(cam_beg.pos, cam_end.pos);
+    if(auto light = connected_path.scene.envir_light())
+        radiance = light->radiance(cam_beg.pos, cam_end.pos);
 
     return radiance * cam_end.accu_bsdf / cam_end.accu_proj_pdf;
 }
@@ -673,37 +712,42 @@ Spectrum BDPTRenderer::contrib_s1_tx_path(const ConnectedPath &connected_path) c
 {
     assert(connected_path.s == 1 && connected_path.t >= 2);
 
-    // camera sample wi
-
     const int t = connected_path.t;
+    Vertex &cam_beg = connected_path.cam_subpath[0];
     const Vertex &lht_end = connected_path.lht_subpath[t - 1];
     const Vertex &lht_bend = connected_path.lht_subpath[t - 2];
-    const auto cam_sam_wi = connected_path.camera->sample_wi(lht_end.pos, connected_path.sampler.sample2());
 
-    if(!cam_sam_wi.we)
+    const CameraEvalWeResult cam_we = connected_path.camera->eval_we(cam_beg.pos, lht_end.pos - cam_beg.pos);
+    if(!cam_we.we)
         return {};
 
-    Vec2 pixel_coord = {
-        cam_sam_wi.film_coord.x * connected_path.full_res.x,
-        cam_sam_wi.film_coord.y * connected_path.full_res.y
+    const Vec2 pixel_coord = {
+        cam_we.film_coord.x * connected_path.full_res.x,
+        cam_we.film_coord.y * connected_path.full_res.y
     };
 
     if(!connected_path.particle_film.in_sample_pixel_bound(pixel_coord.x, pixel_coord.y))
         return {};
 
-    if(!connected_path.scene.visible(cam_sam_wi.pos_on_cam, lht_end.pos))
+    if(!connected_path.scene.visible(cam_beg.pos, lht_end.pos))
         return {};
 
-    // compute path contribution
+    const Spectrum bsdf = lht_end.bsdf->eval(lht_bend.pos - lht_end.pos, cam_beg.pos - lht_end.pos, TransportMode::Radiance);
+    if(!bsdf)
+        return {};
 
-    const Spectrum bsdf = lht_end.bsdf->eval(cam_sam_wi.ref_to_pos, lht_bend.pos - lht_end.pos, TransportMode::Importance);
+    const real G_val = G(cam_beg.pos, lht_end.pos, cam_beg.nor, lht_end.nor);
+    if(G_val < EPS)
+        return {};
 
-    const real proj_pdf = cam_sam_wi.pdf / std::abs(cos(lht_end.nor, cam_sam_wi.ref_to_pos));
-    const Spectrum contrib = cam_sam_wi.we * bsdf * lht_end.accu_bsdf / (lht_end.accu_proj_pdf * proj_pdf);
+    const Spectrum contrib = cam_we.we * G_val * bsdf * lht_end.accu_bsdf / (cam_beg.accu_proj_pdf * lht_end.accu_proj_pdf);
 
-    const real weight = 1 / real(1 + t);
+    if(!contrib.is_black())
+    {
+        const real weight = weight_s1_tx_path(connected_path);
+        connected_path.particle_film.apply(pixel_coord.x, pixel_coord.y, weight * contrib);
+    }
 
-    connected_path.particle_film.apply(pixel_coord.x, pixel_coord.y, weight * contrib);
     return {};
 }
 
@@ -730,13 +774,15 @@ Spectrum BDPTRenderer::contrib_sx_t0_path(const ConnectedPath &connected_path) c
     else
     {
         Spectrum radiance;
-        for(auto light : connected_path.scene.envir_lights())
-            radiance += light->radiance(cam_bend.pos, cam_end.pos);
+        if(auto light = connected_path.scene.envir_light())
+            radiance = light->radiance(cam_bend.pos, cam_end.pos);
         contrib = radiance * cam_end.accu_bsdf / cam_end.accu_proj_pdf;
     }
 
-    const real weight = 1 / real(s);
+    if(!contrib)
+        return {};
 
+    const real weight = weight_sx_t0_path(connected_path);
     return weight * contrib;
 }
 
@@ -764,8 +810,10 @@ Spectrum BDPTRenderer::contrib_sx_t1_path(const ConnectedPath &connected_path) c
     const Spectrum contrib = bsdf * cam_end.accu_bsdf * lht_sam_wi.radiance
                            / (connected_path.select_light_pdf * cam_end.accu_proj_pdf * proj_pdf);
 
-    const real weight = 1 / real(s + 1);
+    if(!contrib)
+        return {};
 
+    const real weight = weight_sx_t1_path(connected_path, lht_sam_wi);
     return weight * contrib;
 }
 
@@ -778,6 +826,9 @@ Spectrum BDPTRenderer::contrib_sx_tx_path(const ConnectedPath &connected_path) c
     const Vertex &cam_end = connected_path.cam_subpath[s - 1];
     const Vertex &lht_end = connected_path.lht_subpath[t - 1];
     if(!cam_end.is_entity())
+        return {};
+
+    if(!connected_path.scene.visible(cam_end.pos, lht_end.pos))
         return {};
 
     const Vertex &cam_bend = connected_path.cam_subpath[s - 2];
@@ -794,9 +845,264 @@ Spectrum BDPTRenderer::contrib_sx_tx_path(const ConnectedPath &connected_path) c
     const Spectrum contrib = cam_bsdf * lht_bsdf * cam_end.accu_bsdf * lht_end.accu_bsdf
                            * G(cam_end.pos, lht_end.pos, cam_end.nor, lht_end.nor) / pdf;
 
-    const real weight = 1 / real(s + t);
+    if(contrib.is_black())
+        return {};
 
+    const real weight = weight_sx_tx_path(connected_path);
     return contrib * weight;
+}
+
+real BDPTRenderer::weight_common(const ConnectedPath &connected_path, real G_between_subpaths) const
+{
+    const int s = connected_path.s;
+    const int t = connected_path.t;
+    assert(s >= 1 && s + t >= 3);
+
+    const Vertex *C = connected_path.cam_subpath;
+    const Vertex *L = connected_path.lht_subpath;
+
+    real sum_pdf = 1;
+
+    // 将light subpath逐顶点纳入camera subpath中
+
+    real cur_pdf = 1;
+
+    // light end
+    if(t >= 2)
+    {
+        const real mul = z2o(L[t - 1].pdf_fwd) * z2o(G_between_subpaths);
+        const real div = z2o(L[t - 1].pdf_bwd) * z2o(L[t - 1].G_with_last);
+
+        cur_pdf *= mul / div;
+
+        if(!L[t - 2].is_delta)
+            sum_pdf += cur_pdf;
+    }
+
+    for(int i = t - 2; i >= 1; --i)
+    {
+        const real mul = z2o(L[i].pdf_fwd) * z2o(L[i + 1].G_with_last);
+        const real div = z2o(L[i].pdf_bwd) * z2o(L[i].G_with_last);
+
+        cur_pdf *= mul / div;
+
+        if(!L[i].is_delta && !L[i - 1].is_delta)
+            sum_pdf += cur_pdf;
+    }
+
+    // light beg
+    if(t >= 1)
+    {
+        const real mul_G = t == 1 ? G_between_subpaths : L[1].G_with_last;
+        const real mul = z2o(L[0].pdf_fwd) * z2o(mul_G);
+        const real div = z2o(L[0].pdf_bwd);
+
+        cur_pdf *= mul / div;
+
+        if(!L[0].is_delta)
+            sum_pdf += cur_pdf;
+    }
+
+    // 将camera subpath逐顶点纳入light subpath中
+
+    cur_pdf = 1;
+
+    // camera end
+    if(s >= 2)
+    {
+        const real mul = z2o(C[s - 1].pdf_bwd) * z2o(G_between_subpaths);
+        const real div = z2o(C[s - 1].pdf_fwd) * z2o(C[s - 1].G_with_last);
+
+        cur_pdf *= mul / div;
+
+        if(!C[s - 2].is_delta)
+            sum_pdf += cur_pdf;
+    }
+
+    for(int i = s - 2; i >= 1; --i)
+    {
+        const real mul = z2o(C[i].pdf_bwd) * z2o(C[i + 1].G_with_last);
+        const real div = z2o(C[i].pdf_fwd) * z2o(C[i].G_with_last);
+
+        cur_pdf *= mul / div;
+
+        if(!C[i].is_delta && !C[i - 1].is_delta)
+            sum_pdf += cur_pdf;
+    }
+
+    return 1 / sum_pdf;
+}
+
+real BDPTRenderer::weight_s1_tx_path(const ConnectedPath &connected_path) const
+{
+    assert(connected_path.s == 1 && connected_path.t >= 2);
+
+    if(!params_.use_mis)
+        return real(1) / (1 + connected_path.t);
+
+    const int t = connected_path.t;
+    Vertex *lht_subpath = connected_path.lht_subpath;
+    const Vertex &cam_beg = connected_path.cam_subpath[0];
+    Vertex &lht_end = lht_subpath[t - 1];
+
+    TmpAssign a0;
+    {
+        const Vec3 cam_beg_to_lht_end = lht_end.pos - cam_beg.pos;
+        const CameraWePDFResult cam_we_pdf = connected_path.camera->pdf_we(cam_beg.pos, cam_beg_to_lht_end);
+
+        a0 = { &lht_end.pdf_fwd, cam_we_pdf.pdf_dir / std::abs(cos(cam_beg.nor, cam_beg_to_lht_end)) };
+    }
+
+    TmpAssign a1;
+    {
+        const Vec3 wo = cam_beg.pos - lht_end.pos;
+        const Vec3 wi = lht_subpath[t - 2].pos - lht_end.pos;
+        const real pdf = lht_end.bsdf->pdf(wi, wo, TransportMode::Radiance);
+        const real proj_pdf = pdf / std::abs(cos(lht_end.nor, wi));
+
+        a1 = { &lht_subpath[t - 2].pdf_fwd, proj_pdf };
+    }
+
+    const real connected_G = G(cam_beg.pos, lht_end.pos, cam_beg.nor, lht_end.nor);
+
+    return weight_common(connected_path, connected_G);
+}
+
+real BDPTRenderer::weight_sx_t0_path(const ConnectedPath &connected_path) const
+{
+    assert(connected_path.s >= 3 && connected_path.t == 0);
+
+    if(!params_.use_mis)
+        return real(1) / connected_path.s;
+
+    Vertex *cam_subpath = connected_path.cam_subpath;
+    Vertex &cam_end = cam_subpath[connected_path.s - 1];
+    Vertex &cam_bend = cam_subpath[connected_path.s - 2];
+
+    if(cam_end.is_entity())
+    {
+        const Vec3 bend_to_end = cam_end.pos - cam_bend.pos;
+
+        const AreaLight *light = cam_end.entity->as_light();
+        const real select_light_pdf = connected_path.scene.light_pdf(light);
+        const LightEmitPDFResult emit_pdf = light->emit_pdf(cam_end.pos, -bend_to_end, cam_end.nor);
+
+        TmpAssign a0 = { &cam_end.pdf_bwd, select_light_pdf * emit_pdf.pdf_pos };
+
+        TmpAssign a1 = { &cam_bend.pdf_bwd, emit_pdf.pdf_dir / std::abs(cos(cam_end.nor, bend_to_end)) };
+
+        return weight_common(connected_path, 1);
+    }
+
+    const EnvirLight *light = connected_path.scene.envir_light();
+    assert(light != nullptr);
+
+    const real select_light_pdf = connected_path.scene.light_pdf(light);
+    const LightEmitPDFResult emit_pdf = light->emit_pdf({}, -cam_end.pos, {});
+    const LightEmitPosResult emit_pos = light->emit_pos(cam_bend.pos, cam_end.pos);
+
+    TmpAssign a0 = { &cam_end.pdf_bwd, select_light_pdf * emit_pdf.pdf_pos };
+    TmpAssign a1 = { &cam_bend.pdf_bwd, emit_pdf.pdf_dir };
+    TmpAssign a2 = { &cam_end.G_with_last, G(cam_bend.pos, emit_pos.pos, cam_bend.nor, emit_pos.nor) };
+
+    return weight_common(connected_path, 1);
+}
+
+real BDPTRenderer::weight_sx_t1_path(const ConnectedPath &connected_path, const LightSampleResult &lht_sam_wi) const
+{
+    assert(connected_path.s >= 2 && connected_path.t == 1);
+
+    if(!params_.use_mis)
+        return real(1) / (connected_path.s + 1);
+
+    const int s = connected_path.s;
+    Vertex *cam_subpath = connected_path.cam_subpath;
+    Vertex &cam_end = cam_subpath[s - 1];
+    Vertex &cam_bend = cam_subpath[s - 2];
+    Vertex &lht_vtx = connected_path.lht_subpath[0];
+
+    const LightEmitPDFResult emit_pdf = connected_path.light->emit_pdf(lht_sam_wi.pos, -lht_sam_wi.ref_to_light(), lht_sam_wi.nor);
+
+    TmpAssign a0;
+    {
+        const real lht_vtx_pa = connected_path.select_light_pdf * emit_pdf.pdf_pos;
+        a0 = { &lht_vtx.pdf_bwd, lht_vtx_pa };
+    }
+
+    TmpAssign a1;
+    {
+        const real pdf = cam_end.bsdf->pdf(lht_sam_wi.ref_to_light(), cam_bend.pos - cam_end.pos, TransportMode::Radiance);
+        const real proj_pdf = pdf / std::abs(cos(cam_end.nor, lht_sam_wi.ref_to_light()));
+        a1 = { &lht_vtx.pdf_fwd, proj_pdf };
+    }
+
+    TmpAssign a2;
+    {
+        const real proj_pdf = emit_pdf.pdf_dir / std::abs(cos(lht_sam_wi.nor, -lht_sam_wi.ref_to_light()));
+        a2 = { &cam_end.pdf_bwd, proj_pdf };
+    }
+
+    TmpAssign a3;
+    {
+        const real pdf = cam_end.bsdf->pdf(cam_bend.pos - cam_end.pos, lht_sam_wi.ref_to_light(), TransportMode::Importance);
+        const real proj_pdf = pdf / std::abs(cos(cam_end.nor, cam_bend.pos - cam_end.pos));
+        a3 = { &cam_bend.pdf_bwd, proj_pdf };
+    }
+
+    const real connected_G = G(cam_end.pos, lht_sam_wi.pos, cam_end.nor, lht_sam_wi.nor);
+
+    return weight_common(connected_path, connected_G);
+}
+
+real BDPTRenderer::weight_sx_tx_path(const ConnectedPath &connected_path) const
+{
+    assert(connected_path.s > 1 && connected_path.t > 1);
+
+    if(!params_.use_mis)
+        return real(1) / (connected_path.s + connected_path.t);
+
+    // ..., a, b | c, d, ...
+
+    const int s = connected_path.s;
+    const int t = connected_path.t;
+    Vertex *cam_subpath = connected_path.cam_subpath;
+    Vertex *lht_subpath = connected_path.lht_subpath;
+    Vertex &a = cam_subpath[s - 2];
+    Vertex &b = cam_subpath[s - 1];
+    Vertex &c = lht_subpath[t - 1];
+    Vertex &d = lht_subpath[t - 2];
+
+    TmpAssign a0;
+    {
+        const real pdf = b.bsdf->pdf(c.pos - b.pos, a.pos - b.pos, TransportMode::Radiance);
+        const real proj_pdf = pdf / std::abs(cos(b.nor, c.pos - b.pos));
+        a0 = { &c.pdf_fwd, proj_pdf };
+    }
+
+    TmpAssign a1;
+    {
+        const real pdf = c.bsdf->pdf(d.pos - c.pos, b.pos - c.pos, TransportMode::Radiance);
+        const real proj_pdf = pdf / std::abs(cos(c.nor, d.pos - c.pos));
+        a1 = { &d.pdf_fwd, proj_pdf };
+    }
+
+    TmpAssign a2;
+    {
+        const real pdf = c.bsdf->pdf(b.pos - c.pos, d.pos - c.pos, TransportMode::Importance);
+        const real proj_pdf = pdf / std::abs(cos(c.nor, b.pos - c.pos));
+        a2 = { &b.pdf_bwd, proj_pdf };
+    }
+
+    TmpAssign a3;
+    {
+        const real pdf = b.bsdf->pdf(a.pos - b.pos, c.pos - b.pos, TransportMode::Importance);
+        const real proj_pdf = pdf / std::abs(cos(b.nor, a.pos - b.pos));
+        a3 = { &a.pdf_bwd, proj_pdf };
+    }
+
+    const real connected_G = G(b.pos, c.pos, b.nor, c.nor);
+
+    return weight_common(connected_path, connected_G);
 }
 
 std::shared_ptr<Renderer> create_bdpt_renderer(const BDPTRendererParams &params)

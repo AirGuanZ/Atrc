@@ -62,7 +62,7 @@ class PathTracingRenderer : public Renderer
             {
                 if(depth == 1)
                 {
-                    for(auto light : scene.envir_lights())
+                    if(auto light = scene.envir_light())
                         pixel.value += coef * light->radiance(r.o, r.d);
                 }
                 return pixel;
@@ -168,7 +168,7 @@ class PathTracingRenderer : public Renderer
             const bool has_ent_inct = scene.closest_intersection(r, &ent_inct);
             if(!has_ent_inct)
             {
-                for(auto light : scene.envir_lights())
+                if(auto light = scene.envir_light())
                     pixel.value += coef * light->radiance(r.o, r.d);
                 return pixel;
             }

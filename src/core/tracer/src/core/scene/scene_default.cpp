@@ -20,9 +20,8 @@ class DefaultScene : public Scene
 
     std::shared_ptr<const Camera> camera_;
 
-    std::vector<Light*>                      lights_;
-    std::vector<EnvirLight *>                envir_lights_;
-    std::vector<std::shared_ptr<EnvirLight>> owner_envir_lights_;
+    std::vector<Light*>         lights_;
+    std::shared_ptr<EnvirLight> envir_light_;
 
     std::vector<std::shared_ptr<Entity>> entities_;
 
@@ -66,15 +65,9 @@ public:
     {
         void_medium_ = create_void();
 
-        owner_envir_lights_ = params.envir_lights;
-        for(auto &nonarea_light : params.envir_lights)
-        {
-            lights_.push_back(nonarea_light.get());
-            envir_lights_.push_back(nonarea_light.get());
-        }
-
-        if(envir_lights_.size() > 1)
-            throw ObjectConstructionException("more than 1 environment lights");
+        envir_light_ = params.envir_light;
+        if(envir_light_)
+            lights_.push_back(params.envir_light.get());
 
         std::vector<std::shared_ptr<const Entity>> const_entities;
         const_entities.reserve(params.entities.size());
@@ -106,10 +99,9 @@ public:
         return misc::span<const Light* const>(ptr, lights_.size());
     }
 
-    misc::span<const EnvirLight * const> envir_lights() const noexcept override
+    const EnvirLight *envir_light() const noexcept override
     {
-        const auto ptr = envir_lights_.data();
-        return misc::span<const EnvirLight * const>(ptr, envir_lights_.size());
+        return envir_light_.get();
     }
 
     SceneSampleLightResult sample_light(const Sample1 &sam) const noexcept override
@@ -126,7 +118,7 @@ public:
         return ret;
     }
 
-    real light_pdf(const AreaLight *light) const noexcept override
+    real light_pdf(const Light *light) const noexcept override
     {
         const auto it = light_ptr_to_pdf_.find(light);
         return it != light_ptr_to_pdf_.end() ? it->second : real(0);
@@ -155,8 +147,8 @@ public:
         for(auto &ent : entities_)
             world_bound |= ent->world_bound();
 
-        for(auto light : lights_)
-            light->preprocess(world_bound);
+        if(envir_light_)
+            envir_light_->preprocess(world_bound);
 
         construct_light_sampler();
     }

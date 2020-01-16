@@ -13,10 +13,10 @@ Spectrum mis_sample_area_light(
 Spectrum mis_sample_area_light(
     const Scene &scene, const AreaLight *light, const MediumScattering &scattering, const BSDF *phase_function, Sampler &sampler);
 
-Spectrum mis_sample_nonarea_light(
+Spectrum mis_sample_envir_light(
     const Scene &scene, const EnvirLight *light, const EntityIntersection &inct, const ShadingPoint &shd, Sampler &sampler);
 
-Spectrum mis_sample_nonarea_light(
+Spectrum mis_sample_envir_light(
     const Scene &scene, const EnvirLight *light, const MediumScattering &scattering, const BSDF *phase_function, Sampler &sampler);
 
 Spectrum mis_sample_light(

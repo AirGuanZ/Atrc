@@ -36,10 +36,10 @@ namespace
 
             LightSampleResult ret;
             ret.pos      = spt.pos;
+            ret.nor      = spt.geometry_coord.z;
             ret.ref      = ref;
             ret.radiance = radiance_;
             ret.pdf      = pdf_area * dist2 / std::abs(cos(spt.geometry_coord.z, spt_to_ref));
-            ret.is_delta = false;
 
             return ret;
         }
@@ -91,11 +91,6 @@ namespace
         Spectrum radiance(const Vec3 &pos, const Vec3 &nor, const Vec3 &light_to_out) const noexcept override
         {
             return dot(nor, light_to_out) > 0 ? radiance_ : Spectrum();
-        }
-
-        void preprocess(const AABB &world_bound) override
-        {
-            // do nothing
         }
 
         const Geometry *geometry() const noexcept

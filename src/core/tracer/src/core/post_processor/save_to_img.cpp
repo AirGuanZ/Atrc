@@ -24,7 +24,7 @@ public:
         filename_ = std::move(filename);
         save_ext_ = std::move(ext);
 
-        if(save_ext_ != "png" && save_ext_ != "jpg")
+        if(save_ext_ != "png" && save_ext_ != "jpg" && save_ext_ != "hdr")
             throw ObjectConstructionException("unsupported image extension: " + save_ext_);
 
         open_after_saved_ = open;
@@ -53,6 +53,8 @@ public:
             img::save_rgb_to_png_file(filename_, imgu8);
         else if(save_ext_ == "jpg")
             img::save_rgb_to_jpg_file(filename_, imgu8);
+        else if(save_ext_ == "hdr")
+            img::save_rgb_to_hdr_file(filename_, render_target.image.get_data());
 
         if(open_after_saved_)
             sys::open_with_default_app(filename_);

@@ -136,7 +136,7 @@ namespace disney_impl
                          * microfacet::smith_anisotropic_gtr2(cos_phi_o, sin_phi_o, trans_ax_, trans_ay_, tan_theta_o);
 
             const real sdem = cos_theta_d + eta * dot(lwi, lwh);
-            const real corr_factor = mode == TransportMode::Radiance ? (1 / eta) : 1;
+            const real corr_factor = mode == TransportMode::Radiance ? 1 / eta : 1;
 
             real(*std_sqrt)(real) = std::sqrt;
             const Spectrum sqrtC = C_.map(std_sqrt);

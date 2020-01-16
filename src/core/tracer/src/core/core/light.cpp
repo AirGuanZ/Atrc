@@ -3,7 +3,7 @@
 
 AGZ_TRACER_BEGIN
 
-void EnvirLight::preprocess(const AABB &world_bound)
+void EnvirLight::preprocess(const AABB &world_bound) noexcept
 {
     // 稍微放大world bound，避免数值精度问题导致某些点没落到包围盒中
 

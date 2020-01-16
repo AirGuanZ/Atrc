@@ -35,10 +35,10 @@ public:
 
         LightSampleResult ret;
         ret.ref          = ref;
-        ret.pos          = ref + 2 * world_radius_ * dir;
+        ret.pos          = emit_pos(ref, dir).pos;
+        ret.nor          = -dir;
         ret.radiance     = radiance_impl(dir);
         ret.pdf          = pdf;
-        ret.is_delta     = false;
 
         return ret;
     }
@@ -57,9 +57,9 @@ public:
         const Vec3 pos        = world_radius_ * (disk_sam.x * dir_coord.x + disk_sam.y * dir_coord.y - dir) + world_centre_;
 
         LightEmitResult ret;
-        ret.pos  = pos;
-        ret.dir = dir;
-        ret.nor    = dir.normalize();
+        ret.pos       = pos;
+        ret.dir       = dir;
+        ret.nor       = dir.normalize();
         ret.radiance  = radiance_impl(-dir);
         ret.pdf_pos   = 1 / (PI_r * world_radius_ * world_radius_);
         ret.pdf_dir   = pdf_dir;
@@ -74,6 +74,40 @@ public:
         return { pdf_pos, pdf_dir };
     }
 
+    LightEmitPosResult emit_pos(const Vec3 &ref, const Vec3 &ref_to_light) const noexcept override
+    {
+        // o: world_center
+        // r: world_radius
+        // x: ref
+        // d: ref_to_light.normalize()
+        // o + r * (u * ex + v * ey + d) = x + d * t
+        // solve [u, v, t] and ans = ref + ref_to_light * t
+
+        // => [a b c][u v t]^T = m
+        // where a = r * ex
+        //       b = r * ey
+        //       c = -d
+        //       m = x - o + r * d
+
+        const auto [ex, ey, d] = Coord::from_z(ref_to_light);
+
+        const Vec3 a = world_radius_ * ex;
+        const Vec3 b = world_radius_ * ey;
+        const Vec3 c = -d;
+        const Vec3 m = ref - world_centre_ - world_radius_ * d;
+
+        const real det  = Mat3::from_cols(a, b, c).det();
+        const real tdet = Mat3::from_cols(a, b, m).det();
+
+        if(std::abs(det) < EPS)
+            return { world_centre_, -ref_to_light };
+
+        const real t = tdet / det;
+        const Vec3 pos = ref + t * d;
+
+        return { pos, c };
+    }
+
     Spectrum power() const noexcept override
     {
         const real radius = world_radius_;
@@ -81,15 +115,13 @@ public:
         return 4 * PI_r * PI_r * radius * radius * mean_radiance;
     }
 
-    Spectrum radiance(const Vec3 &ref, const Vec3 &ref_to_light, Vec3 *light_pnt) const noexcept override
+    Spectrum radiance(const Vec3 &ref, const Vec3 &ref_to_light) const noexcept override
     {
-        if(light_pnt)
-            *light_pnt = ref + 2 * world_radius_ * ref_to_light.normalize();
         return radiance_impl(ref_to_light);
     }
 };
 
-std::shared_ptr<EnvirLight>create_native_sky(
+std::shared_ptr<EnvirLight> create_native_sky(
     const Spectrum &top,
     const Spectrum &bottom,
     const Vec3 &up)
