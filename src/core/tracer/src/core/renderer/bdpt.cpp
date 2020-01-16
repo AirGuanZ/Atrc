@@ -952,6 +952,7 @@ real BDPTRenderer::weight_s1_tx_path(const ConnectedPath &connected_path) const
 
         a0 = { &lht_end.pdf_fwd, cam_we_pdf.pdf_dir / std::abs(cos(cam_beg.nor, cam_beg_to_lht_end)) };
     }
+    AGZ_UNACCESSED(a0);
 
     TmpAssign a1;
     {
@@ -962,6 +963,7 @@ real BDPTRenderer::weight_s1_tx_path(const ConnectedPath &connected_path) const
 
         a1 = { &lht_subpath[t - 2].pdf_fwd, proj_pdf };
     }
+    AGZ_UNACCESSED(a1);
 
     const real connected_G = G(cam_beg.pos, lht_end.pos, cam_beg.nor, lht_end.nor);
 
@@ -1028,6 +1030,7 @@ real BDPTRenderer::weight_sx_t1_path(const ConnectedPath &connected_path, const 
         const real lht_vtx_pa = connected_path.select_light_pdf * emit_pdf.pdf_pos;
         a0 = { &lht_vtx.pdf_bwd, lht_vtx_pa };
     }
+    AGZ_UNACCESSED(a0);
 
     TmpAssign a1;
     {
@@ -1035,12 +1038,14 @@ real BDPTRenderer::weight_sx_t1_path(const ConnectedPath &connected_path, const 
         const real proj_pdf = pdf / std::abs(cos(cam_end.nor, lht_sam_wi.ref_to_light()));
         a1 = { &lht_vtx.pdf_fwd, proj_pdf };
     }
+    AGZ_UNACCESSED(a1);
 
     TmpAssign a2;
     {
         const real proj_pdf = emit_pdf.pdf_dir / std::abs(cos(lht_sam_wi.nor, -lht_sam_wi.ref_to_light()));
         a2 = { &cam_end.pdf_bwd, proj_pdf };
     }
+    AGZ_UNACCESSED(a2);
 
     TmpAssign a3;
     {
@@ -1048,6 +1053,7 @@ real BDPTRenderer::weight_sx_t1_path(const ConnectedPath &connected_path, const 
         const real proj_pdf = pdf / std::abs(cos(cam_end.nor, cam_bend.pos - cam_end.pos));
         a3 = { &cam_bend.pdf_bwd, proj_pdf };
     }
+    AGZ_UNACCESSED(a3);
 
     const real connected_G = G(cam_end.pos, lht_sam_wi.pos, cam_end.nor, lht_sam_wi.nor);
 
@@ -1078,6 +1084,7 @@ real BDPTRenderer::weight_sx_tx_path(const ConnectedPath &connected_path) const
         const real proj_pdf = pdf / std::abs(cos(b.nor, c.pos - b.pos));
         a0 = { &c.pdf_fwd, proj_pdf };
     }
+    AGZ_UNACCESSED(a0);
 
     TmpAssign a1;
     {
@@ -1085,6 +1092,7 @@ real BDPTRenderer::weight_sx_tx_path(const ConnectedPath &connected_path) const
         const real proj_pdf = pdf / std::abs(cos(c.nor, d.pos - c.pos));
         a1 = { &d.pdf_fwd, proj_pdf };
     }
+    AGZ_UNACCESSED(a1);
 
     TmpAssign a2;
     {
@@ -1092,6 +1100,7 @@ real BDPTRenderer::weight_sx_tx_path(const ConnectedPath &connected_path) const
         const real proj_pdf = pdf / std::abs(cos(c.nor, b.pos - c.pos));
         a2 = { &b.pdf_bwd, proj_pdf };
     }
+    AGZ_UNACCESSED(a2);
 
     TmpAssign a3;
     {
@@ -1099,6 +1108,7 @@ real BDPTRenderer::weight_sx_tx_path(const ConnectedPath &connected_path) const
         const real proj_pdf = pdf / std::abs(cos(b.nor, a.pos - b.pos));
         a3 = { &a.pdf_bwd, proj_pdf };
     }
+    AGZ_UNACCESSED(a3);
 
     const real connected_G = G(b.pos, c.pos, b.nor, c.nor);
 

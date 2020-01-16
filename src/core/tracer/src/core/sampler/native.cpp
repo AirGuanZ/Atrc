@@ -43,7 +43,7 @@ public:
     {
         seed_t new_seed;
         {
-            const std::seed_seq seed_gen = { seed_, seed_t(seed) };
+            std::seed_seq seed_gen = { seed_, seed_t(seed) };
             seed_gen.generate(&new_seed, &new_seed + 1);
         }
         return arena.create<NativeSampler>(spp_, new_seed, false);
