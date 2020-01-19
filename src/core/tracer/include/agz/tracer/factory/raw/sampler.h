@@ -7,4 +7,7 @@ AGZ_TRACER_BEGIN
 std::shared_ptr<Sampler> create_native_sampler(
     int spp, int seed, bool use_time_seed);
 
+std::shared_ptr<Sampler> create_sobol_sampler(
+    int spp, int seed, bool use_time_seed);
+
 AGZ_TRACER_END

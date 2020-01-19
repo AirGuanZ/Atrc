@@ -32,7 +32,7 @@ public:
 
     virtual bool next_sample() = 0;
 
-    virtual int get_spp() const noexcept = 0;
+    virtual int get_sample_count() const noexcept = 0;
 };
 
 inline Sample2 Sampler::sample2() noexcept

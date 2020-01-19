@@ -333,7 +333,7 @@ private:
         for(auto &t : threads)
             t.join();
 
-        const int total_particle_count = params_.particle_task_count * params_.particle_sampler_prototype->get_spp();
+        const int total_particle_count = params_.particle_task_count * params_.particle_sampler_prototype->get_sample_count();
         const real scale = filter.width() * filter.height() / static_cast<real>(total_particle_count);
 
         Image2D<Spectrum> ret(filter.height(), filter.width());

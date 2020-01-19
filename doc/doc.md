@@ -833,6 +833,17 @@ The most basic random number sampler, where all samples are independent
 | seed       | int  | by time       | Seed value, default seed is the running time |
 | spp        | int  |               | samples per pixel                            |
 
+**sobol**
+
+Sobol sampler
+
+| Field Name | Type | Default Value | Explanation                                  |
+| ---------- | ---- | ------------- | -------------------------------------------- |
+| seed       | int  | by time       | Seed value, default seed is the running time |
+| spp        | int  |               | samples per pixel                            |
+
+`seed` is only used to offset samples in pixels.
+
 ### Texture2D
 
 ![pic](./pictures/texture.png)
