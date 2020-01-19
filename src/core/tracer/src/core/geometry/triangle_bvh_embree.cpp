@@ -212,7 +212,7 @@ namespace tri_bvh_embree_ws
             RTCIntersectContext inct_ctx{};
             rtcInitIntersectContext(&inct_ctx);
             rtcOccluded1(scene_, &inct_ctx, &ray);
-            return ray.tfar < 0 && isinf(ray.tfar);
+            return ray.tfar < 0 && std::isinf(ray.tfar);
         }
 
         bool closest_intersection(const Ray &r, GeometryIntersection *inct) const noexcept
