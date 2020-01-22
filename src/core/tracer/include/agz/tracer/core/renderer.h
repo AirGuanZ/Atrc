@@ -1,5 +1,8 @@
 ﻿#pragma once
 
+#include <atomic>
+#include <future>
+
 #include <agz/tracer/core/render_target.h>
 
 AGZ_TRACER_BEGIN
@@ -12,14 +15,38 @@ class Scene;
  */
 class Renderer
 {
+protected:
+
+    std::atomic<bool> stop_rendering_ = false;
+
+    bool is_async_rendering_ = false;
+    std::future<RenderTarget> async_thread_;
+
 public:
 
-    virtual ~Renderer() = default;
+    virtual ~Renderer() { stop_async(); }
 
     /**
      * @brief 阻塞式渲染
      */
-    virtual RenderTarget render(const FilmFilterApplier &filter, Scene &scene, ProgressReporter &reporter) = 0;
+    virtual RenderTarget render(FilmFilterApplier filter, Scene &scene, ProgressReporter &reporter) = 0;
+
+    /**
+     * @brief 发起异步渲染任务
+     */
+    void render_async(FilmFilterApplier filter, Scene &scene, ProgressReporter &reporter);
+
+    /**
+     * @brief 终止异步渲染任务
+     */
+    void stop_async();
+
+    /**
+     * @brief 等待异步渲染完成
+     */
+    RenderTarget sync();
+
+    bool is_async_rendering() const noexcept { return is_async_rendering_; }
 };
 
 AGZ_TRACER_END

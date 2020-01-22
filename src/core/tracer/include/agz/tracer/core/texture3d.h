@@ -83,6 +83,8 @@ struct Texture3DCommonParams
  */
 class Texture3D
 {
+protected:
+
     Transform3 transform_;
 
     using WrapFuncPtr = real(*)(real);
@@ -119,8 +121,6 @@ class Texture3D
             return &wrap_mirror;
         throw ObjectConstructionException("invalid wrap function name: " + str);
     }
-
-protected:
 
     void init_common_params(const Texture3DCommonParams &params)
     {

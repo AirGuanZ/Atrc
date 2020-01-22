@@ -3,6 +3,7 @@
 #include <memory>
 
 #include <agz/tracer/core/renderer.h>
+#include <agz/tracer/factory/factory.h>
 #include <agz/tracer/utility/config.h>
 
 AGZ_TRACER_BEGIN
@@ -29,14 +30,14 @@ public:
         std::vector<std::shared_ptr<PostProcessor>> post_processors;
     };
 
+    RenderSession() = default;
+
     RenderSession(std::shared_ptr<Scene> scene, std::unique_ptr<RenderSetting> render_setting) noexcept;
 
     void execute();
 
-private:
-
-    std::shared_ptr<Scene> scene_;
-    std::unique_ptr<RenderSetting> render_settings_;
+    std::shared_ptr<Scene> scene;
+    std::unique_ptr<RenderSetting> render_settings;
 };
 
 RenderSession create_render_session(

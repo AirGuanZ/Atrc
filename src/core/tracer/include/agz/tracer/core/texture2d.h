@@ -56,6 +56,8 @@ struct Texture2DCommonParams
  */
 class Texture2D
 {
+protected:
+
     Transform2 transform_;
 
     using WrapFunctionPtr = real(*)(real);
@@ -79,8 +81,6 @@ class Texture2D
         const int intp = static_cast<int>(x >= 0 ? x : std::floor(x));
         return math::clamp<real>(intp & 1 ? 1 - x + intp : x - intp, 0, 1);
     }
-
-protected:
 
     void init_common_params(const Texture2DCommonParams &params)
     {

@@ -20,6 +20,8 @@ public:
 
     virtual ~ProgressReporter() = default;
 
+    virtual bool need_image_preview() const noexcept = 0;
+
     /**
      * @brief 汇报进度数据
      * 
@@ -27,7 +29,7 @@ public:
      * 
      * 在多线程环境下汇报的数据不一定保证递增
      */
-    virtual void progress(double percent) = 0;
+    virtual void progress(double percent, const std::function<Image2D<Spectrum>()> &get_image_preview) = 0;
 
     /**
      * @brief 输出一条消息

@@ -27,9 +27,8 @@ public:
 
     }
 
-    RenderTarget render(const FilmFilterApplier &filter, Scene &scene, ProgressReporter &reporter) override
+    RenderTarget render(FilmFilterApplier filter, Scene &scene, ProgressReporter &reporter) override
     {
-        scene.start_rendering();
         reporter.begin();
 
         // backward rendering
@@ -70,8 +69,8 @@ private:
         real     denoise = 1;
     };
 
-    using ForwardGrid = FilmFilterApplier::FilmGrid<Spectrum, real, Spectrum, Vec3, real>;
-    using BackwardGrid = FilmFilterApplier::FilmGrid<Spectrum>;
+    using ForwardGrid = FilmFilterApplier::FilmGridView<Spectrum, real, Spectrum, Vec3, real>;
+    using BackwardGrid = FilmFilterApplier::FilmGridView<Spectrum>;
 
     Pixel trace_camera_ray(const Scene &scene, const Ray &r, Arena &arena) const
     {
@@ -198,7 +197,7 @@ private:
                 const int x_end = (std::min)(x_beg + task_grid_size, filter.width());
                 const int y_end = (std::min)(y_beg + task_grid_size, filter.height());
 
-                ForwardGrid film_grid = filter.bind_to(
+                ForwardGrid film_grid = filter.create_subgrid_view(
                     { { x_beg, y_beg }, { x_end - 1, y_end - 1 } },
                     image_buffer.value, image_buffer.weight,
                     image_buffer.albedo, image_buffer.normal, image_buffer.denoise);
@@ -233,13 +232,16 @@ private:
 
                             arena.release();
 
+                            if(stop_rendering_)
+                                return;
+
                         } while(sampler->next_sample());
                     }
                 }
 
                 const real percent = real(100) * (task_id + 1) / total_task_count;
                 std::lock_guard lk(reporter_mutex);
-                reporter.progress(percent);
+                reporter.progress(percent, {});
             }
         };
 
@@ -290,9 +292,10 @@ private:
             &reporter_mutex,
             &next_task_id,
             this
-        ] (Sampler *sampler, Image2D<Spectrum> *image)
+        ] (Sampler *sampler, Image2D<Spectrum> *image, int *particle_count)
         {
-            auto film_grid = filter.bind_to({ { 0, 0 }, { filter.width(), filter.height() } }, *image);
+            auto film_grid = filter.create_subgrid_view(
+                { { 0, 0 }, { filter.width() - 1, filter.height() - 1 } }, *image);
 
             for(;;)
             {
@@ -304,14 +307,18 @@ private:
                 sampler->start_pixel(0, task_id);
                 do
                 {
+                    ++*particle_count;
                     trace_particle(scene, film_grid, *sampler, film_res_f, arena);
                     arena.release();
+
+                    if(stop_rendering_)
+                        return;
 
                 } while(sampler->next_sample());
 
                 const real percent = real(100) * (task_id + 1) / params_.particle_task_count;
                 std::lock_guard lk(reporter_mutex);
-                reporter.progress(percent);
+                reporter.progress(percent, {});
             }
         };
 
@@ -319,21 +326,23 @@ private:
         Arena sampler_arena;
 
         std::vector<std::thread> threads;
+        std::vector<int> particle_counts;
         std::vector<Image2D<Spectrum>> images;
 
         threads.reserve(worker_count);
+        particle_counts.resize(worker_count);
         images.resize(worker_count, Image2D<Spectrum>(filter.height(), filter.width()));
 
         for(int i = 0; i < worker_count; ++i)
         {
             auto sampler = params_.particle_sampler_prototype->clone(i, sampler_arena);
-            threads.emplace_back(backward_func, sampler, &images[i]);
+            threads.emplace_back(backward_func, sampler, &images[i], &particle_counts[i]);
         }
 
         for(auto &t : threads)
             t.join();
 
-        const int total_particle_count = params_.particle_task_count * params_.particle_sampler_prototype->get_sample_count();
+        const int total_particle_count = std::accumulate(particle_counts.begin(), particle_counts.end(), 0, std::plus<int>());
         const real scale = filter.width() * filter.height() / static_cast<real>(total_particle_count);
 
         Image2D<Spectrum> ret(filter.height(), filter.width());

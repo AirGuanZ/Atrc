@@ -5,9 +5,9 @@
 #include <vector>
 
 #include <agz/cli/cli.h>
-#include <agz/cli/config_cvt.h>
 
 #include <agz/tracer/factory/factory.h>
+#include <agz/tracer/utility/config_cvt.h>
 #include <agz/tracer/utility/logger.h>
 #include <agz/tracer/utility/render_session.h>
 
@@ -67,7 +67,7 @@ void run(int argc, char *argv[])
         AGZ_INFO("scene directory: {}", scene_dir);
     }
 
-    const auto root_params       = json_to_config(string_to_json(params->scene_description));
+    const auto root_params       = agz::tracer::json_to_config(agz::tracer::string_to_json(params->scene_description));
     const auto &scene_config     = root_params.child_group("scene");
     const auto &rendering_config = root_params.child("rendering");
 

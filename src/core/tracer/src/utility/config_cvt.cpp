@@ -1,4 +1,4 @@
-#include <agz/cli/config_cvt.h>
+#include <agz/tracer/utility/config_cvt.h>
 
 using namespace agz;
 using namespace tracer;
@@ -80,6 +80,8 @@ namespace
     
 } // namespace anonymous
 
+AGZ_TRACER_BEGIN
+
 JSON string_to_json(const std::string &str)
 {
     return JSON::parse(str);
@@ -100,3 +102,5 @@ Config json_to_config(const JSON &json)
     assert(json.is_object());
     return from_json_impl(json)->as_group();
 }
+
+AGZ_TRACER_END

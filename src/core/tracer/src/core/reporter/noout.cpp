@@ -14,14 +14,12 @@ class NoOutput : public ProgressReporter
 
 public:
 
-    static std::string description()
+    bool need_image_preview() const noexcept override
     {
-        return R"___(
-noout [ProgressReporter]
-)___";
+        return false;
     }
 
-    void progress(double percent) override
+    void progress(double percent, const std::function<Image2D<Spectrum>()> &get_image_preview) override
     {
 
     }

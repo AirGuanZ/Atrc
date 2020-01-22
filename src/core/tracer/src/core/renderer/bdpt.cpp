@@ -21,12 +21,12 @@ public:
 
     explicit BDPTRenderer(const BDPTRendererParams &params);
 
-    RenderTarget render(const FilmFilterApplier &filter, Scene &scene, ProgressReporter &reporter) override;
+    RenderTarget render(FilmFilterApplier filter, Scene &scene, ProgressReporter &reporter) override;
 
 private:
 
-    using FilmGrid     = FilmFilterApplier::FilmGrid<Spectrum, real, Spectrum, Vec3, real>;
-    using ParticleFilm = FilmFilterApplier::FilmGrid<Spectrum>;
+    using FilmGrid     = FilmFilterApplier::FilmGridView<Spectrum, real, Spectrum, Vec3, real>;
+    using ParticleFilm = FilmFilterApplier::FilmGridView<Spectrum>;
 
     struct GPixel
     {
@@ -192,9 +192,8 @@ BDPTRenderer::BDPTRenderer(const BDPTRendererParams &params)
     
 }
 
-RenderTarget BDPTRenderer::render(const FilmFilterApplier &filter, Scene &scene, ProgressReporter &reporter)
+RenderTarget BDPTRenderer::render(FilmFilterApplier filter, Scene &scene, ProgressReporter &reporter)
 {
-    scene.start_rendering();
     reporter.begin();
     reporter.new_stage();
 
@@ -225,8 +224,8 @@ RenderTarget BDPTRenderer::render(const FilmFilterApplier &filter, Scene &scene,
     ] (Sampler *sampler, Image2D<Spectrum> *particle_image)
     {
         const Vec2i full_res = { filter.width(), filter.height() };
-        ParticleFilm particle_film = filter.bind_to(
-            { { 0, 0 }, { filter.width(), filter.height() } }, *particle_image);
+        ParticleFilm particle_film = filter.create_subgrid_view(
+            { { 0, 0 }, { filter.width() - 1, filter.height() - 1 } }, *particle_image);
 
         for(;;)
         {
@@ -242,16 +241,19 @@ RenderTarget BDPTRenderer::render(const FilmFilterApplier &filter, Scene &scene,
             const int x_end = (std::min)(x_beg + task_grid_size, filter.width());
             const int y_end = (std::min)(y_beg + task_grid_size, filter.height());
 
-            FilmGrid film_grid = filter.bind_to(
+            FilmGrid film_grid = filter.create_subgrid_view(
                 { { x_beg, y_beg }, { x_end - 1, y_end - 1 } },
                 image_buffer.value, image_buffer.weight,
                 image_buffer.albedo, image_buffer.normal, image_buffer.denoise);
 
             total_particle_count += this->render_grid(scene, *sampler, film_grid, particle_film, full_res);
 
+            if(stop_rendering_)
+                break;
+
             const real percent = real(100) * (task_id + 1) / total_task_count;
             std::lock_guard lk(reporter_mutex);
-            reporter.progress(percent);
+            reporter.progress(percent, {});
         }
     };
 
@@ -342,6 +344,12 @@ int BDPTRenderer::render_grid(const Scene &scene, Sampler &sampler, FilmGrid &fi
                 ++particle_count;
                 eval_sample(px, py, grid_params, arena);
 
+                if(arena.used_bytes() > 4 * 1024 * 1024)
+                    arena.release();
+
+                if(stop_rendering_)
+                    return particle_count;
+
             } while(sampler.next_sample());
         }
     }
@@ -375,12 +383,15 @@ void BDPTRenderer::eval_sample(int px, int py, const GridParams &grid_params, Ar
         }
     }
 
-    grid_params.film_grid.apply(
-        cam_subpath.pixel_x, cam_subpath.pixel_y,
-        radiance, 1,
-        cam_subpath.gpixel.albedo,
-        cam_subpath.gpixel.normal,
-        cam_subpath.gpixel.denoise);
+    if(radiance.is_finite())
+    {
+        grid_params.film_grid.apply(
+            cam_subpath.pixel_x, cam_subpath.pixel_y,
+            radiance, 1,
+            cam_subpath.gpixel.albedo,
+            cam_subpath.gpixel.normal,
+            cam_subpath.gpixel.denoise);
+    }
 }
 
 BDPTRenderer::CameraSubpath BDPTRenderer::build_camera_subpath(
@@ -745,7 +756,8 @@ Spectrum BDPTRenderer::contrib_s1_tx_path(const ConnectedPath &connected_path) c
     if(!contrib.is_black())
     {
         const real weight = weight_s1_tx_path(connected_path);
-        connected_path.particle_film.apply(pixel_coord.x, pixel_coord.y, weight * contrib);
+        if(math::is_finite(weight) && contrib.is_finite())
+            connected_path.particle_film.apply(pixel_coord.x, pixel_coord.y, weight * contrib);
     }
 
     return {};

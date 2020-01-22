@@ -6,19 +6,18 @@ class Constant3D : public Texture3D
 {
     Spectrum texel_;
 
-protected:
-
-    Spectrum sample_spectrum_impl(const Vec3 &uvw) const noexcept override
-    {
-        return texel_;
-    }
-
 public:
 
     Constant3D(const Texture3DCommonParams &common_params, const Spectrum &texel)
         : texel_(texel)
     {
         init_common_params(common_params);
+
+        if(inv_gamma_ != 1)
+        {
+            for(int i = 0; i < SPECTRUM_COMPONENT_COUNT; ++i)
+                texel_[i] = std::pow(texel_[i], inv_gamma_);
+        }
     }
 
     int width() const noexcept override
@@ -52,6 +51,16 @@ public:
     }
 
     real min_real() const noexcept override
+    {
+        return texel_.r;
+    }
+
+    Spectrum sample_spectrum(const Vec3 &uvw) const noexcept override
+    {
+        return texel_;
+    }
+
+    real sample_real(const Vec3 &uvw) const noexcept override
     {
         return texel_.r;
     }

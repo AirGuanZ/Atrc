@@ -87,6 +87,9 @@ class AORenderer : public Renderer
                     
                     grid.apply(pixel_x, pixel_y, cam_ray.throughput * pixel.value, 1, pixel.albedo, pixel.normal, pixel.denoise);
 
+                    if(stop_rendering_)
+                        return;
+
                 } while(sampler.next_sample());
             }
         }
@@ -100,7 +103,7 @@ public:
 
     }
 
-    RenderTarget render(const FilmFilterApplier &filter, Scene &scene, ProgressReporter &reporter) override
+    RenderTarget render(FilmFilterApplier filter, Scene &scene, ProgressReporter &reporter) override
     {
         int width  = filter.width();
         int height = filter.height();
@@ -111,12 +114,24 @@ public:
         std::atomic<int> next_task_id = 0;
         std::mutex reporter_mutex;
 
+        ImageBuffer image_buffer(width, height);
+
+        auto get_img = std::function([&]()
+        {
+            auto ratio = image_buffer.weight.map([](real w)
+            {
+                return w > 0 ? 1 / w : real(1);
+            });
+            return image_buffer.value * ratio;
+        });
+
         auto func = [
             &filter,
             &scene,
             &reporter,
             &reporter_mutex,
             &next_task_id,
+            &get_img,
             x_task_count,
             total_task_count,
             task_grid_size = params_.task_grid_size,
@@ -127,6 +142,9 @@ public:
 
             for(;;)
             {
+                if(stop_rendering_)
+                    return;
+
                 const int task_id = next_task_id++;
                 if(task_id >= total_task_count)
                     break;
@@ -138,15 +156,29 @@ public:
                 const int x_end = (std::min)(x_beg + task_grid_size, full_res.x);
                 const int y_end = (std::min)(y_beg + task_grid_size, full_res.y);
 
-                auto grid = filter.bind_to(
-                    { { x_beg, y_beg }, { x_end - 1, y_end - 1 } },
-                    image_buffer->value, image_buffer->weight,
-                    image_buffer->albedo, image_buffer->normal, image_buffer->denoise);
+                auto grid = filter.create_subgrid<Spectrum, real, Spectrum, Vec3, real>(
+                    { { x_beg, y_beg }, { x_end - 1, y_end - 1 } });
                 this->render_grid(scene, *sampler, grid, full_res);
 
-                const real percent = real(100) * (task_id + 1) / total_task_count;
-                std::lock_guard lk(reporter_mutex);
-                reporter.progress(percent);
+                if(reporter.need_image_preview())
+                {
+                    const real percent = real(100) * (task_id + 1) / total_task_count;
+                    std::lock_guard lk(reporter_mutex);
+                    grid.merge_into(
+                        image_buffer->value, image_buffer->weight,
+                        image_buffer->albedo, image_buffer->normal, image_buffer->denoise);
+                    reporter.progress(percent, get_img);
+                }
+                else
+                {
+                    grid.merge_into(
+                        image_buffer->value, image_buffer->weight,
+                        image_buffer->albedo, image_buffer->normal, image_buffer->denoise);
+
+                    const real percent = real(100) * (task_id + 1) / total_task_count;
+                    std::lock_guard lk(reporter_mutex);
+                    reporter.progress(percent, {});
+                }
             }
         };
 
@@ -154,10 +186,6 @@ public:
         std::vector<std::thread> threads;
 
         Arena sampler_arena;
-
-        ImageBuffer image_buffer(width, height);
-
-        scene.start_rendering();
 
         reporter.begin();
         reporter.new_stage();

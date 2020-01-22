@@ -71,7 +71,7 @@ namespace
 }
 
 RenderSession::RenderSession(std::shared_ptr<Scene> scene, std::unique_ptr<RenderSetting> render_setting) noexcept
-    : scene_(std::move(scene)), render_settings_(std::move(render_setting))
+    : scene(std::move(scene)), render_settings(std::move(render_setting))
 {
     
 }
@@ -80,13 +80,16 @@ void RenderSession::execute()
 {
     AGZ_INFO("start rendering");
 
-    scene_->set_camera(render_settings_->camera);
-    FilmFilterApplier filter_applier(render_settings_->width, render_settings_->height, render_settings_->film_filter);
-    RenderTarget render_target = render_settings_->renderer->render(filter_applier, *scene_, *render_settings_->reporter);
+    scene->set_camera(render_settings->camera);
+    scene->start_rendering();
+
+    FilmFilterApplier filter_applier(render_settings->width, render_settings->height, render_settings->film_filter);
+
+    RenderTarget render_target = render_settings->renderer->render(filter_applier, *scene, *render_settings->reporter);
 
     AGZ_INFO("running post processors");
 
-    for(auto &p : render_settings_->post_processors)
+    for(auto &p : render_settings->post_processors)
         p->process(render_target);
 }
 

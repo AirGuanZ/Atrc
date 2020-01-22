@@ -1,9 +1,6 @@
-#include <iostream>
-
 #include <agz/tracer/core/reporter.h>
 #include <agz/tracer/utility/logger.h>
 #include <agz/utility/console.h>
-#include <agz/utility/misc.h>
 #include <agz/utility/time.h>
 
 AGZ_TRACER_BEGIN
@@ -20,7 +17,12 @@ class StdOutput : public ProgressReporter
 
 public:
 
-    void progress(double percent) override
+    bool need_image_preview() const noexcept override
+    {
+        return false;
+    }
+
+    void progress(double percent, const std::function<Image2D<Spectrum>()> &get_image_preview) override
     {
         if(percent > percent_)
         {

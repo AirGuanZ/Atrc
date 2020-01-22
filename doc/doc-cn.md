@@ -26,6 +26,7 @@
 需额外准备的依赖项如下：
 
 * [oidn 1.1.0](https://openimagedenoise.github.io/)，基于机器学习的降噪滤波器（仅在启动了`USE_OIDN`选项时需要）
+* Qt5 （仅在启用了`BUILD_GUI`选项时需要）
 
 在Windows下使用MSVC时，将[oidn-1.1.0.x64.vc14.windows.zip](https://github.com/OpenImageDenoise/oidn/releases/download/v1.1.0/oidn-1.1.0.x64.vc14.windows.zip)中的所有文件拷贝到`lib/oidn/vc14`中；使用linux时，将[oidn-1.1.0.x86_64.linux.tar.gz](https://github.com/OpenImageDenoise/oidn/releases/download/v1.1.0/oidn-1.1.0.x86_64.linux.tar.gz)中的所有文件拷贝到`lib/oidn/linux`中。详情可参考`cmake/cmake-oidn`。
 
@@ -36,6 +37,7 @@
 | USE_EMBREE              | OFF    | 启用Embree加速器            |
 | USE_OIDN                | OFF    | 启用OIDN降噪器              |
 | BUILD_MATERIAL_EXPLORER | OFF    | 启用Material Explorer的构建 |
+| BUILD_GUI               | OFF    | 启用GUI启动器               |
 
 注意到OIDN只支持64位程序，因此若启用了OIDN库，必须以64位模式构建程序。
 
@@ -54,10 +56,10 @@
    ```powershell
    mkdir build
    cd build
-   cmake -DUSE_EMBREE=ON -DUSE_OIDN=ON -DBUILD_MATERIAL_EXPLORER=ON -G "Visual Studio 15 2017 Win64" ..
+   cmake -DUSE_EMBREE=ON -DUSE_OIDN=ON -DBUILD_MATERIAL_EXPLORER=ON -DBUILD_GUI=ON -DQt5_DIR="../../Qt5" -G "Visual Studio 15 2017 Win64" ..
    ```
 
-这会在`Atrc/build`下生成`Visual Studio 2017`的解决方案文件。第一次运行时会自动从网络上下载Embree和OIDN，此时应保持网络良好。
+这会在`Atrc/build`下生成`Visual Studio 2017`的解决方案文件。
 
 ## Usage
 
@@ -66,9 +68,9 @@
 编译Atrc得到的结果由以下几部分构成：
 
 1. CLI，为渲染器的命令行可执行程序，是Tracer的简单应用
-2. Tracer，基于光线追踪的离线渲染库（静态库）
+2. GUI，为带渲染过程预览的渲染器启动器，是Tracer的简单应用
+3. Tracer，基于光线追踪的离线渲染库（静态库）
 4. material_explorer，材质参数预览器，使用GPU加速的材质效果调整工具
-5. CLI_RAS，开发中的纯软件光栅化渲染管线，拟在未来用于光线追踪渲染器的加速
 
 本节主要介绍CLI的使用，即其命令参数的含义和场景配置文件的编写。
 
