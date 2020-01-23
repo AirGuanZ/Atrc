@@ -8,11 +8,11 @@
 #include <QWidget>
 
 #include <agz/gui/gui.h>
+#include <agz/tracer/core/post_processor.h>
 #include <agz/tracer/core/scene.h>
 #include <agz/tracer/utility/config_cvt.h>
 #include <agz/utility/file.h>
 #include <agz/utility/misc.h>
-#include <agz/utility/string.h>
 
 #ifdef USE_EMBREE
 #   include <agz/tracer/utility/embree.h>
@@ -21,37 +21,19 @@
 #define WORKING_DIR_PATH_NAME "${working-directory}"
 #define SCENE_DESC_PATH_NAME  "${scene-directory}"
 
-class PathMapper : public agz::tracer::factory::PathMapper
-{
-    std::map<std::string, std::string> replacers_;
-
-public:
-
-    void add_replacer(const std::string &key, const std::string &value)
-    {
-        replacers_[key] = value;
-    }
-
-    std::string map(const std::string &s) const override
-    {
-        std::string ret(s);
-        for(auto &p : replacers_)
-            agz::stdstr::replace_(ret, p.first, p.second);
-        return absolute(std::filesystem::path(ret)).lexically_normal().string();
-    }
-};
-
 GUI::GUI()
 {
-    QMenuBar *menu_bar = menuBar();
-
-    QAction *load = new QAction("Open", this);
-    menu_bar->addAction(load);
+    QAction *load = new QAction("Open Config JSON", this);
+    menuBar()->addAction(load);
     connect(load, &QAction::triggered, this, &GUI::on_load_config);
 
-    QAction *stop = new QAction("Stop", this);
-    menu_bar->addAction(stop);
+    QAction *stop = new QAction("Stop Rendering", this);
+    menuBar()->addAction(stop);
     connect(stop, &QAction::triggered, this, &GUI::on_stop_rendering);
+
+    QAction *post = new QAction("Execute Post Processors", this);
+    menuBar()->addAction(post);
+    connect(post, &QAction::triggered, this, &GUI::on_exec_post_processor);
 
     QWidget *central_widget = new QWidget(this);
     setCentralWidget(central_widget);
@@ -94,7 +76,8 @@ void GUI::on_load_config()
         std::string input_filename = QFileDialog::getOpenFileName(
             this, "Configuration File").toStdString();
 
-        start_rendering(input_filename);
+        if(!input_filename.empty())
+            start_rendering(input_filename);
     }
     catch(const std::exception &err)
     {
@@ -134,29 +117,7 @@ void GUI::on_update_preview()
     if(reporter_)
     {
         if(auto img = reporter_->get_preview_image(); img.is_available())
-        {
-            agz::texture::texture2d_t<agz::math::color3b> imgu8(img.height(), img.width());
-            for(int y = 0; y < imgu8.height(); ++y)
-            {
-                const int ry = img.height() - 1 - y;
-                for(int x = 0; x < imgu8.width(); ++x)
-                {
-                    imgu8(y, x) = to_color3b(img(ry, x).map([](agz::tracer::real r)
-                    {
-                        return std::pow(r, agz::tracer::real(1 / 2.2));
-                    }));
-                }
-            }
-
-            QImage qimg(
-                reinterpret_cast<unsigned char *>(imgu8.raw_data()),
-                imgu8.width(), imgu8.height(),
-                sizeof(agz::math::color3b) * imgu8.width(), QImage::Format::Format_RGB888);
-
-            QPixmap qpixmap;
-            qpixmap.convertFromImage(qimg);
-            preview_label_->setPixmap(qpixmap);
-        }
+            set_preview_img(img);
     }
 }
 
@@ -165,11 +126,42 @@ void GUI::on_update_pbar(double percent)
     pbar_->setValue(agz::math::clamp<int>(static_cast<int>(percent), 0, 100));
 }
 
+void GUI::on_exec_post_processor()
+{
+    if(render_session_.render_settings && render_session_.render_settings->renderer->is_async_rendering())
+    {
+        if(render_session_.render_settings->renderer->is_doing_rendering())
+        {
+            QMessageBox mbox;
+            mbox.setWindowTitle("Note");
+            mbox.setText("Rendering");
+            mbox.exec();
+        }
+        else
+        {
+            auto render_target = render_session_.render_settings->renderer->wait_async();
+            for(auto &p : render_session_.render_settings->post_processors)
+                p->process(render_target);
+
+            set_preview_img(render_target.image);
+
+            stop_rendering();
+        }
+    }
+    else
+    {
+        QMessageBox mbox;
+        mbox.setWindowTitle("Note");
+        mbox.setText("No post processors");
+        mbox.exec();
+    }
+}
+
 void GUI::start_rendering(const std::string &input_filename)
 {
     render_context_ = std::make_unique<Context>();
 
-    std::unique_ptr<PathMapper> path_mapper = std::make_unique<PathMapper>();
+    auto path_mapper = std::make_unique<agz::tracer::factory::BasicPathMapper>();
     {
         const auto working_dir = absolute(std::filesystem::current_path()).lexically_normal().string();
         path_mapper->add_replacer(WORKING_DIR_PATH_NAME, working_dir);
@@ -195,7 +187,7 @@ void GUI::start_rendering(const std::string &input_filename)
     render_session_ = create_render_session(scene, rendering_config, render_context_->context);
 
     reporter_ = std::make_shared<GUIProgressReporter>(
-        std::chrono::duration_cast<GUIProgressReporter::Clock::duration>(std::chrono::milliseconds(250)));
+        std::chrono::duration_cast<GUIProgressReporter::Clock::duration>(std::chrono::milliseconds(500)));
     render_session_.render_settings->reporter = reporter_;
 
     agz::tracer::FilmFilterApplier film_filter_applier(
@@ -223,4 +215,31 @@ void GUI::stop_rendering()
     render_context_.reset();
     render_session_ = agz::tracer::RenderSession();
     reporter_.reset();
+}
+
+void GUI::set_preview_img(const agz::tracer::Image2D<agz::tracer::Spectrum> &img)
+{
+    agz::texture::texture2d_t<agz::math::color3b> imgu8(img.height(), img.width());
+    for(int y = 0; y < imgu8.height(); ++y)
+    {
+        const int ry = img.height() - 1 - y;
+        for(int x = 0; x < imgu8.width(); ++x)
+        {
+            imgu8(y, x) = to_color3b(img(ry, x).map([](agz::tracer::real r)
+            {
+                return std::pow(r, agz::tracer::real(1 / 2.2));
+            }));
+        }
+    }
+
+    QImage qimg(
+        reinterpret_cast<unsigned char *>(imgu8.raw_data()),
+        imgu8.width(), imgu8.height(),
+        sizeof(agz::math::color3b) *imgu8.width(),
+        QImage::Format::Format_RGB888);
+
+    QPixmap qpixmap;
+    qpixmap.convertFromImage(qimg);
+
+    preview_label_->setPixmap(qpixmap);
 }

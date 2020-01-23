@@ -25,7 +25,7 @@ public:
 
 private:
 
-    using FilmGrid     = FilmFilterApplier::FilmGridView<Spectrum, real, Spectrum, Vec3, real>;
+    using FilmGrid     = FilmFilterApplier::FilmGrid<Spectrum, real, Spectrum, Vec3, real>;
     using ParticleFilm = FilmFilterApplier::FilmGridView<Spectrum>;
 
     struct GPixel
@@ -73,12 +73,12 @@ private:
         // 交点bsdf[e]
         const BSDF *bsdf = nullptr;
 
+        // 是否是delta顶点，即从该顶点采样到其他顶点的pdf是否是delta函数
         bool is_delta = false;
 
-        bool is_entity() const noexcept
-        {
-            return entity != nullptr;
-        }
+        // 是否是实体顶点
+        // 对摄像机顶点和光源顶点无意义
+        bool is_entity() const noexcept { return entity != nullptr; }
     };
 
     struct GridParams
@@ -142,6 +142,9 @@ private:
 
     static real n2o(real x) noexcept;
 
+    template<bool REPORTER_WITH_PREVIEW>
+    RenderTarget render_impl(FilmFilterApplier filter, Scene &scene, ProgressReporter &reporter);
+
     int render_grid(
         const Scene &scene, Sampler &sampler, FilmGrid &film_grid, ParticleFilm &particle_film, const Vec2i &full_res);
 
@@ -194,6 +197,31 @@ BDPTRenderer::BDPTRenderer(const BDPTRendererParams &params)
 
 RenderTarget BDPTRenderer::render(FilmFilterApplier filter, Scene &scene, ProgressReporter &reporter)
 {
+    if(reporter.need_image_preview())
+        return render_impl<true>(filter, scene, reporter);
+    return render_impl<false>(filter, scene, reporter);
+}
+
+real BDPTRenderer::G(const Vec3 &a, const Vec3 &b, const Vec3 &na, const Vec3 &nb) noexcept
+{
+    const Vec3 d = a - b;
+    return std::abs(cos(d, na) * cos(d, nb)) / d.length_square();
+}
+
+real BDPTRenderer::z2o(real x) noexcept
+{
+    return !std::isnan(x) && x > EPS ? x : real(1);
+}
+
+real BDPTRenderer::n2o(real x) noexcept
+{
+    return std::isnan(x) ? 1 : x;
+}
+
+template<bool REPORTER_WITH_PREVIEW>
+RenderTarget BDPTRenderer::render_impl(FilmFilterApplier filter, Scene &scene, ProgressReporter &reporter)
+{
+    
     reporter.begin();
     reporter.new_stage();
 
@@ -207,6 +235,13 @@ RenderTarget BDPTRenderer::render(FilmFilterApplier filter, Scene &scene, Progre
     std::atomic<int> next_task_id = 0;
     std::atomic<int> total_particle_count = 0;
 
+    const int worker_count = thread::actual_worker_count(params_.worker_count);
+    auto particle_images_lock = std::make_unique<std::mutex[]>(worker_count);
+
+    std::vector<Image2D<Spectrum>> particle_output_film;
+    if constexpr(REPORTER_WITH_PREVIEW)
+        particle_output_film.resize(worker_count, Image2D<Spectrum>(filter.height(), filter.width()));
+
     ImageBufferTemplate<true, true, true, true, true> image_buffer(width, height);
 
     auto render_func = [
@@ -217,11 +252,14 @@ RenderTarget BDPTRenderer::render(FilmFilterApplier filter, Scene &scene, Progre
         &reporter_mutex,
         &next_task_id,
         &total_particle_count,
+        worker_count,
+        &particle_images_lock,
+        &particle_output_film,
         x_task_count,
         total_task_count,
         task_grid_size = params_.task_grid_size,
         this
-    ] (Sampler *sampler, Image2D<Spectrum> *particle_image)
+    ] (Sampler *sampler, Image2D<Spectrum> *particle_image, int i)
     {
         const Vec2i full_res = { filter.width(), filter.height() };
         ParticleFilm particle_film = filter.create_subgrid_view(
@@ -229,6 +267,9 @@ RenderTarget BDPTRenderer::render(FilmFilterApplier filter, Scene &scene, Progre
 
         for(;;)
         {
+            if(stop_rendering_)
+                break;
+
             const int task_id = next_task_id++;
             if(task_id >= total_task_count)
                 break;
@@ -241,36 +282,84 @@ RenderTarget BDPTRenderer::render(FilmFilterApplier filter, Scene &scene, Progre
             const int x_end = (std::min)(x_beg + task_grid_size, filter.width());
             const int y_end = (std::min)(y_beg + task_grid_size, filter.height());
 
-            FilmGrid film_grid = filter.create_subgrid_view(
-                { { x_beg, y_beg }, { x_end - 1, y_end - 1 } },
-                image_buffer.value, image_buffer.weight,
-                image_buffer.albedo, image_buffer.normal, image_buffer.denoise);
+            FilmGrid film_grid = filter.create_subgrid<Spectrum, real, Spectrum, Vec3, real>(
+                { { x_beg, y_beg }, { x_end - 1, y_end - 1 } });
+            int task_particle_count = this->render_grid(scene, *sampler, film_grid, particle_film, full_res);
 
-            total_particle_count += this->render_grid(scene, *sampler, film_grid, particle_film, full_res);
+            if constexpr(REPORTER_WITH_PREVIEW)
+            {
+                int pc;
 
-            if(stop_rendering_)
-                break;
+                {
+                    std::lock_guard lk(particle_images_lock[i]);
+                    particle_output_film[i] = *particle_image;
 
-            const real percent = real(100) * (task_id + 1) / total_task_count;
-            std::lock_guard lk(reporter_mutex);
-            reporter.progress(percent, {});
+                    total_particle_count += task_particle_count;
+                    pc = total_particle_count;
+                }
+
+                auto get_img = [
+                    &image_buffer,
+                    worker_count,
+                    &particle_images_lock,
+                    &particle_output_film,
+                    &filter,
+                    pc]()
+                {
+                    Image2D<Spectrum> ret(filter.height(), filter.width());
+
+                    for(int j = 0; j < worker_count; ++j)
+                    {
+                        std::lock_guard lk(particle_images_lock[j]);
+                        ret = ret + particle_output_film[j];
+                    }
+
+                    real ratio_particle = filter.width() * filter.height() * (pc ? real(1) / pc : real(0));
+                    ret = ratio_particle * ret;
+
+                    auto ratio_forward = image_buffer.weight.map([](real w)
+                    {
+                        return w > 0 ? 1 / w : real(0);
+                    });
+                    return ret + ratio_forward * image_buffer.value;
+                };
+
+                const real percent = real(100) * (task_id + 1) / total_task_count;
+                std::lock_guard lk(reporter_mutex);
+                film_grid.merge_into(
+                    image_buffer.value, image_buffer.weight,
+                    image_buffer.albedo, image_buffer.normal, image_buffer.denoise);
+
+                reporter.progress(percent, get_img);
+            }
+            else
+            {
+                total_particle_count += task_particle_count;
+                film_grid.merge_into(
+                    image_buffer.value, image_buffer.weight,
+                    image_buffer.albedo, image_buffer.normal, image_buffer.denoise);
+
+                std::lock_guard lk(reporter_mutex);
+                const real percent = real(100) * (task_id + 1) / total_task_count;
+                reporter.progress(percent, {});
+            }
         }
     };
 
     // 创建工作线程
 
-    const int worker_count = thread::actual_worker_count(params_.worker_count);
     Arena sampler_arena;
 
     std::vector<std::thread> threads;
     std::vector<Image2D<Spectrum>> particle_images;
+
     threads.reserve(worker_count);
     particle_images.resize(worker_count, Image2D<Spectrum>(height, width));
 
     for(int i = 0; i < worker_count; ++i)
     {
         Sampler *sampler = params_.sampler_prototype->clone(i, sampler_arena);
-        threads.emplace_back(render_func, sampler, &particle_images[i]);
+        threads.emplace_back(render_func, sampler, &particle_images[i], i);
     }
 
     for(auto &t : threads)
@@ -299,22 +388,6 @@ RenderTarget BDPTRenderer::render(FilmFilterApplier filter, Scene &scene, Progre
     reporter.end();
 
     return render_target;
-}
-
-real BDPTRenderer::G(const Vec3 &a, const Vec3 &b, const Vec3 &na, const Vec3 &nb) noexcept
-{
-    const Vec3 d = a - b;
-    return std::abs(cos(d, na) * cos(d, nb)) / d.length_square();
-}
-
-real BDPTRenderer::z2o(real x) noexcept
-{
-    return !std::isnan(x) && x > EPS ? x : real(1);
-}
-
-real BDPTRenderer::n2o(real x) noexcept
-{
-    return std::isnan(x) ? 1 : x;
 }
 
 int BDPTRenderer::render_grid(const Scene &scene, Sampler &sampler, FilmGrid &film_grid, ParticleFilm &particle_film, const Vec2i &full_res)
@@ -708,7 +781,8 @@ Spectrum BDPTRenderer::contrib_s2_t0_path(const ConnectedPath &connected_path) c
         if(!light)
             return {};
 
-        const Spectrum radiance = light->radiance(cam_end.pos, cam_end.nor, cam_beg.pos - cam_end.pos);
+        const Spectrum radiance = light->radiance(
+            cam_end.pos, cam_end.nor, cam_beg.pos - cam_end.pos);
         return radiance * cam_end.accu_bsdf / cam_end.accu_proj_pdf;
     }
 
@@ -728,7 +802,8 @@ Spectrum BDPTRenderer::contrib_s1_tx_path(const ConnectedPath &connected_path) c
     const Vertex &lht_end = connected_path.lht_subpath[t - 1];
     const Vertex &lht_bend = connected_path.lht_subpath[t - 2];
 
-    const CameraEvalWeResult cam_we = connected_path.camera->eval_we(cam_beg.pos, lht_end.pos - cam_beg.pos);
+    const CameraEvalWeResult cam_we = connected_path.camera->eval_we(
+        cam_beg.pos, lht_end.pos - cam_beg.pos);
     if(!cam_we.we)
         return {};
 
@@ -743,7 +818,8 @@ Spectrum BDPTRenderer::contrib_s1_tx_path(const ConnectedPath &connected_path) c
     if(!connected_path.scene.visible(cam_beg.pos, lht_end.pos))
         return {};
 
-    const Spectrum bsdf = lht_end.bsdf->eval(lht_bend.pos - lht_end.pos, cam_beg.pos - lht_end.pos, TransportMode::Radiance);
+    const Spectrum bsdf = lht_end.bsdf->eval(
+        lht_bend.pos - lht_end.pos, cam_beg.pos - lht_end.pos, TransportMode::Radiance);
     if(!bsdf)
         return {};
 
@@ -751,7 +827,8 @@ Spectrum BDPTRenderer::contrib_s1_tx_path(const ConnectedPath &connected_path) c
     if(G_val < EPS)
         return {};
 
-    const Spectrum contrib = cam_we.we * G_val * bsdf * lht_end.accu_bsdf / (cam_beg.accu_proj_pdf * lht_end.accu_proj_pdf);
+    const Spectrum contrib = cam_we.we * G_val * bsdf * lht_end.accu_bsdf
+                           / (cam_beg.accu_proj_pdf * lht_end.accu_proj_pdf);
 
     if(!contrib.is_black())
     {
@@ -780,7 +857,8 @@ Spectrum BDPTRenderer::contrib_sx_t0_path(const ConnectedPath &connected_path) c
         if(!light)
             return {};
 
-        const Spectrum radiance = light->radiance(cam_end.pos, cam_end.nor, cam_bend.pos - cam_end.pos);
+        const Spectrum radiance = light->radiance(
+            cam_end.pos, cam_end.nor, cam_bend.pos - cam_end.pos);
         contrib = radiance * cam_end.accu_bsdf / cam_end.accu_proj_pdf;
     }
     else
@@ -816,7 +894,8 @@ Spectrum BDPTRenderer::contrib_sx_t1_path(const ConnectedPath &connected_path) c
     if(!connected_path.scene.visible(cam_end.pos, lht_sam_wi.pos))
         return {};
 
-    const Spectrum bsdf = cam_end.bsdf->eval(lht_sam_wi.ref_to_light(), cam_bend.pos - cam_end.pos, TransportMode::Radiance);
+    const Spectrum bsdf = cam_end.bsdf->eval(
+        lht_sam_wi.ref_to_light(), cam_bend.pos - cam_end.pos, TransportMode::Radiance);
 
     const real proj_pdf = lht_sam_wi.pdf / std::abs(cos(cam_end.nor, lht_sam_wi.ref_to_light()));
     const Spectrum contrib = bsdf * cam_end.accu_bsdf * lht_sam_wi.radiance
@@ -999,7 +1078,8 @@ real BDPTRenderer::weight_sx_t0_path(const ConnectedPath &connected_path) const
 
         const AreaLight *light = cam_end.entity->as_light();
         const real select_light_pdf = connected_path.scene.light_pdf(light);
-        const LightEmitPDFResult emit_pdf = light->emit_pdf(cam_end.pos, -bend_to_end, cam_end.nor);
+        const LightEmitPDFResult emit_pdf = light->emit_pdf(
+            cam_end.pos, -bend_to_end, cam_end.nor);
 
         TmpAssign a0 = { &cam_end.pdf_bwd, select_light_pdf * emit_pdf.pdf_pos };
 
@@ -1035,7 +1115,8 @@ real BDPTRenderer::weight_sx_t1_path(const ConnectedPath &connected_path, const 
     Vertex &cam_bend = cam_subpath[s - 2];
     Vertex &lht_vtx = connected_path.lht_subpath[0];
 
-    const LightEmitPDFResult emit_pdf = connected_path.light->emit_pdf(lht_sam_wi.pos, -lht_sam_wi.ref_to_light(), lht_sam_wi.nor);
+    const LightEmitPDFResult emit_pdf = connected_path.light->emit_pdf(
+        lht_sam_wi.pos, -lht_sam_wi.ref_to_light(), lht_sam_wi.nor);
 
     TmpAssign a0;
     {
@@ -1046,7 +1127,8 @@ real BDPTRenderer::weight_sx_t1_path(const ConnectedPath &connected_path, const 
 
     TmpAssign a1;
     {
-        const real pdf = cam_end.bsdf->pdf(lht_sam_wi.ref_to_light(), cam_bend.pos - cam_end.pos, TransportMode::Radiance);
+        const real pdf = cam_end.bsdf->pdf(
+            lht_sam_wi.ref_to_light(), cam_bend.pos - cam_end.pos, TransportMode::Radiance);
         const real proj_pdf = pdf / std::abs(cos(cam_end.nor, lht_sam_wi.ref_to_light()));
         a1 = { &lht_vtx.pdf_fwd, proj_pdf };
     }
@@ -1054,14 +1136,16 @@ real BDPTRenderer::weight_sx_t1_path(const ConnectedPath &connected_path, const 
 
     TmpAssign a2;
     {
-        const real proj_pdf = emit_pdf.pdf_dir / std::abs(cos(lht_sam_wi.nor, -lht_sam_wi.ref_to_light()));
+        const real proj_pdf = emit_pdf.pdf_dir
+                            / std::abs(cos(lht_sam_wi.nor, -lht_sam_wi.ref_to_light()));
         a2 = { &cam_end.pdf_bwd, proj_pdf };
     }
     AGZ_UNACCESSED(a2);
 
     TmpAssign a3;
     {
-        const real pdf = cam_end.bsdf->pdf(cam_bend.pos - cam_end.pos, lht_sam_wi.ref_to_light(), TransportMode::Importance);
+        const real pdf = cam_end.bsdf->pdf(
+            cam_bend.pos - cam_end.pos, lht_sam_wi.ref_to_light(), TransportMode::Importance);
         const real proj_pdf = pdf / std::abs(cos(cam_end.nor, cam_bend.pos - cam_end.pos));
         a3 = { &cam_bend.pdf_bwd, proj_pdf };
     }

@@ -18,6 +18,7 @@ class Renderer
 protected:
 
     std::atomic<bool> stop_rendering_ = false;
+    std::atomic<bool> doing_rendering_ = false;
 
     bool is_async_rendering_ = false;
     std::future<RenderTarget> async_thread_;
@@ -44,9 +45,19 @@ public:
     /**
      * @brief 等待异步渲染完成
      */
-    RenderTarget sync();
+    RenderTarget wait_async();
 
+    /**
+     * @brief 是否正在异步渲染中
+     */
     bool is_async_rendering() const noexcept { return is_async_rendering_; }
+
+    /**
+     * @brief 异步渲染实质上是否已经完成
+     *
+     * 即在调用render_async之后，即使未调用stop_async或wait_async，渲染结束后也会返回false
+     */
+    bool is_doing_rendering() const noexcept { return doing_rendering_; }
 };
 
 AGZ_TRACER_END

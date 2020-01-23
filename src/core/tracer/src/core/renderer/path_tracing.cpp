@@ -260,18 +260,8 @@ class PathTracingRenderer : public Renderer
         }
     }
 
-public:
-
-    explicit PathTracingRenderer(const PathTracingRendererParams &params)
-        : params_(params)
-    {
-        if(params.use_mis)
-            eval_func_ = &PathTracingRenderer::eval_mis;
-        else
-            eval_func_ = &PathTracingRenderer::eval_nomis;
-    }
-
-    RenderTarget render(FilmFilterApplier filter, Scene &scene, ProgressReporter &reporter) override
+    template<bool REPORTER_WITH_PREVIEW>
+    RenderTarget render_impl(FilmFilterApplier filter, Scene &scene, ProgressReporter &reporter)
     {
         int width = filter.width();
         int height = filter.height();
@@ -328,7 +318,7 @@ public:
                     { { x_beg, y_beg }, { x_end - 1, y_end - 1 } });
                 this->render_grid(scene, *sampler, grid, full_res);
 
-                if(reporter.need_image_preview())
+                if constexpr(REPORTER_WITH_PREVIEW)
                 {
                     const real percent = real(100) * (task_id + 1) / total_task_count;
                     std::lock_guard lk(reporter_mutex);
@@ -376,14 +366,32 @@ public:
         });
 
         RenderTarget render_target;
-        render_target.image   = image_buffer.value * ratio;
-        render_target.albedo  = image_buffer.albedo * ratio;
-        render_target.normal  = image_buffer.normal * ratio;
+        render_target.image = image_buffer.value * ratio;
+        render_target.albedo = image_buffer.albedo * ratio;
+        render_target.normal = image_buffer.normal * ratio;
         render_target.denoise = image_buffer.denoise * ratio;
 
         reporter.message("total time: " + std::to_string(reporter.total_seconds()) + "s");
 
         return render_target;
+    }
+
+public:
+
+    explicit PathTracingRenderer(const PathTracingRendererParams &params)
+        : params_(params)
+    {
+        if(params.use_mis)
+            eval_func_ = &PathTracingRenderer::eval_mis;
+        else
+            eval_func_ = &PathTracingRenderer::eval_nomis;
+    }
+
+    RenderTarget render(FilmFilterApplier filter, Scene &scene, ProgressReporter &reporter) override
+    {
+        if(reporter.need_image_preview())
+            return render_impl<true>(filter, scene, reporter);
+        return render_impl<false>(filter, scene, reporter);
     }
 };
 

@@ -5,8 +5,10 @@ AGZ_TRACER_BEGIN
 void Renderer::render_async(FilmFilterApplier filter, Scene &scene, ProgressReporter &reporter)
 {
     stop_rendering_ = false;
+    doing_rendering_ = true;
     async_thread_ = std::async(std::launch::async, [this, filter, &scene, &reporter]()
     {
+        AGZ_SCOPE_GUARD({ doing_rendering_ = false; });
         return this->render(std::move(filter), scene, reporter);
     });
     is_async_rendering_ = true;
@@ -25,7 +27,7 @@ void Renderer::stop_async()
     }
 }
 
-RenderTarget Renderer::sync()
+RenderTarget Renderer::wait_async()
 {
     assert(is_async_rendering_);
     AGZ_SCOPE_GUARD({ is_async_rendering_ = false; });

@@ -131,28 +131,31 @@ namespace post_processor
         std::shared_ptr<PostProcessor> create(const ConfigGroup &params, CreatingContext &context) const override
         {
             const std::string filename = context.path_mapper->map(params.child_str("filename"));
-            const bool open = params.child_int_or("open", 1) != 0;
+            const bool open = params.child_int_or("open", 0) != 0;
 
             real gamma = 1;
             if(auto node = params.find_child_value("gamma"))
                 gamma = node->as_real();
             else if(node = params.find_child_value("inv_gamma"); node)
                 gamma = 1 / node->as_real();
-            
-            const std::string ext = params.child_str_or("ext", "png");
+
+            std::string ext;
+            if(auto child_node = params.find_child_value("ext"))
+                ext = child_node->as_str();
+            else
+            {
+                if(stdstr::ends_with(filename, ".png"))
+                    ext = "png";
+                else if(stdstr::ends_with(filename, ".jpg"))
+                    ext = "jpg";
+                else if(stdstr::ends_with(filename, ".hdr"))
+                    ext = "hdr";
+                else
+                    throw ObjectConstructionException("unknown image file format: " + filename);
+            }
 
             return create_saving_to_img(
                 std::move(filename), std::move(ext), open, gamma);
-        }
-    };
-
-    class SavePNGCreator : public SaveImgCreator
-    {
-    public:
-
-        std::string name() const override
-        {
-            return "save_to_png";
         }
     };
 
@@ -169,7 +172,6 @@ void initialize_post_processor_factory(Factory<PostProcessor> &factory)
     factory.add_creator(std::make_unique<post_processor::ResizeImageCreator>());
     factory.add_creator(std::make_unique<post_processor::SaveGBufferCreator>());
     factory.add_creator(std::make_unique<post_processor::SaveImgCreator>());
-    factory.add_creator(std::make_unique<post_processor::SavePNGCreator>());
 }
 
 AGZ_TRACER_FACTORY_END

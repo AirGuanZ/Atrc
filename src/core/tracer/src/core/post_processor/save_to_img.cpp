@@ -42,7 +42,7 @@ public:
 
         AGZ_INFO("saving image to {}", filename_);
 
-        const auto imgu8 = render_target.image.get_data().map([gamma = gamma_](const Spectrum &s)
+        const auto imgu8 = render_target.image.flip_vertically().get_data().map([gamma = gamma_](const Spectrum &s)
         {
             return s.map([gamma = gamma](real c)
             {

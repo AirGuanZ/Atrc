@@ -32,11 +32,15 @@ private slots:
 
     void on_update_pbar(double percent);
 
+    void on_exec_post_processor();
+
 private:
 
     void start_rendering(const std::string &input_filename);
 
     void stop_rendering();
+
+    void set_preview_img(const agz::tracer::Image2D<agz::tracer::Spectrum> &img);
 
     struct Context
     {

@@ -170,10 +170,6 @@ Atrc使用JSON作为描述场景和渲染设置的配置文件格式。整个JSO
     },
     "post_processors": [
       {
-        "type": "flip",
-        "vertically": true
-      },
-      {
         "type": "save_to_img",
         "filename": "${scene-directory}/output.png",
         "inv_gamma": 2.2
@@ -207,7 +203,7 @@ Atrc使用JSON作为描述场景和渲染设置的配置文件格式。整个JSO
 
 除了这些类型的字段外，其他类型的字段均以JSON对象的语法出现。这些字段除了具有“类型”这一属性外，还具有“类型值”的属性。譬如，一个类型为“Entity”的字段可以出现在任何一个需要“实体”的地方，而该字段的类型值则由它的属性`type`决定，表示该字段具体是哪一种实体。
 
-在后文的叙述中，我将使用简化的表格形式来表示一个对象应包含哪些字段以及这些字段的含义。以整个配置文件中最后出现的后处理器`save_to_png`为例，它的JSON表示是：
+在后文的叙述中，我将使用简化的表格形式来表示一个对象应包含哪些字段以及这些字段的含义。以整个配置文件中最后出现的后处理器`save_to_img`为例，它的JSON表示是：
 
 ```json
 {
@@ -219,14 +215,9 @@ Atrc使用JSON作为描述场景和渲染设置的配置文件格式。整个JSO
 
 它对应的文档表格为：
 
-| 字段名             | 类型   | 默认值 | 含义                                    |
-| ------------------ | ------ | ------ | --------------------------------------- |
-| filename           | string |        | 将图像保存至何处                        |
-| open               | bool   | true   | 保存完成后是否使用默认图像浏览器打开它  |
-| gamma              | real   | 1      | 保存前进行gamma校正时使用的$\gamma$值   |
-| inv_gamma          | real   | 1      | 保存前进行gamma校正时使用的$1/\gamma$值 |
-| with_alpha_channel | bool   | false  | 将gbuffer::binary作为alpha通道保存      |
-| ext                | string | png    | 保存文件类型，取值范围为"png"或"jpg"    |
+| 字段名 | 类型 | 默认值 | 含义 |
+| ------ | ---- | ------ | ---- |
+| ...    | ...  | ...    | ...  |
 
 表格中，“默认值”一栏为空表示这是一个必须填写的字段，不为空则表示这是一个可选的字段。
 
@@ -286,8 +277,6 @@ Atrc使用JSON作为描述场景和渲染设置的配置文件格式。整个JSO
 | fov            | real |        | 摄像机竖直方向上的视角大小，单位为角度 |
 | lens_radius    | real | 0      | 透镜半径                               |
 | focal_distance | real | 1      | 焦平面和镜头的距离                     |
-
-此摄像机的渲染结果是上下颠倒的，因此通常会和类型为“flip”的后处理器配合。
 
 ### Entity
 
@@ -736,17 +725,15 @@ Disney Principled BSDF，具体可参考[原文](https://blog.selfshadow.com/pub
 
 将图像保存至文件。
 
-| 字段名    | 类型   | 默认值 | 含义                                        |
-| --------- | ------ | ------ | ------------------------------------------- |
-| filename  | string |        | 将图像保存至何处                            |
-| open      | bool   | true   | 保存完成后是否使用默认图像浏览器打开它      |
-| gamma     | real   | 1      | 保存前进行gamma校正时使用的$\gamma$值       |
-| inv_gamma | real   | 1      | 保存前进行gamma校正时使用的$1/\gamma$值     |
-| ext       | string | png    | 保存文件类型，取值范围为"png"，"jpg"或"hdr" |
+| 字段名    | 类型   | 默认值        | 含义                                        |
+| --------- | ------ | ------------- | ------------------------------------------- |
+| filename  | string |               | 将图像保存至何处                            |
+| open      | bool   | false         | 保存完成后是否使用默认图像浏览器打开它      |
+| gamma     | real   | 1             | 保存前进行gamma校正时使用的$\gamma$值       |
+| inv_gamma | real   | 1             | 保存前进行gamma校正时使用的$1/\gamma$值     |
+| ext       | string | from filename | 保存文件类型，取值范围为"png"，"jpg"或"hdr" |
 
 `gamma`和`inv_gamma`只需给出其中一个即可，若都未指定，则不进行gamma校正。
-
-该`PostProcessor`亦名`save_to_png`，这只是由兼容性问题造成的，不建议使用此名。
 
 **resize**
 

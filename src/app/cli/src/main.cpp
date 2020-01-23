@@ -21,26 +21,6 @@
 #define WORKING_DIR_PATH_NAME "${working-directory}"
 #define SCENE_DESC_PATH_NAME  "${scene-directory}"
 
-class PathMapper : public agz::tracer::factory::PathMapper
-{
-    std::map<std::string, std::string> replacers_;
-
-public:
-
-    void add_replacer(const std::string &key, const std::string &value)
-    {
-        replacers_[key] = value;
-    }
-
-    std::string map(const std::string &s) const override
-    {
-        std::string ret(s);
-        for(auto &p : replacers_)
-            agz::stdstr::replace_(ret, p.first, p.second);
-        return absolute(std::filesystem::path(ret)).lexically_normal().string();
-    }
-};
-
 void run(int argc, char *argv[])
 {
     auto params = parse_opts(argc, argv);
@@ -56,7 +36,7 @@ void run(int argc, char *argv[])
         });
 #endif
 
-    PathMapper path_mapper;
+    agz::tracer::factory::BasicPathMapper path_mapper;
     {
         const auto working_dir = absolute(std::filesystem::current_path()).lexically_normal().string();
         path_mapper.add_replacer(WORKING_DIR_PATH_NAME, working_dir);

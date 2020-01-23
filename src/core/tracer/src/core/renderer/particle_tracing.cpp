@@ -14,7 +14,7 @@
 #include <agz/tracer/core/scene.h>
 #include <agz/tracer/factory/raw/renderer.h>
 #include <agz/utility/thread.h>
-
+   
 AGZ_TRACER_BEGIN
 
 class ParticleTracingRenderer : public Renderer
@@ -36,7 +36,9 @@ public:
         reporter.message("start backward rendering");
         reporter.new_stage();
 
-        Image2D<Spectrum> backward_image = render_backward(filter, scene, reporter);
+        Image2D<Spectrum> backward_image = reporter.need_image_preview() ?
+            render_backward<true>(filter, scene, reporter) :
+            render_backward<false>(filter, scene, reporter);
 
         reporter.end_stage();
 
@@ -45,7 +47,9 @@ public:
         reporter.message("start forward rendering");
         reporter.new_stage();
 
-        RenderTarget render_target = render_forward(filter, scene, reporter);
+        RenderTarget render_target = reporter.need_image_preview() ?
+            render_forward<true>(filter, scene, reporter, backward_image) :
+            render_forward<false>(filter, scene, reporter, backward_image);
 
         reporter.end_stage();
 
@@ -69,7 +73,7 @@ private:
         real     denoise = 1;
     };
 
-    using ForwardGrid = FilmFilterApplier::FilmGridView<Spectrum, real, Spectrum, Vec3, real>;
+    using ForwardGrid = FilmFilterApplier::FilmGrid<Spectrum, real, Spectrum, Vec3, real>;
     using BackwardGrid = FilmFilterApplier::FilmGridView<Spectrum>;
 
     Pixel trace_camera_ray(const Scene &scene, const Ray &r, Arena &arena) const
@@ -158,7 +162,8 @@ private:
         }
     }
 
-    RenderTarget render_forward(const FilmFilterApplier &filter, const Scene &scene, ProgressReporter &reporter) const
+    template<bool REPORTER_WITH_PREVIEW>
+    RenderTarget render_forward(const FilmFilterApplier &filter, const Scene &scene, ProgressReporter &reporter, const Image2D<Spectrum> &backward) const
     {
         const int width = filter.width();
         const int height = filter.height();
@@ -178,6 +183,7 @@ private:
             &reporter,
             &reporter_mutex,
             &next_task_id,
+            &backward,
             x_task_count,
             total_task_count,
             task_grid_size = params_.forward_task_grid_size,
@@ -186,6 +192,9 @@ private:
         {
             for(;;)
             {
+                if(stop_rendering_)
+                    return;
+
                 const int task_id = next_task_id++;
                 if(task_id >= total_task_count)
                     break;
@@ -197,10 +206,8 @@ private:
                 const int x_end = (std::min)(x_beg + task_grid_size, filter.width());
                 const int y_end = (std::min)(y_beg + task_grid_size, filter.height());
 
-                ForwardGrid film_grid = filter.create_subgrid_view(
-                    { { x_beg, y_beg }, { x_end - 1, y_end - 1 } },
-                    image_buffer.value, image_buffer.weight,
-                    image_buffer.albedo, image_buffer.normal, image_buffer.denoise);
+                ForwardGrid film_grid = filter.create_subgrid<Spectrum, real, Spectrum, Vec3, real>(
+                    { { x_beg, y_beg }, { x_end - 1, y_end - 1 } });
 
                 Arena arena;
                 const Camera *camera = scene.get_camera();
@@ -239,9 +246,35 @@ private:
                     }
                 }
 
-                const real percent = real(100) * (task_id + 1) / total_task_count;
-                std::lock_guard lk(reporter_mutex);
-                reporter.progress(percent, {});
+                if constexpr(REPORTER_WITH_PREVIEW)
+                {
+                    const real percent = real(100) * (task_id + 1) / total_task_count;
+                    std::lock_guard lk(reporter_mutex);
+                    film_grid.merge_into(
+                        image_buffer.value, image_buffer.weight,
+                        image_buffer.albedo, image_buffer.normal, image_buffer.denoise);
+
+                    auto get_img = [&]()
+                    {
+                        auto ratio = image_buffer.weight.map([](real w)
+                        {
+                            return w > 0 ? 1 / w : real(1);
+                        });
+                        return image_buffer.value * ratio + backward;
+                    };
+
+                    reporter.progress(percent, get_img);
+                }
+                else
+                {
+                    film_grid.merge_into(
+                        image_buffer.value, image_buffer.weight,
+                        image_buffer.albedo, image_buffer.normal, image_buffer.denoise);
+
+                    const real percent = real(100) * (task_id + 1) / total_task_count;
+                    std::lock_guard lk(reporter_mutex);
+                    reporter.progress(percent, {});
+                }
             }
         };
 
@@ -274,6 +307,7 @@ private:
         return ret;
     }
 
+    template<bool REPORTER_WITH_PREVIEW>
     Image2D<Spectrum> render_backward(const FilmFilterApplier &filter, const Scene &scene, ProgressReporter &reporter) const
     {
         std::mutex reporter_mutex;
@@ -284,6 +318,12 @@ private:
             static_cast<float>(filter.height())
         };
 
+        const int worker_count = thread::actual_worker_count(params_.worker_count);
+
+        std::atomic<int> total_particle_count = 0;
+        std::unique_ptr<std::mutex[]> output_img_mutex;
+        std::vector<Image2D<Spectrum>> output_img;
+
         auto backward_func = [
             &filter,
             &scene,
@@ -291,23 +331,31 @@ private:
             &reporter,
             &reporter_mutex,
             &next_task_id,
+            &total_particle_count,
+            &output_img_mutex,
+            &output_img,
+            worker_count,
             this
-        ] (Sampler *sampler, Image2D<Spectrum> *image, int *particle_count)
+        ] (Sampler *sampler, Image2D<Spectrum> *image, int i)
         {
             auto film_grid = filter.create_subgrid_view(
                 { { 0, 0 }, { filter.width() - 1, filter.height() - 1 } }, *image);
 
             for(;;)
             {
+                if(stop_rendering_)
+                    return;
+
                 const int task_id = next_task_id++;
                 if(task_id >= params_.particle_task_count)
                     break;
 
                 Arena arena;
                 sampler->start_pixel(0, task_id);
+                int task_particle_count = 0;
                 do
                 {
-                    ++*particle_count;
+                    ++task_particle_count;
                     trace_particle(scene, film_grid, *sampler, film_res_f, arena);
                     arena.release();
 
@@ -316,45 +364,71 @@ private:
 
                 } while(sampler->next_sample());
 
-                const real percent = real(100) * (task_id + 1) / params_.particle_task_count;
-                std::lock_guard lk(reporter_mutex);
-                reporter.progress(percent, {});
+                if constexpr(REPORTER_WITH_PREVIEW)
+                {
+                    int pc;
+
+                    {
+                        std::lock_guard lk(output_img_mutex[i]);
+                        output_img[i] = *image;
+                        total_particle_count += task_particle_count;
+                        pc = total_particle_count;
+                    }
+                    
+                    auto get_img = [worker_count, &output_img, &output_img_mutex, &filter, pc]()
+                    {
+                        Image2D<Spectrum> ret(filter.height(), filter.width());
+                        for(int j = 0; j < worker_count; ++j)
+                        {
+                            std::lock_guard lk(output_img_mutex[j]);
+                            ret = ret + output_img[j];
+                        }
+
+                        real ratio = filter.width() * filter.height() * (pc ? real(1) / pc : real(0));
+                        return ratio * ret;
+                    };
+
+                    const real percent = real(100) * (task_id + 1) / params_.particle_task_count;
+                    std::lock_guard lk(reporter_mutex);
+                    reporter.progress(percent, get_img);
+                }
+                else
+                {
+                    total_particle_count += task_particle_count;
+
+                    const real percent = real(100) * (task_id + 1) / params_.particle_task_count;
+                    std::lock_guard lk(reporter_mutex);
+                    reporter.progress(percent, {});
+                }
             }
         };
 
-        const int worker_count = thread::actual_worker_count(params_.worker_count);
         Arena sampler_arena;
 
         std::vector<std::thread> threads;
-        std::vector<int> particle_counts;
         std::vector<Image2D<Spectrum>> images;
 
         threads.reserve(worker_count);
-        particle_counts.resize(worker_count);
         images.resize(worker_count, Image2D<Spectrum>(filter.height(), filter.width()));
+
+        output_img_mutex = std::make_unique<std::mutex[]>(worker_count);
+        output_img.resize(worker_count, Image2D<Spectrum>(filter.height(), filter.width()));
 
         for(int i = 0; i < worker_count; ++i)
         {
             auto sampler = params_.particle_sampler_prototype->clone(i, sampler_arena);
-            threads.emplace_back(backward_func, sampler, &images[i], &particle_counts[i]);
+            threads.emplace_back(backward_func, sampler, &images[i], i);
         }
 
         for(auto &t : threads)
             t.join();
 
-        const int total_particle_count = std::accumulate(particle_counts.begin(), particle_counts.end(), 0, std::plus<int>());
         const real scale = filter.width() * filter.height() / static_cast<real>(total_particle_count);
 
         Image2D<Spectrum> ret(filter.height(), filter.width());
-        for(int y = 0; y < ret.height(); ++y)
-        {
-            for(int x = 0; x < ret.width(); ++x)
-            {
-                for(auto &img : images)
-                    ret(y, x) += img(y, x);
-                ret(y, x) *= scale;
-            }
-        }
+        for(auto &img : images)
+            ret = ret + img;
+        ret = ret * scale;
 
         return ret;
     }

@@ -172,10 +172,6 @@ Here is a simple example, which results in the above image (a bit rough metal sp
     },
     "post_processors": [
       {
-        "type": "flip",
-        "vertically": true
-      },
-      {
         "type": "save_to_img",
         "filename": "${scene-directory}/output.png",
         "inv_gamma": 2.2
@@ -210,7 +206,7 @@ When a string represents a path or file name, `${scene-directory}` represents th
 
 Except for above types of fields, other fields appear in the syntax of a JSON object. Each object contains a field `type`, representing its type in Atrc renderer.
 
-In the following description, I will use a simplified tabular form to indicate which fields an object should contain and the meaning of these fields. Taking the last post-processor `save_to_png` in the above configuration file as an example, its JSON representation is:
+In the following description, I will use a simplified tabular form to indicate which fields an object should contain and the meaning of these fields. Taking the last post-processor `save_to_img` in the above configuration file as an example, its JSON representation is:
 
 ```json
 {
@@ -222,13 +218,9 @@ In the following description, I will use a simplified tabular form to indicate w
 
 The corresponding tabular form is:
 
-| Field Name         | Type   | Default Value | Explanation                                            |
-| ------------------ | ------ | ------------- | ------------------------------------------------------ |
-| filename           | string |               | where to save the output image                         |
-| open               | bool   | true          | whether to open it with the default image browser      |
-| inv_gamma          | real   | 1             | $1/\gamma$ for gamma correction (typical value is 2.2) |
-| with_alpha_channel | bool   | false         | save G-Buffer::binary to the alpha channel             |
-| ext                | string | png           | saved file type ("jpg" or "png")                       |
+| Field Name | Type | Default Value | Explanation |
+| ---------- | ---- | ------------- | ----------- |
+| ...        | ...  | ...           | ...         |
 
 In the form, the "default value" column is blank to indicate that this is a required field, and not blank to indicate that it is an optional field.
 
@@ -288,8 +280,6 @@ This section describes the possible type values for fields of type `Camera`.
 | fov            | real |               | field of view (in degree)                   |
 | lens_radius    | real | 0             | lens radius (for DoF effect)                |
 | focal_distance | real | 1             | distance between focal plane and lens       |
-
-The rendering result of the `thin_lens` camera is upside down, so it usually works with a post processor of type `flip`.
 
 ### Entity
 
@@ -729,9 +719,12 @@ Save the rendered image to a file
 | Field Name | Type   | Default Value | Explanation                                            |
 | ---------- | ------ | ------------- | ------------------------------------------------------ |
 | filename   | string |               | where to save the output image                         |
-| open       | bool   | true          | whether to open it with the default image browser      |
+| open       | bool   | false         | whether to open it with the default image browser      |
 | inv_gamma  | real   | 1             | $1/\gamma$ for gamma correction (typical value is 2.2) |
-| ext        | string | png           | saved file type ("jpg", "png" or "hdr")                |
+| gamma      | real   | 1             | $\gamma$ for gamma correction (typical value is 1 / 2.2)                                                  |
+| ext        | string | from filename | saved file type ("jpg", "png" or "hdr")                |
+
+Only one of `gamma/inv_gamma` need to be specified for gamma correction.
 
 **resize**
 

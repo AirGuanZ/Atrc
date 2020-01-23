@@ -1,12 +1,14 @@
 #pragma once
 
+#include <filesystem>
 #include <memory>
 #include <string>
 #include <tuple>
 #include <unordered_map>
 
 #include <agz/tracer/utility/config.h>
-#include <agz/utility/misc/exception.h>
+#include <agz/utility/misc.h>
+#include <agz/utility/string.h>
 
 AGZ_TRACER_BEGIN
 
@@ -91,6 +93,17 @@ public:
     virtual std::string map(const std::string &path) const = 0;
 };
 
+class BasicPathMapper : public PathMapper
+{
+    std::map<std::string, std::string> replacers_;
+
+public:
+
+    void add_replacer(const std::string &key, const std::string &value);
+
+    std::string map(const std::string &s) const override;
+};
+
 class CreatingContext
 {
     template<typename...Types>
@@ -138,39 +151,9 @@ class ReferenceCreator : public Creator<T>
 
 public:
 
-    std::string name() const override
-    {
-        return "reference";
-    }
+    std::string name() const override { return "reference"; }
 
-    std::shared_ptr<T> create(const ConfigGroup &params, CreatingContext &context) const override
-    {
-        AGZ_HIERARCHY_TRY
-
-        const ConfigArray &name_arr = params.child_array("name");
-        if(name_arr.size() < 1)
-            throw CreatingObjectException("empty reference name sequence");
-
-        std::vector<std::string> names;
-        names.reserve(name_arr.size());
-        for(size_t i = 0; i < name_arr.size(); ++i)
-            names.push_back(name_arr.at(i).as_value().as_str());
-
-        if(auto it = name2obj_.find(names); it != name2obj_.end())
-            return it->second;
-
-        const ConfigGroup *group = context.reference_root;
-        for(size_t i = 0; i < names.size() - 1; ++i)
-            group = &group->child_group(names[i]);
-
-        const ConfigGroup &true_params = group->child_group(names.back());
-        auto ret = context.create<T>(true_params);
-        name2obj_[names] = ret;
-
-        return ret;
-
-        AGZ_HIERARCHY_WRAP("in creating referenced object")
-    }
+    std::shared_ptr<T> create(const ConfigGroup &params, CreatingContext &context) const override;
 };
 
 template<>
@@ -180,40 +163,92 @@ class ReferenceCreator<Camera> : public Creator<Camera>
 
 public:
 
-    std::string name() const override
-    {
-        return "reference";
-    }
+    std::string name() const override { return "reference"; }
 
-    std::shared_ptr<Camera> create(const ConfigGroup &params, CreatingContext &context, int film_width, int film_height) const override
-    {
-        AGZ_HIERARCHY_TRY
-
-        const ConfigArray &name_arr = params.child_array("name");
-        if(name_arr.size() < 1)
-            throw CreatingObjectException("empty reference name sequence");
-
-        std::vector<std::string> names;
-        names.reserve(name_arr.size());
-        for(size_t i = 0; i < name_arr.size(); ++i)
-            names.push_back(name_arr.at(i).as_value().as_str());
-
-        if(auto it = name2obj_.find(names); it != name2obj_.end())
-            return it->second;
-
-        const ConfigGroup *group = context.reference_root;
-        for(size_t i = 0; i < names.size() - 1; ++i)
-            group = &group->child_group(names[i]);
-
-        const ConfigGroup &true_params = group->child_group(names.back());
-        auto ret = context.create<Camera>(true_params, film_width, film_height);
-        name2obj_[names] = ret;
-
-        return ret;
-
-        AGZ_HIERARCHY_WRAP("in creating referenced object")
-    }
+    std::shared_ptr<Camera> create(
+        const ConfigGroup &params, CreatingContext &context, int film_width, int film_height) const override;
 };
+
+inline void BasicPathMapper::add_replacer(const std::string &key, const std::string &value)
+{
+    replacers_[key] = value;
+}
+
+inline std::string BasicPathMapper::map(const std::string &s) const
+{
+    std::string ret(s);
+    bool done = false;
+    while(!done)
+    {
+        done = true;
+        for(auto &p : replacers_)
+        {
+            if(stdstr::replace_(ret, p.first, p.second) != 0)
+                done = false;
+        }
+    }
+    return absolute(std::filesystem::path(ret)).lexically_normal().string();
+}
+
+template<typename T>
+std::shared_ptr<T> ReferenceCreator<T>::create(const ConfigGroup &params, CreatingContext &context) const
+{
+    AGZ_HIERARCHY_TRY
+
+    const ConfigArray &name_arr = params.child_array("name");
+    if(name_arr.size() < 1)
+        throw CreatingObjectException("empty reference name sequence");
+
+    std::vector<std::string> names;
+    names.reserve(name_arr.size());
+    for(size_t i = 0; i < name_arr.size(); ++i)
+        names.push_back(name_arr.at(i).as_value().as_str());
+
+    if(auto it = name2obj_.find(names); it != name2obj_.end())
+        return it->second;
+
+    const ConfigGroup *group = context.reference_root;
+    for(size_t i = 0; i < names.size() - 1; ++i)
+        group = &group->child_group(names[i]);
+
+    const ConfigGroup &true_params = group->child_group(names.back());
+    auto ret = context.create<T>(true_params);
+    name2obj_[names] = ret;
+
+    return ret;
+
+    AGZ_HIERARCHY_WRAP("in creating referenced object")
+}
+
+inline std::shared_ptr<Camera> ReferenceCreator<Camera>::create(
+    const ConfigGroup &params, CreatingContext &context, int film_width, int film_height) const
+{
+    AGZ_HIERARCHY_TRY
+
+    const ConfigArray &name_arr = params.child_array("name");
+    if(name_arr.size() < 1)
+        throw CreatingObjectException("empty reference name sequence");
+
+    std::vector<std::string> names;
+    names.reserve(name_arr.size());
+    for(size_t i = 0; i < name_arr.size(); ++i)
+        names.push_back(name_arr.at(i).as_value().as_str());
+
+    if(auto it = name2obj_.find(names); it != name2obj_.end())
+        return it->second;
+
+    const ConfigGroup *group = context.reference_root;
+    for(size_t i = 0; i < names.size() - 1; ++i)
+        group = &group->child_group(names[i]);
+
+    const ConfigGroup &true_params = group->child_group(names.back());
+    auto ret = context.create<Camera>(true_params, film_width, film_height);
+    name2obj_[names] = ret;
+
+    return ret;
+
+    AGZ_HIERARCHY_WRAP("in creating referenced object")
+}
 
 template<typename T>
 Factory<T>::Factory(std::string factory_name)

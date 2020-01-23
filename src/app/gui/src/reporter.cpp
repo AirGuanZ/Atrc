@@ -22,7 +22,7 @@ void GUIProgressReporter::progress(double percent, const std::function<agz::text
         emit update_pbar(percent_);
     }
 
-    if(get_image_preview && Clock::now() - last_update_preview_time_ >= update_preview_interval_ || percent_ >= 100)
+    if(get_image_preview && (Clock::now() - last_update_preview_time_ >= update_preview_interval_ || percent_ >= 100))
     {
         last_update_preview_time_ = Clock::now();
 
