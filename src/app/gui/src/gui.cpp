@@ -73,9 +73,8 @@ void GUI::on_load_config()
 
     try
     {
-        std::string input_filename = QFileDialog::getOpenFileName(
+        const std::string input_filename = QFileDialog::getOpenFileName(
             this, "Configuration File").toStdString();
-
         if(!input_filename.empty())
             start_rendering(input_filename);
     }
@@ -172,7 +171,7 @@ void GUI::start_rendering(const std::string &input_filename)
     render_context_->path_mapper = std::move(path_mapper);
     render_context_->context.path_mapper = render_context_->path_mapper.get();
 
-    std::string input_content = agz::file::read_txt_file(input_filename);
+    const std::string input_content = agz::file::read_txt_file(input_filename);
     render_context_->root_params = agz::tracer::json_to_config(agz::tracer::string_to_json(input_content));
 
     const auto &scene_config = render_context_->root_params.child_group("scene");

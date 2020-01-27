@@ -3,7 +3,6 @@
 #include <stdexcept>
 
 #include <agz/utility/alloc.h>
-#include <agz/utility/math.h>
 #include <agz/utility/texture.h>
 
 #define AGZ_TRACER_BEGIN namespace agz::tracer {
@@ -16,6 +15,23 @@
 #define AGZ_TRACER_FACTORY_END   }
 
 AGZ_TRACER_BEGIN
+
+class Aggregate;
+class Camera;
+class Entity;
+class EnvirLight;
+class FilmFilter;
+class Fresnel;
+class Geometry;
+class Material;
+class Medium;
+class PostProcessor;
+class Renderer;
+class ProgressReporter;
+class Sampler;
+class Scene;
+class Texture2D;
+class Texture3D;
 
 using real = float;
 

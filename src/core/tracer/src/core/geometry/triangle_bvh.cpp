@@ -6,7 +6,6 @@
 #include <agz/tracer/utility/logger.h>
 #include <agz/tracer/utility/triangle_aux.h>
 
-#include <agz/utility/math.h>
 #include <agz/utility/mesh.h>
 #include <agz/utility/misc.h>
 

@@ -19,31 +19,65 @@ class ThinLensCamera : public Camera
 
     Transform3 camera_to_world_;
 
+    struct Params
+    {
+        int film_width  = 0;
+        int film_height = 0;
+        Vec3 pos;
+        Vec3 dst;
+        Vec3 up;
+        real fov            = 0;
+        real lens_radius    = 0;
+        real focal_distance = 0;
+    } params_;
+
+    void init_from_params(const Params &params)
+    {
+        const real aspect = static_cast<real>(params.film_width) / params.film_height;
+
+        focal_film_height_ = 2 * params.focal_distance * std::tan(params.fov / 2);
+        focal_film_width_ = aspect * focal_film_height_;
+
+        area_focal_film_ = focal_film_width_ * focal_film_height_;
+        area_lens_ = params.lens_radius > 0 ? PI_r * params.lens_radius * params.lens_radius : 1;
+
+        camera_to_world_ = Transform3(Trans4::look_at(params.pos, params.dst, params.up)).inv();
+
+        pos_ = params.pos;
+        dir_ = (params.dst - params.pos).normalize();
+
+        lens_radius_ = params.lens_radius;
+        focal_distance_ = params.focal_distance;
+    }
+
 public:
 
     ThinLensCamera(
         int film_width, int film_height,
         const Vec3 &pos, const Vec3 &dst, const Vec3 &up,
-        real fov, real aspect, real lens_radius, real focal_distance)
+        real fov, real lens_radius, real focal_distance)
         : Camera(film_width, film_height)
     {
-        AGZ_HIERARCHY_TRY
+        params_.film_width     = film_width;
+        params_.film_height    = film_height;
+        params_.pos            = pos;
+        params_.dst            = dst;
+        params_.up             = up;
+        params_.fov            = fov;
+        params_.lens_radius    = lens_radius;
+        params_.focal_distance = focal_distance;
+        init_from_params(params_);
+    }
 
-        focal_film_height_ = 2 * focal_distance * std::tan(fov / 2);
-        focal_film_width_  = aspect * focal_film_height_;
-
-        area_focal_film_ = focal_film_width_ * focal_film_height_;
-        area_lens_       = lens_radius > 0 ? PI_r * lens_radius * lens_radius : 1;
-
-        camera_to_world_ = Transform3(Trans4::look_at(pos, dst, up)).inv();
-
-        pos_  = pos;
-        dir_  = (dst - pos).normalize();
-        
-        lens_radius_    = lens_radius;
-        focal_distance_ = focal_distance;
-
-        AGZ_HIERARCHY_WRAP("in initializing pinhole camera")
+    void update_param(std::string_view name, const std::any &value) override
+    {
+        if(name == "film_width")
+            params_.film_width = std::any_cast<int>(value);
+        else if(name == "film_height")
+            params_.film_height = std::any_cast<int>(value);
+        else
+            throw ObjectConstructionException("unnown updated param: " + std::string(name));
+        init_from_params(params_);
     }
 
     CameraSampleWeResult sample_we(const Vec2 &film_coord, const Sample2 &aperture_sample) const noexcept override
@@ -154,12 +188,11 @@ std::shared_ptr<Camera> create_thin_lens_camera(
     const Vec3 &dst,
     const Vec3 &up,
     real fov,
-    real aspect,
     real lens_radius,
     real focal_distance)
 {
     return std::make_shared<ThinLensCamera>(
-        film_width, film_height, pos, dst, up, fov, aspect, lens_radius, focal_distance);
+        film_width, film_height, pos, dst, up, fov, lens_radius, focal_distance);
 }
 
 AGZ_TRACER_END

@@ -24,13 +24,14 @@ namespace camera
             const Vec3 dst = params.child_vec3("dst");
             const Vec3 up  = params.child_vec3("up");
 
-            const real aspect = params.child_real("film_aspect");
+            const real aspect = static_cast<real>(film_width) / film_height;
+
             const real width  = params.child_real("width");
             const real height = width / aspect;
             const real dist   = params.child_real("dist");
             const real fov    = 2 * std::atan(height / (2 * dist));
 
-            return create_thin_lens_camera(film_width, film_height, pos, dst, up, fov, aspect, 0, 1);
+            return create_thin_lens_camera(film_width, film_height, pos, dst, up, fov, 0, 1);
         }
     };
 
@@ -50,12 +51,11 @@ namespace camera
             const Vec3 up  = params.child_vec3("up");
 
             const real fov    = math::deg2rad(params.child_real("fov"));
-            const real aspect = params.child_real("film_aspect");
-
+            
             const real lens_radius    = params.child_real_or("lens_radius", 0);
             const real focal_distance = params.child_real_or("focal_distance", 1);
 
-            return create_thin_lens_camera(film_width, film_height, pos, dst, up, fov, aspect, lens_radius, focal_distance);
+            return create_thin_lens_camera(film_width, film_height, pos, dst, up, fov, lens_radius, focal_distance);
         }
     };
 

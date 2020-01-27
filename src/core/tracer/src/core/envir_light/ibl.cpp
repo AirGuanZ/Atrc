@@ -12,19 +12,34 @@ class IBL : public EnvirLight
     std::shared_ptr<const Texture2D> tex_;
     Vec3 up_ = Vec3(0, 0, 1);
 
+    Spectrum avg_rad_;
+
     std::unique_ptr<EnvironmentLightSampler> sampler_;
 
 public:
 
     IBL(std::shared_ptr<const Texture2D> tex, const Vec3 &up)
     {
-        AGZ_HIERARCHY_TRY
-
         tex_     = tex;
         up_      = up;
         sampler_ = std::make_unique<EnvironmentLightSampler>(tex_);
 
-        AGZ_HIERARCHY_WRAP("in initializing native sky light")
+        const int tex_width = tex_->width(), tex_height = tex_->height();
+        for(int y = 0; y < tex_height; ++y)
+        {
+            const real v0 = real(y) / tex_height;
+            const real v1 = real(y + 1) / tex_height;
+
+            for(int x = 0; x < tex_width; ++x)
+            {
+                const real u0 = real(x) / tex_width;
+                const real u1 = real(x + 1) / tex_width;
+
+                const real delta_area = std::abs(2 * PI_r * (u1 - u0) * (std::cos(PI_r * v1) - std::cos(PI_r * v0)));
+                const real u = (u0 + u1) / 2, v = (v0 + v1) / 2;
+                avg_rad_ += PI_r * delta_area * tex_->sample_spectrum({ u, v });
+            }
+        }
     }
 
     LightSampleResult sample(const Vec3 &ref, const Sample5 &sam) const noexcept override
@@ -110,26 +125,7 @@ public:
     Spectrum power() const noexcept override
     {
         const real radius = world_radius_;
-        Spectrum ret;
-
-        const int tex_width = tex_->width(), tex_height = tex_->height();
-        for(int y = 0; y < tex_height; ++y)
-        {
-            const real v0 = real(y) / tex_height;
-            const real v1 = real(y + 1) / tex_height;
-
-            for(int x = 0; x < tex_width; ++x)
-            {
-                const real u0 = real(x) / tex_width;
-                const real u1 = real(x + 1) / tex_width;
-
-                const real delta_area = std::abs(2 * PI_r * (u1 - u0) * (std::cos(PI_r * v1) - std::cos(PI_r * v0)));
-                const real u = (u0 + u1) / 2, v = (v0 + v1) / 2;
-                ret += PI_r * delta_area * tex_->sample_spectrum({ u, v });
-            }
-        }
-
-        return ret * radius * radius;
+        return avg_rad_ * radius * radius;
     }
 
     Spectrum radiance(const Vec3 &ref, const Vec3 &ref_to_light) const noexcept override

@@ -26,7 +26,7 @@
 **Dependencies Need to Be Prepared**
 
 * [oidn](https://openimagedenoise.github.io/) for denoising (only when `USE_OIDN` is `ON`)
-* Qt5 (only when `BUILD_GUI` is `ON`)
+* Qt5 (only when `BUILD_GUI` or `BUILD_SCENE_EDITOR` is `ON`)
 
 When using MSVC under Windows, copy all files in [oidn-1.1.0.x64.vc14.windows.zip](https://github.com/OpenImageDenoise/oidn/releases/download/v1.1.0/oidn-1.1.0. x64.vc14.windows.zip) to `lib/oidn/vc14`; when using linux, copy all files in [oidn-1.1.0.x86_64.linux.tar.gz](https://github.com/OpenImageDenoise/oidn/releases/download/v1.1.0/oidn-1.1.0.x86_64.linux.tar.gz) to `lib/oidn/linux`. Please refer to` cmake/ cmake-oidn` for details.
 
@@ -38,6 +38,7 @@ When using MSVC under Windows, copy all files in [oidn-1.1.0.x64.vc14.windows.zi
 | USE_OIDN                | OFF           | use OIDN denoising library         |
 | BUILD_MATERIAL_EXPLORER | OFF           | build Material Explorer            |
 | BUILD_GUI               | OFF           | build rendering launcher with GUI  |
+| BUILD_SCENE_EDITOR      | OFF           | build scene editor                 |
 
 **Note**. OIDN is 64-bit only.
 
@@ -52,7 +53,7 @@ git clone --recursive --depth=1 https://github.com/AirGuanZ/Atrc
 cd Atrc
 mkdir build
 cd build
-cmake -DUSE_EMBREE=ON -DUSE_OIDN=ON -DBUILD_MATERIAL_EXPLORER=ON -DBUILD_GUI=ON -DQt5_DIR="../../Qt5" -G "Visual Studio 15 2017 Win64" ..
+cmake -DUSE_EMBREE=ON -DUSE_OIDN=ON -DBUILD_MATERIAL_EXPLORER=ON -DBUILD_GUI=ON -DBUILD_SCENE_EDITOR=ON -DQt5_DIR="../../Qt5" -G "Visual Studio 15 2017 Win64" ..
 ```
 
 **Full-featured Building on *nix**
@@ -64,7 +65,7 @@ mkdir build
 cd build
 export CC=clang
 export CXX=clang++
-cmake -DUSE_EMBREE=ON -DUSE_OIDN=ON -DBUILD_MATERIAL_EXPLORER=ON -DBUILD_GUI=ON -DQt5_DIR="../../Qt5" -G "Unix Makefiles" ..
+cmake -DUSE_EMBREE=ON -DUSE_OIDN=ON -DBUILD_MATERIAL_EXPLORER=ON -DBUILD_GUI=ON -DBUILD_SCENE_EDITOR=ON -DQt5_DIR="../../Qt5" -G "Unix Makefiles" ..
 ```
 
 ## Usage
@@ -73,8 +74,9 @@ cmake -DUSE_EMBREE=ON -DUSE_OIDN=ON -DBUILD_MATERIAL_EXPLORER=ON -DBUILD_GUI=ON 
 
 1. CLI, command-line interface of the off-line renderer
 2. GUI, renderer launcher with graphics user interface
-3. Tracer, off-line rendering library based on ray tracing
-4. material_explorer, GPU-accelerated material explorer
+3. Editor, scene editor
+4. Tracer, off-line rendering library based on ray tracing
+5. material_explorer, GPU-accelerated material explorer
 
 ### CLI Usage
 

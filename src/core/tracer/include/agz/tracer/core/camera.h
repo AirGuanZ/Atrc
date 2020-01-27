@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include <any>
+
 #include <agz/tracer/common.h>
 
 AGZ_TRACER_BEGIN
@@ -70,6 +72,8 @@ public:
     explicit Camera(int film_width, int film_height) noexcept : film_width_(film_width), film_height_(film_height) { }
 
     virtual ~Camera() = default;
+
+    virtual void update_param(std::string_view name, const std::any &value) = 0;
 
     /**
      * @brief 生成一条射线

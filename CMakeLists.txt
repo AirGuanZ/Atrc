@@ -10,6 +10,7 @@ OPTION(USE_EMBREE              "use embree for finding triangle mesh intersectio
 OPTION(USE_OIDN                "use oidn denoiser"                                 OFF)
 OPTION(BUILD_MATERIAL_EXPLORER "build material explorer or not"                    OFF)
 OPTION(BUILD_GUI               "build graphics user interface"                     OFF)
+OPTION(BUILD_EDITOR            "build scene editor"                                OFF)
 
 ############## CXX properties
 
@@ -33,7 +34,7 @@ ENDIF()
 
 ############## qt
 
-IF(BUILD_GUI)
+IF(BUILD_GUI OR BUILD_EDITOR)
     FIND_PACKAGE(Qt5 REQUIRED COMPONENTS Widgets)
     SET_PROPERTY(GLOBAL PROPERTY AUTOGEN_SOURCE_GROUP auto_moc)
     SET(CMAKE_AUTOMOC ON)
@@ -64,4 +65,8 @@ ENDIF()
 
 IF(BUILD_GUI)
     ADD_SUBDIRECTORY(src/app/gui)
+ENDIF()
+
+IF(BUILD_EDITOR)
+    ADD_SUBDIRECTORY(src/app/editor)
 ENDIF()

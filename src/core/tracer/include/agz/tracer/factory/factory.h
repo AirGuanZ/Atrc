@@ -10,27 +10,6 @@
 #include <agz/utility/misc.h>
 #include <agz/utility/string.h>
 
-AGZ_TRACER_BEGIN
-
-class Aggregate;
-class Camera;
-class Entity;
-class EnvirLight;
-class FilmFilter;
-class Fresnel;
-class Geometry;
-class Material;
-class Medium;
-class PostProcessor;
-class Renderer;
-class ProgressReporter;
-class Sampler;
-class Scene;
-class Texture2D;
-class Texture3D;
-
-AGZ_TRACER_END
-
 AGZ_TRACER_FACTORY_BEGIN
 
 class CreatingContext;

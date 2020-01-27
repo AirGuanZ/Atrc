@@ -10,7 +10,6 @@ std::shared_ptr<Camera> create_thin_lens_camera(
     const Vec3 &dst,
     const Vec3 &up,
     real fov,
-    real aspect,
     real lens_radius,
     real focal_distance);
 

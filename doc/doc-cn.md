@@ -26,7 +26,7 @@
 需额外准备的依赖项如下：
 
 * [oidn 1.1.0](https://openimagedenoise.github.io/)，基于机器学习的降噪滤波器（仅在启动了`USE_OIDN`选项时需要）
-* Qt5 （仅在启用了`BUILD_GUI`选项时需要）
+* Qt5 （仅在启用了`BUILD_GUI`或`BUILD_SCENE_EDITOR`选项时需要）
 
 在Windows下使用MSVC时，将[oidn-1.1.0.x64.vc14.windows.zip](https://github.com/OpenImageDenoise/oidn/releases/download/v1.1.0/oidn-1.1.0.x64.vc14.windows.zip)中的所有文件拷贝到`lib/oidn/vc14`中；使用linux时，将[oidn-1.1.0.x86_64.linux.tar.gz](https://github.com/OpenImageDenoise/oidn/releases/download/v1.1.0/oidn-1.1.0.x86_64.linux.tar.gz)中的所有文件拷贝到`lib/oidn/linux`中。详情可参考`cmake/cmake-oidn`。
 
@@ -38,6 +38,7 @@
 | USE_OIDN                | OFF    | 启用OIDN降噪器              |
 | BUILD_MATERIAL_EXPLORER | OFF    | 启用Material Explorer的构建 |
 | BUILD_GUI               | OFF    | 启用GUI启动器               |
+| BUILD_SCENE_EDITOR      | OFF    | 启用场景编辑器              |
 
 注意到OIDN只支持64位程序，因此若启用了OIDN库，必须以64位模式构建程序。
 
@@ -56,7 +57,7 @@
    ```powershell
    mkdir build
    cd build
-   cmake -DUSE_EMBREE=ON -DUSE_OIDN=ON -DBUILD_MATERIAL_EXPLORER=ON -DBUILD_GUI=ON -DQt5_DIR="../../Qt5" -G "Visual Studio 15 2017 Win64" ..
+   cmake -DUSE_EMBREE=ON -DUSE_OIDN=ON -DBUILD_MATERIAL_EXPLORER=ON -DBUILD_GUI=ON -DBUILD_SCENE_EDITOR=ON -DQt5_DIR="../../Qt5" -G "Visual Studio 15 2017 Win64" ..
    ```
 
 这会在`Atrc/build`下生成`Visual Studio 2017`的解决方案文件。

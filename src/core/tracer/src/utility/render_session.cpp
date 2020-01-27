@@ -18,15 +18,6 @@ namespace
         const int film_width = rendering_config.child_int("width");
         const int film_height = rendering_config.child_int("height");
 
-        const auto film_width_over_height = static_cast<real>(film_width) / film_height;
-
-        const auto film_width_child = std::make_shared<ConfigValue>(std::to_string(film_width));
-        const auto film_height_child = std::make_shared<ConfigValue>(std::to_string(film_height));
-        const auto film_aspect_child = std::make_shared<ConfigValue>(std::to_string(film_width_over_height));
-        rendering_config.child_group("camera").insert_child("film_width",  film_width_child);
-        rendering_config.child_group("camera").insert_child("film_height", film_height_child);
-        rendering_config.child_group("camera").insert_child("film_aspect", film_aspect_child);
-
         AGZ_INFO("creating render target");
         settings->width  = film_width;
         settings->height = film_height;
