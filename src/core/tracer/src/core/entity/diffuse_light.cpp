@@ -56,7 +56,7 @@ namespace
             return area_pdf * area_to_solid_angle_factor;
         }
 
-        LightEmitResult emit(const Sample5 &sam) const noexcept override
+        LightEmitResult sample_emit(const Sample5 &sam) const noexcept override
         {
             real pdf_pos;
             auto surface_point = geometry_->sample(&pdf_pos, { sam.u, sam.v, sam.w });

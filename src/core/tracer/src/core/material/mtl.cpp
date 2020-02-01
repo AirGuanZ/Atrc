@@ -10,6 +10,13 @@ AGZ_TRACER_BEGIN
 namespace mtl_impl
 {
 
+    class InternalBSDF : public BSDF
+    {
+    public:
+
+        using BSDF::BSDF;
+    };
+
     template<int MAX_BSDF_CNT>
     class BSDFAggregate : public LocalBSDF
     {
@@ -74,7 +81,7 @@ namespace mtl_impl
                 if(i == bsdf_idx)
                     continue;
                 ret.f += bsdfs_[i]->eval(ret.dir, local_out, transport_mode);
-                ret.pdf += bsdfs_[i]->pdf(ret.dir, local_out, transport_mode);
+                ret.pdf += bsdfs_[i]->pdf(ret.dir, local_out);
             }
             ret.pdf /= bsdf_count_;
             ret.dir = shading_coord_.local_to_global(ret.dir).normalize();
@@ -83,7 +90,7 @@ namespace mtl_impl
             return ret;
         }
 
-        real pdf(const Vec3 &in_dir, const Vec3 &out_dir, TransportMode transport_mode) const noexcept override
+        real pdf(const Vec3 &in_dir, const Vec3 &out_dir) const noexcept override
         {
             assert(bsdf_count_ > 0);
 
@@ -92,7 +99,7 @@ namespace mtl_impl
 
             real ret = 0;
             for(int i = 0; i < bsdf_count_; ++i)
-                ret += bsdfs_[i]->pdf(local_in, local_out, transport_mode);
+                ret += bsdfs_[i]->pdf(local_in, local_out);
             return ret / bsdf_count_;
         }
 
@@ -142,13 +149,12 @@ namespace mtl_impl
             ret.dir            = local_in;
             ret.f              = albedo_ / PI_r;
             ret.pdf            = pdf;
-            ret.mode           = transport_mode;
             ret.is_delta       = false;
 
             return ret;
         }
 
-        real pdf(const Vec3 &in_dir, const Vec3 &out_dir, TransportMode) const noexcept override
+        real pdf(const Vec3 &in_dir, const Vec3 &out_dir) const noexcept override
         {
             if(in_dir.z <= 0 || out_dir.z <= 0)
                 return 0;
@@ -220,13 +226,12 @@ namespace mtl_impl
             ret.f              = color_ * D / (4 * wi.z * out_dir.z);
             ret.pdf            = pdf;
             ret.dir            = wi;
-            ret.mode           = transport_mode;
             ret.is_delta       = false;
             
             return ret;
         }
 
-        real pdf(const Vec3 &in_dir, const Vec3 &out_dir, TransportMode) const noexcept override
+        real pdf(const Vec3 &in_dir, const Vec3 &out_dir) const noexcept override
         {
             if(in_dir.z <= 0 || out_dir.z <= 0)
                 return 0;
@@ -272,7 +277,7 @@ public:
         Spectrum ks = ks_->sample_spectrum(inct.uv);
         const real ns     = ns_->sample_real(inct.uv);
 
-        // 能量归一化
+        // energy normalization
         real dem = 1;
         for(int i = 0; i < 3; ++i)
             dem = (std::max)(kd[i] + ks[i], dem);

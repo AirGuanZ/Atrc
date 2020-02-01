@@ -1,6 +1,8 @@
 #pragma once
 
-#include <agz/tracer/common.h>
+#include <QColor>
+
+#include <agz/tracer/tracer.h>
 
 #define AGZ_EDITOR_BEGIN namespace agz::editor {
 #define AGZ_EDITOR_END   }
@@ -22,8 +24,19 @@ using tracer::Rect2i;
 using tracer::Mat3;
 using tracer::Mat4;
 
+using Vec3d = math::vec3d;
+
 using tracer::Spectrum;
 
 using tracer::Image2D;
+
+inline Spectrum qcolor_to_spectrum(const QColor &color) noexcept
+{
+    return {
+        real(color.redF()),
+        real(color.greenF()),
+        real(color.blueF())
+    };
+}
 
 AGZ_EDITOR_END

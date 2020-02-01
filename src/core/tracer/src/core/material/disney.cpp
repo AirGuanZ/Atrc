@@ -99,7 +99,7 @@ namespace disney_impl
             const real D = microfacet::gtr1(sin_theta_h, cos_theta_h, clearcoat_roughness_);
             const real F = schlick(real(0.04), cos_theta_d);
             const real G = microfacet::smith_gtr2(tan_theta_i, real(0.25))
-                   * microfacet::smith_gtr2(tan_theta_o, real(0.25));
+                         * microfacet::smith_gtr2(tan_theta_o, real(0.25));
             return Spectrum(clearcoat_ * D * F * G / std::abs(4 * cos_theta_i * cos_theta_o));
         }
 
@@ -223,7 +223,7 @@ namespace disney_impl
 
         Vec3 sample_specular(const Vec3 &lwo, const Sample2 &sam) const noexcept
         {
-            const Vec3 lwh = microfacet::sample_anisotropic_gtr2(ax_, ay_, sam).normalize();
+            const Vec3 lwh = microfacet::sample_anisotropic_gtr2_vnor(lwo, ax_, ay_, sam).normalize();
             if(lwh.z <= 0)
                 return {};
 
@@ -300,10 +300,18 @@ namespace disney_impl
             const real cos_theta_h = local_angle::cos_theta(lwh);
             const real sin_theta_h = local_angle::cos_2_sin(cos_theta_h);
             const real cos_theta_d = dot(lwi, lwh);
-            
+
+            const real cos_phi_o = std::cos(local_angle::phi(lwo));
+            const real sin_phi_o = local_angle::cos_2_sin(cos_phi_o);
+
+            const real tan_theta_o = local_angle::tan_theta(lwo);
+
             const real specular_D = microfacet::anisotropic_gtr2(
                 sin_phi_h, cos_phi_h, sin_theta_h, cos_theta_h, ax_, ay_);
-            const real pdf_specular = cos_theta_h * specular_D / (4 * cos_theta_d);
+
+            const real pdf_specular =
+                microfacet::smith_anisotropic_gtr2(cos_phi_o, sin_phi_o, ax_, ay_, tan_theta_o)
+                * specular_D / (4 * lwo.z);
 
             const real clearcoat_D = microfacet::gtr1(sin_theta_h, cos_theta_h, clearcoat_roughness_);
             const real pdf_clearcoat = cos_theta_h * clearcoat_D / (4 * cos_theta_d);
@@ -505,8 +513,7 @@ namespace disney_impl
                 BSDFSampleResult ret;
                 ret.dir      = shading_coord_.local_to_global(lwi);
                 ret.f        = eval(ret.dir, wo, mode);
-                ret.pdf      = pdf(ret.dir, wo, mode);
-                ret.mode     = mode;
+                ret.pdf      = pdf(ret.dir, wo);
                 ret.is_delta = false;
 
                 if(!ret.f.is_finite() || ret.pdf < EPS)
@@ -536,8 +543,7 @@ namespace disney_impl
             BSDFSampleResult ret;
             ret.dir      = shading_coord_.local_to_global(lwi);
             ret.f        = eval(ret.dir, wo, mode);
-            ret.pdf      = pdf(ret.dir, wo, mode);
-            ret.mode     = mode;
+            ret.pdf      = pdf(ret.dir, wo);
             ret.is_delta = false;
 
             if(!ret.f.is_finite() || ret.pdf < EPS)
@@ -546,7 +552,7 @@ namespace disney_impl
             return ret;
         }
 
-        real pdf(const Vec3 &wi, const Vec3 &wo, TransportMode mode) const noexcept override
+        real pdf(const Vec3 &wi, const Vec3 &wo) const noexcept override
         {
             if(cause_black_fringes(wi, wo))
                 return pdf_for_black_fringes(wi, wo);

@@ -1,7 +1,7 @@
 #include <functional>
 
 #include <agz/gui/reporter.h>
-#include <agz/tracer/utility/logger.h>
+#include <agz/tracer/tracer.h>
 
 GUIProgressReporter::GUIProgressReporter(Clock::duration update_preview_interval)
     : update_preview_interval_(update_preview_interval), last_update_preview_time_(Clock::now())

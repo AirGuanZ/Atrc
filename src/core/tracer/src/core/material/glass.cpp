@@ -16,7 +16,6 @@ namespace
         Spectrum color_reflection_;
         Spectrum color_refraction_;
 
-        // 计算折射方向向量，发生全反射时返回std::nullopt
         static std::optional<Vec3> refr_dir(const Vec3 &nwo, const Vec3 &nor, real eta)
         {
             const real cos_theta_i = std::abs(nwo.z);
@@ -57,7 +56,6 @@ namespace
                 ret.dir      = shading_coord_.local_to_global(local_in);
                 ret.f        = color_reflection_ * fr / std::abs(local_in.z);
                 ret.pdf      = fr.r;
-                ret.mode     = transport_mode;
                 ret.is_delta = true;
 
                 ret.f *= local_angle::normal_corr_factor(geometry_coord_, shading_coord_, ret.dir);
@@ -83,7 +81,6 @@ namespace
             ret.f        = corr_factor * color_refraction_ * (1 - fr.r) / std::abs(nwi.z);
             ret.pdf      = 1 - fr.r;
             ret.is_delta = true;
-            ret.mode     = transport_mode;
 
             ret.f *= local_angle::normal_corr_factor(geometry_coord_, shading_coord_, ret.dir);
             if(has_inf(ret.f))
@@ -92,7 +89,7 @@ namespace
             return ret;
         }
 
-        real pdf(const Vec3&, const Vec3&, TransportMode) const noexcept override
+        real pdf(const Vec3&, const Vec3&) const noexcept override
         {
             return 0;
         }

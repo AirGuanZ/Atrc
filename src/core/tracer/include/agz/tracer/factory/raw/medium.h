@@ -14,12 +14,14 @@ std::shared_ptr<Medium> create_heterogeneous_medium(
     const Transform3 &local_to_world,
     std::shared_ptr<const Texture3D> density,
     std::shared_ptr<const Texture3D> albedo,
-    std::shared_ptr<const Texture3D> g);
+    std::shared_ptr<const Texture3D> g,
+    int max_scattering_count);
 
 std::shared_ptr<Medium> create_homogeneous_medium(
     const Spectrum &sigma_a,
     const Spectrum &sigma_s,
-    real g);
+    real g,
+    int max_scattering_count);
 
 std::shared_ptr<Medium> create_void();
 

@@ -17,13 +17,16 @@ class HeterogeneousMedium : public Medium
     real max_density_;
     real inv_max_density_;
 
+    int max_scattering_count_;
+
 public:
 
     HeterogeneousMedium(
         const Transform3 &local_to_world,
         std::shared_ptr<const Texture3D> density,
         std::shared_ptr<const Texture3D> albedo,
-        std::shared_ptr<const Texture3D> g)
+        std::shared_ptr<const Texture3D> g,
+        int max_scattering_count)
     {
         local_to_world_ = local_to_world;
 
@@ -35,6 +38,13 @@ public:
         if(max_density_ < EPS)
             throw ObjectConstructionException("invalid max density value: " + std::to_string(max_density_));
         inv_max_density_ = 1 / max_density_;
+
+        max_scattering_count_ = max_scattering_count;
+    }
+
+    int get_max_scattering_count() const noexcept override
+    {
+        return max_scattering_count_;
     }
 
     Spectrum tr(const Vec3 &a, const Vec3 &b, Sampler &sampler) const noexcept override
@@ -104,10 +114,11 @@ std::shared_ptr<Medium> create_heterogeneous_medium(
     const Transform3 &local_to_world,
     std::shared_ptr<const Texture3D> density,
     std::shared_ptr<const Texture3D> albedo,
-    std::shared_ptr<const Texture3D> g)
+    std::shared_ptr<const Texture3D> g,
+    int max_scattering_count)
 {
     return std::make_shared<HeterogeneousMedium>(
-        local_to_world, std::move(density), std::move(albedo), std::move(g));
+        local_to_world, std::move(density), std::move(albedo), std::move(g), max_scattering_count);
 }
 
 AGZ_TRACER_END

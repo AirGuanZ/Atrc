@@ -21,7 +21,7 @@ class IdealBlack : public Material
             return BSDF_SAMPLE_RESULT_INVALID;
         }
 
-        real pdf(const Vec3&, const Vec3&, TransportMode) const noexcept override
+        real pdf(const Vec3&, const Vec3&) const noexcept override
         {
             return 0;
         }

@@ -25,6 +25,8 @@ namespace microfacet
 
     Vec3 sample_gtr1(real alpha, const Sample2 &sample) noexcept;
 
+    Vec3 sample_anisotropic_gtr2_vnor(const Vec3 &ve, real ax, real ay, const Sample2 &sample) noexcept;
+
 } // namespace microfacet
 
 AGZ_TRACER_END

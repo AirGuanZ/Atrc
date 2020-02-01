@@ -5,8 +5,7 @@
 #include <QProgressBar>
 
 #include <agz/gui/reporter.h>
-#include <agz/tracer/factory/factory.h>
-#include <agz/tracer/utility/render_session.h>
+#include <agz/tracer/tracer.h>
 
 class GUI : public QMainWindow
 {

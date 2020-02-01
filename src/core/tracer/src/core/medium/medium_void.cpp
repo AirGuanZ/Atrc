@@ -7,6 +7,11 @@ class VoidMedium : public Medium
 {
 public:
 
+    int get_max_scattering_count() const noexcept override
+    {
+        return (std::numeric_limits<int>::max)();
+    }
+
     Spectrum tr(const Vec3 &a, const Vec3 &b, Sampler &sampler) const noexcept override
     {
         return Spectrum(1);

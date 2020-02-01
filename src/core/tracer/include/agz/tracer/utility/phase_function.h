@@ -54,12 +54,11 @@ public:
         ret.f        = Spectrum(ret.pdf);
         ret.dir      = Coord::from_z(wo).local_to_global(local_wi);
         ret.is_delta = false;
-        ret.mode     = mode;
 
         return ret;
     }
 
-    real pdf(const Vec3 &wi, const Vec3 &wo, TransportMode mode) const noexcept override
+    real pdf(const Vec3 &wi, const Vec3 &wo) const noexcept override
     {
         return phase_func(-cos(wi, wo));
     }

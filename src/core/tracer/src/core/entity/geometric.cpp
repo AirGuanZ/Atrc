@@ -11,21 +11,18 @@ class GeometricEntity : public Entity
     std::shared_ptr<const Material> material_;
     MediumInterface medium_interface_;
 
-    bool is_shadow_catcher_ = false;
-
 public:
 
     GeometricEntity(
         std::shared_ptr<const Geometry> geometry,
         std::shared_ptr<const Material> material,
         const MediumInterface &med,
-        bool shadow_catcher, bool no_denoise)
+        bool no_denoise)
     {
         geometry_ = std::move(geometry);
         material_ = std::move(material);
         medium_interface_ = med;
-        is_shadow_catcher_ = shadow_catcher;
-
+        
         set_no_denoise_flag(no_denoise);
     }
 
@@ -61,21 +58,16 @@ public:
     {
         return nullptr;
     }
-
-    bool is_shadow_catcher() const noexcept override
-    {
-        return is_shadow_catcher_;
-    }
 };
 
 std::shared_ptr<Entity> create_geometric(
     std::shared_ptr<const Geometry> geometry,
     std::shared_ptr<const Material> material,
     const MediumInterface &med,
-    bool shadow_catcher, bool no_denoise)
+    bool no_denoise)
 {
     return std::make_shared<GeometricEntity>(
-        std::move(geometry), std::move(material), med, shadow_catcher, no_denoise);
+        std::move(geometry), std::move(material), med, no_denoise);
 }
 
 AGZ_TRACER_END

@@ -1,11 +1,9 @@
 #pragma once
 
 #include <atomic>
-#include <condition_variable>
-#include <mutex>
 
-#include <agz/editor/framebuffer.h>
-#include <agz/editor/renderer.h>
+#include <agz/editor/renderer/framebuffer.h>
+#include <agz/editor/renderer/renderer.h>
 
 AGZ_EDITOR_BEGIN
 
@@ -28,11 +26,11 @@ public:
 
     ~PathTracer();
 
+    void start() override;
+
     Image2D<math::color3b> get_image() const override;
 
 private:
-
-    Spectrum eval(const tracer::Scene &scene, const tracer::Ray &ray, tracer::Sampler &sampler, tracer::Arena &arena) const;
 
     void exec_render_task(Framebuffer::Task &task, tracer::Sampler *sampler);
 

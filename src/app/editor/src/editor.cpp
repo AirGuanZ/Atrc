@@ -1,20 +1,12 @@
 #include <QFileDialog>
-#include <QGridLayout>
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QTimer>
 
 #include <agz/editor/editor.h>
-#include <agz/tracer/core/camera.h>
-#include <agz/tracer/core/scene.h>
-#include <agz/tracer/factory/factory.h>
-#include <agz/tracer/utility/config_cvt.h>
-#include <agz/tracer/utility/render_session.h>
-#include <agz/utility/file.h>
+#include <agz/editor/renderer/renderer_widget.h>
 
-#ifdef USE_EMBREE
-#   include <agz/tracer/utility/embree.h>
-#endif
+#include <agz/utility/file.h>
 
 #define WORKING_DIR_PATH_NAME "${working-directory}"
 #define SCENE_DESC_PATH_NAME  "${scene-directory}"
@@ -23,32 +15,28 @@ AGZ_EDITOR_BEGIN
 
 Editor::Editor()
 {
-    QAction *load_config = new QAction("Load JSON Config", this);
-    menuBar()->addAction(load_config);
-    connect(load_config, &QAction::triggered, this, &Editor::on_load_config);
-
-    QWidget *central_widget = new QWidget(this);
-    setCentralWidget(central_widget);
-
-    QGridLayout *layout = new QGridLayout(central_widget);
-    central_widget->setLayout(layout);
-
-    display_label_ = new DisplayLabel(this);
-    connect(display_label_, &DisplayLabel::resize, this, &Editor::on_resize_display);
-    layout->addWidget(display_label_, 0, 0);
-
 #ifdef USE_EMBREE
     tracer::init_embree_device();
 #endif
 
-    QTimer *update_timer = new QTimer(this);
-    update_timer->setInterval(100);
-    connect(update_timer, &QTimer::timeout, this, &Editor::on_update_time);
-    update_timer->start();
+    init_menu_bar();
+
+    init_panels();
+
+    init_displayer();
+
+    init_renderer_panel();
+
+    init_camera_panel();
+
+    redistribute_panels();
 }
 
 Editor::~Editor()
 {
+    renderer_.reset();
+    scene_.reset();
+
 #ifdef USE_EMBREE
     tracer::destroy_embree_device();
 #endif
@@ -65,7 +53,7 @@ void Editor::on_load_config()
     }
     catch(const std::exception & err)
     {
-        path_tracer_.reset();
+        renderer_.reset();
 
         QMessageBox mbox;
         mbox.setWindowTitle("Error");
@@ -82,7 +70,7 @@ void Editor::on_load_config()
     }
     catch(...)
     {
-        path_tracer_.reset();
+        renderer_.reset();
 
         QMessageBox mbox;
         mbox.setWindowTitle("Error");
@@ -91,37 +79,130 @@ void Editor::on_load_config()
     }
 }
 
-void Editor::on_update_time()
+void Editor::on_update_display()
 {
-    if(path_tracer_)
+    if(renderer_)
     {
-        const auto img = path_tracer_->get_image();
+        const auto img = renderer_->get_image();
         if(img.is_available())
             set_display_image(img);
     }
 }
 
-void Editor::on_resize_display()
+void Editor::on_change_camera()
 {
     if(!scene_)
         return;
 
-    path_tracer_.reset();
+    renderer_.reset();
+    
+    auto camera = displayer_->create_camera();
+    scene_->set_camera(camera);
 
-    const int film_width = display_label_->size().width();
-    const int film_height = display_label_->size().height();
+    launch_renderer();
+}
 
-    camera_->update_param("film_width", film_width);
-    camera_->update_param("film_height", film_height);
+void Editor::on_change_renderer()
+{
+    if(!scene_)
+        return;
 
-    scene_->start_rendering();
+    renderer_.reset();
 
-    path_tracer_ = std::make_unique<PathTracer>(PathTracingParams{}, film_width, film_height, scene_);
+    launch_renderer();
+}
+
+void Editor::init_menu_bar()
+{
+    QAction *load_config = new QAction("Load JSON Config", this);
+    menuBar()->addAction(load_config);
+    connect(load_config, &QAction::triggered, [=] { on_load_config(); });
+}
+
+void Editor::init_panels()
+{
+    hori_splitter_ = new QSplitter(this);
+    setCentralWidget(hori_splitter_);
+
+    left_panel_    = new QFrame(hori_splitter_);
+    vert_splitter_ = new QSplitter(hori_splitter_);
+    right_panel_   = new QFrame(hori_splitter_);
+
+    left_panel_->setFrameShape(QFrame::Box);
+    left_panel_->setFrameShadow(QFrame::Shadow::Sunken);
+
+    right_panel_->setFrameShape(QFrame::Box);
+    right_panel_->setFrameShadow(QFrame::Shadow::Sunken);
+
+    right_panel_layout_ = new QVBoxLayout(right_panel_);
+    right_panel_layout_->setAlignment(Qt::AlignTop);
+
+    hori_splitter_->setOrientation(Qt::Horizontal);
+    hori_splitter_->addWidget(left_panel_);
+    hori_splitter_->addWidget(vert_splitter_);
+    hori_splitter_->addWidget(right_panel_);
+
+    up_panel_   = new QFrame(vert_splitter_);
+    down_panel_ = new QFrame(vert_splitter_);
+
+    up_panel_->setFrameShape(QFrame::Box);
+    up_panel_->setFrameShadow(QFrame::Shadow::Sunken);
+    
+    down_panel_->setFrameShape(QFrame::Box);
+    down_panel_->setFrameShadow(QFrame::Shadow::Sunken);
+
+    vert_splitter_->setOrientation(Qt::Vertical);
+    vert_splitter_->addWidget(up_panel_);
+    vert_splitter_->addWidget(down_panel_);
+}
+
+void Editor::init_displayer()
+{
+    displayer_ = new Displayer(up_panel_);
+    connect(displayer_, &Displayer::need_to_recreate_camera, [=] { on_change_camera(); });
+
+    QVBoxLayout *up_panel_layout = new QVBoxLayout(up_panel_);
+    up_panel_layout->addWidget(displayer_);
+
+    update_display_timer_ = new QTimer(this);
+    update_display_timer_->setInterval(200);
+    connect(update_display_timer_, &QTimer::timeout, [=] { on_update_display(); });
+    update_display_timer_->start();
+}
+
+void Editor::init_renderer_panel()
+{
+    renderer_panel_ = new RendererPanel(right_panel_, "Path Tracer");
+    right_panel_layout_->addWidget(renderer_panel_);
+
+    connect(renderer_panel_, &RendererPanel::change_renderer_params, [=] { on_change_renderer(); });
+    connect(renderer_panel_, &RendererPanel::change_renderer_type, [=] { on_change_renderer(); });
+}
+
+void Editor::init_camera_panel()
+{
+    camera_panel_ = displayer_->get_camera_panel();
+    right_panel_layout_->addWidget(camera_panel_);
+}
+
+void Editor::redistribute_panels()
+{
+    auto ver_init_height = (std::max)(displayer_->minimumSizeHint().height(),
+                                   down_panel_->minimumSizeHint().height());
+    vert_splitter_->setSizes(QList<int>({ 2 * ver_init_height, ver_init_height }));
+
+    auto hor_init_width = (std::max)((std::max)(left_panel_->minimumSizeHint().width(),
+        right_panel_->minimumSizeHint().width()),
+        vert_splitter_->minimumSizeHint().width());
+    hori_splitter_->setSizes(QList<int>({ hor_init_width, 2 * hor_init_width, hor_init_width }));
 }
 
 void Editor::load_config(const std::string &input_filename)
 {
     using namespace tracer;
+
+    renderer_.reset();
+    scene_.reset();
 
     factory::BasicPathMapper path_mapper;
     {
@@ -140,18 +221,14 @@ void Editor::load_config(const std::string &input_filename)
     factory::CreatingContext context;
     context.path_mapper = &path_mapper;
     context.reference_root = &scene_config;
+    
+    displayer_->load_camera_from_config(root_params.child_group("rendering").child_group("camera"));
+    auto camera = displayer_->create_camera();
 
     scene_ = context.create<Scene>(scene_config);
+    scene_->set_camera(camera);
 
-    const int film_width = display_label_->size().width();
-    const int film_height = display_label_->size().height();
-    
-    camera_ = context.create<Camera>(root_params.child_group("rendering").child_group("camera"), film_width, film_height);
-    
-    scene_->set_camera(camera_);
-    scene_->start_rendering();
-
-    path_tracer_ = std::make_unique<PathTracer>(PathTracingParams{}, film_width, film_height, scene_);
+    launch_renderer();
 }
 
 void Editor::set_display_image(const Image2D<math::color3b> &img)
@@ -165,7 +242,24 @@ void Editor::set_display_image(const Image2D<math::color3b> &img)
     QPixmap qpixmap;
     qpixmap.convertFromImage(qimg);
 
-    display_label_->setPixmap(qpixmap);
+    displayer_->setPixmap(qpixmap);
+}
+
+void Editor::launch_renderer()
+{
+    update_display_timer_->stop();
+
+    const int film_width = displayer_->size().width();
+    const int film_height = displayer_->size().height();
+
+    scene_->start_rendering();
+    renderer_ = renderer_panel_->create_renderer(scene_, { film_width, film_height });
+
+    connect(renderer_.get(), &Renderer::can_get_img, this, &Editor::on_update_display);
+
+    renderer_->start();
+
+    update_display_timer_->start();
 }
 
 AGZ_EDITOR_END

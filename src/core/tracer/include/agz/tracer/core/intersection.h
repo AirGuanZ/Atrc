@@ -12,7 +12,7 @@ class Material;
 class Medium;
 
 /**
- * @brief 几何体表面上的一点
+ * @brief point on geometry object
  */
 struct SurfacePoint
 {
@@ -30,7 +30,7 @@ struct SurfacePoint
 };
 
 /**
- * @brief 介质中的一点
+ * @brief point in participating medium
  */
 struct MediumPoint
 {
@@ -38,7 +38,7 @@ struct MediumPoint
 };
 
 /**
- * @brief 射线与几何体表面的交点
+ * @brief intersection between ray and geometry object
  */
 struct GeometryIntersection : SurfacePoint
 {
@@ -47,7 +47,7 @@ struct GeometryIntersection : SurfacePoint
 };
 
 /**
- * @brief 射线与实体表面的交点
+ * @brief intersection between ray and entity
  */
 struct EntityIntersection : GeometryIntersection
 {
@@ -73,7 +73,7 @@ struct EntityIntersection : GeometryIntersection
 };
 
 /**
- * @brief 射线在介质中的散射点
+ * @brief scattering point in participating medium
  */
 struct MediumScattering : MediumPoint
 {
@@ -87,7 +87,7 @@ struct MediumScattering : MediumPoint
 };
 
 /**
- * @brief 实体表面一点处的着色信息
+ * @brief shading information at an entity intersection
  */
 struct ShadingPoint
 {

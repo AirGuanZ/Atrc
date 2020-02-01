@@ -37,7 +37,8 @@ namespace medium
             const auto density = context.create<Texture3D>(params.child_group("density"));
             const auto albedo  = context.create<Texture3D>(params.child_group("albedo"));
             const auto g       = context.create<Texture3D>(params.child_group("g"));
-            return create_heterogeneous_medium(local_to_world, std::move(density), std::move(albedo), std::move(g));
+            const int max_scat_count = params.child_int_or("max_scattering_count", (std::numeric_limits<int>::max)());
+            return create_heterogeneous_medium(local_to_world, std::move(density), std::move(albedo), std::move(g), max_scat_count);
         }
     };
 
@@ -55,7 +56,8 @@ namespace medium
             const auto sigma_a = params.child_spectrum("sigma_a");
             const auto sigma_s = params.child_spectrum("sigma_s");
             const real g = params.child_real("g");
-            return create_homogeneous_medium(sigma_a, sigma_s, g);
+            const int max_scat_count = params.child_int_or("max_scattering_count", (std::numeric_limits<int>::max)());
+            return create_homogeneous_medium(sigma_a, sigma_s, g, max_scat_count);
         }
     };
 

@@ -21,7 +21,6 @@
 * [stl reader](https://github.com/sreiter/stl_reader) for parsing STL model file
 * [tiny obj loader](https://github.com/syoyo/tinyobjloader) for parsing OBJ model file
 * [Embree 3.6.1](https://www.embree.org/) for better ray-mesh intersection test
-* [glfw](https://www.glfw.org/) for managing OpenGL context of Material Explorer
 
 **Dependencies Need to Be Prepared**
 
@@ -32,13 +31,12 @@ When using MSVC under Windows, copy all files in [oidn-1.1.0.x64.vc14.windows.zi
 
 ### CMake Options
 
-| Name                    | Default Value | Explanation                        |
-| ----------------------- | ------------- | ---------------------------------- |
-| USE_EMBREE              | OFF           | use Embree library to tracing rays |
-| USE_OIDN                | OFF           | use OIDN denoising library         |
-| BUILD_MATERIAL_EXPLORER | OFF           | build Material Explorer            |
-| BUILD_GUI               | OFF           | build rendering launcher with GUI  |
-| BUILD_SCENE_EDITOR      | OFF           | build scene editor                 |
+| Name               | Default Value | Explanation                        |
+| ------------------ | ------------- | ---------------------------------- |
+| USE_EMBREE         | OFF           | use Embree library to tracing rays |
+| USE_OIDN           | OFF           | use OIDN denoising library         |
+| BUILD_GUI          | OFF           | build rendering launcher with GUI  |
+| BUILD_SCENE_EDITOR | OFF           | build scene editor                 |
 
 **Note**. OIDN is 64-bit only.
 
@@ -53,7 +51,7 @@ git clone --recursive --depth=1 https://github.com/AirGuanZ/Atrc
 cd Atrc
 mkdir build
 cd build
-cmake -DUSE_EMBREE=ON -DUSE_OIDN=ON -DBUILD_MATERIAL_EXPLORER=ON -DBUILD_GUI=ON -DBUILD_SCENE_EDITOR=ON -DQt5_DIR="../../Qt5" -G "Visual Studio 15 2017 Win64" ..
+cmake -DUSE_EMBREE=ON -DUSE_OIDN=ON -DBUILD_GUI=ON -DBUILD_SCENE_EDITOR=ON -DQt5_DIR="../../Qt5" -G "Visual Studio 15 2017 Win64" ..
 ```
 
 **Full-featured Building on *nix**
@@ -65,7 +63,7 @@ mkdir build
 cd build
 export CC=clang
 export CXX=clang++
-cmake -DUSE_EMBREE=ON -DUSE_OIDN=ON -DBUILD_MATERIAL_EXPLORER=ON -DBUILD_GUI=ON -DBUILD_SCENE_EDITOR=ON -DQt5_DIR="../../Qt5" -G "Unix Makefiles" ..
+cmake -DUSE_EMBREE=ON -DUSE_OIDN=ON -DBUILD_GUI=ON -DBUILD_SCENE_EDITOR=ON -DQt5_DIR="../../Qt5" -G "Unix Makefiles" ..
 ```
 
 ## Usage
@@ -76,7 +74,6 @@ cmake -DUSE_EMBREE=ON -DUSE_OIDN=ON -DBUILD_MATERIAL_EXPLORER=ON -DBUILD_GUI=ON 
 2. GUI, renderer launcher with graphics user interface
 3. Editor, scene editor
 4. Tracer, off-line rendering library based on ray tracing
-5. material_explorer, GPU-accelerated material explorer
 
 ### CLI Usage
 
@@ -305,13 +302,12 @@ Geometric diffuse light source, that is, a light source with a geometric shape. 
 
 Ordinary entity with geometry shape, material and mediums.
 
-| Field Name     | Type     | Default Value | Explanation                |
-| -------------- | -------- | ------------- | -------------------------- |
-| geometry       | Geometry |               | geometric shape            |
-| material       | Material |               | surface material           |
-| med_in         | Medium   | void          | outer medium               |
-| med_out        | Medium   | void          | inner medium               |
-| shadow_catcher | bool     | false         | marked as a shadow catcher |
+| Field Name | Type     | Default Value | Explanation      |
+| ---------- | -------- | ------------- | ---------------- |
+| geometry   | Geometry |               | geometric shape  |
+| material   | Material |               | surface material |
+| med_in     | Medium   | void          | outer medium     |
+| med_out    | Medium   | void          | inner medium     |
 
 ### FilmFilter
 
@@ -631,22 +627,24 @@ Non-scattering medium.
 
 Heterogeneous media defined based on 3D textures
 
-| Field Name | Type        | Default Value | Explanation                                     |
-| ---------- | ----------- | ------------- | ----------------------------------------------- |
-| transform  | [Transform] |               | from texture space ($[0,1]^3$) to world space   |
-| density    | Texture3D   |               | medium density, i.e. $\sigma_s + \sigma_a$      |
-| albedo     | Texture3D   |               | albedo, i.e. $\sigma_s / (\sigma_s + \sigma_a)$ |
-| g          | Texture3D   |               | asymmetry of scattering                         |
+| Field Name           | Type        | Default Value | Explanation                                     |
+| -------------------- | ----------- | ------------- | ----------------------------------------------- |
+| transform            | [Transform] |               | from texture space ($[0,1]^3$) to world space   |
+| density              | Texture3D   |               | medium density, i.e. $\sigma_s + \sigma_a$      |
+| albedo               | Texture3D   |               | albedo, i.e. $\sigma_s / (\sigma_s + \sigma_a)$ |
+| g                    | Texture3D   |               | asymmetry of scattering                         |
+| max_scattering_count | int         | INT_MAX       | max continous scattering count                  |
 
 **homogeneous**
 
 ![pic](./pictures/homogeneous.png)
 
-| Field Name | Type     | Default Value | Explanation             |
-| ---------- | -------- | ------------- | ----------------------- |
-| sigma_a    | Spectrum |               | absorption rate         |
-| sigma_s    | Spectrum |               | scattering rate         |
-| g          | real     |               | asymmetry of scattering |
+| Field Name           | Type     | Default Value | Explanation                    |
+| -------------------- | -------- | ------------- | ------------------------------ |
+| sigma_a              | Spectrum |               | absorption rate                |
+| sigma_s              | Spectrum |               | scattering rate                |
+| g                    | real     |               | asymmetry of scattering        |
+| max_scattering_count | int      | INT_MAX       | max continous scattering count |
 
 ### NonareaLight
 

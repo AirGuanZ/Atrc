@@ -8,15 +8,9 @@
 #include <QWidget>
 
 #include <agz/gui/gui.h>
-#include <agz/tracer/core/post_processor.h>
-#include <agz/tracer/core/scene.h>
-#include <agz/tracer/utility/config_cvt.h>
+#include <agz/tracer/tracer.h>
 #include <agz/utility/file.h>
 #include <agz/utility/misc.h>
-
-#ifdef USE_EMBREE
-#   include <agz/tracer/utility/embree.h>
-#endif
 
 #define WORKING_DIR_PATH_NAME "${working-directory}"
 #define SCENE_DESC_PATH_NAME  "${scene-directory}"

@@ -53,20 +53,20 @@ public:
             if(i == static_cast<size_t>(bsdf_idx))
                 continue;
             ret.f   += bsdfs_[i]->eval(ret.dir, wo, mode);
-            ret.pdf += bsdfs_[i]->pdf(ret.dir, wo, mode);
+            ret.pdf += bsdfs_[i]->pdf(ret.dir, wo);
         }
         ret.pdf /= bsdfs_.size();
 
         return ret;
     }
 
-    real pdf(const Vec3 &wi, const Vec3 &wo, TransportMode mode) const noexcept override
+    real pdf(const Vec3 &wi, const Vec3 &wo) const noexcept override
     {
         assert(!bsdfs_.empty());
 
         real ret = 0;
         for(auto bsdf : bsdfs_)
-            ret += bsdf->pdf(wi, wo, mode);
+            ret += bsdf->pdf(wi, wo);
         return ret / bsdfs_.size();
     }
 

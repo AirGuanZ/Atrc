@@ -8,7 +8,7 @@ AGZ_TRACER_BEGIN
 
 namespace
 {
-    
+
     class MirrorVarnishBSDF : public LocalBSDF
     {
         const BSDF *internal_;
@@ -64,7 +64,6 @@ namespace
                 ret.f        = color_ * Fr / std::abs(lwi.z);
                 ret.pdf      = Fr;
                 ret.is_delta = true;
-                ret.mode     = mode;
 
                 ret.f *= local_angle::normal_corr_factor(geometry_coord_, shading_coord_, ret.dir);
                 return ret;
@@ -91,13 +90,12 @@ namespace
             ret.f        = color_ * color_ * (1 - Fr) * internal_sample.f;
             ret.pdf      = (1 - Fr) * internal_sample.pdf;
             ret.is_delta = internal_sample.is_delta;
-            ret.mode     = mode;
 
             ret.f *= local_angle::normal_corr_factor(geometry_coord_, shading_coord_, ret.dir);
             return ret;
         }
 
-        real pdf(const Vec3 &wi, const Vec3 &wo, TransportMode mode) const noexcept override
+        real pdf(const Vec3 &wi, const Vec3 &wo) const noexcept override
         {
             if(cause_black_fringes(wi) || cause_black_fringes(wo))
                 return 0;
@@ -111,7 +109,7 @@ namespace
             const Vec3 lwo = shading_coord_.global_to_local(wo).normalize();
             const real Fr = refl_aux::dielectric_fresnel(eta_in_, eta_out_, local_angle::cos_theta(lwo));
 
-            return (1 - Fr) * internal_->pdf(-*opt_wit, -*opt_wot, mode);
+            return (1 - Fr) * internal_->pdf(-*opt_wit, -*opt_wot);
         }
 
         Spectrum albedo() const noexcept override

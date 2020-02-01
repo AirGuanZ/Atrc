@@ -61,7 +61,7 @@ public:
         return sampler_->pdf(ref_to_light);
     }
 
-    LightEmitResult emit(const Sample5 &sam) const noexcept override
+    LightEmitResult sample_emit(const Sample5 &sam) const noexcept override
     {
         auto [dir, pdf_dir] = sampler_->sample({ sam.u, sam.v, sam.w });
         dir = -dir;

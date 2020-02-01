@@ -50,9 +50,7 @@ struct Texture2DCommonParams
 };
 
 /**
- * @brief 纹理接口
- * 
- * sample_spectrum和sample_real中至少要实现一个
+ * @brief 2d texture interface
  */
 class Texture2D
 {
@@ -122,7 +120,7 @@ public:
     virtual ~Texture2D() = default;
 
     /**
-     * @brief 采样特定uv点处的Spectrum
+     * @brief sample spectrum value at uv
      */
     virtual Spectrum sample_spectrum(const Vec2 &uv) const noexcept
     {
@@ -139,7 +137,7 @@ public:
     }
 
     /**
-     * @brief 采样特定uv点处的实数值
+     * @brief sample real value at uv
      */
     virtual real sample_real(const Vec2 &uv) const noexcept
     {
@@ -152,14 +150,8 @@ public:
         return ret;
     }
 
-    /**
-     * @brief 纹理宽度
-     */
     virtual int width() const noexcept = 0;
 
-    /**
-     * @brief 纹理高度
-     */
     virtual int height() const noexcept = 0;
 };
 

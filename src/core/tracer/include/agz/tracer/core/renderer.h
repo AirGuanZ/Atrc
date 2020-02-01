@@ -11,7 +11,7 @@ class ProgressReporter;
 class Scene;
 
 /**
- * @brief 渲染器接口，负责将场景转换为图像
+ * @brief rendering algorithm interface
  */
 class Renderer
 {
@@ -28,34 +28,32 @@ public:
     virtual ~Renderer() { stop_async(); }
 
     /**
-     * @brief 阻塞式渲染
+     * @brief blocking rendering
      */
     virtual RenderTarget render(FilmFilterApplier filter, Scene &scene, ProgressReporter &reporter) = 0;
 
     /**
-     * @brief 发起异步渲染任务
+     * @brief start the async rendering
      */
     void render_async(FilmFilterApplier filter, Scene &scene, ProgressReporter &reporter);
 
     /**
-     * @brief 终止异步渲染任务
+     * @brief stop the async rendering
      */
     void stop_async();
 
     /**
-     * @brief 等待异步渲染完成
+     * @brief wait the async rendering to complete
      */
     RenderTarget wait_async();
 
     /**
-     * @brief 是否正在异步渲染中
+     * @brief returns true after calling render_async and before calling stop_async/wait_async
      */
     bool is_async_rendering() const noexcept { return is_async_rendering_; }
 
     /**
-     * @brief 异步渲染实质上是否已经完成
-     *
-     * 即在调用render_async之后，即使未调用stop_async或wait_async，渲染结束后也会返回false
+     * @brief is the async rendering actually completed
      */
     bool is_doing_rendering() const noexcept { return doing_rendering_; }
 };

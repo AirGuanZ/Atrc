@@ -16,17 +16,17 @@ AGZ_TRACER_BEGIN
 namespace
 {
 
-    // 用于遍历bvh树的栈大小和空间
+    // stack for traversal the bvh tree
     constexpr int TRAVERSAL_STACK_SIZE = 128;
     thread_local uint32_t traversal_stack[TRAVERSAL_STACK_SIZE];
 
-    // triangle bvh中的三角形
+    // triangle in bvh
     struct Primitive
     {
         Vec3 a_, b_a_, c_a_;
     };
 
-    // triangle bvh中的三角形附加信息
+    // triangle info in bvh
     struct PrimitiveInfo
     {
         Vec3 n_a_, n_b_a_, n_c_a_;
@@ -34,12 +34,12 @@ namespace
         Vec3 x_, z_;
     };
 
-    // triangle bvh节点
+    // node in triangle bvh
     struct Node
     {
         real low[3], high[3];
 
-        // start为uint32_t max时为internal node，否则为leaf node
+        // internal node when start == uint32_t.max; otherwise, leaf node
         uint32_t start, end_or_right_offset;
 
         static Node new_leaf(const real *low, const real *high, uint32_t start, uint32_t end)
@@ -93,8 +93,8 @@ namespace
         }
     };
 
-    // 建立triangle bvh中临时使用的链式节点
-    // left为nullptr时为leaf，否则为internal。BuildingNode的所有权统一由arena管理。
+    // linking node used in building bvh
+    // leaf node when left == nullptr. otherwise, internal node
     struct BuildingNode
     {
         AABB bounding;
@@ -102,7 +102,7 @@ namespace
         uint32_t start = 0, end = 0;
     };
 
-    // 建立triangle bvh中临时使用的三角形信息
+    // triangle used in building bvh
     struct BuildingTriangle
     {
         const mesh::vertex_t *vtx = nullptr;
@@ -147,7 +147,7 @@ namespace
                 centroid_bound |= tri.centroid;
             }
 
-            // 当三角形数量足够小时构建叶节点
+            // construct leaf node when triangle count is sufficiently low
             const uint32_t n = task.end - task.start;
             if(n <= leaf_size_threshold)
             {
@@ -165,13 +165,13 @@ namespace
                 continue;
             }
 
-            // 选择跨度最大的坐标轴为划分方向
+            // select the split axis with max extent
             const Vec3 centroid_delta = centroid_bound.high - centroid_bound.low;
             const int split_axis = centroid_delta[0] > centroid_delta[1] ?
                 (centroid_delta[0] > centroid_delta[2] ? 0 : 2) :
                 (centroid_delta[1] > centroid_delta[2] ? 1 : 2);
 
-            // 深度较小时使用位置二分，较大时使用数量二分
+            // divide the axis with centroid position when recursive depth is small. otherwise, divide with triangle count
             uint32_t split_middle;
             if(task.depth < depth_threshold)
             {

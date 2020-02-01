@@ -82,6 +82,27 @@ namespace microfacet
         return Vec3(sin_theta * std::cos(phi), sin_theta * std::sin(phi), cos_theta).normalize();
     }
 
+    Vec3 sample_anisotropic_gtr2_vnor(const Vec3 &ve, real ax, real ay, const Sample2 &sam) noexcept
+    {
+        const Vec3 vh = Vec3(ax * ve.x, ay * ve.y, ve.z).normalize();
+        const real lensq = vh.x * vh.x + vh.y * vh.y;
+
+        const Vec3 t1 = lensq > EPS ? Vec3(-vh.y, vh.x, 0) / std::sqrt(lensq) : Vec3(1, 0, 0);
+        const Vec3 t2 = cross(vh, t1);
+
+        const real r = std::sqrt(sam.u);
+        const real phi = 2 * PI_r * sam.v;
+        const real t_1 = r * std::cos(phi);
+        const real _t_2 = r * std::sin(phi);
+        const real s = real(0.5) * (1 + vh.z);
+        const real t_2 = (1 - s) * std::sqrt(1 - t_1 * t_1) + s * _t_2;
+
+        const Vec3 nh = t_1 * t1 + t_2 * t2 + std::sqrt((std::max)(real(0), 1 - t_1 * t_1 - t_2 * t_2)) * vh;
+        const Vec3 ne = Vec3(ax * nh.x, ay * nh.y, (std::max)(real(0), nh.z)).normalize();
+
+        return ne;
+    }
+
 } // namespace microfacet
 
 AGZ_TRACER_END

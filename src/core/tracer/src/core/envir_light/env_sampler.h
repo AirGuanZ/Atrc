@@ -9,7 +9,7 @@
 AGZ_TRACER_BEGIN
 
 /**
- * @brief 对环境映射进行重要性采样的辅助设施
+ * @brief helper class for importance sampling of environment light
  */
 class EnvironmentLightSampler : public misc::uncopyable_t
 {
@@ -24,7 +24,7 @@ public:
         const int new_width = (std::min)(width, 200);
         const int new_height = (std::min)(height, 200);
 
-        // 得到能量分布图
+        // compute energy distribution
 
         real lum_sum = 0;
         probs_.initialize(new_height, new_width);
@@ -68,7 +68,7 @@ public:
             }
         }
 
-        // 归一化
+        // normalize the energy distribution
 
         if(lum_sum > EPS)
         {
@@ -80,7 +80,7 @@ public:
             }
         }
 
-        // 线性化
+        // linearize the energy distribution
 
         std::vector<real> linear_probs(probs_.size().product());
         for(int y = 0; y < new_height; ++y)
@@ -93,7 +93,7 @@ public:
             }
         }
 
-        // 构造sampler
+        // construct sampler
 
         sampler_.initialize(linear_probs.data(), int(linear_probs.size()));
     }

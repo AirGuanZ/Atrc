@@ -16,7 +16,7 @@ struct EntityIntersection;
 class ScatteringPoint;
 
 /**
- * @brief 采样光源的结果
+ * @brief result of sampling light sources
  */
 struct SceneSampleLightResult
 {
@@ -25,9 +25,7 @@ struct SceneSampleLightResult
 };
 
 /**
- * @brief 场景管理器接口
- *
- * 除非专门指明，否则Scene不拥有任何传递给它的Object的所有权
+ * @brief scene manager interface
  */
 class Scene
 {
@@ -35,51 +33,47 @@ public:
 
     virtual ~Scene() = default;
 
-    /** @brief 设置当前使用的摄像机 */
+    /** @brief set current active camera */
     virtual void set_camera(std::shared_ptr<const Camera> camera) = 0;
 
-    /** @brief 当前使用的摄像机，若未设置过则返回nullptr */
+    /** @brief get current active camera */
     virtual const Camera *get_camera() const noexcept = 0;
 
-    /** @brief 场景中的所有光源 */
+    /** @brief get all light sources */
     virtual misc::span<const Light* const> lights() const noexcept = 0;
 
-    /** @brief 环境光 */
+    /** @brief get environment light */
     virtual const EnvirLight *envir_light() const noexcept = 0;
 
-    /**
-     * @brief 随机选择场景中的一个光源
-     *
-     * 除非无光源，否则绝不会返回空值
-     */
+    /** @brief sample a light source */
     virtual SceneSampleLightResult sample_light(const Sample1 &sam) const noexcept = 0;
 
     /**
-     * @brief sample_light方法选中light的概率
+     * @brief pdf of sample_light
      *
-     * assert(light in scene)
+     * assert(light is in scene)
      */
     virtual real light_pdf(const Light *light) const noexcept = 0;
 
-    /** @brief 给定射线是否与场景中的实体有交点 */
+    /** @brief is there an intersection with given ray */
     virtual bool has_intersection(const Ray &r) const noexcept = 0;
 
     /**
-     * @brief 两个点之间是否有障碍物
+     * @brief is there no intersection between two given points
      */
     virtual bool visible(const Vec3 &A, const Vec3 &B) const noexcept = 0;
 
     /**
-     * @brief 给定射线与场景中实体的最近交点
+     * @brief find closest intersection with given ray
      *
-     * 只有在交点存在时inct中的数据才是有效的
+     * note that *inct may be modified even there is no intersection at all
      *
-     * @return 交点是否存在
+     * @return whether there is an intersection
      */
     virtual bool closest_intersection(const Ray &r, EntityIntersection *inct) const noexcept = 0;
 
     /**
-     * @brief 预处理world bound、light source等
+     * @brief must be called before rendering
      */
     virtual void start_rendering() = 0;
 };

@@ -8,7 +8,6 @@ PROJECT(Atrc)
 
 OPTION(USE_EMBREE              "use embree for finding triangle mesh intersection" OFF)
 OPTION(USE_OIDN                "use oidn denoiser"                                 OFF)
-OPTION(BUILD_MATERIAL_EXPLORER "build material explorer or not"                    OFF)
 OPTION(BUILD_GUI               "build graphics user interface"                     OFF)
 OPTION(BUILD_EDITOR            "build scene editor"                                OFF)
 
@@ -35,7 +34,7 @@ ENDIF()
 ############## qt
 
 IF(BUILD_GUI OR BUILD_EDITOR)
-    FIND_PACKAGE(Qt5 REQUIRED COMPONENTS Widgets)
+    FIND_PACKAGE(Qt5 REQUIRED COMPONENTS Core Widgets)
     SET_PROPERTY(GLOBAL PROPERTY AUTOGEN_SOURCE_GROUP auto_moc)
     SET(CMAKE_AUTOMOC ON)
     SET(CMAKE_AUTOUIC ON)
@@ -52,16 +51,6 @@ SET_TARGET_PROPERTIES(spdlog AGZUtils PROPERTIES FOLDER "ThirdParty")
 
 ADD_SUBDIRECTORY(src/core/tracer)
 ADD_SUBDIRECTORY(src/app/cli)
-
-IF(BUILD_MATERIAL_EXPLORER OR BUILD_SCENE_EDITOR)
-    INCLUDE("${PROJECT_SOURCE_DIR}/cmake/cmake-glfw")
-	INCLUDE("${PROJECT_SOURCE_DIR}/cmake/cmake-glew")
-	FIND_PACKAGE(OpenGL REQUIRED)
-ENDIF()
-
-IF(BUILD_MATERIAL_EXPLORER)
-    ADD_SUBDIRECTORY(src/app/material_explorer)
-ENDIF()
 
 IF(BUILD_GUI)
     ADD_SUBDIRECTORY(src/app/gui)

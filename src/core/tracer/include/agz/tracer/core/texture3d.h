@@ -79,7 +79,7 @@ struct Texture3DCommonParams
 };
 
 /**
- * @brief 三维纹理接口
+ * @brief 3d texture interface
  */
 class Texture3D
 {
@@ -146,7 +146,7 @@ public:
     virtual ~Texture3D() = default;
 
     /**
-     * @brief 采样uvw处的Spectrum
+     * @brief sample spectrum value at uv
      */
     virtual Spectrum sample_spectrum(const Vec3 &uvw) const noexcept
     {
@@ -164,7 +164,7 @@ public:
     }
     
     /**
-     * @brief 采样uvw处的实数
+     * @brief sample real value at uv
      */
     virtual real sample_real(const Vec3 &uvw) const noexcept
     {
@@ -178,38 +178,29 @@ public:
         return ret;
     }
 
-    /**
-     * @brief 纹理宽度（u方向）
-     */
     virtual int width() const noexcept = 0;
 
-    /**
-     * @brief 纹理高度（v方向）
-     */
     virtual int height() const noexcept = 0;
 
-    /**
-     * @brief 纹理深度（w方向）
-     */
     virtual int depth() const noexcept = 0;
 
     /**
-     * @brief 逐分量spectrum最大值
+     * @brief element-wise maximal spectrum value
      */
     virtual Spectrum max_spectrum() const noexcept = 0;
 
     /**
-     * @brief 逐分量spectrum最小值
+     * @brief element-wise minimal spectrum value
      */
     virtual Spectrum min_spectrum() const noexcept = 0;
 
     /**
-     * @brief 最大实数值
+     * @brief maximal real value
      */
     virtual real max_real() const noexcept = 0;
 
     /**
-     * @brief 最小实数值
+     * @brief minimal real value
      */
     virtual real min_real() const noexcept = 0;
 };

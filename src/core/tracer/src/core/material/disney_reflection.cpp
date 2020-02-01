@@ -201,7 +201,7 @@ namespace
 
             const Vec3 global_wi = shading_coord_.local_to_global(wi);
 
-            const real pdf_val = pdf(global_wi, out_dir, transport_mode);
+            const real pdf_val = pdf(global_wi, out_dir);
             if(pdf_val < EPS)
                 return BSDF_SAMPLE_RESULT_INVALID;
 
@@ -211,12 +211,11 @@ namespace
             ret.f        = eval(global_wi, out_dir, transport_mode);
             ret.is_delta = false;
             ret.pdf      = pdf_val;
-            ret.mode     = transport_mode;
 
             return ret;
         }
 
-        real pdf(const Vec3 &in_dir, const Vec3 &out_dir, TransportMode) const noexcept override
+        real pdf(const Vec3 &in_dir, const Vec3 &out_dir) const noexcept override
         {
             if(cause_black_fringes(in_dir, out_dir))
                 return pdf_for_black_fringes(in_dir, out_dir);

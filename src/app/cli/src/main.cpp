@@ -5,18 +5,10 @@
 #include <vector>
 
 #include <agz/cli/cli.h>
-
-#include <agz/tracer/factory/factory.h>
-#include <agz/tracer/utility/config_cvt.h>
-#include <agz/tracer/utility/logger.h>
-#include <agz/tracer/utility/render_session.h>
+#include <agz/tracer/tracer.h>
 
 #include <agz/utility/misc.h>
 #include <agz/utility/string.h>
-
-#ifdef USE_EMBREE
-#   include <agz/tracer/utility/embree.h>
-#endif
 
 #define WORKING_DIR_PATH_NAME "${working-directory}"
 #define SCENE_DESC_PATH_NAME  "${scene-directory}"

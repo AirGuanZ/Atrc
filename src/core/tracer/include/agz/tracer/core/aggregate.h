@@ -10,7 +10,7 @@ AGZ_TRACER_BEGIN
 class Entity;
 
 /**
- * @brief 实体聚合接口，表示针对一组实体实现的求交加速数据结构
+ * @brief acceleration data structure interface between entities
  */
 class Aggregate
 {
@@ -19,19 +19,21 @@ public:
     virtual ~Aggregate() = default;
 
     /**
-     * @brief 建立静态加速数据结构
+     * @brief build the data structure
      * 
-     * 添加完所有实体后、开始渲染前调用
+     * must be called before rendering
+     *
+     * recall this method will rebuild the dt
      */
     virtual void build(const std::vector<std::shared_ptr<const Entity>> &entities) = 0;
 
     /**
-     * @brief 测试射线与实体有交点
+     * @brief test whether an intersection exists
      */
     virtual bool has_intersection(const Ray &r) const noexcept = 0;
 
     /**
-     * @brief 寻找与射线起点最近的交点
+     * @brief find the closest intersection between ray and entities
      */
     virtual bool closest_intersection(const Ray &r, EntityIntersection *inct) const noexcept = 0;
 };

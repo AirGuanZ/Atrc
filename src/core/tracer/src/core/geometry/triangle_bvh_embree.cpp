@@ -39,25 +39,16 @@ namespace tri_bvh_embree_ws
         float x, y, z, r;
     };
 
-    /**
-     * @brief 向embree传递的三角形index格式
-     */
     struct EmbreeIndex
     {
         uint32_t v0, v1, v2;
     };
 
-    /**
-     * @brief 记录单个三角形的位置
-     */
     struct Primitive
     {
         Vec3 a, b_a, c_a;
     };
 
-    /**
-     * @brief 记录单个三角形的法线、uv等
-     */
     struct PrimitiveInfo
     {
         Vec3 n_a, n_b_a, n_c_a;
@@ -65,18 +56,12 @@ namespace tri_bvh_embree_ws
         Vec3 x, z;
     };
 
-    /**
-     * @brief 将embree的上一个错误信息作为异常抛出
-     */
     [[noreturn]] void throw_embree_error()
     {
         const RTCError err = rtcGetDeviceError(embree_device());
         throw ObjectConstructionException(embree_err_str(err));
     }
 
-    /**
-     * @brief 将一个几何物体封装进embree scene中
-     */
     class UntransformedTriangleBVH : public misc::uncopyable_t
     {
         RTCScene scene_ = nullptr;
@@ -106,8 +91,8 @@ namespace tri_bvh_embree_ws
             surface_area_ = 0;
             local_bound_ = AABB();
 
-            // 0. 准备embree的vertex buffer和index buffer
-            // 1. 遍历所有三角形，填充prob buffer、vertex buffer和prim info buffer
+            // 0. prepare embree的vertex buffer and index buffer
+            // 1. fill prob buffer、vertex buffer and prim info buffer
 
             RTCDevice device = embree_device();
             scene_ = rtcNewScene(device);

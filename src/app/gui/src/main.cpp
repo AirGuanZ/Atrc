@@ -19,5 +19,5 @@ int main(int argc, char *argv[])
     gui.resize(640, 480);
     gui.show();
 
-    QApplication::exec();
+    return QApplication::exec();
 }

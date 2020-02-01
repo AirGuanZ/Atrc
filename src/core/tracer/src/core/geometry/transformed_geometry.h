@@ -23,11 +23,6 @@ protected:
     Transform3 local_to_world_;
     real local_to_world_ratio_ = 1;
 
-    /**
-     * @brief 构造一个transform，将local_bound的中心transform到原点，且变换后的bound最长的一条轴对齐边长为1
-     */
-    static Transform3 pretransform(const AABB &local_bound) noexcept;
-
 public:
 
     using Geometry::Geometry;
@@ -84,24 +79,6 @@ inline AABB TransformedGeometry::to_world(const AABB &local_aabb) const noexcept
     ret |= local_to_world_.apply_to_point(high);
 
     return ret;
-}
-
-inline Transform3 TransformedGeometry::pretransform(const AABB &local_bound) noexcept
-{
-    // 先挪到原点
-
-    const Vec3 centre = real(0.5) * (local_bound.low + local_bound.high);
-    const Transform3 translate = Transform3::translate(-centre);
-
-    // 找出最长的一条边
-
-    real max_l = (local_bound.high - local_bound.low).max_elem();
-    
-    // 将此边放缩到1
-
-    const Transform3 scale = Transform3::scale(Vec3(1 / max_l));
-
-    return scale * translate;
 }
 
 AGZ_TRACER_END

@@ -22,7 +22,7 @@ Materials:
 
 ![0](./doc/gallery/0.png)
 
-Breakfast Room (scene ref [here](http://casual-effects.com/data/index.html)):
+Fireplace Room (scene ref [here](http://casual-effects.com/data/index.html)):
 
 ![1](./doc/gallery/1.png)
 

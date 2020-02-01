@@ -5,9 +5,9 @@
 AGZ_TRACER_BEGIN
 
 /**
- * @brief 图像重建滤波器
+ * @brief filter function for reconstructing the image with samples
  * 
- * 参见 http://alvyray.com/Memos/CG/Microsoft/6_pixel.pdf
+ * see http://alvyray.com/Memos/CG/Microsoft/6_pixel.pdf
  */
 class FilmFilter
 {
@@ -16,12 +16,12 @@ public:
     virtual ~FilmFilter() = default;
 
     /**
-     * @brief 最大有效半径，以pixel为单位
+     * @brief max non-zero radius in pixels
      */
     virtual real radius() const noexcept = 0;
 
     /**
-     * @brief 求滤波器值
+     * @brief eval function value
      */
     virtual real eval(real x, real y) const noexcept = 0;
 };

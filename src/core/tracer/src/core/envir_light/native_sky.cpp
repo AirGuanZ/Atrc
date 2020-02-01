@@ -48,7 +48,7 @@ public:
         return math::distribution::uniform_on_sphere_pdf<real>;
     }
 
-    LightEmitResult emit(const Sample5 &sam) const noexcept override
+    LightEmitResult sample_emit(const Sample5 &sam) const noexcept override
     {
         const auto [dir, pdf_dir] = math::distribution::uniform_on_sphere(sam.u, sam.v);
 

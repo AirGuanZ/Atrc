@@ -38,14 +38,13 @@ namespace
             ret.dir      = shading_coord_.local_to_global(Vec3(0, 0, 2 * nwo.z) - nwo);
             ret.pdf      = 1;
             ret.f        = fresnel_point_->eval(nwo.z) * rc_ / std::abs(nwo.z);
-            ret.mode     = transport_mode;
             ret.is_delta = true;
 
             ret.f *= local_angle::normal_corr_factor(geometry_coord_, shading_coord_, ret.dir);
             return ret;
         }
 
-        real pdf(const Vec3 &in_dir, const Vec3 &out_dir, TransportMode transport_mode) const noexcept override
+        real pdf(const Vec3 &in_dir, const Vec3 &out_dir) const noexcept override
         {
             return 0;
         }

@@ -1,0 +1,53 @@
+#pragma once
+
+#include <agz/tracer/core/aggregate.h>
+#include <agz/tracer/core/bsdf.h>
+#include <agz/tracer/core/camera.h>
+#include <agz/tracer/core/entity.h>
+#include <agz/tracer/core/film_filter.h>
+#include <agz/tracer/core/fresnel.h>
+#include <agz/tracer/core/geometry.h>
+#include <agz/tracer/core/intersection.h>
+#include <agz/tracer/core/light.h>
+#include <agz/tracer/core/material.h>
+#include <agz/tracer/core/medium.h>
+#include <agz/tracer/core/post_processor.h>
+#include <agz/tracer/core/renderer.h>
+#include <agz/tracer/core/renderer.h>
+#include <agz/tracer/core/reporter.h>
+#include <agz/tracer/core/sampler.h>
+#include <agz/tracer/core/scene.h>
+#include <agz/tracer/core/texture2d.h>
+#include <agz/tracer/core/texture3d.h>
+
+#include <agz/tracer/factory/factory.h>
+#include <agz/tracer/factory/raw/aggregate.h>
+#include <agz/tracer/factory/raw/camera.h>
+#include <agz/tracer/factory/raw/entity.h>
+#include <agz/tracer/factory/raw/envir_light.h>
+#include <agz/tracer/factory/raw/film_filter.h>
+#include <agz/tracer/factory/raw/fresnel.h>
+#include <agz/tracer/factory/raw/geometry.h>
+#include <agz/tracer/factory/raw/material.h>
+#include <agz/tracer/factory/raw/medium.h>
+#include <agz/tracer/factory/raw/post_processor.h>
+#include <agz/tracer/factory/raw/renderer.h>
+#include <agz/tracer/factory/raw/reporter.h>
+#include <agz/tracer/factory/raw/sampler.h>
+#include <agz/tracer/factory/raw/scene.h>
+#include <agz/tracer/factory/raw/texture2d.h>
+#include <agz/tracer/factory/raw/texture3d.h>
+
+#include <agz/tracer/render/bidir_path_tracing.h>
+#include <agz/tracer/render/direct_illum.h>
+#include <agz/tracer/render/path_tracing.h>
+
+#include <agz/tracer/utility/config.h>
+#include <agz/tracer/utility/config_cvt.h>
+#include <agz/tracer/utility/embree.h>
+#include <agz/tracer/utility/logger.h>
+#include <agz/tracer/utility/phase_function.h>
+#include <agz/tracer/utility/reflection.h>
+#include <agz/tracer/utility/render_session.h>
+#include <agz/tracer/utility/sphere_aux.h>
+#include <agz/tracer/utility/triangle_aux.h>

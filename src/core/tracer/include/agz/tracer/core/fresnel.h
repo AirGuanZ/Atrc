@@ -5,7 +5,7 @@
 AGZ_TRACER_BEGIN
 
 /**
- * @brief 表面上某一点处的fresnel项
+ * @brief fresnel term
  */
 class FresnelPoint
 {
@@ -24,7 +24,7 @@ public:
 };
 
 /**
- * @brief 材质中的fresnel项，用于接受uv以得到特定点的FresnelPoint
+ * @brief map uv to FresnelPoint
  */
 class Fresnel
 {
@@ -32,9 +32,6 @@ public:
 
     virtual ~Fresnel() = default;
 
-    /**
-     * @brief 取得指定点处的fresnel point对象
-     */
     virtual FresnelPoint *get_point(const Vec2 &uv, Arena &arena) const = 0;
 };
 

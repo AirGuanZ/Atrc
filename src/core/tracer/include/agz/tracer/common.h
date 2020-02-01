@@ -17,6 +17,7 @@
 AGZ_TRACER_BEGIN
 
 class Aggregate;
+class BSDF;
 class Camera;
 class Entity;
 class EnvirLight;
@@ -71,16 +72,7 @@ template<typename T>
 using Image2D = texture::texture2d_t<T>;
 
 /**
- * @brief 用0-255下的rgb三分量构造0-1下的spectrum
- */
-inline Spectrum rgb255(real r, real g, real b) noexcept
-{
-    constexpr real ratio = real(1) / 255;
-    return ratio * Spectrum(r, g, b);
-}
-
-/**
- * @brief 某spectrum中是否含有inf成分
+ * @brief is there any inf component in given spectrum value
  */
 inline bool has_inf(const Spectrum &s) noexcept
 {
@@ -100,8 +92,6 @@ namespace local_angle
 {
 
     /**
-     * @brief 取得某向量与+z方向的夹角的cos值
-     *
      * w must be normalized
      */
     inline real cos_theta(const Vec3 &w) noexcept
@@ -109,25 +99,17 @@ namespace local_angle
         return w.z;
     }
 
-    /**
-     * @brief cos_theta的绝对值
-     */
     inline real abs_cos_theta(const Vec3 &w) noexcept
     {
         return std::abs(cos_theta(w));
     }
 
-    /**
-     * @brief 将某角度的cos值转为其sin正值
-     */
     inline real cos_2_sin(real cos)
     {
         return std::sqrt((std::max<real>)(0, 1 - cos * cos));
     }
 
     /**
-     * @brief 求某向量与+z方向夹角的tan值
-     *
      * w must be normalized
      */
     inline real tan_theta(const Vec3 &w)
@@ -139,8 +121,6 @@ namespace local_angle
     }
 
     /**
-     * @brief 求某向量与+z方向夹角的tan值的平方
-     *
      * w must be normalized
      */
     inline real tan_theta_2(const Vec3 &w)
@@ -152,9 +132,6 @@ namespace local_angle
         return t / z2;
     }
 
-    /**
-     * @brief 求某向量在xy平面上的极角，范围[0-2pi]
-     */
     inline real phi(const Vec3 &w) noexcept
     {
         if(!w.y && !w.x)
@@ -164,8 +141,6 @@ namespace local_angle
     }
 
     /**
-     * @brief 求某向量与+z方向的夹角
-     *
      * w must be normalized
      */
     inline real theta(const Vec3 &w) noexcept
@@ -174,7 +149,7 @@ namespace local_angle
     }
 
     /**
-     * @brief shading normal的proj factor校正因子
+     * @brief correction factor for shading normal
      */
     inline real normal_corr_factor(const Vec3 &geo, const Vec3 &shd, const Vec3 &wi) noexcept
     {
@@ -189,17 +164,14 @@ namespace local_angle
 
 } // namespace local_angle
 
-/**
- * @brief 由参数方程 o + td (t in [t_min, t_max]) 定义的射线（段）
- */
 class Ray
 {
 public:
 
-    Vec3 o;     // 起点
-    Vec3 d;     // 方向
-    real t_min; // 参数最小值
-    real t_max; // 参数最大值
+    Vec3 o;
+    Vec3 d;
+    real t_min;
+    real t_max;
 
     Ray();
     Ray(const Vec3 &o, const Vec3 &d, real t_min = 0, real t_max = REAL_INF) noexcept;
@@ -209,15 +181,6 @@ public:
     bool between(real t) const noexcept;
 };
 
-/**
- * @brief 三维轴对齐包围盒
- *
- * 由包围盒对角线上的两点构成，low为包围盒上各维度最小值，high为包围盒上各维度最大值。
- *
- * 若low的每个分量都小于high的对应分量，称该包围盒是有效的，否则为无效。
- *
- * 包围盒上的基本运算是求并，即求出包含两个包围盒的最小包围盒。求并的零元称为零包围盒，是一个无效包围盒。
- */
 class AABB
 {
 public:
@@ -225,32 +188,17 @@ public:
     Vec3 low;
     Vec3 high;
 
-    /** @brief 默认初始化为零包围盒 */
+    /** @brief defaultly initialized to an invalid aabb */
     AABB() noexcept;
 
-    /** @brief 用指定的两个关键点构造包围盒 */
     AABB(const Vec3 &low, const Vec3 &high) noexcept;
 
-    /** @brief 构造一个未初始化的包围盒 */
     explicit AABB(uninitialized_t) noexcept;
 
-    /** @brief 返回该包围盒是否有效 */
-    bool valid() const noexcept;
-
-    /**
-     * @brief 返回该包围盒的体积
-     *
-     * 对无效包围盒，该方法返回0
-     */
-    real volume() const noexcept;
-
-    /** @brief 并入另一个包围盒 */
     AABB &operator|=(const AABB &rhs) noexcept;
 
-    /** @brief 并入另一个点 */
     AABB &operator|=(const Vec3 &p) noexcept;
 
-    /** @brief 是否包含某个点 */
     bool contains(const Vec3 &pnt) const noexcept
     {
         return low.x <= pnt.x && pnt.x <= high.x &&
@@ -258,7 +206,6 @@ public:
                low.z <= pnt.z && pnt.z <= high.z;
     }
 
-    /** @brief 是否同某条参数射线有交点 */
     bool intersect(const Vec3 &ori, const Vec3 &inv_dir, real t_min, real t_max) const noexcept
     {
         const real nx = inv_dir[0] * (low[0] - ori[0]);
@@ -281,7 +228,6 @@ public:
     }
 };
 
-/** @beif 求两个包围盒的并 */
 AABB operator|(const AABB &lhs, const AABB &rhs) noexcept;
 
 inline Ray::Ray()
@@ -322,16 +268,6 @@ inline AABB::AABB(uninitialized_t) noexcept
     : low(UNINIT), high(UNINIT)
 {
 
-}
-
-inline bool AABB::valid() const noexcept
-{
-    return low.x < high.x && low.y < high.y && low.z < high.z;
-}
-
-inline real AABB::volume() const noexcept
-{
-    return valid() ? (high - low).product() : 0;
 }
 
 inline AABB &AABB::operator|=(const AABB &rhs) noexcept

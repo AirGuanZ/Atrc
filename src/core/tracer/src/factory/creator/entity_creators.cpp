@@ -58,10 +58,8 @@ namespace entity
             const auto geometry = context.create<Geometry>(params.child_group("geometry"));
             const auto material = context.create<Material>(params.child_group("material"));
             const auto med = create_medium_interface(params, context);
-            const bool is_shadow_catcher = params.child_int_or("shadow_catcher", 0) != 0;
             const auto no_denoise = params.child_int_or("no_denoise", 0);
-            return create_geometric(std::move(geometry), std::move(material), med,
-                                    is_shadow_catcher, no_denoise);
+            return create_geometric(std::move(geometry), std::move(material), med, no_denoise);
         }
     };
 

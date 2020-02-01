@@ -9,7 +9,7 @@ class AreaLight;
 class EnvirLight;
 
 /**
- * @brief 根据参考点采样光源得到的结果
+ * @brief result of sampling light wi
  */
 struct LightSampleResult
 {
@@ -31,25 +31,25 @@ struct LightSampleResult
 };
 
 /**
- * @brief 采样实体光源失败时的返回值
+ * @brief return value when sampling light wi fails
  */
 inline const LightSampleResult LIGHT_SAMPLE_RESULT_NULL = { { }, { }, { }, { }, 0 };
 
 /**
- * @brief 采样光源发射的结果
+ * @brief result of sampling light emission
  */
 struct LightEmitResult
 {
-    Vec3 pos;          // 发射点位置
-    Vec3 dir;          // 发射方向
-    Vec3 nor;          // 发射点法线，为0表示无法线
-    Spectrum radiance; // 辐射亮度
+    Vec3 pos;          // emitting position
+    Vec3 dir;          // emitting direction
+    Vec3 nor;          // normal at pos
+    Spectrum radiance; // emitted radiance
     real pdf_pos = 0;  // pdf w.r.t. light surface area
     real pdf_dir = 0;  // pdf w.r.t. solid angle at position
 };
 
 /**
- * @brief 求光源发射pdf的结果
+ * @brief pdf of sampling light emission
  */
 struct LightEmitPDFResult
 {
@@ -58,7 +58,7 @@ struct LightEmitPDFResult
 };
 
 /**
- * @brief 取得光源发射位置和法线的结果
+ * @brief result of finding light emission position
  */
 struct LightEmitPosResult
 {
@@ -67,10 +67,9 @@ struct LightEmitPosResult
 };
 
 /**
- * @brief 光源接口
- * 
- * 全体光源被分为两类：实体光源和环境光源。
- * 实体光源在场景中有对应的Entity，环境光源则没有
+ * @brief light source interface
+ *
+ * light sources are divided into two categories: area light & environment light
  */
 class Light
 {
@@ -79,47 +78,45 @@ public:
     virtual ~Light() = default;
 
     /**
-     * @brief 是否是有实体的光源
+     * @brief is this an area light
      */
     virtual bool is_area() const noexcept = 0;
 
     /**
-     * @brief 返回其实体光源接口
+     * @brief get the area light source interface
      */
     virtual const AreaLight *as_area() const noexcept { return nullptr; }
 
     /**
-     * @brief 返回其非实体光源接口
+     * @brief get the environment light source interface
      */
     virtual const EnvirLight *as_envir() const noexcept { return nullptr; }
 
     /**
-     * @brief 采样一条照射到ref的射线
-     * @param ref 参考点
-     * @param sam 采样数据
+     * @brief sample light wi at ref
      */
     virtual LightSampleResult sample(const Vec3 &ref, const Sample5 &sam) const noexcept = 0;
 
     /**
-     * @brief 采样出射光线
+     * @brief sample emission
      *
      * assert(ret.pdf_pos && ret.pdf_dir)
      */
-    virtual LightEmitResult emit(const Sample5 &sam) const noexcept = 0;
+    virtual LightEmitResult sample_emit(const Sample5 &sam) const noexcept = 0;
 
     /**
-     * @brief 采样出射光线的pdf
+     * @brief pdf of sample_emit
      */
     virtual LightEmitPDFResult emit_pdf(const Vec3 &position, const Vec3 &direction, const Vec3 &normal) const noexcept = 0;
 
     /**
-     * @brief 发射的光通量
+     * @brief emission power
      */
     virtual Spectrum power() const noexcept = 0;
 };
 
 /**
- * @brief 实体光源接口
+ * @brief area light source interface
  */
 class AreaLight : public Light
 {
@@ -130,26 +127,25 @@ public:
     const AreaLight *as_area() const noexcept override final { return this; }
 
     /**
-     * @brief 光源表面某点朝指定方向的辐射亮度
+     * @brief eval light source radiance
      * 
-     * @param pos 光源表面的点
-     * @param nor pos处的法线
-     * @param light_to_out spt向外照射的方向
-     * @return 沿该射线反方向的radiance
+     * @param pos position on light source
+     * @param nor normal at pos
+     * @param light_to_out direction from light source to outside
      */
     virtual Spectrum radiance(const Vec3 &pos, const Vec3 &nor, const Vec3 &light_to_out) const noexcept = 0;
 
     /**
-     * @brief 采样到某条照射ref的射线的概率密度（w.r.t. solid angle）
+     * @brief pdf of sample_wi (w.r.t. solid angle)
      *
-     * @param ref 参考点
-     * @param spt 光源上的点
+     * @param ref reference point
+     * @param spt point on light source
      */
     virtual real pdf(const Vec3 &ref, const SurfacePoint &spt) const noexcept = 0;
 };
 
 /**
- * @brief 环境光源接口
+ * @brief environment light source interface
  */
 class EnvirLight : public Light
 {
@@ -165,26 +161,30 @@ public:
     const EnvirLight *as_envir() const noexcept override final { return this; }
 
     /**
-     * @brief 光源沿指定方向照射到空间中某点的辐射亮度
+     * @brief eval light source radiance
      *
-     * @param ref 被照射的点
-     * @param ref_to_light 沿哪个方向照射到ref点
-     * @return 沿ref_to_light向ref点发射的辐射亮度
+     * @param ref outside point
+     * @param ref_to_light direction from outside to light source
+     * @return radiance from light source to outside
      */
     virtual Spectrum radiance(const Vec3 &ref, const Vec3 &ref_to_light) const noexcept = 0;
 
     /**
-     * @brief 以ref点为参考点时采样入射方向采样到ref_to_light的概率密度（w.r.t. solid angle）
+     * @brief pdf of sample_wi (w.r.t. solid angle)
      */
     virtual real pdf(const Vec3 &ref, const Vec3 &ref_to_light) const noexcept = 0;
 
-    /** @brief 求发射点的位置坐标 */
+    /**
+     * @brief find the emitting position according to outside point and emitting direction
+     *
+     * used in bidirectional rendering algorithms
+     */
     virtual LightEmitPosResult emit_pos(const Vec3 &ref, const Vec3 &ref_to_light) const noexcept = 0;
 
     /**
-     * @brief 基于场景进行预处理，在渲染开始之前、场景准备完毕之后调用一次
+     * @brief preprocess before the rendering start
      *
-     * 此方法应可以被多次调用，每次调用会覆盖之前的结果
+     * calling this method again will cover the previous result
      */
     void preprocess(const AABB &world_bound) noexcept;
 };

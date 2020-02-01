@@ -104,7 +104,7 @@ private:
         if(!light)
             return;
 
-        const auto emit_result = light->emit(sampler.sample5());
+        const auto emit_result = light->sample_emit(sampler.sample5());
         if(!emit_result.radiance)
             return;
 
@@ -248,7 +248,7 @@ private:
 
                 if constexpr(REPORTER_WITH_PREVIEW)
                 {
-                    const real percent = real(100) * (task_id + 1) / total_task_count;
+                    const real percent = real(100) * (task_id + 1) / real(total_task_count);
                     std::lock_guard lk(reporter_mutex);
                     film_grid.merge_into(
                         image_buffer.value, image_buffer.weight,
@@ -267,11 +267,13 @@ private:
                 }
                 else
                 {
+                    AGZ_UNACCESSED(backward);
+
                     film_grid.merge_into(
                         image_buffer.value, image_buffer.weight,
                         image_buffer.albedo, image_buffer.normal, image_buffer.denoise);
 
-                    const real percent = real(100) * (task_id + 1) / total_task_count;
+                    const real percent = real(100) * (task_id + 1) / real(total_task_count);
                     std::lock_guard lk(reporter_mutex);
                     reporter.progress(percent, {});
                 }
@@ -320,7 +322,8 @@ private:
 
         const int worker_count = thread::actual_worker_count(params_.worker_count);
 
-        std::atomic<int> total_particle_count = 0;
+        std::atomic<uint64_t> total_particle_count = 0;
+
         std::unique_ptr<std::mutex[]> output_img_mutex;
         std::vector<Image2D<Spectrum>> output_img;
 
@@ -366,7 +369,7 @@ private:
 
                 if constexpr(REPORTER_WITH_PREVIEW)
                 {
-                    int pc;
+                    uint64_t pc;
 
                     {
                         std::lock_guard lk(output_img_mutex[i]);
@@ -394,6 +397,10 @@ private:
                 }
                 else
                 {
+                    AGZ_UNACCESSED(output_img_mutex);
+                    AGZ_UNACCESSED(output_img);
+                    AGZ_UNACCESSED(worker_count);
+
                     total_particle_count += task_particle_count;
 
                     const real percent = real(100) * (task_id + 1) / params_.particle_task_count;
@@ -411,8 +418,11 @@ private:
         threads.reserve(worker_count);
         images.resize(worker_count, Image2D<Spectrum>(filter.height(), filter.width()));
 
-        output_img_mutex = std::make_unique<std::mutex[]>(worker_count);
-        output_img.resize(worker_count, Image2D<Spectrum>(filter.height(), filter.width()));
+        if constexpr(REPORTER_WITH_PREVIEW)
+        {
+            output_img_mutex = std::make_unique<std::mutex[]>(worker_count);
+            output_img.resize(worker_count, Image2D<Spectrum>(filter.height(), filter.width()));
+        }
 
         for(int i = 0; i < worker_count; ++i)
         {

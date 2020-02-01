@@ -21,7 +21,6 @@
 * [stl reader](https://github.com/sreiter/stl_reader)，用于解析STL模型文件
 * [tiny obj loader](https://github.com/syoyo/tinyobjloader)，用于解析OBJ模型文件
 * [Embree 3.6.1](https://www.embree.org/)，用于加速射线与几何体的求交
-* [glfw](https://www.glfw.org/)，用于Material Explorer的OpenGL Context管理
 
 需额外准备的依赖项如下：
 
@@ -32,13 +31,12 @@
 
 ### CMake Options
 
-| 选项名                  | 默认值 | 含义                        |
-| ----------------------- | ------ | --------------------------- |
-| USE_EMBREE              | OFF    | 启用Embree加速器            |
-| USE_OIDN                | OFF    | 启用OIDN降噪器              |
-| BUILD_MATERIAL_EXPLORER | OFF    | 启用Material Explorer的构建 |
-| BUILD_GUI               | OFF    | 启用GUI启动器               |
-| BUILD_SCENE_EDITOR      | OFF    | 启用场景编辑器              |
+| 选项名             | 默认值 | 含义             |
+| ------------------ | ------ | ---------------- |
+| USE_EMBREE         | OFF    | 启用Embree加速器 |
+| USE_OIDN           | OFF    | 启用OIDN降噪器   |
+| BUILD_GUI          | OFF    | 启用GUI启动器    |
+| BUILD_SCENE_EDITOR | OFF    | 启用场景编辑器   |
 
 注意到OIDN只支持64位程序，因此若启用了OIDN库，必须以64位模式构建程序。
 
@@ -57,7 +55,7 @@
    ```powershell
    mkdir build
    cd build
-   cmake -DUSE_EMBREE=ON -DUSE_OIDN=ON -DBUILD_MATERIAL_EXPLORER=ON -DBUILD_GUI=ON -DBUILD_SCENE_EDITOR=ON -DQt5_DIR="../../Qt5" -G "Visual Studio 15 2017 Win64" ..
+   cmake -DUSE_EMBREE=ON -DUSE_OIDN=ON -DBUILD_GUI=ON -DBUILD_SCENE_EDITOR=ON -DQt5_DIR="../../Qt5" -G "Visual Studio 15 2017 Win64" ..
    ```
 
 这会在`Atrc/build`下生成`Visual Studio 2017`的解决方案文件。
@@ -71,7 +69,6 @@
 1. CLI，为渲染器的命令行可执行程序，是Tracer的简单应用
 2. GUI，为带渲染过程预览的渲染器启动器，是Tracer的简单应用
 3. Tracer，基于光线追踪的离线渲染库（静态库）
-4. material_explorer，材质参数预览器，使用GPU加速的材质效果调整工具
 
 本节主要介绍CLI的使用，即其命令参数的含义和场景配置文件的编写。
 
@@ -305,13 +302,12 @@ Atrc使用JSON作为描述场景和渲染设置的配置文件格式。整个JSO
 
 普通的物体，可指定其几何形状、材质和内外介质。
 
-| 字段名         | 类型     | 默认值 | 含义                             |
-| -------------- | -------- | ------ | -------------------------------- |
-| geometry       | Geometry |        | 几何形状                         |
-| material       | Material |        | 实体表面材质                     |
-| med_in         | Medium   | void   | 内部介质，默认为真空             |
-| med_out        | Medium   | void   | 外部介质，默认为真空             |
-| shadow_catcher | bool     | false  | 是否被标记为shadow catcher类实体 |
+| 字段名   | 类型     | 默认值 | 含义                 |
+| -------- | -------- | ------ | -------------------- |
+| geometry | Geometry |        | 几何形状             |
+| material | Material |        | 实体表面材质         |
+| med_in   | Medium   | void   | 内部介质，默认为真空 |
+| med_out  | Medium   | void   | 外部介质，默认为真空 |
 
 ### FilmFilter
 
@@ -633,12 +629,13 @@ Disney Principled BSDF，具体可参考[原文](https://blog.selfshadow.com/pub
 
 基于三维纹理定义的非均匀介质
 
-| 字段名    | 类型        | 默认值 | 含义                                         |
-| --------- | ----------- | ------ | -------------------------------------------- |
-| transform | [Transform] |        | 从$[0, 1]^3$的纹理参数空间到世界空间的变换   |
-| density   | Texture3D   |        | 介质密度，即$\sigma_s + \sigma_a$            |
-| albedo    | Texture3D   |        | 反照率，即$\sigma_s / (\sigma_s + \sigma_a)$ |
-| g         | Texture3D   |        | 散射方向的不对称度                           |
+| 字段名               | 类型        | 默认值  | 含义                                         |
+| -------------------- | ----------- | ------- | -------------------------------------------- |
+| transform            | [Transform] |         | 从$[0, 1]^3$的纹理参数空间到世界空间的变换   |
+| density              | Texture3D   |         | 介质密度，即$\sigma_s + \sigma_a$            |
+| albedo               | Texture3D   |         | 反照率，即$\sigma_s / (\sigma_s + \sigma_a)$ |
+| g                    | Texture3D   |         | 散射方向的不对称度                           |
+| max_scattering_count | int         | INT_MAX | 最大连续散射次数                             |
 
 **homogeneous**
 
@@ -646,11 +643,12 @@ Disney Principled BSDF，具体可参考[原文](https://blog.selfshadow.com/pub
 
 各处散射性质均相同的介质。
 
-| 字段名  | 类型     | 默认值 | 含义               |
-| ------- | -------- | ------ | ------------------ |
-| sigma_a | Spectrum |        | 吸收率             |
-| sigma_s | Spectrum |        | 散射率             |
-| g       | real     |        | 散射方向的不对称度 |
+| 字段名               | 类型     | 默认值  | 含义               |
+| -------------------- | -------- | ------- | ------------------ |
+| sigma_a              | Spectrum |         | 吸收率             |
+| sigma_s              | Spectrum |         | 散射率             |
+| g                    | real     |         | 散射方向的不对称度 |
+| max_scattering_count | int      | INT_MAX | 最大连续散射次数   |
 
 ### NonareaLight
 

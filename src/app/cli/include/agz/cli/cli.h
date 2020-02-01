@@ -19,8 +19,9 @@ struct Params
 
 /*
     -d,--scene-filename SceneDescriptionFilename | -s,--scene SceneDescription
-        若只给了-d，就从其文件中读取场景描述信息
-        若只给了-s，就以其内容为场景描述信息，且假装这些信息是从路径“./scene.txt”中读取出的
-        若同时给了-s和-d，就以前者为场景描述信息，且假装这些信息是从后者中读取出的
+
+        -d only: load scene desc from SceneDescriptionFilename
+        -s only: use SceneDescription as scene desc and assume that it's loaded from './scene.txt'
+        -d and -s: use SceneDescription as scene desc and assume that it's loaded from SceneDescriptionFilename
 */
 std::optional<Params> parse_opts(int argc, char *argv[]);

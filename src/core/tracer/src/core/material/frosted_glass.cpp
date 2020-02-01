@@ -21,7 +21,6 @@ namespace
         real alpha_;
         const FresnelPoint *fresnel_;
 
-        // w位于micro coord和macro coord的z=0平面的夹缝中间的情况
         bool cause_normal_conflict(const Vec3 &h, const Vec3 &w) const
         {
             const bool macro_posi = w.z > 0;
@@ -29,7 +28,6 @@ namespace
             return macro_posi != micro_posi;
         }
 
-        // 已知lwi.z * lwo.z > 0，求brdf
         Spectrum eval_reflection(const Vec3 &lwi, const Vec3 &lwo) const noexcept
         {
             Vec3 h = lwi + lwo;
@@ -156,7 +154,6 @@ namespace
                 ret.pdf      = pdf_h * Fr / std::abs(4 * dot(lwo, h));
                 ret.is_delta = false;
                 ret.dir      = shading_coord_.local_to_global(lwi);
-                ret.mode     = mode;
 
                 if(cause_black_fringes(ret.dir) || !ret.f.is_finite() || ret.pdf < EPS)
                     return BSDF_SAMPLE_RESULT_INVALID;
@@ -199,7 +196,6 @@ namespace
             ret.f        = color_ * std::abs(val);
             ret.pdf      = std::abs(pdf_h * dhdwi * (1 - Fr));
             ret.is_delta = false;
-            ret.mode     = mode;
 
             if(cause_black_fringes(ret.dir) || !ret.f.is_finite() || ret.pdf < EPS)
                 return BSDF_SAMPLE_RESULT_INVALID;
@@ -208,7 +204,7 @@ namespace
             return ret;
         }
 
-        real pdf(const Vec3 &wi, const Vec3 &wo, TransportMode mode) const noexcept override
+        real pdf(const Vec3 &wi, const Vec3 &wo) const noexcept override
         {
             if(cause_black_fringes(wi) || cause_black_fringes(wo))
                 return 0;

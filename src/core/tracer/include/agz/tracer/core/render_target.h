@@ -25,9 +25,9 @@ namespace img_buf_impl
 }
 
 /**
- * @brief 用于存储中间结果的image buffer的标准模板
+ * @brief standard template for storing intermediate rendering results
  *
- * 通过模板参数控制其是否拥有指定的成员：
+ * use template arguments to select between following members:
  * Image2D<Spectrum> value
  * Image2D<real>     weight
  * Image2D<Spectrum> albedo
@@ -48,7 +48,7 @@ struct ImageBufferTemplate
 };
 
 /**
- * @brief 渲染算法的输出结果
+ * @brief output of rendering algorithm
  *
  * assert(image.is_available())
  *
@@ -67,7 +67,7 @@ struct RenderTarget
 };
 
 /**
- * @brief 将film filter作用与图像平面上指定区域的辅助设施
+ * @brief helper class for reconstructing the image buffer with given filter function and sample points
  */
 class FilmFilterApplier
 {
@@ -118,38 +118,31 @@ public:
         void set_pixel_range(const Rect2i &pixel_range);
 
         /**
-         * @brief 添加一个采样点
-         *
-         * px、py为以像素为单位的采样点位置，texels按图像像素中的通道顺序给出采样点所有通道的值
+         * @brief add a sample point
          */
         void apply(real px, real py, const TexelTypes&...texels) noexcept;
 
         /**
-         * @brief 给定像素坐标是否位于该图像区域的有效采样范围内
-         *
-         * 这是一个必要性检查，即该函数返回true未必有效，但返回false一定无效
+         * @brief is the given pixel coordinate in non-zero sample bounds
          */
         bool in_sample_pixel_bound(real px, real py);
 
         /**
-         * @brief 取得该区域的采样像素的下标范围
+         * @brief get sample pixel range
          */
         const Rect2i &sample_pixels() const noexcept;
 
         /**
-         * @brief 将内部数据叠加到给定图像上
+         * @brief add grid data to full image buffer
          */
         void merge_into(Image2D<TexelTypes>&...textures) const;
 
         /**
-         * @brief 清空整个grid的值
+         * @brief clear the grid data
          */
         void clear(const TexelTypes&...texels);
     };
 
-    /**
-     * @brief 图像平面上使用特定film filter的区域
-     */
     template<typename...TexelTypes>
     class FilmGridView
     {
@@ -177,21 +170,17 @@ public:
             Image2D<TexelTypes>&...textures) noexcept;
 
         /**
-         * @brief 添加一个采样点
-         *
-         * px、py为以像素为单位的采样点位置，texels按图像像素中的通道顺序给出采样点所有通道的值
+         * @brief add a sample point
          */
         void apply(real px, real py, const TexelTypes &...texels) const noexcept;
 
         /**
-         * @brief 给定像素坐标是否位于该图像区域的有效采样范围内
-         *
-         * 这是一个必要性检查，即该函数返回true未必有效，但返回false一定无效
+         * @brief is the given pixel coordinate in non-zero sample bounds
          */
         bool in_sample_pixel_bound(real px, real py) const noexcept;
 
         /**
-         * @brief 取得该区域的采样像素的下标范围
+         * @brief get sample pixel range
          */
         const Rect2i &sample_pixels() const noexcept;
     };
@@ -203,15 +192,15 @@ public:
     int height() const noexcept;
 
     /**
-     * @brief 将图像重建滤波器绑定到给定Image2D的指定像素区域
+     * @brief create subgrid bound to a pixel range on given textures
      *
-     * 绑定后得到的区域可能会写入这部分像素的值，但绝不会写入区域以外的像素
+     * values in the pixel range can be written by the returned subgrid
      */
     template<typename...TexelTypes>
     FilmGridView<TexelTypes...> create_subgrid_view(const Rect2i &pixel_bound, Image2D<TexelTypes> &...textures) const noexcept;
 
     /**
-     * @brief 创建指定的图像像素子区域
+     * @brief create subgrid representing the given pixel range
      */
     template<typename...TexelTypes>
     FilmGrid<TexelTypes...> create_subgrid(const Rect2i &pixel_bound) const noexcept;

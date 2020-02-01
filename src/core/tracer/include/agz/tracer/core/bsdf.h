@@ -6,7 +6,7 @@
 AGZ_TRACER_BEGIN
 
 /**
- * @brief 路径所携带的量：radiance/importance
+ * @brief what is carried by the path: radiance/importance
  */
 enum class TransportMode
 {
@@ -15,15 +15,14 @@ enum class TransportMode
 };
 
 /**
- * @brief 对bsdf进行重要性采样的结果
+ * @brief result of sampling BSDF
  */
 struct BSDFSampleResult
 {
-    Vec3          dir;                                // 采样得到的散射方向
-    Spectrum      f;                                  // bsdf值
-    real          pdf      = 0;                       // 采样的概率密度函数值,w.r.t. solid angle
-    TransportMode mode     = TransportMode::Radiance; // 传输模式
-    bool          is_delta = false;                   // pdf和f是否是delta函数
+    Vec3          dir;              // scattering direction
+    Spectrum      f;                // bsdf value
+    real          pdf = 0;          // pdf w.r.t. solid angle
+    bool          is_delta = false; // is f/pdf delta function?
 
     bool invalid() const noexcept
     {
@@ -32,15 +31,13 @@ struct BSDFSampleResult
 };
 
 /**
- * @brief bsdf采样失败时的返回值
+ * @brief returned value when BSDF sampling fails
  */
 inline const BSDFSampleResult BSDF_SAMPLE_RESULT_INVALID =
-    { {}, {}, 0, TransportMode::Radiance, false };
+    { {}, {}, 0, false };
 
 /**
- * @brief 双向散射分布函数（bidirectional scattering distribution function）接口
- *
- * f(x, in_dir, out_dir)中的x被预先给定，故实际上只有两个参数：in_dir和out_dir
+ * @brief bidirectional scattering distribution function
  */
 class BSDF : public misc::uncopyable_t
 {
@@ -49,33 +46,33 @@ public:
     virtual ~BSDF() = default;
 
     /**
-     * @brief 求f(in, out)或f*(in, out)
+     * @brief eval f(in, out) or f*(in, out)
      */
     virtual Spectrum eval(const Vec3 &wi, const Vec3 &wo, TransportMode mode) const noexcept = 0;
 
     /**
-     * @brief 给定out，采样in
+     * @brief given wo, sample wi
      */
     virtual BSDFSampleResult sample(const Vec3 &wo, TransportMode mode, const Sample3 &sam) const noexcept = 0;
 
     /**
-     * @brief 给定out的情况下采样到in的pdf
+     * @brief pdf of sample
      */
-    virtual real pdf(const Vec3 &wi, const Vec3 &wo, TransportMode mode) const noexcept = 0;
+    virtual real pdf(const Vec3 &wi, const Vec3 &wo) const noexcept = 0;
 
     /**
-     * @brief 材质反照率
+     * @brief material albedo
      */
     virtual Spectrum albedo() const noexcept = 0;
 
     /**
-     * @brief 是否是delta函数
+     * @brief is this a delta function?
      */
     virtual bool is_delta() const noexcept = 0;
 };
 
 /**
- * @brief 定义了x点的局部坐标系的BSDF实现
+ * @brief BSDF with local frame
  */
 class LocalBSDF : public BSDF
 {
@@ -84,9 +81,9 @@ protected:
     Coord geometry_coord_;
     Coord shading_coord_;
 
-    // w位于shading_coord和geometry_coord的z=0平面的夹缝中间的情况
-    // 此时bsdf是未定义的
-    // 以下的几个black fringes函数是用来快捷地判别、处理这种情况的
+    // black fringes: cases when w is in different hemispheres of geometry_coord and shading_coord.
+    // in these cases, BSDF values are undefined
+    // following 5 methods are used for handling black bringes quickly
 
     bool cause_black_fringes(const Vec3 &w) const noexcept
     {
@@ -121,7 +118,6 @@ protected:
         ret.dir      = geometry_coord_.local_to_global(local_in).normalize();
         ret.f        = albedo() / PI_r * local_angle::normal_corr_factor(geometry_coord_, shading_coord_, ret.dir);
         ret.pdf      = pdf;
-        ret.mode     = mode;
         ret.is_delta = false;
 
         return ret;
@@ -138,24 +134,14 @@ protected:
 public:
 
     /**
-     * @param geometry_coord 几何局部坐标系，由物体的数学正确的几何属性确定
-     * @param shading_coord 着色局部坐标系，在几何坐标系的基础上经法线插值、纹理扰动等处理得来
+     * @param geometry_coord geometric local frame, determined by the mathematically correct geometric properties of the object
+     * @param shading_coord shading local frame, constructed by geometry_coord, normal interpolation and normal mapping
      */
     LocalBSDF(const Coord &geometry_coord, const Coord &shading_coord) noexcept
         : geometry_coord_(geometry_coord), shading_coord_(shading_coord)
     {
 
     }
-};
-
-/**
- * @brief 局部坐标系内的BSDF实现，其in_dir和out_dir默认位于local coord中且已归一化
- */
-class InternalBSDF : public BSDF
-{
-public:
-
-    using BSDF::BSDF;
 };
 
 AGZ_TRACER_END

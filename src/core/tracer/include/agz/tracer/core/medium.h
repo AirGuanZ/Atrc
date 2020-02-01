@@ -8,10 +8,7 @@
 AGZ_TRACER_BEGIN
 
 /**
- * @brief 采样介质中发生的外散射的结果
- *
- * 可能会采样到一个散射点，也可能会采样到不发生散射。
- * 后一种情况下mediumInct为std::nullopt
+ * @brief result of sampling outer-scattering event
  */
 struct SampleOutScatteringResult
 {
@@ -27,7 +24,7 @@ struct SampleOutScatteringResult
 };
 
 /**
- * @brief 介质接口
+ * @brief participating medium interface
  */
 class Medium
 {
@@ -36,16 +33,26 @@ public:
     virtual ~Medium() = default;
 
     /**
-     * @brief a与b点间的透射比
+     * @brief maximum continuous scattering event count in this medium
+     *
+     * e.g. 1 means only single scattering is considered
+     */
+    virtual int get_max_scattering_count() const noexcept = 0;
+
+    /**
+     * @brief transmittance between two points
      */
     virtual Spectrum tr(const Vec3 &a, const Vec3 &b, Sampler &sampler) const noexcept = 0;
 
     /**
-     * @brief 在从o向d的射线上采样一个散射点
+     * @brief sample out-scattering event from a to b
      */
     virtual SampleOutScatteringResult sample_scattering(const Vec3 &a, const Vec3 &b, Sampler &sampler, Arena &arena) const = 0;
 };
 
+/**
+ * @brief medium interface on entity surface point
+ */
 struct MediumInterface
 {
     std::shared_ptr<const Medium> in;

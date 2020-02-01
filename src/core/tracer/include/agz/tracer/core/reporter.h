@@ -5,11 +5,11 @@
 AGZ_TRACER_BEGIN
 
 /**
- * @brief 用于展示渲染进度的reporter接口
+ * @brief progress reporter interface
  * 
- * 实现不必管线程安全
+ * all methods are not thread-safe
  * 
- * 使用姿势：
+ * typical usage:
  *  reporter.begin();
  *  { reporter.new_stage(); reporter.end_stage(); }*
  *  reporter.end();
@@ -23,51 +23,51 @@ public:
     virtual bool need_image_preview() const noexcept = 0;
 
     /**
-     * @brief 汇报进度数据
+     * @brief report the progress data
      * 
-     * @param percent 百分比，范围[0, 100]
+     * @param percent range: [0, 100]
      * 
-     * 在多线程环境下汇报的数据不一定保证递增
+     * reported values are not guaranteed to ↗ in multi-thread rendering
      */
     virtual void progress(double percent, const std::function<Image2D<Spectrum>()> &get_image_preview) = 0;
 
     /**
-     * @brief 输出一条消息
+     * @brief output a ordinary message
      */
     virtual void message(const std::string &msg) = 0;
 
     /**
-     * @brief 输出一条错误信息
+     * @brief output an error message
      */
     virtual void error(const std::string &err) = 0;
 
     /**
-     * @brief 开始渲染的回调函数
+     * @brief start rendering
      */
     virtual void begin() = 0;
 
     /**
-     * @brief 结束渲染的回调函数
+     * @brief complete rendering
      */
     virtual void end() = 0;
 
     /**
-     * @brief 开始一个新渲染pass，调用后progress给的percent会重新累计
+     * @brief start a new rendering stage. progress percentage will be reset to 0
      */
     virtual void new_stage() = 0;
 
     /**
-     * @brief 结束一个渲染pass
+     * @brief complete the rendering stage
      */
     virtual void end_stage() = 0;
 
     /**
-     * @brief 到目前为止所有已完成的pass用了多少秒
+     * @brief totally used seconds
      */
     virtual double total_seconds() = 0;
 
     /**
-     * @brief 上一个完成的pass用了多少秒
+     * @brief how many seconds does last rendering stage use
      */
     virtual double last_stage_seconds() = 0;
 };

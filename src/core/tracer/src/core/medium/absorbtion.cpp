@@ -5,13 +5,18 @@ AGZ_TRACER_BEGIN
 
 class AbsorbtionMedium : public Medium
 {
-    Spectrum sigma_a_; // 吸收系数
+    Spectrum sigma_a_;
 
 public:
 
     explicit AbsorbtionMedium(const Spectrum &sigma_a)
     {
         sigma_a_ = sigma_a;
+    }
+
+    int get_max_scattering_count() const noexcept override
+    {
+        return (std::numeric_limits<int>::max)();
     }
 
     Spectrum tr(const Vec3 &a, const Vec3 &b, Sampler &sampler) const noexcept override

@@ -21,19 +21,19 @@ class ThinLensCamera : public Camera
 
     struct Params
     {
-        int film_width  = 0;
-        int film_height = 0;
+        real film_aspect    = 1;
         Vec3 pos;
         Vec3 dst;
         Vec3 up;
         real fov            = 0;
         real lens_radius    = 0;
         real focal_distance = 0;
+
     } params_;
 
     void init_from_params(const Params &params)
     {
-        const real aspect = static_cast<real>(params.film_width) / params.film_height;
+        const real aspect = params.film_aspect;
 
         focal_film_height_ = 2 * params.focal_distance * std::tan(params.fov / 2);
         focal_film_width_ = aspect * focal_film_height_;
@@ -53,13 +53,11 @@ class ThinLensCamera : public Camera
 public:
 
     ThinLensCamera(
-        int film_width, int film_height,
+        real film_aspect,
         const Vec3 &pos, const Vec3 &dst, const Vec3 &up,
         real fov, real lens_radius, real focal_distance)
-        : Camera(film_width, film_height)
     {
-        params_.film_width     = film_width;
-        params_.film_height    = film_height;
+        params_.film_aspect    = film_aspect;
         params_.pos            = pos;
         params_.dst            = dst;
         params_.up             = up;
@@ -71,10 +69,8 @@ public:
 
     void update_param(std::string_view name, const std::any &value) override
     {
-        if(name == "film_width")
-            params_.film_width = std::any_cast<int>(value);
-        else if(name == "film_height")
-            params_.film_height = std::any_cast<int>(value);
+        if(name == "film_aspect")
+            params_.film_aspect = std::any_cast<real>(value);
         else
             throw ObjectConstructionException("unnown updated param: " + std::string(name));
         init_from_params(params_);
@@ -101,23 +97,19 @@ public:
 
     CameraEvalWeResult eval_we(const Vec3 &pos_on_cam, const Vec3 &pos_to_out) const noexcept override
     {
-        // 若方向和摄像机朝向差距超过180度，丢弃
+        // discard when <pos_to_out, cam_dir> > 180 degrees
 
         const Vec3 lens_pos  = camera_to_world_.apply_inverse_to_point(pos_on_cam);
         const Vec3 local_dir = camera_to_world_.apply_inverse_to_vector(pos_to_out).normalize();
         if(local_dir.z <= 0)
             return CAMERA_EVAL_WE_RESULT_ZERO;
 
-        // 计算film coord
-
         const Vec3 focal_film_pos = lens_pos + (focal_distance_ / local_dir.z) * local_dir;
-
-        // 丢弃film coord超出采样范围的结果
-
         const Vec2 film_coord = {
             real(0.5) - focal_film_pos.x / focal_film_width_,
             real(0.5) + focal_film_pos.y / focal_film_height_
         };
+
         const real cos_theta  = local_dir.z;
         const real cos2_theta = cos_theta * cos_theta;
         const real we         = focal_distance_ * focal_distance_ / (area_focal_film_ * area_lens_ * cos2_theta * cos2_theta);
@@ -127,13 +119,11 @@ public:
 
     CameraWePDFResult pdf_we(const Vec3 &pos_on_cam, const Vec3 &pos_to_out) const noexcept override
     {
-        // 若方向和摄像机朝向差距超过180度，则方向pdf为0
+        // discard when <pos_to_out, cam_dir> > 180 degrees
 
         const Vec3 local_dir = camera_to_world_.apply_inverse_to_vector(pos_to_out).normalize();
         if(local_dir.z <= 0)
             return { 1 / area_lens_, 0 };
-
-        // 若film coord超出采样范围，则方向pdf为0
 
         const real cos_theta = local_dir.z;
         const real pdf_dir   = focal_distance_ * focal_distance_ / (area_focal_film_ * cos_theta * cos_theta * cos_theta);
@@ -145,19 +135,19 @@ public:
     {
         const Vec3 local_ref = camera_to_world_.apply_inverse_to_point(ref);
 
-        // 采样镜头
+        // sample lens
 
         const Vec2 disk_sam = math::distribution::uniform_on_unit_disk(sam.u, sam.v);
         const Vec2 lens_sam = lens_radius_ * disk_sam;
         const Vec3 lens_pos = { lens_sam.x, lens_sam.y, 0 };
 
-        // 计算方向
+        // compute local dir
 
         const Vec3 local_dir = (local_ref - lens_pos).normalize();
         if(local_dir.z <= 0)
             return CAMERA_SAMPLE_WI_RESULT_INVALID;
 
-        // 计算focal film上的位置
+        // compute film coord
 
         const Vec3 focal_film_pos = lens_pos + (focal_distance_ / local_dir.z) * local_dir;
         const Vec2 film_coord = {
@@ -175,15 +165,10 @@ public:
 
         return ret;
     }
-
-    AABB get_world_bound() const noexcept override
-    {
-        return { pos_ - Vec3(real(0.1)), pos_ + Vec3(real(0.1)) };
-    }
 };
 
 std::shared_ptr<Camera> create_thin_lens_camera(
-    int film_width, int film_height,
+    real film_aspect,
     const Vec3 &pos,
     const Vec3 &dst,
     const Vec3 &up,
@@ -192,7 +177,7 @@ std::shared_ptr<Camera> create_thin_lens_camera(
     real focal_distance)
 {
     return std::make_shared<ThinLensCamera>(
-        film_width, film_height, pos, dst, up, fov, lens_radius, focal_distance);
+        film_aspect, pos, dst, up, fov, lens_radius, focal_distance);
 }
 
 AGZ_TRACER_END

@@ -42,7 +42,7 @@ public:
 
     virtual std::string name() const = 0;
 
-    virtual std::shared_ptr<Camera> create(const ConfigGroup &params, CreatingContext &context, int film_width, int film_height) const = 0;
+    virtual std::shared_ptr<Camera> create(const ConfigGroup &params, CreatingContext &context, real film_aspect) const = 0;
 };
 
 template<typename T>
@@ -145,7 +145,7 @@ public:
     std::string name() const override { return "reference"; }
 
     std::shared_ptr<Camera> create(
-        const ConfigGroup &params, CreatingContext &context, int film_width, int film_height) const override;
+        const ConfigGroup &params, CreatingContext &context, real film_aspect) const override;
 };
 
 inline void BasicPathMapper::add_replacer(const std::string &key, const std::string &value)
@@ -200,7 +200,7 @@ std::shared_ptr<T> ReferenceCreator<T>::create(const ConfigGroup &params, Creati
 }
 
 inline std::shared_ptr<Camera> ReferenceCreator<Camera>::create(
-    const ConfigGroup &params, CreatingContext &context, int film_width, int film_height) const
+    const ConfigGroup &params, CreatingContext &context, real film_aspect) const
 {
     AGZ_HIERARCHY_TRY
 
@@ -221,7 +221,7 @@ inline std::shared_ptr<Camera> ReferenceCreator<Camera>::create(
         group = &group->child_group(names[i]);
 
     const ConfigGroup &true_params = group->child_group(names.back());
-    auto ret = context.create<Camera>(true_params, film_width, film_height);
+    auto ret = context.create<Camera>(true_params, film_aspect);
     name2obj_[names] = ret;
 
     return ret;

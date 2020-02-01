@@ -4,7 +4,7 @@
 
 #include <QObject>
 
-#include <agz/tracer/core/reporter.h>
+#include <agz/tracer/tracer.h>
 #include <agz/utility/time.h>
 
 class GUIProgressReporter : public QObject, public agz::tracer::ProgressReporter

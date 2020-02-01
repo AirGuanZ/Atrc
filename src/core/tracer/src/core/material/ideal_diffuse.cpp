@@ -47,13 +47,12 @@ namespace
             ret.dir      = shading_coord_.local_to_global(local_in).normalize();
             ret.f        = albedo_ / PI_r * local_angle::normal_corr_factor(geometry_coord_, shading_coord_, ret.dir);
             ret.pdf      = pdf;
-            ret.mode     = transport_mode;
             ret.is_delta = false;
             
             return ret;
         }
 
-        real pdf(const Vec3 &in_dir, const Vec3 &out_dir, TransportMode) const noexcept override
+        real pdf(const Vec3 &in_dir, const Vec3 &out_dir) const noexcept override
         {
             if(cause_black_fringes(in_dir, out_dir))
                 return pdf_for_black_fringes(in_dir, out_dir);

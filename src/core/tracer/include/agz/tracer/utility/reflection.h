@@ -10,10 +10,10 @@ namespace refl_aux
 {
     
 /**
- * @param w 入射方向，从反射点指向外部
- * @param n 法线
+ * @param w incident direction. from reflection point to outside
+ * @param n reflection normal
  * 
- * w和n都应已被归一化
+ * both w and n should be normalized
  */
 inline Vec3 reflect(const Vec3 &w, const Vec3 &n) noexcept
 {
@@ -21,11 +21,11 @@ inline Vec3 reflect(const Vec3 &w, const Vec3 &n) noexcept
 }
 
 /**
- * @param w 入射方向，从折射点指向外部
- * @param n 法线，与入射方向在同一侧
- * @param eta 入射介质IOR/折射介质IOR
+ * @param w incident direction. from refraction point to outside
+ * @param n normal direction on the same side with w
+ * @param eta incident IOR / refracted IOR
  * 
- * w和n都应已被归一化
+ * both w and n should be normalized
  */
 inline std::optional<Vec3> refract(const Vec3 &w, const Vec3 &n, real eta) noexcept
 {
@@ -39,10 +39,10 @@ inline std::optional<Vec3> refract(const Vec3 &w, const Vec3 &n, real eta) noexc
 }
 
 /**
- * @brief 电介质fresnel项计算
+ * @brief compute fresnel value of dielectric surface
  * 
- * @param eta_i 内部IOR
- * @param eta_o 外部IOR
+ * @param eta_i inner IOR
+ * @param eta_o outer IOR
  */
 inline real dielectric_fresnel(real eta_i, real eta_o, real cos_theta_i) noexcept
 {

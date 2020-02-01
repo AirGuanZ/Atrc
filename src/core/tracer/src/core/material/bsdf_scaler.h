@@ -29,9 +29,9 @@ public:
         return ret;
     }
 
-    real pdf(const Vec3 &wi, const Vec3 &wo, TransportMode mode) const noexcept override
+    real pdf(const Vec3 &wi, const Vec3 &wo) const noexcept override
     {
-        return internal_->pdf(wi, wo, mode);
+        return internal_->pdf(wi, wo);
     }
 
     Spectrum albedo() const noexcept override

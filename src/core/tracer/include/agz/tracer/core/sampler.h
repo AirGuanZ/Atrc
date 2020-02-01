@@ -5,7 +5,7 @@
 AGZ_TRACER_BEGIN
 
 /**
- * @brief 采样器接口，用于在渲染过程中提供随机数
+ * @brief rng sampler interface
  */
 class Sampler
 {
@@ -14,7 +14,7 @@ public:
     virtual ~Sampler() = default;
 
     /**
-     * @brief 将新seed和内部seed结合clone一个新的sampler
+     * @brief combine the new seed with internal seed to create a new sampler instance
      */
     virtual Sampler *clone(int seed, Arena &arena) const = 0;
 

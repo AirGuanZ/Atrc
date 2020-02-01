@@ -6,10 +6,12 @@ AGZ_TRACER_BEGIN
 
 class HomogeneousMedium : public Medium
 {
-    Spectrum sigma_a_; // 吸收系数
-    Spectrum sigma_s_; // 散射系数
-    Spectrum sigma_t_; // 衰减系数
-    real g_ = 0;       // 散射不对称因子
+    Spectrum sigma_a_;
+    Spectrum sigma_s_;
+    Spectrum sigma_t_;
+    real g_ = 0;
+
+    int max_scattering_count_;
 
     Spectrum albedo() const
     {
@@ -18,7 +20,7 @@ class HomogeneousMedium : public Medium
 
 public:
 
-    HomogeneousMedium(const Spectrum &sigma_a, const Spectrum &sigma_s, real g)
+    HomogeneousMedium(const Spectrum &sigma_a, const Spectrum &sigma_s, real g, int max_scattering_count)
     {
         AGZ_HIERARCHY_TRY
 
@@ -30,7 +32,14 @@ public:
         if(g_ <= -1 || g_ >= 1)
             throw ObjectConstructionException("invalid g value: " + std::to_string(g_));
 
+        max_scattering_count_ = max_scattering_count;
+
         AGZ_HIERARCHY_WRAP("in initializing homogeneous medium")
+    }
+
+    int get_max_scattering_count() const noexcept override
+    {
+        return max_scattering_count_;
     }
 
     Spectrum tr(const Vec3 &a, const Vec3 &b, Sampler &sampler) const noexcept override
@@ -86,9 +95,10 @@ public:
 std::shared_ptr<Medium> create_homogeneous_medium(
     const Spectrum &sigma_a,
     const Spectrum &sigma_s,
-    real g)
+    real g,
+    int max_scattering_count)
 {
-    return std::make_shared<HomogeneousMedium>(sigma_a, sigma_s, g);
+    return std::make_shared<HomogeneousMedium>(sigma_a, sigma_s, g, max_scattering_count);
 }
 
 AGZ_TRACER_END

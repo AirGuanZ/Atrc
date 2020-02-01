@@ -30,12 +30,11 @@ namespace
             ret.dir      = -wo;
             ret.f        = Spectrum(1) / (cosv < EPS ? 1 : cosv);
             ret.pdf      = 1;
-            ret.mode     = mode;
             ret.is_delta = true;
             return ret;
         }
 
-        real pdf(const Vec3 &wi, const Vec3 &wo, TransportMode mode) const noexcept override
+        real pdf(const Vec3 &wi, const Vec3 &wo) const noexcept override
         {
             return 0;
         }

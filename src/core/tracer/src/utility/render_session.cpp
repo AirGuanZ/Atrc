@@ -29,7 +29,7 @@ namespace
 
         AGZ_INFO("creating camera");
         const auto &camera_params = rendering_config.child_group("camera");
-        settings->camera = context.create<Camera>(camera_params, film_width, film_height);
+        settings->camera = context.create<Camera>(camera_params, static_cast<real>(film_width) / film_height);
 
         AGZ_INFO("creating renderer");
         const auto &renderer_params = rendering_config.child_group("renderer");

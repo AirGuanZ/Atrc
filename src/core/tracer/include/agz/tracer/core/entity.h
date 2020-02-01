@@ -7,9 +7,9 @@ AGZ_TRACER_BEGIN
 class AreaLight;
 
 /**
- * @brief 实体接口，表示场景中的可渲染物体
- * 
- * 所有的实体都被定义在世界坐标系中，原则上不允许实体间出现任何直接或间接的嵌套结构
+ * @brief entity interface, representing visible object in scene
+ *
+ * all entities are in the world space
  */
 class Entity
 {
@@ -19,46 +19,39 @@ public:
 
     virtual ~Entity() = default;
 
-    /** @brief 设置用于取消降噪功能的flag */
+    /** @brief set the cancel-denoising flag */
     void set_no_denoise_flag(bool no_denoise) noexcept { no_denoise_ = no_denoise; }
 
-    /** @brief 是否在该entity上禁用降噪功能 */
+    /** @brief is cancel-denoising flag on? */
     bool get_no_denoise_flag() const noexcept { return no_denoise_; }
 
-    /** @brief 判断给定射线是否与该实体有交点 */
+    /** @brief is there an intersection with given ray? */
     virtual bool has_intersection(const Ray &r) const noexcept = 0;
 
     /**
-     * @brief 找到给定射线与该实体的最近交点
+     * @brief find closest intersection with given ray
      * 
-     * @param r 射线
-     * @param inct 交点信息，其每个成员有效当且仅当返回值为true；若返回false，则inct必然未被修改
+     * @param r ray
+     * @param inct intersection information. only be modified when true is returned
      * 
-     * @return 存在交点时返回true，否则返回false
+     * @return whether there is an intersection
      */
     virtual bool closest_intersection(const Ray &r, EntityIntersection *inct) const noexcept = 0;
 
     /**
-     * @brief 返回该实体在世界坐标系中的轴对齐包围盒
+     * @brief aabb in world space
      */
     virtual AABB world_bound() const noexcept = 0;
 
     /**
-     * @brief 返回自身作为area_light的接口。若并非光源，则返回nullptr。
+     * @brief area light interface of this entity. nullptr means this is not a light source
      */
     virtual const AreaLight *as_light() const noexcept = 0;
 
     /**
-     * @brief 返回自身作为area_light的接口。若并非光源，则返回nullptr。
+     * @brief area light interface of this entity. nullptr means this is not a light source
      */
     virtual AreaLight *as_light() noexcept = 0;
-
-    /**
-     * @brief 是否是shadow catcher
-     * 
-     * shadow catcher效果需要renderer方面的支持
-     */
-    virtual bool is_shadow_catcher() const noexcept { return false; }
 };
 
 AGZ_TRACER_END
