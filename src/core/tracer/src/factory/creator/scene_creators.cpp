@@ -54,6 +54,12 @@ namespace scene
             else
                 scene_params.aggregate = create_native_aggregate();
 
+            std::vector<std::shared_ptr<const Entity>> const_entities;
+            const_entities.reserve(scene_params.entities.size());
+            for(auto ent : scene_params.entities)
+                const_entities.push_back(ent);
+            scene_params.aggregate->build(const_entities);
+
             return create_default_scene(scene_params);
         }
     };

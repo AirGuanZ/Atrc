@@ -1,6 +1,6 @@
 #include <QPropertyAnimation>
 
-#include <agz/editor/ui/collapsible.h>
+#include <agz/editor/ui/utility/collapsible.h>
 
 AGZ_EDITOR_BEGIN
 

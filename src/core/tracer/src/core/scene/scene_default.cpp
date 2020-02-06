@@ -69,17 +69,13 @@ public:
         if(envir_light_)
             lights_.push_back(params.envir_light.get());
 
-        std::vector<std::shared_ptr<const Entity>> const_entities;
-        const_entities.reserve(params.entities.size());
         for(auto &ent : params.entities)
         {
             if(auto light = ent->as_light())
                 lights_.push_back(light);
-            const_entities.push_back(ent);
         }
-        aggregate_ = params.aggregate;
-        params.aggregate->build(const_entities);
 
+        aggregate_ = params.aggregate;
         entities_ = params.entities;
     }
 

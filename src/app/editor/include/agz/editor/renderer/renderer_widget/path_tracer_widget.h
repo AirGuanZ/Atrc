@@ -15,6 +15,8 @@ public:
 
     explicit PathTracerWidget(QWidget *parent);
 
+    ~PathTracerWidget();
+
     std::unique_ptr<Renderer> create_renderer(std::shared_ptr<tracer::Scene> scene, const Vec2i &framebuffer_size) const override;
 
 private:

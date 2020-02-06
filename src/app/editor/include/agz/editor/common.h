@@ -11,6 +11,8 @@ AGZ_EDITOR_BEGIN
 
 using tracer::real;
 
+using tracer::PI_r;
+
 using tracer::Vec2;
 using tracer::Vec3;
 using tracer::Vec4;

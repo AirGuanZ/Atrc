@@ -20,7 +20,6 @@ ENDIF()
 ############## embree
 
 IF(USE_EMBREE)
-    ADD_DEFINITIONS(-DUSE_EMBREE)
     INCLUDE("${PROJECT_SOURCE_DIR}/cmake/cmake-embree") 
 ENDIF()
 

@@ -1,10 +1,11 @@
 #include <QFileDialog>
 #include <QMenuBar>
-#include <QMessageBox>
 #include <QTimer>
+#include <QWidgetAction>
 
 #include <agz/editor/editor.h>
 #include <agz/editor/renderer/renderer_widget.h>
+#include <agz/editor/ui/global_setting_widget.h>
 
 #include <agz/utility/file.h>
 
@@ -15,31 +16,62 @@ AGZ_EDITOR_BEGIN
 
 Editor::Editor()
 {
-#ifdef USE_EMBREE
-    tracer::init_embree_device();
-#endif
-
     init_menu_bar();
 
     init_panels();
 
     init_displayer();
 
+    init_resource_panel();
+
+    init_texture2d_pool();
+
     init_renderer_panel();
 
     init_camera_panel();
+
+    init_global_setting_widget();
 
     redistribute_panels();
 }
 
 Editor::~Editor()
 {
-    renderer_.reset();
-    scene_.reset();
+    scene_params_ = tracer::DefaultSceneParams();
 
-#ifdef USE_EMBREE
-    tracer::destroy_embree_device();
-#endif
+    renderer_.reset();
+    scene_   .reset();
+
+    delete texture2d_pool_;
+}
+
+void Editor::on_change_camera()
+{
+    if(!scene_)
+        return;
+
+    std::thread destroy_renderer_thread([renderer = std::move(renderer_)](){ });
+    destroy_renderer_thread.detach();
+
+    scene_ = create_default_scene(scene_params_);
+    auto camera = displayer_->create_camera();
+    scene_->set_camera(camera);
+
+    launch_renderer();
+}
+
+void Editor::add_to_resource_panel(QWidget *widget)
+{
+    right_panel_->resource_tab_layout->addWidget(widget);
+    widget->hide();
+}
+
+void Editor::show_resource_panel(QWidget *widget)
+{
+    if(editing_rsc_widget_)
+        editing_rsc_widget_->hide();
+    widget->show();
+    editing_rsc_widget_ = widget;
 }
 
 void Editor::on_load_config()
@@ -89,19 +121,6 @@ void Editor::on_update_display()
     }
 }
 
-void Editor::on_change_camera()
-{
-    if(!scene_)
-        return;
-
-    renderer_.reset();
-    
-    auto camera = displayer_->create_camera();
-    scene_->set_camera(camera);
-
-    launch_renderer();
-}
-
 void Editor::on_change_renderer()
 {
     if(!scene_)
@@ -126,16 +145,11 @@ void Editor::init_panels()
 
     left_panel_    = new QFrame(hori_splitter_);
     vert_splitter_ = new QSplitter(hori_splitter_);
-    right_panel_   = new QFrame(hori_splitter_);
+
+    right_panel_ = new RightPanel(hori_splitter_);
 
     left_panel_->setFrameShape(QFrame::Box);
     left_panel_->setFrameShadow(QFrame::Shadow::Sunken);
-
-    right_panel_->setFrameShape(QFrame::Box);
-    right_panel_->setFrameShadow(QFrame::Shadow::Sunken);
-
-    right_panel_layout_ = new QVBoxLayout(right_panel_);
-    right_panel_layout_->setAlignment(Qt::AlignTop);
 
     hori_splitter_->setOrientation(Qt::Horizontal);
     hori_splitter_->addWidget(left_panel_);
@@ -158,7 +172,7 @@ void Editor::init_panels()
 
 void Editor::init_displayer()
 {
-    displayer_ = new Displayer(up_panel_);
+    displayer_ = new Displayer(up_panel_, this);
     connect(displayer_, &Displayer::need_to_recreate_camera, [=] { on_change_camera(); });
 
     QVBoxLayout *up_panel_layout = new QVBoxLayout(up_panel_);
@@ -170,10 +184,25 @@ void Editor::init_displayer()
     update_display_timer_->start();
 }
 
+void Editor::init_resource_panel()
+{
+    // TODO
+}
+
+void Editor::init_texture2d_pool()
+{
+    init_texture2d_factory(texture2d_factory_);
+
+    texture2d_pool_ = new Texture2DPool(texture2d_factory_, this);
+
+    QVBoxLayout *down_layout = new QVBoxLayout(down_panel_);
+    down_layout->addWidget(texture2d_pool_->get_widget());
+}
+
 void Editor::init_renderer_panel()
 {
-    renderer_panel_ = new RendererPanel(right_panel_, "Path Tracer");
-    right_panel_layout_->addWidget(renderer_panel_);
+    renderer_panel_ = new RendererPanel(right_panel_->renderer_tab, "Path Tracer");
+    right_panel_->renderer_tab_layout->addWidget(renderer_panel_);
 
     connect(renderer_panel_, &RendererPanel::change_renderer_params, [=] { on_change_renderer(); });
     connect(renderer_panel_, &RendererPanel::change_renderer_type, [=] { on_change_renderer(); });
@@ -181,19 +210,37 @@ void Editor::init_renderer_panel()
 
 void Editor::init_camera_panel()
 {
-    camera_panel_ = displayer_->get_camera_panel();
-    right_panel_layout_->addWidget(camera_panel_);
+    right_panel_->camera_tab_layout->addWidget(displayer_->get_camera_panel());
+}
+
+void Editor::init_global_setting_widget()
+{
+    QWidgetAction *action = new QWidgetAction(this);
+    GlobalSettingWidget *global_setting = new GlobalSettingWidget(this);
+    action->setDefaultWidget(global_setting);
+    menuBar()->addMenu("Global Settings")->addAction(action);
+
+    connect(global_setting->camera_rotate_speed, &QSlider::valueChanged,
+        [=](int v)
+    {
+        const real speed = real(0.001) * v / 10;
+        global_setting->display_camera_rotate_speed->setText(QString::number(100 * speed, 'g', 2));
+        displayer_->set_camera_rotate_speed(speed);
+    });
+
+    global_setting->camera_rotate_speed->setRange(1, 100);
+    global_setting->camera_rotate_speed->setValue(40);
 }
 
 void Editor::redistribute_panels()
 {
-    auto ver_init_height = (std::max)(displayer_->minimumSizeHint().height(),
-                                   down_panel_->minimumSizeHint().height());
+    const int ver_init_height = (std::max)(displayer_->minimumSizeHint().height(),
+                                     down_panel_->minimumSizeHint().height());
     vert_splitter_->setSizes(QList<int>({ 2 * ver_init_height, ver_init_height }));
 
-    auto hor_init_width = (std::max)((std::max)(left_panel_->minimumSizeHint().width(),
-        right_panel_->minimumSizeHint().width()),
-        vert_splitter_->minimumSizeHint().width());
+    const int hor_init_width = math::max3(left_panel_->minimumSizeHint().width(),
+                                          right_panel_->minimumSizeHint().width(),
+                                          vert_splitter_->minimumSizeHint().width());
     hori_splitter_->setSizes(QList<int>({ hor_init_width, 2 * hor_init_width, hor_init_width }));
 }
 
@@ -202,7 +249,7 @@ void Editor::load_config(const std::string &input_filename)
     using namespace tracer;
 
     renderer_.reset();
-    scene_.reset();
+    scene_   .reset();
 
     factory::BasicPathMapper path_mapper;
     {
@@ -225,7 +272,46 @@ void Editor::load_config(const std::string &input_filename)
     displayer_->load_camera_from_config(root_params.child_group("rendering").child_group("camera"));
     auto camera = displayer_->create_camera();
 
-    scene_ = context.create<Scene>(scene_config);
+    {
+        scene_params_ = DefaultSceneParams();
+
+        if(auto ent_arr = scene_config.find_child_array("entities"))
+        {
+            if(ent_arr->size() == 1)
+                AGZ_INFO("creating 1 entity");
+            else
+                AGZ_INFO("creating {} entities", ent_arr->size());
+
+            for(size_t i = 0; i < ent_arr->size(); ++i)
+            {
+                auto &group = ent_arr->at_group(i);
+                if(stdstr::ends_with(group.child_str("type"), "//"))
+                {
+                    AGZ_INFO("skip entity with type ending with //");
+                    continue;
+                }
+
+                auto ent = context.create<Entity>(group);
+                scene_params_.entities.push_back(ent);
+            }
+        }
+
+        if(auto group = scene_config.find_child_group("env"))
+            scene_params_.envir_light = context.create<EnvirLight>(*group);
+
+        if(auto group = scene_config.find_child_group("aggregate"))
+            scene_params_.aggregate = context.create<Aggregate>(*group);
+        else
+            scene_params_.aggregate = create_native_aggregate();
+
+        std::vector<std::shared_ptr<const Entity>> const_entities;
+        const_entities.reserve(scene_params_.entities.size());
+        for(auto ent : scene_params_.entities)
+            const_entities.push_back(ent);
+        scene_params_.aggregate->build(const_entities);
+    }
+
+    scene_ = create_default_scene(scene_params_);
     scene_->set_camera(camera);
 
     launch_renderer();
@@ -253,12 +339,10 @@ void Editor::launch_renderer()
     const int film_height = displayer_->size().height();
 
     scene_->start_rendering();
+
     renderer_ = renderer_panel_->create_renderer(scene_, { film_width, film_height });
-
-    connect(renderer_.get(), &Renderer::can_get_img, this, &Editor::on_update_display);
-
-    renderer_->start();
-
+    set_display_image(renderer_->start());
+    
     update_display_timer_->start();
 }
 

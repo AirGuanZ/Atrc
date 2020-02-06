@@ -24,18 +24,11 @@
     <rect>
      <x>9</x>
      <y>9</y>
-     <width>651</width>
-     <height>511</height>
+     <width>661</width>
+     <height>162</height>
     </rect>
    </property>
-   <layout class="QFormLayout" name="formLayout">
-    <item row="0" column="0">
-     <widget class="QLabel" name="label">
-      <property name="text">
-       <string>sample count  </string>
-      </property>
-     </widget>
-    </item>
+   <layout class="QGridLayout" name="gridLayout">
     <item row="0" column="1">
      <widget class="QSpinBox" name="sample_count_spinbox">
       <property name="sizePolicy">
@@ -44,20 +37,36 @@
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
+      <property name="buttonSymbols">
+       <enum>QAbstractSpinBox::NoButtons</enum>
+      </property>
       <property name="minimum">
        <number>1</number>
       </property>
      </widget>
     </item>
-    <item row="1" column="0">
-     <widget class="QLabel" name="label_2">
+    <item row="2" column="0">
+     <widget class="QLabel" name="label_3">
       <property name="text">
-       <string>occlusion distance  </string>
+       <string>Background Color</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="1">
+     <widget class="QPushButton" name="low_color">
+      <property name="text">
+       <string/>
+      </property>
+      <property name="flat">
+       <bool>true</bool>
       </property>
      </widget>
     </item>
     <item row="1" column="1">
      <widget class="QDoubleSpinBox" name="occlusion_distance_spinbox">
+      <property name="buttonSymbols">
+       <enum>QAbstractSpinBox::NoButtons</enum>
+      </property>
       <property name="decimals">
        <number>4</number>
       </property>
@@ -75,27 +84,6 @@
       </property>
      </widget>
     </item>
-    <item row="2" column="0">
-     <widget class="QLabel" name="label_3">
-      <property name="text">
-       <string>background color  </string>
-      </property>
-     </widget>
-    </item>
-    <item row="3" column="0">
-     <widget class="QLabel" name="label_4">
-      <property name="text">
-       <string>low  </string>
-      </property>
-     </widget>
-    </item>
-    <item row="4" column="0">
-     <widget class="QLabel" name="label_5">
-      <property name="text">
-       <string>high  </string>
-      </property>
-     </widget>
-    </item>
     <item row="2" column="1">
      <widget class="QPushButton" name="background_color">
       <property name="text">
@@ -106,13 +94,10 @@
       </property>
      </widget>
     </item>
-    <item row="3" column="1">
-     <widget class="QPushButton" name="low_color">
+    <item row="0" column="0">
+     <widget class="QLabel" name="label">
       <property name="text">
-       <string/>
-      </property>
-      <property name="flat">
-       <bool>true</bool>
+       <string>Sample Count</string>
       </property>
      </widget>
     </item>
@@ -123,6 +108,27 @@
       </property>
       <property name="flat">
        <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QLabel" name="label_2">
+      <property name="text">
+       <string>Occlusion Distance</string>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="0">
+     <widget class="QLabel" name="label_5">
+      <property name="text">
+       <string>High Color</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="0">
+     <widget class="QLabel" name="label_4">
+      <property name="text">
+       <string>Low Color</string>
       </property>
      </widget>
     </item>

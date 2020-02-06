@@ -74,11 +74,11 @@ AOWidget::AOWidget(QWidget *parent)
 
 std::unique_ptr<Renderer> AOWidget::create_renderer(std::shared_ptr<tracer::Scene> scene, const Vec2i &framebuffer_size) const
 {
-    AOParams params = {
+    const AO::Params params = {
+        -2, 32, ao_sample_count_, occlusion_distance_,
         qcolor_to_spectrum(background_color_),
         qcolor_to_spectrum(low_color_),
         qcolor_to_spectrum(high_color_),
-        -1, ao_sample_count_, occlusion_distance_
     };
     return std::make_unique<AO>(params, framebuffer_size.x, framebuffer_size.y, std::move(scene));
 }

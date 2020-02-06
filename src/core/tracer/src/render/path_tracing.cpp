@@ -248,4 +248,46 @@ Pixel trace_ao(const AOParams &params, const Scene &scene, const Ray &ray, Sampl
     };
 }
 
+Pixel trace_albedo_ao(const AlbedoAOParams &params, const Scene &scene, const Ray &ray, Sampler &sampler, Arena &arena)
+{
+    Pixel pixel;
+
+    EntityIntersection inct;
+    if(!scene.closest_intersection(ray, &inct))
+    {
+        const EnvirLight *env = scene.envir_light();
+        pixel.value = env ? env->radiance(ray.o, ray.d) : Spectrum();
+        return pixel;
+    }
+
+    Spectrum le;
+    if(const AreaLight *light = inct.entity->as_light())
+        le = light->radiance(inct.pos, inct.geometry_coord.z, inct.wr);
+
+    const ShadingPoint shd = inct.material->shade(inct, arena);
+    const Spectrum albedo = shd.bsdf->albedo();
+
+    pixel.normal = inct.geometry_coord.z;
+    pixel.albedo = shd.bsdf->albedo();
+    pixel.denoise = inct.entity->get_no_denoise_flag() ? real(0) : real(1);
+
+    const Vec3 start_pos = inct.eps_offset(inct.geometry_coord.z);
+
+    real ao_factor = 0;
+    for(int i = 0; i < params.ao_sample_count; ++i)
+    {
+        const Sample2 sam = sampler.sample2();
+        const Vec3 local_dir = math::distribution::zweighted_on_hemisphere(sam.u, sam.v).first;
+        const Vec3 global_dir = inct.geometry_coord.local_to_global(local_dir).normalize();
+
+        const Vec3 end_pos = start_pos + global_dir * params.max_occlusion_distance;
+        if(scene.visible(start_pos, end_pos))
+            ao_factor += 1;
+    }
+    ao_factor /= params.ao_sample_count;
+
+    pixel.value = le + ao_factor * albedo;
+    return pixel;
+}
+
 AGZ_TRACER_RENDER_END

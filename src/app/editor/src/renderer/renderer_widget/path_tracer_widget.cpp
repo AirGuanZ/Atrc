@@ -18,10 +18,15 @@ PathTracerWidget::PathTracerWidget(QWidget *parent)
     ui_->min_depth_slider->setValue(min_depth_);
     ui_->max_depth_slider->setValue(max_depth_);
     ui_->cont_prob_slider->setValue(static_cast<int>(cont_prob_ * 10));
+
+    ui_->display_min_depth->setText(QString::number(min_depth_));
+    ui_->display_max_depth->setText(QString::number(max_depth_));
+    ui_->display_cont_prob->setText(QString::number(cont_prob_));
     
     connect(ui_->min_depth_slider, &QSlider::valueChanged, [=](int value)
     {
         min_depth_ = value;
+        ui_->display_min_depth->setText(QString::number(value));
         if(min_depth_ > max_depth_)
             ui_->max_depth_slider->setValue(min_depth_);
         emit change_renderer_params();
@@ -30,6 +35,7 @@ PathTracerWidget::PathTracerWidget(QWidget *parent)
     connect(ui_->max_depth_slider, &QSlider::valueChanged, [=](int value)
     {
         max_depth_ = value;
+        ui_->display_max_depth->setText(QString::number(value));
         if(min_depth_ > max_depth_)
             ui_->min_depth_slider->setValue(max_depth_);
         emit change_renderer_params();
@@ -38,13 +44,22 @@ PathTracerWidget::PathTracerWidget(QWidget *parent)
     connect(ui_->cont_prob_slider, &QSlider::valueChanged, [=](int value)
     {
         cont_prob_ = value / real(10);
+        ui_->display_cont_prob->setText(QString::number(cont_prob_));
         emit change_renderer_params();
     });
 }
 
+PathTracerWidget::~PathTracerWidget()
+{
+    delete ui_;
+}
+
 std::unique_ptr<Renderer> PathTracerWidget::create_renderer(std::shared_ptr<tracer::Scene> scene, const Vec2i &framebuffer_size) const
 {
-    PathTracingParams params = { -1, min_depth_, max_depth_, cont_prob_ };
+    PathTracer::Params params = {
+        -2, 32,
+        min_depth_, max_depth_, cont_prob_,
+        ui_->fast_preview->isChecked() };
     return std::make_unique<PathTracer>(params, framebuffer_size.x, framebuffer_size.y, std::move(scene));
 }
 

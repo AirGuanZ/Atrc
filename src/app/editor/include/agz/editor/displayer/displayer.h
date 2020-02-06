@@ -7,13 +7,15 @@
 
 AGZ_EDITOR_BEGIN
 
+class Editor;
+
 class Displayer : public QLabel
 {
     Q_OBJECT
 
 public:
 
-    explicit Displayer(QWidget *parent);
+    Displayer(QWidget *parent, Editor *editor);
 
     void load_camera_from_config(const tracer::ConfigGroup &camera_params);
 
@@ -25,27 +27,68 @@ signals:
 
     void need_to_recreate_camera();
 
+    void update_camera_panel();
+
+public slots:
+
+    void set_camera_rotate_speed(real speed);
+
 protected:
+
+    void leaveEvent(QEvent *event) override;
 
     void resizeEvent(QResizeEvent *event) override;
 
+    void mousePressEvent(QMouseEvent *event) override;
+
+    void mouseMoveEvent(QMouseEvent *event) override;
+
+    void mouseReleaseEvent(QMouseEvent *event) override;
+
+    void wheelEvent(QWheelEvent *event) override;
+
 private:
+
+    static Vec2 pos_to_radian(const Vec3 &pos, const Vec3 &dst, const Vec3 &up);
+
+    static Vec3 radian_to_pos(const Vec2 &radian, const Vec3 &dst, real distance, const Vec3 up);
 
     struct DisplayerCameraParams
     {
-        Vec3d pos = Vec3d(-5, 0, 0);
-        Vec3d dst;
-        Vec3d up = Vec3d(0, 0, 1);
+        Vec2 radian;
+        real distance = 1;
 
-        double fov = 60;
+        Vec3 dst;
+        Vec3 up = Vec3(0, 0, 1);
 
-        double lens_radius = 0;
-        double focal_distance = 1;
+        real fov = 60;
+
+        real lens_radius = 0;
+        real focal_distance = 1;
     };
 
-    DisplayerCameraParams get_camera_params();
+    DisplayerCameraParams camera_params_;
 
     QPointer<CameraPanel> camera_panel_ = nullptr;
+
+    // camera controller state
+
+    enum class CameraState
+    {
+        Free,
+        Rotate,
+        Move
+
+    } camera_state_ = CameraState::Free;
+
+    Vec2i press_coord_;  // cursor coord when controller starts
+    Vec2  press_radian_; // camera direction when controller starts
+    Vec3  press_dst_;    // camera destination when controller starts
+
+    real rotate_speed_  = real(0.0025);
+    real panning_speed_ = real(0.001);
+    
+    Editor *editor_;
 };
 
 AGZ_EDITOR_END

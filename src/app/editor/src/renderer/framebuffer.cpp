@@ -5,19 +5,14 @@
 
 AGZ_EDITOR_BEGIN
 
-Framebuffer::Framebuffer(int width, int height, int init_task_size)
+Framebuffer::Framebuffer(int width, int height, int task_grid_size)
+    : width_(width), height_(height), task_grid_size_(task_grid_size)
 {
-    width_  = width;
-    height_ = height;
-
-    can_get_img_ = false;
-
     value_      = Image2D<Spectrum>(height, width);
     weight_     = Image2D<real>(height, width);
     pixel_size_ = Image2D<int>(height, width);
 
-    init_task_size_ = init_task_size;
-    rebuild_task_queue();
+    build_task_queue();
 
     exit_ = false;
 }
@@ -33,7 +28,7 @@ void Framebuffer::start()
 {
     output_updater_thread_ = std::thread([this]
     {
-        constexpr std::chrono::milliseconds wait_ms(30);
+        constexpr std::chrono::milliseconds wait_ms(50);
 
         while(!exit_)
         {
@@ -46,11 +41,6 @@ void Framebuffer::start()
                 {
                     std::lock_guard lk(output_mutex_);
                     output_.swap(new_output);
-                }
-                if(!can_get_img_)
-                {
-                    can_get_img_ = true;
-                    emit can_get_img();
                 }
             }
         }
@@ -76,7 +66,6 @@ int Framebuffer::get_tasks(int expected_task_count, std::vector<Task> &tasks)
         new_task.full_res    = top.full_res;
         new_task.pixel_range = top.pixel_range;
         new_task.pixel_size  = top.pixel_size;
-        new_task.iter        = top.iter;
         new_task.spp         = top.spp;
 
         tasks.push_back(std::move(new_task));
@@ -106,8 +95,7 @@ void Framebuffer::merge_tasks(int task_count, Task *tasks)
 
             if(task.pixel_size == 1)
             {
-                task.spp = (std::min)(task.spp + 1, 8);
-                ++task.iter;
+                task.spp = (std::min)(task.spp + 1, 16);
                 tasks_.push_back(std::move(task));
                 continue;
             }
@@ -133,7 +121,6 @@ void Framebuffer::merge_tasks(int task_count, Task *tasks)
             new_task.full_res     = { real(width_) / new_pixel_size, real(height_) / new_pixel_size };
             new_task.pixel_range  = { { new_x_min, new_y_min }, { new_x_max, new_y_max } };
             new_task.pixel_size   = task.pixel_size / 2;
-            new_task.iter         = task.iter + 1;
             new_task.spp          = 1;
 
             tasks_.push_back(std::move(new_task));
@@ -143,13 +130,10 @@ void Framebuffer::merge_tasks(int task_count, Task *tasks)
 
 Image2D<math::color3b> Framebuffer::get_image() const
 {
-    {
-        std::lock_guard lk(output_mutex_);
-        if(output_.is_available())
-            return output_;
-    }
-
-    return {}; // compute_image();
+    std::lock_guard lk(output_mutex_);
+    if(output_.is_available())
+        return output_;
+    return {};
 }
 
 Vec2i Framebuffer::get_resolution() const noexcept
@@ -195,32 +179,45 @@ void Framebuffer::merge_single_task(const Task &task)
 {
     if(task.pixel_size == 1)
     {
-        for(int y = task.pixel_range.low.y, ly = 0; y <= task.pixel_range.high.y; ++y, ++ly)
-        {
-            for(int x = task.pixel_range.low.x, lx = 0; x <= task.pixel_range.high.x; ++x, ++lx)
-            {
-                if(pixel_size_(y, x) != 1)
-                {
-                    value_(y, x)  = task.grid->value(ly, lx);
-                    weight_(y, x) = task.grid->weight(ly, lx);
-
-                    assert(task.spp == 1);
-                    pixel_size_(y, x) = 1;
-                }
-                else
-                {
-                    value_(y, x) += task.grid->value(ly, lx);
-                    weight_(y, x) += task.grid->weight(ly, lx);
-                }
-            }
-        }
+        merge_full_res_task(task);
         return;
     }
+    merge_partial_res_task(task);
+}
 
+void Framebuffer::merge_full_res_task(const Task &task)
+{
+    assert(task.pixel_size == 1);
+
+    for(int y = task.pixel_range.low.y, ly = 0; y <= task.pixel_range.high.y; ++y, ++ly)
+    {
+        for(int x = task.pixel_range.low.x, lx = 0; x <= task.pixel_range.high.x; ++x, ++lx)
+        {
+            if(pixel_size_(y, x) != 1)
+            {
+                value_(y, x)  = task.grid->value(ly, lx);
+                weight_(y, x) = task.grid->weight(ly, lx);
+
+                assert(task.spp == 1);
+                pixel_size_(y, x) = 1;
+            }
+            else
+            {
+                value_(y, x)  += task.grid->value(ly, lx);
+                weight_(y, x) += task.grid->weight(ly, lx);
+            }
+        }
+    }
+}
+
+void Framebuffer::merge_partial_res_task(const Task &task)
+{
     int y_base = task.pixel_range.low.y * task.pixel_size;
+
     for(int ly = 0; ly < task.grid->value.height(); ++ly)
     {
         int x_base = task.pixel_range.low.x * task.pixel_size;
+
         for(int lx = 0; lx < task.grid->value.width(); ++lx)
         {
             for(int y_offset = 0; y_offset < task.pixel_size; ++y_offset)
@@ -249,32 +246,32 @@ void Framebuffer::merge_single_task(const Task &task)
     }
 }
 
-void Framebuffer::rebuild_task_queue()
+void Framebuffer::build_task_queue()
 {
     // assert(queue_mutex is locked);
 
-    const int x_task_count = (width_ + init_task_size_ - 1) / init_task_size_;
-    const int y_task_count = (height_ + init_task_size_ - 1) / init_task_size_;
+    const int x_task_count = (width_ + task_grid_size_ - 1) / task_grid_size_;
+    const int y_task_count = (height_ + task_grid_size_ - 1) / task_grid_size_;
 
     std::vector<Task> tasks;
     tasks.reserve(x_task_count * y_task_count);
 
     for(int y = 0; y < y_task_count; ++y)
     {
-        const int y_min = y * init_task_size_;
+        const int y_min = y * task_grid_size_;
         
         for(int x = 0; x < x_task_count; ++x)
         {
-            const int x_min = x * init_task_size_;
+            const int x_min = x * task_grid_size_;
             
             int x_low = x_min;
             int y_low = y_min;
-            int x_rng = (std::min)(x_min + init_task_size_, width_) - x_min;
-            int y_rng = (std::min)(y_min + init_task_size_, height_) - y_min;
+            int x_rng = (std::min)(x_min + task_grid_size_, width_) - x_min;
+            int y_rng = (std::min)(y_min + task_grid_size_, height_) - y_min;
 
             int pixel_size = 1;
 
-            for(int i = 0; i < 4; ++i)
+            for(int i = 0; i < 3; ++i)
             {
                 if(x_rng <= 1 || y_rng <= 1 || (x_low & 1) || (x_rng & 1) || (y_low & 1) || (y_rng & 1))
                     break;
@@ -293,7 +290,6 @@ void Framebuffer::rebuild_task_queue()
             task.full_res      = { real(width_) / pixel_size, real(height_) / pixel_size };
             task.pixel_range   = { { x_low, y_low }, { x_low + x_rng - 1, y_low + y_rng - 1} };
             task.pixel_size    = pixel_size;
-            task.iter          = 1;
             task.spp           = 1;
 
             tasks.push_back(std::move(task));
