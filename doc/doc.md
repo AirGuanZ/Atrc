@@ -654,10 +654,9 @@ Heterogeneous media defined based on 3D textures
 
 Image based lighting
 
-| Field Name | Type      | Default Value | Explanation                                 |
-| ---------- | --------- | ------------- | ------------------------------------------- |
-| tex        | Texture2D |               | texture object describing radiance          |
-| up         | Vec3      | [ 0, 0, 1 ]   | which direction is "above", default is $+z$ |
+| Field Name | Type      | Default Value | Explanation                        |
+| ---------- | --------- | ------------- | ---------------------------------- |
+| tex        | Texture2D |               | texture object describing radiance |
 
 **native_sky**
 
@@ -665,11 +664,10 @@ Image based lighting
 
 Environment light that represents a sky with a gradient of color from top to bottom.
 
-| Field Name | Type     | Default Value | Explanation                                                  |
-| ---------- | -------- | ------------- | ------------------------------------------------------------ |
-| top        | Spectrum |               | top radiance                                                 |
-| bottom     | Spectrum |               | bottom radiance                                              |
-| up         | Vec3     | [ 0, 0, 1 ]   | describe which direction in the world space is "above", default is $+z$ |
+| Field Name | Type     | Default Value | Explanation     |
+| ---------- | -------- | ------------- | --------------- |
+| top        | Spectrum |               | top radiance    |
+| bottom     | Spectrum |               | bottom radiance |
 
 ### Post Processor
 

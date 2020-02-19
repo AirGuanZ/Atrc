@@ -19,3 +19,13 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+/////////////////////////////////// libs ///////////////////////////////////
+
+avir          ./lib/misc/LICENSE-avir
+cxxopts       ./lib/misc/LICENSE-cxxopts
+embree        ./lib/embree/LICENSE.txt
+im3d          ./lib/im3d/LICENSE
+nlohmann json ./lib/misc/LICENSE-json
+spdlog        ./lib/spdlog/LICENSE
+ubuntu font   ./src/editor/ui/style/darkstyle/UBUNTU-FONT-LICENSE

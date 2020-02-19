@@ -10,6 +10,7 @@ OPTION(USE_EMBREE              "use embree for finding triangle mesh intersectio
 OPTION(USE_OIDN                "use oidn denoiser"                                 OFF)
 OPTION(BUILD_GUI               "build graphics user interface"                     OFF)
 OPTION(BUILD_EDITOR            "build scene editor"                                OFF)
+OPTION(BUILD_CLI               "build cmd-line launcher"                           ON)
 
 ############## CXX properties
 
@@ -34,10 +35,17 @@ ENDIF()
 
 IF(BUILD_GUI OR BUILD_EDITOR)
     FIND_PACKAGE(Qt5 REQUIRED COMPONENTS Core Widgets)
-    SET_PROPERTY(GLOBAL PROPERTY AUTOGEN_SOURCE_GROUP auto_moc)
+    SET_PROPERTY(GLOBAL PROPERTY AUTOGEN_SOURCE_GROUP auto_gen)
     SET(CMAKE_AUTOMOC ON)
     SET(CMAKE_AUTOUIC ON)
     SET(CMAKE_AUTORCC ON)
+ENDIF()
+
+############## im3d
+
+IF(BUILD_EDITOR)
+    ADD_SUBDIRECTORY(lib/im3d)
+    SET_TARGET_PROPERTIES(Im3D PROPERTIES FOLDER "ThirdParty")
 ENDIF()
 
 ############## necessory submodules
@@ -48,13 +56,16 @@ ADD_SUBDIRECTORY(lib/spdlog)
 ADD_SUBDIRECTORY(lib/utility)
 SET_TARGET_PROPERTIES(spdlog AGZUtils PROPERTIES FOLDER "ThirdParty")
 
-ADD_SUBDIRECTORY(src/core/tracer)
-ADD_SUBDIRECTORY(src/app/cli)
+ADD_SUBDIRECTORY(src/tracer)
+
+IF(BUILD_CLI)
+    ADD_SUBDIRECTORY(src/cli)
+ENDIF()
 
 IF(BUILD_GUI)
-    ADD_SUBDIRECTORY(src/app/gui)
+    ADD_SUBDIRECTORY(src/gui)
 ENDIF()
 
 IF(BUILD_EDITOR)
-    ADD_SUBDIRECTORY(src/app/editor)
+    ADD_SUBDIRECTORY(src/editor)
 ENDIF()

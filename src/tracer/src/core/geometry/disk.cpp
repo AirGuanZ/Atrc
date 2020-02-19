@@ -1,0 +1,136 @@
+#include <agz/utility/misc.h>
+#include "./transformed_geometry.h"
+
+AGZ_TRACER_BEGIN
+
+class Disk : public TransformedGeometry
+{
+    real radius_ = 1;
+    real radius2_ = 1;
+
+    SurfacePoint to_local_surface_point(const Vec3 &pos, real radius) const noexcept
+    {
+        const real phi = local_angle::phi(pos);
+        const real u = phi / (2 * PI_r);
+        const real v = radius / radius_;
+
+        const Vec3 coord_x = Vec3(pos.x, pos.y, 0).normalize();
+        const Vec3 coord_z = Vec3(0, 0, 1);
+        const Vec3 coord_y = cross(coord_z, coord_x);
+
+        SurfacePoint ret;
+        ret.pos            = pos;
+        ret.uv             = Vec2(u, v);
+        ret.geometry_coord = Coord(coord_x, coord_y, coord_z);
+        ret.user_coord     = ret.geometry_coord;
+
+        return ret;
+    }
+
+public:
+
+    Disk(real radius, const Transform3 &transform)
+    {
+        AGZ_HIERARCHY_TRY
+
+        init_transform(transform);
+
+        if(radius <= 0)
+            throw ObjectConstructionException("invalid radius value: " + std::to_string(radius));
+        radius_ = radius;
+        radius2_ = radius * radius;
+
+        AGZ_HIERARCHY_WRAP("in initializing disk geometry object")
+    }
+
+    void update_param(std::string_view name, const std::any &value) override
+    {
+        if(name == "transform")
+            init_transform(std::any_cast<Transform3>(value));
+        else
+            throw ObjectConstructionException("unknown updated param: " + std::string(name));
+    }
+
+    bool has_intersection(const Ray &r) const noexcept override
+    {
+        const Ray local_r = to_local(r);
+        
+        const real t = -local_r.o.z / local_r.d.z;
+        if(std::isinf(t) || !local_r.between(t))
+            return false;
+
+        const Vec3 pnt = local_r.at(t);
+        const real radius2 = pnt.xy().length_square();
+        return radius2 <= radius2_;
+    }
+
+    bool closest_intersection(const Ray &r, GeometryIntersection *inct) const noexcept override
+    {
+        const Ray local_r = to_local(r);
+
+        const real t_val = -local_r.o.z / local_r.d.z;
+        if(std::isinf(t_val) || !local_r.between(t_val))
+            return false;
+
+        const Vec3 pos = local_r.at(t_val);
+        const real radius = pos.xy().length();
+        if(radius > radius_)
+            return false;
+
+        *static_cast<SurfacePoint*>(inct) = to_local_surface_point(pos, radius);
+        inct->wr = -local_r.d;
+        inct->t = t_val;
+
+        to_world(inct);
+        return true;
+    }
+
+    AABB world_bound() const noexcept override
+    {
+        const real vertical_size = (std::min)(real(0.1) * radius_, real(0.01));
+        const AABB local_bound = {
+            Vec3(-radius_, -radius_, -vertical_size),
+            Vec3(radius_, radius_, vertical_size)
+        };
+        return to_world(local_bound);
+    }
+
+    real surface_area() const noexcept override
+    {
+        return local_to_world_ratio_ * local_to_world_ratio_ * PI_r * radius2_;
+    }
+
+    SurfacePoint sample(real *pdf, const Sample3 &sam) const noexcept override
+    {
+        const Vec2 pos = radius_ * math::distribution::uniform_on_unit_disk(sam.u, sam.v);
+        *pdf = 1 / surface_area();
+
+        SurfacePoint ret = to_local_surface_point(Vec3(pos.x, pos.y, 0), pos.length());
+        to_world(&ret);
+
+        return ret;
+    }
+
+    real pdf(const Vec3 &) const noexcept override
+    {
+        return 1 / surface_area();
+    }
+
+    SurfacePoint sample(const Vec3&, real *pdf, const Sample3 &sam) const noexcept override
+    {
+        return sample(pdf, sam);
+    }
+
+    real pdf(const Vec3&, const Vec3 &sample) const noexcept override
+    {
+        return pdf(sample);
+    }
+};
+
+std::shared_ptr<Geometry> create_disk(
+    real radius, const Transform3 &local_to_world)
+{
+    return std::make_shared<Disk>(radius, local_to_world);
+}
+
+AGZ_TRACER_END

@@ -38,6 +38,6 @@ Volumetric Rendering (model ref [here](http://casual-effects.com/data/index.html
 
 ![4](./doc/gallery/4.png)
 
-Living Room (scene ref [here](http://casual-effects.com/data/index.html)):
+Scene Editor:
 
 ![5](./doc/gallery/5.png)

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>RightPanel</class>
+ <widget class="QWidget" name="RightPanel">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>598</width>
+    <height>479</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <widget class="QTabWidget" name="right_tab">
+   <property name="geometry">
+    <rect>
+     <x>4</x>
+     <y>9</y>
+     <width>401</width>
+     <height>291</height>
+    </rect>
+   </property>
+   <property name="currentIndex">
+    <number>2</number>
+   </property>
+   <widget class="QWidget" name="entity_tab">
+    <attribute name="title">
+     <string>Entity</string>
+    </attribute>
+   </widget>
+   <widget class="QWidget" name="resource_tab">
+    <attribute name="title">
+     <string>Resource</string>
+    </attribute>
+   </widget>
+   <widget class="QWidget" name="global_tab">
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <attribute name="title">
+     <string>Global</string>
+    </attribute>
+   </widget>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
