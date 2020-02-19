@@ -18,15 +18,15 @@ Offline rendering lab based on ray tracing
 
 ## Gallery
 
-Materials:
+Scene Editor:
 
 ![0](./doc/gallery/0.png)
 
-Fireplace Room (scene ref [here](http://casual-effects.com/data/index.html)):
+Materials:
 
 ![1](./doc/gallery/1.png)
 
-G-Buffer & Denoiser (model ref [here](http://graphics.stanford.edu/data/3Dscanrep/)):
+Fireplace Room (scene ref [here](http://casual-effects.com/data/index.html)):
 
 ![2](./doc/gallery/2.png)
 
@@ -38,6 +38,6 @@ Volumetric Rendering (model ref [here](http://casual-effects.com/data/index.html
 
 ![4](./doc/gallery/4.png)
 
-Scene Editor:
+G-Buffer & Denoiser (model ref [here](http://graphics.stanford.edu/data/3Dscanrep/)):
 
 ![5](./doc/gallery/5.png)
