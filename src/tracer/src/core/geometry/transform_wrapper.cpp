@@ -37,14 +37,6 @@ public:
         init_transform(local_to_world);
     }
 
-    void update_param(std::string_view name, const std::any &value) override
-    {
-        if(name == "transform")
-            init_transform(std::any_cast<Transform3>(value));
-        else
-            throw ObjectConstructionException("unknown updated param: " + std::string(name));
-    }
-
     bool has_intersection(const Ray &r) const noexcept override
     {
         const Ray local_r(
@@ -98,7 +90,7 @@ public:
 
     SurfacePoint sample(const Vec3 &ref, real *pdf, const Sample3 &sam) const noexcept override
     {
-        SurfacePoint spt = internal_->sample(ref, pdf, sam);
+        SurfacePoint spt = internal_->sample(local_to_world_.apply_inverse_to_point(ref), pdf, sam);
 
         spt.pos            = local_to_world_.apply_to_point(spt.pos);
         spt.geometry_coord = local_to_world_.apply_to_coord(spt.geometry_coord);
@@ -111,12 +103,15 @@ public:
 
     real pdf(const Vec3 &pos) const noexcept override
     {
-        return internal_->pdf(pos) / (scale_ratio_ * scale_ratio_);
+        return internal_->pdf(local_to_world_.apply_inverse_to_point(pos)) / (scale_ratio_ * scale_ratio_);
     }
 
     real pdf(const Vec3 &ref, const Vec3 &pos) const noexcept override
     {
-        return internal_->pdf(ref, pos) / (scale_ratio_ * scale_ratio_);
+        return internal_->pdf(
+            local_to_world_.apply_inverse_to_point(ref),
+            local_to_world_.apply_inverse_to_point(pos))
+            / (scale_ratio_ * scale_ratio_);
     }
 };
 

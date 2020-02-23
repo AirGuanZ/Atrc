@@ -15,8 +15,6 @@ public:
 
     virtual ~Geometry() = default;
 
-    virtual void update_param(std::string_view name, const std::any &value) = 0;
-
     /**
      * @brief is there an intersection with given ray
      */

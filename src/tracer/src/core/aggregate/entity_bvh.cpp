@@ -166,17 +166,16 @@ public:
 
     explicit EntityBVH(int max_leaf_size)
     {
-        AGZ_HIERARCHY_TRY
-
         max_leaf_size_ = max_leaf_size;
         if(max_leaf_size < 1)
             throw ObjectConstructionException("invalid max_leaf_size value");
-      
-        AGZ_HIERARCHY_WRAP("in initializing entity bvh aggregate")
     }
 
     void build(const std::vector<std::shared_ptr<const Entity>> &entities) override
     {
+        nodes_.clear();
+        prims_.clear();
+
         if(entities.empty())
         {
             nodes_.emplace_back(Leaf{ AABB{ Vec3(0), Vec3(1) }, 0, 0 });

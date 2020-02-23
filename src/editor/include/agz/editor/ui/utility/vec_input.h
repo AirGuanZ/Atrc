@@ -63,9 +63,35 @@ public:
 
     Vec3 get_value() const;
 
+    void set_alignment(Qt::Alignment alignment);
+
 signals:
 
     void edit_value(const Vec3 &new_value);
+
+private:
+
+    QLineEdit *edit_ = nullptr;
+    std::unique_ptr<Vec3Validator> validator_;
+};
+
+class SpectrumInput : public QWidget
+{
+    Q_OBJECT
+
+public:
+
+    explicit SpectrumInput(QWidget *parent = nullptr);
+
+    void set_value(const Spectrum &value);
+
+    Spectrum get_value() const;
+
+    void set_alignment(Qt::Alignment alignment);
+
+signals:
+
+    void edit_value(const Spectrum &new_value);
 
 private:
 

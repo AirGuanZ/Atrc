@@ -5,7 +5,6 @@
 #include <agz/tracer/core/camera.h>
 #include <agz/tracer/core/entity.h>
 #include <agz/tracer/core/film_filter.h>
-#include <agz/tracer/core/fresnel.h>
 #include <agz/tracer/core/geometry.h>
 #include <agz/tracer/core/intersection.h>
 #include <agz/tracer/core/light.h>
@@ -26,7 +25,6 @@
 #include <agz/tracer/factory/raw/entity.h>
 #include <agz/tracer/factory/raw/envir_light.h>
 #include <agz/tracer/factory/raw/film_filter.h>
-#include <agz/tracer/factory/raw/fresnel.h>
 #include <agz/tracer/factory/raw/geometry.h>
 #include <agz/tracer/factory/raw/material.h>
 #include <agz/tracer/factory/raw/medium.h>
@@ -40,6 +38,7 @@
 
 #include <agz/tracer/render/bidir_path_tracing.h>
 #include <agz/tracer/render/direct_illum.h>
+#include <agz/tracer/render/particle_tracing.h>
 #include <agz/tracer/render/path_tracing.h>
 
 #include <agz/tracer/utility/config.h>

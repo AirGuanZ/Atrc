@@ -1,6 +1,6 @@
 # Atrc Renderer Documentation
 
-![pic](./gallery/0.png)
+![pic](./gallery/1.png)
 
 [TOC]
 
@@ -25,18 +25,18 @@
 需额外准备的依赖项如下：
 
 * [oidn 1.1.0](https://openimagedenoise.github.io/)，基于机器学习的降噪滤波器（仅在启动了`USE_OIDN`选项时需要）
-* Qt5 （仅在启用了`BUILD_GUI`或`BUILD_SCENE_EDITOR`选项时需要）
+* Qt5 （仅在启用了`BUILD_GUI`或`BUILD_EDITOR`选项时需要）
 
 在Windows下使用MSVC时，将[oidn-1.1.0.x64.vc14.windows.zip](https://github.com/OpenImageDenoise/oidn/releases/download/v1.1.0/oidn-1.1.0.x64.vc14.windows.zip)中的所有文件拷贝到`lib/oidn/vc14`中；使用linux时，将[oidn-1.1.0.x86_64.linux.tar.gz](https://github.com/OpenImageDenoise/oidn/releases/download/v1.1.0/oidn-1.1.0.x86_64.linux.tar.gz)中的所有文件拷贝到`lib/oidn/linux`中。详情可参考`cmake/cmake-oidn`。
 
 ### CMake Options
 
-| 选项名             | 默认值 | 含义             |
-| ------------------ | ------ | ---------------- |
-| USE_EMBREE         | OFF    | 启用Embree加速器 |
-| USE_OIDN           | OFF    | 启用OIDN降噪器   |
-| BUILD_GUI          | OFF    | 启用GUI启动器    |
-| BUILD_SCENE_EDITOR | OFF    | 启用场景编辑器   |
+| 选项名       | 默认值 | 含义             |
+| ------------ | ------ | ---------------- |
+| USE_EMBREE   | OFF    | 启用Embree加速器 |
+| USE_OIDN     | OFF    | 启用OIDN降噪器   |
+| BUILD_GUI    | OFF    | 启用GUI启动器    |
+| BUILD_EDITOR | OFF    | 启用场景编辑器   |
 
 注意到OIDN只支持64位程序，因此若启用了OIDN库，必须以64位模式构建程序。
 
@@ -55,7 +55,7 @@
    ```powershell
    mkdir build
    cd build
-   cmake -DUSE_EMBREE=ON -DUSE_OIDN=ON -DBUILD_GUI=ON -DBUILD_SCENE_EDITOR=ON -DQt5_DIR="../../Qt5" -G "Visual Studio 15 2017 Win64" ..
+   cmake -DUSE_EMBREE=ON -DUSE_OIDN=ON -DBUILD_GUI=ON -DBUILD_EDITOR=ON -DQt5_DIR="../../Qt5" -G "Visual Studio 15 2017 Win64" ..
    ```
 
 这会在`Atrc/build`下生成`Visual Studio 2017`的解决方案文件。
@@ -335,33 +335,6 @@ Gaussian滤波函数。
 | radius | real |        | 滤波函数非零半径，单位为像素 |
 | alpha  | real |        | gaussian函数参数$\alpha$     |
 
-### Fresnel
-
-表示物体表面材质中的fresnel项。
-
-**always_one**
-
-值永远为1的fresnel项，表示能量的反射/折射比为$\infty$。
-
-**dielectric**
-
-电介质的fresnel项。
-
-| 字段名  | 类型      | 默认值  | 含义       |
-| ------- | --------- | ------- | ---------- |
-| eta_out | Texture2D | all_one | 外部折射率 |
-| eta_in  | Texture2D |         | 内部折射率 |
-
-**conductor**
-
-导体的fresnel项
-
-| 字段名  | 类型      | 默认值  | 含义       |
-| ------- | --------- | ------- | ---------- |
-| eta_out | Texture2D | all_one | 外部折射率 |
-| eta_in  | Texture2D |         | 内部折射率 |
-| k       | Texture2D |         | 吸收率     |
-
 ### Geometry
 
 用于描述物体的几何形状。
@@ -511,11 +484,11 @@ Disney Principled BSDF，具体可参考[原文](https://blog.selfshadow.com/pub
 
 磨砂玻璃材质，详情请参考[Microfacet Models for Refraction through Rough Surfaces](https://www.cs.cornell.edu/~srm/publications/EGSR07-btdf.html)。
 
-| 字段名    | 类型      | 默认值 | 含义      |
-| --------- | --------- | ------ | --------- |
-| color_map | Texture2D |        | 表面颜色  |
-| fresnel   | Fresnel   |        | Fresnel项 |
-| roughness | Texture2D |        | 粗糙度    |
+| 字段名    | 类型      | 默认值 | 含义           |
+| --------- | --------- | ------ | -------------- |
+| color_map | Texture2D |        | 表面颜色       |
+| ior       | Texture2D |        | 内外折射率之比 |
+| roughness | Texture2D |        | 粗糙度         |
 
 **glass**
 
@@ -523,12 +496,13 @@ Disney Principled BSDF，具体可参考[原文](https://blog.selfshadow.com/pub
 
 光滑玻璃材质。
 
-| 字段名               | 类型      | 默认值 | 含义      |
-| -------------------- | --------- | ------ | --------- |
-| color_map            | Texture2D |        | 表面颜色  |
-| color_reflection_map | Texture2D |        | 反射颜色  |
-| color_refraction_map | Texture2D |        | 折射颜色  |
-| fresnel              | Fresnel   |        | Fresnel项 |
+| 字段名               | 类型      | 默认值 | 含义              |
+| -------------------- | --------- | ------ | ----------------- |
+| color_map            | Texture2D |        | 表面颜色          |
+| color_reflection_map | Texture2D |        | 反射颜色          |
+| color_refraction_map | Texture2D |        | 折射颜色          |
+| eta                  | Texture2D |        | 内外折射率之比    |
+| k                    | Texture2D |        | 吸收率/外部折射率 |
 
 提供两种颜色指定方式：
 
@@ -559,7 +533,7 @@ Disney Principled BSDF，具体可参考[原文](https://blog.selfshadow.com/pub
 | 字段名  | 类型    | 默认值 | 含义      |
 | ------- | ------- | ------ | --------- |
 | color_map  | Texture2D |        | 表面颜色  |
-| fresnel | Fresnel |        | Fresnel项 |
+| ior | Texture2D |        | 内外折射率之比 |
 
 **mtl**
 
@@ -602,6 +576,22 @@ Disney Principled BSDF，具体可参考[原文](https://blog.selfshadow.com/pub
 | eta_in   | Texture2D |         | 清漆内部的折射率 |
 | eta_out  | Texture2D | all_one | 清漆外部的折射率 |
 | color    | Texture2D |         | 清漆颜色         |
+
+**phong**
+
+光照模型：
+$$
+\begin{aligned}f_r(\omega_i, x, \omega_o) &= \frac d {\pi} + \frac{sD}{4\cos\langle\omega_i, n_x\rangle\cos\langle \omega_o, n_x\rangle} \\D &= \frac{e + 1}{2\pi}\cos^e\langle\omega_h, n_x\rangle \\\omega_h &= \mathrm{normalize}(\mathrm{normalize}(\omega_i) + \mathrm{normalize}(\omega_o))\end{aligned}
+$$
+其中，$\omega_i$是入射方向，$\omega_o$是出射方向，$x$是反射点，$d$是漫反射强度，$s$是高光强度，$e$是高光光滑度，$n_x$是$x$点的法向量。
+
+*NOTE*. Atrc会自动对$d$和$s$进行等比例缩放，以确保反射能量不会超过入射能量。
+
+| 字段名 | 类型      | 默认值 | 含义       |
+| ------ | --------- | ------ | ---------- |
+| d      | Texture2D |        | 漫反射颜色 |
+| s      | Texture2D |        | 高光颜色   |
+| ns     | Texture2D |        | 高光光泽度 |
 
 **invisible_surface**
 

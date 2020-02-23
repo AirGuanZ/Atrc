@@ -22,8 +22,6 @@ public:
 
     using MeshID = int;
 
-    using QOpenGLWidget::QOpenGLWidget;
-
     DisplayerGLWidget();
 
     ~DisplayerGLWidget();
@@ -42,7 +40,7 @@ public:
 
     void set_selected_mesh(MeshID id);
 
-    void set_background_image(const QImage &img);
+    void set_background_image(const Image2D<Spectrum> &img);
 
     bool is_in_realtime_mode() const;
 
@@ -99,6 +97,8 @@ private:
     QMatrix4x4 proj_view_;
 
     // im3d
+
+    bool cursor_moved_ = false;
 
     GizmoSelector *gizmo_selector_ = nullptr;
 

@@ -3,7 +3,6 @@
 #include <agz/tracer/factory/creator/entity_creators.h>
 #include <agz/tracer/factory/creator/envir_light_creators.h>
 #include <agz/tracer/factory/creator/film_filter_creators.h>
-#include <agz/tracer/factory/creator/fresnel_creators.h>
 #include <agz/tracer/factory/creator/geometry_creators.h>
 #include <agz/tracer/factory/creator/material_creators.h>
 #include <agz/tracer/factory/creator/medium_creators.h>
@@ -24,7 +23,6 @@ CreatingContext::CreatingContext()
         Factory<Entity>               ("entity"),
         Factory<EnvirLight>           ("envir_light"),
         Factory<FilmFilter>           ("film_filter"),
-        Factory<Fresnel>              ("fresnel"),
         Factory<Geometry>             ("geometry"),
         Factory<Material>             ("material"),
         Factory<Medium>               ("medium"),
@@ -45,7 +43,6 @@ CreatingContext::CreatingContext()
     initialize_entity_factory                 (factory<Entity>());
     initialize_envir_light_factory            (factory<EnvirLight>());
     initialize_film_filter_factory            (factory<FilmFilter>());
-    initialize_fresnel_factory                (factory<Fresnel>());
     initialize_geometry_factory               (factory<Geometry>());
     initialize_material_factory               (factory<Material>());
     initialize_medium_factory                 (factory<Medium>());

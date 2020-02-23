@@ -14,11 +14,6 @@ public:
         internal_ = internal;
     }
 
-    void update_param(std::string_view name, const std::any &value) override
-    {
-        throw ObjectConstructionException("unknown updated param: " + std::string(name));
-    }
-
     bool has_intersection(const Ray &r) const noexcept override
     {
         return internal_->has_intersection(r);

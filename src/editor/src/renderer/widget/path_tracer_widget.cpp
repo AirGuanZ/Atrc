@@ -1,7 +1,7 @@
 #include <QVBoxLayout>
 
 #include <agz/editor/renderer/path_tracer.h>
-#include <agz/editor/renderer/renderer_widget/path_tracer_widget.h>
+#include <agz/editor/renderer/widget/path_tracer_widget.h>
 
 #include "ui_PathTracer.h"
 

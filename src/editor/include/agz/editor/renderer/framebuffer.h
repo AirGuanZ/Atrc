@@ -42,13 +42,13 @@ public:
 
     void merge_tasks(int task_count, Task *tasks);
 
-    Image2D<math::color3b> get_image() const;
+    Image2D<Spectrum> get_image() const;
 
     Vec2i get_resolution() const noexcept;
 
 private:
 
-    Image2D<math::color3b> compute_image() const;
+    Image2D<Spectrum> compute_image() const;
 
     // assert lock_shared(es_mutex)
     void merge_single_task(const Task &task);
@@ -79,7 +79,7 @@ private:
     // output image
 
     mutable std::mutex output_mutex_;
-    Image2D<math::color3b> output_;
+    Image2D<Spectrum> output_;
 
     // thread updating output image
 

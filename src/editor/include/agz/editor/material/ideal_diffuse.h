@@ -10,13 +10,13 @@ class IdealDiffuseWidget : public MaterialWidget
 {
 public:
 
-    struct CloneState
+    struct InitData
     {
         Texture2DSlot *albedo       = nullptr;
         NormalMapWidget *normal_map = nullptr;
     };
 
-    explicit IdealDiffuseWidget(const CloneState &clone_state, ObjectContext &obj_ctx);
+    explicit IdealDiffuseWidget(const InitData &clone_state, ObjectContext &obj_ctx);
 
     ResourceWidget<tracer::Material> *clone() override;
 

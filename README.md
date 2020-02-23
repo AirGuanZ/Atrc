@@ -10,6 +10,14 @@ Offline rendering lab based on ray tracing
 - [x] (optional) integrated [Embree](https://github.com/embree/embree) engine
 - [x] (optional) integrated [OIDN](https://github.com/OpenImageDenoise/oidn) denoiser
 
+## Roadmap
+
+- [ ] refactor area light source as entity material
+- [ ] impl material thumbnail in editor
+- [ ] saving/loading in editor
+- [ ] JSON exporter in editor
+- [ ] more rendering algorithms: sppm, vcm, mlt, ...
+
 ## Documentation
 
 [doc](https://airguanz.github.io/atrc_doc/doc.html)

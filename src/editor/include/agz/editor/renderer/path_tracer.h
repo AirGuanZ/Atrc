@@ -1,7 +1,6 @@
 #pragma once
 
-#include <agz/editor/renderer/framebuffer.h>
-#include <agz/editor/renderer/renderer.h>
+#include <agz/editor/renderer/per_pixel_renderer.h>
 
 AGZ_EDITOR_BEGIN
 

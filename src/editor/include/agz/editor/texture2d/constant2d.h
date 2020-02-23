@@ -2,6 +2,7 @@
 
 #include <agz/editor/texture2d/texture2d.h>
 #include <agz/editor/ui/utility/color_holder.h>
+#include <agz/editor/ui/utility/vec_input.h>
 
 AGZ_EDITOR_BEGIN
 
@@ -11,7 +12,14 @@ class Constant2DWidget : public Texture2DWidget
 
 public:
 
-    explicit Constant2DWidget(const Spectrum &init_color = Spectrum(real(0.5)));
+    struct InitData
+    {
+        bool use_input_color        = false;
+        Spectrum color_holder_value = Spectrum(real(0.5));
+        Spectrum input_value        = Spectrum(real(0.5));
+    };
+
+    explicit Constant2DWidget(const InitData &init_data);
 
     Texture2DWidget *clone() override;
 
@@ -23,8 +31,10 @@ protected:
 
 private:
 
-    QVBoxLayout *layout_;
-    ColorHolder *color_holder_;
+    QCheckBox *use_input_color_ = nullptr;
+
+    Vec3Input   *input_color_  = nullptr;
+    ColorHolder *color_holder_ = nullptr;
 };
 
 class Constant2DCreator : public Texture2DWidgetCreator

@@ -497,7 +497,7 @@ namespace
             contrib = radiance * cam_end.accu_bsdf / cam_end.accu_proj_pdf;
         }
     
-        if(!contrib)
+        if(!contrib || !contrib.is_finite())
             return {};
     
         const real weight = weight_sx_t0_path(use_mis, connected_path);
@@ -844,18 +844,27 @@ std::optional<BDPTPixel> trace_bdpt(
     BDPTVertex *lht_subpath_space,
     FilmFilterApplier::FilmGridView<Spectrum> *particle_film)
 {
+    if(scene.lights().empty())
+        return std::nullopt;
+
     const CameraSubpath cam_subpath = build_camera_subpath(
         params, px, py, scene, full_res, sampler, arena, cam_subpath_space);
 
     const LightSubpath lht_subpath = build_light_subpath(
         params, scene, sampler, arena, lht_subpath_space);
 
+    const Rect2i particle_sample_pixels = particle_film->sample_pixels();
+    const Vec2 particle_film_full_res = {
+        real(particle_sample_pixels.high.x - particle_sample_pixels.low.x + 1),
+        real(particle_sample_pixels.high.y - particle_sample_pixels.low.y + 1)
+    };
+
     ConnectedPath connected_path = {
         scene, lht_subpath.light, scene.get_camera(),
         lht_subpath.select_light_pdf,
         cam_subpath.subpath, 0,
         lht_subpath.subpath, 0,
-        sampler, *particle_film, full_res
+        sampler, *particle_film, particle_film_full_res
     };
 
     Spectrum radiance;

@@ -100,4 +100,48 @@ Vec3 Vec3Input::get_value() const
     return Vec3Validator::parse(text);
 }
 
+void Vec3Input::set_alignment(Qt::Alignment alignment)
+{
+    edit_->setAlignment(alignment);
+}
+
+SpectrumInput::SpectrumInput(QWidget *parent)
+    : QWidget(parent)
+{
+    QVBoxLayout *layout = new QVBoxLayout(this);
+    edit_ = new QLineEdit(this);
+    validator_ = std::make_unique<Vec3Validator>();
+
+    layout->addWidget(edit_);
+    edit_->setText("0 0 0");
+    edit_->setValidator(validator_.get());
+
+    setContentsMargins(0, 0, 0, 0);
+    layout->setContentsMargins(0, 0, 0, 0);
+
+    connect(edit_, &QLineEdit::returnPressed, [=]
+    {
+        QString text = edit_->text();
+        const Vec3 new_value = Vec3Validator::parse(text);
+        emit edit_value({ new_value.x, new_value.y, new_value.z });
+    });
+}
+
+void SpectrumInput::set_value(const Spectrum &value)
+{
+    edit_->setText(QString("%1 %2 %3").arg(value.r).arg(value.g).arg(value.b));
+}
+
+Spectrum SpectrumInput::get_value() const
+{
+    QString text = edit_->text();
+    const Vec3 v = Vec3Validator::parse(text);
+    return { v.x, v.y, v.z };
+}
+
+void SpectrumInput::set_alignment(Qt::Alignment alignment)
+{
+    edit_->setAlignment(alignment);
+}
+
 AGZ_EDITOR_END

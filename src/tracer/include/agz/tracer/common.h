@@ -22,7 +22,6 @@ class Camera;
 class Entity;
 class EnvirLight;
 class FilmFilter;
-class Fresnel;
 class Geometry;
 class Material;
 class Medium;

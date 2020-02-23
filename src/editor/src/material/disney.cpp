@@ -108,6 +108,9 @@ DisneyWidget::DisneyWidget(const InitData &init_data, ObjectContext &obj_ctx)
     if(!normal_map_)
         normal_map_ = new NormalMapWidget({}, obj_ctx_);
     add_section("Normal Map", normal_map_);
+
+    setContentsMargins(0, 0, 0, 0);
+    layout->setContentsMargins(0, 0, 0, 0);
     
     connect(normal_map_, &NormalMapWidget::change_params, [=]
     {
@@ -162,7 +165,7 @@ void DisneyWidget::do_update_tracer_object()
     auto sheen_tint             = sheen_tint_            ->update_tracer_object();
     auto clearcoat              = clearcoat_             ->update_tracer_object();
     auto clearcoat_gloss        = clearcoat_gloss_       ->update_tracer_object();
-    auto normal_map             = normal_map_            ->get_tracer_object();
+    auto normal_map             = normal_map_            ->update_tracer_object();
 
     tracer_object_ = create_disney(
         base_color, metallic, roughness, transmission, transmission_roughness,

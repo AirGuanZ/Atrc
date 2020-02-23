@@ -22,17 +22,6 @@ public:
         init_from_params(params);
     }
 
-    void update_param(std::string_view name, const std::any &value) override
-    {
-        if(name == "transform")
-        {
-            params_.local_to_world = std::any_cast<Transform3>(value);
-            init_from_params(params_);
-        }
-        else
-            throw ObjectConstructionException("unknown updated param: " + std::string(name));
-    }
-
     bool has_intersection(const Ray &r) const noexcept override
     {
         const Ray local_r = to_local(r);

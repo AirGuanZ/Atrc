@@ -36,6 +36,7 @@ public:
 
         QScrollArea *scroll_area = new QScrollArea(this);
         name_list = new QListWidget(scroll_area);
+        name_list->setDragDropMode(QAbstractItemView::InternalMove);
 
         vlayout->setAlignment(Qt::AlignTop);
         vlayout->addWidget(hlayout_widget);

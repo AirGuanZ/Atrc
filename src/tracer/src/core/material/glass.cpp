@@ -1,10 +1,11 @@
 ﻿#include <optional>
 
 #include <agz/tracer/core/bsdf.h>
-#include <agz/tracer/core/fresnel.h>
 #include <agz/tracer/core/material.h>
 #include <agz/tracer/core/texture2d.h>
 #include <agz/utility/misc.h>
+
+#include "./utility/fresnel_point.h"
 
 AGZ_TRACER_BEGIN
 
@@ -12,7 +13,7 @@ namespace
 {
     class GlassBSDF : public LocalBSDF
     {
-        const FresnelPoint *fresnel_point_;
+        const DielectricFresnelPoint *fresnel_point_;
         Spectrum color_reflection_;
         Spectrum color_refraction_;
 
@@ -30,7 +31,7 @@ namespace
     public:
 
         GlassBSDF(const Coord &geometry_coord, const Coord &shading_coord,
-                  const FresnelPoint *fresnel_point,
+                  const DielectricFresnelPoint *fresnel_point,
                   const Spectrum &color_reflection, const Spectrum &color_refraction) noexcept
             : LocalBSDF(geometry_coord, shading_coord), fresnel_point_(fresnel_point),
               color_reflection_(color_reflection), color_refraction_(color_refraction)
@@ -108,29 +109,31 @@ namespace
 
 class Glass : public Material
 {
-    std::shared_ptr<const Fresnel> fresnel_;
     std::shared_ptr<const Texture2D> color_reflection_map_;
     std::shared_ptr<const Texture2D> color_refraction_map_;
+    std::shared_ptr<const Texture2D> ior_;
 
 public:
 
     Glass(
         std::shared_ptr<const Texture2D> color_reflection_map,
         std::shared_ptr<const Texture2D> color_refraction_map,
-        std::shared_ptr<const Fresnel> fresnel)
+        std::shared_ptr<const Texture2D> ior)
     {
         color_reflection_map_ = color_reflection_map;
         color_refraction_map_ = color_refraction_map;
-        fresnel_   = fresnel;
+        ior_                  = ior;
     }
 
     ShadingPoint shade(const EntityIntersection &inct, Arena &arena) const override
     {
         ShadingPoint ret;
 
-        const FresnelPoint *fresnel_point = fresnel_->get_point(inct.uv, arena);
+        const real     ior                = ior_->sample_real(inct.uv);
         const Spectrum color_reflection   = color_reflection_map_->sample_spectrum(inct.uv);
         const Spectrum color_refraction   = color_refraction_map_->sample_spectrum(inct.uv);
+
+        const DielectricFresnelPoint *fresnel_point = arena.create<DielectricFresnelPoint>(ior, real(1));
 
         ret.bsdf = arena.create<GlassBSDF>(
             inct.geometry_coord, inct.user_coord, fresnel_point,
@@ -144,9 +147,9 @@ public:
 std::shared_ptr<Material> create_glass(
     std::shared_ptr<const Texture2D> color_reflection_map,
     std::shared_ptr<const Texture2D> color_refraction_map,
-    std::shared_ptr<const Fresnel> fresnel)
+    std::shared_ptr<const Texture2D> ior)
 {
-    return std::make_shared<Glass>(color_reflection_map, color_refraction_map, fresnel);
+    return std::make_shared<Glass>(color_reflection_map, color_refraction_map, ior);
 }
 
 AGZ_TRACER_END

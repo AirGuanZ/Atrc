@@ -72,15 +72,13 @@ CameraPanel *Displayer::get_camera_panel()
 
     connect(camera_panel_->distance, &RealInput::edit_value, [=](real new_distance)
     {
-        if(new_distance < real(0.01))
+        if(new_distance < real(0.001))
         {
-            camera_panel_->distance->set_value(real(0.01));
-            new_distance = real(0.01);
+            camera_panel_->distance->set_value(real(0.001));
+            new_distance = real(0.001);
         }
 
         camera_params_.distance = new_distance;
-
-        AGZ_INFO("edit camera distance: {}", new_distance);
 
         update_gl_camera();
         emit update_camera_panel();
@@ -91,8 +89,6 @@ CameraPanel *Displayer::get_camera_panel()
     {
         camera_params_.radian   = pos_to_radian(new_pos, camera_params_.dst, camera_params_.up);
         camera_params_.distance = distance(new_pos, camera_params_.dst);
-
-        AGZ_INFO("edit camera position: {}, {}, {}", new_pos.x, new_pos.y, new_pos.z);
 
         update_gl_camera();
         emit update_camera_panel();
@@ -107,8 +103,6 @@ CameraPanel *Displayer::get_camera_panel()
         camera_params_.radian   = pos_to_radian(old_pos, new_dst, camera_params_.up);
         camera_params_.distance = distance(old_pos, new_dst);
 
-        AGZ_INFO("edit camera look_at: {}, {}, {}", new_dst.x, new_dst.y, new_dst.z);
-
         update_gl_camera();
         emit update_camera_panel();
         emit need_to_recreate_camera();
@@ -121,8 +115,6 @@ CameraPanel *Displayer::get_camera_panel()
         camera_params_.up     = new_up;
         camera_params_.radian = pos_to_radian(old_pos, camera_params_.dst, new_up);
 
-        AGZ_INFO("edit camera up: {}, {}, {}", new_up.x, new_up.y, new_up.z);
-
         update_gl_camera();
         emit update_camera_panel();
         emit need_to_recreate_camera();
@@ -131,8 +123,6 @@ CameraPanel *Displayer::get_camera_panel()
     connect(camera_panel_->radian, &Vec2Input::edit_value, [=](const Vec2 &new_radian)
     {
         camera_params_.radian = new_radian;
-
-        AGZ_INFO("edit camera direction: {}, {}", new_radian.x, new_radian.y);
 
         update_gl_camera();
         emit update_camera_panel();
@@ -143,8 +133,6 @@ CameraPanel *Displayer::get_camera_panel()
     {
         camera_params_.fov = new_fov;
 
-        AGZ_INFO("edit camera fov: {}", new_fov);
-
         emit need_to_recreate_camera();
     });
 
@@ -152,16 +140,12 @@ CameraPanel *Displayer::get_camera_panel()
     {
         camera_params_.lens_radius = lens_size;
 
-        AGZ_INFO("edit camera lens radius: {}", lens_size);
-
         emit need_to_recreate_camera();
     });
 
     connect(camera_panel_->focal_distance, &RealInput::edit_value, [=](real new_focal_distance)
     {
         camera_params_.focal_distance = new_focal_distance;
-
-        AGZ_INFO("edit camera focal distance: {}", new_focal_distance);
 
         emit need_to_recreate_camera();
     });
@@ -225,7 +209,7 @@ Vec2i Displayer::pixmap_size() const
     return { gl_widget_->width(), gl_widget_->height() };
 }
 
-void Displayer::set_display_image(const QImage &img)
+void Displayer::set_display_image(const Image2D<Spectrum> &img)
 {
     gl_widget_->set_background_image(img);
 }
@@ -288,6 +272,9 @@ void Displayer::mouseMoveEvent(QMouseEvent *event)
         const int dx = event->x() - press_coord_.x;
         const int dy = event->y() - press_coord_.y;
 
+        if(!dx && !dy)
+            return;
+
         camera_params_.radian.x = press_radian_.x - rotate_speed_ * real(dx);
         camera_params_.radian.y = math::clamp<real>(
             press_radian_.y - rotate_speed_ * dy, real(0.001), PI_r - real(0.001));
@@ -302,6 +289,9 @@ void Displayer::mouseMoveEvent(QMouseEvent *event)
     {
         const int dx = event->x() - press_coord_.x;
         const int dy = event->y() - press_coord_.y;
+
+        if(!dx && !dy)
+            return;
 
         const auto up_coord = tracer::Coord::from_z(camera_params_.up);
         const Vec3 local_dir = {

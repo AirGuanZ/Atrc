@@ -1,7 +1,9 @@
 #include <QVBoxLayout>
 
-#include <agz/editor/renderer/renderer_widget/ao_widget.h>
-#include <agz/editor/renderer/renderer_widget/path_tracer_widget.h>
+#include <agz/editor/renderer/widget/ao_widget.h>
+#include <agz/editor/renderer/widget/bdpt_renderer_widget.h>
+#include <agz/editor/renderer/widget/particle_tracer_widget.h>
+#include <agz/editor/renderer/widget/path_tracer_widget.h>
 
 AGZ_EDITOR_BEGIN
 
@@ -34,6 +36,8 @@ RendererPanel::RendererPanel(QWidget *parent, const std::string &default_rendere
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
     factory_.add_creator(std::make_unique<AOWidgetCreator>());
+    factory_.add_creator(std::make_unique<BDPTRendererWidgetCreator>());
+    factory_.add_creator(std::make_unique<ParticleTracerWidgetCreator>());
     factory_.add_creator(std::make_unique<PathTracerWidgetCreator>());
 
     const auto raw_type_names = factory_.get_type_names();

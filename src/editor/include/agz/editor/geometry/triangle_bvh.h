@@ -15,6 +15,10 @@ public:
 
     struct CloneState
     {
+        // vertices && tracer_object: cloning
+        // vertices && !tracer_object: create tracer_object according to vertices
+        // !vertices && !tracer_object completely new widget
+
         QString                              filename;
         std::shared_ptr<std::vector<Vertex>> vertices;
         std::shared_ptr<tracer::Geometry>    tracer_object;

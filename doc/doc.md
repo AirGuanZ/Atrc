@@ -1,6 +1,6 @@
 # Atrc Renderer Documentation
 
-![pic](./gallery/0.png)
+![pic](./gallery/1.png)
 
 [TOC]
 
@@ -25,18 +25,18 @@
 **Dependencies Need to Be Prepared**
 
 * [oidn](https://openimagedenoise.github.io/) for denoising (only when `USE_OIDN` is `ON`)
-* Qt5 (only when `BUILD_GUI` or `BUILD_SCENE_EDITOR` is `ON`)
+* Qt5 (only when `BUILD_GUI` or `BUILD_EDITOR` is `ON`)
 
 When using MSVC under Windows, copy all files in [oidn-1.1.0.x64.vc14.windows.zip](https://github.com/OpenImageDenoise/oidn/releases/download/v1.1.0/oidn-1.1.0. x64.vc14.windows.zip) to `lib/oidn/vc14`; when using linux, copy all files in [oidn-1.1.0.x86_64.linux.tar.gz](https://github.com/OpenImageDenoise/oidn/releases/download/v1.1.0/oidn-1.1.0.x86_64.linux.tar.gz) to `lib/oidn/linux`. Please refer to` cmake/ cmake-oidn` for details.
 
 ### CMake Options
 
-| Name               | Default Value | Explanation                        |
-| ------------------ | ------------- | ---------------------------------- |
-| USE_EMBREE         | OFF           | use Embree library to tracing rays |
-| USE_OIDN           | OFF           | use OIDN denoising library         |
-| BUILD_GUI          | OFF           | build rendering launcher with GUI  |
-| BUILD_SCENE_EDITOR | OFF           | build scene editor                 |
+| Name         | Default Value | Explanation                        |
+| ------------ | ------------- | ---------------------------------- |
+| USE_EMBREE   | OFF           | use Embree library to tracing rays |
+| USE_OIDN     | OFF           | use OIDN denoising library         |
+| BUILD_GUI    | OFF           | build rendering launcher with GUI  |
+| BUILD_EDITOR | OFF           | build scene editor                 |
 
 **Note**. OIDN is 64-bit only.
 
@@ -51,7 +51,7 @@ git clone --recursive --depth=1 https://github.com/AirGuanZ/Atrc
 cd Atrc
 mkdir build
 cd build
-cmake -DUSE_EMBREE=ON -DUSE_OIDN=ON -DBUILD_GUI=ON -DBUILD_SCENE_EDITOR=ON -DQt5_DIR="../../Qt5" -G "Visual Studio 15 2017 Win64" ..
+cmake -DUSE_EMBREE=ON -DUSE_OIDN=ON -DBUILD_GUI=ON -DBUILD_EDITOR=ON -DQt5_DIR="../../Qt5" -G "Visual Studio 15 2017 Win64" ..
 ```
 
 **Full-featured Building on *nix**
@@ -63,7 +63,7 @@ mkdir build
 cd build
 export CC=clang
 export CXX=clang++
-cmake -DUSE_EMBREE=ON -DUSE_OIDN=ON -DBUILD_GUI=ON -DBUILD_SCENE_EDITOR=ON -DQt5_DIR="../../Qt5" -G "Unix Makefiles" ..
+cmake -DUSE_EMBREE=ON -DUSE_OIDN=ON -DBUILD_GUI=ON -DBUILD_EDITOR=ON -DQt5_DIR="../../Qt5" -G "Unix Makefiles" ..
 ```
 
 ## Usage
@@ -335,33 +335,6 @@ Gaussian filter function
 | radius     | real |               | filter radius in pixels       |
 | alpha      | real |               | $\alpha$ in gaussian function |
 
-### Fresnel
-
-Fresnel term in surface material BSDF
-
-**always_one**
-
-Fresnel term whose value is always 1.
-
-**dielectric**
-
-Fresnel term for dielectric
-
-| Field Name | Type      | Default Value | Explanation                     |
-| ---------- | --------- | ------------- | ------------------------------- |
-| eta_out    | Texture2D | all_one       | outer ior (index of refraction) |
-| eta_in     | Texture2D |               | inner ior                       |
-
-**conductor**
-
-Fresnel term of conductor
-
-| Field Name | Type      | Default Value | Explanation         |
-| ---------- | --------- | ------------- | ------------------- |
-| eta_out    | Texture2D | all_one       | outer ior           |
-| eta_in     | Texture2D |               | inner ior           |
-| k          | Texture2D |               | index of absorption |
-
 ### Geometry
 
 Used to describe the geometry of an object.
@@ -511,11 +484,11 @@ see [Disney Principled BSDF](https://blog.selfshadow.com/publications/s2015-shad
 
 Frosted glass material. Please refer to [Microfacet Models for Refraction through Rough Surfaces](https://www.cs.cornell.edu/~srm/publications/EGSR07-btdf.html).
 
-| Field Name | Type      | Default Value | Explanation       |
-| ---------- | --------- | ------------- | ----------------- |
-| color_map  | Texture2D |               | surface color     |
-| fresnel    | Fresnel   |               | fresnel term      |
-| roughness  | Texture2D |               | surface roughness |
+| Field Name | Type      | Default Value | Explanation         |
+| ---------- | --------- | ------------- | ------------------- |
+| color_map  | Texture2D |               | surface color       |
+| ior        | Texture2D |               | index of refraction |
+| roughness  | Texture2D |               | surface roughness   |
 
 **glass**
 
@@ -523,12 +496,12 @@ Frosted glass material. Please refer to [Microfacet Models for Refraction throug
 
 Smooth glass
 
-| Field Name           | Type      | Default Value | Explanation      |
-| -------------------- | --------- | ------------- | ---------------- |
-| color_map            | Texture2D |               | surface color    |
-| color_reflection_map | Texture2D |               | reflection color |
-| color_refraction_map | Texture2D |               | refraction color |
-| fresnel              | Fresnel   |               | fresnel term     |
+| Field Name           | Type      | Default Value | Explanation         |
+| -------------------- | --------- | ------------- | ------------------- |
+| color_map            | Texture2D |               | surface color       |
+| color_reflection_map | Texture2D |               | reflection color    |
+| color_refraction_map | Texture2D |               | refraction color    |
+| ior                  | Texture2D |               | index of refraction |
 
 Two color assignment methods are provided:
 
@@ -559,7 +532,8 @@ Ideal mirror reflection
 | Field Name | Type  | Default Value | Explanation |
 | ------- | ------- | ------ | --------- |
 | color_map  | Texture2D |        | surface color |
-| fresnel | Fresnel |        | fresnel term |
+| eta | Texture2D |        | index of refraction |
+| k | Texture2D | | index of absorbtion |
 
 **mtl**
 
@@ -602,6 +576,22 @@ Absolutely smooth varnish, where the interior material must be opaque.
 | eta_in     | Texture2D |               | inner ior of varnish             |
 | eta_out    | Texture2D | all_one       | outer ior of varnish             |
 | color      | Texture2D |               | varnish color                    |
+
+**phong**
+
+BRDF:
+$$
+\begin{aligned}f_r(\omega_i, x, \omega_o) &= \frac d {\pi} + \frac{sD}{4\cos\langle\omega_i, n_x\rangle\cos\langle \omega_o, n_x\rangle} \\D &= \frac{e + 1}{2\pi}\cos^e\langle\omega_h, n_x\rangle \\\omega_h &= \mathrm{normalize}(\mathrm{normalize}(\omega_i) + \mathrm{normalize}(\omega_o))\end{aligned}
+$$
+where $d$ is diffuse color, $s$ is specular color, $e$ is specular glossness and $n_x$ is the normal vector at $x$.
+
+*NOTE*. Atrc will automatically scale $d$ and $s$ to keep energy conservation.
+
+| Field Name | Type      | Default Value | Explanation        |
+| ---------- | --------- | ------------- | ------------------ |
+| d          | Texture2D |               | diffuse color      |
+| s          | Texture2D |               | specular color     |
+| ns         | Texture2D |               | specular glossness |
 
 **invisible_surface**
 

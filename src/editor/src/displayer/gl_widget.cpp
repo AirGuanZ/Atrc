@@ -7,6 +7,12 @@
 #include <agz/editor/displayer/gl_widget.h>
 #include <agz/editor/ui/transform3d_widget.h>
 #include <agz/editor/utility/direct_transform3d.h>
+#include <agz/utility/system.h>
+
+#ifdef AGZ_DEBUG
+#include <QOpenGLDebugLogger>
+#include <QOpenGLDebugMessage>
+#endif
 
 AGZ_EDITOR_BEGIN
 
@@ -76,7 +82,8 @@ namespace
 
     void main()
     {
-        frag_color = texture2D(tex, uv);
+        vec3 color = texture2D(tex, uv).rgb;
+        frag_color = vec4(pow(color, vec3(1 / 2.2)), 1);
     }
 )___";
 
@@ -105,7 +112,16 @@ DisplayerGLWidget::DisplayerGLWidget()
     connect(gizmo_selector_, &GizmoSelector::change_gizmo, [=]
     {
         update();
-    });;
+    });
+
+    QSurfaceFormat format;
+    format.setMajorVersion(3);
+    format.setMinorVersion(3);
+    format.setProfile(QSurfaceFormat::CoreProfile);
+#ifdef AGZ_DEBUG
+    format.setOption(QSurfaceFormat::DebugContext);
+#endif
+    setFormat(format);
 }
 
 DisplayerGLWidget::~DisplayerGLWidget()
@@ -211,14 +227,20 @@ void DisplayerGLWidget::set_selected_mesh(MeshID id)
     update();
 }
 
-void DisplayerGLWidget::set_background_image(const QImage &img)
+void DisplayerGLWidget::set_background_image(const Image2D<Spectrum> &img)
 {
     makeCurrent();
 
     if(img.width() > 0 && img.height() > 0)
     {
-        background_tex_ = std::make_unique<QOpenGLTexture>(
-            img, QOpenGLTexture::DontGenerateMipMaps);
+        background_tex_ = std::make_unique<QOpenGLTexture>(QOpenGLTexture::Target2D);
+        background_tex_->create();
+        background_tex_->setSize(img.width(), img.height());
+        background_tex_->setFormat(QOpenGLTexture::RGB16F);
+        background_tex_->setMipLevels(1);
+        background_tex_->allocateStorage(QOpenGLTexture::RGB, QOpenGLTexture::Float16);
+        background_tex_->setData(
+            QOpenGLTexture::RGB, QOpenGLTexture::Float32, img.raw_data());
         background_tex_->setMinMagFilters(
             QOpenGLTexture::Nearest, QOpenGLTexture::Nearest);
     }
@@ -243,6 +265,7 @@ void DisplayerGLWidget::cursor_leave(QEvent *event)
 void DisplayerGLWidget::mouse_move(QMouseEvent *event)
 {
     cursor_pos_ = { float(event->x()), float(event->y()) };
+    cursor_moved_ = true;
     update();
 }
 
@@ -270,6 +293,20 @@ void DisplayerGLWidget::mouse_release(QMouseEvent *event)
 
 void DisplayerGLWidget::initializeGL()
 {
+    // debugger
+
+#ifdef AGZ_DEBUG
+    QOpenGLDebugLogger *logger = new QOpenGLDebugLogger(this);
+    connect(logger, &QOpenGLDebugLogger::messageLogged, [=](const QOpenGLDebugMessage &msg)
+    {
+        printf("%s\n", msg.message().toStdString().c_str());
+    });
+    logger->initialize();
+    logger->startLogging();
+#endif
+
+    // opengl funcs
+
     initializeOpenGLFunctions();
 
     // entity shader
@@ -481,6 +518,9 @@ void DisplayerGLWidget::render_gizmo()
             else if(mesh.world.scale != scale[2]) mesh.world.scale = scale[2];
         }
     }
+
+    is_edited &= cursor_moved_;
+    cursor_moved_ = false;
 
     Im3d::PopMatrix();
 

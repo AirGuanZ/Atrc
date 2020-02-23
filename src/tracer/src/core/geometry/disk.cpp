@@ -43,14 +43,6 @@ public:
         AGZ_HIERARCHY_WRAP("in initializing disk geometry object")
     }
 
-    void update_param(std::string_view name, const std::any &value) override
-    {
-        if(name == "transform")
-            init_transform(std::any_cast<Transform3>(value));
-        else
-            throw ObjectConstructionException("unknown updated param: " + std::string(name));
-    }
-
     bool has_intersection(const Ray &r) const noexcept override
     {
         const Ray local_r = to_local(r);

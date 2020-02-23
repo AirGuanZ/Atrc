@@ -128,7 +128,7 @@ void Framebuffer::merge_tasks(int task_count, Task *tasks)
     }
 }
 
-Image2D<math::color3b> Framebuffer::get_image() const
+Image2D<Spectrum> Framebuffer::get_image() const
 {
     std::lock_guard lk(output_mutex_);
     if(output_.is_available())
@@ -141,17 +141,17 @@ Vec2i Framebuffer::get_resolution() const noexcept
     return { width_, height_ };
 }
 
-Image2D<math::color3b> Framebuffer::compute_image() const
+Image2D<Spectrum> Framebuffer::compute_image() const
 {
     Image2D<Spectrum> value;
     Image2D<real>     weight;
     {
         std::lock_guard lk(es_mutex_);
-        value = value_;
+        value  = value_;
         weight = weight_;
     }
 
-    Image2D<math::color3b> image(value.height(), value.width());
+    Image2D<Spectrum> image(value.height(), value.width());
     for(int y = 0; y < image.height(); ++y)
     {
         if(exit_)
@@ -163,11 +163,7 @@ Image2D<math::color3b> Framebuffer::compute_image() const
             if(w <= 0)
                 return {};
 
-            const Spectrum pixel = value(y, x) / w;
-            image(y, x) = to_color3b(pixel.map([](real c)
-            {
-                return std::pow(c, real(1 / 2.2));
-            }));
+            image(y, x) = value(y, x) / w;
         }
     }
 

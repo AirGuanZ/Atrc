@@ -23,6 +23,8 @@ public:
 
     std::shared_ptr<tracer::Aggregate> update_tracer_aggregate(std::vector<std::shared_ptr<tracer::Entity>> &entities);
 
+    void add_meshes(const std::vector<mesh::mesh_t> &meshes);
+
 signals:
 
     void change_scene();
@@ -40,6 +42,12 @@ private:
     void selected_entity_changed();
 
     void edit_entity_gizmo(const DirectTransform &new_world_transform);
+
+    // add single mesh without emit change_scene
+    void add_single_mesh(const mesh::mesh_t &mesh);
+
+    // convert a (possibly empty) name to a valid name
+    QString to_valid_name(const QString &name) const;
 
     struct Record
     {

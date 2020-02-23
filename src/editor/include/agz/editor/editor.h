@@ -77,7 +77,7 @@ private:
 
     void load_config(const std::string &input_filename);
 
-    void set_display_image(const Image2D<math::color3b> &img);
+    void set_display_image(const Image2D<Spectrum> &img);
 
     void launch_renderer(bool enable_preview);
 

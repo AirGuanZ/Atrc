@@ -1,7 +1,7 @@
 #include <QColorDialog>
 
 #include <agz/editor/renderer/ao.h>
-#include <agz/editor/renderer/renderer_widget/ao_widget.h>
+#include <agz/editor/renderer/widget/ao_widget.h>
 
 #include "ui_AO.h"
 

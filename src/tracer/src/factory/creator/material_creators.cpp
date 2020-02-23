@@ -118,9 +118,9 @@ namespace material
         std::shared_ptr<Material> create(const ConfigGroup &params, CreatingContext &context) const override
         {
             const auto color_map = context.create<Texture2D>(params.child_group("color_map"));
-            const auto fresnel = context.create<Fresnel>(params.child_group("fresnel"));
+            const auto ior       = context.create<Texture2D>(params.child_group("ior"));
             const auto roughness = context.create<Texture2D>(params.child_group("roughness"));
-            return create_frosted_glass(std::move(color_map), std::move(roughness), std::move(fresnel));
+            return create_frosted_glass(std::move(color_map), std::move(roughness), std::move(ior));
         }
     };
 
@@ -135,7 +135,7 @@ namespace material
 
         std::shared_ptr<Material> create(const ConfigGroup &params, CreatingContext &context) const override
         {
-            const auto fresnel = context.create<Fresnel>(params.child_group("fresnel"));
+            const auto ior = context.create<Texture2D>(params.child_group("ior"));
 
             std::shared_ptr<Texture2D> color_reflection_map, color_refraction_map;
 
@@ -155,7 +155,10 @@ namespace material
             if(!color_reflection_map || !color_refraction_map)
                 throw CreatingObjectException("empty color reflection/refraction map");
 
-            return create_glass(std::move(color_reflection_map), std::move(color_refraction_map), std::move(fresnel));
+            return create_glass(
+                std::move(color_reflection_map),
+                std::move(color_refraction_map),
+                std::move(ior));
         }
     };
 
@@ -256,8 +259,9 @@ namespace material
         std::shared_ptr<Material> create(const ConfigGroup &params, CreatingContext &context) const override
         {
             auto color_map = context.create<Texture2D>(params.child_group("color_map"));
-            auto fresnel = context.create<Fresnel>(params.child_group("fresnel"));
-            return create_mirror(std::move(color_map), std::move(fresnel));
+            auto eta = context.create<Texture2D>(params.child_group("eta"));
+            auto k   = context.create<Texture2D>(params.child_group("k"));
+            return create_mirror(std::move(color_map), std::move(eta), std::move(k));
         }
     };
 
@@ -298,6 +302,25 @@ namespace material
         }
     };
 
+    class PhongCreator : public Creator<Material>
+    {
+    public:
+
+        std::string name() const override
+        {
+            return "phong";
+        }
+
+        std::shared_ptr<Material> create(const ConfigGroup &params, CreatingContext &context) const override
+        {
+            auto d  = context.create<Texture2D>(params.child_group("d"));
+            auto s  = context.create<Texture2D>(params.child_group("s"));
+            auto ns = context.create<Texture2D>(params.child_group("ns"));
+            auto nor_map = init_normal_mapper(params, context);
+            return create_phong(std::move(d), std::move(s), std::move(ns), std::move(nor_map));
+        }
+    };
+
 } // namespace material;
 
 void initialize_material_factory(Factory<Material> &factory)
@@ -314,6 +337,7 @@ void initialize_material_factory(Factory<Material> &factory)
     factory.add_creator(std::make_unique<material::MirrorCreator>());
     factory.add_creator(std::make_unique<material::MTLCreator>());
     factory.add_creator(std::make_unique<material::MirrorVarnishCreator>());
+    factory.add_creator(std::make_unique<material::PhongCreator>());
 }
 
 AGZ_TRACER_FACTORY_END

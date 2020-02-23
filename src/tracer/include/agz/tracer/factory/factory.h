@@ -94,7 +94,6 @@ class CreatingContext
         Entity,
         EnvirLight,
         FilmFilter,
-        Fresnel,
         Geometry,
         Material,
         Medium,

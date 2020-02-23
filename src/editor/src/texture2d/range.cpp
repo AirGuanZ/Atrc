@@ -35,9 +35,8 @@ RangeWidget::RangeWidget(const CloneState &clone_state)
 
     value_->setButtonSymbols(QDoubleSpinBox::NoButtons);
 
-    value_->setValue(clone_state.value);
-
     value_->setRange(clone_state.low, clone_state.high);
+    value_->setValue(clone_state.value);
 
     slider_->set_range(clone_state.low, clone_state.high);
     slider_->set_value(clone_state.value);

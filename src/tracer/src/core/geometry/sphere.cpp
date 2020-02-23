@@ -25,17 +25,6 @@ public:
         AGZ_HIERARCHY_WRAP("in initializing sphere")
     }
 
-    void update_param(std::string_view name, const std::any &value) override
-    {
-        if(name == "transform")
-        {
-            init_transform(std::any_cast<Transform3>(value));
-            world_radius_ = local_to_world_ratio_ * radius_;
-        }
-        else
-            throw ObjectConstructionException("unknown updated param: " + std::string(name));
-    }
-
     bool has_intersection(const Ray &r) const noexcept override
     {
         const Ray local_r = to_local(r);
@@ -96,10 +85,10 @@ public:
             pos, &geometry_uv, &geometry_coord, radius_);
 
         SurfacePoint spt;
-        spt.pos = pos;
+        spt.pos            = pos;
         spt.geometry_coord = geometry_coord;
-        spt.uv = geometry_uv;
-        spt.user_coord = geometry_coord;
+        spt.uv             = geometry_uv;
+        spt.user_coord     = geometry_coord;
         to_world(&spt);
 
         return spt;
@@ -121,10 +110,10 @@ public:
             pos, &geometry_uv, &geometry_coord, radius_);
 
         SurfacePoint spt;
-        spt.pos = pos;
+        spt.pos            = pos;
         spt.geometry_coord = geometry_coord;
-        spt.uv = geometry_uv;
-        spt.user_coord = geometry_coord;
+        spt.uv             = geometry_uv;
+        spt.user_coord     = geometry_coord;
         to_world(&spt);
 
         const real world_radius_square = world_radius_ * world_radius_;

@@ -20,7 +20,7 @@ public:
 
     NormalMapWidget *clone() const;
 
-    std::unique_ptr<tracer::NormalMapper> get_tracer_object() const;
+    std::unique_ptr<tracer::NormalMapper> update_tracer_object() const;
 
 signals:
 

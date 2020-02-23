@@ -3,7 +3,7 @@
 
 AGZ_EDITOR_BEGIN
 
-IdealDiffuseWidget::IdealDiffuseWidget(const CloneState &clone_state, ObjectContext &obj_ctx)
+IdealDiffuseWidget::IdealDiffuseWidget(const InitData &clone_state, ObjectContext &obj_ctx)
     : obj_ctx_(obj_ctx)
 {
     QVBoxLayout *layout             = new QVBoxLayout(this);
@@ -42,7 +42,7 @@ IdealDiffuseWidget::IdealDiffuseWidget(const CloneState &clone_state, ObjectCont
 
 ResourceWidget<tracer::Material> *IdealDiffuseWidget::clone()
 {
-    CloneState clone_state;
+    InitData clone_state;
     clone_state.albedo     = albedo_->clone();
     clone_state.normal_map = normal_map_->clone();
     return new IdealDiffuseWidget(clone_state, obj_ctx_);
@@ -61,7 +61,7 @@ void IdealDiffuseWidget::update_tracer_object_impl()
 void IdealDiffuseWidget::do_update_tracer_object()
 {
     auto albedo_tex = albedo_->update_tracer_object();
-    auto normal_map = normal_map_->get_tracer_object();
+    auto normal_map = normal_map_->update_tracer_object();
     tracer_object_ = create_ideal_diffuse(albedo_tex, std::move(normal_map));
 }
 

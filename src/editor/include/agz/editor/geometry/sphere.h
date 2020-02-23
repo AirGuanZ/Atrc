@@ -21,11 +21,15 @@ public:
 
     QPixmap get_thumbnail(int width, int height) const override;
 
+    std::vector<Vertex> get_vertices() const override;
+
 protected:
 
     void update_tracer_object_impl() override;
 
 private:
+
+    static std::vector<Vertex> unit_vertices();
 
     void do_update_tracer_object();
 

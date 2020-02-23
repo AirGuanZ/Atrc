@@ -429,15 +429,9 @@ void Editor::load_config(const std::string &input_filename)
     launch_renderer(true);
 }
 
-void Editor::set_display_image(const Image2D<math::color3b> &img)
+void Editor::set_display_image(const Image2D<Spectrum> &img)
 {
-    const QImage qimg(
-        reinterpret_cast<const unsigned char *>(img.raw_data()),
-        img.width(), img.height(),
-        sizeof(math::color3b) * img.width(),
-        QImage::Format::Format_RGB888);
-
-    displayer_->set_display_image(qimg);
+    displayer_->set_display_image(img);
 }
 
 void Editor::launch_renderer(bool enable_preview)

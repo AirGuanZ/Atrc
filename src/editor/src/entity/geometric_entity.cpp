@@ -17,6 +17,7 @@ GeometricEntityWidget::GeometricEntityWidget(const CloneState &clone_state, Obje
 
     if(!geometry_)
         geometry_ = new GeometrySlot(obj_ctx_, "Triangle Mesh");
+
     if(!material_)
         material_ = new MaterialSlot(obj_ctx_, "Ideal Diffuse");
 

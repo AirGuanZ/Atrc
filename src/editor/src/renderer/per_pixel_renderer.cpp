@@ -1,4 +1,4 @@
-#include <agz/editor/renderer/renderer.h>
+#include <agz/editor/renderer/per_pixel_renderer.h>
 #include <agz/utility/thread.h>
 
 AGZ_EDITOR_BEGIN
@@ -25,7 +25,7 @@ PerPixelRenderer::~PerPixelRenderer()
     assert(threads_.empty());
 }
 
-Image2D<math::color3b> PerPixelRenderer::start()
+Image2D<Spectrum> PerPixelRenderer::start()
 {
     auto render_func = [this](tracer::Sampler *sampler)
     {
@@ -37,7 +37,7 @@ Image2D<math::color3b> PerPixelRenderer::start()
                 return;
 
             tasks.clear();
-            int task_count = framebuffer_.get_tasks(2, tasks);
+            const int task_count = framebuffer_.get_tasks(2, tasks);
 
             for(int i = 0; i < task_count; ++i)
                 exec_render_task(tasks[i], sampler);
@@ -48,8 +48,8 @@ Image2D<math::color3b> PerPixelRenderer::start()
 
     auto ret = do_fast_rendering();
 
-    auto sampler_prototype = tracer::create_native_sampler(1, 0, true);
-    int worker_count = thread::actual_worker_count(worker_count_);
+    const auto sampler_prototype = tracer::create_native_sampler(1, 0, true);
+    const int worker_count = thread::actual_worker_count(worker_count_);
     for(int i = 0; i < worker_count; ++i)
     {
         auto sampler = sampler_prototype->clone(i, sampler_arena_);
@@ -61,7 +61,7 @@ Image2D<math::color3b> PerPixelRenderer::start()
     return ret;
 }
 
-Image2D<math::color3b> PerPixelRenderer::get_image() const
+Image2D<Spectrum> PerPixelRenderer::get_image() const
 {
     return framebuffer_.get_image();
 }
@@ -77,7 +77,7 @@ void PerPixelRenderer::stop_rendering()
     threads_.clear();
 }
 
-Image2D<math::color3b> PerPixelRenderer::do_fast_rendering()
+Image2D<Spectrum> PerPixelRenderer::do_fast_rendering()
 {
     using namespace tracer;
 
@@ -98,7 +98,7 @@ Image2D<math::color3b> PerPixelRenderer::do_fast_rendering()
         small_height = (std::max)(1, static_cast<int>(std::floor(fast_resolution_ / target_ratio)));
     }
 
-    Image2D<math::color3b> small_target(small_height, small_width);
+    Image2D<Spectrum> small_target(small_height, small_width);
 
     const int x_task_count = (small_width + fast_task_grid_size_ - 1) / fast_task_grid_size_;
     const int y_task_count = (small_height + fast_task_grid_size_ - 1) / fast_task_grid_size_;
@@ -151,7 +151,7 @@ Image2D<math::color3b> PerPixelRenderer::do_fast_rendering()
     return small_target;
 }
 
-void PerPixelRenderer::exec_fast_render_task(Image2D<math::color3b> &target, const Vec2i &beg, const Vec2i &end, tracer::Sampler &sampler)
+void PerPixelRenderer::exec_fast_render_task(Image2D<Spectrum> &target, const Vec2i &beg, const Vec2i &end, tracer::Sampler &sampler)
 {
     using namespace tracer;
 
@@ -187,7 +187,7 @@ void PerPixelRenderer::exec_fast_render_task(Image2D<math::color3b> &target, con
             } while(sampler.next_sample());
 
             const Spectrum rad = sum / real(sampler.get_sample_count());
-            target(py, px) = to_color3b(rad.map([](real c) { return std::pow(c, real(1 / 2.2)); }));
+            target(py, px) = rad;
         }
     }
 }

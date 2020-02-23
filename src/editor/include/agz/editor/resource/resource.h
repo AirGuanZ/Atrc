@@ -3,7 +3,6 @@
 #include <map>
 #include <set>
 
-#include <QComboBox>
 #include <QInputDialog>
 #include <QMessageBox>
 #include <QPointer>
@@ -11,6 +10,7 @@
 #include <QVBoxLayout>
 
 #include <agz/editor/resource/entity_interface.h>
+#include <agz/editor/ui/utility/combobox_without_wheel.h>
 #include <agz/editor/ui/utility/qsignal_to_callback.h>
 
 AGZ_EDITOR_BEGIN
@@ -190,8 +190,8 @@ private:
 
     QSignalToCallback signal_to_callback_;
 
-    QVBoxLayout *layout_        = nullptr;
-    QComboBox   *type_selector_ = nullptr;
+    QVBoxLayout               *layout_        = nullptr;
+    ComboBoxWithoutWheelFocus *type_selector_ = nullptr;
 
     ResourceWidget<TracerObject> *rsc_widget_ = nullptr;
 
@@ -480,7 +480,6 @@ void ResourceWidget<TracerObject>::set_dirty_callback(std::function<void()> call
 template<typename TracerObject>
 std::shared_ptr<TracerObject> ResourceWidget<TracerObject>::update_tracer_object()
 {
-    assert(tracer_object_);
     if(check_update_flag())
         update_tracer_object_impl();
     return tracer_object_;
@@ -535,7 +534,7 @@ template<typename TracerObject>
 ResourcePanel<TracerObject>::ResourcePanel(ObjectContext &obj_ctx, const QString &default_type)
     : obj_ctx_(obj_ctx)
 {
-    type_selector_ = new QComboBox(this);
+    type_selector_ = new ComboBoxWithoutWheelFocus(this);
     type_selector_->addItems(obj_ctx.factory<TracerObject>().get_type_names());
     type_selector_->setCurrentText(default_type);
 
@@ -568,7 +567,8 @@ ResourcePanel<TracerObject>::ResourcePanel(ObjectContext &obj_ctx, const QString
         set_entity_transform_dirty();
     };
 
-    signal_to_callback_.connect_callback(type_selector_, &QComboBox::currentTextChanged, change_type);
+    signal_to_callback_.connect_callback(
+        type_selector_, &ComboBoxWithoutWheelFocus::currentTextChanged, change_type);
 
     layout_ = new QVBoxLayout(this);
     layout_->addWidget(type_selector_);
@@ -585,12 +585,12 @@ ResourcePanel<TracerObject>::ResourcePanel(
     ResourceWidget<TracerObject> *rsc_widget, const QString &current_type_name)
     : obj_ctx_(obj_ctx)
 {
-    type_selector_ = new QComboBox(this);
+    type_selector_ = new ComboBoxWithoutWheelFocus(this);
     type_selector_->addItems(obj_ctx.factory<TracerObject>().get_type_names());
     type_selector_->setCurrentText(current_type_name);
 
     signal_to_callback_.connect_callback(
-        type_selector_, &QComboBox::currentTextChanged, [=](const QString &new_type)
+        type_selector_, &ComboBoxWithoutWheelFocus::currentTextChanged, [=](const QString &new_type)
     {
         if(rsc_widget_)
             delete rsc_widget_;

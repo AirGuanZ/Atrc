@@ -1,11 +1,11 @@
 ﻿#include <optional>
 
 #include <agz/tracer/core/bsdf.h>
-#include <agz/tracer/core/fresnel.h>
 #include <agz/tracer/core/material.h>
 #include <agz/tracer/core/texture2d.h>
 #include <agz/utility/misc.h>
 
+#include "./utility/fresnel_point.h"
 #include "./utility/microfacet.h"
 
 AGZ_TRACER_BEGIN
@@ -19,7 +19,7 @@ namespace
     {
         Spectrum color_;
         real alpha_;
-        const FresnelPoint *fresnel_;
+        const DielectricFresnelPoint *fresnel_;
 
         bool cause_normal_conflict(const Vec3 &h, const Vec3 &w) const
         {
@@ -98,7 +98,7 @@ namespace
 
         FrostedGlassBSDF(
             const Coord &geometry_coord, const Coord &shading_coord,
-            const Spectrum &color, real alpha, const FresnelPoint *fresnel) noexcept
+            const Spectrum &color, real alpha, const DielectricFresnelPoint *fresnel) noexcept
             : LocalBSDF(geometry_coord, shading_coord),
               color_(color), alpha_(alpha), fresnel_(fresnel)
         {
@@ -261,7 +261,7 @@ namespace
 
 class FrostedGlass : public Material
 {
-    std::shared_ptr<const Fresnel> fresnel_;
+    std::shared_ptr<const Texture2D> ior_;
     std::shared_ptr<const Texture2D> color_map_;
     std::shared_ptr<const Texture2D> roughness_;
 
@@ -270,10 +270,10 @@ public:
     FrostedGlass(
         std::shared_ptr<const Texture2D> color_map,
         std::shared_ptr<const Texture2D> roughness,
-        std::shared_ptr<const Fresnel> fresnel)
+        std::shared_ptr<const Texture2D> ior)
     {
         color_map_ = std::move(color_map);
-        fresnel_   = std::move(fresnel);
+        ior_       = std::move(ior);
         roughness_ = std::move(roughness);
     }
 
@@ -281,7 +281,9 @@ public:
     {
         const Spectrum color = color_map_->sample_spectrum(inct.uv);
         const real roughness = math::clamp<real>(roughness_->sample_real(inct.uv), real(0.01), 1);
-        auto fresnel = fresnel_->get_point(inct.uv, arena);
+        const real ior = ior_->sample_real(inct.uv);
+
+        const DielectricFresnelPoint *fresnel = arena.create<DielectricFresnelPoint>(ior, real(1));
 
         const BSDF *bsdf = arena.create<FrostedGlassBSDF>(
             inct.geometry_coord, inct.user_coord, color, roughness, fresnel);
@@ -292,9 +294,9 @@ public:
 std::shared_ptr<Material> create_frosted_glass(
     std::shared_ptr<const Texture2D> color_map,
     std::shared_ptr<const Texture2D> roughness,
-    std::shared_ptr<const Fresnel> fresnel)
+    std::shared_ptr<const Texture2D> ior)
 {
-    return std::make_shared<FrostedGlass>(color_map, roughness, fresnel);
+    return std::make_shared<FrostedGlass>(color_map, roughness, ior);
 }
 
 AGZ_TRACER_END

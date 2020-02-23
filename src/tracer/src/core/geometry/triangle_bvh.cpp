@@ -544,11 +544,6 @@ public:
         AGZ_HIERARCHY_WRAP("in initializing triangle_bvh geometry object")
     }
 
-    void update_param(std::string_view name, const std::any &value) override
-    {
-        throw ObjectConstructionException("unknown updated param: " + std::string(name));
-    }
-
     bool has_intersection(const Ray &r) const noexcept override
     {
         return untransformed_->has_intersection(r);

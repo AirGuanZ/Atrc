@@ -30,8 +30,15 @@ TriangleBVHWidget::TriangleBVHWidget(const CloneState &clone_state)
     tracer_object_ = clone_state.tracer_object;
     vertices_      = clone_state.vertices;
 
-    if(!tracer_object_)
+    assert(!(tracer_object_ && !vertices_));
+
+    if(!tracer_object_ && !vertices_)
         init_as_cube();
+    else if(!tracer_object_ && vertices_)
+    {
+        assert(vertices_);
+        do_update_tracer_object();
+    }
 
     connect(filename_browse, &QPushButton::clicked, [=]
     {
@@ -159,7 +166,6 @@ void TriangleBVHWidget::load_from_file()
     filename_label_->setToolTip(filename_);
 
     set_dirty_flag();
-
     set_geometry_vertices_dirty();
 }
 

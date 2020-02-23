@@ -1,6 +1,5 @@
 #pragma once
 
-#include <agz/tracer/core/fresnel.h>
 #include <agz/tracer/core/material.h>
 #include <agz/tracer/core/texture2d.h>
 
@@ -39,12 +38,12 @@ std::shared_ptr<Material> create_disney(
 std::shared_ptr<Material> create_frosted_glass(
     std::shared_ptr<const Texture2D> color_map,
     std::shared_ptr<const Texture2D> roughness,
-    std::shared_ptr<const Fresnel> fresnel);
+    std::shared_ptr<const Texture2D> ior);
 
 std::shared_ptr<Material> create_glass(
     std::shared_ptr<const Texture2D> color_reflection_map,
     std::shared_ptr<const Texture2D> color_refraction_map,
-    std::shared_ptr<const Fresnel> fresnel);
+    std::shared_ptr<const Texture2D> ior);
 
 std::shared_ptr<Material> create_ideal_black();
 
@@ -63,7 +62,8 @@ std::shared_ptr<Material> create_mat_scaler(
 
 std::shared_ptr<Material> create_mirror(
     std::shared_ptr<const Texture2D> color_map,
-    std::shared_ptr<const Fresnel> fresnel);
+    std::shared_ptr<const Texture2D> eta,
+    std::shared_ptr<const Texture2D> k);
 
 std::shared_ptr<Material> create_mtl(
     std::shared_ptr<const Texture2D> kd,
@@ -75,5 +75,11 @@ std::shared_ptr<Material> create_mirror_varnish(
     std::shared_ptr<const Texture2D> eta_in,
     std::shared_ptr<const Texture2D> eta_out,
     std::shared_ptr<const Texture2D> color);
+
+std::shared_ptr<Material> create_phong(
+    std::shared_ptr<const Texture2D> d,
+    std::shared_ptr<const Texture2D> s,
+    std::shared_ptr<const Texture2D> ns,
+    std::unique_ptr<NormalMapper> nor_map);
 
 AGZ_TRACER_END

@@ -1,8 +1,9 @@
 #include <agz/tracer/core/bsdf.h>
-#include <agz/tracer/core/fresnel.h>
 #include <agz/tracer/core/material.h>
 #include <agz/tracer/core/texture2d.h>
 #include <agz/utility/misc.h>
+
+#include "./utility/fresnel_point.h"
 
 AGZ_TRACER_BEGIN
 
@@ -10,13 +11,13 @@ namespace
 {
     class MirrorBSDF : public LocalBSDF
     {
-        const FresnelPoint *fresnel_point_;
+        const ConductorPoint *fresnel_point_;
         Spectrum rc_;
 
     public:
 
         MirrorBSDF(const Coord &geometry_coord, const Coord &shading_coord,
-                   const FresnelPoint *fresnel_point, const Spectrum &rc) noexcept
+                   const ConductorPoint *fresnel_point, const Spectrum &rc) noexcept
             : LocalBSDF(geometry_coord, shading_coord), fresnel_point_(fresnel_point), rc_(rc)
         {
             
@@ -63,25 +64,30 @@ namespace
 
 class Mirror : public Material
 {
-    std::shared_ptr<const Fresnel> fresnel_;
+    std::shared_ptr<const Texture2D> ior_;
+    std::shared_ptr<const Texture2D> k_;
     std::shared_ptr<const Texture2D> rc_map_;
 
 public:
 
-    Mirror(std::shared_ptr<const Texture2D> color_map, std::shared_ptr<const Fresnel> fresnel)
+    Mirror(std::shared_ptr<const Texture2D> color_map, std::shared_ptr<const Texture2D> ior, std::shared_ptr<const Texture2D> k)
     {
         rc_map_ = color_map;
-        fresnel_ = fresnel;
+        ior_    = ior;
+        k_      = k;
     }
 
     ShadingPoint shade(const EntityIntersection &inct, Arena &arena) const override
     {
-        const FresnelPoint*fresnel_point = fresnel_->get_point(inct.uv, arena);
-        const Spectrum rc = rc_map_->sample_spectrum(inct.uv);
+        const Spectrum rc  = rc_map_->sample_spectrum(inct.uv);
+        const Spectrum ior = ior_   ->sample_spectrum(inct.uv);
+        const Spectrum k   = k_     ->sample_spectrum(inct.uv);
+
+        const ConductorPoint *fresnel = arena.create<ConductorPoint>(ior, Spectrum(1), k);
 
         ShadingPoint ret;
 
-        const BSDF *bsdf = arena.create<MirrorBSDF >(inct.geometry_coord, inct.user_coord, fresnel_point, rc);
+        const BSDF *bsdf = arena.create<MirrorBSDF >(inct.geometry_coord, inct.user_coord, fresnel, rc);
         ret.bsdf = bsdf;
         ret.shading_normal = inct.user_coord.z;
 
@@ -91,9 +97,10 @@ public:
 
 std::shared_ptr<Material> create_mirror(
     std::shared_ptr<const Texture2D> color_map,
-    std::shared_ptr<const Fresnel> fresnel)
+    std::shared_ptr<const Texture2D> eta,
+    std::shared_ptr<const Texture2D> k)
 {
-    return std::make_shared<Mirror>(color_map, fresnel);
+    return std::make_shared<Mirror>(color_map, eta, k);
 }
 
 AGZ_TRACER_END
