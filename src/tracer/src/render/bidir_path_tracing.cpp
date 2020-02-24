@@ -191,6 +191,7 @@ namespace
             vertex.pdf_fwd       = proj_pdf;
             vertex.G_with_last   = G(inct.pos, last_pos, inct.geometry_coord.z, last_nor);
             vertex.entity        = inct.entity;
+            vertex.uv            = inct.uv;
             vertex.bsdf          = shd.bsdf;
             vertex.is_delta      = shd.bsdf->is_delta();
 
@@ -307,6 +308,7 @@ namespace
             vertex.pdf_bwd       = proj_pdf;
             vertex.G_with_last   = G(inct.pos, last_pos, inct.geometry_coord.z, last_nor);
             vertex.entity        = inct.entity;
+            vertex.uv            = inct.uv;
             vertex.bsdf          = shd.bsdf;
             vertex.is_delta      = shd.bsdf->is_delta();
     
@@ -410,7 +412,7 @@ namespace
                 return {};
     
             const Spectrum radiance = light->radiance(
-                cam_end.pos, cam_end.nor, cam_beg.pos - cam_end.pos);
+                cam_end.pos, cam_end.nor, cam_end.uv, cam_beg.pos - cam_end.pos);
             return radiance * cam_end.accu_bsdf / cam_end.accu_proj_pdf;
         }
     
@@ -486,7 +488,7 @@ namespace
                 return {};
     
             const Spectrum radiance = light->radiance(
-                cam_end.pos, cam_end.nor, cam_bend.pos - cam_end.pos);
+                cam_end.pos, cam_end.nor, cam_end.uv, cam_bend.pos - cam_end.pos);
             contrib = radiance * cam_end.accu_bsdf / cam_end.accu_proj_pdf;
         }
         else
@@ -528,7 +530,7 @@ namespace
         const real proj_pdf = lht_sam_wi.pdf / std::abs(cos(cam_end.nor, lht_sam_wi.ref_to_light()));
         const Spectrum contrib = bsdf * cam_end.accu_bsdf * lht_sam_wi.radiance
                                / (connected_path.select_light_pdf * cam_end.accu_proj_pdf * proj_pdf);
-    
+
         if(!contrib)
             return {};
     

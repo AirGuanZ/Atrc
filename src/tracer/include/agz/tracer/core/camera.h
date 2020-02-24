@@ -62,8 +62,6 @@ public:
 
     virtual ~Camera() = default;
 
-    virtual void update_param(std::string_view name, const std::any &value) = 0;
-
     /**
      * @brief generate a ray
      *

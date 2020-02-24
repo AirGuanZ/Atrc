@@ -106,7 +106,7 @@ Pixel trace_std(const TraceParams &params, const Scene &scene, const Ray &ray, S
         if(depth == 1)
         {
             if(auto light = ent_inct.entity->as_light())
-                pixel.value += coef * light->radiance(ent_inct.pos, ent_inct.geometry_coord.z, ent_inct.wr);
+                pixel.value += coef * light->radiance(ent_inct.pos, ent_inct.geometry_coord.z, ent_inct.uv, ent_inct.wr);
         }
 
         // direct illumination
@@ -210,7 +210,7 @@ Pixel trace_nomis(const TraceParams &params, const Scene &scene, const Ray &ray,
         // process surface scattering
 
         if(auto light = ent_inct.entity->as_light())
-            pixel.value += coef * light->radiance(ent_inct.pos, ent_inct.geometry_coord.z, ent_inct.wr);
+            pixel.value += coef * light->radiance(ent_inct.pos, ent_inct.geometry_coord.z, ent_inct.uv, ent_inct.wr);
 
         const auto bsdf_sample = ent_shd.bsdf->sample(ent_inct.wr, TransportMode::Radiance, sampler.sample3());
         if(!bsdf_sample.f)
@@ -268,7 +268,7 @@ Pixel trace_albedo_ao(const AlbedoAOParams &params, const Scene &scene, const Ra
 
     Spectrum le;
     if(const AreaLight *light = inct.entity->as_light())
-        le = light->radiance(inct.pos, inct.geometry_coord.z, inct.wr);
+        le = light->radiance(inct.pos, inct.geometry_coord.z, inct.uv, inct.wr);
 
     const ShadingPoint shd = inct.material->shade(inct, arena);
     const Spectrum albedo = shd.bsdf->albedo();

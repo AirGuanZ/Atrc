@@ -56,7 +56,7 @@ void IBLWidget::update_tracer_object_impl()
 void IBLWidget::do_update_tracer_object()
 {
     const bool use_importance_sampling = importance_sampling_->isChecked();
-    tracer_object_ = create_ibl_light(tex_->update_tracer_object(), !use_importance_sampling);
+    tracer_object_ = create_ibl_light(tex_->get_tracer_object(), !use_importance_sampling);
 }
 
 ResourceWidget<tracer::EnvirLight> *IBLCreator::create_widget(ObjectContext &obj_ctx) const

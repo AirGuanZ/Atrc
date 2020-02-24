@@ -43,11 +43,11 @@ NormalMapWidget *NormalMapWidget::clone() const
     return new NormalMapWidget(init_data, obj_ctx_);
 }
 
-std::unique_ptr<tracer::NormalMapper> NormalMapWidget::update_tracer_object() const
+std::unique_ptr<tracer::NormalMapper> NormalMapWidget::get_tracer_object() const
 {
     if(apply_normal_map_->isChecked())
     {
-        auto normal_map = normal_map_->update_tracer_object();
+        auto normal_map = normal_map_->get_tracer_object();
         return std::make_unique<tracer::NormalMapper>(std::move(normal_map));
     }
     return std::make_unique<tracer::NormalMapper>(nullptr);

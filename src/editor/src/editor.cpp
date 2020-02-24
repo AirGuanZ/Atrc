@@ -57,7 +57,7 @@ Editor::Editor()
 
     AGZ_INFO("initialize initial scene");
 
-    scene_params_.envir_light = envir_light_slot_->update_tracer_object();
+    scene_params_.envir_light = envir_light_slot_->get_tracer_object();
     scene_params_.aggregate = scene_mgr_->update_tracer_aggregate(scene_params_.entities);
     scene_ = create_default_scene(scene_params_);
     scene_->set_camera(displayer_->create_camera());
@@ -199,7 +199,7 @@ void Editor::on_update_envir_light()
 
     renderer_.reset();
 
-    scene_params_.envir_light = envir_light_slot_->update_tracer_object();
+    scene_params_.envir_light = envir_light_slot_->get_tracer_object();
 
     auto old_camera = scene_->get_shared_camera();
 

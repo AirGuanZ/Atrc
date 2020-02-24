@@ -133,7 +133,7 @@ public:
      * @param nor normal at pos
      * @param light_to_out direction from light source to outside
      */
-    virtual Spectrum radiance(const Vec3 &pos, const Vec3 &nor, const Vec3 &light_to_out) const noexcept = 0;
+    virtual Spectrum radiance(const Vec3 &pos, const Vec3 &nor, const Vec2 &uv, const Vec3 &light_to_out) const noexcept = 0;
 
     /**
      * @brief pdf of sample_wi (w.r.t. solid angle)

@@ -68,7 +68,7 @@ std::shared_ptr<tracer::Aggregate> SceneManager::update_tracer_aggregate(
     std::vector<std::shared_ptr<const tracer::Entity>> entity_arr;
     for(auto &p : name2record_)
     {
-        auto ent = p.second->panel->update_tracer_object();
+        auto ent = p.second->panel->get_tracer_object();
         entity_arr.push_back(ent);
         entities.push_back(ent);
     }

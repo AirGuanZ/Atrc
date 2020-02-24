@@ -86,10 +86,10 @@ void PhongWidget::update_tracer_object_impl()
 
 void PhongWidget::do_update_tracer_object()
 {
-    auto d   = d_->update_tracer_object();
-    auto s   = s_->update_tracer_object();
-    auto ns  = ns_->update_tracer_object();
-    auto nor = normal_map_->update_tracer_object();
+    auto d   = d_->get_tracer_object();
+    auto s   = s_->get_tracer_object();
+    auto ns  = ns_->get_tracer_object();
+    auto nor = normal_map_->get_tracer_object();
 
     tracer_object_ = create_phong(
         std::move(d), std::move(s), std::move(ns), std::move(nor));

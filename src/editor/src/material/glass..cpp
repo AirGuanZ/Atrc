@@ -91,12 +91,12 @@ void GlassWidget::update_tracer_object_impl()
 
 void GlassWidget::do_update_tracer_object()
 {
-    auto color      = color_->update_tracer_object();
-    auto ior        = ior_->update_tracer_object();
+    auto color      = color_->get_tracer_object();
+    auto ior        = ior_->get_tracer_object();
 
     auto color_refr = color;
     if(use_color_refr_->isChecked())
-        color_refr = color_refr_->update_tracer_object();
+        color_refr = color_refr_->get_tracer_object();
 
     tracer_object_ = create_glass(color, color_refr, ior);
 }

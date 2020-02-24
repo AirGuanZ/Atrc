@@ -79,7 +79,7 @@ public:
     /**
      * @brief get the newest tracer object
      */
-    std::shared_ptr<TracerObject> update_tracer_object();
+    std::shared_ptr<TracerObject> get_tracer_object();
 
     /**
      * @brief clone the resource widget and tracer object
@@ -106,13 +106,6 @@ protected:
     std::shared_ptr<TracerObject> tracer_object_;
     
 private:
-
-    /**
-     * @brief check whether need to update the corresponding tracer object and set the dirty flag to false
-     */
-    bool check_update_flag() noexcept;
-
-    bool dirty_flag_ = false;
 
     std::function<void()> dirty_callback_;
 };
@@ -172,7 +165,7 @@ public:
 
     void set_dirty_callback(std::function<void()> callback);
 
-    std::shared_ptr<TracerObject> update_tracer_object();
+    std::shared_ptr<TracerObject> get_tracer_object();
 
     ResourcePanel<TracerObject> *clone() const;
 
@@ -216,7 +209,7 @@ public:
 
     void set_removed_callback(std::function<void()> callback);
 
-    std::shared_ptr<TracerObject> update_tracer_object();
+    std::shared_ptr<TracerObject> get_tracer_object();
 
     ResourceInPool<TracerObject> *get_resource();
 
@@ -268,7 +261,7 @@ public:
 
     std::unique_ptr<ResourceReference<TracerObject>> create_reference();
 
-    std::shared_ptr<TracerObject> update_tracer_object();
+    std::shared_ptr<TracerObject> get_tracer_object();
 
     ResourcePanel<TracerObject> *get_panel();
 
@@ -350,7 +343,7 @@ public:
 
     void set_dirty_callback(std::function<void()> callback);
 
-    std::shared_ptr<TracerObject> update_tracer_object();
+    std::shared_ptr<TracerObject> get_tracer_object();
 
     ResourceSlot<TracerObject> *clone() const;
 
@@ -478,27 +471,17 @@ void ResourceWidget<TracerObject>::set_dirty_callback(std::function<void()> call
 }
 
 template<typename TracerObject>
-std::shared_ptr<TracerObject> ResourceWidget<TracerObject>::update_tracer_object()
+std::shared_ptr<TracerObject> ResourceWidget<TracerObject>::get_tracer_object()
 {
-    if(check_update_flag())
-        update_tracer_object_impl();
     return tracer_object_;
 }
 
 template<typename TracerObject>
 void ResourceWidget<TracerObject>::set_dirty_flag()
 {
-    dirty_flag_ = true;
+    update_tracer_object_impl();
     if(dirty_callback_)
         dirty_callback_();
-}
-
-template<typename TracerObject>
-bool ResourceWidget<TracerObject>::check_update_flag() noexcept
-{
-    const bool ret = dirty_flag_;
-    dirty_flag_ = false;
-    return ret;
 }
 
 template<typename TracerObject>
@@ -649,9 +632,9 @@ void ResourcePanel<TracerObject>::set_dirty_callback(std::function<void()> callb
 }
 
 template<typename TracerObject>
-std::shared_ptr<TracerObject> ResourcePanel<TracerObject>::update_tracer_object()
+std::shared_ptr<TracerObject> ResourcePanel<TracerObject>::get_tracer_object()
 {
-    return rsc_widget_->update_tracer_object();
+    return rsc_widget_->get_tracer_object();
 }
 
 template<typename TracerObject>
@@ -714,10 +697,10 @@ void ResourceReference<TracerObject>::set_removed_callback(std::function<void()>
 }
 
 template<typename TracerObject>
-std::shared_ptr<TracerObject> ResourceReference<TracerObject>::update_tracer_object()
+std::shared_ptr<TracerObject> ResourceReference<TracerObject>::get_tracer_object()
 {
     assert(rsc_in_pool_);
-    return rsc_in_pool_->update_tracer_object();
+    return rsc_in_pool_->get_tracer_object();
 }
 
 template<typename TracerObject>
@@ -867,9 +850,9 @@ void ResourceInPool<TracerObject>::remove_reference(ResourceReference<TracerObje
 }
 
 template<typename TracerObject>
-std::shared_ptr<TracerObject> ResourceInPool<TracerObject>::update_tracer_object()
+std::shared_ptr<TracerObject> ResourceInPool<TracerObject>::get_tracer_object()
 {
-    return panel_->update_tracer_object();
+    return panel_->get_tracer_object();
 }
 
 template<typename TracerObject>
@@ -956,12 +939,12 @@ void ResourceSlot<TracerObject>::set_dirty_callback(std::function<void()> callba
 }
 
 template<typename TracerObject>
-std::shared_ptr<TracerObject> ResourceSlot<TracerObject>::update_tracer_object()
+std::shared_ptr<TracerObject> ResourceSlot<TracerObject>::get_tracer_object()
 {
     if(reference_)
-        return reference_->update_tracer_object();
+        return reference_->get_tracer_object();
     assert(owned_panel_);
-    return owned_panel_->update_tracer_object();
+    return owned_panel_->get_tracer_object();
 }
 
 template<typename TracerObject>
@@ -1134,11 +1117,12 @@ ResourceSlot<TracerObject>::ResourceSlot(
             });
             layout_->addWidget(owned_panel_);
 
-            reference_widget_->hide();
-            owned_button_widget_    ->show();
+            reference_widget_   ->hide();
+            owned_button_widget_->show();
 
             if(dirty_callback_)
                 dirty_callback_();
+
             set_geometry_vertices_dirty();
             set_entity_transform_dirty();
         });
@@ -1206,11 +1190,12 @@ ResourceSlot<TracerObject>::ResourceSlot(
 
             reference_.reset();
 
-            reference_widget_->hide();
-            owned_button_widget_    ->show();
+            reference_widget_   ->hide();
+            owned_button_widget_->show();
 
             if(dirty_callback_)
                 dirty_callback_();
+
             set_geometry_vertices_dirty();
             set_entity_transform_dirty();
         });
@@ -1243,13 +1228,14 @@ ResourceSlot<TracerObject>::ResourceSlot(
             });
             reference_->set_removed_callback(reference_removed_callback);
 
-            reference_widget_->show();
+            reference_widget_   ->show();
             owned_button_widget_->hide();
 
             reference_layout->insertWidget(0, reference_->get_name_widget());
 
             if(dirty_callback_)
                 dirty_callback_();
+
             set_geometry_vertices_dirty();
             set_entity_transform_dirty();
         });
@@ -1288,13 +1274,14 @@ ResourceSlot<TracerObject>::ResourceSlot(
             });
             reference_->set_removed_callback(reference_removed_callback);
 
-            reference_widget_->show();
+            reference_widget_   ->show();
             owned_button_widget_->hide();
 
             reference_layout->insertWidget(0, reference_->get_name_widget());
 
             if(dirty_callback_)
                 dirty_callback_();
+
             set_geometry_vertices_dirty();
             set_entity_transform_dirty();
         });

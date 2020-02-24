@@ -60,8 +60,8 @@ void IdealDiffuseWidget::update_tracer_object_impl()
 
 void IdealDiffuseWidget::do_update_tracer_object()
 {
-    auto albedo_tex = albedo_->update_tracer_object();
-    auto normal_map = normal_map_->update_tracer_object();
+    auto albedo_tex = albedo_->get_tracer_object();
+    auto normal_map = normal_map_->get_tracer_object();
     tracer_object_ = create_ideal_diffuse(albedo_tex, std::move(normal_map));
 }
 

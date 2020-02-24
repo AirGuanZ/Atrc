@@ -12,10 +12,15 @@ Offline rendering lab based on ray tracing
 
 ## Roadmap
 
-- [ ] refactor area light source as entity material
-- [ ] impl material thumbnail in editor
+- [x] refactor area light source as entity material
+- [ ] material thumbnail in editor
 - [ ] saving/loading in editor
+- [ ] rendering camera setting in editor
 - [ ] JSON exporter in editor
+- [x] ply loading
+- [ ] mouse picking
+- [ ] scene tree
+- [ ] variance buffer
 - [ ] more rendering algorithms: sppm, vcm, mlt, ...
 
 ## Documentation
@@ -26,26 +31,18 @@ Offline rendering lab based on ray tracing
 
 ## Gallery
 
-Scene Editor:
+Scene Editor (under development) (scene ref [here](https://luxcorerender.org/download/)):
 
-![0](./doc/gallery/0.png)
+![0](./doc/gallery/editor.png)
 
 Materials:
 
-![1](./doc/gallery/1.png)
+![1](./doc/gallery/materials.png)
 
 Fireplace Room (scene ref [here](http://casual-effects.com/data/index.html)):
 
-![2](./doc/gallery/2.png)
+![2](./doc/gallery/fireplace.png)
 
-Glasses:
+DoF:
 
-![3](./doc/gallery/3.png)
-
-Volumetric Rendering (model ref [here](http://casual-effects.com/data/index.html)):
-
-![4](./doc/gallery/4.png)
-
-G-Buffer & Denoiser (model ref [here](http://graphics.stanford.edu/data/3Dscanrep/)):
-
-![5](./doc/gallery/5.png)
+![3](./doc/gallery/dof.png)

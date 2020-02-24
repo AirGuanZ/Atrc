@@ -50,7 +50,7 @@ Spectrum ParticleTracer::render_pixel(
     }
 
     if(auto light = inct.entity->as_light())
-        return light->radiance(inct.pos, inct.geometry_coord.z, -ray.d);
+        return light->radiance(inct.pos, inct.geometry_coord.z, inct.uv, -ray.d);
     return Spectrum();
 }
 

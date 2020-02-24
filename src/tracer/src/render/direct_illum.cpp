@@ -166,7 +166,7 @@ Spectrum mis_sample_bsdf(
     if(!light)
         return {};
 
-    const Spectrum light_radiance = light->radiance(ent_inct.pos, ent_inct.geometry_coord.z, ent_inct.wr);
+    const Spectrum light_radiance = light->radiance(ent_inct.pos, ent_inct.geometry_coord.z, ent_inct.uv, ent_inct.wr);
     if(!light_radiance)
         return {};
 
@@ -225,7 +225,7 @@ Spectrum mis_sample_bsdf(
     if(!light)
         return {};
 
-    const Spectrum light_f = light->radiance(ent_inct.pos, ent_inct.geometry_coord.z, ent_inct.wr);
+    const Spectrum light_f = light->radiance(ent_inct.pos, ent_inct.geometry_coord.z, ent_inct.uv, ent_inct.wr);
     if(!light_f)
         return {};
 

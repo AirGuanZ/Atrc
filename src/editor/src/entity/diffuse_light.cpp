@@ -97,7 +97,7 @@ void DiffuseLightEntityWidget::update_tracer_object_impl()
 
 void DiffuseLightEntityWidget::do_update_tracer_object()
 {
-    auto geometry = geometry_->update_tracer_object();
+    auto geometry = geometry_->get_tracer_object();
     auto radiance = radiance_->get_value();
 
     tracer::MediumInterface med;

@@ -16,6 +16,7 @@ std::shared_ptr<Entity> create_geometric(
     std::shared_ptr<const Geometry> geometry,
     std::shared_ptr<const Material> material,
     const MediumInterface &med,
+    const Spectrum &emit_radiance,
     bool no_denoise);
 
 AGZ_TRACER_END

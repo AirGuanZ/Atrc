@@ -55,11 +55,12 @@ namespace entity
 
         std::shared_ptr<Entity> create(const ConfigGroup &params, CreatingContext &context) const override
         {
-            const auto geometry = context.create<Geometry>(params.child_group("geometry"));
-            const auto material = context.create<Material>(params.child_group("material"));
-            const auto med = create_medium_interface(params, context);
+            const auto geometry   = context.create<Geometry>(params.child_group("geometry"));
+            const auto material   = context.create<Material>(params.child_group("material"));
+            const auto medium     = create_medium_interface(params, context);
+            const auto emit_rad   = params.child_spectrum_or("emit_radiance", Spectrum());
             const auto no_denoise = params.child_int_or("no_denoise", 0);
-            return create_geometric(std::move(geometry), std::move(material), med, no_denoise);
+            return create_geometric(std::move(geometry), std::move(material), medium, emit_rad, no_denoise);
         }
     };
 

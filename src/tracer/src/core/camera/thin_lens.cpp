@@ -67,15 +67,6 @@ public:
         init_from_params(params_);
     }
 
-    void update_param(std::string_view name, const std::any &value) override
-    {
-        if(name == "film_aspect")
-            params_.film_aspect = std::any_cast<real>(value);
-        else
-            throw ObjectConstructionException("unknown updated param: " + std::string(name));
-        init_from_params(params_);
-    }
-
     CameraSampleWeResult sample_we(const Vec2 &film_coord, const Sample2 &aperture_sample) const noexcept override
     {
         const Vec3 focal_film_pos = {

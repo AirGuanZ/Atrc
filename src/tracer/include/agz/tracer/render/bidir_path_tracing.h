@@ -49,6 +49,9 @@ struct BDPTVertex
     // vertex entity
     const Entity *entity = nullptr;
 
+    // vertex uv[e]
+    Vec2 uv;
+
     // vertex bsdf[e]
     const BSDF *bsdf = nullptr;
 

@@ -1,6 +1,6 @@
 # Atrc Renderer Documentation
 
-![pic](./gallery/1.png)
+![pic](./gallery/editor.png)
 
 [TOC]
 
@@ -302,12 +302,14 @@ Geometric diffuse light source, that is, a light source with a geometric shape. 
 
 Ordinary entity with geometry shape, material and mediums.
 
-| Field Name | Type     | Default Value | Explanation      |
-| ---------- | -------- | ------------- | ---------------- |
-| geometry   | Geometry |               | geometric shape  |
-| material   | Material |               | surface material |
-| med_in     | Medium   | void          | outer medium     |
-| med_out    | Medium   | void          | inner medium     |
+| Field Name    | Type     | Default Value | Explanation                     |
+| ------------- | -------- | ------------- | ------------------------------- |
+| geometry      | Geometry |               | geometric shape                 |
+| material      | Material |               | surface material                |
+| med_in        | Medium   | void          | outer medium                    |
+| med_out       | Medium   | void          | inner medium                    |
+| emit_radiance | Spectrum | [ 0, 0, 0 ]   | emitted radiance                |
+| no_denoise    | bool     | false         | disable denoiser on this entity |
 
 ### FilmFilter
 

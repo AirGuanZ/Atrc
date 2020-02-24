@@ -3,6 +3,7 @@
 #include <agz/editor/entity/entity.h>
 #include <agz/editor/geometry/geometry.h>
 #include <agz/editor/material/material.h>
+#include <agz/editor/ui/utility/vec_input.h>
 #include <agz/editor/ui/transform3d_widget.h>
 
 AGZ_EDITOR_BEGIN
@@ -15,7 +16,7 @@ public:
     {
         GeometrySlot *geometry = nullptr;
         MaterialSlot *material = nullptr;
-
+        Spectrum emit_radiance;
         DirectTransform transform;
     };
 
@@ -43,6 +44,8 @@ private:
 
     GeometrySlot *geometry_ = nullptr;
     MaterialSlot *material_ = nullptr;
+
+    SpectrumInput *emit_radiance_ = nullptr;
 
     Transform3DWidget *transform_ = nullptr;
 };

@@ -79,9 +79,9 @@ void MirrorWidget::update_tracer_object_impl()
 
 void MirrorWidget::do_update_tracer_object()
 {
-    auto color_map = color_map_->update_tracer_object();
-    auto ior       = eta_      ->update_tracer_object();
-    auto k         = k_->update_tracer_object();
+    auto color_map = color_map_->get_tracer_object();
+    auto ior       = eta_      ->get_tracer_object();
+    auto k         = k_->get_tracer_object();
     tracer_object_ = create_mirror(color_map, ior, k);
 }
 

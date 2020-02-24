@@ -152,20 +152,20 @@ void DisneyWidget::update_tracer_object_impl()
 
 void DisneyWidget::do_update_tracer_object()
 {
-    auto base_color             = base_color_            ->update_tracer_object();
-    auto metallic               = metallic_              ->update_tracer_object();
-    auto roughness              = roughness_             ->update_tracer_object();
-    auto transmission           = transmission_          ->update_tracer_object();
-    auto transmission_roughness = transmission_roughness_->update_tracer_object();
-    auto ior                    = ior_                   ->update_tracer_object();
-    auto specular_scale         = specular_scale_        ->update_tracer_object();
-    auto specular_tint          = specular_tint_         ->update_tracer_object();
-    auto anisotropic            = anisotropic_           ->update_tracer_object();
-    auto sheen                  = sheen_                 ->update_tracer_object();
-    auto sheen_tint             = sheen_tint_            ->update_tracer_object();
-    auto clearcoat              = clearcoat_             ->update_tracer_object();
-    auto clearcoat_gloss        = clearcoat_gloss_       ->update_tracer_object();
-    auto normal_map             = normal_map_            ->update_tracer_object();
+    auto base_color             = base_color_            ->get_tracer_object();
+    auto metallic               = metallic_              ->get_tracer_object();
+    auto roughness              = roughness_             ->get_tracer_object();
+    auto transmission           = transmission_          ->get_tracer_object();
+    auto transmission_roughness = transmission_roughness_->get_tracer_object();
+    auto ior                    = ior_                   ->get_tracer_object();
+    auto specular_scale         = specular_scale_        ->get_tracer_object();
+    auto specular_tint          = specular_tint_         ->get_tracer_object();
+    auto anisotropic            = anisotropic_           ->get_tracer_object();
+    auto sheen                  = sheen_                 ->get_tracer_object();
+    auto sheen_tint             = sheen_tint_            ->get_tracer_object();
+    auto clearcoat              = clearcoat_             ->get_tracer_object();
+    auto clearcoat_gloss        = clearcoat_gloss_       ->get_tracer_object();
+    auto normal_map             = normal_map_            ->get_tracer_object();
 
     tracer_object_ = create_disney(
         base_color, metallic, roughness, transmission, transmission_roughness,

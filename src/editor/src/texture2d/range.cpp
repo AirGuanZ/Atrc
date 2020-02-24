@@ -1,3 +1,5 @@
+#include <QEvent>
+
 #include <agz/editor/texture2d/range.h>
 
 AGZ_EDITOR_BEGIN
@@ -40,6 +42,21 @@ RangeWidget::RangeWidget(const CloneState &clone_state)
 
     slider_->set_range(clone_state.low, clone_state.high);
     slider_->set_value(clone_state.value);
+
+    class DisableSliderWheel : public QObject
+    {
+    protected:
+
+        using QObject::QObject;
+
+        bool eventFilter(QObject *watched, QEvent *event) override
+        {
+            if(event->type() == QEvent::Wheel)
+                return true;
+            return QObject::eventFilter(watched, event);
+        }
+    };
+    slider_->installEventFilter(new DisableSliderWheel(slider_));
 
     connect(range_edit_, &QLineEdit::returnPressed, [=]
     {

@@ -93,7 +93,7 @@ private:
             pixel.denoise = inct.entity->get_no_denoise_flag() ? real(0) : real(1);
 
             if(auto light = inct.entity->as_light())
-                pixel.value = light->radiance(inct.pos, inct.geometry_coord.z, -r.d);
+                pixel.value = light->radiance(inct.pos, inct.geometry_coord.z, inct.uv, -r.d);
             return pixel;
         }
 

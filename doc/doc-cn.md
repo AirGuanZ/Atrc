@@ -1,6 +1,6 @@
 # Atrc Renderer Documentation
 
-![pic](./gallery/1.png)
+![pic](./gallery/editor.png)
 
 [TOC]
 
@@ -302,12 +302,14 @@ Atrc使用JSON作为描述场景和渲染设置的配置文件格式。整个JSO
 
 普通的物体，可指定其几何形状、材质和内外介质。
 
-| 字段名   | 类型     | 默认值 | 含义                 |
-| -------- | -------- | ------ | -------------------- |
-| geometry | Geometry |        | 几何形状             |
-| material | Material |        | 实体表面材质         |
-| med_in   | Medium   | void   | 内部介质，默认为真空 |
-| med_out  | Medium   | void   | 外部介质，默认为真空 |
+| 字段名        | 类型     | 默认值      | 含义                            |
+| ------------- | -------- | ----------- | ------------------------------- |
+| geometry      | Geometry |             | 几何形状                        |
+| material      | Material |             | 实体表面材质                    |
+| med_in        | Medium   | void        | 内部介质，默认为真空            |
+| med_out       | Medium   | void        | 外部介质，默认为真空            |
+| emit_radiance | Spectrum | [ 0, 0, 0 ] | 作为光源的亮度                  |
+| no_denoise    | bool     | false       | disable denoiser on this entity |
 
 ### FilmFilter
 
