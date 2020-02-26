@@ -76,7 +76,7 @@ Texture2DWidget *Constant2DWidget::clone()
     return new Constant2DWidget(init_data);
 }
 
-QPixmap Constant2DWidget::get_thumbnail(int width, int height) const
+std::unique_ptr<ResourceThumbnailProvider> Constant2DWidget::get_thumbnail(int width, int height) const
 {
     QImage image(1, 1, QImage::Format::Format_RGB888);
     image.setPixelColor(0, 0, color_holder_->get_qcolor());
@@ -84,7 +84,7 @@ QPixmap Constant2DWidget::get_thumbnail(int width, int height) const
     QPixmap pixmap;
     pixmap.convertFromImage(image);
 
-    return pixmap.scaled(width, height);
+    return std::make_unique<FixedResourceThumbnailProvider>(pixmap.scaled(width, height));
 }
 
 void Constant2DWidget::update_tracer_object_impl()

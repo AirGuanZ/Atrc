@@ -6,7 +6,7 @@
 
 AGZ_EDITOR_BEGIN
 
-class DisplayerGLWidget;
+class Displayer;
 class Editor;
 
 class SceneManager : public QObject, public misc::uncopyable_t
@@ -15,7 +15,7 @@ class SceneManager : public QObject, public misc::uncopyable_t
 
 public:
 
-    SceneManager(ObjectContext &obj_ctx, Editor *editor, DisplayerGLWidget *displayer_gl);
+    SceneManager(ObjectContext &obj_ctx, Editor *editor, Displayer *displayer);
 
     ~SceneManager();
 
@@ -58,6 +58,8 @@ private:
 
     ObjectContext     &obj_ctx_;
     Editor            *editor_ = nullptr;
+
+    Displayer         *displayer_    = nullptr;
     DisplayerGLWidget *displayer_gl_ = nullptr;
 
     std::map<QString, std::unique_ptr<Record>> name2record_;

@@ -277,7 +277,7 @@ public:
         roughness_ = std::move(roughness);
     }
 
-    ShadingPoint shade(const EntityIntersection &inct, Arena &arena) const override
+    ShadingPoint shade(const SurfacePoint &inct, Arena &arena) const override
     {
         const Spectrum color = color_map_->sample_spectrum(inct.uv);
         const real roughness = math::clamp<real>(roughness_->sample_real(inct.uv), real(0.01), 1);

@@ -20,7 +20,7 @@ public:
 
     ResourceWidget<tracer::Material> *clone() override;
 
-    QPixmap get_thumbnail(int width, int height) const override;
+    std::unique_ptr<ResourceThumbnailProvider> get_thumbnail(int width, int height) const override;
 
 protected:
 

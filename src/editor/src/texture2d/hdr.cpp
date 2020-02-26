@@ -93,7 +93,7 @@ void HDRWidget::init_ui(const CloneState &clone_state)
     layout_->setContentsMargins(0, 0, 0, 0);
 }
 
-QPixmap HDRWidget::get_thumbnail(int width, int height) const
+std::unique_ptr<ResourceThumbnailProvider> HDRWidget::get_thumbnail(int width, int height) const
 {
     if(!img_data_)
     {
@@ -102,7 +102,7 @@ QPixmap HDRWidget::get_thumbnail(int width, int height) const
 
         QPixmap pixmap;
         pixmap.convertFromImage(img);
-        return pixmap.scaled(width, height);
+        return std::make_unique<FixedResourceThumbnailProvider>(pixmap.scaled(width, height));
     }
 
     auto imgu8 = img_data_->map(&math::to_color3b<float>);
@@ -116,7 +116,7 @@ QPixmap HDRWidget::get_thumbnail(int width, int height) const
     QPixmap pixmap;
     pixmap.convertFromImage(img);
 
-    return pixmap.scaled(width, height);
+    return std::make_unique<FixedResourceThumbnailProvider>(pixmap.scaled(width, height));
 }
 
 void HDRWidget::browse_filename()

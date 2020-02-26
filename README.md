@@ -13,12 +13,13 @@ Offline rendering lab based on ray tracing
 ## Roadmap
 
 - [x] refactor area light source as entity material
-- [ ] material thumbnail in editor
+- [x] highlighting selected entity
+- [x] ply loading
+- [x] mouse picking
+- [x] material thumbnail in editor
 - [ ] saving/loading in editor
 - [ ] rendering camera setting in editor
 - [ ] JSON exporter in editor
-- [x] ply loading
-- [ ] mouse picking
 - [ ] scene tree
 - [ ] variance buffer
 - [ ] more rendering algorithms: sppm, vcm, mlt, ...

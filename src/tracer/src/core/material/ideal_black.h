@@ -41,7 +41,7 @@ class IdealBlack : public Material
 
 public:
 
-    ShadingPoint shade(const EntityIntersection &inct, Arena&) const override
+    ShadingPoint shade(const SurfacePoint &inct, Arena&) const override
     {
         ShadingPoint shd;
         shd.bsdf = IDEAL_BLACK_BSDF_INSTANCE();

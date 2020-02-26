@@ -55,11 +55,6 @@ ResourceWidget<tracer::Geometry> *TriangleBVHWidget::clone()
     return new TriangleBVHWidget(clone_state);
 }
 
-QPixmap TriangleBVHWidget::get_thumbnail(int width, int height) const
-{
-    return QPixmap(width, height);
-}
-
 std::vector<EntityInterface::Vertex> TriangleBVHWidget::get_vertices() const
 {
     assert(vertices_);

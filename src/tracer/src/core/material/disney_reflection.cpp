@@ -297,7 +297,7 @@ public:
         normal_mapper_   = std::move(normal_mapper);
     }
 
-    ShadingPoint shade(const EntityIntersection &inct, Arena &arena) const override
+    ShadingPoint shade(const SurfacePoint &inct, Arena &arena) const override
     {
         const Spectrum base_color      = base_color_     ->sample_spectrum(inct.uv);
         const real     metallic        = metallic_       ->sample_real(inct.uv);

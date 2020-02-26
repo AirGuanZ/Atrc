@@ -271,7 +271,7 @@ public:
         ns_ = std::move(ns);
     }
 
-    ShadingPoint shade(const EntityIntersection &inct, Arena &arena) const override
+    ShadingPoint shade(const SurfacePoint &inct, Arena &arena) const override
     {
         Spectrum kd = kd_->sample_spectrum(inct.uv);
         Spectrum ks = ks_->sample_spectrum(inct.uv);

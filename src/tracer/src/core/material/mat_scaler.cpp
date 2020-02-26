@@ -19,7 +19,7 @@ public:
         scale_ = scale;
     }
 
-    ShadingPoint shade(const EntityIntersection &inct, Arena &arena) const override
+    ShadingPoint shade(const SurfacePoint &inct, Arena &arena) const override
     {
         const ShadingPoint internal_shd = internal_->shade(inct, arena);
         const Spectrum scale = scale_->sample_spectrum(inct.uv);

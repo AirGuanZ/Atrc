@@ -13,11 +13,6 @@ public:
         return new NoEnvirLightWidget;
     }
 
-    QPixmap get_thumbnail(int width, int height) const override
-    {
-        return QPixmap(width, height);
-    }
-
 protected:
 
     void update_tracer_object_impl() override

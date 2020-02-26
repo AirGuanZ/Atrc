@@ -24,8 +24,6 @@ public:
 
     ResourceWidget<tracer::Entity> *clone() override;
 
-    QPixmap get_thumbnail(int width, int height) const override;
-
     std::vector<Vertex> get_vertices() const override;
 
     DirectTransform get_transform() const override;

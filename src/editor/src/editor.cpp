@@ -287,7 +287,7 @@ void Editor::init_obj_context()
 
 void Editor::init_scene_mgr()
 {
-    scene_mgr_ = std::make_unique<SceneManager>(*obj_ctx_, this, displayer_->get_gl_widget());
+    scene_mgr_ = std::make_unique<SceneManager>(*obj_ctx_, this, displayer_);
     left_panel_->up_panel_layout->addWidget(scene_mgr_->get_widget());
 
     connect(scene_mgr_.get(), &SceneManager::change_scene, [=]

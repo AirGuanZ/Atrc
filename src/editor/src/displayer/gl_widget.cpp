@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include <QMouseEvent>
 #include <QTimer>
 #include <QVBoxLayout>
@@ -49,6 +51,11 @@ namespace
 
     void main()
     {
+        if(light_dir.x == 0 && light_dir.y == 0 && light_dir.z == 0)
+        {
+            frag_color = vec4(color, 0.2);
+            return;
+        }
         float light_factor = 0.1 + 0.75 * max(0, dot(normalize(w_normal), -light_dir));
         light_factor = 0.4 * light_factor + 0.6 * light_factor * light_factor;
         light_factor = pow(light_factor, 1 / 1.4);
@@ -91,14 +98,19 @@ namespace
 
 DisplayerGLWidget::DisplayerGLWidget()
 {
-    QHBoxLayout *layout      = new QHBoxLayout(this);
-    QPushButton *switch_mode = new QPushButton("Switch Mode", this);
-    gizmo_selector_          = new GizmoSelector;
+    QHBoxLayout *layout        = new QHBoxLayout(this);
+    QPushButton *switch_mode   = new QPushButton("Switch Mode", this);
+    always_highlight_selected_ = new QPushButton("H", this);
+    gizmo_selector_            = new GizmoSelector;
 
     switch_mode->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    always_highlight_selected_->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    always_highlight_selected_->setCheckable(true);
+    always_highlight_selected_->setChecked(false);
 
     layout->addWidget(switch_mode);
     layout->addWidget(gizmo_selector_);
+    layout->addWidget(always_highlight_selected_);
     layout->setAlignment(Qt::AlignTop | Qt::AlignLeft);
 
     connect(switch_mode, &QPushButton::clicked, [=]
@@ -106,6 +118,11 @@ DisplayerGLWidget::DisplayerGLWidget()
         in_realtime_mode_ = !in_realtime_mode_;
 
         emit switch_render_mode();
+        update();
+    });
+
+    connect(always_highlight_selected_, &QPushButton::clicked, [=]
+    {
         update();
     });
 
@@ -274,7 +291,8 @@ void DisplayerGLWidget::mouse_press(QMouseEvent *event)
     if(event->button() != Qt::MouseButton::LeftButton)
         return;
 
-    is_left_button_down_ = true;
+    is_left_button_just_down_ = true;
+    is_left_button_down_      = true;
     cursor_pos_ = { float(event->x()), float(event->y()) };
 
     update();
@@ -299,7 +317,7 @@ void DisplayerGLWidget::initializeGL()
     QOpenGLDebugLogger *logger = new QOpenGLDebugLogger(this);
     connect(logger, &QOpenGLDebugLogger::messageLogged, [=](const QOpenGLDebugMessage &msg)
     {
-        printf("%s\n", msg.message().toStdString().c_str());
+        std::cerr << msg.message().toStdString();
     });
     logger->initialize();
     logger->startLogging();
@@ -433,29 +451,26 @@ void DisplayerGLWidget::render_background_image()
     background_tex_->release(0);
     background_vao_.release();
     background_shader_->release();
-}
 
-void DisplayerGLWidget::render_entities()
-{
     glEnable(GL_DEPTH_TEST);
     glDepthMask(GL_TRUE);
 
-    glClearColor(0, 0, 0, 0);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    const real cam_hori_rad = tracer::local_angle::phi(cam_dir_);
-    const real cam_vert_rad = tracer::local_angle::theta(cam_dir_);
-
-    const QVector3D light_dir = QVector3D(
-        std::sin(cam_vert_rad + 0.3f) * std::cos(cam_hori_rad - 0.2f),
-        std::sin(cam_vert_rad + 0.3f) * std::sin(cam_hori_rad - 0.2f),
-        std::cos(cam_vert_rad + 0.3f)).normalized();
-
     entity_shader_->bind();
 
-    for(auto &p : id2mesh_)
+    if(always_highlight_selected_->isChecked() && selected_mesh_id_ >= 0)
     {
-        Mesh &mesh = p.second;
+        const real cam_hori_rad = tracer::local_angle::phi(cam_dir_);
+        const real cam_vert_rad = tracer::local_angle::theta(cam_dir_);
+
+        const QVector3D light_dir = QVector3D(
+            std::sin(cam_vert_rad + 0.3f) * std::cos(cam_hori_rad - 0.2f),
+            std::sin(cam_vert_rad + 0.3f) * std::sin(cam_hori_rad - 0.2f),
+            std::cos(cam_vert_rad + 0.3f)).normalized();
+
+        auto it = id2mesh_.find(selected_mesh_id_);
+        assert(it != id2mesh_.end());
+        auto &mesh = it->second;
+
         mesh.vao.bind();
 
         const Mat4 world_t = mesh.world.compose().transpose();
@@ -463,13 +478,9 @@ void DisplayerGLWidget::render_entities()
         const QMatrix4x4 world(&world_t.data[0][0]);
         const QMatrix4x4 mvp = proj_view_ * world;
 
-        const QVector3D color = p.first == selected_mesh_id_ ?
-                                QVector3D(0, 1, 1) :
-                                QVector3D(0.7f, 0.7f, 0.7f);
-
         entity_shader_->setUniformValue(entity_uniforms_.world_loc_, world);
         entity_shader_->setUniformValue(entity_uniforms_.mvp_loc_, mvp);
-        entity_shader_->setUniformValue(entity_uniforms_.color_loc_, color);
+        entity_shader_->setUniformValue(entity_uniforms_.color_loc_, QVector3D(0, 1, 1));
         entity_shader_->setUniformValue(entity_uniforms_.light_dir_loc_, light_dir);
 
         glDrawArrays(GL_TRIANGLES, 0, mesh.vertex_count);
@@ -480,8 +491,85 @@ void DisplayerGLWidget::render_entities()
     entity_shader_->release();
 }
 
+void DisplayerGLWidget::render_entities()
+{
+    const real cam_hori_rad = tracer::local_angle::phi(cam_dir_);
+    const real cam_vert_rad = tracer::local_angle::theta(cam_dir_);
+
+    const QVector3D light_dir = QVector3D(
+        std::sin(cam_vert_rad + 0.3f) * std::cos(cam_hori_rad - 0.2f),
+        std::sin(cam_vert_rad + 0.3f) * std::sin(cam_hori_rad - 0.2f),
+        std::cos(cam_vert_rad + 0.3f)).normalized();
+
+    auto render_mesh = [&](Mesh &mesh, const QVector3D &color, const QVector3D &light_d)
+    {
+        mesh.vao.bind();
+
+        const Mat4 world_t = mesh.world.compose().transpose();
+
+        const QMatrix4x4 world(&world_t.data[0][0]);
+        const QMatrix4x4 mvp = proj_view_ * world;
+
+        entity_shader_->setUniformValue(entity_uniforms_.world_loc_, world);
+        entity_shader_->setUniformValue(entity_uniforms_.mvp_loc_, mvp);
+        entity_shader_->setUniformValue(entity_uniforms_.color_loc_, color);
+        entity_shader_->setUniformValue(entity_uniforms_.light_dir_loc_, light_d);
+
+        glDrawArrays(GL_TRIANGLES, 0, mesh.vertex_count);
+
+        mesh.vao.release();
+    };
+
+    entity_shader_->bind();
+
+    glEnable(GL_DEPTH_TEST);
+    glDepthMask(GL_TRUE);
+
+    glClearColor(0, 0, 0, 0);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    for(auto &p : id2mesh_)
+    {
+        if(p.first != selected_mesh_id_)
+            render_mesh(p.second, { 0.7f, 0.7f, 0.7f }, light_dir);
+    }
+
+    if(selected_mesh_id_ >= 0)
+    {
+        auto it = id2mesh_.find(selected_mesh_id_);
+        assert(it != id2mesh_.end());
+
+        glDisable(GL_DEPTH_TEST);
+        glDepthMask(GL_FALSE);
+
+        glEnable(GL_BLEND);
+        render_mesh(it->second, { 0.5f, 0, 0 }, QVector3D(0, 0, 0));
+        glDisable(GL_BLEND);
+
+        glEnable(GL_DEPTH_TEST);
+        glDepthMask(GL_TRUE);
+        render_mesh(it->second, { 0, 1, 1 }, light_dir);
+    }
+
+    entity_shader_->release();
+}
+
 void DisplayerGLWidget::render_gizmo()
 {
+    AGZ_SCOPE_GUARD({
+        if(is_left_button_just_down_)
+        {
+            is_left_button_just_down_ = false;
+            if(Im3d::GetContext().m_hotDepth == (std::numeric_limits<float>::max)())
+            {
+                const Vec2 film_coord(
+                    cursor_pos_.x / width(),
+                    1 - cursor_pos_.y / height());
+                emit free_left_click(film_coord);
+            }
+        }
+    });
+
     if(selected_mesh_id_ < 0)
         return;
 

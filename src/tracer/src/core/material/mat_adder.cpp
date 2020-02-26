@@ -17,7 +17,7 @@ public:
         mats_ = std::move(mats);
     }
 
-    ShadingPoint shade(const EntityIntersection &inct, Arena &arena) const override
+    ShadingPoint shade(const SurfacePoint &inct, Arena &arena) const override
     {
         auto bsdf = arena.create<BSDFAdder>();
         for(auto mat : mats_)

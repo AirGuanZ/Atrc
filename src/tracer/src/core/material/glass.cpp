@@ -125,7 +125,7 @@ public:
         ior_                  = ior;
     }
 
-    ShadingPoint shade(const EntityIntersection &inct, Arena &arena) const override
+    ShadingPoint shade(const SurfacePoint &inct, Arena &arena) const override
     {
         ShadingPoint ret;
 

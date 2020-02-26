@@ -81,11 +81,6 @@ ResourceWidget<tracer::Entity> *GeometricEntityWidget::clone()
     return new GeometricEntityWidget(clone_state, obj_ctx_);
 }
 
-QPixmap GeometricEntityWidget::get_thumbnail(int width, int height) const
-{
-    return QPixmap(width, height);
-}
-
 std::vector<EntityInterface::Vertex> GeometricEntityWidget::get_vertices() const
 {
     return geometry_->get_vertices();

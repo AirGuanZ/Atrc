@@ -1,6 +1,7 @@
 #include <QCheckBox>
 
 #include <agz/editor/material/glass.h>
+#include <agz/editor/material/material_thumbnail.h>
 #include <agz/editor/texture2d/range.h>
 #include <agz/editor/ui/utility/collapsible.h>
 
@@ -79,9 +80,9 @@ ResourceWidget<tracer::Material> *GlassWidget::clone()
     return new GlassWidget(init_data, obj_ctx_);
 }
 
-QPixmap GlassWidget::get_thumbnail(int width, int height) const
+std::unique_ptr<ResourceThumbnailProvider> GlassWidget::get_thumbnail(int width, int height) const
 {
-    return QPixmap(width, height);
+    return std::make_unique<MaterialThumbnailProvider>(width, height, tracer_object_);
 }
 
 void GlassWidget::update_tracer_object_impl()

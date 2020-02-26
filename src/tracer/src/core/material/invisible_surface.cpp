@@ -55,7 +55,7 @@ class InvisibleSurfaceMaterial : public Material
 {
 public:
 
-    ShadingPoint shade(const EntityIntersection &inct, Arena &arena) const override
+    ShadingPoint shade(const SurfacePoint &inct, Arena &arena) const override
     {
         ShadingPoint shd;
         shd.bsdf           = arena.create<InvisibleSurfaceBSDF>(inct.geometry_coord.z);

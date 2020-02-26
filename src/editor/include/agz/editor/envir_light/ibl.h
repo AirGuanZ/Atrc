@@ -15,8 +15,6 @@ public:
 
     ResourceWidget<tracer::EnvirLight> *clone() override;
 
-    QPixmap get_thumbnail(int width, int height) const override;
-
 protected:
 
     void update_tracer_object_impl() override;

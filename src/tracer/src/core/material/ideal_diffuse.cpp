@@ -88,7 +88,7 @@ public:
         normal_mapper_ = std::move(normal_mapper);
     }
 
-    ShadingPoint shade(const EntityIntersection &inct, Arena &arena) const override
+    ShadingPoint shade(const SurfacePoint &inct, Arena &arena) const override
     {
         const Spectrum albedo = albedo_->sample_spectrum(inct.uv);
         Coord shading_coord = normal_mapper_->reorient(inct.uv, inct.user_coord);

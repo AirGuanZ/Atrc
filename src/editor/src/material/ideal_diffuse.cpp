@@ -1,4 +1,5 @@
 #include <agz/editor/material/ideal_diffuse.h>
+#include <agz/editor/material/material_thumbnail.h>
 #include <agz/editor/ui/utility/collapsible.h>
 
 AGZ_EDITOR_BEGIN
@@ -48,9 +49,9 @@ ResourceWidget<tracer::Material> *IdealDiffuseWidget::clone()
     return new IdealDiffuseWidget(clone_state, obj_ctx_);
 }
 
-QPixmap IdealDiffuseWidget::get_thumbnail(int width, int height) const
+std::unique_ptr<ResourceThumbnailProvider> IdealDiffuseWidget::get_thumbnail(int width, int height) const
 {
-    return QPixmap(width, height);
+    return std::make_unique<MaterialThumbnailProvider>(width, height, tracer_object_);
 }
 
 void IdealDiffuseWidget::update_tracer_object_impl()

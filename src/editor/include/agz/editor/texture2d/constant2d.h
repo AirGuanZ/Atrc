@@ -23,7 +23,7 @@ public:
 
     Texture2DWidget *clone() override;
 
-    QPixmap get_thumbnail(int width, int height) const override;
+    std::unique_ptr<ResourceThumbnailProvider> get_thumbnail(int width, int height) const override;
 
 protected:
 

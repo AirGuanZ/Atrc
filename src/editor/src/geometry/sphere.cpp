@@ -36,11 +36,6 @@ ResourceWidget<tracer::Geometry> *SphereWidget::clone()
     return new SphereWidget(clone_state);
 }
 
-QPixmap SphereWidget::get_thumbnail(int width, int height) const
-{
-    return QPixmap(width, height);
-}
-
 std::vector<EntityInterface::Vertex> SphereWidget::get_vertices() const
 {
     static const auto UNIT_VERTICES = unit_vertices();

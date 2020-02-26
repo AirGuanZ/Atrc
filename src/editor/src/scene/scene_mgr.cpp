@@ -1,7 +1,8 @@
+#include <agz/editor/displayer/displayer.h>
 #include <agz/editor/editor.h>
 #include <agz/editor/entity/geometric_entity.h>
 #include <agz/editor/geometry/triangle_bvh.h>
-#include <agz/editor/import/model_importer.h>
+#include <agz/editor/imexport/model_importer.h>
 #include <agz/editor/scene/scene_mgr.h>
 
 AGZ_EDITOR_BEGIN
@@ -11,8 +12,9 @@ namespace
     constexpr int WIDGET_ITEM_HEIGHT = 35;
 }
 
-SceneManager::SceneManager(ObjectContext &obj_ctx, Editor *editor, DisplayerGLWidget *displayer_gl)
-    : obj_ctx_(obj_ctx), editor_(editor), displayer_gl_(displayer_gl)
+SceneManager::SceneManager(ObjectContext &obj_ctx, Editor *editor, Displayer *displayer)
+    : obj_ctx_(obj_ctx), editor_(editor),
+      displayer_(displayer), displayer_gl_(displayer_->get_gl_widget())
 {
     ui_ = new SceneManagerWidget;
 
@@ -34,6 +36,33 @@ SceneManager::SceneManager(ObjectContext &obj_ctx, Editor *editor, DisplayerGLWi
     connect(ui_->name_list, &QListWidget::currentTextChanged, [=](const QString&)
     {
         selected_entity_changed();
+    });
+
+    connect(displayer_, &Displayer::left_button_emit_ray, [=](const Vec3 &o, const Vec3 &d)
+    {
+        const tracer::Ray ray(o, d);
+        real t = (std::numeric_limits<real>::max)();
+        Record *selected_record = nullptr;
+        for(auto &p : name2record_)
+        {
+            tracer::EntityIntersection inct;
+            if(p.second->panel->get_tracer_object()->closest_intersection(ray, &inct))
+            {
+                if(inct.t < t)
+                {
+                    t = inct.t;
+                    selected_record = p.second.get();
+                }
+            }
+        }
+
+        if(selected_record)
+        {
+            ui_->name_list->setCurrentItem(
+                ui_->name_list->findItems(selected_record->name, Qt::MatchExactly).front());
+        }
+        else
+            ui_->name_list->setCurrentItem(nullptr);
     });
 
     connect(displayer_gl_, &DisplayerGLWidget::edit_gizmo, [=](const DirectTransform &new_world)

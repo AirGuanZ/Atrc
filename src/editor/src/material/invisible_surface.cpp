@@ -1,4 +1,5 @@
 #include <agz/editor/material/invisible_surface.h>
+#include <agz/editor/material/material_thumbnail.h>
 
 AGZ_EDITOR_BEGIN
 
@@ -12,9 +13,9 @@ ResourceWidget<tracer::Material> *InvisibleSurfaceWidget::clone()
     return new InvisibleSurfaceWidget;
 }
 
-QPixmap InvisibleSurfaceWidget::get_thumbnail(int width, int height) const
+std::unique_ptr<ResourceThumbnailProvider> InvisibleSurfaceWidget::get_thumbnail(int width, int height) const
 {
-    return QPixmap(width, height);
+    return std::make_unique<MaterialThumbnailProvider>(width, height, tracer_object_);
 }
 
 void InvisibleSurfaceWidget::update_tracer_object_impl()

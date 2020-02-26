@@ -43,11 +43,6 @@ ResourceWidget<tracer::EnvirLight> *IBLWidget::clone()
     return new IBLWidget(tex_->clone(), obj_ctx_);
 }
 
-QPixmap IBLWidget::get_thumbnail(int width, int height) const
-{
-    return {};
-}
-
 void IBLWidget::update_tracer_object_impl()
 {
     do_update_tracer_object();

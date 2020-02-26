@@ -10,6 +10,7 @@
 #include <QVBoxLayout>
 
 #include <agz/editor/resource/entity_interface.h>
+#include <agz/editor/resource/thumbnail_provider.h>
 #include <agz/editor/ui/utility/combobox_without_wheel.h>
 #include <agz/editor/ui/utility/qsignal_to_callback.h>
 
@@ -89,7 +90,7 @@ public:
     /**
      * @brief get the thumbnail image
      */
-    virtual QPixmap get_thumbnail(int width, int height) const = 0;
+    virtual std::unique_ptr<ResourceThumbnailProvider> get_thumbnail(int width, int height) const;
 
 protected:
 
@@ -169,7 +170,7 @@ public:
 
     ResourcePanel<TracerObject> *clone() const;
 
-    QPixmap get_thumbnail(int width, int height) const;
+    std::unique_ptr<ResourceThumbnailProvider> get_thumbnail(int width, int height) const;
 
     std::vector<Vertex> get_vertices() const override;
 
@@ -267,7 +268,7 @@ public:
 
     ResourcePanel<TracerObject> *clone_panel();
 
-    QPixmap get_thumbnail(int width, int height) const;
+    std::unique_ptr<ResourceThumbnailProvider> get_thumbnail(int width, int height) const;
 
     QString get_name() const;
 
@@ -477,6 +478,12 @@ std::shared_ptr<TracerObject> ResourceWidget<TracerObject>::get_tracer_object()
 }
 
 template<typename TracerObject>
+std::unique_ptr<ResourceThumbnailProvider> ResourceWidget<TracerObject>::get_thumbnail(int width, int height) const
+{
+    return std::make_unique<EmptyResourceThumbnailProvider>(width, height);
+}
+
+template<typename TracerObject>
 void ResourceWidget<TracerObject>::set_dirty_flag()
 {
     update_tracer_object_impl();
@@ -644,7 +651,7 @@ ResourcePanel<TracerObject> *ResourcePanel<TracerObject>::clone() const
 }
 
 template<typename TracerObject>
-QPixmap ResourcePanel<TracerObject>::get_thumbnail(int width, int height) const
+std::unique_ptr<ResourceThumbnailProvider> ResourcePanel<TracerObject>::get_thumbnail(int width, int height) const
 {
     return rsc_widget_->get_thumbnail(width, height);
 }
@@ -868,7 +875,7 @@ ResourcePanel<TracerObject> *ResourceInPool<TracerObject>::clone_panel()
 }
 
 template<typename TracerObject>
-QPixmap ResourceInPool<TracerObject>::get_thumbnail(int width, int height) const
+std::unique_ptr<ResourceThumbnailProvider> ResourceInPool<TracerObject>::get_thumbnail(int width, int height) const
 {
     assert(panel_);
     return panel_->get_thumbnail(width, height);

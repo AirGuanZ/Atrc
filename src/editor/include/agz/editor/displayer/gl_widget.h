@@ -54,8 +54,13 @@ public:
 
 signals:
 
+    // left button clicked at film_coord
+    void free_left_click(const Vec2 &film_coord);
+
+    // switch between realtime mode/offline mode
     void switch_render_mode();
 
+    // gizmo is directly edited
     void edit_gizmo(const DirectTransform &new_transform);
 
 protected:
@@ -74,6 +79,8 @@ private:
 
     void destroy();
 
+    // mesh group
+
     struct Mesh
     {
         int vertex_count = 0;
@@ -87,8 +94,11 @@ private:
     std::unordered_map<MeshID, Mesh> id2mesh_;
 
     bool in_realtime_mode_ = true;
-
     MeshID selected_mesh_id_ = -1;
+
+    QPushButton *always_highlight_selected_ = nullptr;
+
+    // camera params
 
     Vec3 cam_pos_;
     Vec3 cam_dir_;
@@ -137,7 +147,8 @@ private:
     // cursor tracker
 
     Vec2 cursor_pos_;
-    bool is_left_button_down_ = false;
+    bool is_left_button_just_down_ = false;
+    bool is_left_button_down_      = false;
 };
 
 AGZ_EDITOR_END

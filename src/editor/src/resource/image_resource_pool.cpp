@@ -7,7 +7,7 @@ AGZ_EDITOR_BEGIN
 
 namespace
 {
-    constexpr int TEXTURE2D_THUMBNAIL_SIZE = 64;
+    constexpr int TEXTURE2D_THUMBNAIL_RENDER_SIZE = 96;
 }
 
 template<typename TracerObject>
@@ -131,10 +131,9 @@ ResourceInPool<TracerObject> *ImageResourcePool<TracerObject>::add_resource(
     editor_->add_to_resource_panel(raw_panel);
 
     ImageTextIcon *icon = new ImageTextIcon(
-        ui_->scroll_area_widget, icon_font_, TEXTURE2D_THUMBNAIL_SIZE);
+        ui_->scroll_area_widget, icon_font_, TEXTURE2D_THUMBNAIL_RENDER_SIZE);
     icon->set_text(name);
-    icon->set_image(raw_panel->get_thumbnail(
-        TEXTURE2D_THUMBNAIL_SIZE, TEXTURE2D_THUMBNAIL_SIZE));
+    icon->set_image(raw_panel->get_thumbnail(TEXTURE2D_THUMBNAIL_RENDER_SIZE, TEXTURE2D_THUMBNAIL_RENDER_SIZE));
 
     auto record = std::make_unique<Record>();
     auto raw_record = record.get();
@@ -157,7 +156,7 @@ ResourceInPool<TracerObject> *ImageResourcePool<TracerObject>::add_resource(
     raw_rsc->set_dirty_callback([=]
     {
         icon->set_image(raw_panel->get_thumbnail(
-            TEXTURE2D_THUMBNAIL_SIZE, TEXTURE2D_THUMBNAIL_SIZE));
+            TEXTURE2D_THUMBNAIL_RENDER_SIZE, TEXTURE2D_THUMBNAIL_RENDER_SIZE));
     });
 
     layout_->addWidget(icon);

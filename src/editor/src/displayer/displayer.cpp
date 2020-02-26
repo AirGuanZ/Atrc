@@ -22,6 +22,28 @@ Displayer::Displayer(QWidget *parent, Editor *editor)
     gl_widget_->setMouseTracking(true);
     setMouseTracking(true);
 
+    connect(gl_widget_, &DisplayerGLWidget::free_left_click, [=](const Vec2 &film_coord)
+    {
+        const int film_width = size().width();
+        const int film_height = size().height();
+        const real film_aspect = static_cast<real>(film_width) / film_height;
+
+        const Vec3 d = get_camera_dir();
+        const Vec3 x = cross(d, camera_params_.up).normalize();
+        const Vec3 y = cross(x, d).normalize();
+
+        const real y_ext = 2 * camera_params_.distance * std::tan(
+            math::deg2rad(camera_params_.fov / 2));
+        const real x_ext = film_aspect * y_ext;
+
+        const Vec3 ray_dst = camera_params_.dst
+                           + (film_coord.x - real(0.5)) * x_ext * x
+                           + (film_coord.y - real(0.5)) * y_ext * y;
+
+        const Vec3 eye = get_camera_pos();
+        emit left_button_emit_ray(eye, ray_dst - eye);
+    });
+
     update_gl_camera();
 }
 

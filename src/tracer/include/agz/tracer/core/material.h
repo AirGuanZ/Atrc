@@ -15,7 +15,7 @@ public:
     virtual ~Material() = default;
 
     /** @brief entity intersection -> shading point */
-    virtual ShadingPoint shade(const EntityIntersection &inct, Arena &arena) const = 0;
+    virtual ShadingPoint shade(const SurfacePoint &inct, Arena &arena) const = 0;
 };
 
 /**

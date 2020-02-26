@@ -39,11 +39,6 @@ ResourceWidget<tracer::EnvirLight> *NativeSkyWidget::clone()
     return new NativeSkyWidget(clone_data);
 }
 
-QPixmap NativeSkyWidget::get_thumbnail(int width, int height) const
-{
-    return {};
-}
-
 void NativeSkyWidget::update_tracer_object_impl()
 {
     do_update_tracer_object();

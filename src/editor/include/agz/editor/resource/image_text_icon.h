@@ -1,10 +1,11 @@
 #pragma once
 
 #include <QLabel>
+#include <QTimer>
 #include <QVBoxLayout>
 #include <QWidget>
 
-#include <agz/editor/common.h>
+#include <agz/editor/resource/thumbnail_provider.h>
 
 AGZ_EDITOR_BEGIN
 
@@ -42,9 +43,14 @@ public:
             setToolTip(text);
     }
 
-    void set_image(const QPixmap &pixmap)
+    void set_image(std::unique_ptr<ResourceThumbnailProvider> thumbnail_provider)
     {
-        image_->setPixmap(pixmap);
+        thumbnail_provider_ = std::move(thumbnail_provider);
+
+        connect(thumbnail_provider_.get(), &ResourceThumbnailProvider::update_thumbnail,
+                this, &ImageTextIcon::set_pixmap);
+
+        image_->setPixmap(thumbnail_provider_->start());
     }
 
     void set_selected(bool selected)
@@ -61,6 +67,13 @@ public:
 signals:
 
     void clicked();
+
+public slots:
+
+    void set_pixmap(QPixmap pixmap)
+    {
+        image_->setPixmap(pixmap);
+    }
 
 protected:
 
@@ -143,9 +156,11 @@ private:
     QLabel *image_;
     QLabel *text_;
 
-    bool is_in_ = false;
-    bool is_pressed_ = false;
+    bool is_in_       = false;
+    bool is_pressed_  = false;
     bool is_selected_ = false;
+
+    std::unique_ptr<ResourceThumbnailProvider> thumbnail_provider_;
 };
 
 AGZ_EDITOR_END

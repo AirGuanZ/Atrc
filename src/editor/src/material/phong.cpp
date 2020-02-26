@@ -1,6 +1,7 @@
 #include <QVBoxLayout>
 
 #include <agz/editor/material/phong.h>
+#include <agz/editor/material/material_thumbnail.h>
 #include <agz/editor/texture2d/range.h>
 #include <agz/editor/ui/utility/collapsible.h>
 
@@ -74,9 +75,9 @@ ResourceWidget<tracer::Material> *PhongWidget::clone()
     return new PhongWidget(init_data, obj_ctx_);
 }
 
-QPixmap PhongWidget::get_thumbnail(int width, int height) const
+std::unique_ptr<ResourceThumbnailProvider> PhongWidget::get_thumbnail(int width, int height) const
 {
-    return QPixmap(width, height);
+    return std::make_unique<MaterialThumbnailProvider>(width, height, tracer_object_);
 }
 
 void PhongWidget::update_tracer_object_impl()

@@ -43,6 +43,8 @@ public:
 
 signals:
 
+    void left_button_emit_ray(const Vec3 &o, const Vec3 &d);
+
     void need_to_recreate_camera();
 
     void update_camera_panel();

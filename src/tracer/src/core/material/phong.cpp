@@ -206,7 +206,7 @@ public:
         
     }
 
-    ShadingPoint shade(const EntityIntersection &inct, Arena &arena) const override
+    ShadingPoint shade(const SurfacePoint &inct, Arena &arena) const override
     {
         Spectrum d = d_->sample_spectrum(inct.uv);
         Spectrum s = s_->sample_spectrum(inct.uv);

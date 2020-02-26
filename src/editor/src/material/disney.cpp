@@ -1,4 +1,5 @@
 #include <agz/editor/material/disney.h>
+#include <agz/editor/material/material_thumbnail.h>
 #include <agz/editor/texture2d/range.h>
 #include <agz/editor/ui/utility/collapsible.h>
 
@@ -140,9 +141,9 @@ ResourceWidget<tracer::Material> *DisneyWidget::clone()
     return new DisneyWidget(init_data, obj_ctx_);
 }
 
-QPixmap DisneyWidget::get_thumbnail(int width, int height) const
+std::unique_ptr<ResourceThumbnailProvider> DisneyWidget::get_thumbnail(int width, int height) const
 {
-    return QPixmap(width, height);
+    return std::make_unique<MaterialThumbnailProvider>(width, height, tracer_object_);
 }
 
 void DisneyWidget::update_tracer_object_impl()

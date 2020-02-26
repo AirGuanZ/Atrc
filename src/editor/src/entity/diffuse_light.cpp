@@ -68,11 +68,6 @@ ResourceWidget<tracer::Entity> *DiffuseLightEntityWidget::clone()
     return new DiffuseLightEntityWidget(clone_state, obj_ctx_);
 }
 
-QPixmap DiffuseLightEntityWidget::get_thumbnail(int width, int height) const
-{
-    return QPixmap(width, height);
-}
-
 std::vector<EntityInterface::Vertex> DiffuseLightEntityWidget::get_vertices() const
 {
     return geometry_->get_vertices();

@@ -91,7 +91,7 @@ ResourceWidget<tracer::Texture2D> *RangeWidget::clone()
     return new RangeWidget(clone_state);
 }
 
-QPixmap RangeWidget::get_thumbnail(int width, int height) const
+std::unique_ptr<ResourceThumbnailProvider> RangeWidget::get_thumbnail(int width, int height) const
 {
     const double value = slider_->value();
 
@@ -101,7 +101,7 @@ QPixmap RangeWidget::get_thumbnail(int width, int height) const
     QPixmap pixmap;
     pixmap.convertFromImage(img);
 
-    return pixmap.scaled(width, height);
+    return std::make_unique<FixedResourceThumbnailProvider>(pixmap.scaled(width, height));
 }
 
 void RangeWidget::update_tracer_object_impl()
