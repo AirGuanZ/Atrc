@@ -315,14 +315,14 @@ void Editor::init_global_setting_widget()
 
 void Editor::init_save_asset_dialog()
 {
-    AssetLoadDialog *load_dialog = new AssetLoadDialog(
+    asset_load_dialog_ = std::make_unique<AssetLoadDialog>(
         scene_mgr_.get(), obj_ctx_.get(), envir_light_slot_);
     QAction *load_action = new QAction("Load", this);
     menuBar()->addAction(load_action);
     connect(load_action, &QAction::triggered, [=]
     {
-        load_dialog->exec();
-        if(!load_dialog->is_ok_clicked())
+        asset_load_dialog_->exec();
+        if(!asset_load_dialog_->is_ok_clicked())
             return;
 
         renderer_.reset();
@@ -336,11 +336,11 @@ void Editor::init_save_asset_dialog()
         launch_renderer(true);
     });
 
-    AssetSaveDialog *save_dialog = new AssetSaveDialog(
+    asset_save_dialog_ = std::make_unique<AssetSaveDialog>(
         scene_mgr_.get(), obj_ctx_.get(), envir_light_slot_);
     QAction *save_action = new QAction("Save", this);
     menuBar()->addAction(save_action);
-    connect(save_action, &QAction::triggered, save_dialog, &AssetSaveDialog::exec);
+    connect(save_action, &QAction::triggered, asset_save_dialog_.get(), &AssetSaveDialog::exec);
 }
 
 void Editor::redistribute_panels()

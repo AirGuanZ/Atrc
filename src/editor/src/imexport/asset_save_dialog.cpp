@@ -174,6 +174,7 @@ void AssetSaveDialog::ok()
 
     if(save_texture3d_pool_->isChecked())
     {
+        ++section_count;
         saver.write(AssetSectionType::Texture3DPool);
         obj_ctx_->pool<tracer::Texture3D>()->save_asset(saver);
     }

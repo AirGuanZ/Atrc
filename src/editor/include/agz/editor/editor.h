@@ -17,6 +17,9 @@ AGZ_EDITOR_BEGIN
 
 class GlobalSettingWidget;
 
+class AssetLoadDialog;
+class AssetSaveDialog;
+
 class Editor : public QMainWindow, public misc::uncopyable_t
 {
     Q_OBJECT
@@ -100,6 +103,9 @@ private:
     GlobalSettingWidget *global_setting_ = nullptr;
 
     EnvirLightSlot *envir_light_slot_ = nullptr;
+
+    std::unique_ptr<AssetLoadDialog> asset_load_dialog_;
+    std::unique_ptr<AssetSaveDialog> asset_save_dialog_;
 
     std::unique_ptr<SceneManager> scene_mgr_;
     
