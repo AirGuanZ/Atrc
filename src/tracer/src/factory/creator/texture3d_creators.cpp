@@ -2,8 +2,7 @@
 
 #include <agz/tracer/factory/creator/texture3d_creators.h>
 #include <agz/tracer/factory/raw/texture3d.h>
-#include <agz/utility/image.h>
-#include <agz/utility/misc.h>
+#include <agz/tracer/utility/texture3d_loader.h>
 
 AGZ_TRACER_FACTORY_BEGIN
 
@@ -35,136 +34,31 @@ namespace
 
     class GrayGridPoint3DCreator : public Creator<Texture3D>
     {
-        /**
-         * @brief 从文本文件中读取体数据
-         *
-         * 格式：
-         * width : int
-         * height: int
-         * depth : int
-         * for z in 0 to depth
-         *     for y in 0 to height
-         *         for x in 0 to width
-         *             texel: float
-         */
         static texture::texture3d_t<real> read_from_ascii(const std::string &filename)
         {
             std::ifstream fin(filename, std::ios::in);
             if(!fin)
                 throw ObjectConstructionException("failed to open file: " + filename);
-
-            int width, height, depth;
-            fin >> width >> height >> depth;
-            if(!fin)
-                throw ObjectConstructionException("failed to read width/height/depth from " + filename);
-
-            texture::texture3d_t<real> data(depth, height, width);
-            for(int z = 0; z < depth; ++z)
-            {
-                for(int y = 0; y < height; ++y)
-                {
-                    for(int x = 0; x < width; ++x)
-                    {
-                        fin >> data(z, y, x);
-                        if(!fin)
-                            throw ObjectConstructionException("failed to parse texel data from " + filename);
-                    }
-                }
-            }
-
-            return data;
+            return texture3d_load::load_gray_from_ascii(fin);
         }
 
-        /**
-         * @brief 从二进制文件中读取体数据
-         *
-         * 存储使用小端序
-         *
-         * 格式：
-         * width : int32_t
-         * height: int32_t
-         * depth : int32_t
-         * for z in 0 to depth
-         *     for y in 0 to height
-         *         for x in 0 to width
-         *             texel: float
-         */
         static texture::texture3d_t<real> read_from_binary(const std::string &filename)
         {
             std::ifstream fin(filename, std::ios::in | std::ios::binary);
             if(!fin)
                 throw ObjectConstructionException("failed to open file: " + filename);
-
-            int32_t width, height, depth;
-            fin.read(reinterpret_cast<char*>(&width),  sizeof(width));
-            fin.read(reinterpret_cast<char*>(&height), sizeof(height));
-            fin.read(reinterpret_cast<char*>(&depth),  sizeof(depth));
-            if(!fin)
-                throw ObjectConstructionException("failed to read width/height/depth from file: " + filename);
-
-            texture::texture3d_t<real> data(depth, height, width);
-
-            for(int32_t z = 0; z < depth; ++z)
-            {
-                for(int32_t y = 0; y < height; ++y)
-                {
-                    for(int32_t x = 0; x < width; ++x)
-                    {
-                        float texel;
-                        fin.read(reinterpret_cast<char*>(&texel), sizeof(texel));
-                        data(z, y, x) = misc::to_local_endian<misc::endian_type::little>(texel);
-                    }
-                }
-            }
-
-            return data;
+            return texture3d_load::load_gray_from_binary(fin);
         }
 
-        static texture::texture3d_t<real> read_from_images(const ConfigArray &filename_array, CreatingContext &context)
+        static texture::texture3d_t<real> read_from_images(const ConfigArray &filename_array, const PathMapper &path_mapper)
         {
             if(!filename_array.size())
                 throw ObjectConstructionException("empty image filename array");
 
-            texture::texture3d_t<real> data;
-
-            int width = -1, height = -1, depth = static_cast<int>(filename_array.size());
-            for(int z = 0; z < depth; ++z)
-            {
-                const std::string filename = context.path_mapper->map(filename_array.at_str(z));
-                const auto slice = img::load_gray_from_file(filename);
-
-                const int new_width  = slice.shape()[1];
-                const int new_height = slice.shape()[0];
-
-                if(width < 0)
-                    width = new_width;
-                else if(width != new_width)
-                {
-                    throw ObjectConstructionException(
-                        "inconsistent image width: " + std::to_string(width) + " and " + std::to_string(new_width));
-                }
-
-                if(height < 0)
-                    height = new_height;
-                else if(height != new_height)
-                {
-                    throw ObjectConstructionException(
-                        "inconsistent image height: " + std::to_string(height) + " and " + std::to_string(new_height));
-                }
-
-                if(!data.is_available())
-                    data.initialize(depth, height, width);
-
-                for(int y = 0; y < height; ++y)
-                {
-                    for(int x = 0; x < width; ++x)
-                    {
-                        data(z, y, x) = slice(y, x) / 255.0f;
-                    }
-                }
-            }
-
-            return data;
+            std::vector<std::string> filenames(filename_array.size());
+            for(size_t i = 0; i < filename_array.size(); ++i)
+                filenames[i] = filename_array.at_str(i);
+            return texture3d_load::load_gray_from_images(filenames.data(), int(filenames.size()), path_mapper);
         }
 
     public:
@@ -188,7 +82,7 @@ namespace
                 data = read_from_binary(filename);
             }
             else if(auto arr_child = params.find_child_array("image_filenames"))
-                data = read_from_images(*arr_child, context);
+                data = read_from_images(*arr_child, *context.path_mapper);
             else
                 throw ObjectConstructionException("texel data filename not provided");
 
@@ -198,144 +92,31 @@ namespace
 
     class SpectrumGridPoint3DCreator : public Creator<Texture3D>
     {
-        /**
-         * @brief 从文本文件中读取体数据
-         *
-         * 格式：
-         * width : int
-         * height: int
-         * depth : int
-         * for z in 0 to depth
-         *     for y in 0 to height
-         *         for x in 0 to width
-         *             texel: float * SPECTRUM_COMPONENT_COUNT
-         */
         static texture::texture3d_t<Spectrum> read_from_ascii(const std::string &filename)
         {
             std::ifstream fin(filename, std::ios::in);
             if(!fin)
                 throw ObjectConstructionException("failed to open file: " + filename);
-
-            int width, height, depth;
-            fin >> width >> height >> depth;
-            if(!fin)
-                throw ObjectConstructionException("failed to read width/height/depth from " + filename);
-
-            texture::texture3d_t<Spectrum> data(depth, height, width);
-            for(int z = 0; z < depth; ++z)
-            {
-                for(int y = 0; y < height; ++y)
-                {
-                    for(int x = 0; x < width; ++x)
-                    {
-                        Spectrum spec;
-                        for(int c = 0; c < SPECTRUM_COMPONENT_COUNT; ++c)
-                            fin >> spec[c];
-                        if(!fin)
-                            throw ObjectConstructionException("failed to parse texel data from " + filename);
-                        data(z, y, x) = spec;
-                    }
-                }
-            }
-
-            return data;
+            return texture3d_load::load_rgb_from_ascii(fin);
         }
 
-        /**
-         * @brief 从二进制文件中读取体数据
-         *
-         * 存储使用小端序
-         *
-         * 格式：
-         * width : int32_t
-         * height: int32_t
-         * depth : int32_t
-         * for z in 0 to depth
-         *     for y in 0 to height
-         *         for x in 0 to width
-         *             texel: float * SPECTRUM_COMPONENT_COUNT
-         */
         static texture::texture3d_t<Spectrum> read_from_binary(const std::string &filename)
         {
             std::ifstream fin(filename, std::ios::in | std::ios::binary);
             if(!fin)
                 throw ObjectConstructionException("failed to open file: " + filename);
-
-            int32_t width, height, depth;
-            fin.read(reinterpret_cast<char*>(&width),  sizeof(width));
-            fin.read(reinterpret_cast<char*>(&height), sizeof(height));
-            fin.read(reinterpret_cast<char*>(&depth),  sizeof(depth));
-            if(!fin)
-                throw ObjectConstructionException("failed to read width/height/depth from file: " + filename);
-
-            texture::texture3d_t<Spectrum> data(depth, height, width);
-
-            for(int32_t z = 0; z < depth; ++z)
-            {
-                for(int32_t y = 0; y < height; ++y)
-                {
-                    for(int32_t x = 0; x < width; ++x)
-                    {
-                        Spectrum texel;
-                        for(int c = 0; c < SPECTRUM_COMPONENT_COUNT; ++c)
-                        {
-                            real component;
-                            fin.read(reinterpret_cast<char*>(&component), sizeof(component));
-                            texel[c] = misc::to_local_endian<misc::endian_type::little>(component);
-                        }
-                        data(z, y, x) = texel;
-                    }
-                }
-            }
-
-            return data;
+            return texture3d_load::load_rgb_from_binary(fin);
         }
 
-        static texture::texture3d_t<Spectrum> read_from_images(const ConfigArray &filename_array, CreatingContext &context)
+        static texture::texture3d_t<Spectrum> read_from_images(const ConfigArray &filename_array, const PathMapper &path_mapper)
         {
             if(!filename_array.size())
                 throw ObjectConstructionException("empty image filename array");
 
-            texture::texture3d_t<Spectrum> data;
-
-            int width = -1, height = -1, depth = static_cast<int>(filename_array.size());
-            for(int z = 0; z < depth; ++z)
-            {
-                const std::string filename = context.path_mapper->map(filename_array.at_str(z));
-                const auto slice = img::load_rgb_from_file(filename);
-
-                const int new_width  = slice.shape()[1];
-                const int new_height = slice.shape()[0];
-
-                if(width < 0)
-                    width = new_width;
-                else if(width != new_width)
-                {
-                    throw ObjectConstructionException(
-                        "inconsistent image width: " + std::to_string(width) + " and " + std::to_string(new_width));
-                }
-
-                if(height < 0)
-                    height = new_height;
-                else if(height != new_height)
-                {
-                    throw ObjectConstructionException(
-                        "inconsistent image height: " + std::to_string(height) + " and " + std::to_string(new_height));
-                }
-
-                if(!data.is_available())
-                    data.initialize(depth, height, width);
-
-                for(int y = 0; y < height; ++y)
-                {
-                    for(int x = 0; x < width; ++x)
-                    {
-                        data(z, y, x) = math::from_color3b<real>(slice(y, x));
-                    }
-                }
-            }
-
-            return data;
+            std::vector<std::string> filenames(filename_array.size());
+            for(size_t i = 0; i < filename_array.size(); ++i)
+                filenames[i] = filename_array.at_str(i);
+            return texture3d_load::load_rgb_from_images(filenames.data(), int(filenames.size()), path_mapper);
         }
 
     public:
@@ -353,7 +134,7 @@ namespace
             else if(str_child = params.find_child_value("binary_filename"); str_child)
                 data = read_from_binary(context.path_mapper->map(str_child->as_str()));
             else if(auto arr_child = params.find_child_array("image_filenames"))
-                data = read_from_images(*arr_child, context);
+                data = read_from_images(*arr_child, *context.path_mapper);
             else
                 throw ObjectConstructionException("texel data filename not provided");
 

@@ -20,6 +20,10 @@ public:
 
     NormalMapWidget *clone() const;
 
+    void save_asset(AssetSaver &saver);
+
+    void load_asset(AssetLoader &loader);
+
     std::unique_ptr<tracer::NormalMapper> get_tracer_object() const;
 
 signals:

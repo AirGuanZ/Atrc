@@ -119,6 +119,47 @@ std::unique_ptr<ResourceThumbnailProvider> HDRWidget::get_thumbnail(int width, i
     return std::make_unique<FixedResourceThumbnailProvider>(pixmap.scaled(width, height));
 }
 
+void HDRWidget::save_asset(AssetSaver &saver)
+{
+    saver.write_string(filename_);
+
+    if(img_data_)
+    {
+        const auto img_data = img::save_rgb_to_hdr_in_memory(
+            img_data_->raw_data(), img_data_->width(), img_data_->height());
+
+        saver.write(uint32_t(img_data.size()));
+        saver.write_raw(img_data.data(), img_data.size());
+    }
+    else
+        saver.write(uint32_t(0));
+
+    adv_widget_->save_asset(saver);
+}
+
+void HDRWidget::load_asset(AssetLoader &loader)
+{
+    filename_ = loader.read_string();
+    filename_label_->setText(filename_);
+    filename_label_->setToolTip(filename_);
+
+    const uint32_t img_data_byte_size = loader.read<uint32_t>();
+    if(img_data_byte_size)
+    {
+        std::vector<unsigned char> img_data(img_data_byte_size);
+        loader.read_raw(img_data.data(), img_data_byte_size);
+
+        img_data_ = std::make_shared<Image2D<math::color3f>>(
+            img::load_rgb_from_hdr_memory(img_data.data(), img_data.size()));
+    }
+    else
+        img_data_.reset();
+
+    adv_widget_->load_asset(loader);
+
+    do_update_tracer_object();
+}
+
 void HDRWidget::browse_filename()
 {
     const QString filename = QFileDialog::getOpenFileName(this, "Load Image");

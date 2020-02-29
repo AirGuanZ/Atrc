@@ -55,6 +55,25 @@ ResourceWidget<tracer::Geometry> *TriangleBVHWidget::clone()
     return new TriangleBVHWidget(clone_state);
 }
 
+void TriangleBVHWidget::save_asset(AssetSaver &saver)
+{
+    saver.write_string(filename_);
+    saver.write(uint32_t(vertices_->size()));
+    saver.write_raw(vertices_->data(), sizeof(Vertex) * vertices_->size());
+}
+
+void TriangleBVHWidget::load_asset(AssetLoader &loader)
+{
+    filename_ = loader.read_string();
+    filename_label_->setText(filename_);
+    filename_label_->setToolTip(filename_);
+
+    vertices_->resize(loader.read<uint32_t>());
+    loader.read_raw(vertices_->data(), sizeof(Vertex) * vertices_->size());
+
+    do_update_tracer_object();
+}
+
 std::vector<EntityInterface::Vertex> TriangleBVHWidget::get_vertices() const
 {
     assert(vertices_);

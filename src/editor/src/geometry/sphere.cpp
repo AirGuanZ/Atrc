@@ -1,3 +1,6 @@
+#include <QLabel>
+#include <QLineEdit>
+
 #include <agz/editor/geometry/sphere.h>
 
 AGZ_EDITOR_BEGIN
@@ -34,6 +37,18 @@ ResourceWidget<tracer::Geometry> *SphereWidget::clone()
     CloneState clone_state;
     clone_state.radius = radius_edit_->text().toFloat();
     return new SphereWidget(clone_state);
+}
+
+void SphereWidget::save_asset(AssetSaver &saver)
+{
+    saver.write(real(radius_edit_->text().toFloat()));
+}
+
+void SphereWidget::load_asset(AssetLoader &loader)
+{
+    radius_edit_->setText(QString::number(loader.read<real>()));
+
+    do_update_tracer_object();
 }
 
 std::vector<EntityInterface::Vertex> SphereWidget::get_vertices() const

@@ -49,4 +49,5 @@
 #include <agz/tracer/utility/reflection.h>
 #include <agz/tracer/utility/render_session.h>
 #include <agz/tracer/utility/sphere_aux.h>
+#include <agz/tracer/utility/texture3d_loader.h>
 #include <agz/tracer/utility/triangle_aux.h>

@@ -8,8 +8,6 @@ AGZ_EDITOR_BEGIN
 
 class Constant2DWidget : public Texture2DWidget
 {
-    Q_OBJECT
-
 public:
 
     struct InitData
@@ -25,6 +23,10 @@ public:
 
     std::unique_ptr<ResourceThumbnailProvider> get_thumbnail(int width, int height) const override;
 
+    void save_asset(AssetSaver &saver) override;
+
+    void load_asset(AssetLoader &loader) override;
+
 protected:
 
     void update_tracer_object_impl() override;
@@ -33,8 +35,8 @@ private:
 
     QCheckBox *use_input_color_ = nullptr;
 
-    Vec3Input   *input_color_  = nullptr;
-    ColorHolder *color_holder_ = nullptr;
+    SpectrumInput *input_color_  = nullptr;
+    ColorHolder   *color_holder_ = nullptr;
 };
 
 class Constant2DCreator : public Texture2DWidgetCreator

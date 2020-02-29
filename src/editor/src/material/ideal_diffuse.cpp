@@ -54,6 +54,20 @@ std::unique_ptr<ResourceThumbnailProvider> IdealDiffuseWidget::get_thumbnail(int
     return std::make_unique<MaterialThumbnailProvider>(width, height, tracer_object_);
 }
 
+void IdealDiffuseWidget::save_asset(AssetSaver &saver)
+{
+    albedo_->save_asset(saver);
+    normal_map_->save_asset(saver);
+}
+
+void IdealDiffuseWidget::load_asset(AssetLoader &loader)
+{
+    albedo_->load_asset(loader);
+    normal_map_->load_asset(loader);
+
+    do_update_tracer_object();
+}
+
 void IdealDiffuseWidget::update_tracer_object_impl()
 {
     do_update_tracer_object();

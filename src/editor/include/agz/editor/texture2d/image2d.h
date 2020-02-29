@@ -13,7 +13,7 @@ class Image2DWidget : public Texture2DWidget
 
 public:
 
-    struct CloneState
+    struct InitData
     {
         QString filename;
         std::shared_ptr<const Image2D<math::color3b>> img_data;
@@ -21,11 +21,15 @@ public:
         Texture2DCommonParamsWidget *adv = nullptr;
     };
 
-    explicit Image2DWidget(const CloneState &clone_state);
+    explicit Image2DWidget(const InitData &clone_state);
 
     ResourceWidget<tracer::Texture2D> *clone() override;
 
     std::unique_ptr<ResourceThumbnailProvider> get_thumbnail(int width, int height) const override;
+
+    void save_asset(AssetSaver &saver) override;
+
+    void load_asset(AssetLoader &loader) override;
 
 protected:
 
@@ -35,7 +39,7 @@ private:
 
     void do_update_tracer_object();
 
-    void init_ui(const CloneState &clone_state);
+    void init_ui(const InitData &clone_state);
 
     void browse_filename();
 
@@ -49,7 +53,7 @@ private:
 
     QPushButton *preview_button_  = nullptr;
 
-    Collapsible                   *adv_section_ = nullptr;
+    Collapsible                 *adv_section_ = nullptr;
     Texture2DCommonParamsWidget *adv_widget_  = nullptr;
 };
 

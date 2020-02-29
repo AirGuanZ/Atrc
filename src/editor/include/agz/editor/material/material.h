@@ -1,6 +1,6 @@
 #pragma once
 
-#include <agz/editor/resource/image_resource_pool.h>
+#include <agz/editor/resource/pool/image_resource_pool.h>
 
 AGZ_EDITOR_BEGIN
 

@@ -35,8 +35,7 @@ public:
         g_       = std::move(g);
 
         max_density_ = density_->max_real();
-        if(max_density_ < EPS)
-            throw ObjectConstructionException("invalid max density value: " + std::to_string(max_density_));
+        max_density_ = (std::max)(max_density_, EPS);
         inv_max_density_ = 1 / max_density_;
 
         max_scattering_count_ = max_scattering_count;

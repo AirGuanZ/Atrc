@@ -9,7 +9,7 @@ Collapsible::Collapsible(QWidget *parent, const QString &title)
 {
     toggle_button_ = new QToolButton(this);
     layout_        = new QVBoxLayout(this);
-
+    
     toggle_button_->setStyleSheet("QToolButton { border: none; }");
     toggle_button_->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     toggle_button_->setArrowType(Qt::ArrowType::RightArrow);
@@ -54,12 +54,12 @@ void Collapsible::toggle(bool checked)
     if(checked)
     {
         toggle_button_->setArrowType(Qt::ArrowType::DownArrow);
-        content_->setVisible(true);
+        content_->show();
     }
     else
     {
         toggle_button_->setArrowType(Qt::ArrowType::RightArrow);
-        content_->setVisible(false);
+        content_->hide();
     }
 }
 

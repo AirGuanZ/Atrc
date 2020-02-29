@@ -146,6 +146,44 @@ std::unique_ptr<ResourceThumbnailProvider> DisneyWidget::get_thumbnail(int width
     return std::make_unique<MaterialThumbnailProvider>(width, height, tracer_object_);
 }
 
+void DisneyWidget::save_asset(AssetSaver &saver)
+{
+    base_color_            ->save_asset(saver);
+    metallic_              ->save_asset(saver);
+    roughness_             ->save_asset(saver);
+    transmission_          ->save_asset(saver);
+    transmission_roughness_->save_asset(saver);
+    ior_                   ->save_asset(saver);
+    specular_scale_        ->save_asset(saver);
+    specular_tint_         ->save_asset(saver);
+    anisotropic_           ->save_asset(saver);
+    sheen_                 ->save_asset(saver);
+    sheen_tint_            ->save_asset(saver);
+    clearcoat_             ->save_asset(saver);
+    clearcoat_gloss_       ->save_asset(saver);
+    normal_map_            ->save_asset(saver);
+}
+
+void DisneyWidget::load_asset(AssetLoader &loader)
+{
+    base_color_            ->load_asset(loader);
+    metallic_              ->load_asset(loader);
+    roughness_             ->load_asset(loader);
+    transmission_          ->load_asset(loader);
+    transmission_roughness_->load_asset(loader);
+    ior_                   ->load_asset(loader);
+    specular_scale_        ->load_asset(loader);
+    specular_tint_         ->load_asset(loader);
+    anisotropic_           ->load_asset(loader);
+    sheen_                 ->load_asset(loader);
+    sheen_tint_            ->load_asset(loader);
+    clearcoat_             ->load_asset(loader);
+    clearcoat_gloss_       ->load_asset(loader);
+    normal_map_            ->load_asset(loader);
+
+    do_update_tracer_object();
+}
+
 void DisneyWidget::update_tracer_object_impl()
 {
     do_update_tracer_object();

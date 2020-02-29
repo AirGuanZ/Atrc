@@ -33,6 +33,12 @@ public:
         return color_;
     }
 
+    void set_color(const Spectrum &c)
+    {
+        color_ = QColor::fromRgbF(c.r, c.g, c.b);
+        update_label_color();
+    }
+
 signals:
 
     void change_color(const Spectrum &color);

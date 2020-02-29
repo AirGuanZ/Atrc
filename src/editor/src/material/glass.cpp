@@ -85,6 +85,27 @@ std::unique_ptr<ResourceThumbnailProvider> GlassWidget::get_thumbnail(int width,
     return std::make_unique<MaterialThumbnailProvider>(width, height, tracer_object_);
 }
 
+void GlassWidget::save_asset(AssetSaver &saver)
+{
+    color_->save_asset(saver);
+    ior_->save_asset(saver);
+
+    saver.write(uint8_t(use_color_refr_->isChecked() ? 1 : 0));
+    color_refr_->save_asset(saver);
+}
+
+void GlassWidget::load_asset(AssetLoader &loader)
+{
+    color_->load_asset(loader);
+    ior_->load_asset(loader);
+
+    const bool use_color_refr = loader.read<uint8_t>() != 0;
+    use_color_refr_->setChecked(use_color_refr);
+    color_refr_->load_asset(loader);
+
+    do_update_tracer_object();
+}
+
 void GlassWidget::update_tracer_object_impl()
 {
     do_update_tracer_object();

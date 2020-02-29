@@ -13,6 +13,10 @@ public:
         return new NoEnvirLightWidget;
     }
 
+    void save_asset(AssetSaver &saver) override { }
+
+    void load_asset(AssetLoader &loader) override { }
+
 protected:
 
     void update_tracer_object_impl() override

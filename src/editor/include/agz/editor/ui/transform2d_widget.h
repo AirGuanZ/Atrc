@@ -8,6 +8,9 @@
 
 AGZ_EDITOR_BEGIN
 
+class AssetLoader;
+class AssetSaver;
+
 class Transform2DUnitWidget : public QWidget
 {
     Q_OBJECT
@@ -23,9 +26,15 @@ public:
 
     using QWidget::QWidget;
 
+    virtual UnitType get_type() const noexcept = 0;
+
     virtual tracer::Transform2 get_transform() const = 0;
 
     virtual Transform2DUnitWidget *clone() const = 0;
+
+    virtual void save_asset(AssetSaver &saver) const = 0;
+
+    virtual void load_asset(AssetLoader &loader) = 0;
 
 signals:
 
@@ -46,6 +55,10 @@ public:
 
     Transform2DWidget *clone() const;
 
+    void save_asset(AssetSaver &saver) const;
+
+    void load_asset(AssetLoader &loader);
+
 signals:
 
     void change_transform();
@@ -61,6 +74,8 @@ private:
     void add_up();
 
     void add_down();
+
+    void push_back(Transform2DUnitWidget *unit_widget);
 
     std::vector<Transform2DUnitWidget*> units_;
 

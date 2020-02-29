@@ -70,6 +70,9 @@ constexpr int SPECTRUM_COMPONENT_COUNT = 3;
 template<typename T>
 using Image2D = texture::texture2d_t<T>;
 
+template<typename T>
+using Image3D = texture::texture3d_t<T>;
+
 /**
  * @brief is there any inf component in given spectrum value
  */

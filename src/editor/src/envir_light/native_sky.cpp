@@ -39,6 +39,20 @@ ResourceWidget<tracer::EnvirLight> *NativeSkyWidget::clone()
     return new NativeSkyWidget(clone_data);
 }
 
+void NativeSkyWidget::save_asset(AssetSaver &saver)
+{
+    saver.write(top_->get_color());
+    saver.write(bottom_->get_color());
+}
+
+void NativeSkyWidget::load_asset(AssetLoader &loader)
+{
+    top_->set_color(loader.read<Spectrum>());
+    bottom_->set_color(loader.read<Spectrum>());
+
+    do_update_tracer_object();
+}
+
 void NativeSkyWidget::update_tracer_object_impl()
 {
     do_update_tracer_object();

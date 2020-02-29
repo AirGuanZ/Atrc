@@ -80,6 +80,24 @@ std::unique_ptr<ResourceThumbnailProvider> PhongWidget::get_thumbnail(int width,
     return std::make_unique<MaterialThumbnailProvider>(width, height, tracer_object_);
 }
 
+void PhongWidget::save_asset(AssetSaver &saver)
+{
+    d_         ->save_asset(saver);
+    s_         ->save_asset(saver);
+    ns_        ->save_asset(saver);
+    normal_map_->save_asset(saver);
+}
+
+void PhongWidget::load_asset(AssetLoader &loader)
+{
+    d_         ->load_asset(loader);
+    s_         ->load_asset(loader);
+    ns_        ->load_asset(loader);
+    normal_map_->load_asset(loader);
+
+    do_update_tracer_object();
+}
+
 void PhongWidget::update_tracer_object_impl()
 {
     do_update_tracer_object();

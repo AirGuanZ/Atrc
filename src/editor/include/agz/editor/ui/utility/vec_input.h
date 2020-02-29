@@ -17,6 +17,8 @@ public:
 
     void set_value(real value);
 
+    void set_alignment(Qt::Alignment alignment);
+
     real get_value() const;
 
 signals:

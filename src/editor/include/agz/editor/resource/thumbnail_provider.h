@@ -6,6 +6,9 @@
 
 AGZ_EDITOR_BEGIN
 
+/**
+ * @brief compute the thumbnail for a specific resource asynchronously
+ */
 class ResourceThumbnailProvider : public QObject
 {
     Q_OBJECT
@@ -21,9 +24,17 @@ public:
 
 signals:
 
+    /**
+     * @brief a newer version of thumbnail is generated
+     */
     void update_thumbnail(QPixmap new_thumbnail);
 };
 
+/**
+ * @brief empty thumbnail generator
+ *
+ * the generated thumbnail has unspecific pixel values
+ */
 class EmptyResourceThumbnailProvider : public ResourceThumbnailProvider
 {
     int width_, height_;
@@ -42,6 +53,9 @@ public:
     }
 };
 
+/**
+ * @brief return a fixed thumbnail provided to constructor
+ */
 class FixedResourceThumbnailProvider : public ResourceThumbnailProvider
 {
     QPixmap pixmap_;

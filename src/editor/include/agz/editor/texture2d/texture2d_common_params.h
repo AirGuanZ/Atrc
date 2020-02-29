@@ -7,6 +7,9 @@
 
 AGZ_EDITOR_BEGIN
 
+class AssetLoader;
+class AssetSaver;
+
 class Texture2DCommonParamsWidget : public QWidget
 {
     Q_OBJECT
@@ -33,6 +36,10 @@ public:
     Texture2DCommonParamsWidget *clone() const;
 
     tracer::Texture2DCommonParams get_tracer_params() const;
+
+    void save_asset(AssetSaver &saver) const;
+
+    void load_asset(AssetLoader &loader);
 
 signals:
 

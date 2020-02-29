@@ -112,6 +112,70 @@ void SceneManager::add_meshes(const std::vector<mesh::mesh_t> &meshes)
     emit change_scene();
 }
 
+void SceneManager::save_asset(AssetSaver &saver) const
+{
+    saver.write(uint32_t(name2record_.size()));
+    for(auto &p : name2record_)
+    {
+        saver.write_string(p.first);
+        p.second->panel->save_asset(saver);
+    }
+}
+
+void SceneManager::load_asset(AssetLoader &loader)
+{
+    const uint32_t count = loader.read<uint32_t>();
+    for(uint32_t i = 0; i < count; ++i)
+    {
+        // load name & entity panel
+        
+        const QString name = to_valid_name(loader.read_string());
+
+        EntityPanel *panel = new EntityPanel(obj_ctx_, "Geometric");
+        panel->load_asset(loader);
+
+        // generate mesh id
+
+        auto mesh_id = displayer_gl_->generate_mesh_id();
+
+        // record name -> entity
+
+        Record record = { name, panel, mesh_id };
+        name2record_[name] = std::make_unique<Record>(record);
+
+        // add widget to editor
+
+        editor_->add_to_entity_panel(panel);
+        ui_->name_list->addItem(name);
+
+        auto new_item = ui_->name_list->findItems(name, Qt::MatchExactly).front();
+        new_item->setSizeHint(QSize(new_item->sizeHint().width(), WIDGET_ITEM_HEIGHT));
+
+        // set widget callback
+
+        panel->set_dirty_callback([=] { emit change_scene(); });
+
+        // add mesh to gl widget
+
+        const auto geometry_data = panel->get_vertices();
+        displayer_gl_->add_mesh(mesh_id, geometry_data.data(), static_cast<int>(geometry_data.size()));
+        displayer_gl_->set_transform(mesh_id, panel->get_transform());
+
+        panel->set_geometry_vertices_dirty_callback([=]
+        {
+            displayer_gl_->remove_mesh(mesh_id);
+            const auto data = panel->get_vertices();
+            displayer_gl_->add_mesh(mesh_id, data.data(), static_cast<int>(data.size()));
+            displayer_gl_->set_transform(mesh_id, panel->get_transform());
+        });
+
+        panel->set_entity_transform_dirty_callback([=]
+        {
+            displayer_gl_->set_transform(mesh_id, panel->get_transform());
+        });
+    }
+}
+
 bool SceneManager::is_valid_name(const QString &name) const
 {
     return name2record_.find(name) == name2record_.end();

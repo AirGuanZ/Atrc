@@ -43,6 +43,19 @@ NormalMapWidget *NormalMapWidget::clone() const
     return new NormalMapWidget(init_data, obj_ctx_);
 }
 
+void NormalMapWidget::save_asset(AssetSaver &saver)
+{
+    saver.write(uint8_t(apply_normal_map_->isChecked() ? 1 : 0));
+    normal_map_->save_asset(saver);
+}
+
+void NormalMapWidget::load_asset(AssetLoader &loader)
+{
+    const bool apply = loader.read<uint8_t>() != 0;
+    apply_normal_map_->setChecked(apply);
+    normal_map_->load_asset(loader);
+}
+
 std::unique_ptr<tracer::NormalMapper> NormalMapWidget::get_tracer_object() const
 {
     if(apply_normal_map_->isChecked())

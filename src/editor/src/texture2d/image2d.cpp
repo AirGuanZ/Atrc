@@ -6,7 +6,7 @@
 
 AGZ_EDITOR_BEGIN
 
-Image2DWidget::Image2DWidget(const CloneState &clone_state)
+Image2DWidget::Image2DWidget(const InitData &clone_state)
 {
     init_ui(clone_state);
 
@@ -25,11 +25,75 @@ Image2DWidget::Image2DWidget(const CloneState &clone_state)
 
 ResourceWidget<tracer::Texture2D> *Image2DWidget::clone()
 {
-    CloneState clone_state;
+    InitData clone_state;
     clone_state.filename               = filename_;
     clone_state.img_data               = img_data_;
     clone_state.adv                    = adv_widget_->clone();
     return new Image2DWidget(clone_state);
+}
+
+std::unique_ptr<ResourceThumbnailProvider> Image2DWidget::get_thumbnail(int width, int height) const
+{
+    if(!img_data_)
+    {
+        QImage img(1, 1, QImage::Format::Format_RGB888);
+        img.setPixelColor(0, 0, Qt::black);
+
+        QPixmap pixmap;
+        pixmap.convertFromImage(img);
+        return std::make_unique<FixedResourceThumbnailProvider>(pixmap.scaled(width, height));
+    }
+
+    const QImage img(
+        reinterpret_cast<const uchar *>(&img_data_->raw_data()[0]),
+        img_data_->width(), img_data_->height(),
+        sizeof(math::color3b) * img_data_->width(),
+        QImage::Format::Format_RGB888);
+
+    QPixmap pixmap;
+    pixmap.convertFromImage(img);
+
+    return std::make_unique<FixedResourceThumbnailProvider>(pixmap.scaled(width, height));
+}
+
+void Image2DWidget::save_asset(AssetSaver &saver)
+{
+    saver.write_string(filename_);
+
+    if(img_data_)
+    {
+        const auto img_data = img::save_rgb_to_png_in_memory(
+            img_data_->raw_data(), img_data_->width(), img_data_->height());
+        saver.write(uint32_t(img_data.size()));
+        saver.write_raw(img_data.data(), img_data.size());
+    }
+    else
+        saver.write(uint32_t(0));
+
+    adv_widget_->save_asset(saver);
+}
+
+void Image2DWidget::load_asset(AssetLoader &loader)
+{
+    filename_ = loader.read_string();
+    filename_label_->setText(filename_);
+    filename_label_->setToolTip(filename_);
+
+    const uint32_t img_data_byte_size = loader.read<uint32_t>();
+
+    if(img_data_byte_size)
+    {
+        std::vector<unsigned char> img_data(img_data_byte_size);
+        loader.read_raw(img_data.data(), img_data_byte_size);
+        img_data_ = std::make_shared<Image2D<math::color3b>>(
+            img::load_rgb_from_memory(img_data.data(), img_data.size()));
+    }
+    else
+        img_data_.reset();
+
+    adv_widget_->load_asset(loader);
+
+    do_update_tracer_object();
 }
 
 void Image2DWidget::update_tracer_object_impl()
@@ -50,7 +114,7 @@ void Image2DWidget::do_update_tracer_object()
     tracer_object_ = create_image_texture(common_params, img_data_, "linear");
 }
 
-void Image2DWidget::init_ui(const CloneState &clone_state)
+void Image2DWidget::init_ui(const InitData &clone_state)
 {
     // filename and image data
 
@@ -91,30 +155,6 @@ void Image2DWidget::init_ui(const CloneState &clone_state)
 
     setContentsMargins(0, 0, 0, 0);
     layout_->setContentsMargins(0, 0, 0, 0);
-}
-
-std::unique_ptr<ResourceThumbnailProvider> Image2DWidget::get_thumbnail(int width, int height) const
-{
-    if(!img_data_)
-    {
-        QImage img(1, 1, QImage::Format::Format_RGB888);
-        img.setPixelColor(0, 0, Qt::black);
-
-        QPixmap pixmap;
-        pixmap.convertFromImage(img);
-        return std::make_unique<FixedResourceThumbnailProvider>(pixmap.scaled(width, height));
-    }
-
-    const QImage img(
-        reinterpret_cast<const uchar *>(&img_data_->raw_data()[0]),
-        img_data_->width(), img_data_->height(),
-        sizeof(math::color3b) * img_data_->width(),
-        QImage::Format::Format_RGB888);
-
-    QPixmap pixmap;
-    pixmap.convertFromImage(img);
-
-    return std::make_unique<FixedResourceThumbnailProvider>(pixmap.scaled(width, height));
 }
 
 void Image2DWidget::browse_filename()

@@ -43,6 +43,20 @@ ResourceWidget<tracer::EnvirLight> *IBLWidget::clone()
     return new IBLWidget(tex_->clone(), obj_ctx_);
 }
 
+void IBLWidget::save_asset(AssetSaver &saver)
+{
+    tex_->save_asset(saver);
+    saver.write(importance_sampling_->isChecked() ? uint8_t(1) : uint8_t(0));
+}
+
+void IBLWidget::load_asset(AssetLoader &loader)
+{
+    tex_->load_asset(loader);
+    importance_sampling_->setChecked(loader.read<uint8_t>() != 0);
+
+    do_update_tracer_object();
+}
+
 void IBLWidget::update_tracer_object_impl()
 {
     do_update_tracer_object();

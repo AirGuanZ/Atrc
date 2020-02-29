@@ -6,6 +6,8 @@
 
 AGZ_EDITOR_BEGIN
 
+class AssetLoader;
+class AssetSaver;
 class Displayer;
 class Editor;
 
@@ -24,6 +26,10 @@ public:
     std::shared_ptr<tracer::Aggregate> update_tracer_aggregate(std::vector<std::shared_ptr<tracer::Entity>> &entities);
 
     void add_meshes(const std::vector<mesh::mesh_t> &meshes);
+
+    void save_asset(AssetSaver &saver) const;
+
+    void load_asset(AssetLoader &loader);
 
 signals:
 

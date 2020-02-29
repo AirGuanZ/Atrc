@@ -8,6 +8,7 @@ FILE(GLOB_RECURSE TARGET_SRC
 		"${PROJECT_SOURCE_DIR}/src/*.ui"
 		"${PROJECT_SOURCE_DIR}/src/*.qrc"
 		"${PROJECT_SOURCE_DIR}/include/*.h"
+		"${PROJECT_SOURCE_DIR}/include/*.inl"
 		"${PROJECT_SOURCE_DIR}/include/*.ui")
 ADD_EXECUTABLE(Editor ${TARGET_SRC})
 

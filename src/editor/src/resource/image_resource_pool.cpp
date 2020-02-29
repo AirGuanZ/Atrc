@@ -1,7 +1,7 @@
 #include <QApplication>
 
 #include <agz/editor/editor.h>
-#include <agz/editor/resource/image_resource_pool.h>
+#include <agz/editor/resource/pool/image_resource_pool.h>
 
 AGZ_EDITOR_BEGIN
 
@@ -13,7 +13,7 @@ namespace
 template<typename TracerObject>
 ImageResourcePool<TracerObject>::ImageResourcePool(
     ObjectContext &obj_ctx, Editor *editor, const QString &default_type)
-    : obj_ctx_(obj_ctx), editor_(editor)
+    : obj_ctx_(obj_ctx), editor_(editor), default_type_(default_type)
 {
     ui_ = new ImageResourcePoolWidget;
     layout_ = new FlowLayout(ui_->scroll_area_widget);
@@ -165,9 +165,89 @@ ResourceInPool<TracerObject> *ImageResourcePool<TracerObject>::add_resource(
 }
 
 template<typename TracerObject>
+void ImageResourcePool<TracerObject>::save_asset(AssetSaver &saver) const
+{
+    saver.write(uint32_t(name2rsc_.size()));
+    for(auto &p : name2rsc_)
+        p.second->rsc->save_asset(saver);
+}
+
+template<typename TracerObject>
+void ImageResourcePool<TracerObject>::load_asset(AssetLoader &loader)
+{
+    const uint32_t count = loader.read<uint32_t>();
+    for(uint32_t i = 0; i < count; ++i)
+    {
+        auto rsc = std::make_unique<ResourceInPool<TracerObject>>(
+            "", std::make_unique<ResourcePanel<TracerObject>>(obj_ctx_, default_type_));
+        rsc->load_asset(*this, loader);
+        const QString name = rsc->get_name();
+
+        auto raw_rsc = rsc.get();
+        auto raw_panel = rsc->get_panel();
+        editor_->add_to_resource_panel(raw_panel);
+
+        ImageTextIcon *icon = new ImageTextIcon(
+            ui_->scroll_area_widget, icon_font_, TEXTURE2D_THUMBNAIL_RENDER_SIZE);
+        icon->set_text(name);
+        icon->set_image(raw_panel->get_thumbnail(TEXTURE2D_THUMBNAIL_RENDER_SIZE, TEXTURE2D_THUMBNAIL_RENDER_SIZE));
+
+        auto record = std::make_unique<Record>();
+        auto raw_record = record.get();
+        record->name = name;
+        record->rsc  = std::move(rsc);
+        record->icon = icon;
+        name2rsc_[name] = std::move(record);
+
+        connect(icon, &ImageTextIcon::clicked, [=]
+        {
+            if(!raw_record->icon->is_selected())
+            {
+                set_selected_rsc(raw_record);
+                show_edit_panel(raw_record->rsc->get_panel(), false);
+            }
+            else
+                set_selected_rsc(nullptr);
+        });
+
+        raw_rsc->set_dirty_callback([=]
+        {
+            icon->set_image(raw_panel->get_thumbnail(
+                TEXTURE2D_THUMBNAIL_RENDER_SIZE, TEXTURE2D_THUMBNAIL_RENDER_SIZE));
+        });
+
+        layout_->addWidget(icon);
+    }
+}
+
+template<typename TracerObject>
+ResourceInPool<TracerObject> *ImageResourcePool<TracerObject>::name_to_rsc(const QString &name)
+{
+    auto it = name2rsc_.find(name);
+    return it == name2rsc_.end() ? nullptr : it->second->rsc.get();
+}
+
+template<typename TracerObject>
 bool ImageResourcePool<TracerObject>::is_valid_name(const QString &name) const
 {
     return name2rsc_.find(name) == name2rsc_.end();
+}
+
+template<typename TracerObject>
+QString ImageResourcePool<TracerObject>::to_valid_name(const QString &name) const
+{
+    if(name.isEmpty())
+        return to_valid_name("auto");
+
+    if(is_valid_name(name))
+        return name;
+
+    for(int index = 0;; ++index)
+    {
+        QString ret = QString("%1 (%2)").arg(name).arg(index);
+        if(is_valid_name(ret))
+            return ret;
+    }
 }
 
 template<typename TracerObject>
@@ -196,5 +276,6 @@ void ImageResourcePool<TracerObject>::set_selected_rsc(Record *record)
 
 template class ImageResourcePool<tracer::Material>;
 template class ImageResourcePool<tracer::Texture2D>;
+template class ImageResourcePool<tracer::Texture3D>;
 
 AGZ_EDITOR_END

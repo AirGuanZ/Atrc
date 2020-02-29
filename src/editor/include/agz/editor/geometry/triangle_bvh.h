@@ -28,6 +28,10 @@ public:
 
     ResourceWidget<tracer::Geometry> *clone() override;
 
+    void save_asset(AssetSaver &saver) override;
+
+    void load_asset(AssetLoader &loader) override;
+
     std::vector<EntityInterface::Vertex> get_vertices() const override;
 
 protected:

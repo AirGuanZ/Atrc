@@ -15,6 +15,8 @@
 
 AGZ_EDITOR_BEGIN
 
+class GlobalSettingWidget;
+
 class Editor : public QMainWindow, public misc::uncopyable_t
 {
     Q_OBJECT
@@ -39,13 +41,11 @@ public:
 
 signals:
 
-    void change_scene();
+    void change_envir_light();
 
 private:
 
     // slots
-
-    void on_load_config();
 
     void on_update_display();
 
@@ -54,8 +54,6 @@ private:
     void on_update_envir_light();
 
     // init
-
-    void init_menu_bar();
 
     void init_panels();
 
@@ -70,6 +68,8 @@ private:
     void init_renderer_panel();
 
     void init_global_setting_widget();
+
+    void init_save_asset_dialog();
 
     void redistribute_panels();
 
@@ -96,6 +96,8 @@ private:
     QPointer<QWidget> editing_rsc_widget_;
 
     std::unique_ptr<ObjectContext> obj_ctx_;
+
+    GlobalSettingWidget *global_setting_ = nullptr;
 
     EnvirLightSlot *envir_light_slot_ = nullptr;
 

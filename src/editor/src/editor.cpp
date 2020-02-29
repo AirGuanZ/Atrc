@@ -1,9 +1,10 @@
 #include <QFileDialog>
 #include <QMenuBar>
-#include <QTimer>
 #include <QWidgetAction>
 
 #include <agz/editor/editor.h>
+#include <agz/editor/imexport/asset_load_dialog.h>
+#include <agz/editor/imexport/asset_save_dialog.h>
 #include <agz/editor/renderer/renderer_widget.h>
 #include <agz/editor/ui/global_setting_widget.h>
 #include <agz/editor/ui/log_widget.h>
@@ -17,8 +18,6 @@ AGZ_EDITOR_BEGIN
 
 Editor::Editor()
 {
-    init_menu_bar();
-
     init_panels();
 
     init_log_widget();
@@ -48,6 +47,10 @@ Editor::Editor()
     AGZ_INFO("initialize renderer panel");
 
     init_renderer_panel();
+
+    AGZ_INFO("initialize asset saving dialog");
+
+    init_save_asset_dialog();
 
     AGZ_INFO("initialize global settings");
 
@@ -142,36 +145,6 @@ void Editor::show_entity_panel(QWidget *widget, bool display_entity_panel)
         right_panel_->right_tab_widget->setCurrentWidget(right_panel_->entity_area);
 }
 
-void Editor::on_load_config()
-{
-    try
-    {
-        const std::string input_filename = QFileDialog::getOpenFileName(
-            this, "Configuration File").toStdString();
-        if(!input_filename.empty())
-            load_config(input_filename);
-    }
-    catch(const std::exception &err)
-    {
-        renderer_.reset();
-
-        std::vector<std::string> err_strs;
-        misc::extract_hierarchy_exceptions(err, std::back_inserter(err_strs));
-
-        QString err_msg;
-        for(auto &s : err_strs)
-            err_msg.append(QString::fromStdString(s + "\n"));
-
-        QMessageBox::information(this, "Error", err_msg);
-    }
-    catch(...)
-    {
-        renderer_.reset();
-
-        QMessageBox::information(this, "Error", "An unknown error occurred");
-    }
-}
-
 void Editor::on_update_display()
 {
     if(renderer_)
@@ -207,13 +180,6 @@ void Editor::on_update_envir_light()
     scene_->set_camera(old_camera);
 
     launch_renderer(true);
-}
-
-void Editor::init_menu_bar()
-{
-    QAction *load_config = new QAction("Load JSON Config", this);
-    menuBar()->addAction(load_config);
-    connect(load_config, &QAction::triggered, [=] { on_load_config(); });
 }
 
 void Editor::init_panels()
@@ -278,8 +244,14 @@ void Editor::init_obj_context()
     left_panel_->material_tab_layout->addWidget(
         obj_ctx_->pool<tracer::Material>()->get_widget());
 
-    left_panel_->texture_tab_layout->addWidget(
+    left_panel_->medium_tab_layout->addWidget(
+        obj_ctx_->pool<tracer::Medium>()->get_widget());
+
+    left_panel_->texture2d_tab_layout->addWidget(
         obj_ctx_->pool<tracer::Texture2D>()->get_widget());
+
+    left_panel_->texture3d_tab_layout->addWidget(
+        obj_ctx_->pool<tracer::Texture3D>()->get_widget());
 
     left_panel_->geometry_tab_layout->addWidget(
         obj_ctx_->pool<tracer::Geometry>()->get_widget());
@@ -315,30 +287,60 @@ void Editor::init_renderer_panel()
     envir_light_slot_ = new EnvirLightSlot(*obj_ctx_, "Native Sky");
     envir_light_slot_->set_dirty_callback([=]
     {
-        emit change_scene();
+        emit change_envir_light();
     });
-    connect(this, &Editor::change_scene, [=] { on_update_envir_light(); });
+    connect(this, &Editor::change_envir_light, [=] { on_update_envir_light(); });
 
     right_panel_->envir_light_tab_layout->addWidget(envir_light_slot_);
 }
 
 void Editor::init_global_setting_widget()
 {
-    QWidgetAction       *action         = new QWidgetAction(this);
-    GlobalSettingWidget *global_setting = new GlobalSettingWidget(this);
-    action->setDefaultWidget(global_setting);
+    QWidgetAction *action = new QWidgetAction(this);
+    global_setting_ = new GlobalSettingWidget(this);
+    action->setDefaultWidget(global_setting_);
     menuBar()->addMenu("Global Settings")->addAction(action);
 
-    connect(global_setting->camera_rotate_speed, &QSlider::valueChanged,
+    connect(global_setting_->camera_rotate_speed, &QSlider::valueChanged,
         [=](int v)
     {
         const real speed = real(0.001) * v / 10;
-        global_setting->display_camera_rotate_speed->setText(QString::number(100 * speed, 'g', 2));
+        global_setting_->display_camera_rotate_speed->setText(QString::number(100 * speed, 'g', 2));
         displayer_->set_camera_rotate_speed(speed);
     });
 
-    global_setting->camera_rotate_speed->setRange(1, 100);
-    global_setting->camera_rotate_speed->setValue(40);
+    global_setting_->camera_rotate_speed->setRange(1, 100);
+    global_setting_->camera_rotate_speed->setValue(40);
+}
+
+void Editor::init_save_asset_dialog()
+{
+    AssetLoadDialog *load_dialog = new AssetLoadDialog(
+        scene_mgr_.get(), obj_ctx_.get(), envir_light_slot_);
+    QAction *load_action = new QAction("Load", this);
+    menuBar()->addAction(load_action);
+    connect(load_action, &QAction::triggered, [=]
+    {
+        load_dialog->exec();
+        if(!load_dialog->is_ok_clicked())
+            return;
+
+        renderer_.reset();
+
+        scene_params_.envir_light = envir_light_slot_->get_tracer_object();
+        scene_params_.aggregate = scene_mgr_->update_tracer_aggregate(scene_params_.entities);
+
+        scene_ = create_default_scene(scene_params_);
+        scene_->set_camera(displayer_->create_camera());
+
+        launch_renderer(true);
+    });
+
+    AssetSaveDialog *save_dialog = new AssetSaveDialog(
+        scene_mgr_.get(), obj_ctx_.get(), envir_light_slot_);
+    QAction *save_action = new QAction("Save", this);
+    menuBar()->addAction(save_action);
+    connect(save_action, &QAction::triggered, save_dialog, &AssetSaveDialog::exec);
 }
 
 void Editor::redistribute_panels()

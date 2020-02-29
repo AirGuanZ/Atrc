@@ -3,6 +3,7 @@
 #include <agz/editor/entity/entity.h>
 #include <agz/editor/geometry/geometry.h>
 #include <agz/editor/material/material.h>
+#include <agz/editor/medium/medium.h>
 #include <agz/editor/ui/utility/vec_input.h>
 #include <agz/editor/ui/transform3d_widget.h>
 
@@ -16,6 +17,8 @@ public:
     {
         GeometrySlot *geometry = nullptr;
         MaterialSlot *material = nullptr;
+        MediumSlot *medium_in  = nullptr;
+        MediumSlot *medium_out = nullptr;
         Spectrum emit_radiance;
         DirectTransform transform;
     };
@@ -23,6 +26,10 @@ public:
     GeometricEntityWidget(const CloneState &clone_state, ObjectContext &obj_ctx);
 
     ResourceWidget<tracer::Entity> *clone() override;
+
+    void save_asset(AssetSaver &saver) override;
+
+    void load_asset(AssetLoader &loader) override;
 
     std::vector<Vertex> get_vertices() const override;
 
@@ -42,6 +49,8 @@ private:
 
     GeometrySlot *geometry_ = nullptr;
     MaterialSlot *material_ = nullptr;
+    MediumSlot *medium_in_  = nullptr;
+    MediumSlot *medium_out_ = nullptr;
 
     SpectrumInput *emit_radiance_ = nullptr;
 

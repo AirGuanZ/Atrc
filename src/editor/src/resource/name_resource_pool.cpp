@@ -1,5 +1,5 @@
 #include <agz/editor/editor.h>
-#include <agz/editor/resource/name_resource_pool.h>
+#include <agz/editor/resource/pool/name_resource_pool.h>
 
 AGZ_EDITOR_BEGIN
 
@@ -11,7 +11,7 @@ namespace
 template<typename TracerObject>
 NameResourcePool<TracerObject>::NameResourcePool(
     ObjectContext &obj_ctx, Editor *editor, const QString &default_type)
-    : obj_ctx_(obj_ctx), editor_(editor)
+    : obj_ctx_(obj_ctx), editor_(editor), default_type_(default_type)
 {
     widget_ = new NameResourcePoolWidget;
 
@@ -170,9 +170,69 @@ ResourceInPool<TracerObject> *NameResourcePool<TracerObject>::add_resource(
 }
 
 template<typename TracerObject>
+void NameResourcePool<TracerObject>::save_asset(AssetSaver &saver) const
+{
+    saver.write(uint32_t(name2record_.size()));
+    for(auto &p : name2record_)
+        p.second->rsc->save_asset(saver);
+}
+
+template<typename TracerObject>
+void NameResourcePool<TracerObject>::load_asset(AssetLoader &loader)
+{
+    const uint32_t count = loader.read<uint32_t>();
+    for(uint32_t i = 0; i < count; ++i)
+    {
+        auto rsc = std::make_unique<ResourceInPool<TracerObject>>(
+            "", std::make_unique<ResourcePanel<TracerObject>>(obj_ctx_, default_type_));
+        rsc->load_asset(*this, loader);
+        const QString name = rsc->get_name();
+
+        auto raw_rsc = rsc.get();
+        auto raw_panel = rsc->get_panel();
+        editor_->add_to_resource_panel(raw_panel);
+
+        auto record = std::make_unique<Record>();
+        auto raw_record = record.get();
+        record->name = name;
+        record->rsc = std::move(rsc);
+        name2record_[name] = std::move(record);
+
+        widget_->name_list->addItem(name);
+
+        auto new_item = widget_->name_list->findItems(name, Qt::MatchExactly).front();
+        new_item->setSizeHint(QSize(new_item->sizeHint().width(), WIDGET_ITEM_HEIGHT));
+    }
+}
+
+template<typename TracerObject>
+ResourceInPool<TracerObject> *NameResourcePool<TracerObject>::name_to_rsc(const QString &name)
+{
+    auto it = name2record_.find(name);
+    return it == name2record_.end() ? nullptr : it->second->rsc.get();
+}
+
+template<typename TracerObject>
 bool NameResourcePool<TracerObject>::is_valid_name(const QString &name) const
 {
-    return name2record_.find(name) == name2record_.end();
+    return !name.isEmpty() && name2record_.find(name) == name2record_.end();
+}
+
+template<typename TracerObject>
+QString NameResourcePool<TracerObject>::to_valid_name(const QString &name) const
+{
+    if(name.isEmpty())
+        return to_valid_name("auto");
+
+    if(is_valid_name(name))
+        return name;
+
+    for(int index = 0;; ++index)
+    {
+        QString ret = QString("%1 (%2)").arg(name).arg(index);
+        if(is_valid_name(ret))
+            return ret;
+    }
 }
 
 template<typename TracerObject>
@@ -189,5 +249,6 @@ QWidget *NameResourcePool<TracerObject>::get_widget()
 }
 
 template class NameResourcePool<tracer::Geometry>;
+template class NameResourcePool<tracer::Medium>;
 
 AGZ_EDITOR_END

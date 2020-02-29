@@ -9,12 +9,16 @@ GeometricEntityWidget::GeometricEntityWidget(const CloneState &clone_state, Obje
     : obj_ctx_(obj_ctx)
 {
     QGridLayout *layout = new QGridLayout(this);
-    Collapsible *geometry_section  = new Collapsible(this, "Geometry");
-    Collapsible *transform_section = new Collapsible(this, "Transform");
-    Collapsible *material_section  = new Collapsible(this, "Material");
+    Collapsible *geometry_section   = new Collapsible(this, "Geometry");
+    Collapsible *transform_section  = new Collapsible(this, "Transform");
+    Collapsible *material_section   = new Collapsible(this, "Material");
+    Collapsible *medium_in_section  = new Collapsible(this, "MediumIn");
+    Collapsible *medium_out_section = new Collapsible(this, "MediumOut");
 
     geometry_      = clone_state.geometry;
     material_      = clone_state.material;
+    medium_in_     = clone_state.medium_in;
+    medium_out_    = clone_state.medium_out;
     emit_radiance_ = new SpectrumInput;
     transform_     = new Transform3DWidget(clone_state.transform);
 
@@ -24,6 +28,12 @@ GeometricEntityWidget::GeometricEntityWidget(const CloneState &clone_state, Obje
     if(!material_)
         material_ = new MaterialSlot(obj_ctx_, "Ideal Diffuse");
 
+    if(!medium_in_)
+        medium_in_ = new MediumSlot(obj_ctx_, "Void");
+
+    if(!medium_out_)
+        medium_out_ = new MediumSlot(obj_ctx_, "Void");
+
     emit_radiance_->set_value(clone_state.emit_radiance);
 
     geometry_->set_dirty_callback([=]
@@ -31,7 +41,18 @@ GeometricEntityWidget::GeometricEntityWidget(const CloneState &clone_state, Obje
         set_dirty_flag();
     });
 
-    material_->set_dirty_callback([=] {
+    material_->set_dirty_callback([=]
+    {
+        set_dirty_flag();
+    });
+
+    medium_in_->set_dirty_callback([=]
+    {
+        set_dirty_flag();
+    });
+
+    medium_out_->set_dirty_callback([=]
+    {
         set_dirty_flag();
     });
 
@@ -46,9 +67,11 @@ GeometricEntityWidget::GeometricEntityWidget(const CloneState &clone_state, Obje
         set_dirty_flag();
     });
 
-    geometry_section ->set_content_widget(geometry_);
-    transform_section->set_content_widget(transform_);
-    material_section ->set_content_widget(material_);
+    geometry_section  ->set_content_widget(geometry_);
+    transform_section ->set_content_widget(transform_);
+    material_section  ->set_content_widget(material_);
+    medium_in_section ->set_content_widget(medium_in_);
+    medium_out_section->set_content_widget(medium_out_);
 
     geometry_section ->open();
     transform_section->open();
@@ -59,6 +82,8 @@ GeometricEntityWidget::GeometricEntityWidget(const CloneState &clone_state, Obje
     layout->addWidget(new QLabel("   Emit Radiance", this), 2, 0, 1, 1);
     layout->addWidget(emit_radiance_, 2, 1, 1, 1);
     layout->addWidget(material_section, 3, 0, 1, 2);
+    layout->addWidget(medium_in_section, 4, 0, 1, 2);
+    layout->addWidget(medium_out_section, 5, 0, 1, 2);
 
     setContentsMargins(0, 0, 0, 0);
     layout->setContentsMargins(0, 0, 0, 0);
@@ -79,6 +104,28 @@ ResourceWidget<tracer::Entity> *GeometricEntityWidget::clone()
     clone_state.emit_radiance = emit_radiance_->get_value();
     clone_state.transform     = transform_->get_transform();
     return new GeometricEntityWidget(clone_state, obj_ctx_);
+}
+
+void GeometricEntityWidget::save_asset(AssetSaver &saver)
+{
+    geometry_->save_asset(saver);
+    material_->save_asset(saver);
+    medium_in_->save_asset(saver);
+    medium_out_->save_asset(saver);
+    saver.write(emit_radiance_->get_value());
+    saver.write(transform_->get_transform());
+}
+
+void GeometricEntityWidget::load_asset(AssetLoader &loader)
+{
+    geometry_->load_asset(loader);
+    material_->load_asset(loader);
+    medium_in_->load_asset(loader);
+    medium_out_->load_asset(loader);
+    emit_radiance_->set_value(loader.read<Spectrum>());
+    transform_->set_transform(loader.read<DirectTransform>());
+
+    do_update_tracer_object();
 }
 
 std::vector<EntityInterface::Vertex> GeometricEntityWidget::get_vertices() const
@@ -109,8 +156,8 @@ void GeometricEntityWidget::do_update_tracer_object()
     auto material = material_->get_tracer_object();
 
     tracer::MediumInterface med;
-    med.in  = tracer::create_void();
-    med.out = tracer::create_void();
+    med.in  = medium_in_ ->get_tracer_object();
+    med.out = medium_out_->get_tracer_object();
 
     const Spectrum emit_radiance = emit_radiance_->get_value();
 

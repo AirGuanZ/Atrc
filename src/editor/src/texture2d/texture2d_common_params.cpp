@@ -1,6 +1,8 @@
 #include <QLabel>
 #include <QLineEdit>
 
+#include <agz/editor/imexport/asset_loader.h>
+#include <agz/editor/imexport/asset_saver.h>
 #include <agz/editor/texture2d/texture2d_common_params.h>
 
 AGZ_EDITOR_BEGIN
@@ -134,6 +136,36 @@ tracer::Texture2DCommonParams Texture2DCommonParamsWidget::get_tracer_params() c
     ret.wrap_u    = wrap_u_->currentText().toLower().toStdString();
     ret.wrap_v    = wrap_v_->currentText().toLower().toStdString();
     return ret;
+}
+
+void Texture2DCommonParamsWidget::save_asset(AssetSaver &saver) const
+{
+    saver.write(uint8_t(apply_inv_gamma_->isChecked() ? 1 : 0));
+    saver.write(inv_gamma_->text().toFloat());
+
+    saver.write(uint8_t(inv_u_->isChecked() ? 1 : 0));
+    saver.write(uint8_t(inv_v_->isChecked() ? 1 : 0));
+    saver.write(uint8_t(swap_uv_->isChecked() ? 1 : 0));
+
+    transform_->save_asset(saver);
+
+    saver.write_string(wrap_u_->currentText());
+    saver.write_string(wrap_v_->currentText());
+}
+
+void Texture2DCommonParamsWidget::load_asset(AssetLoader &loader)
+{
+    apply_inv_gamma_->setChecked(loader.read<uint8_t>() != 0);
+    inv_gamma_->setText(QString::number(loader.read<float>()));
+
+    inv_u_->setChecked(loader.read<uint8_t>() != 0);
+    inv_v_->setChecked(loader.read<uint8_t>() != 0);
+    swap_uv_->setChecked(loader.read<uint8_t>() != 0);
+
+    transform_->load_asset(loader);
+
+    wrap_u_->setCurrentText(loader.read_string());
+    wrap_v_->setCurrentText(loader.read_string());
 }
 
 AGZ_EDITOR_END

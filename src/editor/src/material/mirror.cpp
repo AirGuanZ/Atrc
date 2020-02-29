@@ -73,6 +73,22 @@ std::unique_ptr<ResourceThumbnailProvider> MirrorWidget::get_thumbnail(int width
     return std::make_unique<MaterialThumbnailProvider>(width, height, tracer_object_);
 }
 
+void MirrorWidget::save_asset(AssetSaver &saver)
+{
+    color_map_->save_asset(saver);
+    eta_      ->save_asset(saver);
+    k_        ->save_asset(saver);
+}
+
+void MirrorWidget::load_asset(AssetLoader &loader)
+{
+    color_map_->load_asset(loader);
+    eta_      ->load_asset(loader);
+    k_        ->load_asset(loader);
+
+    do_update_tracer_object();
+}
+
 void MirrorWidget::update_tracer_object_impl()
 {
     do_update_tracer_object();

@@ -1,6 +1,8 @@
 #include <QInputDialog>
 #include <QLabel>
 
+#include <agz/editor/imexport/asset_loader.h>
+#include <agz/editor/imexport/asset_saver.h>
 #include <agz/editor/ui/transform2d_widget.h>
 #include <agz/editor/ui/utility/validator.h>
 
@@ -46,6 +48,11 @@ namespace
             layout->setContentsMargins(0, 0, 0, 0);
         }
 
+        UnitType get_type() const noexcept override
+        {
+            return UnitType::Translate;
+        }
+
         tracer::Transform2 get_transform() const override
         {
             real x, y;
@@ -60,6 +67,16 @@ namespace
             QString line = offset_edit_->text();
             QTextStream(&line) >> x >> y;
             return new Translate2DWidget(nullptr, { x, y });
+        }
+
+        void save_asset(AssetSaver &saver) const override
+        {
+            saver.write_string(offset_edit_->text());
+        }
+
+        void load_asset(AssetLoader &loader) override
+        {
+            offset_edit_->setText(loader.read_string());
         }
 
     private:
@@ -107,6 +124,11 @@ namespace
             layout->setContentsMargins(0, 0, 0, 0);
         }
 
+        UnitType get_type() const noexcept override
+        {
+            return UnitType::Rotate;
+        }
+
         tracer::Transform2 get_transform() const override
         {
             const real deg = deg_edit_->text().toFloat();
@@ -118,6 +140,16 @@ namespace
         {
             const real deg = deg_edit_->text().toFloat();
             return new Rotate2DWidget(nullptr, deg);
+        }
+
+        void save_asset(AssetSaver &saver) const override
+        {
+            saver.write_string(deg_edit_->text());
+        }
+
+        void load_asset(AssetLoader &loader) override
+        {
+            deg_edit_->setText(loader.read_string());
         }
 
     private:
@@ -165,6 +197,11 @@ namespace
             layout->setContentsMargins(0, 0, 0, 0);
         }
 
+        UnitType get_type() const noexcept override
+        {
+            return UnitType::Scale;
+        }
+
         tracer::Transform2 get_transform() const override
         {
             real x, y;
@@ -179,6 +216,16 @@ namespace
             QString line = ratio_edit_->text();
             QTextStream(&line) >> x >> y;
             return new Scale2DWidget(nullptr, { x, y });
+        }
+
+        void save_asset(AssetSaver &saver) const override
+        {
+            saver.write_string(ratio_edit_->text());
+        }
+
+        void load_asset(AssetLoader &loader) override
+        {
+            ratio_edit_->setText(loader.read_string());
         }
 
     private:
@@ -209,6 +256,33 @@ Transform2DWidget *Transform2DWidget::clone() const
     for(auto u : units_)
         units.push_back(u->clone());
     return new Transform2DWidget(std::move(units));
+}
+
+void Transform2DWidget::save_asset(AssetSaver &saver) const
+{
+    saver.write(uint32_t(units_.size()));
+    for(auto &u : units_)
+    {
+        saver.write(u->get_type());
+        u->save_asset(saver);
+    }
+}
+
+void Transform2DWidget::load_asset(AssetLoader &loader)
+{
+    for(auto &u : units_)
+        delete u;
+    units_.clear();
+
+    const uint32_t unit_count = loader.read<uint32_t>();
+    for(uint32_t i = 0; i < unit_count; ++i)
+    {
+        const auto type = loader.read<Transform2DUnitWidget::UnitType>();
+        auto widget = create_new_unit_widget(type);
+        push_back(widget);
+
+        widget->load_asset(loader);
+    }
 }
 
 Transform2DUnitWidget::UnitType Transform2DWidget::get_unit_type()
@@ -300,7 +374,11 @@ void Transform2DWidget::add_down()
 {
     const Transform2DUnitWidget::UnitType unit_type = get_unit_type();
     Transform2DUnitWidget *unit_widget = create_new_unit_widget(unit_type);
+    push_back(unit_widget);
+}
 
+void Transform2DWidget::push_back(Transform2DUnitWidget *unit_widget)
+{
     units_.push_back(unit_widget);
     layout_->insertWidget(layout_->count() - 1, unit_widget);
 

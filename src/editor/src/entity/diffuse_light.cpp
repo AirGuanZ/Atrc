@@ -68,6 +68,22 @@ ResourceWidget<tracer::Entity> *DiffuseLightEntityWidget::clone()
     return new DiffuseLightEntityWidget(clone_state, obj_ctx_);
 }
 
+void DiffuseLightEntityWidget::save_asset(AssetSaver &saver)
+{
+    geometry_->save_asset(saver);
+    saver.write(radiance_->get_value());
+    saver.write(transform_->get_transform());
+}
+
+void DiffuseLightEntityWidget::load_asset(AssetLoader &loader)
+{
+    geometry_->load_asset(loader);
+    radiance_->set_value(loader.read<Spectrum>());
+    transform_->set_transform(loader.read<DirectTransform>());
+
+    do_update_tracer_object();
+}
+
 std::vector<EntityInterface::Vertex> DiffuseLightEntityWidget::get_vertices() const
 {
     return geometry_->get_vertices();

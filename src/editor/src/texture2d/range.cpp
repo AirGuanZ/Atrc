@@ -104,6 +104,36 @@ std::unique_ptr<ResourceThumbnailProvider> RangeWidget::get_thumbnail(int width,
     return std::make_unique<FixedResourceThumbnailProvider>(pixmap.scaled(width, height));
 }
 
+void RangeWidget::save_asset(AssetSaver &saver)
+{
+    saver.write(slider_->low());
+    saver.write(slider_->high());
+    saver.write(slider_->value());
+}
+
+void RangeWidget::load_asset(AssetLoader &loader)
+{
+    const real low   = real(loader.read<double>());
+    const real high  = real(loader.read<double>());
+    const real value = real(loader.read<double>());
+
+    range_edit_->blockSignals(true);
+    range_edit_->setText(QString("%1 %2").arg(low).arg(high));
+    range_edit_->blockSignals(false);
+
+    value_->blockSignals(true);
+    value_->setRange(low, high);
+    value_->setValue(value);
+    value_->blockSignals(false);
+
+    slider_->blockSignals(true);
+    slider_->set_range(low, high);
+    slider_->set_value(value);
+    slider_->blockSignals(false);
+
+    do_update_tracer_object();
+}
+
 void RangeWidget::update_tracer_object_impl()
 {
     do_update_tracer_object();

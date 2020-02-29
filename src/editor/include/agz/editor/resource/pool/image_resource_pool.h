@@ -1,7 +1,7 @@
 #pragma once
 
-#include <agz/editor/resource/image_text_icon.h>
-#include <agz/editor/resource/image_resource_pool_ui.h>
+#include <agz/editor/resource/pool/image_text_icon.h>
+#include <agz/editor/resource/pool/image_resource_pool_ui.h>
 #include <agz/editor/resource/resource.h>
 #include <agz/editor/ui/utility/flow_layout.h>
 
@@ -21,7 +21,15 @@ public:
     ResourceInPool<TracerObject> *add_resource(
         const QString &name, std::unique_ptr<ResourcePanel<TracerObject>> panel) override;
 
+    void save_asset(AssetSaver &saver) const override;
+
+    void load_asset(AssetLoader &loader) override;
+
+    ResourceInPool<TracerObject> *name_to_rsc(const QString &name) override;
+
     bool is_valid_name(const QString &name) const override;
+
+    QString to_valid_name(const QString &name) const override;
 
     void show_edit_panel(ResourcePanel<TracerObject> *rsc, bool display_rsc_panel) override;
 
@@ -38,6 +46,7 @@ private:
 
     void set_selected_rsc(Record *record);
 
+    QString default_type_;
     ObjectContext &obj_ctx_;
     Editor *editor_ = nullptr;
 

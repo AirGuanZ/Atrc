@@ -29,6 +29,11 @@ void RealInput::set_value(real value)
     edit_->setText(QString::number(value));
 }
 
+void RealInput::set_alignment(Qt::Alignment alignment)
+{
+    edit_->setAlignment(alignment);
+}
+
 real RealInput::get_value() const
 {
     return real(edit_->text().toDouble());

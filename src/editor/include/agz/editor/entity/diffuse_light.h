@@ -22,6 +22,10 @@ public:
 
     ResourceWidget<tracer::Entity> *clone() override;
 
+    void save_asset(AssetSaver &saver) override;
+
+    void load_asset(AssetLoader &loader) override;
+
     std::vector<Vertex> get_vertices() const override;
 
     DirectTransform get_transform() const override;

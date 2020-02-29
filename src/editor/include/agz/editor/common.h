@@ -31,6 +31,7 @@ using Vec3d = math::vec3d;
 using tracer::Spectrum;
 
 using tracer::Image2D;
+using tracer::Image3D;
 
 inline Spectrum qcolor_to_spectrum(const QColor &color) noexcept
 {

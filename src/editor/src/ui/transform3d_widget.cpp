@@ -1,5 +1,6 @@
 #include <QGridLayout>
 #include <QLabel>
+#include <QInputDialog>
 #include <QPushButton>
 
 #include <im3d_math.h>
