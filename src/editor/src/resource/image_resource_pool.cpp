@@ -25,16 +25,11 @@ ImageResourcePool<TracerObject>::ImageResourcePool(
 
     connect(ui_->create, &QPushButton::clicked, [=]
     {
-        const QString name = QInputDialog::getText(
-            ui_, "Name", "Enter resource name");
-        if(name.isEmpty())
+        bool ok = false;
+        const QString name = to_valid_name(QInputDialog::getText(
+            ui_, "Name", "Enter resource name", QLineEdit::Normal, {}, &ok));
+        if(!ok)
             return;
-
-        if(!is_valid_name(name))
-        {
-            show_invalid_name_mbox(name);
-            return;
-        }
 
         AGZ_INFO("create new '{}' with name: {}",
                  typeid(TracerObject).name(), name.toStdString());
@@ -64,17 +59,12 @@ ImageResourcePool<TracerObject>::ImageResourcePool(
         if(!selected_rsc_)
             return;
 
-        const QString name = QInputDialog::getText(
-            ui_, "Name", "Enter resource name");
-        if(name.isEmpty())
+        bool ok = false;
+        const QString name = to_valid_name(QInputDialog::getText(
+            ui_, "Name", "Enter resource name", QLineEdit::Normal, {}, &ok));
+        if(!ok)
             return;
-
-        if(!is_valid_name(name))
-        {
-            show_invalid_name_mbox(name);
-            return;
-        }
-
+        
         AGZ_INFO("duplicate '{}' : {} -> {}",
             typeid(TracerObject).name(), selected_rsc_->name.toStdString(), name.toStdString());
 
@@ -95,16 +85,11 @@ ImageResourcePool<TracerObject>::ImageResourcePool(
         if(!selected_rsc_)
             return;
 
-        const QString name = QInputDialog::getText(
-            ui_, "Name", "Enter resource name");
-        if(name.isEmpty())
+        bool ok = false;
+        const QString name = to_valid_name(QInputDialog::getText(
+            ui_, "Name", "Enter resource name", QLineEdit::Normal, {}, &ok));
+        if(!ok)
             return;
-
-        if(!is_valid_name(name))
-        {
-            show_invalid_name_mbox(name);
-            return;
-        }
 
         selected_rsc_->name = name;
         selected_rsc_->icon->set_text(name);

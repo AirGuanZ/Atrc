@@ -23,6 +23,16 @@
     </rect>
    </property>
    <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="0">
+     <widget class="QLabel" name="label">
+      <property name="text">
+       <string>Camera Rotating Speed</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+    </item>
     <item row="0" column="2">
      <widget class="QSlider" name="camera_rotate_speed">
       <property name="maximum">
@@ -33,13 +43,6 @@
       </property>
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="0">
-     <widget class="QLabel" name="label">
-      <property name="text">
-       <string>Camera Rotating Speed</string>
       </property>
      </widget>
     </item>
@@ -59,6 +62,26 @@
       </property>
       <property name="text">
        <string>0.00</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QLabel" name="label_2">
+      <property name="text">
+       <string>Scene EPS</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="2" colspan="2">
+     <widget class="QDoubleSpinBox" name="scene_eps">
+      <property name="decimals">
+       <number>6</number>
+      </property>
+      <property name="minimum">
+       <double>0.000001000000000</double>
       </property>
      </widget>
     </item>

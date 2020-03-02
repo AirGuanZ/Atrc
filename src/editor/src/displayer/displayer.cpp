@@ -226,11 +226,6 @@ real Displayer::get_camera_fov_deg() const
     return camera_params_.fov;
 }
 
-Vec2i Displayer::pixmap_size() const
-{
-    return { gl_widget_->width(), gl_widget_->height() };
-}
-
 void Displayer::set_display_image(const Image2D<Spectrum> &img)
 {
     gl_widget_->set_background_image(img);
@@ -379,7 +374,8 @@ Vec3 Displayer::radian_to_pos(const Vec2 &radian, const Vec3 &dst, real distance
 
 void Displayer::update_gl_camera()
 {
-    const auto [width, height] = pixmap_size();
+    const int width  = gl_widget_->width();
+    const int height = gl_widget_->height();
     const real aspect = real(width) / height;
     const Vec3 pos = radian_to_pos(
         camera_params_.radian, camera_params_.dst, camera_params_.distance, camera_params_.up);

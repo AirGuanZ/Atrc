@@ -1,18 +1,9 @@
 #pragma once
 
 #include <QInputDialog>
-#include <QMessageBox>
 #include <QPushButton>
 
 AGZ_EDITOR_BEGIN
-
-inline void show_invalid_name_mbox(const QString &name)
-{
-    QMessageBox mbox;
-    mbox.setWindowTitle("Error");
-    mbox.setText("Invalid resource name: " + name);
-    mbox.exec();
-}
 
 template<typename TracerObject>
 ResourceSlot<TracerObject>::ResourceSlot(
@@ -361,15 +352,11 @@ ResourceSlot<TracerObject>::ResourceSlot(
         {
             assert(!reference_ && owned_panel_);
 
-            const QString name = QInputDialog::getText(this, "Name", "Enter resource name");
-            if(name.isEmpty())
+            bool ok = false;
+            const QString name = obj_ctx_.pool<TracerObject>()->to_valid_name(QInputDialog::getText(
+                this, "Name", "Enter resource name", QLineEdit::Normal, {}, &ok));
+            if(!ok)
                 return;
-
-            if(!obj_ctx_.pool<TracerObject>()->is_valid_name(name))
-            {
-                show_invalid_name_mbox(name);
-                return;
-            }
 
             auto rsc = obj_ctx_.pool<TracerObject>()->add_resource(
                 name, std::unique_ptr<ResourcePanel<TracerObject>>(owned_panel_));

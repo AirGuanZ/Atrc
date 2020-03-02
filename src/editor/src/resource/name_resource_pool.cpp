@@ -17,16 +17,11 @@ NameResourcePool<TracerObject>::NameResourcePool(
 
     connect(widget_->create, &QPushButton::clicked, [=]
     {
-        const QString name = QInputDialog::getText(
-            widget_, "Name", "Enter resource name");
-        if(name.isEmpty())
+        bool ok = false;
+        const QString name = to_valid_name(QInputDialog::getText(
+            widget_, "Name", "Enter resource name", QLineEdit::Normal, {}, &ok));
+        if(!ok)
             return;
-
-        if(!is_valid_name(name))
-        {
-            show_invalid_name_mbox(name);
-            return;
-        }
 
         AGZ_INFO("create new '{}' with name: {}",
                  typeid(TracerObject).name(), name.toStdString());
@@ -62,16 +57,11 @@ NameResourcePool<TracerObject>::NameResourcePool(
         const auto it = name2record_.find(old_name);
         assert(it != name2record_.end());
 
-        const QString new_name = QInputDialog::getText(
-            widget_, "Name", "Enter resource name");
-        if(new_name.isEmpty())
+        bool ok = false;
+        const QString new_name = to_valid_name(QInputDialog::getText(
+            widget_, "Name", "Enter resource name", QLineEdit::Normal, {}, &ok));
+        if(!ok)
             return;
-
-        if(!is_valid_name(new_name))
-        {
-            show_invalid_name_mbox(new_name);
-            return;
-        }
 
         AGZ_INFO("duplicate '{}' : {} -> {}",
             typeid(TracerObject).name(), it->second->name.toStdString(), new_name.toStdString());
@@ -99,16 +89,11 @@ NameResourcePool<TracerObject>::NameResourcePool(
         if(!selected)
             return;
 
-        const QString new_name = QInputDialog::getText(
-            widget_, "Name", "Enter resource name");
-        if(new_name.isEmpty())
+        bool ok = false;
+        const QString new_name = to_valid_name(QInputDialog::getText(
+            widget_, "Name", "Enter resource name", QLineEdit::Normal, {}, &ok));
+        if(!ok)
             return;
-
-        if(!is_valid_name(new_name))
-        {
-            show_invalid_name_mbox(new_name);
-            return;
-        }
 
         auto it = name2record_.find(selected->text());
         assert(it != name2record_.end());

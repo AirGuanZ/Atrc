@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QCheckBox>
+
 #include <agz/editor/texture2d/texture2d.h>
 #include <agz/editor/ui/utility/color_holder.h>
 #include <agz/editor/ui/utility/vec_input.h>

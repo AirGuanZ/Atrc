@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QCheckBox>
 #include <QDialog>
 
 #include <agz/editor/envir_light/envir_light.h>

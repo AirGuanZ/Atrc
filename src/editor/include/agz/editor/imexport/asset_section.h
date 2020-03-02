@@ -4,7 +4,7 @@
 
 AGZ_EDITOR_BEGIN
 
-enum class AssetSectionType
+enum class AssetSectionType : uint8_t
 {
     MaterialPool  = 0,
     MediumPool    = 1,

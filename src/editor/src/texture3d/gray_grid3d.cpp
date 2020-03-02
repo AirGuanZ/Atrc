@@ -1,4 +1,5 @@
 #include <QFileDialog>
+#include <QMessageBox>
 
 #include <agz/editor/texture3d/gray_grid3d.h>
 

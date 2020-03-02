@@ -17,7 +17,7 @@ Offline rendering lab based on ray tracing
 - [x] ply loading
 - [x] mouse picking
 - [x] material thumbnail in editor
-- [ ] saving/loading in editor
+- [x] saving/loading in editor
 - [ ] rendering camera setting in editor
 - [ ] JSON exporter in editor
 - [ ] scene tree

@@ -1,5 +1,6 @@
 #include <QFileDialog>
 #include <QGridLayout>
+#include <QMessageBox>
 
 #include <agz/editor/imexport/model_importer.h>
 #include <agz/editor/scene/scene_mgr.h>

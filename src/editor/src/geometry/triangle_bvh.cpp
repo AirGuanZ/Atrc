@@ -1,4 +1,5 @@
 #include <QFileDialog>
+#include <QMessageBox>
 
 #include <agz/editor/geometry/triangle_bvh.h>
 #include <agz/editor/ui/utility/elided_label.h>

@@ -33,8 +33,6 @@ public:
 
     real get_camera_fov_deg() const;
 
-    Vec2i pixmap_size() const;
-
     void set_display_image(const Image2D<Spectrum> &img);
 
     bool is_in_realtime_mode() const;

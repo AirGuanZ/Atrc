@@ -118,11 +118,11 @@ protected:
         const real yt = yf - static_cast<real>(yi);
         const real zt = zf - static_cast<real>(zi);
 
-        const Spectrum y0z0 = lerp(data_(xi, yi,     zi), data_(xi + 1, yi,     zi), xt);
-        const Spectrum y1z0 = lerp(data_(xi, yi + 1, zi), data_(xi + 1, yi + 1, zi), xt);
+        const Spectrum y0z0 = lerp(data_(zi, yi,     xi), data_(zi + 1, yi,     xi), xt);
+        const Spectrum y1z0 = lerp(data_(zi, yi + 1, xi), data_(zi + 1, yi + 1, xi), xt);
 
-        const Spectrum y0z1 = lerp(data_(xi, yi,     zi + 1), data_(xi + 1, yi,     zi + 1), xt);
-        const Spectrum y1z1 = lerp(data_(xi, yi + 1, zi + 1), data_(xi + 1, yi + 1, zi + 1), xt);
+        const Spectrum y0z1 = lerp(data_(zi, yi,     xi + 1), data_(zi + 1, yi,     xi + 1), xt);
+        const Spectrum y1z1 = lerp(data_(zi, yi + 1, xi + 1), data_(zi + 1, yi + 1, xi + 1), xt);
 
         const Spectrum z0 = lerp(y0z0, y1z0, yt);
         const Spectrum z1 = lerp(y0z1, y1z1, yt);

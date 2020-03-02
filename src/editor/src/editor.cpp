@@ -311,6 +311,15 @@ void Editor::init_global_setting_widget()
 
     global_setting_->camera_rotate_speed->setRange(1, 100);
     global_setting_->camera_rotate_speed->setValue(40);
+
+    global_setting_->scene_eps->setValue(tracer::EPS);
+    connect(global_setting_->scene_eps, qOverload<double>(&QDoubleSpinBox::valueChanged),
+        [=](double new_eps)
+    {
+        renderer_.reset();
+        tracer::set_eps(new_eps);
+        launch_renderer(true);
+    });
 }
 
 void Editor::init_save_asset_dialog()

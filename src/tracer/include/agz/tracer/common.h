@@ -37,6 +37,8 @@ using real = float;
 
 extern real EPS;
 
+void set_eps(real new_eps) noexcept;
+
 constexpr real PI_r = math::PI<real>;
 constexpr real invPI_r = 1 / PI_r;
 

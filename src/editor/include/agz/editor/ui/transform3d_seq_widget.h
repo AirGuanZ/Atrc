@@ -17,7 +17,7 @@ class Transform3DSeqUnitWidget : public QWidget
 
 public:
 
-    enum class UnitType
+    enum class UnitType : uint8_t
     {
         Translate,
         RotateX,

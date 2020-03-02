@@ -12,7 +12,6 @@ int main(int argc, char *argv[])
 {
 #if defined(_WIN32) && defined(_DEBUG)
     _CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) | _CRTDBG_LEAK_CHECK_DF);
-    _CrtSetBreakAlloc(404156);
 #endif
 
 #ifdef USE_EMBREE

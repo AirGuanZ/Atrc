@@ -57,7 +57,7 @@ public:
 
     QString name() const override
     {
-        return "SpectrumGrid";
+        return "Spectrum Grid";
     }
 
     ResourceWidget<tracer::Texture3D> *create_widget(ObjectContext &obj_ctx) const override;

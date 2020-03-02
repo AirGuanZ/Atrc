@@ -89,7 +89,7 @@ namespace
 
     void main()
     {
-        vec3 color = texture2D(tex, uv).rgb;
+        vec3 color = texture(tex, uv).rgb;
         frag_color = vec4(pow(color, vec3(1 / 2.2)), 1);
     }
 )___";
@@ -246,6 +246,9 @@ void DisplayerGLWidget::set_selected_mesh(MeshID id)
 
 void DisplayerGLWidget::set_background_image(const Image2D<Spectrum> &img)
 {
+    if(!context())
+        return;
+
     makeCurrent();
 
     if(img.width() > 0 && img.height() > 0)

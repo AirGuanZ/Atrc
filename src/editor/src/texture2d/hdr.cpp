@@ -1,4 +1,5 @@
 #include <QFileDialog>
+#include <QMessageBox>
 
 #include <agz/editor/texture2d/hdr.h>
 #include <agz/utility/image.h>

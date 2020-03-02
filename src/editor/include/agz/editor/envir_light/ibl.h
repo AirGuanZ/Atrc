@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QCheckBox>
+
 #include <agz/editor/envir_light/envir_light.h>
 #include <agz/editor/texture2d/texture2d.h>
 
@@ -27,7 +29,7 @@ private:
 
     void do_update_tracer_object();
 
-    Texture2DSlot *tex_     = nullptr;
+    Texture2DSlot *tex_                 = nullptr;
     QCheckBox     *importance_sampling_ = nullptr;
 
     ObjectContext &obj_ctx_;

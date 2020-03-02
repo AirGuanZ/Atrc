@@ -1,5 +1,6 @@
 #include <QCheckBox>
 #include <QFileDialog>
+#include <QMessageBox>
 
 #include <agz/editor/imexport/asset_load_dialog.h>
 #include <agz/editor/resource/object_context.h>

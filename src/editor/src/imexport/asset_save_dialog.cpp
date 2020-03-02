@@ -1,5 +1,6 @@
 #include <QCheckBox>
 #include <QFileDialog>
+#include <QMessageBox>
 
 #include <agz/editor/imexport/asset_save_dialog.h>
 #include <agz/editor/scene/scene_mgr.h>
@@ -7,9 +8,9 @@
 AGZ_EDITOR_BEGIN
 
 AssetSaveDialog::AssetSaveDialog(
-    SceneManager        *scene_mgr,
-    ObjectContext       *obj_ctx,
-    EnvirLightSlot      *envir_light)
+    SceneManager   *scene_mgr,
+    ObjectContext  *obj_ctx,
+    EnvirLightSlot *envir_light)
     : scene_mgr_(scene_mgr),
       obj_ctx_(obj_ctx),
       envir_light_(envir_light)

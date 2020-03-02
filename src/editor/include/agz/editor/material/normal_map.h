@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QCheckBox>
+
 #include <agz/editor/texture2d/texture2d.h>
 
 AGZ_EDITOR_BEGIN

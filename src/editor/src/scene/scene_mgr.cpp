@@ -158,7 +158,9 @@ void SceneManager::load_asset(AssetLoader &loader)
         // add mesh to gl widget
 
         const auto geometry_data = panel->get_vertices();
-        displayer_gl_->add_mesh(mesh_id, geometry_data.data(), static_cast<int>(geometry_data.size()));
+        displayer_gl_->add_mesh(
+            mesh_id, geometry_data.data(),
+            static_cast<int>(geometry_data.size()));
         displayer_gl_->set_transform(mesh_id, panel->get_transform());
 
         panel->set_geometry_vertices_dirty_callback([=]
@@ -185,16 +187,11 @@ void SceneManager::create_entity()
 {
     // get entity name
 
-    const QString name = QInputDialog::getText(
-        ui_, "Name", "Enter entity name");
-    if(name.isEmpty())
+    bool ok = false;
+    const QString name = to_valid_name(QInputDialog::getText(
+        ui_, "Name", "Enter entity name", QLineEdit::Normal, {}, &ok));
+    if(!ok)
         return;
-
-    if(!is_valid_name(name))
-    {
-        QMessageBox::information(ui_, "Error", "Invalid entity name: " + name);
-        return;
-    }
 
     // create entity panel
 
@@ -224,7 +221,9 @@ void SceneManager::create_entity()
     // add mesh to gl widget
 
     const auto geometry_data = panel->get_vertices();
-    displayer_gl_->add_mesh(mesh_id, geometry_data.data(), static_cast<int>(geometry_data.size()));
+    displayer_gl_->add_mesh(
+        mesh_id, geometry_data.data(),
+        static_cast<int>(geometry_data.size()));
 
     panel->set_geometry_vertices_dirty_callback([=]
     {
@@ -266,16 +265,11 @@ void SceneManager::rename_selected_entity()
     if(!item)
         return;
 
-    const QString new_name = QInputDialog::getText(
-        ui_, "Name", "Enter resource name");
-    if(new_name.isEmpty())
+    bool ok = false;
+    const QString new_name = to_valid_name(QInputDialog::getText(
+        ui_, "Name", "Enter resource name", QLineEdit::Normal, {}, &ok));
+    if(!ok)
         return;
-
-    if(!is_valid_name(new_name))
-    {
-        show_invalid_name_mbox(new_name);
-        return;
-    }
 
     auto it = name2record_.find(item->text());
     item->setText(new_name);
