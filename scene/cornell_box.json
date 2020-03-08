@@ -1,0 +1,233 @@
+{
+  "scene": {
+    "type": "default",
+    "entities": [
+      {
+        "type": "geometric",
+        "geometry": {
+          "type": "double_sided",
+          "internal": {
+            "type": "quad",
+            "A": [ 0, 0, 0 ],
+            "B": [ 0, 0, 1 ],
+            "C": [ 0, 1, 1 ],
+            "D": [ 0, 1, 0 ],
+            "tA": [ 0 ],
+            "tB": [ 0 ],
+            "tC": [ 0 ],
+            "tD": [ 0 ],
+            "transform": []
+          }
+        },
+        "material": {
+          "type": "ideal_diffuse",
+          "albedo": {
+            "type": "constant",
+            "texel": [ 0.9, 0, 0 ]
+          }
+        }
+      },
+      {
+        "type": "geometric",
+        "geometry": {
+          "type": "double_sided",
+          "internal": {
+            "type": "quad",
+            "A": [ 0, 1, 0 ],
+            "B": [ 0, 1, 1 ],
+            "C": [ 1, 1, 1 ],
+            "D": [ 1, 1, 0 ],
+            "tA": [ 0 ],
+            "tB": [ 0 ],
+            "tC": [ 0 ],
+            "tD": [ 0 ],
+            "transform": []
+          }
+        },
+        "material": {
+          "type": "ideal_diffuse",
+          "albedo": {
+            "type": "constant",
+            "texel": [ 0.9 ]
+          }
+        }
+      },
+      {
+        "type": "geometric",
+        "geometry": {
+          "type": "double_sided",
+          "internal": {
+            "type": "quad",
+            "A": [ 0, 0, 0 ],
+            "B": [ 0, 1, 0 ],
+            "C": [ 1, 1, 0 ],
+            "D": [ 1, 0, 0 ],
+            "tA": [ 0 ],
+            "tB": [ 0 ],
+            "tC": [ 0 ],
+            "tD": [ 0 ],
+            "transform": []
+          }
+        },
+        "material": {
+          "type": "ideal_diffuse",
+          "albedo": {
+            "type": "constant",
+            "texel": [ 0.9 ]
+          }
+        }
+      },
+      {
+        "type": "geometric",
+        "geometry": {
+          "type": "double_sided",
+          "internal": {
+            "type": "quad",
+            "A": [ 1, 1, 0 ],
+            "B": [ 1, 1, 1 ],
+            "C": [ 1, 0, 1 ],
+            "D": [ 1, 0, 0 ],
+            "tA": [ 0 ],
+            "tB": [ 0 ],
+            "tC": [ 0 ],
+            "tD": [ 0 ],
+            "transform": []
+          }
+        },
+        "material": {
+          "type": "ideal_diffuse",
+          "albedo": {
+            "type": "constant",
+            "texel": [ 0, 0.9, 0 ]
+          }
+        }
+      },
+      {
+        "type": "geometric",
+        "geometry": {
+          "type": "double_sided",
+          "internal": {
+            "type": "quad",
+            "A": [ 0.7, 1, 0 ],
+            "B": [ 0.7, 1, 0.5 ],
+            "C": [ 0.7, 0, 0.5 ],
+            "D": [ 0.7, 0, 0 ],
+            "tA": [ 0 ],
+            "tB": [ 0 ],
+            "tC": [ 0 ],
+            "tD": [ 0 ],
+            "transform": []
+          }
+        },
+        "material": {
+          "type": "ideal_diffuse",
+          "albedo": {
+            "type": "constant",
+            "texel": [ 0.9 ]
+          }
+        }
+      },
+      {
+        "type": "geometric",
+        "geometry": {
+          "type": "double_sided",
+          "internal": {
+            "type": "quad",
+            "A": [ 0, 0, 1 ],
+            "B": [ 0, 1, 1 ],
+            "C": [ 1, 1, 1 ],
+            "D": [ 1, 0, 1 ],
+            "tA": [ 0 ],
+            "tB": [ 0 ],
+            "tC": [ 0 ],
+            "tD": [ 0 ],
+            "transform": []
+          }
+        },
+        "material": {
+          "type": "ideal_diffuse",
+          "albedo": {
+            "type": "constant",
+            "texel": [ 0.9 ]
+          }
+        }
+      },
+      {
+        "type": "diffuse",
+        "geometry": {
+          "type": "sphere",
+          "radius": 0.1,
+          "transform": [
+            {
+              "type": "translate",
+              "offset": [ 0.2, 0.4, 0.1 ]
+            }
+          ]
+        },
+        "radiance": [ 2.5 ]
+      },
+      {
+        "type": "geometric",
+        "geometry": {
+          "type": "sphere",
+          "radius": 0.1,
+          "transform": [
+            {
+              "type": "translate",
+              "offset": [ 0.5, 0.4, 0.1 ]
+            }
+          ]
+        },
+        "material": {
+          "type": "glass",
+          "color_map": {
+            "type": "constant",
+            "texel": [ 0.95 ]
+          },
+          "ior": {
+            "type": "constant",
+            "texel": [ 1.5 ]
+          }
+        }
+      }
+    ]
+  },
+  "rendering": {
+    "camera": {
+      "type": "thin_lens",
+      "pos": [ 0.5, -4, 0.5 ],
+      "dst": [ 0.5, 0, 0.5 ],
+      "up": [ 0, 0, 1 ],
+      "fov": 15
+    },
+    "film_filter": {
+      "type": "box",
+      "radius": 0.5
+    },
+    "width": 640,
+    "height": 640,
+    "renderer": {
+      "type": "bdpt",
+      "spp": 16
+    },
+    "reporter": {
+      "type": "stdout"
+    },
+    "post_processors": [
+      {
+        "type": "save_to_img",
+        "inv_gamma": 2.2,
+        "filename": "${scene-directory}/output_original.png"
+      },
+      {
+        "type": "oidn_denoiser"
+      },
+      {
+        "type": "save_to_img",
+        "filename": "${scene-directory}/output.png",
+        "inv_gamma": 2.2,
+        "open": false
+      }
+    ]
+  }
+}

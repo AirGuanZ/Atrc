@@ -121,7 +121,7 @@ void GUI::on_update_pbar(double percent)
 
 void GUI::on_exec_post_processor()
 {
-    if(render_session_.render_settings && render_session_.render_settings->renderer->is_async_rendering())
+    if(render_session_.render_settings && render_session_.render_settings->renderer->is_waitable())
     {
         if(render_session_.render_settings->renderer->is_doing_rendering())
         {
@@ -166,16 +166,22 @@ void GUI::start_rendering(const std::string &input_filename)
     render_context_->context.path_mapper = render_context_->path_mapper.get();
 
     const std::string input_content = agz::file::read_txt_file(input_filename);
-    render_context_->root_params = agz::tracer::json_to_config(agz::tracer::string_to_json(input_content));
+    render_context_->root_params = agz::tracer::factory::json_to_config(
+        agz::tracer::factory::string_to_json(input_content));
+
+    const auto rendering_config = render_context_->root_params.child_group("rendering");
+    if(!rendering_config.is_group())
+        throw std::runtime_error("rendering setting array is not supported by Atrc GUI");
+
+    agz::tracer::real eps = agz::tracer::real(3e-4);
+    if(auto node = rendering_config.find_child_value("eps"))
+        eps = node->as_real();
+    agz::tracer::set_eps(eps);
 
     const auto &scene_config = render_context_->root_params.child_group("scene");
     render_context_->context.reference_root = &scene_config;
 
     auto scene = render_context_->context.create<agz::tracer::Scene>(scene_config);
-
-    const auto rendering_config = render_context_->root_params.child_group("rendering");
-    if(!rendering_config.is_group())
-        throw std::runtime_error("rendering setting array is not supported by Atrc GUI");
 
     render_session_ = create_render_session(scene, rendering_config, render_context_->context);
 

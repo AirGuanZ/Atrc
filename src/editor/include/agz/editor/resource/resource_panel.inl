@@ -130,6 +130,12 @@ void ResourcePanel<TracerObject>::load_asset(AssetLoader &loader)
 }
 
 template<typename TracerObject>
+std::shared_ptr<tracer::ConfigNode> ResourcePanel<TracerObject>::to_config(JSONExportContext &ctx) const
+{
+    return rsc_widget_->to_config(ctx);
+}
+
+template<typename TracerObject>
 std::vector<EntityInterface::Vertex> ResourcePanel<TracerObject>::get_vertices() const
 {
     return rsc_widget_->get_vertices();

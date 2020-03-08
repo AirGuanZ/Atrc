@@ -106,6 +106,26 @@ void GlassWidget::load_asset(AssetLoader &loader)
     do_update_tracer_object();
 }
 
+std::shared_ptr<tracer::ConfigNode> GlassWidget::to_config(JSONExportContext &ctx) const
+{
+    auto grp = std::make_shared<tracer::ConfigGroup>();
+    grp->insert_str("type", "glass");
+
+    if(use_color_refr_->isChecked())
+    {
+        grp->insert_child("color_reflection_map", color_->to_config(ctx));
+        grp->insert_child("color_refraction_map", color_refr_->to_config(ctx));
+    }
+    else
+    {
+        grp->insert_child("color_map", color_->to_config(ctx));
+    }
+
+    grp->insert_child("ior", ior_->to_config(ctx));
+
+    return grp;
+}
+
 void GlassWidget::update_tracer_object_impl()
 {
     do_update_tracer_object();

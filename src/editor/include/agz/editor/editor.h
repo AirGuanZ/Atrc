@@ -3,7 +3,7 @@
 #include <QMainWindow>
 #include <QSplitter>
 
-#include <agz/editor/displayer/displayer.h>
+#include <agz/editor/displayer/preview_window.h>
 #include <agz/editor/envir_light/envir_light.h>
 #include <agz/editor/renderer/renderer.h>
 #include <agz/editor/renderer/renderer_widget.h>
@@ -78,8 +78,6 @@ private:
 
     // helper
 
-    void load_config(const std::string &input_filename);
-
     void set_display_image(const Image2D<Spectrum> &img);
 
     void launch_renderer(bool enable_preview);
@@ -114,7 +112,7 @@ private:
 
     RendererPanel *renderer_panel_ = nullptr;
 
-    Displayer *displayer_ = nullptr;
+    PreviewWindow *preview_window_ = nullptr;
     QTimer *update_display_timer_ = nullptr;
 };
 

@@ -1,6 +1,6 @@
 ﻿#include <agz/tracer/core/light.h>
 #include <agz/tracer/core/texture2d.h>
-#include <agz/tracer/factory/raw/texture2d.h>
+#include <agz/tracer/create/texture2d.h>
 #include <agz/utility/misc.h>
 #include <agz/utility/texture.h>
 

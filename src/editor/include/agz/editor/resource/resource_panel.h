@@ -36,6 +36,8 @@ public:
 
     void load_asset(AssetLoader &loader);
 
+    std::shared_ptr<tracer::ConfigNode> to_config(JSONExportContext &ctx) const;
+
     std::vector<Vertex> get_vertices() const override;
 
     DirectTransform get_transform() const override;

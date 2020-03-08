@@ -184,7 +184,7 @@ QPixmap MaterialThumbnailProvider::start()
     assert(!exit_);
 
     accum_color_.initialize(height_, width_, Spectrum());
-    sampler_ = tracer::create_native_sampler(1, 42, false);
+    sampler_ = std::make_shared<tracer::Sampler>(42, false);
 
     run_one_iter(1);
     auto ret = compute_pixmap();

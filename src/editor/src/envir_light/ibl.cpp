@@ -57,6 +57,14 @@ void IBLWidget::load_asset(AssetLoader &loader)
     do_update_tracer_object();
 }
 
+std::shared_ptr<tracer::ConfigNode> IBLWidget::to_config(JSONExportContext &ctx) const
+{
+    auto grp = std::make_shared<tracer::ConfigGroup>();
+    grp->insert_str("type", "ibl");
+    grp->insert_child("tex", tex_->to_config(ctx));
+    return grp;
+}
+
 void IBLWidget::update_tracer_object_impl()
 {
     do_update_tracer_object();

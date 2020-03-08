@@ -51,6 +51,15 @@ void SphereWidget::load_asset(AssetLoader &loader)
     do_update_tracer_object();
 }
 
+std::shared_ptr<tracer::ConfigNode> SphereWidget::to_config(JSONExportContext &ctx) const
+{
+    auto grp = std::make_shared<tracer::ConfigGroup>();
+    grp->insert_str("type", "sphere");
+    grp->insert_real("radius", radius_edit_->text().toFloat());
+    grp->insert_child("transform", std::make_shared<tracer::ConfigArray>());
+    return grp;
+}
+
 std::vector<EntityInterface::Vertex> SphereWidget::get_vertices() const
 {
     static const auto UNIT_VERTICES = unit_vertices();

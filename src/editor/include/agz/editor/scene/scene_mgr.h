@@ -1,6 +1,6 @@
 #pragma once
 
-#include <agz/editor/displayer/gl_widget.h>
+#include <agz/editor/displayer/preview_window.h>
 #include <agz/editor/entity/entity.h>
 #include <agz/editor/scene/scene_mgr_ui.h>
 
@@ -8,7 +8,6 @@ AGZ_EDITOR_BEGIN
 
 class AssetLoader;
 class AssetSaver;
-class Displayer;
 class Editor;
 
 class SceneManager : public QObject, public misc::uncopyable_t
@@ -17,7 +16,7 @@ class SceneManager : public QObject, public misc::uncopyable_t
 
 public:
 
-    SceneManager(ObjectContext &obj_ctx, Editor *editor, Displayer *displayer);
+    SceneManager(ObjectContext &obj_ctx, Editor *editor, PreviewWindow *preview_window);
 
     ~SceneManager();
 
@@ -30,6 +29,8 @@ public:
     void save_asset(AssetSaver &saver) const;
 
     void load_asset(AssetLoader &loader);
+
+    std::shared_ptr<tracer::ConfigArray> to_config(JSONExportContext &ctx) const;
 
 signals:
 
@@ -52,6 +53,8 @@ private:
     // add single mesh without emit change_scene
     void add_single_mesh(const mesh::mesh_t &mesh);
 
+    void add_record(const QString &name, EntityPanel *entity_panel);
+
     // convert a (possibly empty) name to a valid name
     QString to_valid_name(const QString &name) const;
 
@@ -59,14 +62,13 @@ private:
     {
         QString                   name;
         EntityPanel              *panel;
-        DisplayerGLWidget::MeshID mesh_id;
+        PreviewWindow::MeshID mesh_id;
     };
 
     ObjectContext     &obj_ctx_;
     Editor            *editor_ = nullptr;
 
-    Displayer         *displayer_    = nullptr;
-    DisplayerGLWidget *displayer_gl_ = nullptr;
+    PreviewWindow *preview_window_ = nullptr;
 
     std::map<QString, std::unique_ptr<Record>> name2record_;
 

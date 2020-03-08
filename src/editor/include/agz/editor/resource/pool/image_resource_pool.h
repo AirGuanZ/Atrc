@@ -25,6 +25,8 @@ public:
 
     void load_asset(AssetLoader &loader) override;
 
+    void to_config(tracer::ConfigGroup &scene_grp, JSONExportContext &ctx) const override;
+
     ResourceInPool<TracerObject> *name_to_rsc(const QString &name) override;
 
     bool is_valid_name(const QString &name) const override;

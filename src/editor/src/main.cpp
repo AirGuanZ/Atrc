@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
 
     QApplication app(argc, argv);
 
-    app.setStyle(new DarkStyle);
+    //app.setStyle(new DarkStyle);
     
     const int font_id = QFontDatabase::addApplicationFont(":/darkstyle/Ubuntu-R.ttf");
     QFont font(QFontDatabase::applicationFontFamilies(font_id).at(0));
@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
 
     agz::editor::Editor editor;
     editor.setWindowTitle("Atrc Scene Editor");
-    editor.resize(1024, 768);
+    editor.resize(1440, 768);
     editor.showMaximized();
 
     return QApplication::exec();

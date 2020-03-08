@@ -1,4 +1,4 @@
-#include <agz/tracer/factory/raw/renderer.h>
+#include <agz/tracer/create/renderer.h>
 #include <agz/tracer/render/path_tracing.h>
 
 #include "./perpixel_renderer.h"
@@ -14,7 +14,7 @@ class PathTracingRenderer : public PerPixelRenderer
 public:
 
     explicit PathTracingRenderer(const PathTracingRendererParams &params)
-        : PerPixelRenderer(params.worker_count, params.task_grid_size, params.sampler_prototype)
+        : PerPixelRenderer(params.worker_count, params.task_grid_size, params.spp)
     {
         params_.min_depth = params.min_depth;
         params_.max_depth = params.max_depth;

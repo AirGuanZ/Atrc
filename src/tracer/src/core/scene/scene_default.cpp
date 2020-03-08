@@ -8,8 +8,8 @@
 #include <agz/tracer/core/light.h>
 #include <agz/tracer/core/medium.h>
 #include <agz/tracer/core/scene.h>
-#include <agz/tracer/factory/raw/medium.h>
-#include <agz/tracer/factory/raw/scene.h>
+#include <agz/tracer/create/medium.h>
+#include <agz/tracer/create/scene.h>
 #include <agz/utility/misc.h>
 
 AGZ_TRACER_BEGIN

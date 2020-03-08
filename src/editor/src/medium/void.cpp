@@ -12,6 +12,13 @@ ResourceWidget<tracer::Medium> *VoidWidget::clone()
     return new VoidWidget;
 }
 
+std::shared_ptr<tracer::ConfigNode> VoidWidget::to_config(JSONExportContext &ctx) const
+{
+    auto grp = std::make_shared<tracer::ConfigGroup>();
+    grp->insert_str("type", "void");
+    return grp;
+}
+
 void VoidWidget::update_tracer_object_impl()
 {
     // do nothing

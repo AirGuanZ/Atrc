@@ -32,9 +32,6 @@ private:
 
     SceneManager *scene_mgr_;
 
-    QPushButton *browse_filename_    = nullptr;
-    ElidedLabel *filename_displayer_ = nullptr;
-
     QPushButton *ok_     = nullptr;
     QPushButton *cancel_ = nullptr;
 };

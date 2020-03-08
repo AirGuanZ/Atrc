@@ -149,6 +149,15 @@ void ResourceSlot<TracerObject>::load_asset(AssetLoader &loader)
 }
 
 template<typename TracerObject>
+std::shared_ptr<tracer::ConfigNode> ResourceSlot<TracerObject>::to_config(JSONExportContext &ctx) const
+{
+    if(reference_)
+        return reference_->to_config();
+    assert(owned_panel_);
+    return owned_panel_->to_config(ctx);
+}
+
+template<typename TracerObject>
 std::vector<EntityInterface::Vertex> ResourceSlot<TracerObject>::get_vertices() const
 {
     if(reference_)

@@ -134,6 +134,14 @@ void Range3DWidget::load_asset(AssetLoader &loader)
     do_update_tracer_object();
 }
 
+std::shared_ptr<tracer::ConfigNode> Range3DWidget::to_config(JSONExportContext &ctx) const
+{
+    auto grp = std::make_shared<tracer::ConfigGroup>();
+    grp->insert_str("type", "constant");
+    grp->insert_child("texel", tracer::ConfigArray::from_spectrum(Spectrum(real(value_->value()))));
+    return grp;
+}
+
 void Range3DWidget::update_tracer_object_impl()
 {
     do_update_tracer_object();

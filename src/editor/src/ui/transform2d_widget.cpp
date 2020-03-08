@@ -79,6 +79,18 @@ namespace
             offset_edit_->setText(loader.read_string());
         }
 
+        std::shared_ptr<tracer::ConfigGroup> to_config() const override
+        {
+            real x, y;
+            QString line = offset_edit_->text();
+            QTextStream(&line) >> x >> y;
+
+            auto grp = std::make_shared<tracer::ConfigGroup>();
+            grp->insert_str("type", "translate");
+            grp->insert_child("offset", tracer::ConfigArray::from_vec2({ x, y }));
+            return grp;
+        }
+
     private:
 
         QLineEdit *offset_edit_;
@@ -150,6 +162,14 @@ namespace
         void load_asset(AssetLoader &loader) override
         {
             deg_edit_->setText(loader.read_string());
+        }
+
+        std::shared_ptr<tracer::ConfigGroup> to_config() const override
+        {
+            auto grp = std::make_shared<tracer::ConfigGroup>();
+            grp->insert_str("type", "rotate");
+            grp->insert_real("deg", deg_edit_->text().toFloat());
+            return grp;
         }
 
     private:
@@ -228,6 +248,18 @@ namespace
             ratio_edit_->setText(loader.read_string());
         }
 
+        std::shared_ptr<tracer::ConfigGroup> to_config() const override
+        {
+            real x, y;
+            QString line = ratio_edit_->text();
+            QTextStream(&line) >> x >> y;
+
+            auto grp = std::make_shared<tracer::ConfigGroup>();
+            grp->insert_str("type", "scale");
+            grp->insert_child("ratio", tracer::ConfigArray::from_vec2({ x, y }));
+            return grp;
+        }
+
     private:
 
         QLineEdit *ratio_edit_;
@@ -283,6 +315,14 @@ void Transform2DWidget::load_asset(AssetLoader &loader)
 
         widget->load_asset(loader);
     }
+}
+
+std::shared_ptr<tracer::ConfigArray> Transform2DWidget::to_config() const
+{
+    auto arr = std::make_shared<tracer::ConfigArray>();
+    for(auto &u : units_)
+        arr->push_back(u->to_config());
+    return arr;
 }
 
 Transform2DUnitWidget::UnitType Transform2DWidget::get_unit_type()

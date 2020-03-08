@@ -98,6 +98,21 @@ void PhongWidget::load_asset(AssetLoader &loader)
     do_update_tracer_object();
 }
 
+std::shared_ptr<tracer::ConfigNode> PhongWidget::to_config(JSONExportContext &ctx) const
+{
+    auto grp = std::make_shared<tracer::ConfigGroup>();
+    grp->insert_str("type", "phong");
+
+    grp->insert_child("d", d_->to_config(ctx));
+    grp->insert_child("s", s_->to_config(ctx));
+    grp->insert_child("ns", ns_->to_config(ctx));
+
+    if(normal_map_->is_enabled())
+        grp->insert_child("normal_map", normal_map_->to_config(ctx));
+
+    return grp;
+}
+
 void PhongWidget::update_tracer_object_impl()
 {
     do_update_tracer_object();

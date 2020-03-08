@@ -103,6 +103,19 @@ void Constant3DWidget::load_asset(AssetLoader &loader)
         tracer_object_ = tracer::create_constant3d_texture({}, color_holder_->get_color());
 }
 
+std::shared_ptr<tracer::ConfigNode> Constant3DWidget::to_config(JSONExportContext &ctx) const
+{
+    auto grp = std::make_shared<tracer::ConfigGroup>();
+    grp->insert_str("type", "constant");
+
+    if(use_input_color_->isChecked())
+        grp->insert_child("texel", tracer::ConfigArray::from_spectrum(input_color_->get_value()));
+    else
+        grp->insert_child("texel", tracer::ConfigArray::from_spectrum(color_holder_->get_color()));
+
+    return grp;
+}
+
 void Constant3DWidget::update_tracer_object_impl()
 {
     if(use_input_color_->isChecked())

@@ -4,6 +4,7 @@
 #include <agz/editor/renderer/widget/bdpt_renderer_widget.h>
 #include <agz/editor/renderer/widget/particle_tracer_widget.h>
 #include <agz/editor/renderer/widget/path_tracer_widget.h>
+#include <agz/editor/ui/utility/collapsible.h>
 
 AGZ_EDITOR_BEGIN
 
@@ -61,7 +62,7 @@ RendererPanel::RendererPanel(QWidget *parent, const std::string &default_rendere
     {
         delete renderer_widget_;
         renderer_widget_ = factory_.create_widget(new_type.toStdString(), this);
-        layout_->addWidget(renderer_widget_);
+        layout_->insertWidget(1, renderer_widget_);
         connect(renderer_widget_, &RendererWidget::change_renderer_params, this, &RendererPanel::on_change_renderer_params);
         emit change_renderer_type();
     });
@@ -70,6 +71,13 @@ RendererPanel::RendererPanel(QWidget *parent, const std::string &default_rendere
 
     layout_->addWidget(renderer_type_selector_);
     layout_->addWidget(renderer_widget_);
+
+    Collapsible *export_sec = new Collapsible(this, "Exported Renderer");
+    export_renderer_ = new ExportRendererPanel;
+
+    export_sec->set_content_widget(export_renderer_);
+    export_sec->open();
+    layout_->addWidget(export_sec);
 }
 
 std::unique_ptr<Renderer> RendererPanel::create_renderer(
@@ -78,6 +86,11 @@ std::unique_ptr<Renderer> RendererPanel::create_renderer(
     if(renderer_widget_)
         return renderer_widget_->create_renderer(std::move(scene), framebuffer_size, enable_preview);
     return nullptr;
+}
+
+std::shared_ptr<tracer::ConfigGroup> RendererPanel::to_config() const
+{
+    return export_renderer_->to_config();
 }
 
 void RendererPanel::on_change_renderer_params()

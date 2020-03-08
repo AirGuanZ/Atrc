@@ -249,6 +249,39 @@ namespace
             return Transform3::scale(ratio, ratio, ratio);
         }
 
+        if(type == "mat3")
+        {
+            if(auto arr = group.find_child_array("row_major"))
+            {
+                if(arr->size() != 9)
+                    throw ConfigException("invalid mat3 elem count");
+
+                Mat4 mat;
+                mat[0][0] = arr->at_real(0); mat[1][0] = arr->at_real(1); mat[2][0] = arr->at_real(2); mat[3][0] = 0;
+                mat[0][1] = arr->at_real(3); mat[1][1] = arr->at_real(4); mat[2][1] = arr->at_real(5); mat[3][1] = 0;
+                mat[0][2] = arr->at_real(6); mat[1][2] = arr->at_real(7); mat[2][2] = arr->at_real(8); mat[3][2] = 0;
+                mat[0][3] = 0;               mat[1][3] = 0;               mat[2][3] = 0;               mat[3][3] = 1;
+
+                return Transform3(mat);
+            }
+
+            if(auto arr = group.find_child_array("col_major"); arr)
+            {
+                if(arr->size() != 9)
+                    throw ConfigException("invalid mat3 elem count");
+
+                Mat4 mat;
+                mat[0][0] = arr->at_real(0); mat[0][1] = arr->at_real(1); mat[0][2] = arr->at_real(2); mat[0][3] = 0;
+                mat[1][0] = arr->at_real(3); mat[1][1] = arr->at_real(4); mat[1][2] = arr->at_real(5); mat[1][3] = 0;
+                mat[2][0] = arr->at_real(6); mat[2][1] = arr->at_real(7); mat[2][2] = arr->at_real(8); mat[2][3] = 0;
+                mat[3][0] = 0;               mat[3][1] = 0;               mat[3][2] = 0;               mat[3][3] = 1;
+
+                return Transform3(mat);
+            }
+
+            throw ConfigException("row_major/col_major expected");
+        }
+
         throw ConfigException(stdstr::cat("unknown transform3 type (type = ", type, ")"));
 
         AGZ_HIERARCHY_WRAP("in config to_basic_transform3")
@@ -359,6 +392,33 @@ const ConfigValue *ConfigGroup::find_child_value(const std::string &name) const
 }
 
 const ConfigNode *ConfigGroup::find_child(const std::string &name) const
+{
+    const auto it = group_.find(name);
+    return it != group_.end() ? it->second.get() : nullptr;
+}
+
+ConfigGroup *ConfigGroup::find_child_group(const std::string &name)
+{
+    if(auto node = find_child(name))
+        return &node->as_group();
+    return nullptr;
+}
+
+ConfigArray *ConfigGroup::find_child_array(const std::string &name)
+{
+    if(auto node = find_child(name))
+        return &node->as_array();
+    return nullptr;
+}
+
+ConfigValue *ConfigGroup::find_child_value(const std::string &name)
+{
+    if(auto node = find_child(name))
+        return &node->as_value();
+    return nullptr;
+}
+
+ConfigNode *ConfigGroup::find_child(const std::string &name)
 {
     const auto it = group_.find(name);
     return it != group_.end() ? it->second.get() : nullptr;
@@ -517,6 +577,26 @@ void ConfigGroup::insert_child(const std::string &name, std::shared_ptr<ConfigNo
     group_[name] = std::move(child);
 }
 
+void ConfigGroup::insert_real(const std::string &name, real value)
+{
+    insert_child(name, std::make_shared<ConfigValue>(std::to_string(value)));
+}
+
+void ConfigGroup::insert_int(const std::string &name, int value)
+{
+    insert_child(name, std::make_shared<ConfigValue>(std::to_string(value)));
+}
+
+void ConfigGroup::insert_str(const std::string &name, const std::string &str)
+{
+    insert_child(name, std::make_shared<ConfigValue>(str));
+}
+
+void ConfigGroup::insert_bool(const std::string &name, bool value)
+{
+    insert_child(name, std::make_shared<ConfigValue>(value ? "1" : "0"));
+}
+
 const char *ConfigArray::type() const noexcept
 {
     return "ConfigArray";
@@ -644,6 +724,78 @@ const std::string& ConfigArray::at_str(size_t idx) const
 void ConfigArray::push_back(std::shared_ptr<ConfigNode> elem)
 {
     array_.push_back(std::move(elem));
+}
+
+void ConfigArray::push_back_real(real value)
+{
+    push_back(std::make_shared<ConfigValue>(std::to_string(value)));
+}
+
+void ConfigArray::push_back_int(int value)
+{
+    push_back(std::make_shared<ConfigValue>(std::to_string(value)));
+}
+
+void ConfigArray::push_back_str(const std::string &str)
+{
+    push_back(std::make_shared<ConfigValue>(str));
+}
+
+void ConfigArray::push_back_bool(bool value)
+{
+    push_back(std::make_shared<ConfigValue>(value ? "1" : "0"));
+}
+
+std::shared_ptr<ConfigArray> ConfigArray::from_vec2(const Vec2 &v)
+{
+    auto arr = std::make_shared<ConfigArray>();
+    arr->push_back_real(v.x);
+    arr->push_back_real(v.y);
+    return arr;
+}
+
+std::shared_ptr<ConfigArray> ConfigArray::from_vec3(const Vec3 &v)
+{
+    auto arr = std::make_shared<ConfigArray>();
+    arr->push_back_real(v.x);
+    arr->push_back_real(v.y);
+    arr->push_back_real(v.z);
+    return arr;
+}
+
+std::shared_ptr<ConfigArray> ConfigArray::from_vec4(const Vec4 &v)
+{
+    auto arr = std::make_shared<ConfigArray>();
+    arr->push_back_real(v.x);
+    arr->push_back_real(v.y);
+    arr->push_back_real(v.z);
+    arr->push_back_real(v.w);
+    return arr;
+}
+
+std::shared_ptr<ConfigArray> ConfigArray::from_vec2i(const Vec2i &v)
+{
+    auto arr = std::make_shared<ConfigArray>();
+    arr->push_back_int(v.x);
+    arr->push_back_int(v.y);
+    return arr;
+}
+
+std::shared_ptr<ConfigArray> ConfigArray::from_vec3i(const Vec3i &v)
+{
+    auto arr = std::make_shared<ConfigArray>();
+    arr->push_back_int(v.x);
+    arr->push_back_int(v.y);
+    arr->push_back_int(v.z);
+    return arr;
+}
+
+std::shared_ptr<ConfigArray> ConfigArray::from_spectrum(const Spectrum &v)
+{
+    auto arr = std::make_shared<ConfigArray>();
+    for(int i = 0; i < SPECTRUM_COMPONENT_COUNT; ++i)
+        arr->push_back_real(v[i]);
+    return arr;
 }
 
 ConfigValue::ConfigValue(std::string value)

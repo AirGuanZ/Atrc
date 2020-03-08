@@ -32,6 +32,8 @@ public:
 
     void load_asset(AssetLoader &loader) override;
 
+    std::shared_ptr<tracer::ConfigNode> to_config(JSONExportContext &ctx) const override;
+
     std::vector<EntityInterface::Vertex> get_vertices() const override;
 
 protected:

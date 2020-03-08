@@ -1,6 +1,5 @@
 #include <atomic>
 #include <mutex>
-#include <string>
 #include <thread>
 
 #include <agz/tracer/core/bsdf.h>
@@ -9,10 +8,10 @@
 #include <agz/tracer/core/light.h>
 #include <agz/tracer/core/material.h>
 #include <agz/tracer/core/renderer.h>
-#include <agz/tracer/core/reporter.h>
+#include <agz/tracer/core/renderer_interactor.h>
 #include <agz/tracer/core/sampler.h>
 #include <agz/tracer/core/scene.h>
-#include <agz/tracer/factory/raw/renderer.h>
+#include <agz/tracer/create/renderer.h>
 #include <agz/tracer/render/particle_tracing.h>
 #include <agz/utility/thread.h>
    
@@ -30,7 +29,7 @@ public:
         particle_params_.cont_prob = params.cont_prob;
     }
 
-    RenderTarget render(FilmFilterApplier filter, Scene &scene, ProgressReporter &reporter) override
+    RenderTarget render(FilmFilterApplier filter, Scene &scene, RendererInteractor &reporter) override
     {
         reporter.begin();
 
@@ -62,7 +61,6 @@ public:
         render_target.image = render_target.image + backward_image;
 
         reporter.end();
-        reporter.message("total time: " + std::to_string(reporter.total_seconds()) + "s");
 
         return render_target;
     }
@@ -104,7 +102,7 @@ private:
 
     template<bool REPORTER_WITH_PREVIEW>
     RenderTarget render_forward(
-        const FilmFilterApplier &filter, const Scene &scene, ProgressReporter &reporter, const Image2D<Spectrum> &backward) const
+        const FilmFilterApplier &filter, const Scene &scene, RendererInteractor &reporter, const Image2D<Spectrum> &backward) const
     {
         const int width = filter.width();
         const int height = filter.height();
@@ -159,8 +157,7 @@ private:
                 {
                     for(int px = sam_pixels.low.x; px <= sam_pixels.high.x; ++px)
                     {
-                        sampler->start_pixel(px, py);
-                        do
+                        for(int i = 0; i < params_.forward_spp; ++i)
                         {
                             const Sample2 film_sam = sampler->sample2();
                             const real pixel_x = px + film_sam.u;
@@ -182,8 +179,7 @@ private:
 
                             if(stop_rendering_)
                                 return;
-
-                        } while(sampler->next_sample());
+                        }
                     }
                 }
 
@@ -227,9 +223,11 @@ private:
         std::vector<std::thread> threads;
         threads.reserve(worker_count);
 
+        auto forward_sampler_prototype = std::make_shared<Sampler>(42, false);
+
         for(int i = 0; i < worker_count; ++i)
         {
-            auto sampler = params_.forward_sampler_prototype->clone(i, sampler_arena);
+            auto sampler = forward_sampler_prototype->clone(i, sampler_arena);
             threads.emplace_back(forward_func, sampler);
         }
 
@@ -251,7 +249,7 @@ private:
     }
 
     template<bool REPORTER_WITH_PREVIEW>
-    Image2D<Spectrum> render_backward(const FilmFilterApplier &filter, const Scene &scene, ProgressReporter &reporter) const
+    Image2D<Spectrum> render_backward(const FilmFilterApplier &filter, const Scene &scene, RendererInteractor &reporter) const
     {
         std::mutex reporter_mutex;
         std::atomic<int> next_task_id = 0;
@@ -289,18 +287,16 @@ private:
                     break;
 
                 Arena arena;
-                sampler->start_pixel(0, task_id);
                 int task_particle_count = 0;
-                do
+                for(int j = 0; j < params_.particles_per_task; ++j)
                 {
                     ++task_particle_count;
-                    render::trace_particle(particle_params_, scene, *sampler, film_grid, arena);
+                    trace_particle(particle_params_, scene, *sampler, film_grid, arena);
                     arena.release();
 
                     if(stop_rendering_)
                         return;
-
-                } while(sampler->next_sample());
+                }
 
                 if constexpr(REPORTER_WITH_PREVIEW)
                 {
@@ -359,9 +355,11 @@ private:
             output_img.resize(worker_count, Image2D<Spectrum>(filter.height(), filter.width()));
         }
 
+        auto particle_sampler_prototype = std::make_shared<Sampler>(42, false);
+
         for(int i = 0; i < worker_count; ++i)
         {
-            auto sampler = params_.particle_sampler_prototype->clone(i, sampler_arena);
+            auto sampler = particle_sampler_prototype->clone(i, sampler_arena);
             threads.emplace_back(backward_func, sampler, &images[i], i);
         }
 

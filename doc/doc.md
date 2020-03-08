@@ -74,6 +74,7 @@ cmake -DUSE_EMBREE=ON -DUSE_OIDN=ON -DBUILD_GUI=ON -DBUILD_EDITOR=ON -DQt5_DIR="
 2. GUI, renderer launcher with graphics user interface
 3. Editor, scene editor
 4. Tracer, off-line rendering library based on ray tracing
+5. Factory, JSON config -> Tracer object
 
 ### CLI Usage
 
@@ -161,10 +162,7 @@ Here is a simple example, which results in the above image (a bit rough metal sp
     "height": 640,
     "renderer": {
       "type": "pt",
-      "sampler": {
-        "type": "native",
-        "spp": 100
-      }
+      "spp": 100
     },
     "reporter": {
       "type": "stdout"
@@ -236,6 +234,7 @@ This section describes fields included in the `rendering` item.
 | width           | int              |                       | image width                      |
 | height          | int              |                       | image height                     |
 | film_filter     | FilmFilter       | box with radius = 0.5 | film filter function             |
+| eps             | real             | 3e-4                  | scene epsilon                    |
 
 ### Scene
 
@@ -589,11 +588,12 @@ where $d$ is diffuse color, $s$ is specular color, $e$ is specular glossness and
 
 *NOTE*. Atrc will automatically scale $d$ and $s$ to keep energy conservation.
 
-| Field Name | Type      | Default Value | Explanation        |
-| ---------- | --------- | ------------- | ------------------ |
-| d          | Texture2D |               | diffuse color      |
-| s          | Texture2D |               | specular color     |
-| ns         | Texture2D |               | specular glossness |
+| Field Name | Type      | Default Value   | Explanation        |
+| ---------- | --------- | --------------- | ------------------ |
+| d          | Texture2D |                 | diffuse color      |
+| s          | Texture2D |                 | specular color     |
+| ns         | Texture2D |                 | specular glossness |
+| normal_map | Texture2D | all_{ 0, 0, 1 } | normal map         |
 
 **invisible_surface**
 
@@ -730,15 +730,15 @@ Resize the image and G-Buffer to the specified resolution
 
 Traditional path tracing. You can specify the tracing strategy by `integrator`.
 
-| Field Name     | Type    | Default Value | Explanation                               |
-| -------------- | ------- | ------------- | ----------------------------------------- |
-| task_grid_size | int     | 32            | rendering task pixel size                 |
-| worker_count   | int     | 0             | rendering thread count                    |
-| sampler        | Sampler |               | random number generator                   |
-| min_depth      | int     | 5             | minimum path depth before using RR policy |
-| max_depth      | int     | 10            | maximum depth of the path                 |
-| cont_prob      | real    | 0.9           | pass probability when using RR strategy   |
-| use_mis        | bool    | true          | use mis to computing direct illumination  |
+| Field Name     | Type | Default Value | Explanation                               |
+| -------------- | ---- | ------------- | ----------------------------------------- |
+| task_grid_size | int  | 32            | rendering task pixel size                 |
+| worker_count   | int  | 0             | rendering thread count                    |
+| spp            | int  |               | samples per pixel                         |
+| min_depth      | int  | 5             | minimum path depth before using RR policy |
+| max_depth      | int  | 10            | maximum depth of the path                 |
+| cont_prob      | real | 0.9           | pass probability when using RR strategy   |
+| use_mis        | bool | true          | use mis to computing direct illumination  |
 
 The entire image is divided into multiple square pixel blocks (rendering tasks), and each pixel block is assigned to a worker thread for execution as a subtask.
 
@@ -759,39 +759,39 @@ Ambient occlusion renderer
 | high_color             | Spectrum | [ 1 ]         | unoccluded color          |
 | max_occlusion_distance | real     | 1             | max occlusion distance    |
 | background_color       | Spectrum | [ 0 ]         | background color          |
-| sampler                | Sampler  |               | random number generator   |
+| spp                    | int      |               | samples per pixel         |
 
 **bdpt**
 
 Bidirectional path tracer
 
-| Field Name       | Type    | Default Value | Explanation                      |
-| ---------------- | ------- | ------------- | -------------------------------- |
-| worker_count     | int     | 0             | rendering thread count           |
-| task_grid_size   | int     | 32            | rendering task pixel size        |
-| camera_max_depth | int     | 10            | max depth of camera subpath      |
-| light_max_depth  | int     | 10            | max depth of light subpath       |
-| use_mis          | bool    | true          | use multiple importance sampling |
-| sampler          | Sampler |               | sampler                          |
+| Field Name       | Type | Default Value | Explanation                      |
+| ---------------- | ---- | ------------- | -------------------------------- |
+| worker_count     | int  | 0             | rendering thread count           |
+| task_grid_size   | int  | 32            | rendering task pixel size        |
+| camera_max_depth | int  | 10            | max depth of camera subpath      |
+| light_max_depth  | int  | 10            | max depth of light subpath       |
+| use_mis          | bool | true          | use multiple importance sampling |
+| spp              | int  |               | samples per pixel                |
 
 **particle**
 
 Adjoint particle tracer. `particle` builds path from light source to camera, making the convergence very slow.
 
-| Field Name             | Type    | Default Value | Explanation                               |
-| ---------------------- | ------- | ------------- | ----------------------------------------- |
-| worker_count           | int     | 0             | rendering thread count                    |
-| particle_task_count    | int     |               | particle tracing task count               |
-| backward_sampler       | Sampler |               | sampler used in backward pass             |
-| min_depth              | int     | 5             | min path depth before using RR policy     |
-| max_depth              | int     | 10            | max depth of the path                     |
-| cont_prob              | real    | 0.9           | pass probability when using RR strategy   |
-| forward_task_grid_size | int     | 32            | rendering task pixel size in forward pass |
-| forward_sampler        | Sampler |               | sampler used in forward pass              |
+| Field Name             | Type | Default Value | Explanation                               |
+| ---------------------- | ---- | ------------- | ----------------------------------------- |
+| worker_count           | int  | 0             | rendering thread count                    |
+| particle_task_count    | int  |               | particle tracing task count               |
+| particles_per_task     | int  |               | particles per task in backward pass       |
+| min_depth              | int  | 5             | min path depth before using RR policy     |
+| max_depth              | int  | 10            | max depth of the path                     |
+| cont_prob              | real | 0.9           | pass probability when using RR strategy   |
+| forward_task_grid_size | int  | 32            | rendering task pixel size in forward pass |
+| forward_spp            | int  |               | samples per pixel in forward pass         |
 
 `particle` uses the strategy of starting from a light source to construct a light path, called backward pass; for paths of length 1 (that is, the light source is directly seen from the camera), however, `particle` builds them from the camera to light sources, called forward pass. The two passes are independent executed and are combined to render the final image.
 
-Backward pass consists of `particle_task_count` particle tracing tasks. Each task contains `spp` of `backward_sampler`, so a total of `particle_task_count * backward_sampler.spp` paths are traced in backward pass.
+Backward pass consists of `particle_task_count` particle tracing tasks. Each task contains `particles_per_task` particles, so a total number of `particle_task_count * particles_per_task` paths are traced in backward pass.
 
 ### ProgressReporter
 
@@ -802,30 +802,6 @@ Print to standard output
 **noout**
 
 No progress output
-
-### Sampler
-
-Random number generator
-
-**native**
-
-The most basic random number sampler, where all samples are independent
-
-| Field Name | Type | Default Value | Explanation                                  |
-| ---------- | ---- | ------------- | -------------------------------------------- |
-| seed       | int  | by time       | Seed value, default seed is the running time |
-| spp        | int  |               | samples per pixel                            |
-
-**sobol**
-
-Sobol sampler
-
-| Field Name | Type | Default Value | Explanation                                  |
-| ---------- | ---- | ------------- | -------------------------------------------- |
-| seed       | int  | by time       | Seed value, default seed is the running time |
-| spp        | int  |               | samples per pixel                            |
-
-`seed` is only used to offset samples in pixels.
 
 ### Texture2D
 

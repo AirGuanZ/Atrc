@@ -89,6 +89,16 @@ void MirrorWidget::load_asset(AssetLoader &loader)
     do_update_tracer_object();
 }
 
+std::shared_ptr<tracer::ConfigNode> MirrorWidget::to_config(JSONExportContext &ctx) const
+{
+    auto grp = std::make_shared<tracer::ConfigGroup>();
+    grp->insert_str("type", "mirror");
+    grp->insert_child("color_map", color_map_->to_config(ctx));
+    grp->insert_child("eta",       eta_->to_config(ctx));
+    grp->insert_child("k",         k_->to_config(ctx));
+    return grp;
+}
+
 void MirrorWidget::update_tracer_object_impl()
 {
     do_update_tracer_object();

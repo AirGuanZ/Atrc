@@ -1,4 +1,3 @@
-#include <agz/editor/displayer/displayer.h>
 #include <agz/editor/editor.h>
 #include <agz/editor/entity/geometric_entity.h>
 #include <agz/editor/geometry/triangle_bvh.h>
@@ -12,9 +11,8 @@ namespace
     constexpr int WIDGET_ITEM_HEIGHT = 35;
 }
 
-SceneManager::SceneManager(ObjectContext &obj_ctx, Editor *editor, Displayer *displayer)
-    : obj_ctx_(obj_ctx), editor_(editor),
-      displayer_(displayer), displayer_gl_(displayer_->get_gl_widget())
+SceneManager::SceneManager(ObjectContext &obj_ctx, Editor *editor, PreviewWindow *preview_window)
+    : obj_ctx_(obj_ctx), editor_(editor), preview_window_(preview_window)
 {
     ui_ = new SceneManagerWidget;
 
@@ -38,7 +36,7 @@ SceneManager::SceneManager(ObjectContext &obj_ctx, Editor *editor, Displayer *di
         selected_entity_changed();
     });
 
-    connect(displayer_, &Displayer::left_button_emit_ray, [=](const Vec3 &o, const Vec3 &d)
+    connect(preview_window_, &PreviewWindow::left_click_to_emit_ray, [=](const Vec3 &o, const Vec3 &d)
     {
         const tracer::Ray ray(o, d);
         real t = (std::numeric_limits<real>::max)();
@@ -65,7 +63,7 @@ SceneManager::SceneManager(ObjectContext &obj_ctx, Editor *editor, Displayer *di
             ui_->name_list->setCurrentItem(nullptr);
     });
 
-    connect(displayer_gl_, &DisplayerGLWidget::edit_gizmo, [=](const DirectTransform &new_world)
+    connect(preview_window_, &PreviewWindow::edit_gizmo, [=](const DirectTransform &new_world)
     {
         edit_entity_gizmo(new_world);
     });
@@ -114,11 +112,19 @@ void SceneManager::add_meshes(const std::vector<mesh::mesh_t> &meshes)
 
 void SceneManager::save_asset(AssetSaver &saver) const
 {
-    saver.write(uint32_t(name2record_.size()));
-    for(auto &p : name2record_)
+    const uint32_t entity_count = uint32_t(name2record_.size());
+    saver.write(entity_count);
+
+    for(uint32_t i = 0; i < entity_count; ++i)
     {
-        saver.write_string(p.first);
-        p.second->panel->save_asset(saver);
+        auto item = ui_->name_list->item(i);
+        const QString name = item->text();
+
+        saver.write_string(name);
+
+        auto it = name2record_.find(name);
+        assert(it != name2record_.end());
+        it->second->panel->save_asset(saver);
     }
 }
 
@@ -134,48 +140,16 @@ void SceneManager::load_asset(AssetLoader &loader)
         EntityPanel *panel = new EntityPanel(obj_ctx_, "Geometric");
         panel->load_asset(loader);
 
-        // generate mesh id
-
-        auto mesh_id = displayer_gl_->generate_mesh_id();
-
-        // record name -> entity
-
-        Record record = { name, panel, mesh_id };
-        name2record_[name] = std::make_unique<Record>(record);
-
-        // add widget to editor
-
-        editor_->add_to_entity_panel(panel);
-        ui_->name_list->addItem(name);
-
-        auto new_item = ui_->name_list->findItems(name, Qt::MatchExactly).front();
-        new_item->setSizeHint(QSize(new_item->sizeHint().width(), WIDGET_ITEM_HEIGHT));
-
-        // set widget callback
-
-        panel->set_dirty_callback([=] { emit change_scene(); });
-
-        // add mesh to gl widget
-
-        const auto geometry_data = panel->get_vertices();
-        displayer_gl_->add_mesh(
-            mesh_id, geometry_data.data(),
-            static_cast<int>(geometry_data.size()));
-        displayer_gl_->set_transform(mesh_id, panel->get_transform());
-
-        panel->set_geometry_vertices_dirty_callback([=]
-        {
-            displayer_gl_->remove_mesh(mesh_id);
-            const auto data = panel->get_vertices();
-            displayer_gl_->add_mesh(mesh_id, data.data(), static_cast<int>(data.size()));
-            displayer_gl_->set_transform(mesh_id, panel->get_transform());
-        });
-
-        panel->set_entity_transform_dirty_callback([=]
-        {
-            displayer_gl_->set_transform(mesh_id, panel->get_transform());
-        });
+        add_record(name, panel);
     }
+}
+
+std::shared_ptr<tracer::ConfigArray> SceneManager::to_config(JSONExportContext &ctx) const
+{
+    auto arr = std::make_shared<tracer::ConfigArray>();
+    for(auto &p : name2record_)
+        arr->push_back(p.second->panel->to_config(ctx));
+    return arr;
 }
 
 bool SceneManager::is_valid_name(const QString &name) const
@@ -197,46 +171,7 @@ void SceneManager::create_entity()
 
     EntityPanel *panel = new EntityPanel(obj_ctx_, "Geometric");
 
-    // generate mesh id
-
-    auto mesh_id = displayer_gl_->generate_mesh_id();
-
-    // record name -> entity
-
-    Record record = { name, panel, mesh_id };
-    name2record_[name] = std::make_unique<Record>(record);
-
-    // add widget to editor
-
-    editor_->add_to_entity_panel(panel);
-    ui_->name_list->addItem(name);
-
-    auto new_item = ui_->name_list->findItems(name, Qt::MatchExactly).front();
-    new_item->setSizeHint(QSize(new_item->sizeHint().width(), WIDGET_ITEM_HEIGHT));
-
-    // set widget callback
-
-    panel->set_dirty_callback([=] { emit change_scene(); });
-
-    // add mesh to gl widget
-
-    const auto geometry_data = panel->get_vertices();
-    displayer_gl_->add_mesh(
-        mesh_id, geometry_data.data(),
-        static_cast<int>(geometry_data.size()));
-
-    panel->set_geometry_vertices_dirty_callback([=]
-    {
-        displayer_gl_->remove_mesh(mesh_id);
-        const auto data = panel->get_vertices();
-        displayer_gl_->add_mesh(mesh_id, data.data(), static_cast<int>(data.size()));
-        displayer_gl_->set_transform(mesh_id, panel->get_transform());
-    });
-
-    panel->set_entity_transform_dirty_callback([=]
-    {
-        displayer_gl_->set_transform(mesh_id, panel->get_transform());
-    });
+    add_record(name, panel);
 
     emit change_scene();
 }
@@ -251,7 +186,7 @@ void SceneManager::remove_selected_entity()
     assert(it != name2record_.end());
     delete it->second->panel;
 
-    displayer_gl_->remove_mesh(it->second->mesh_id);
+    preview_window_->remove_mesh(it->second->mesh_id);
 
     name2record_.erase(it);
     delete ui_->name_list->takeItem(ui_->name_list->row(item));
@@ -286,14 +221,14 @@ void SceneManager::selected_entity_changed()
     auto item = ui_->name_list->currentItem();
     if(!item)
     {
-        displayer_gl_->set_selected_mesh(-1);
+        preview_window_->set_selected_mesh(-1);
         return;
     }
 
     auto it = name2record_.find(item->text());
     auto &mesh = *it->second;
 
-    displayer_gl_->set_selected_mesh(mesh.mesh_id);
+    preview_window_->set_selected_mesh(mesh.mesh_id);
     editor_->show_entity_panel(mesh.panel, false);
 }
 
@@ -302,7 +237,7 @@ void SceneManager::edit_entity_gizmo(const DirectTransform &transform)
     auto item = ui_->name_list->currentItem();
     if(!item)
     {
-        displayer_gl_->set_selected_mesh(-1);
+        preview_window_->set_selected_mesh(-1);
         return;
     }
 
@@ -339,13 +274,18 @@ void SceneManager::add_single_mesh(const mesh::mesh_t &mesh)
     GeometricEntityWidget *entity_widget = new GeometricEntityWidget(entity_clone_state, obj_ctx_);
     EntityPanel *entity_panel = new EntityPanel(obj_ctx_, entity_widget, "Geometric");
 
+    add_record(QString::fromStdString(mesh.name), entity_panel);
+}
+
+void SceneManager::add_record(const ::QString &name, EntityPanel *entity_panel)
+{
     // generate mesh id
 
-    auto mesh_id = displayer_gl_->generate_mesh_id();
+    auto mesh_id = preview_window_->generate_mesh_id();
 
     // record name -> entity
 
-    const QString final_name = to_valid_name(QString::fromStdString(mesh.name));
+    const QString final_name = to_valid_name(name);
 
     Record record = { final_name, entity_panel, mesh_id };
     name2record_[final_name] = std::make_unique<Record>(record);
@@ -365,19 +305,19 @@ void SceneManager::add_single_mesh(const mesh::mesh_t &mesh)
     // add mesh to gl widget
 
     const auto geometry_data = entity_panel->get_vertices();
-    displayer_gl_->add_mesh(mesh_id, geometry_data.data(), static_cast<int>(geometry_data.size()));
+    preview_window_->add_mesh(mesh_id, geometry_data.data(), static_cast<int>(geometry_data.size()));
 
     entity_panel->set_geometry_vertices_dirty_callback([=]
     {
-        displayer_gl_->remove_mesh(mesh_id);
+        preview_window_->remove_mesh(mesh_id);
         const auto data = entity_panel->get_vertices();
-        displayer_gl_->add_mesh(mesh_id, data.data(), static_cast<int>(data.size()));
-        displayer_gl_->set_transform(mesh_id, entity_panel->get_transform());
+        preview_window_->add_mesh(mesh_id, data.data(), static_cast<int>(data.size()));
+        preview_window_->set_mesh_transform(mesh_id, entity_panel->get_transform());
     });
 
     entity_panel->set_entity_transform_dirty_callback([=]
     {
-        displayer_gl_->set_transform(mesh_id, entity_panel->get_transform());
+        preview_window_->set_mesh_transform(mesh_id, entity_panel->get_transform());
     });
 }
 

@@ -1,6 +1,7 @@
 #include <QFileDialog>
 #include <QMessageBox>
 
+#include <agz/editor/imexport/json_export_context.h>
 #include <agz/editor/texture2d/image2d.h>
 #include <agz/utility/image.h>
 #include <agz/utility/system.h>
@@ -95,6 +96,29 @@ void Image2DWidget::load_asset(AssetLoader &loader)
     adv_widget_->load_asset(loader);
 
     do_update_tracer_object();
+}
+
+std::shared_ptr<tracer::ConfigNode> Image2DWidget::to_config(JSONExportContext &ctx) const
+{
+    auto grp = std::make_shared<tracer::ConfigGroup>();
+
+    if(!img_data_)
+    {
+        grp->insert_str("type", "constant");
+        grp->insert_child("texel", tracer::ConfigArray::from_spectrum(Spectrum(0.5f)));
+        return grp;
+    }
+
+    grp->insert_str("type", "image");
+
+    auto [ref_filename, filename] = ctx.gen_filename(".png");
+    img::save_rgb_to_png_file(filename, img_data_->raw_data(), img_data_->width(), img_data_->height());
+
+    grp->insert_str("filename", ref_filename);
+
+    adv_widget_->to_config(*grp);
+
+    return grp;
 }
 
 void Image2DWidget::update_tracer_object_impl()

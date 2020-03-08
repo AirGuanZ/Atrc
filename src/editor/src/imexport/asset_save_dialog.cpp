@@ -1,4 +1,5 @@
-#include <QCheckBox>
+#include <fstream>
+
 #include <QFileDialog>
 #include <QMessageBox>
 
@@ -8,12 +9,16 @@
 AGZ_EDITOR_BEGIN
 
 AssetSaveDialog::AssetSaveDialog(
-    SceneManager   *scene_mgr,
-    ObjectContext  *obj_ctx,
-    EnvirLightSlot *envir_light)
-    : scene_mgr_(scene_mgr),
-      obj_ctx_(obj_ctx),
-      envir_light_(envir_light)
+    SceneManager        *scene_mgr,
+    ObjectContext       *obj_ctx,
+    EnvirLightSlot      *envir_light,
+    GlobalSettingWidget *global_settings,
+    PreviewWindow       *preview_window)
+    : scene_mgr_      (scene_mgr),
+      obj_ctx_        (obj_ctx),
+      envir_light_    (envir_light),
+      global_settings_(global_settings),
+      preview_window_ (preview_window)
 {
     init_ui();
 }
@@ -27,8 +32,10 @@ void AssetSaveDialog::init_ui()
     save_texture2d_pool_ = new QCheckBox("Texture2D Pool", this);
     save_texture3d_pool_ = new QCheckBox("Texture3D Pool", this);
 
-    save_entities_    = new QCheckBox("Entities",    this);
-    save_envir_light_ = new QCheckBox("Envir Light", this);
+    save_entities_        = new QCheckBox("Entities",    this);
+    save_envir_light_     = new QCheckBox("Envir Light", this);
+    save_global_settings_ = new QCheckBox("Global Settings", this);
+    save_preview_window_  = new QCheckBox("Camera", this);
 
     save_all_pools_->setTristate(true);
     save_all_pools_->setCheckState(Qt::Checked);
@@ -39,8 +46,10 @@ void AssetSaveDialog::init_ui()
     save_texture2d_pool_->setChecked(true);
     save_texture3d_pool_->setChecked(true);
 
-    save_entities_   ->setChecked(true);
-    save_envir_light_->setChecked(true);
+    save_entities_       ->setChecked(true);
+    save_envir_light_    ->setChecked(true);
+    save_global_settings_->setChecked(true);
+    save_preview_window_ ->setChecked(true);
 
     QPushButton *ok     = new QPushButton("Ok",     this);
     QPushButton *cancel = new QPushButton("Cancel", this);
@@ -48,14 +57,16 @@ void AssetSaveDialog::init_ui()
     QGridLayout *layout = new QGridLayout(this);
     int row = 0;
 
-    layout->addWidget(save_all_pools_,        row, 0, 1, 2);
-    layout->addWidget(save_material_pool_,  ++row, 0, 1, 2);
-    layout->addWidget(save_medium_pool_,    ++row, 0, 1, 2);
-    layout->addWidget(save_geometry_pool_,  ++row, 0, 1, 2);
-    layout->addWidget(save_texture2d_pool_, ++row, 0, 1, 2);
-    layout->addWidget(save_texture3d_pool_, ++row, 0, 1, 2);
-    layout->addWidget(save_entities_,       ++row, 0, 1, 2);
-    layout->addWidget(save_envir_light_,    ++row, 0, 1, 2);
+    layout->addWidget(save_all_pools_,         row, 0, 1, 2);
+    layout->addWidget(save_material_pool_,   ++row, 0, 1, 2);
+    layout->addWidget(save_medium_pool_,     ++row, 0, 1, 2);
+    layout->addWidget(save_geometry_pool_,   ++row, 0, 1, 2);
+    layout->addWidget(save_texture2d_pool_,  ++row, 0, 1, 2);
+    layout->addWidget(save_texture3d_pool_,  ++row, 0, 1, 2);
+    layout->addWidget(save_entities_,        ++row, 0, 1, 2);
+    layout->addWidget(save_envir_light_,     ++row, 0, 1, 2);
+    layout->addWidget(save_global_settings_, ++row, 0, 1, 2);
+    layout->addWidget(save_preview_window_,  ++row, 0, 1, 2);
     
     layout->addWidget(ok,   ++row, 0, 1, 1);
     layout->addWidget(cancel, row, 1, 1, 1);
@@ -192,6 +203,20 @@ void AssetSaveDialog::ok()
         ++section_count;
         saver.write(AssetSectionType::EnvirLight);
         envir_light_->save_asset(saver);
+    }
+
+    if(save_global_settings_->isChecked())
+    {
+        ++section_count;
+        saver.write(AssetSectionType::GlobalSettings);
+        global_settings_->save_asset(saver);
+    }
+
+    if(save_preview_window_->isChecked())
+    {
+        ++section_count;
+        saver.write(AssetSectionType::PreviewWindow);
+        preview_window_->save_asset(saver);
     }
 
     fout.seekp(0, std::ios::beg);

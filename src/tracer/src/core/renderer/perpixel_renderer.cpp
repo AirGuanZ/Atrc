@@ -1,5 +1,5 @@
 #include <agz/tracer/core/camera.h>
-#include <agz/tracer/core/reporter.h>
+#include <agz/tracer/core/renderer_interactor.h>
 #include <agz/tracer/core/sampler.h>
 #include <agz/tracer/core/scene.h>
 #include <agz/utility/thread.h>
@@ -18,8 +18,7 @@ void PerPixelRenderer::render_grid(const Scene &scene, Sampler &sampler, Grid &g
     {
         for(int px = sam_bound.low.x; px <= sam_bound.high.x; ++px)
         {
-            sampler.start_pixel(px, py);
-            do
+            for(int i = 0; i < spp_; ++i)
             {
                 const Sample2 film_sam = sampler.sample2();
                 const real pixel_x = px + film_sam.u;
@@ -38,14 +37,13 @@ void PerPixelRenderer::render_grid(const Scene &scene, Sampler &sampler, Grid &g
 
                 if(stop_rendering_)
                     return;
-
-            } while(sampler.next_sample());
+            }
         }
     }
 }
 
 template<bool REPORTER_WITH_PREVIEW>
-RenderTarget PerPixelRenderer::render_impl(FilmFilterApplier filter, Scene &scene, ProgressReporter &reporter)
+RenderTarget PerPixelRenderer::render_impl(FilmFilterApplier filter, Scene &scene, RendererInteractor &reporter)
 {
     int width = filter.width();
     int height = filter.height();
@@ -55,6 +53,8 @@ RenderTarget PerPixelRenderer::render_impl(FilmFilterApplier filter, Scene &scen
 
     std::atomic<int> next_task_id = 0;
     std::mutex reporter_mutex;
+
+    auto sampler_prototype = std::make_shared<Sampler>(42, false);
 
     ImageBuffer image_buffer(width, height);
 
@@ -136,7 +136,7 @@ RenderTarget PerPixelRenderer::render_impl(FilmFilterApplier filter, Scene &scen
 
     for(int i = 0; i < worker_count; ++i)
     {
-        auto sampler = sampler_prototype_->clone(i, sampler_arena);
+        auto sampler = sampler_prototype->clone(i, sampler_arena);
         threads.emplace_back(func, sampler, &image_buffer);
     }
 
@@ -152,23 +152,21 @@ RenderTarget PerPixelRenderer::render_impl(FilmFilterApplier filter, Scene &scen
     });
 
     RenderTarget render_target;
-    render_target.image = image_buffer.value * ratio;
-    render_target.albedo = image_buffer.albedo * ratio;
-    render_target.normal = image_buffer.normal * ratio;
+    render_target.image   = image_buffer.value   * ratio;
+    render_target.albedo  = image_buffer.albedo  * ratio;
+    render_target.normal  = image_buffer.normal  * ratio;
     render_target.denoise = image_buffer.denoise * ratio;
-
-    reporter.message("total time: " + std::to_string(reporter.total_seconds()) + "s");
 
     return render_target;
 }
 
-PerPixelRenderer::PerPixelRenderer(int worker_count, int task_grid_size, std::shared_ptr<const Sampler> sampler_prototype)
-    : worker_count_(worker_count), task_grid_size_(task_grid_size), sampler_prototype_(std::move(sampler_prototype))
+PerPixelRenderer::PerPixelRenderer(int worker_count, int task_grid_size, int spp)
+    : worker_count_(worker_count), task_grid_size_(task_grid_size), spp_(spp)
 {
     
 }
 
-RenderTarget PerPixelRenderer::render(FilmFilterApplier filter, Scene &scene, ProgressReporter &reporter)
+RenderTarget PerPixelRenderer::render(FilmFilterApplier filter, Scene &scene, RendererInteractor &reporter)
 {
     if(reporter.need_image_preview())
         return render_impl<true>(filter, scene, reporter);

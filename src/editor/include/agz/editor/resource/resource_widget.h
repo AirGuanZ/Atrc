@@ -14,6 +14,7 @@
 AGZ_EDITOR_BEGIN
 
 class ObjectContext;
+class JSONExportContext;
 
 class ResourceObjectException : public std::exception
 {
@@ -71,6 +72,11 @@ public:
      * @brief deserialize
      */
     virtual void load_asset(AssetLoader &loader) = 0;
+
+    /**
+     * @brief convert to tracer config node
+     */
+    virtual std::shared_ptr<tracer::ConfigNode> to_config(JSONExportContext &ctx) const = 0;
 
 protected:
 

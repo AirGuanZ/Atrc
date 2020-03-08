@@ -39,9 +39,9 @@ Texture3DCommonParamsWidget::Texture3DCommonParamsWidget(const InitData &init_da
     QLabel *wrap_v_text = new QLabel("Wrap V", wrap_v_widget);
     QLabel *wrap_w_text = new QLabel("Wrap W", wrap_w_widget);
 
-    wrap_u_ = new QComboBox(this);
-    wrap_v_ = new QComboBox(this);
-    wrap_w_ = new QComboBox(this);
+    wrap_u_ = new ComboBoxWithoutWheelFocus(this);
+    wrap_v_ = new ComboBoxWithoutWheelFocus(this);
+    wrap_w_ = new ComboBoxWithoutWheelFocus(this);
 
     apply_inv_gamma_->setChecked(init_data.apply_inv_gamma);
     inv_gamma_->setText(QString::number(init_data.inv_gamma));
@@ -183,6 +183,22 @@ void Texture3DCommonParamsWidget::load_asset(AssetLoader &loader)
     wrap_u_->setCurrentText(loader.read_string());
     wrap_v_->setCurrentText(loader.read_string());
     wrap_w_->setCurrentText(loader.read_string());
+}
+
+void Texture3DCommonParamsWidget::to_config(tracer::ConfigGroup &grp) const
+{
+    grp.insert_bool("inv_u", inv_u_->isChecked());
+    grp.insert_bool("inv_v", inv_v_->isChecked());
+    grp.insert_bool("inv_w", inv_w_->isChecked());
+
+    grp.insert_child("transform", transform_->to_config());
+
+    grp.insert_str("wrap_u", wrap_u_->currentText().toLower().toStdString());
+    grp.insert_str("wrap_v", wrap_v_->currentText().toLower().toStdString());
+    grp.insert_str("wrap_w", wrap_w_->currentText().toLower().toStdString());
+
+    if(apply_inv_gamma_->isChecked())
+        grp.insert_real("inv_gamma", inv_gamma_->text().toFloat());
 }
 
 AGZ_EDITOR_END

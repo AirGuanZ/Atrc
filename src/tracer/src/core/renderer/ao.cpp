@@ -1,13 +1,12 @@
-#include <atomic>
 #include <mutex>
 #include <thread>
 
 #include <agz/tracer/core/camera.h>
 #include <agz/tracer/core/renderer.h>
-#include <agz/tracer/core/reporter.h>
+#include <agz/tracer/core/renderer_interactor.h>
 #include <agz/tracer/core/sampler.h>
 #include <agz/tracer/core/scene.h>
-#include <agz/tracer/factory/raw/renderer.h>
+#include <agz/tracer/create/renderer.h>
 #include <agz/tracer/render/path_tracing.h>
 #include <agz/utility/thread.h>
 
@@ -22,7 +21,7 @@ class AORenderer : public PerPixelRenderer
 public:
 
     explicit AORenderer(const AORendererParams &params)
-        : PerPixelRenderer(params.worker_count, params.task_grid_size, params.sampler_prototype)
+        : PerPixelRenderer(params.worker_count, params.task_grid_size, params.spp)
     {
         params_.background_color       = params.background_color;
         params_.low_color              = params.low_color;

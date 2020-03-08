@@ -3,7 +3,7 @@
 #include <QSpinBox>
 
 #include <agz/editor/medium/medium.h>
-#include <agz/editor/ui/utility/adaptive_slider.h>
+#include <agz/editor/ui/utility/real_slider.h>
 #include <agz/editor/ui/utility/vec_input.h>
 
 AGZ_EDITOR_BEGIN
@@ -28,6 +28,8 @@ public:
     void save_asset(AssetSaver &saver) override;
 
     void load_asset(AssetLoader &loader) override;
+
+    std::shared_ptr<tracer::ConfigNode> to_config(JSONExportContext &ctx) const override;
 
 protected:
 

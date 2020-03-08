@@ -16,12 +16,12 @@ class PerPixelRenderer : public Renderer
     void render_grid(const Scene &scene, Sampler &sampler, Grid &grid, const Vec2i &full_res) const;
 
     template<bool REPORTER_WITH_PREVIEW>
-    RenderTarget render_impl(FilmFilterApplier filter, Scene &scene, ProgressReporter &reporter);
+    RenderTarget render_impl(FilmFilterApplier filter, Scene &scene, RendererInteractor &reporter);
 
     int worker_count_;
     int task_grid_size_;
 
-    std::shared_ptr<const Sampler> sampler_prototype_;
+    int spp_;
 
 protected:
 
@@ -31,9 +31,9 @@ protected:
 
 public:
 
-    PerPixelRenderer(int worker_count, int task_grid_size, std::shared_ptr<const Sampler> sampler_prototype);
+    PerPixelRenderer(int worker_count, int task_grid_size, int spp);
 
-    RenderTarget render(FilmFilterApplier filter, Scene &scene, ProgressReporter &reporter) override;
+    RenderTarget render(FilmFilterApplier filter, Scene &scene, RendererInteractor &reporter) override;
 };
 
 AGZ_TRACER_END

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <agz/tracer/core/framebuffer.h>
 #include <agz/tracer/core/film_filter.h>
 #include <agz/utility/texture.h>
 
@@ -51,8 +52,6 @@ struct ImageBufferTemplate
  * @brief output of rendering algorithm
  *
  * assert(image.is_available())
- *
- * 其他成员可以为!is_available()
  */
 struct RenderTarget
 {
@@ -73,6 +72,9 @@ class FilmFilterApplier
 {
 public:
 
+    /**
+     * @brief copy of a rect region on film
+     */
     template<typename...TexelTypes>
     class FilmGrid
     {
@@ -143,6 +145,9 @@ public:
         void clear(const TexelTypes&...texels);
     };
 
+    /**
+     * @brief ref to a rect region on film
+     */
     template<typename...TexelTypes>
     class FilmGridView
     {
@@ -258,14 +263,16 @@ void FilmFilterApplier::FilmGrid<TexelTypes...>::resize_grid(int width, int heig
 
 template<typename...TexelTypes>
 template<int I, typename T1>
-void FilmFilterApplier::FilmGrid<TexelTypes...>::apply_aux(int px, int py, real weight, const T1 &texel)
+void FilmFilterApplier::FilmGrid<TexelTypes...>::apply_aux(
+    int px, int py, real weight, const T1 &texel)
 {
     std::get<I>(grids_).at(py, px) += weight * texel;
 }
 
 template<typename...TexelTypes>
 template<int I, typename T1, typename T2, typename...Ts>
-void FilmFilterApplier::FilmGrid<TexelTypes...>::apply_aux(int px, int py, real weight, const T1 &t1, const T2 &t2, const Ts &... ts)
+void FilmFilterApplier::FilmGrid<TexelTypes...>::apply_aux(
+    int px, int py, real weight, const T1 &t1, const T2 &t2, const Ts &... ts)
 {
     apply_aux<I>(px, py, weight, t1);
     apply_aux<I + 1>(px, py, weight, t2, ts...);
@@ -285,7 +292,8 @@ void FilmFilterApplier::FilmGrid<TexelTypes...>::merge_into_aux(Image2D<T1> &tex
 
 template<typename...TexelTypes>
 template<int I, typename T1, typename T2, typename ... Ts>
-void FilmFilterApplier::FilmGrid<TexelTypes...>::merge_into_aux(Image2D<T1> &t1, Image2D<T2> &t2, Image2D<Ts> &...ts) const
+void FilmFilterApplier::FilmGrid<TexelTypes...>::merge_into_aux(
+    Image2D<T1> &t1, Image2D<T2> &t2, Image2D<Ts> &...ts) const
 {
     merge_into_aux<I>(t1);
     merge_into_aux<I + 1>(t2, ts...);
@@ -307,7 +315,8 @@ void FilmFilterApplier::FilmGrid<TexelTypes...>::clear_aux(const T1 &t1, const T
 }
 
 template<typename...TexelTypes>
-FilmFilterApplier::FilmGrid<TexelTypes...>::FilmGrid(const Rect2i &pixel_range, std::shared_ptr<const FilmFilter> film_filter)
+FilmFilterApplier::FilmGrid<TexelTypes...>::FilmGrid(
+    const Rect2i &pixel_range, std::shared_ptr<const FilmFilter> film_filter)
     : film_filter_(std::move(film_filter))
 {
     set_pixel_range(pixel_range);
@@ -324,10 +333,7 @@ void FilmFilterApplier::FilmGrid<TexelTypes...>::set_pixel_range(const Rect2i &p
 
     const real radius = film_filter_->radius();
 
-    sample_pixels_.low.x  = static_cast<int>(std::floor(pixel_range.low.x + real(0.5) - radius));
-    sample_pixels_.low.y  = static_cast<int>(std::floor(pixel_range.low.y + real(0.5) - radius));
-    sample_pixels_.high.x = static_cast<int>(std::floor(pixel_range.high.x + real(0.5) + radius));
-    sample_pixels_.high.y = static_cast<int>(std::floor(pixel_range.high.y + real(0.5) + radius));
+    sample_pixels_ = sample_bound_of(radius, pixel_range);
 
     sample_pixel_bound_.low.x  = static_cast<real>(sample_pixels_.low.x);
     sample_pixel_bound_.low.y  = static_cast<real>(sample_pixels_.low.y);
@@ -336,37 +342,16 @@ void FilmFilterApplier::FilmGrid<TexelTypes...>::set_pixel_range(const Rect2i &p
 }
 
 template<typename...TexelTypes>
-void FilmFilterApplier::FilmGrid<TexelTypes...>::apply(real px, real py, const TexelTypes&...texels) noexcept
+void FilmFilterApplier::FilmGrid<TexelTypes...>::apply(
+    real px, real py, const TexelTypes&...texels) noexcept
 {
-    const real radius = film_filter_->radius();
-
-    const int x_min = (std::max)(pixel_range_.low.x, static_cast<int>(std::ceil(px - radius - real(0.5))));
-    const int y_min = (std::max)(pixel_range_.low.y, static_cast<int>(std::ceil(py - radius - real(0.5))));
-    const int x_max = (std::min)(pixel_range_.high.x, static_cast<int>(std::floor(px + radius - real(0.5))));
-    const int y_max = (std::min)(pixel_range_.high.y, static_cast<int>(std::floor(py + radius - real(0.5))));
-
-    for(int y = y_min; y <= y_max; ++y)
+    apply_image_filter(
+        pixel_range_, film_filter_->radius(), { px, py },
+        [&](int pix, int piy, real rel_x, real rel_y)
     {
-        const real y_pixel_center = y + real(0.5);
-        const real y_relative = std::abs(py - y_pixel_center);
-        if(y_relative > radius)
-            continue;
-
-        const int local_y = y - pixel_range_.low.y;
-
-        for(int x = x_min; x <= x_max; ++x)
-        {
-            const real x_pixel_center = x + real(0.5);
-            const real x_relative = std::abs(px - x_pixel_center);
-            if(x_relative > radius)
-                continue;
-
-            const int local_x = x - pixel_range_.low.x;
-
-            const real weight = film_filter_->eval(x_relative, y_relative);
-            apply_aux<0>(local_x, local_y, weight, texels...);
-        }
-    }
+        const real weight = film_filter_->eval(rel_x, rel_y);
+        apply_aux<0>(pix - pixel_range_.low.x, piy - pixel_range_.low.y, weight, texels...);
+    });
 }
 
 template<typename...TexelTypes>
@@ -396,7 +381,8 @@ void FilmFilterApplier::FilmGrid<TexelTypes...>::merge_into(Image2D<TexelTypes> 
 
 template<typename...TexelTypes>
 template<int I, typename T1>
-void FilmFilterApplier::FilmGridView<TexelTypes...>::apply_aux(int px, int py, real weight, const T1 &texel) const
+void FilmFilterApplier::FilmGridView<TexelTypes...>::apply_aux(
+    int px, int py, real weight, const T1 &texel) const
 {
     std::get<I>(textures_)->at(py, px) += weight * texel;
 }
@@ -419,10 +405,7 @@ FilmFilterApplier::FilmGridView<TexelTypes...>::FilmGridView(
 {
     const real radius = film_filter_->radius();
 
-    sample_pixels_.low.x = static_cast<int>(std::floor(pixel_bound.low.x + real(0.5) - radius));
-    sample_pixels_.low.y = static_cast<int>(std::floor(pixel_bound.low.y + real(0.5) - radius));
-    sample_pixels_.high.x = static_cast<int>(std::floor(pixel_bound.high.x + real(0.5) + radius));
-    sample_pixels_.high.y = static_cast<int>(std::floor(pixel_bound.high.y + real(0.5) + radius));
+    sample_pixels_ = sample_bound_of(radius, pixel_bound);
 
     sample_pixel_bound_.low.x = static_cast<real>(sample_pixels_.low.x);
     sample_pixel_bound_.low.y = static_cast<real>(sample_pixels_.low.y);
@@ -431,37 +414,21 @@ FilmFilterApplier::FilmGridView<TexelTypes...>::FilmGridView(
 }
 
 template<typename...TexelTypes>
-void FilmFilterApplier::FilmGridView<TexelTypes...>::apply(real px, real py, const TexelTypes&...texels) const noexcept
+void FilmFilterApplier::FilmGridView<TexelTypes...>::apply(
+    real px, real py, const TexelTypes&...texels) const noexcept
 {
-    const real radius = film_filter_->radius();
-
-    const int x_min = (std::max)(pixels_.low.x, static_cast<int>(std::ceil(px - radius - real(0.5))));
-    const int y_min = (std::max)(pixels_.low.y, static_cast<int>(std::ceil(py - radius - real(0.5))));
-    const int x_max = (std::min)(pixels_.high.x, static_cast<int>(std::floor(px + radius - real(0.5))));
-    const int y_max = (std::min)(pixels_.high.y, static_cast<int>(std::floor(py + radius - real(0.5))));
-
-    for(int y = y_min; y <= y_max; ++y)
+    apply_image_filter(
+        pixels_, film_filter_->radius(), { px, py },
+        [&](int pix, int piy, real rel_x, real rel_y)
     {
-        const real y_pixel_center = y + real(0.5);
-        const real y_relative = std::abs(py - y_pixel_center);
-        if(y_relative > radius)
-            continue;
-
-        for(int x = x_min; x <= x_max; ++x)
-        {
-            const real x_pixel_center = x + real(0.5);
-            const real x_relative = std::abs(px - x_pixel_center);
-            if(x_relative > radius)
-                continue;
-
-            const real weight = film_filter_->eval(x_relative, y_relative);
-            apply_aux<0>(x, y, weight, texels...);
-        }
-    }
+        const real weight = film_filter_->eval(rel_x, rel_y);
+        apply_aux<0>(pix, piy, weight, texels...);
+    });
 }
 
 template<typename...TexelTypes>
-bool FilmFilterApplier::FilmGridView<TexelTypes...>::in_sample_pixel_bound(real px, real py) const noexcept
+bool FilmFilterApplier::FilmGridView<TexelTypes...>::in_sample_pixel_bound(
+    real px, real py) const noexcept
 {
     return sample_pixel_bound_.low.x <= px && px <= sample_pixel_bound_.high.x &&
            sample_pixel_bound_.low.y <= py && py <= sample_pixel_bound_.high.y;
@@ -473,7 +440,8 @@ const Rect2i &FilmFilterApplier::FilmGridView<TexelTypes...>::sample_pixels() co
     return sample_pixels_;
 }
 
-inline FilmFilterApplier::FilmFilterApplier(int width, int height, std::shared_ptr<const FilmFilter> film_filter) noexcept
+inline FilmFilterApplier::FilmFilterApplier(
+    int width, int height, std::shared_ptr<const FilmFilter> film_filter) noexcept
     : width_(width), height_(height), film_filter_(std::move(film_filter))
 {
     
@@ -490,13 +458,15 @@ inline int FilmFilterApplier::height() const noexcept
 }
 
 template<typename...TexelTypes>
-FilmFilterApplier::FilmGridView<TexelTypes...> FilmFilterApplier::create_subgrid_view(const Rect2i &pixel_bound, Image2D<TexelTypes>&...textures) const noexcept
+FilmFilterApplier::FilmGridView<TexelTypes...> FilmFilterApplier::create_subgrid_view(
+    const Rect2i &pixel_bound, Image2D<TexelTypes>&...textures) const noexcept
 {
     return FilmGridView<TexelTypes...>(pixel_bound, film_filter_, textures...);
 }
 
 template<typename...TexelTypes>
-FilmFilterApplier::FilmGrid<TexelTypes...> FilmFilterApplier::create_subgrid(const Rect2i &pixel_bound) const noexcept
+FilmFilterApplier::FilmGrid<TexelTypes...> FilmFilterApplier::create_subgrid(
+    const Rect2i &pixel_bound) const noexcept
 {
     return FilmGrid<TexelTypes...>(pixel_bound, film_filter_);
 }

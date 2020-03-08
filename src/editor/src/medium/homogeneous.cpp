@@ -93,6 +93,20 @@ void HomogeneousWidget::load_asset(AssetLoader &loader)
     do_update_tracer_object();
 }
 
+std::shared_ptr<tracer::ConfigNode> HomogeneousWidget::to_config(JSONExportContext &ctx) const
+{
+    auto grp = std::make_shared<tracer::ConfigGroup>();
+    grp->insert_str("type", "homogeneous");
+
+    grp->insert_child("sigma_a", tracer::ConfigArray::from_spectrum(sigma_a_->get_value()));
+    grp->insert_child("sigma_s", tracer::ConfigArray::from_spectrum(sigma_s_->get_value()));
+    grp->insert_real("g", g_->value());
+
+    grp->insert_int("max_scattering_count", max_scattering_count_->value());
+
+    return grp;
+}
+
 void HomogeneousWidget::update_tracer_object_impl()
 {
     do_update_tracer_object();

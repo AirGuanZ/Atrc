@@ -13,7 +13,10 @@ enum class AssetSectionType : uint8_t
     Texture3DPool = 4,
 
     Entities      = 6,
-    EnvirLight    = 7
+    EnvirLight    = 7,
+
+    GlobalSettings = 8,
+    PreviewWindow  = 9
 };
 
 AGZ_EDITOR_END

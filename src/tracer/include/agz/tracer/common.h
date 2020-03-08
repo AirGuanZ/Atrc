@@ -27,7 +27,7 @@ class Material;
 class Medium;
 class PostProcessor;
 class Renderer;
-class ProgressReporter;
+class RendererInteractor;
 class Sampler;
 class Scene;
 class Texture2D;

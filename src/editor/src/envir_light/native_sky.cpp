@@ -53,6 +53,15 @@ void NativeSkyWidget::load_asset(AssetLoader &loader)
     do_update_tracer_object();
 }
 
+std::shared_ptr<tracer::ConfigNode> NativeSkyWidget::to_config(JSONExportContext &ctx) const
+{
+    auto grp = std::make_shared<tracer::ConfigGroup>();
+    grp->insert_str("type", "native_sky");
+    grp->insert_child("top",    tracer::ConfigArray::from_spectrum(top_->get_color()));
+    grp->insert_child("bottom", tracer::ConfigArray::from_spectrum(bottom_->get_color()));
+    return grp;
+}
+
 void NativeSkyWidget::update_tracer_object_impl()
 {
     do_update_tracer_object();

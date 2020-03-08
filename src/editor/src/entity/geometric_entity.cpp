@@ -1,6 +1,7 @@
 #include <QGridLayout>
 
 #include <agz/editor/entity/geometric_entity.h>
+#include <agz/editor/imexport/json_export_context.h>
 #include <agz/editor/ui/utility/collapsible.h>
 
 AGZ_EDITOR_BEGIN
@@ -126,6 +127,25 @@ void GeometricEntityWidget::load_asset(AssetLoader &loader)
     transform_->set_transform(loader.read<DirectTransform>());
 
     do_update_tracer_object();
+}
+
+std::shared_ptr<tracer::ConfigNode> GeometricEntityWidget::to_config(JSONExportContext &ctx) const
+{
+    auto grp = std::make_shared<tracer::ConfigGroup>();
+    grp->insert_str("type", "geometric");
+
+    auto geo_grp = std::make_shared<tracer::ConfigGroup>();
+    geo_grp->insert_str("type", "transform_wrapper");
+    geo_grp->insert_child("internal", geometry_->to_config(ctx));
+    geo_grp->insert_child("transform", transform_->get_transform().to_config());
+
+    grp->insert_child("geometry", geo_grp);
+    grp->insert_child("material", material_->to_config(ctx));
+    grp->insert_child("med_in",   medium_in_->to_config(ctx));
+    grp->insert_child("med_out",  medium_out_->to_config(ctx));
+    grp->insert_child("emit_radiance", tracer::ConfigArray::from_spectrum(emit_radiance_->get_value()));
+
+    return grp;
 }
 
 std::vector<EntityInterface::Vertex> GeometricEntityWidget::get_vertices() const

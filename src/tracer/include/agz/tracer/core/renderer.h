@@ -7,7 +7,7 @@
 
 AGZ_TRACER_BEGIN
 
-class ProgressReporter;
+class RendererInteractor;
 class Scene;
 
 /**
@@ -20,7 +20,7 @@ protected:
     std::atomic<bool> stop_rendering_ = false;
     std::atomic<bool> doing_rendering_ = false;
 
-    bool is_async_rendering_ = false;
+    bool is_waitable_ = false;
     std::future<RenderTarget> async_thread_;
 
 public:
@@ -30,12 +30,12 @@ public:
     /**
      * @brief blocking rendering
      */
-    virtual RenderTarget render(FilmFilterApplier filter, Scene &scene, ProgressReporter &reporter) = 0;
+    virtual RenderTarget render(FilmFilterApplier filter, Scene &scene, RendererInteractor &reporter) = 0;
 
     /**
      * @brief start the async rendering
      */
-    void render_async(FilmFilterApplier filter, Scene &scene, ProgressReporter &reporter);
+    void render_async(FilmFilterApplier filter, Scene &scene, RendererInteractor &reporter);
 
     /**
      * @brief stop the async rendering
@@ -50,7 +50,7 @@ public:
     /**
      * @brief returns true after calling render_async and before calling stop_async/wait_async
      */
-    bool is_async_rendering() const noexcept { return is_async_rendering_; }
+    bool is_waitable() const noexcept { return is_waitable_; }
 
     /**
      * @brief is the async rendering actually completed

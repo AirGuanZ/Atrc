@@ -184,6 +184,31 @@ void DisneyWidget::load_asset(AssetLoader &loader)
     do_update_tracer_object();
 }
 
+std::shared_ptr<tracer::ConfigNode> DisneyWidget::to_config(JSONExportContext &ctx) const
+{
+    auto grp = std::make_shared<tracer::ConfigGroup>();
+    grp->insert_str("type", "disney");
+
+    grp->insert_child("base_color",             base_color_->to_config(ctx));
+    grp->insert_child("metallic",               metallic_->to_config(ctx));
+    grp->insert_child("roughness",              roughness_->to_config(ctx));
+    grp->insert_child("transmission",           transmission_->to_config(ctx));
+    grp->insert_child("transmission_roughness", transmission_roughness_->to_config(ctx));
+    grp->insert_child("ior",                    ior_->to_config(ctx));
+    grp->insert_child("specular_scale",         specular_scale_->to_config(ctx));
+    grp->insert_child("specular_tint",          specular_tint_->to_config(ctx));
+    grp->insert_child("anisotropic",            anisotropic_->to_config(ctx));
+    grp->insert_child("sheen",                  sheen_->to_config(ctx));
+    grp->insert_child("sheen_tint",             sheen_tint_->to_config(ctx));
+    grp->insert_child("clearcoat",              clearcoat_->to_config(ctx));
+    grp->insert_child("clearcoat_gloss",        clearcoat_gloss_->to_config(ctx));
+
+    if(normal_map_->is_enabled())
+        grp->insert_child("normal_map", normal_map_->to_config(ctx));
+
+    return grp;
+}
+
 void DisneyWidget::update_tracer_object_impl()
 {
     do_update_tracer_object();

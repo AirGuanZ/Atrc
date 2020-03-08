@@ -6,6 +6,7 @@
 #include <QComboBox>
 #include <QVBoxLayout>
 
+#include <agz/editor/renderer/export/export_renderer.h>
 #include <agz/editor/renderer/renderer.h>
 
 AGZ_EDITOR_BEGIN
@@ -65,6 +66,8 @@ public:
     std::unique_ptr<Renderer> create_renderer(
         std::shared_ptr<tracer::Scene> scene, const Vec2i &framebuffer_size, bool enable_preview) const;
 
+    std::shared_ptr<tracer::ConfigGroup> to_config() const;
+
 signals:
 
     void change_renderer_type();
@@ -77,11 +80,17 @@ private slots:
 
 private:
 
+    // preview
+
     QComboBox      *renderer_type_selector_;
     QVBoxLayout    *layout_;
     RendererWidget *renderer_widget_;
 
     RendererWidgetFactory factory_;
+
+    // export
+
+    ExportRendererPanel *export_renderer_;
 };
 
 AGZ_EDITOR_END

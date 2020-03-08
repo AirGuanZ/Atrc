@@ -14,7 +14,7 @@ bool GUIProgressReporter::need_image_preview() const noexcept
     return true;
 }
 
-void GUIProgressReporter::progress(double percent, const std::function<agz::texture::texture2d_t<agz::math::tcolor3<float>>()> &get_image_preview)
+void GUIProgressReporter::progress(double percent, const PreviewFunc &get_image_preview)
 {
     if(percent > percent_)
     {
@@ -42,14 +42,9 @@ void GUIProgressReporter::message(const std::string &msg)
     AGZ_INFO(msg);
 }
 
-void GUIProgressReporter::error(const std::string &err)
-{
-    AGZ_ERROR(err);
-}
-
 void GUIProgressReporter::begin()
 {
-    total_seconds_ = 0;
+
 }
 
 void GUIProgressReporter::end()
@@ -60,25 +55,13 @@ void GUIProgressReporter::end()
 void GUIProgressReporter::new_stage()
 {
     percent_ = 0;
-    clock_.restart();
 
     last_update_preview_time_ = Clock::now();
 }
 
 void GUIProgressReporter::end_stage()
 {
-    last_stage_seconds_ = clock_.ms() / 1000.0;
-    total_seconds_ += last_stage_seconds_;
-}
 
-double GUIProgressReporter::total_seconds()
-{
-    return total_seconds_;
-}
-
-double GUIProgressReporter::last_stage_seconds()
-{
-    return last_stage_seconds_;
 }
 
 agz::tracer::Image2D<agz::tracer::Spectrum> GUIProgressReporter::get_preview_image()

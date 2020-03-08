@@ -39,6 +39,8 @@ public:
 
     virtual void load_asset(AssetLoader &loader) = 0;
 
+    virtual std::shared_ptr<tracer::ConfigGroup> to_config() const = 0;
+
 signals:
 
     void change_transform();
@@ -61,6 +63,8 @@ public:
     void save_asset(AssetSaver &saver) const;
 
     void load_asset(AssetLoader &loader);
+
+    std::shared_ptr<tracer::ConfigArray> to_config() const;
 
 signals:
 

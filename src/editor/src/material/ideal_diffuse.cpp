@@ -68,6 +68,19 @@ void IdealDiffuseWidget::load_asset(AssetLoader &loader)
     do_update_tracer_object();
 }
 
+std::shared_ptr<tracer::ConfigNode> IdealDiffuseWidget::to_config(JSONExportContext &ctx) const
+{
+    auto grp = std::make_shared<tracer::ConfigGroup>();
+    grp->insert_str("type", "ideal_diffuse");
+
+    grp->insert_child("albedo", albedo_->to_config(ctx));
+
+    if(normal_map_->is_enabled())
+        grp->insert_child("normal_map", normal_map_->to_config(ctx));
+
+    return grp;
+}
+
 void IdealDiffuseWidget::update_tracer_object_impl()
 {
     do_update_tracer_object();

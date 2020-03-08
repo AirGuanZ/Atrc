@@ -125,6 +125,21 @@ void HeterogeneousWidget::load_asset(AssetLoader &loader)
     do_update_tracer_object();
 }
 
+std::shared_ptr<tracer::ConfigNode> HeterogeneousWidget::to_config(JSONExportContext &ctx) const
+{
+    auto grp = std::make_shared<tracer::ConfigGroup>();
+    grp->insert_str("type", "heterogeneous");
+
+    grp->insert_child("transform", transform_->to_config());
+    grp->insert_child("density", density_->to_config(ctx));
+    grp->insert_child("albedo", albedo_->to_config(ctx));
+    grp->insert_child("g", g_->to_config(ctx));
+
+    grp->insert_int("max_scattering_count", max_scattering_count_->value());
+
+    return grp;
+}
+
 void HeterogeneousWidget::update_tracer_object_impl()
 {
     do_update_tracer_object();

@@ -1,7 +1,11 @@
+#include <fstream>
+
 #include <QFileDialog>
 #include <QMessageBox>
 
+#include <agz/editor/imexport/json_export_context.h>
 #include <agz/editor/texture3d/gray_grid3d.h>
+#include <agz/factory/factory.h>
 
 AGZ_EDITOR_BEGIN
 
@@ -39,7 +43,7 @@ void GrayGrid3DWidget::do_update_tracer_object()
         return;
     }
 
-    tracer_object_ = create_gray_grid_point3d(common_params, *img_data_);
+    tracer_object_ = create_gray_grid_point3d(common_params, img_data_);
 }
 
 void GrayGrid3DWidget::init_ui(const InitData &clone_state)
@@ -124,6 +128,31 @@ void GrayGrid3DWidget::load_asset(AssetLoader &loader)
     adv_widget_->load_asset(loader);
 
     do_update_tracer_object();
+}
+
+std::shared_ptr<tracer::ConfigNode> GrayGrid3DWidget::to_config(JSONExportContext &ctx) const
+{
+    auto grp = std::make_shared<tracer::ConfigGroup>();
+
+    if(!img_data_)
+    {
+        grp->insert_str("type", "constant");
+        grp->insert_child("texel", tracer::ConfigArray::from_spectrum(Spectrum(real(0.5))));
+        return grp;
+    }
+
+    grp->insert_str("type", "gray_grid");
+
+    auto [ref_filename, filename] = ctx.gen_filename(".gray_grid");
+
+    tracer::texture3d_load::save_gray_to_binary(
+        filename, { img_data_->width(), img_data_->height(), img_data_->depth() }, img_data_->raw_data());
+
+    grp->insert_str("binary_filename", ref_filename);
+
+    adv_widget_->to_config(*grp);
+
+    return grp;
 }
 
 void GrayGrid3DWidget::browse_filename()

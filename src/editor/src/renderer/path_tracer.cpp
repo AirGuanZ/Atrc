@@ -4,7 +4,7 @@ AGZ_EDITOR_BEGIN
 
 PathTracer::PathTracer(const Params &params, int fb_width, int fb_height, std::shared_ptr<const tracer::Scene> scene)
     : PerPixelRenderer(
-        params.worker_count, params.task_grid_size, 2,
+        params.worker_count, params.task_grid_size, 3,
         fb_width, fb_height, params.enable_preview, 128, 32, scene)
 {
     trace_params_.min_depth = params.min_depth;

@@ -18,6 +18,13 @@ std::unique_ptr<ResourceThumbnailProvider> InvisibleSurfaceWidget::get_thumbnail
     return std::make_unique<MaterialThumbnailProvider>(width, height, tracer_object_);
 }
 
+std::shared_ptr<tracer::ConfigNode> InvisibleSurfaceWidget::to_config(JSONExportContext &ctx) const
+{
+    auto grp = std::make_shared<tracer::ConfigGroup>();
+    grp->insert_str("type", "invisible_surface");
+    return grp;
+}
+
 void InvisibleSurfaceWidget::update_tracer_object_impl()
 {
     do_update_tracer_object();

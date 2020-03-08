@@ -2,10 +2,10 @@
 #include <mutex>
 #include <thread>
 
-#include <agz/tracer/core/reporter.h>
+#include <agz/tracer/core/renderer_interactor.h>
 #include <agz/tracer/core/renderer.h>
 #include <agz/tracer/core/scene.h>
-#include <agz/tracer/factory/raw/renderer.h>
+#include <agz/tracer/create/renderer.h>
 #include <agz/tracer/render/bidir_path_tracing.h>
 #include <agz/utility/thread.h>
 
@@ -17,7 +17,7 @@ public:
 
     explicit BDPTRenderer(const BDPTRendererParams &params);
 
-    RenderTarget render(FilmFilterApplier filter, Scene &scene, ProgressReporter &reporter) override;
+    RenderTarget render(FilmFilterApplier filter, Scene &scene, RendererInteractor &reporter) override;
 
 private:
 
@@ -31,12 +31,12 @@ private:
         FilmGrid     &film_grid;
         ParticleFilm &particle_film;
         const Vec2   &full_res;
-        render::BDPTVertex       *cam_subpath_space = nullptr;
-        render::BDPTVertex       *lht_subpath_space = nullptr;
+        render::BDPTVertex *cam_subpath_space = nullptr;
+        render::BDPTVertex *lht_subpath_space = nullptr;
     };
 
     template<bool REPORTER_WITH_PREVIEW>
-    RenderTarget render_impl(FilmFilterApplier filter, Scene &scene, ProgressReporter &reporter);
+    RenderTarget render_impl(FilmFilterApplier filter, Scene &scene, RendererInteractor &reporter);
 
     int render_grid(
         const Scene &scene, Sampler &sampler, FilmGrid &film_grid, ParticleFilm &particle_film, const Vec2i &full_res);
@@ -56,7 +56,7 @@ BDPTRenderer::BDPTRenderer(const BDPTRendererParams &params)
     algo_params_.use_mis = params_.use_mis;
 }
 
-RenderTarget BDPTRenderer::render(FilmFilterApplier filter, Scene &scene, ProgressReporter &reporter)
+RenderTarget BDPTRenderer::render(FilmFilterApplier filter, Scene &scene, RendererInteractor &reporter)
 {
     if(reporter.need_image_preview())
         return render_impl<true>(filter, scene, reporter);
@@ -64,7 +64,7 @@ RenderTarget BDPTRenderer::render(FilmFilterApplier filter, Scene &scene, Progre
 }
 
 template<bool REPORTER_WITH_PREVIEW>
-RenderTarget BDPTRenderer::render_impl(FilmFilterApplier filter, Scene &scene, ProgressReporter &reporter)
+RenderTarget BDPTRenderer::render_impl(FilmFilterApplier filter, Scene &scene, RendererInteractor &reporter)
 {
     reporter.begin();
     reporter.new_stage();
@@ -206,9 +206,11 @@ RenderTarget BDPTRenderer::render_impl(FilmFilterApplier filter, Scene &scene, P
     threads.reserve(worker_count);
     particle_images.resize(worker_count, Image2D<Spectrum>(height, width));
 
+    auto sampler_prototype = std::make_shared<Sampler>(42, false);
+
     for(int i = 0; i < worker_count; ++i)
     {
-        Sampler *sampler = params_.sampler_prototype->clone(i, sampler_arena);
+        Sampler *sampler = sampler_prototype->clone(i, sampler_arena);
         threads.emplace_back(render_func, sampler, &particle_images[i], i);
     }
 
@@ -261,8 +263,7 @@ int BDPTRenderer::render_grid(const Scene &scene, Sampler &sampler, FilmGrid &fi
     {
         for(int px = sample_pixels.low.x; px <= sample_pixels.high.x; ++px)
         {
-            sampler.start_pixel(px, py);
-            do
+            for(int i = 0; i < params_.spp; ++i)
             {
                 ++particle_count;
                 eval_sample(px, py, grid_params, arena);
@@ -272,8 +273,7 @@ int BDPTRenderer::render_grid(const Scene &scene, Sampler &sampler, FilmGrid &fi
 
                 if(stop_rendering_)
                     return particle_count;
-
-            } while(sampler.next_sample());
+            }
         }
     }
 

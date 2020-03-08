@@ -57,8 +57,6 @@ uint64_t BDPTRenderer::exec_render_task(
     {
         for(int px = sam_bound.low.x; px <= sam_bound.high.x; ++px)
         {
-            sampler.start_pixel(px, py);
-
             for(int s = 0; s < task.spp; ++s)
             {
                 if(stop_rendering_)

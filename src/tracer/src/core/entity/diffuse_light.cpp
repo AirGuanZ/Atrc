@@ -2,7 +2,7 @@
 #include <agz/tracer/core/geometry.h>
 #include <agz/tracer/core/light.h>
 #include <agz/tracer/core/medium.h>
-#include <agz/tracer/factory/raw/material.h>
+#include <agz/tracer/create/material.h>
 
 AGZ_TRACER_BEGIN
 

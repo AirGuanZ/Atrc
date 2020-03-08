@@ -38,6 +38,8 @@ public:
 
     QWidget *get_name_widget();
 
+    std::shared_ptr<tracer::ConfigNode> to_config() const;
+
     std::vector<Vertex> get_vertices() const override;
 
     DirectTransform get_transform() const override;
@@ -100,6 +102,10 @@ public:
 
     void load_asset(ResourcePool<TracerObject> &pool, AssetLoader &loader);
 
+    std::shared_ptr<tracer::ConfigNode> to_config(JSONExportContext &ctx) const;
+
+    std::shared_ptr<tracer::ConfigArray> get_config_ref_name() const;
+
     std::vector<Vertex> get_vertices() const override;
 
     DirectTransform get_transform() const override;
@@ -115,6 +121,7 @@ private:
     std::function<void()> dirty_callback_;
 
     QString name_;
+    std::string str_ptr_;
 
     std::set<ResourceReference<TracerObject>*> references_;
 
@@ -139,6 +146,8 @@ public:
     virtual void save_asset(AssetSaver &saver) const = 0;
 
     virtual void load_asset(AssetLoader &loader) = 0;
+
+    virtual void to_config(tracer::ConfigGroup &scene_grp, JSONExportContext &ctx) const = 0;
 
     virtual ResourceInPool<TracerObject> *name_to_rsc(const QString &name) = 0;
 

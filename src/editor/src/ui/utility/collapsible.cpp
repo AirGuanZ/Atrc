@@ -33,10 +33,9 @@ void Collapsible::set_content_widget(QWidget *widget)
     content_ = widget;
     layout_->addWidget(content_);
 
-    int cm_left, cm_right, cm_top, cm_bottom;
-    content_->getContentsMargins(&cm_left, &cm_top, &cm_right, &cm_bottom);
+    const auto cm = content_->contentsMargins();
     content_->setContentsMargins(
-        (std::max)(cm_left, toggle_button_->iconSize().width() + 5), cm_top, cm_right, cm_bottom);
+        (std::max)(cm.left(), toggle_button_->iconSize().width() + 5), cm.top(), cm.right(), cm.bottom());
 
     content_->hide();
 }

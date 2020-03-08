@@ -191,6 +191,35 @@ void NameResourcePool<TracerObject>::load_asset(AssetLoader &loader)
 }
 
 template<typename TracerObject>
+void NameResourcePool<TracerObject>::to_config(tracer::ConfigGroup &scene_grp, JSONExportContext &ctx) const
+{
+    for(auto &p : name2record_)
+    {
+        auto rsc = p.second->rsc.get();
+        auto ref_name = rsc->get_config_ref_name();
+
+        tracer::ConfigGroup *grp = &scene_grp;
+        for(size_t i = 0; i < ref_name->size() - 1; ++i)
+        {
+            auto sub_grp = grp->find_child_group(ref_name->at_str(i));
+            if(sub_grp)
+            {
+                grp = sub_grp;
+                continue;
+            }
+
+            auto new_grp = std::make_shared<tracer::ConfigGroup>();
+            grp->insert_child(ref_name->at_str(i), new_grp);
+            grp = new_grp.get();
+        }
+
+        auto rsc_grp = rsc->to_config(ctx);
+        assert(rsc_grp);
+        grp->insert_child(ref_name->at_str(ref_name->size() - 1), rsc_grp);
+    }
+}
+
+template<typename TracerObject>
 ResourceInPool<TracerObject> *NameResourcePool<TracerObject>::name_to_rsc(const QString &name)
 {
     auto it = name2record_.find(name);

@@ -4,6 +4,7 @@
 
 #include <agz/editor/imexport/model_importer.h>
 #include <agz/editor/scene/scene_mgr.h>
+#include <agz/utility/string.h>
 
 AGZ_EDITOR_BEGIN
 
@@ -35,8 +36,6 @@ ModelImporter::ModelImporter(QWidget *parent, SceneManager *scene_mgr)
     up_dir_             = new QComboBox(this);
     front_dir_          = new QComboBox(this);
     to_unit_cube_       = new QCheckBox("To Unit Cube", this);
-    browse_filename_    = new QPushButton("Browse", this);
-    filename_displayer_ = new ElidedLabel("", this);
     ok_                 = new QPushButton("Ok", this);
     cancel_             = new QPushButton("Cancel", this);
 
@@ -74,25 +73,21 @@ ModelImporter::ModelImporter(QWidget *parent, SceneManager *scene_mgr)
         }
     });
 
-    connect(browse_filename_, &QPushButton::clicked, [=]
-    {
-        const QString filename = QFileDialog::getOpenFileName(this, "Select Obj");
-        filename_displayer_->setText(filename);
-        filename_displayer_->setToolTip(filename);
-    });
-
-    connect(cancel_, &QPushButton::clicked, [=]
-    {
-        filename_displayer_->setText("");
-        close();
-    });
-
     connect(ok_, &QPushButton::clicked, [=]
     {
         std::vector<mesh::mesh_t> meshes;
         try
         {
-            meshes = load_meshes_from(filename_displayer_->text().toStdString());
+            const auto filenames = QFileDialog::getOpenFileNames(this);
+            if(filenames.isEmpty())
+                return;
+
+            for(auto &f : filenames)
+            {
+                auto ms = load_meshes_from(f.toStdString());
+                for(auto &m : ms)
+                    meshes.push_back(std::move(m));
+            }
 
             const int to_pz = str_to_axis(up_dir_->currentText());
             const int to_px = str_to_axis(front_dir_->currentText());
@@ -108,7 +103,6 @@ ModelImporter::ModelImporter(QWidget *parent, SceneManager *scene_mgr)
             return;
         }
 
-        filename_displayer_->setText("");
         scene_mgr_->add_meshes(meshes);
         close();
     });
@@ -116,10 +110,7 @@ ModelImporter::ModelImporter(QWidget *parent, SceneManager *scene_mgr)
     QGridLayout *layout = new QGridLayout(this);
     int layout_row = 0;
 
-    layout->addWidget(browse_filename_, layout_row, 0, 1, 1);
-    layout->addWidget(filename_displayer_, layout_row, 1, 1, 2);
-
-    ++layout_row;
+    //++layout_row;
     layout->addWidget(new QLabel("Up Dir", this), layout_row, 0, 1, 1);
     layout->addWidget(up_dir_, layout_row, 1, 1, 2);
 

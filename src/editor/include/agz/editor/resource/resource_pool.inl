@@ -56,6 +56,16 @@ QWidget *ResourceReference<TracerObject>::get_name_widget()
 }
 
 template<typename TracerObject>
+std::shared_ptr<tracer::ConfigNode> ResourceReference<TracerObject>::to_config() const
+{
+    auto grp = std::make_shared<tracer::ConfigGroup>();
+    auto name = rsc_in_pool_->get_config_ref_name();
+    grp->insert_str("type", "reference");
+    grp->insert_child("name", name);
+    return grp;
+}
+
+template<typename TracerObject>
 std::vector<EntityInterface::Vertex> ResourceReference<TracerObject>::get_vertices() const
 {
     return rsc_in_pool_->get_vertices();
@@ -119,6 +129,9 @@ ResourceInPool<TracerObject>::ResourceInPool(const QString &name, std::unique_pt
         for(auto ref : references_)
             ref->set_entity_transform_dirty();
     });
+
+    size_t my_ptr = reinterpret_cast<size_t>(this);
+    str_ptr_ = std::to_string(my_ptr);
 }
 
 template<typename TracerObject>
@@ -147,6 +160,9 @@ ResourceInPool<TracerObject>::ResourceInPool(
         for(auto ref : references_)
             ref->set_entity_transform_dirty();
     });
+
+    size_t my_ptr = reinterpret_cast<size_t>(this);
+    str_ptr_ = std::to_string(my_ptr);
 }
 
 template<typename TracerObject>
@@ -246,6 +262,25 @@ void ResourceInPool<TracerObject>::load_asset(ResourcePool<TracerObject> &pool, 
     }
 
     panel_->load_asset(loader);
+}
+
+template<typename TracerObject>
+std::shared_ptr<tracer::ConfigNode> ResourceInPool<TracerObject>::to_config(JSONExportContext &ctx) const
+{
+    return panel_->to_config(ctx);
+}
+
+template<typename TracerObject>
+std::shared_ptr<tracer::ConfigArray> ResourceInPool<TracerObject>::get_config_ref_name() const
+{
+    auto arr = std::make_shared<tracer::ConfigArray>();
+
+    arr->push_back_str("pool");
+    arr->push_back_str(
+        typeid(TracerObject).name() + std::string(".") +
+        name_.toStdString() + "." + str_ptr_);
+
+    return arr;
 }
 
 template<typename TracerObject>

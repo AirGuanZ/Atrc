@@ -1,39 +1,65 @@
 ﻿#pragma once
 
+#include <chrono>
+#include <random>
+
 #include <agz/tracer/common.h>
 
 AGZ_TRACER_BEGIN
 
-/**
- * @brief rng sampler interface
- */
-class Sampler
+class Sampler : public misc::uncopyable_t
 {
+    using rng_t = std::minstd_rand;
+    using seed_t = rng_t::result_type;
+
+    seed_t seed_;
+    rng_t rng_;
+    std::uniform_real_distribution<real> dis_;
+
 public:
 
-    virtual ~Sampler() = default;
+    Sampler(int seed, bool use_time_seed);
 
     /**
      * @brief combine the new seed with internal seed to create a new sampler instance
      */
-    virtual Sampler *clone(int seed, Arena &arena) const = 0;
+    Sampler *clone(int seed, Arena &arena) const;
 
-    virtual Sample1 sample1() noexcept = 0;
-
-    virtual Sample2 sample2() noexcept;
-    virtual Sample3 sample3() noexcept;
-    virtual Sample4 sample4() noexcept;
-    virtual Sample5 sample5() noexcept;
-
-    template<int N>
-    SampleN<N> SampleN() noexcept;
-
-    virtual void start_pixel(int x, int y) = 0;
-
-    virtual bool next_sample() = 0;
-
-    virtual int get_sample_count() const noexcept = 0;
+    Sample1 sample1() noexcept;
+    Sample2 sample2() noexcept;
+    Sample3 sample3() noexcept;
+    Sample4 sample4() noexcept;
+    Sample5 sample5() noexcept;
 };
+
+inline Sampler::Sampler(int seed, bool use_time_seed)
+    : rng_(seed)
+{
+    if(use_time_seed)
+    {
+        seed_ = static_cast<seed_t>(
+            std::chrono::high_resolution_clock::now().time_since_epoch().count());
+    }
+    else
+        seed_ = static_cast<seed_t>(seed);
+
+    rng_ = rng_t(seed_);
+}
+
+inline Sampler *Sampler::clone(int seed, Arena &arena) const
+{
+    seed_t new_seed;
+    {
+        std::seed_seq seed_gen = { seed_, seed_t(seed) };
+        seed_gen.generate(&new_seed, &new_seed + 1);
+    }
+    return arena.create<Sampler>(new_seed, false);
+}
+
+inline Sample1 Sampler::sample1() noexcept
+{
+    return { dis_(rng_) };
+}
 
 inline Sample2 Sampler::sample2() noexcept
 {
@@ -67,15 +93,6 @@ inline Sample5 Sampler::sample5() noexcept
     const real r = sample1().u;
     const real s = sample1().u;
     return { u, v, w, r, s };
-}
-
-template<int N>
-SampleN<N> Sampler::SampleN() noexcept
-{
-    tracer::SampleN<N> ret;
-    for(int i = 0; i < N; ++i)
-        ret.u[i] = sample1().u;
-    return ret;
 }
 
 AGZ_TRACER_END

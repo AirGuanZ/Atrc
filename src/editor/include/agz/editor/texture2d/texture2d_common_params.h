@@ -4,6 +4,7 @@
 #include <QComboBox>
 
 #include <agz/editor/ui/transform2d_widget.h>
+#include <agz/editor/ui/utility/combobox_without_wheel.h>
 
 AGZ_EDITOR_BEGIN
 
@@ -41,6 +42,8 @@ public:
 
     void load_asset(AssetLoader &loader);
 
+    void to_config(tracer::ConfigGroup &grp)  const;
+
 signals:
 
     void change_params();
@@ -58,8 +61,8 @@ private:
 
     Transform2DWidget *transform_ = nullptr;
 
-    QComboBox *wrap_u_ = nullptr;
-    QComboBox *wrap_v_ = nullptr;
+    ComboBoxWithoutWheelFocus *wrap_u_ = nullptr;
+    ComboBoxWithoutWheelFocus *wrap_v_ = nullptr;
 };
 
 AGZ_EDITOR_END

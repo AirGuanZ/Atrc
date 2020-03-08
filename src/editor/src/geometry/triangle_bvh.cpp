@@ -1,7 +1,10 @@
+#include <fstream>
+
 #include <QFileDialog>
 #include <QMessageBox>
 
 #include <agz/editor/geometry/triangle_bvh.h>
+#include <agz/editor/imexport/json_export_context.h>
 #include <agz/editor/ui/utility/elided_label.h>
 
 AGZ_EDITOR_BEGIN
@@ -73,6 +76,44 @@ void TriangleBVHWidget::load_asset(AssetLoader &loader)
     loader.read_raw(vertices_->data(), sizeof(Vertex) * vertices_->size());
 
     do_update_tracer_object();
+}
+
+std::shared_ptr<tracer::ConfigNode> TriangleBVHWidget::to_config(JSONExportContext &ctx) const
+{
+    auto grp = std::make_shared<tracer::ConfigGroup>();
+    grp->insert_str("type", "triangle_bvh");
+    grp->insert_child("transform", std::make_shared<tracer::ConfigArray>());
+
+    const auto [ref_filename, filename] = ctx.gen_filename(".obj");
+    std::ofstream fout(filename, std::ios::out | std::ios::trunc);
+    if(!fout)
+        throw std::runtime_error("failed to open file: " + filename);
+
+    auto add_vtx = [&](const mesh::vertex_t &v)
+    {
+        fout << "v " << v.position.x << " " << v.position.y << " " << v.position.z << std::endl;
+        fout << "vn " << v.normal.x << " " << v.normal.y << " " << v.normal.z << std::endl;
+        fout << "vt " << v.tex_coord.x << " " << v.tex_coord.y << std::endl;
+    };
+
+    for(size_t i = 0; i < vertices_->size(); i += 3)
+    {
+        add_vtx((*vertices_)[i + 0]);
+        add_vtx((*vertices_)[i + 1]);
+        add_vtx((*vertices_)[i + 2]);
+
+        const auto istr0 = std::to_string(i + 1);
+        const auto istr1 = std::to_string(i + 2);
+        const auto istr2 = std::to_string(i + 3);
+
+        fout << "f " << istr0 << "/" << istr0 << "/" << istr0 << " "
+                     << istr1 << "/" << istr1 << "/" << istr1 << " "
+                     << istr2 << "/" << istr2 << "/" << istr2 << std::endl;
+    }
+
+    grp->insert_str("filename", ref_filename);
+
+    return grp;
 }
 
 std::vector<EntityInterface::Vertex> TriangleBVHWidget::get_vertices() const

@@ -15,6 +15,8 @@ struct DirectTransform
     static Mat3 from_euler_zyx(const Vec3 &rad) noexcept;
 
     Mat4 compose() const noexcept;
+
+    std::shared_ptr<tracer::ConfigArray> to_config() const;
 };
 
 AGZ_EDITOR_END

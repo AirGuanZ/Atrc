@@ -66,4 +66,14 @@ std::unique_ptr<tracer::NormalMapper> NormalMapWidget::get_tracer_object() const
     return std::make_unique<tracer::NormalMapper>(nullptr);
 }
 
+bool NormalMapWidget::is_enabled() const noexcept
+{
+    return apply_normal_map_->isChecked();
+}
+
+std::shared_ptr<tracer::ConfigNode> NormalMapWidget::to_config(JSONExportContext &ctx) const
+{
+    return normal_map_->to_config(ctx);
+}
+
 AGZ_EDITOR_END

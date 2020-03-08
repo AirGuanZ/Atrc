@@ -59,6 +59,11 @@ public:
     const ConfigArray *find_child_array(const std::string &name) const;
     const ConfigValue *find_child_value(const std::string &name) const;
 
+    ConfigNode  *find_child(const std::string &name);
+    ConfigGroup *find_child_group(const std::string &name);
+    ConfigArray *find_child_array(const std::string &name);
+    ConfigValue *find_child_value(const std::string &name);
+
     ConfigNode  &child      (const std::string &name);
     ConfigGroup &child_group(const std::string &name);
     ConfigArray &child_array(const std::string &name);
@@ -97,6 +102,11 @@ public:
     std::string        child_str_or(const std::string &name, const std::string &default_val) const;
 
     void insert_child(const std::string &name, std::shared_ptr<ConfigNode> child);
+
+    void insert_real(const std::string &name, real value);
+    void insert_int (const std::string &name, int value);
+    void insert_str (const std::string &name, const std::string &str);
+    void insert_bool(const std::string &name, bool value);
 
     auto begin() { return group_.begin(); }
     auto end()   { return group_.end();   }
@@ -148,6 +158,18 @@ public:
     const std::string &at_str(size_t idx) const;
 
     void push_back(std::shared_ptr<ConfigNode> elem);
+    
+    void push_back_real(real value);
+    void push_back_int (int value);
+    void push_back_str (const std::string &str);
+    void push_back_bool(bool value);
+
+    static std::shared_ptr<ConfigArray> from_vec2(const Vec2 &v);
+    static std::shared_ptr<ConfigArray> from_vec3(const Vec3 &v);
+    static std::shared_ptr<ConfigArray> from_vec4(const Vec4 &v);
+    static std::shared_ptr<ConfigArray> from_vec2i(const Vec2i &v);
+    static std::shared_ptr<ConfigArray> from_vec3i(const Vec3i &v);
+    static std::shared_ptr<ConfigArray> from_spectrum(const Spectrum &v);
 };
 
 class ConfigValue : public ConfigNode

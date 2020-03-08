@@ -5,6 +5,7 @@
 #include <agz/editor/editor.h>
 #include <agz/editor/imexport/asset_load_dialog.h>
 #include <agz/editor/imexport/asset_save_dialog.h>
+#include <agz/editor/imexport/json_export_dialog.h>
 #include <agz/editor/renderer/renderer_widget.h>
 #include <agz/editor/ui/global_setting_widget.h>
 #include <agz/editor/ui/log_widget.h>
@@ -63,7 +64,7 @@ Editor::Editor()
     scene_params_.envir_light = envir_light_slot_->get_tracer_object();
     scene_params_.aggregate = scene_mgr_->update_tracer_aggregate(scene_params_.entities);
     scene_ = create_default_scene(scene_params_);
-    scene_->set_camera(displayer_->create_camera());
+    scene_->set_camera(preview_window_->create_camera());
 
     AGZ_INFO("launch renderer");
 
@@ -90,7 +91,7 @@ void Editor::on_change_camera()
     destroy_renderer_thread.detach();
     
     scene_ = create_default_scene(scene_params_);
-    auto camera = displayer_->create_camera();
+    auto camera = preview_window_->create_camera();
     scene_->set_camera(camera);
 
     launch_renderer(true);
@@ -219,13 +220,12 @@ void Editor::init_log_widget()
 
 void Editor::init_displayer()
 {
-    displayer_ = new Displayer(up_panel_, this);
-    connect(displayer_, &Displayer::need_to_recreate_camera, [=] { on_change_camera(); });
-
+    preview_window_ = new PreviewWindow(up_panel_, this);
+    
     QVBoxLayout *up_panel_layout = new QVBoxLayout(up_panel_);
-    up_panel_layout->addWidget(displayer_);
+    up_panel_layout->addWidget(preview_window_);
 
-    connect(displayer_->get_gl_widget(), &DisplayerGLWidget::switch_render_mode, [=]
+    connect(preview_window_, &PreviewWindow::edit_render_mode, [=]
     {
         renderer_.reset();
         launch_renderer(true);
@@ -259,7 +259,7 @@ void Editor::init_obj_context()
 
 void Editor::init_scene_mgr()
 {
-    scene_mgr_ = std::make_unique<SceneManager>(*obj_ctx_, this, displayer_);
+    scene_mgr_ = std::make_unique<SceneManager>(*obj_ctx_, this, preview_window_);
     left_panel_->up_panel_layout->addWidget(scene_mgr_->get_widget());
 
     connect(scene_mgr_.get(), &SceneManager::change_scene, [=]
@@ -280,7 +280,7 @@ void Editor::init_renderer_panel()
 
     // camera
 
-    right_panel_->camera_tab_layout->addWidget(displayer_->get_camera_panel());
+    right_panel_->camera_tab_layout->addWidget(preview_window_->get_camera_panel());
 
     // environment light
 
@@ -301,17 +301,6 @@ void Editor::init_global_setting_widget()
     action->setDefaultWidget(global_setting_);
     menuBar()->addMenu("Global Settings")->addAction(action);
 
-    connect(global_setting_->camera_rotate_speed, &QSlider::valueChanged,
-        [=](int v)
-    {
-        const real speed = real(0.001) * v / 10;
-        global_setting_->display_camera_rotate_speed->setText(QString::number(100 * speed, 'g', 2));
-        displayer_->set_camera_rotate_speed(speed);
-    });
-
-    global_setting_->camera_rotate_speed->setRange(1, 100);
-    global_setting_->camera_rotate_speed->setValue(40);
-
     global_setting_->scene_eps->setValue(tracer::EPS);
     connect(global_setting_->scene_eps, qOverload<double>(&QDoubleSpinBox::valueChanged),
         [=](double new_eps)
@@ -324,15 +313,21 @@ void Editor::init_global_setting_widget()
 
 void Editor::init_save_asset_dialog()
 {
-    asset_load_dialog_ = std::make_unique<AssetLoadDialog>(
-        scene_mgr_.get(), obj_ctx_.get(), envir_light_slot_);
     QAction *load_action = new QAction("Load", this);
     menuBar()->addAction(load_action);
     connect(load_action, &QAction::triggered, [=]
     {
+        if(!asset_load_dialog_)
+        {
+            asset_load_dialog_ = std::make_unique<AssetLoadDialog>(
+                scene_mgr_.get(), obj_ctx_.get(), envir_light_slot_, global_setting_, preview_window_);
+        }
+
         asset_load_dialog_->exec();
         if(!asset_load_dialog_->is_ok_clicked())
             return;
+
+        tracer::set_eps(real(global_setting_->scene_eps->value()));
 
         renderer_.reset();
 
@@ -340,23 +335,42 @@ void Editor::init_save_asset_dialog()
         scene_params_.aggregate = scene_mgr_->update_tracer_aggregate(scene_params_.entities);
 
         scene_ = create_default_scene(scene_params_);
-        scene_->set_camera(displayer_->create_camera());
+        scene_->set_camera(preview_window_->create_camera());
 
         launch_renderer(true);
     });
 
-    asset_save_dialog_ = std::make_unique<AssetSaveDialog>(
-        scene_mgr_.get(), obj_ctx_.get(), envir_light_slot_);
     QAction *save_action = new QAction("Save", this);
     menuBar()->addAction(save_action);
-    connect(save_action, &QAction::triggered, asset_save_dialog_.get(), &AssetSaveDialog::exec);
+    connect(save_action, &QAction::triggered, [=]
+    {
+        if(!asset_save_dialog_)
+        {
+            asset_save_dialog_ = std::make_unique<AssetSaveDialog>(
+                scene_mgr_.get(), obj_ctx_.get(), envir_light_slot_, global_setting_, preview_window_);
+        }
+        asset_save_dialog_->exec();
+    });
+
+    QAction *export_json_action = new QAction("Export JSON", this);
+    menuBar()->addAction(export_json_action);
+    connect(export_json_action, &QAction::triggered, [=]
+    {
+        export_json(
+            scene_mgr_.get(),
+            obj_ctx_.get(),
+            envir_light_slot_,
+            preview_window_,
+            global_setting_,
+            renderer_panel_);
+    });
 }
 
 void Editor::redistribute_panels()
 {
-    const int ver_init_height = (std::max)(displayer_->minimumSizeHint().height(),
+    const int ver_init_height = (std::max)(preview_window_->minimumSizeHint().height(),
                                      down_panel_->minimumSizeHint().height());
-    vert_splitter_->setSizes(QList<int>({ 2 * ver_init_height, ver_init_height }));
+    vert_splitter_->setSizes(QList<int>({ 3 * ver_init_height, ver_init_height }));
 
     const int hor_init_width = math::max3(left_panel_->minimumSizeHint().width(),
                                           right_panel_->minimumSizeHint().width(),
@@ -364,99 +378,23 @@ void Editor::redistribute_panels()
     hori_splitter_->setSizes(QList<int>({ hor_init_width, 2 * hor_init_width, hor_init_width }));
 }
 
-void Editor::load_config(const std::string &input_filename)
-{
-    using namespace tracer;
-
-    renderer_.reset();
-
-    AGZ_INFO("load JSON config from {}", input_filename);
-
-    factory::BasicPathMapper path_mapper;
-    {
-        const auto working_dir = absolute(
-            std::filesystem::current_path()).lexically_normal().string();
-        path_mapper.add_replacer(WORKING_DIR_PATH_NAME, working_dir);
-
-        const auto scene_dir = absolute(
-            std::filesystem::path(input_filename)).parent_path().lexically_normal().string();
-        path_mapper.add_replacer(SCENE_DESC_PATH_NAME, scene_dir);
-    }
-
-    const std::string input_content = file::read_txt_file(input_filename);
-    const ConfigGroup root_params = json_to_config(string_to_json(input_content));
-
-    const ConfigGroup &scene_config = root_params.child_group("scene");
-
-    factory::CreatingContext context;
-    context.path_mapper = &path_mapper;
-    context.reference_root = &scene_config;
-    
-    displayer_->load_camera_from_config(root_params.child_group("rendering").child_group("camera"));
-    auto camera = displayer_->create_camera();
-
-    {
-        scene_params_ = DefaultSceneParams();
-
-        if(auto ent_arr = scene_config.find_child_array("entities"))
-        {
-            if(ent_arr->size() == 1)
-                AGZ_INFO("creating 1 entity");
-            else
-                AGZ_INFO("creating {} entities", ent_arr->size());
-
-            for(size_t i = 0; i < ent_arr->size(); ++i)
-            {
-                auto &group = ent_arr->at_group(i);
-                if(stdstr::ends_with(group.child_str("type"), "//"))
-                {
-                    AGZ_INFO("skip entity with type ending with //");
-                    continue;
-                }
-
-                auto ent = context.create<Entity>(group);
-                scene_params_.entities.push_back(ent);
-            }
-        }
-
-        if(auto group = scene_config.find_child_group("env"))
-            scene_params_.envir_light = context.create<EnvirLight>(*group);
-
-        if(auto group = scene_config.find_child_group("aggregate"))
-            scene_params_.aggregate = context.create<Aggregate>(*group);
-        else
-            scene_params_.aggregate = create_native_aggregate();
-
-        std::vector<std::shared_ptr<const Entity>> const_entities;
-        const_entities.reserve(scene_params_.entities.size());
-        for(auto ent : scene_params_.entities)
-            const_entities.push_back(ent);
-        scene_params_.aggregate->build(const_entities);
-    }
-
-    scene_ = create_default_scene(scene_params_);
-    scene_->set_camera(camera);
-
-    launch_renderer(true);
-}
-
 void Editor::set_display_image(const Image2D<Spectrum> &img)
 {
-    displayer_->set_display_image(img);
+    preview_window_->set_preview_image(img);
 }
 
 void Editor::launch_renderer(bool enable_preview)
 {
     update_display_timer_->stop();
 
-    if(displayer_->is_in_realtime_mode())
+    if(preview_window_->is_in_realtime_mode())
     {
         renderer_.reset();
         return;
     }
 
-    const int film_width  = displayer_->size().width();
-    const int film_height = displayer_->size().height();
+    const int film_width  = preview_window_->width();
+    const int film_height = preview_window_->height();
 
     if(film_width == 0 || film_height == 0)
     {

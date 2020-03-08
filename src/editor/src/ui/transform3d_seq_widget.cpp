@@ -79,6 +79,18 @@ namespace
             offset_edit_->setText(loader.read_string());
         }
 
+        std::shared_ptr<tracer::ConfigGroup> to_config() const override
+        {
+            real x, y, z;
+            QString line = offset_edit_->text();
+            QTextStream(&line) >> x >> y >> z;
+
+            auto grp = std::make_shared<tracer::ConfigGroup>();
+            grp->insert_str("type", "translate");
+            grp->insert_child("offset", tracer::ConfigArray::from_vec3({ x, y, z }));
+            return grp;
+        }
+
     private:
 
         QLineEdit *offset_edit_;
@@ -164,6 +176,18 @@ namespace
             axis_->set_value(loader.read<Vec3>());
         }
 
+        std::shared_ptr<tracer::ConfigGroup> to_config() const override
+        {
+            const real deg = deg_edit_->text().toFloat();
+            const Vec3 axis = axis_->get_value();
+
+            auto grp = std::make_shared<tracer::ConfigGroup>();
+            grp->insert_str("type", "rotate");
+            grp->insert_child("axis", tracer::ConfigArray::from_vec3(axis));
+            grp->insert_real("deg", deg);
+            return grp;
+        }
+
     private:
 
         QLineEdit *deg_edit_;
@@ -247,6 +271,22 @@ namespace
             deg_->set_value(loader.read<real>());
         }
 
+        std::shared_ptr<tracer::ConfigGroup> to_config() const override
+        {
+            auto grp = std::make_shared<tracer::ConfigGroup>();
+
+            if constexpr(Axis == 0)
+                grp->insert_str("type", "rotate_x");
+            else if constexpr(Axis == 1)
+                grp->insert_str("type", "rotate_y");
+            else
+                grp->insert_str("type", "rotate_z");
+
+            grp->insert_real("deg", deg_->get_value());
+
+            return grp;
+        }
+
     private:
 
         RealInput *deg_;
@@ -321,6 +361,18 @@ namespace
             ratio_edit_->setText(loader.read_string());
         }
 
+        std::shared_ptr<tracer::ConfigGroup> to_config() const override
+        {
+            real x, y, z;
+            QString line = ratio_edit_->text();
+            QTextStream(&line) >> x >> y >> z;
+
+            auto grp = std::make_shared<tracer::ConfigGroup>();
+            grp->insert_str("type", "scale");
+            grp->insert_child("ratio", tracer::ConfigArray::from_vec3({ x, y, z }));
+            return grp;
+        }
+
     private:
 
         QLineEdit *ratio_edit_;
@@ -376,6 +428,14 @@ void Transform3DSeqWidget::load_asset(AssetLoader &loader)
 
         widget->load_asset(loader);
     }
+}
+
+std::shared_ptr<tracer::ConfigArray> Transform3DSeqWidget::to_config() const
+{
+    auto arr = std::make_shared<tracer::ConfigArray>();
+    for(auto &u : units_)
+        arr->push_back(u->to_config());
+    return arr;
 }
 
 Transform3DSeqUnitWidget::UnitType Transform3DSeqWidget::get_unit_type()
