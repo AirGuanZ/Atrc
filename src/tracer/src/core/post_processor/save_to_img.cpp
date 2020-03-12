@@ -25,13 +25,15 @@ public:
         save_ext_ = std::move(ext);
 
         if(save_ext_ != "png" && save_ext_ != "jpg" && save_ext_ != "hdr")
-            throw ObjectConstructionException("unsupported image extension: " + save_ext_);
+            throw ObjectConstructionException(
+                "unsupported image extension: " + save_ext_);
 
         open_after_saved_ = open;
         gamma_ = gamma;
 
         if(gamma_ <= 0)
-            throw ObjectConstructionException("invalid gamma value: " + std::to_string(gamma_));
+            throw ObjectConstructionException(
+                "invalid gamma value: " + std::to_string(gamma_));
 
         AGZ_HIERARCHY_WRAP("in initializing save_to_png post processor")
     }
@@ -42,11 +44,13 @@ public:
 
         AGZ_INFO("saving image to {}", filename_);
 
-        const auto imgu8 = render_target.image.flip_vertically().get_data().map([gamma = gamma_](const Spectrum &s)
+        const auto imgu8 = render_target.image.flip_vertically()
+            .get_data().map([gamma = gamma_](const Spectrum &s)
         {
             return s.map([gamma = gamma](real c)
             {
-                return static_cast<uint8_t>(math::clamp<real>(std::pow(c, gamma), 0, 1) * 255);
+                return static_cast<uint8_t>(
+                    math::clamp<real>(std::pow(c, gamma), 0, 1) * 255);
             });
         });
         if(save_ext_ == "png")
@@ -61,11 +65,11 @@ public:
     }
 };
 
-std::shared_ptr<PostProcessor> create_saving_to_img(
+RC<PostProcessor> create_saving_to_img(
     std::string filename, std::string ext,
     bool open, real gamma)
 {
-    return std::make_shared<SaveToImage>(filename, ext, open, gamma);
+    return newRC<SaveToImage>(filename, ext, open, gamma);
 }
 
 AGZ_TRACER_END

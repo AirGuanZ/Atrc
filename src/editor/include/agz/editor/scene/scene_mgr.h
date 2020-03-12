@@ -16,13 +16,15 @@ class SceneManager : public QObject, public misc::uncopyable_t
 
 public:
 
-    SceneManager(ObjectContext &obj_ctx, Editor *editor, PreviewWindow *preview_window);
+    SceneManager(
+        ObjectContext &obj_ctx, Editor *editor, PreviewWindow *preview_window);
 
     ~SceneManager();
 
     QWidget *get_widget();
 
-    std::shared_ptr<tracer::Aggregate> update_tracer_aggregate(std::vector<std::shared_ptr<tracer::Entity>> &entities);
+    RC<tracer::Aggregate> update_tracer_aggregate(
+        std::vector<RC<tracer::Entity>> &entities);
 
     void add_meshes(const std::vector<mesh::mesh_t> &meshes);
 
@@ -30,7 +32,7 @@ public:
 
     void load_asset(AssetLoader &loader);
 
-    std::shared_ptr<tracer::ConfigArray> to_config(JSONExportContext &ctx) const;
+    RC<tracer::ConfigArray> to_config(JSONExportContext &ctx) const;
 
 signals:
 
@@ -70,11 +72,11 @@ private:
 
     PreviewWindow *preview_window_ = nullptr;
 
-    std::map<QString, std::unique_ptr<Record>> name2record_;
+    std::map<QString, Box<Record>> name2record_;
 
     SceneManagerWidget *ui_ = nullptr;
 
-    std::shared_ptr<tracer::Aggregate> aggregate_;
+    RC<tracer::Aggregate> aggregate_;
 };
 
 AGZ_EDITOR_END

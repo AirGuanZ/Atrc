@@ -8,7 +8,8 @@ class Disk : public TransformedGeometry
     real radius_ = 1;
     real radius2_ = 1;
 
-    SurfacePoint to_local_surface_point(const Vec3 &pos, real radius) const noexcept
+    SurfacePoint to_local_surface_point(
+        const Vec3 &pos, real radius) const noexcept
     {
         const real phi = local_angle::phi(pos);
         const real u = phi / (2 * PI_r);
@@ -36,7 +37,8 @@ public:
         init_transform(transform);
 
         if(radius <= 0)
-            throw ObjectConstructionException("invalid radius value: " + std::to_string(radius));
+            throw ObjectConstructionException(
+                "invalid radius value: " + std::to_string(radius));
         radius_ = radius;
         radius2_ = radius * radius;
 
@@ -56,7 +58,8 @@ public:
         return radius2 <= radius2_;
     }
 
-    bool closest_intersection(const Ray &r, GeometryIntersection *inct) const noexcept override
+    bool closest_intersection(
+        const Ray &r, GeometryIntersection *inct) const noexcept override
     {
         const Ray local_r = to_local(r);
 
@@ -94,10 +97,12 @@ public:
 
     SurfacePoint sample(real *pdf, const Sample3 &sam) const noexcept override
     {
-        const Vec2 pos = radius_ * math::distribution::uniform_on_unit_disk(sam.u, sam.v);
+        const Vec2 pos = radius_ * math::distribution
+                                    ::uniform_on_unit_disk(sam.u, sam.v);
         *pdf = 1 / surface_area();
 
-        SurfacePoint ret = to_local_surface_point(Vec3(pos.x, pos.y, 0), pos.length());
+        SurfacePoint ret = to_local_surface_point(
+                                Vec3(pos.x, pos.y, 0), pos.length());
         to_world(&ret);
 
         return ret;
@@ -108,7 +113,8 @@ public:
         return 1 / surface_area();
     }
 
-    SurfacePoint sample(const Vec3&, real *pdf, const Sample3 &sam) const noexcept override
+    SurfacePoint sample(
+        const Vec3&, real *pdf, const Sample3 &sam) const noexcept override
     {
         return sample(pdf, sam);
     }
@@ -119,10 +125,10 @@ public:
     }
 };
 
-std::shared_ptr<Geometry> create_disk(
+RC<Geometry> create_disk(
     real radius, const Transform3 &local_to_world)
 {
-    return std::make_shared<Disk>(radius, local_to_world);
+    return newRC<Disk>(radius, local_to_world);
 }
 
 AGZ_TRACER_END

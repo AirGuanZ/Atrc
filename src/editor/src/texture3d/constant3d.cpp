@@ -58,9 +58,11 @@ Constant3DWidget::Constant3DWidget(const InitData &init_data)
     });
 
     if(use_input_color_->isChecked())
-        tracer_object_ = tracer::create_constant3d_texture({}, input_color_->get_value());
+        tracer_object_ = tracer::create_constant3d_texture(
+            {}, input_color_->get_value());
     else
-        tracer_object_ = tracer::create_constant3d_texture({}, color_holder_->get_color());
+        tracer_object_ = tracer::create_constant3d_texture(
+            {}, color_holder_->get_color());
 }
 
 Texture3DWidget *Constant3DWidget::clone()
@@ -73,7 +75,8 @@ Texture3DWidget *Constant3DWidget::clone()
     return new Constant3DWidget(init_data);
 }
 
-std::unique_ptr<ResourceThumbnailProvider> Constant3DWidget::get_thumbnail(int width, int height) const
+Box<ResourceThumbnailProvider> Constant3DWidget::get_thumbnail(
+    int width, int height) const
 {
     QImage image(1, 1, QImage::Format::Format_RGB888);
     image.setPixelColor(0, 0, color_holder_->get_qcolor());
@@ -81,7 +84,7 @@ std::unique_ptr<ResourceThumbnailProvider> Constant3DWidget::get_thumbnail(int w
     QPixmap pixmap;
     pixmap.convertFromImage(image);
 
-    return std::make_unique<FixedResourceThumbnailProvider>(pixmap.scaled(width, height));
+    return newBox<FixedResourceThumbnailProvider>(pixmap.scaled(width, height));
 }
 
 void Constant3DWidget::save_asset(AssetSaver &saver)
@@ -98,20 +101,24 @@ void Constant3DWidget::load_asset(AssetLoader &loader)
     input_color_->set_value(loader.read<Spectrum>());
 
     if(use_input_color_->isChecked())
-        tracer_object_ = tracer::create_constant3d_texture({}, input_color_->get_value());
+        tracer_object_ = tracer::create_constant3d_texture(
+            {}, input_color_->get_value());
     else
-        tracer_object_ = tracer::create_constant3d_texture({}, color_holder_->get_color());
+        tracer_object_ = tracer::create_constant3d_texture(
+            {}, color_holder_->get_color());
 }
 
-std::shared_ptr<tracer::ConfigNode> Constant3DWidget::to_config(JSONExportContext &ctx) const
+RC<tracer::ConfigNode> Constant3DWidget::to_config(JSONExportContext &ctx) const
 {
-    auto grp = std::make_shared<tracer::ConfigGroup>();
+    auto grp = newRC<tracer::ConfigGroup>();
     grp->insert_str("type", "constant");
 
     if(use_input_color_->isChecked())
-        grp->insert_child("texel", tracer::ConfigArray::from_spectrum(input_color_->get_value()));
+        grp->insert_child(
+            "texel", tracer::ConfigArray::from_spectrum(input_color_->get_value()));
     else
-        grp->insert_child("texel", tracer::ConfigArray::from_spectrum(color_holder_->get_color()));
+        grp->insert_child(
+            "texel", tracer::ConfigArray::from_spectrum(color_holder_->get_color()));
 
     return grp;
 }
@@ -119,12 +126,15 @@ std::shared_ptr<tracer::ConfigNode> Constant3DWidget::to_config(JSONExportContex
 void Constant3DWidget::update_tracer_object_impl()
 {
     if(use_input_color_->isChecked())
-        tracer_object_ = tracer::create_constant3d_texture({}, input_color_->get_value());
+        tracer_object_ = tracer::create_constant3d_texture(
+            {}, input_color_->get_value());
     else
-        tracer_object_ = tracer::create_constant3d_texture({}, color_holder_->get_color());
+        tracer_object_ = tracer::create_constant3d_texture(
+            {}, color_holder_->get_color());
 }
 
-ResourceWidget<tracer::Texture3D> *Constant3DWidgetCreator::create_widget(ObjectContext &obj_ctx) const
+ResourceWidget<tracer::Texture3D> *Constant3DWidgetCreator::create_widget(
+    ObjectContext &obj_ctx) const
 {
     return new Constant3DWidget({});
 }

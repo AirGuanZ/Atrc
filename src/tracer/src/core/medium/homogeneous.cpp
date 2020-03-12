@@ -20,7 +20,9 @@ class HomogeneousMedium : public Medium
 
 public:
 
-    HomogeneousMedium(const Spectrum &sigma_a, const Spectrum &sigma_s, real g, int max_scattering_count)
+    HomogeneousMedium(
+        const Spectrum &sigma_a, const Spectrum &sigma_s, real g,
+        int max_scattering_count)
     {
         AGZ_HIERARCHY_TRY
 
@@ -30,7 +32,8 @@ public:
 
         g_ = g;
         if(g_ <= -1 || g_ >= 1)
-            throw ObjectConstructionException("invalid g value: " + std::to_string(g_));
+            throw ObjectConstructionException(
+                "invalid g value: " + std::to_string(g_));
 
         max_scattering_count_ = max_scattering_count;
 
@@ -52,14 +55,17 @@ public:
         };
     }
 
-    SampleOutScatteringResult sample_scattering(const Vec3 &a, const Vec3 &b, Sampler &sampler, Arena &arena) const override
+    SampleOutScatteringResult sample_scattering(
+        const Vec3 &a, const Vec3 &b,
+        Sampler &sampler, Arena &arena) const override
     {
         const Sample1 sam = sampler.sample1();
         if(!sigma_s_)
             return { { }, tr(a, b, sampler), nullptr };
 
         const real t_max = (b - a).length();
-        const auto [color_channel, new_sam] = math::distribution::extract_uniform_int(sam.u, 0, SPECTRUM_COMPONENT_COUNT);
+        const auto [color_channel, new_sam] = math::distribution
+            ::extract_uniform_int(sam.u, 0, SPECTRUM_COMPONENT_COUNT);
         const real st = -std::log(new_sam) / sigma_t_[color_channel];
 
         const bool sample_medium = st < t_max;
@@ -81,7 +87,8 @@ public:
             result.scattering_point.pos    = lerp(a, b, st / t_max);
             result.scattering_point.medium = this;
             result.scattering_point.wr     = (a - b) / t_max;
-            result.phase_function          = arena.create<HenyeyGreensteinPhaseFunction>(g_, albedo());
+            result.phase_function = arena.create<HenyeyGreensteinPhaseFunction>(
+                g_, albedo());
         }
 
         result.throughput = tr / pdf;
@@ -92,13 +99,13 @@ public:
     }
 };
 
-std::shared_ptr<Medium> create_homogeneous_medium(
+RC<Medium> create_homogeneous_medium(
     const Spectrum &sigma_a,
     const Spectrum &sigma_s,
     real g,
     int max_scattering_count)
 {
-    return std::make_shared<HomogeneousMedium>(sigma_a, sigma_s, g, max_scattering_count);
+    return newRC<HomogeneousMedium>(sigma_a, sigma_s, g, max_scattering_count);
 }
 
 AGZ_TRACER_END

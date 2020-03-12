@@ -6,11 +6,11 @@ AGZ_TRACER_BEGIN
 
 struct DefaultSceneParams
 {
-    std::vector<std::shared_ptr<Entity>> entities;
-    std::shared_ptr<EnvirLight>          envir_light;
-    std::shared_ptr<Aggregate>           aggregate;
+    std::vector<RC<Entity>> entities;
+    RC<EnvirLight>          envir_light;
+    RC<Aggregate>           aggregate;
 };
 
-std::shared_ptr<Scene> create_default_scene(const DefaultSceneParams &params);
+RC<Scene> create_default_scene(const DefaultSceneParams &params);
 
 AGZ_TRACER_END

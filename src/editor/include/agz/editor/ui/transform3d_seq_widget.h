@@ -39,7 +39,7 @@ public:
 
     virtual void load_asset(AssetLoader &loader) = 0;
 
-    virtual std::shared_ptr<tracer::ConfigGroup> to_config() const = 0;
+    virtual RC<tracer::ConfigGroup> to_config() const = 0;
 
 signals:
 
@@ -64,7 +64,7 @@ public:
 
     void load_asset(AssetLoader &loader);
 
-    std::shared_ptr<tracer::ConfigArray> to_config() const;
+    RC<tracer::ConfigArray> to_config() const;
 
 signals:
 
@@ -76,7 +76,8 @@ private:
 
     Transform3DSeqUnitWidget::UnitType get_unit_type();
 
-    Transform3DSeqUnitWidget *create_new_unit_widget(Transform3DSeqUnitWidget::UnitType type);
+    Transform3DSeqUnitWidget *create_new_unit_widget(
+        Transform3DSeqUnitWidget::UnitType type);
 
     void add_up();
 

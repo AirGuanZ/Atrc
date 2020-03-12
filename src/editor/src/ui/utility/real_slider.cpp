@@ -27,7 +27,8 @@ RealSlider::RealSlider(QWidget *parent, double low, double high, double value)
 
     connect(slider_, &QSlider::valueChanged, [=](int int_value)
     {
-        const double t = (int_value - SLIDER_INT_MIN) / double(SLIDER_INT_MAX - SLIDER_INT_MIN);
+        const double t = (int_value - SLIDER_INT_MIN)
+                       / double(SLIDER_INT_MAX - SLIDER_INT_MIN);
         value_ = low_ * (1 - t) + high_ * t;
         emit change_value(value_);
     });

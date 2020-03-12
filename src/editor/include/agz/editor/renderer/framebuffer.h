@@ -23,7 +23,7 @@ public:
 
     struct Task
     {
-        mutable std::unique_ptr<Grid> grid;
+        mutable Box<Grid> grid;
 
         Vec2 full_res;
         Rect2i pixel_range;
@@ -32,7 +32,8 @@ public:
         int spp = 1;
     };
 
-    Framebuffer(int width, int height, int task_grid_size, int init_pixel_size = 3);
+    Framebuffer(
+        int width, int height, int task_grid_size, int init_pixel_size = 3);
 
     ~Framebuffer();
 

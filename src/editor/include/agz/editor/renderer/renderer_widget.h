@@ -21,8 +21,9 @@ public:
 
     virtual ~RendererWidget() = default;
 
-    virtual std::unique_ptr<Renderer> create_renderer(
-        std::shared_ptr<tracer::Scene> scene, const Vec2i &framebuffer_size, bool enable_preview) const = 0;
+    virtual Box<Renderer> create_renderer(
+        RC<tracer::Scene> scene, const Vec2i &framebuffer_size,
+        bool enable_preview) const = 0;
 
 signals:
 
@@ -44,7 +45,7 @@ class RendererWidgetFactory : public misc::uncopyable_t
 {
 public:
 
-    void add_creator(std::unique_ptr<RendererWidgetCreator> creator);
+    void add_creator(Box<RendererWidgetCreator> creator);
 
     RendererWidget *create_widget(std::string_view name, QWidget *parent) const;
 
@@ -52,7 +53,7 @@ public:
 
 private:
 
-    std::map<std::string, std::unique_ptr<RendererWidgetCreator>, std::less<>> name2creator_;
+    std::map<std::string, Box<RendererWidgetCreator>, std::less<>> name2creator_;
 };
 
 class RendererPanel : public QWidget
@@ -63,10 +64,11 @@ public:
 
     RendererPanel(QWidget *parent, const std::string &default_renderer_type);
 
-    std::unique_ptr<Renderer> create_renderer(
-        std::shared_ptr<tracer::Scene> scene, const Vec2i &framebuffer_size, bool enable_preview) const;
+    Box<Renderer> create_renderer(
+        RC<tracer::Scene> scene, const Vec2i &framebuffer_size,
+        bool enable_preview) const;
 
-    std::shared_ptr<tracer::ConfigGroup> to_config() const;
+    RC<tracer::ConfigGroup> to_config() const;
 
 signals:
 

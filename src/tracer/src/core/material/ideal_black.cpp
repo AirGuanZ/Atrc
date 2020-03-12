@@ -6,9 +6,9 @@
 
 AGZ_TRACER_BEGIN
 
-std::shared_ptr<Material> create_ideal_black()
+RC<Material> create_ideal_black()
 {
-    return std::make_shared<IdealBlack>();
+    return newRC<IdealBlack>();
 }
 
 AGZ_TRACER_END

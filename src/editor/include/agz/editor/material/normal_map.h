@@ -26,11 +26,11 @@ public:
 
     void load_asset(AssetLoader &loader);
 
-    std::unique_ptr<tracer::NormalMapper> get_tracer_object() const;
+    Box<tracer::NormalMapper> get_tracer_object() const;
 
     bool is_enabled() const noexcept;
 
-    std::shared_ptr<tracer::ConfigNode> to_config(JSONExportContext &ctx) const;
+    RC<tracer::ConfigNode> to_config(JSONExportContext &ctx) const;
 
 signals:
 

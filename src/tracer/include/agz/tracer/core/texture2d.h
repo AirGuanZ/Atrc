@@ -91,7 +91,11 @@ protected:
         else if(params.wrap_u == "mirror")
             wrapper_u_ = &wrap_mirror;
         else
-            throw ObjectConstructionException("invalid wrap_u value: " + params.wrap_u + " (expect clamp/repeat/mirror)");
+        {
+            throw ObjectConstructionException(
+                "invalid wrap_u value: " + params.wrap_u +
+                " (expect clamp/repeat/mirror)");
+        }
 
         if(params.wrap_v == "clamp")
             wrapper_v_ = &wrap_clamp;
@@ -100,7 +104,11 @@ protected:
         else if(params.wrap_v == "mirror")
             wrapper_v_ = &wrap_mirror;
         else
-            throw ObjectConstructionException("invalid wrap_v value: " + params.wrap_v + " (expect clamp/repeat/mirror)");
+        {
+            throw ObjectConstructionException(
+                "invalid wrap_v value: " + params.wrap_v +
+                " (expect clamp/repeat/mirror)");
+        }
 
         inv_gamma_ = params.inv_gamma;
     }

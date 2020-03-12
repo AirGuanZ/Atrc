@@ -21,7 +21,8 @@ struct PathTracingRendererParams
     int spp = 1;
 };
 
-std::shared_ptr<Renderer> create_path_tracing_renderer(const PathTracingRendererParams &params);
+RC<Renderer> create_path_tracing_renderer(
+    const PathTracingRendererParams &params);
 
 // particle tracing
 
@@ -44,7 +45,8 @@ struct ParticleTracingRendererParams
     int forward_spp = 1;
 };
 
-std::shared_ptr<Renderer> create_particle_tracing_renderer(const ParticleTracingRendererParams &params);
+RC<Renderer> create_particle_tracing_renderer(
+    const ParticleTracingRendererParams &params);
 
 // ambient occlusion
 
@@ -63,7 +65,7 @@ struct AORendererParams
     int spp = 1;
 };
 
-std::shared_ptr<Renderer> create_ao_renderer(const AORendererParams &params);
+RC<Renderer> create_ao_renderer(const AORendererParams &params);
 
 // bidirectional path tracing
 
@@ -75,11 +77,34 @@ struct BDPTRendererParams
     int cam_max_vtx_cnt = 10;
     int lht_max_vtx_cnt = 10;
 
-    bool use_mis = true;
-
     int spp = 1;
 };
 
-std::shared_ptr<Renderer> create_bdpt_renderer(const BDPTRendererParams &params);
+RC<Renderer> create_bdpt_renderer(const BDPTRendererParams &params);
+
+// sppm
+
+struct SPPMRendererParams
+{
+    int worker_count           = 0;
+
+    int forward_task_grid_size = 64;
+    int forward_max_depth      = 8;
+
+    real init_radius = real(0.1);
+
+    int iteration_count       = 100;
+    int photons_per_iteration = 100000;
+
+    int photon_min_depth = 5;
+    int photon_max_depth = 10;
+    real photon_cont_prob = real(0.9);
+
+    real update_alpha = real(2) / 3;
+
+    int grid_accel_resolution  = 128;
+};
+
+RC<Renderer> create_sppm_renderer(const SPPMRendererParams &params);
 
 AGZ_TRACER_END

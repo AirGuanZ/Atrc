@@ -4,7 +4,8 @@
 
 AGZ_EDITOR_BEGIN
 
-FlowLayout::FlowLayout(QWidget *parent, int margin, int hori_spacing, int vert_spacing)
+FlowLayout::FlowLayout(
+    QWidget *parent, int margin, int hori_spacing, int vert_spacing)
     : QLayout(parent), hori_space_(hori_spacing), vert_space_(vert_spacing)
 {
     setContentsMargins(margin, margin, margin, margin);

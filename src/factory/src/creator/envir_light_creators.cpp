@@ -15,7 +15,8 @@ namespace envir_light
             return "ibl";
         }
 
-        std::shared_ptr<EnvirLight> create(const ConfigGroup &params, CreatingContext &context) const override
+        RC<EnvirLight> create(
+            const ConfigGroup &params, CreatingContext &context) const override
         {
             const auto tex = context.create<Texture2D>(params.child_group("tex"));
             return create_ibl_light(std::move(tex));
@@ -31,7 +32,8 @@ namespace envir_light
             return "native_sky";
         }
 
-        std::shared_ptr<EnvirLight> create(const ConfigGroup &params, CreatingContext &context) const override
+        RC<EnvirLight> create(
+            const ConfigGroup &params, CreatingContext &context) const override
         {
             const auto top    = params.child_spectrum("top");
             const auto bottom = params.child_spectrum("bottom");
@@ -43,8 +45,8 @@ namespace envir_light
 
 void initialize_envir_light_factory(Factory<EnvirLight> &factory)
 {
-    factory.add_creator(std::make_unique<envir_light::IBLEnvirLightCreator>());
-    factory.add_creator(std::make_unique<envir_light::NativeSkyCreator>());
+    factory.add_creator(newBox<envir_light::IBLEnvirLightCreator>());
+    factory.add_creator(newBox<envir_light::NativeSkyCreator>());
 }
 
 AGZ_TRACER_FACTORY_END

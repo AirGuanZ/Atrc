@@ -15,7 +15,9 @@ struct ParticleTraceParams
 };
 
 void trace_particle(
-    const ParticleTraceParams &params, const Scene &scene, Sampler &sampler,
-    FilmFilterApplier::FilmGridView<Spectrum> &film, Arena &arena);
+    const ParticleTraceParams &params,
+    const Scene &scene, Sampler &sampler,
+    FilmFilterApplier::FilmGridView<Spectrum> &film,
+    Arena &arena);
 
 AGZ_TRACER_RENDER_END

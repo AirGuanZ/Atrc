@@ -15,7 +15,8 @@ public:
 
         gamma_ = gamma;
         if(gamma_ <= 0)
-            throw ObjectConstructionException("invalid gamma value: " + std::to_string(gamma_));
+            throw ObjectConstructionException(
+                "invalid gamma value: " + std::to_string(gamma_));
 
         AGZ_HIERARCHY_WRAP("in initializing gamma correction post processor")
     }
@@ -36,10 +37,10 @@ public:
     }
 };
 
-std::shared_ptr<PostProcessor> create_gamma_corrector(
+RC<PostProcessor> create_gamma_corrector(
     real gamma)
 {
-    return std::make_shared<Gamma>(gamma);
+    return newRC<Gamma>(gamma);
 }
 
 AGZ_TRACER_END

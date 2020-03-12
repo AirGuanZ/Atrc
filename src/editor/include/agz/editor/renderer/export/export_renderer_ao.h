@@ -14,7 +14,7 @@ public:
 
     explicit ExportRendererAO(QWidget *parent = nullptr);
 
-    std::shared_ptr<tracer::ConfigGroup> to_config() const override;
+    RC<tracer::ConfigGroup> to_config() const override;
 
 private:
 

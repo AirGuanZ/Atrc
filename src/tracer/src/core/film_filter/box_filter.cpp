@@ -33,10 +33,10 @@ public:
     }
 };
 
-std::shared_ptr<FilmFilter> create_box_filter(
+RC<FilmFilter> create_box_filter(
     real radius)
 {
-    return std::make_shared<BoxFilter>(radius);
+    return newRC<BoxFilter>(radius);
 }
 
 AGZ_TRACER_END

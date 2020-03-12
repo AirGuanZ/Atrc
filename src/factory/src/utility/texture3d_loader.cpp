@@ -10,7 +10,8 @@ texture::texture3d_t<real> texture3d_load::load_gray_from_ascii(std::ifstream &f
     int width, height, depth;
     fin >> width >> height >> depth;
     if(!fin)
-        throw ObjectConstructionException("failed to read width/height/depth from file");
+        throw ObjectConstructionException(
+            "failed to read width/height/depth from file");
 
     texture::texture3d_t<real> data(depth, height, width);
     for(int z = 0; z < depth; ++z)
@@ -21,7 +22,8 @@ texture::texture3d_t<real> texture3d_load::load_gray_from_ascii(std::ifstream &f
             {
                 fin >> data(z, y, x);
                 if(!fin)
-                    throw ObjectConstructionException("failed to parse texel data from file");
+                    throw ObjectConstructionException(
+                        "failed to parse texel data from file");
             }
         }
     }
@@ -36,7 +38,8 @@ texture::texture3d_t<real> texture3d_load::load_gray_from_binary(std::ifstream &
     fin.read(reinterpret_cast<char *>(&height), sizeof(height));
     fin.read(reinterpret_cast<char *>(&depth), sizeof(depth));
     if(!fin)
-        throw ObjectConstructionException("failed to read width/height/depth from file");
+        throw ObjectConstructionException(
+            "failed to read width/height/depth from file");
 
     texture::texture3d_t<real> data(depth, height, width);
 
@@ -75,7 +78,8 @@ texture::texture3d_t<real> texture3d_load::load_gray_from_images(
         else if(width != new_width)
         {
             throw ObjectConstructionException(
-                "inconsistent image width: " + std::to_string(width) + " and " + std::to_string(new_width));
+                "inconsistent image width: " + std::to_string(width) +
+                " and " + std::to_string(new_width));
         }
 
         if(height < 0)
@@ -83,7 +87,8 @@ texture::texture3d_t<real> texture3d_load::load_gray_from_images(
         else if(height != new_height)
         {
             throw ObjectConstructionException(
-                "inconsistent image height: " + std::to_string(height) + " and " + std::to_string(new_height));
+                "inconsistent image height: " + std::to_string(height) +
+                " and " + std::to_string(new_height));
         }
 
         if(!data.is_available())
@@ -106,7 +111,8 @@ texture::texture3d_t<Spectrum> texture3d_load::load_rgb_from_ascii(std::ifstream
     int width, height, depth;
     fin >> width >> height >> depth;
     if(!fin)
-        throw ObjectConstructionException("failed to read width/height/depth from file");
+        throw ObjectConstructionException(
+            "failed to read width/height/depth from file");
 
     texture::texture3d_t<Spectrum> data(depth, height, width);
     for(int z = 0; z < depth; ++z)
@@ -119,7 +125,8 @@ texture::texture3d_t<Spectrum> texture3d_load::load_rgb_from_ascii(std::ifstream
                 for(int c = 0; c < SPECTRUM_COMPONENT_COUNT; ++c)
                     fin >> spec[c];
                 if(!fin)
-                    throw ObjectConstructionException("failed to parse texel data from file");
+                    throw ObjectConstructionException(
+                        "failed to parse texel data from file");
                 data(z, y, x) = spec;
             }
         }
@@ -135,7 +142,8 @@ texture::texture3d_t<Spectrum> texture3d_load::load_rgb_from_binary(std::ifstrea
     fin.read(reinterpret_cast<char *>(&height), sizeof(height));
     fin.read(reinterpret_cast<char *>(&depth), sizeof(depth));
     if(!fin)
-        throw ObjectConstructionException("failed to read width/height/depth from file");
+        throw ObjectConstructionException(
+            "failed to read width/height/depth from file");
 
     texture::texture3d_t<Spectrum> data(depth, height, width);
 
@@ -179,7 +187,8 @@ texture::texture3d_t<Spectrum> texture3d_load::load_rgb_from_images(
         else if(width != new_width)
         {
             throw ObjectConstructionException(
-                "inconsistent image width: " + std::to_string(width) + " and " + std::to_string(new_width));
+                "inconsistent image width: " + std::to_string(width) +
+                " and " + std::to_string(new_width));
         }
 
         if(height < 0)
@@ -187,7 +196,8 @@ texture::texture3d_t<Spectrum> texture3d_load::load_rgb_from_images(
         else if(height != new_height)
         {
             throw ObjectConstructionException(
-                "inconsistent image height: " + std::to_string(height) + " and " + std::to_string(new_height));
+                "inconsistent image height: " + std::to_string(height) +
+                " and " + std::to_string(new_height));
         }
 
         if(!data.is_available())
@@ -205,7 +215,8 @@ texture::texture3d_t<Spectrum> texture3d_load::load_rgb_from_images(
     return data;
 }
 
-void texture3d_load::save_gray_to_binary(const std::string &filename, const Vec3i &size, const float *data)
+void texture3d_load::save_gray_to_binary(
+    const std::string &filename, const Vec3i &size, const float *data)
 {
     std::ofstream fout(filename, std::ios::trunc | std::ios::binary);
     if(!fout)
@@ -219,7 +230,8 @@ void texture3d_load::save_gray_to_binary(const std::string &filename, const Vec3
     fout.write(reinterpret_cast<const char *>(data), size.product() * sizeof(float));
 }
 
-void texture3d_load::save_rgb_to_binary(const std::string &filename, const Vec3i &size, const float *data)
+void texture3d_load::save_rgb_to_binary(
+    const std::string &filename, const Vec3i &size, const float *data)
 {
     std::ofstream fout(filename, std::ios::trunc | std::ios::binary);
     if(!fout)

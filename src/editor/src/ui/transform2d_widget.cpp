@@ -23,7 +23,7 @@ namespace
 
             text->setAlignment(Qt::AlignCenter);
 
-            edit_validator_ = std::make_unique<Vec2Validator>();
+            edit_validator_ = newBox<Vec2Validator>();
 
             offset_edit_ = new QLineEdit(this);
             offset_edit_->setText(QString("%1 %2").arg(offset.x).arg(offset.y));
@@ -79,13 +79,13 @@ namespace
             offset_edit_->setText(loader.read_string());
         }
 
-        std::shared_ptr<tracer::ConfigGroup> to_config() const override
+        RC<tracer::ConfigGroup> to_config() const override
         {
             real x, y;
             QString line = offset_edit_->text();
             QTextStream(&line) >> x >> y;
 
-            auto grp = std::make_shared<tracer::ConfigGroup>();
+            auto grp = newRC<tracer::ConfigGroup>();
             grp->insert_str("type", "translate");
             grp->insert_child("offset", tracer::ConfigArray::from_vec2({ x, y }));
             return grp;
@@ -95,7 +95,7 @@ namespace
 
         QLineEdit *offset_edit_;
 
-        std::unique_ptr<Vec2Validator> edit_validator_;
+        Box<Vec2Validator> edit_validator_;
     };
 
     class Rotate2DWidget : public Transform2DUnitWidget
@@ -111,7 +111,7 @@ namespace
 
             text->setAlignment(Qt::AlignCenter);
 
-            edit_validator_ = std::make_unique<QDoubleValidator>();
+            edit_validator_ = newBox<QDoubleValidator>();
 
             deg_edit_ = new QLineEdit(this);
             deg_edit_->setText(QString::number(deg));
@@ -164,9 +164,9 @@ namespace
             deg_edit_->setText(loader.read_string());
         }
 
-        std::shared_ptr<tracer::ConfigGroup> to_config() const override
+        RC<tracer::ConfigGroup> to_config() const override
         {
-            auto grp = std::make_shared<tracer::ConfigGroup>();
+            auto grp = newRC<tracer::ConfigGroup>();
             grp->insert_str("type", "rotate");
             grp->insert_real("deg", deg_edit_->text().toFloat());
             return grp;
@@ -176,7 +176,7 @@ namespace
 
         QLineEdit *deg_edit_;
 
-        std::unique_ptr<QValidator> edit_validator_;
+        Box<QValidator> edit_validator_;
     };
 
     class Scale2DWidget : public Transform2DUnitWidget
@@ -192,7 +192,7 @@ namespace
 
             text->setAlignment(Qt::AlignCenter);
 
-            edit_validator_ = std::make_unique<Vec2Validator>();
+            edit_validator_ = newBox<Vec2Validator>();
 
             ratio_edit_ = new QLineEdit(this);
             ratio_edit_->setText(QString("%1 %2").arg(ratio.x).arg(ratio.y));
@@ -248,13 +248,13 @@ namespace
             ratio_edit_->setText(loader.read_string());
         }
 
-        std::shared_ptr<tracer::ConfigGroup> to_config() const override
+        RC<tracer::ConfigGroup> to_config() const override
         {
             real x, y;
             QString line = ratio_edit_->text();
             QTextStream(&line) >> x >> y;
 
-            auto grp = std::make_shared<tracer::ConfigGroup>();
+            auto grp = newRC<tracer::ConfigGroup>();
             grp->insert_str("type", "scale");
             grp->insert_child("ratio", tracer::ConfigArray::from_vec2({ x, y }));
             return grp;
@@ -264,7 +264,7 @@ namespace
 
         QLineEdit *ratio_edit_;
 
-        std::unique_ptr<QValidator> edit_validator_;
+        Box<QValidator> edit_validator_;
     };
 }
 
@@ -317,9 +317,9 @@ void Transform2DWidget::load_asset(AssetLoader &loader)
     }
 }
 
-std::shared_ptr<tracer::ConfigArray> Transform2DWidget::to_config() const
+RC<tracer::ConfigArray> Transform2DWidget::to_config() const
 {
-    auto arr = std::make_shared<tracer::ConfigArray>();
+    auto arr = newRC<tracer::ConfigArray>();
     for(auto &u : units_)
         arr->push_back(u->to_config());
     return arr;
@@ -328,7 +328,8 @@ std::shared_ptr<tracer::ConfigArray> Transform2DWidget::to_config() const
 Transform2DUnitWidget::UnitType Transform2DWidget::get_unit_type()
 {
     const QStringList item_list = { "Translate", "Rotate", "Scale" };
-    const QString item = QInputDialog::getItem(this, "Type", "Select transform type", item_list);
+    const QString item = QInputDialog::getItem(
+        this, "Type", "Select transform type", item_list);
     if(item == "Translate")
         return Transform2DUnitWidget::UnitType::Translate;
     if(item == "Rotate")
@@ -336,7 +337,8 @@ Transform2DUnitWidget::UnitType Transform2DWidget::get_unit_type()
     return Transform2DUnitWidget::UnitType::Scale;
 }
 
-Transform2DUnitWidget *Transform2DWidget::create_new_unit_widget(Transform2DUnitWidget::UnitType type)
+Transform2DUnitWidget *Transform2DWidget::create_new_unit_widget(
+    Transform2DUnitWidget::UnitType type)
 {
     if(type == Transform2DUnitWidget::UnitType::Translate)
         return new Translate2DWidget(this);

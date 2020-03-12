@@ -22,18 +22,22 @@ public:
         bool enable_preview = true;
     };
 
-    ParticleTracer(const Params &params, int width, int height, std::shared_ptr<const tracer::Scene> scene);
+    ParticleTracer(const Params &params, int width, int height,
+                   RC<const tracer::Scene> scene);
 
     ~ParticleTracer();
 
 protected:
 
     Spectrum fast_render_pixel(
-        const tracer::Scene &scene, const tracer::Ray &ray, tracer::Sampler &sampler, tracer::Arena &arena) override;
+        const tracer::Scene &scene, const tracer::Ray &ray,
+        tracer::Sampler &sampler, tracer::Arena &arena) override;
 
     Spectrum render_pixel(
-        const tracer::Scene &scene, const tracer::Ray &ray, tracer::Sampler &sampler,
-        tracer::Arena &arena, tracer::FilmFilterApplier::FilmGridView<Spectrum> &particle_film, uint64_t *particle_count) override;
+        const tracer::Scene &scene, const tracer::Ray &ray,
+        tracer::Sampler &sampler, tracer::Arena &arena,
+        tracer::FilmFilterApplier::FilmGridView<Spectrum> &particle_film,
+        uint64_t *particle_count) override;
 
 private:
 

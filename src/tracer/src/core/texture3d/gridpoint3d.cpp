@@ -5,7 +5,7 @@ AGZ_TRACER_BEGIN
 
 class GrayGridPoint3D : public Texture3D
 {
-    std::shared_ptr<const Image3D<real>> data_;
+    RC<const Image3D<real>> data_;
     real max_value_;
     real min_value_;
 
@@ -17,19 +17,26 @@ protected:
         const real yf = math::saturate(uvw.y) * (data_->height() - 1);
         const real zf = math::saturate(uvw.z) * (data_->depth()  - 1);
 
-        const int xi = (std::min)(static_cast<int>(std::floor(xf)), data_->width()  - 2);
-        const int yi = (std::min)(static_cast<int>(std::floor(yf)), data_->height() - 2);
-        const int zi = (std::min)(static_cast<int>(std::floor(zf)), data_->depth()  - 2);
+        const int xi = (std::min)(static_cast<int>(
+            std::floor(xf)), data_->width()  - 2);
+        const int yi = (std::min)(static_cast<int>(
+            std::floor(yf)), data_->height() - 2);
+        const int zi = (std::min)(static_cast<int>(
+            std::floor(zf)), data_->depth()  - 2);
         
         const real xt = xf - static_cast<real>(xi);
         const real yt = yf - static_cast<real>(yi);
         const real zt = zf - static_cast<real>(zi);
         
-        const real y0z0 = math::lerp(data_->at(zi, yi,     xi), data_->at(zi, yi,     xi + 1), xt);
-        const real y1z0 = math::lerp(data_->at(zi, yi + 1, xi), data_->at(zi, yi + 1, xi + 1), xt);
+        const real y0z0 = math::lerp(data_->at(zi, yi,     xi),
+                                     data_->at(zi, yi,     xi + 1), xt);
+        const real y1z0 = math::lerp(data_->at(zi, yi + 1, xi),
+                                     data_->at(zi, yi + 1, xi + 1), xt);
 
-        const real y0z1 = math::lerp(data_->at(zi + 1, yi,     xi), data_->at(zi + 1, yi,     xi + 1), xt);
-        const real y1z1 = math::lerp(data_->at(zi + 1, yi + 1, xi), data_->at(zi + 1, yi + 1, xi + 1), xt);
+        const real y0z1 = math::lerp(data_->at(zi + 1, yi,     xi),
+                                     data_->at(zi + 1, yi,     xi + 1), xt);
+        const real y1z1 = math::lerp(data_->at(zi + 1, yi + 1, xi),
+                                     data_->at(zi + 1, yi + 1, xi + 1), xt);
 
         const real z0 = math::lerp(y0z0, y1z0, yt);
         const real z1 = math::lerp(y0z1, y1z1, yt);
@@ -39,7 +46,8 @@ protected:
 
 public:
 
-    GrayGridPoint3D(const Texture3DCommonParams &common_params, std::shared_ptr<const Image3D<real>> data)
+    GrayGridPoint3D(
+        const Texture3DCommonParams &common_params, RC<const Image3D<real>> data)
     {
         init_common_params(common_params);
         assert(data->is_available());
@@ -98,7 +106,7 @@ public:
 
 class SpectrumGridPoint3D : public Texture3D
 {
-    std::shared_ptr<const texture::texture3d_t<Spectrum>> data_;
+    RC<const texture::texture3d_t<Spectrum>> data_;
     Spectrum max_value_;
     Spectrum min_value_;
 
@@ -110,19 +118,26 @@ protected:
         const real yf = math::saturate(uvw.y) * (data_->height() - 1);
         const real zf = math::saturate(uvw.z) * (data_->depth() - 1);
 
-        const int xi = (std::min)(static_cast<int>(std::floor(xf)), data_->width() - 2);
-        const int yi = (std::min)(static_cast<int>(std::floor(yf)), data_->height() - 2);
-        const int zi = (std::min)(static_cast<int>(std::floor(zf)), data_->depth() - 2);
+        const int xi = (std::min)(
+            static_cast<int>(std::floor(xf)), data_->width() - 2);
+        const int yi = (std::min)(
+            static_cast<int>(std::floor(yf)), data_->height() - 2);
+        const int zi = (std::min)(
+            static_cast<int>(std::floor(zf)), data_->depth() - 2);
 
         const real xt = xf - static_cast<real>(xi);
         const real yt = yf - static_cast<real>(yi);
         const real zt = zf - static_cast<real>(zi);
 
-        const Spectrum y0z0 = lerp(data_->at(zi, yi,     xi), data_->at(zi, yi,     xi + 1), xt);
-        const Spectrum y1z0 = lerp(data_->at(zi, yi + 1, xi), data_->at(zi, yi + 1, xi + 1), xt);
+        const Spectrum y0z0 = lerp(data_->at(zi, yi,     xi),
+                                   data_->at(zi, yi,     xi + 1), xt);
+        const Spectrum y1z0 = lerp(data_->at(zi, yi + 1, xi),
+                                   data_->at(zi, yi + 1, xi + 1), xt);
 
-        const Spectrum y0z1 = lerp(data_->at(zi + 1, yi,     xi), data_->at(zi + 1, yi,     xi + 1), xt);
-        const Spectrum y1z1 = lerp(data_->at(zi + 1, yi + 1, xi), data_->at(zi + 1, yi + 1, xi + 1), xt);
+        const Spectrum y0z1 = lerp(data_->at(zi + 1, yi,     xi),
+                                   data_->at(zi + 1, yi,     xi + 1), xt);
+        const Spectrum y1z1 = lerp(data_->at(zi + 1, yi + 1, xi),
+                                   data_->at(zi + 1, yi + 1, xi + 1), xt);
 
         const Spectrum z0 = lerp(y0z0, y1z0, yt);
         const Spectrum z1 = lerp(y0z1, y1z1, yt);
@@ -132,7 +147,9 @@ protected:
 
 public:
 
-    SpectrumGridPoint3D(const Texture3DCommonParams &common_params, std::shared_ptr<const texture::texture3d_t<Spectrum>> data)
+    SpectrumGridPoint3D(
+        const Texture3DCommonParams &common_params,
+        RC<const texture::texture3d_t<Spectrum>> data)
     {
         init_common_params(common_params);
         assert(data->is_available());
@@ -193,16 +210,17 @@ public:
     }
 };
 
-std::shared_ptr<Texture3D> create_gray_grid_point3d(
-    const Texture3DCommonParams &common_params, std::shared_ptr<const Image3D<real>> data)
+RC<Texture3D> create_gray_grid_point3d(
+    const Texture3DCommonParams &common_params, RC<const Image3D<real>> data)
 {
-    return std::make_shared<GrayGridPoint3D>(common_params, std::move(data));
+    return newRC<GrayGridPoint3D>(common_params, std::move(data));
 }
 
-std::shared_ptr<Texture3D> create_spectrum_grid_point3d(
-    const Texture3DCommonParams &common_params, std::shared_ptr<const texture::texture3d_t<Spectrum>> data)
+RC<Texture3D> create_spectrum_grid_point3d(
+    const Texture3DCommonParams &common_params,
+    RC<const texture::texture3d_t<Spectrum>> data)
 {
-    return std::make_shared<SpectrumGridPoint3D>(common_params, std::move(data));
+    return newRC<SpectrumGridPoint3D>(common_params, std::move(data));
 }
 
 AGZ_TRACER_END

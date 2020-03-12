@@ -12,20 +12,23 @@ public:
         return (std::numeric_limits<int>::max)();
     }
 
-    Spectrum tr(const Vec3 &a, const Vec3 &b, Sampler &sampler) const noexcept override
+    Spectrum tr(
+        const Vec3 &a, const Vec3 &b, Sampler &sampler) const noexcept override
     {
         return Spectrum(1);
     }
 
-    SampleOutScatteringResult sample_scattering(const Vec3 &a, const Vec3 &b, Sampler &sampler, Arena &arena) const override
+    SampleOutScatteringResult sample_scattering(
+        const Vec3 &a, const Vec3 &b,
+        Sampler &sampler, Arena &arena) const override
     {
         return { { }, Spectrum(1), nullptr };
     }
 };
 
-std::shared_ptr<Medium> create_void()
+RC<Medium> create_void()
 {
-    static std::shared_ptr<Medium> ret = std::make_shared<VoidMedium>();
+    static RC<Medium> ret = newRC<VoidMedium>();
     return ret;
 }
 

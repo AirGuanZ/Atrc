@@ -5,8 +5,10 @@
 
 AGZ_EDITOR_BEGIN
 
-Framebuffer::Framebuffer(int width, int height, int task_grid_size, int init_pixel_size)
-    : width_(width), height_(height), task_grid_size_(task_grid_size), init_pixel_size_(init_pixel_size)
+Framebuffer::Framebuffer(
+    int width, int height, int task_grid_size, int init_pixel_size)
+    : width_(width), height_(height),
+      task_grid_size_(task_grid_size), init_pixel_size_(init_pixel_size)
 {
     value_      = Image2D<Spectrum>(height, width);
     weight_     = Image2D<real>(height, width);
@@ -118,8 +120,10 @@ void Framebuffer::merge_tasks(int task_count, Task *tasks)
             new_task.grid         = std::move(task.grid);
             new_task.grid->value  = Image2D<Spectrum>(new_y_size, new_x_size);
             new_task.grid->weight = Image2D<real>(new_y_size, new_x_size);
-            new_task.full_res     = { real(width_) / new_pixel_size, real(height_) / new_pixel_size };
-            new_task.pixel_range  = { { new_x_min, new_y_min }, { new_x_max, new_y_max } };
+            new_task.full_res     = {
+                real(width_) / new_pixel_size, real(height_) / new_pixel_size };
+            new_task.pixel_range  = {
+                { new_x_min, new_y_min }, { new_x_max, new_y_max } };
             new_task.pixel_size   = task.pixel_size / 2;
             new_task.spp          = 1;
 
@@ -184,9 +188,11 @@ void Framebuffer::merge_full_res_task(const Task &task)
 {
     assert(task.pixel_size == 1);
 
-    for(int y = task.pixel_range.low.y, ly = 0; y <= task.pixel_range.high.y; ++y, ++ly)
+    for(int y = task.pixel_range.low.y, ly = 0;
+        y <= task.pixel_range.high.y; ++y, ++ly)
     {
-        for(int x = task.pixel_range.low.x, lx = 0; x <= task.pixel_range.high.x; ++x, ++lx)
+        for(int x = task.pixel_range.low.x, lx = 0;
+            x <= task.pixel_range.high.x; ++x, ++lx)
         {
             if(pixel_size_(y, x) != 1)
             {
@@ -268,7 +274,9 @@ void Framebuffer::build_task_queue()
 
             for(int i = 2; i <= init_pixel_size_; ++i)
             {
-                if(x_rng <= 1 || y_rng <= 1 || (x_low & 1) || (x_rng & 1) || (y_low & 1) || (y_rng & 1))
+                if(x_rng <= 1 || y_rng <= 1 ||
+                   (x_low & 1) || (x_rng & 1) ||
+                   (y_low & 1) || (y_rng & 1))
                     break;
 
                 x_low /= 2, y_low /= 2;
@@ -278,12 +286,14 @@ void Framebuffer::build_task_queue()
             }
 
             Task task;
-            task.grid = std::make_unique<Grid>();
+            task.grid = newBox<Grid>();
 
             task.grid->value  = Image2D<Spectrum>(y_rng, x_rng);
             task.grid->weight = Image2D<real>(y_rng, x_rng);
-            task.full_res      = { real(width_) / pixel_size, real(height_) / pixel_size };
-            task.pixel_range   = { { x_low, y_low }, { x_low + x_rng - 1, y_low + y_rng - 1} };
+            task.full_res      = {
+                real(width_) / pixel_size, real(height_) / pixel_size };
+            task.pixel_range   = {
+                { x_low, y_low }, { x_low + x_rng - 1, y_low + y_rng - 1} };
             task.pixel_size    = pixel_size;
             task.spp           = 1;
 
@@ -291,8 +301,10 @@ void Framebuffer::build_task_queue()
         }
     }
 
-    std::default_random_engine rng(static_cast<std::default_random_engine::result_type>(
-        std::chrono::high_resolution_clock::now().time_since_epoch().count()));
+    std::default_random_engine rng(
+        static_cast<std::default_random_engine::result_type>(
+            std::chrono::high_resolution_clock::now()
+                .time_since_epoch().count()));
     std::shuffle(tasks.begin(), tasks.end(), rng);
 
     for(auto &task : tasks)

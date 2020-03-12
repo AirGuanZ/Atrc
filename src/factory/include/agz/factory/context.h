@@ -30,7 +30,8 @@ public:
 
     virtual std::string name() const = 0;
 
-    virtual std::shared_ptr<T> create(const ConfigGroup &params, CreatingContext &context) const = 0;
+    virtual RC<T> create(
+        const ConfigGroup &params, CreatingContext &context) const = 0;
 };
 
 template<>
@@ -42,7 +43,9 @@ public:
 
     virtual std::string name() const = 0;
 
-    virtual std::shared_ptr<Camera> create(const ConfigGroup &params, CreatingContext &context, real film_aspect) const = 0;
+    virtual RC<Camera> create(
+        const ConfigGroup &params, CreatingContext &context,
+        real film_aspect) const = 0;
 };
 
 template<typename T>
@@ -50,13 +53,13 @@ class Factory
 {
     std::string factory_name_;
 
-    std::unordered_map<std::string, std::unique_ptr<Creator<T>>> name2creator_;
+    std::unordered_map<std::string, Box<Creator<T>>> name2creator_;
 
 public:
 
     explicit Factory(std::string factory_name);
 
-    void add_creator(std::unique_ptr<Creator<T>> &&creator);
+    void add_creator(Box<Creator<T>> &&creator);
 
     const Creator<T> *get_creator(const std::string &name) const;
 
@@ -118,35 +121,38 @@ public:
     const Factory<T> &factory() const noexcept;
 
     template<typename T, typename...Args>
-    std::shared_ptr<T> create(const ConfigGroup &params, Args&&...args);
+    RC<T> create(const ConfigGroup &params, Args&&...args);
 };
 
 template<typename T>
 class ReferenceCreator : public Creator<T>
 {
-    mutable std::map<std::vector<std::string>, std::shared_ptr<T>> name2obj_;
+    mutable std::map<std::vector<std::string>, RC<T>> name2obj_;
 
 public:
 
     std::string name() const override { return "reference"; }
 
-    std::shared_ptr<T> create(const ConfigGroup &params, CreatingContext &context) const override;
+    RC<T> create(
+        const ConfigGroup &params, CreatingContext &context) const override;
 };
 
 template<>
 class ReferenceCreator<Camera> : public Creator<Camera>
 {
-    mutable std::map<std::vector<std::string>, std::shared_ptr<Camera>> name2obj_;
+    mutable std::map<std::vector<std::string>, RC<Camera>> name2obj_;
 
 public:
 
     std::string name() const override { return "reference"; }
 
-    std::shared_ptr<Camera> create(
-        const ConfigGroup &params, CreatingContext &context, real film_aspect) const override;
+    RC<Camera> create(
+        const ConfigGroup &params, CreatingContext &context,
+        real film_aspect) const override;
 };
 
-inline void BasicPathMapper::add_replacer(const std::string &key, const std::string &value)
+inline void BasicPathMapper::add_replacer(
+    const std::string &key, const std::string &value)
 {
     replacers_[key] = value;
 }
@@ -168,7 +174,8 @@ inline std::string BasicPathMapper::map(const std::string &s) const
 }
 
 template<typename T>
-std::shared_ptr<T> ReferenceCreator<T>::create(const ConfigGroup &params, CreatingContext &context) const
+RC<T> ReferenceCreator<T>::create(
+    const ConfigGroup &params, CreatingContext &context) const
 {
     AGZ_HIERARCHY_TRY
 
@@ -197,8 +204,9 @@ std::shared_ptr<T> ReferenceCreator<T>::create(const ConfigGroup &params, Creati
     AGZ_HIERARCHY_WRAP("in creating referenced object")
 }
 
-inline std::shared_ptr<Camera> ReferenceCreator<Camera>::create(
-    const ConfigGroup &params, CreatingContext &context, real film_aspect) const
+inline RC<Camera> ReferenceCreator<Camera>::create(
+    const ConfigGroup &params, CreatingContext &context,
+    real film_aspect) const
 {
     AGZ_HIERARCHY_TRY
 
@@ -231,11 +239,11 @@ template<typename T>
 Factory<T>::Factory(std::string factory_name)
     : factory_name_(std::move(factory_name))
 {
-    this->add_creator(std::make_unique<ReferenceCreator<T>>());
+    this->add_creator(newBox<ReferenceCreator<T>>());
 }
 
 template<typename T>
-void Factory<T>::add_creator(std::unique_ptr<Creator<T>> &&creator)
+void Factory<T>::add_creator(Box<Creator<T>> &&creator)
 {
     const std::string name = creator->name();
     name2creator_[name] = std::move(creator);
@@ -267,7 +275,7 @@ const Factory<T> &CreatingContext::factory() const noexcept
 }
 
 template<typename T, typename...Args>
-std::shared_ptr<T> CreatingContext::create(const ConfigGroup &params, Args&&...args)
+RC<T> CreatingContext::create(const ConfigGroup &params, Args&&...args)
 {
     AGZ_HIERARCHY_TRY
 

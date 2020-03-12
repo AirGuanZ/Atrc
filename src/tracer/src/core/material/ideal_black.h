@@ -11,12 +11,14 @@ class IdealBlack : public Material
     {
     public:
 
-        Spectrum eval(const Vec3&, const Vec3&, TransportMode) const noexcept override
+        Spectrum eval(
+            const Vec3&, const Vec3&, TransMode) const noexcept override
         {
             return Spectrum();
         }
 
-        BSDFSampleResult sample(const Vec3&, TransportMode mode, const Sample3&) const noexcept override
+        BSDFSampleResult sample(
+            const Vec3&, TransMode mode, const Sample3&) const noexcept override
         {
             return BSDF_SAMPLE_RESULT_INVALID;
         }
@@ -32,6 +34,11 @@ class IdealBlack : public Material
         }
 
         bool is_delta() const noexcept override
+        {
+            return false;
+        }
+
+        bool has_diffuse_component() const noexcept override
         {
             return false;
         }

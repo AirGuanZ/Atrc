@@ -4,8 +4,8 @@
 
 AGZ_TRACER_BEGIN
 
-std::shared_ptr<RendererInteractor> create_noout_reporter();
+RC<RendererInteractor> create_noout_reporter();
 
-std::shared_ptr<RendererInteractor> create_stdout_reporter();
+RC<RendererInteractor> create_stdout_reporter();
 
 AGZ_TRACER_END

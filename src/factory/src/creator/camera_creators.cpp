@@ -18,7 +18,9 @@ namespace camera
             return "pinhole";
         }
 
-        std::shared_ptr<Camera> create(const ConfigGroup &params, CreatingContext &context, real film_aspect) const override
+        RC<Camera> create(
+            const ConfigGroup &params, CreatingContext &context,
+            real film_aspect) const override
         {
             const Vec3 pos = params.child_vec3("pos");
             const Vec3 dst = params.child_vec3("dst");
@@ -42,7 +44,9 @@ namespace camera
             return "thin_lens";
         }
 
-        std::shared_ptr<Camera> create(const ConfigGroup &params, CreatingContext &context, real film_aspect) const override
+        RC<Camera> create(
+            const ConfigGroup &params, CreatingContext &context,
+            real film_aspect) const override
         {
             const Vec3 pos = params.child_vec3("pos");
             const Vec3 dst = params.child_vec3("dst");
@@ -53,7 +57,8 @@ namespace camera
             const real lens_radius    = params.child_real_or("lens_radius", 0);
             const real focal_distance = params.child_real_or("focal_distance", 1);
 
-            return create_thin_lens_camera(film_aspect, pos, dst, up, fov, lens_radius, focal_distance);
+            return create_thin_lens_camera(
+                film_aspect, pos, dst, up, fov, lens_radius, focal_distance);
         }
     };
 
@@ -61,8 +66,8 @@ namespace camera
 
 void initialize_camera_factory(Factory<Camera> &factory)
 {
-    factory.add_creator(std::make_unique<camera::PinholeCameraCreator>());
-    factory.add_creator(std::make_unique<camera::PerspectiveCameraCreator>());
+    factory.add_creator(newBox<camera::PinholeCameraCreator>());
+    factory.add_creator(newBox<camera::PerspectiveCameraCreator>());
 }
 
 AGZ_TRACER_FACTORY_END

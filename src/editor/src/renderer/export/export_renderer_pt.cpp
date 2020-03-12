@@ -5,9 +5,10 @@
 AGZ_EDITOR_BEGIN
 
 ExportRendererPT::ExportRendererPT(QWidget *parent)
+    : ExportRendererWidget(parent)
 {
-    min_depth_ = new QSlider(this);
-    max_depth_ = new QSlider(this);
+    min_depth_ = new QSpinBox(this);
+    max_depth_ = new QSpinBox(this);
 
     cont_prob_ = new RealSlider(this);
 
@@ -17,15 +18,14 @@ ExportRendererPT::ExportRendererPT(QWidget *parent)
     worker_count_   = new QSpinBox(this);
     task_grid_size_ = new QSpinBox(this);
 
-    min_depth_->setOrientation(Qt::Horizontal);
     min_depth_->setRange(1, 20);
     min_depth_->setValue(5);
 
-    max_depth_->setOrientation(Qt::Horizontal);
     max_depth_->setRange(1, 20);
     max_depth_->setValue(10);
 
-    connect(min_depth_, &QSlider::valueChanged, [=](int new_min_depth)
+    connect(min_depth_, qOverload<int>(&QSpinBox::valueChanged),
+        [=](int new_min_depth)
     {
         if(new_min_depth > max_depth_->value())
         {
@@ -35,7 +35,8 @@ ExportRendererPT::ExportRendererPT(QWidget *parent)
         }
     });
 
-    connect(max_depth_, &QSlider::valueChanged, [=](int new_max_depth)
+    connect(max_depth_, qOverload<int>(&QSpinBox::valueChanged),
+        [=](int new_max_depth)
     {
         if(new_max_depth < min_depth_->value())
         {
@@ -47,7 +48,7 @@ ExportRendererPT::ExportRendererPT(QWidget *parent)
 
     cont_prob_->set_orientation(Qt::Horizontal);
     cont_prob_->set_range(0, 1);
-    cont_prob_->set_value(real(0.5));
+    cont_prob_->set_value(real(0.9));
 
     use_mis_->setChecked(true);
     spp_->setRange(1, (std::numeric_limits<int>::max)());
@@ -88,9 +89,9 @@ ExportRendererPT::ExportRendererPT(QWidget *parent)
     layout->setContentsMargins(0, 0, 0, 0);
 }
 
-std::shared_ptr<tracer::ConfigGroup> ExportRendererPT::to_config() const
+RC<tracer::ConfigGroup> ExportRendererPT::to_config() const
 {
-    auto grp = std::make_shared<tracer::ConfigGroup>();
+    auto grp = newRC<tracer::ConfigGroup>();
 
     grp->insert_str("type", "pt");
     grp->insert_int("min_depth", min_depth_->value());

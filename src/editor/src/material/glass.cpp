@@ -80,9 +80,10 @@ ResourceWidget<tracer::Material> *GlassWidget::clone()
     return new GlassWidget(init_data, obj_ctx_);
 }
 
-std::unique_ptr<ResourceThumbnailProvider> GlassWidget::get_thumbnail(int width, int height) const
+Box<ResourceThumbnailProvider> GlassWidget::get_thumbnail(
+    int width, int height) const
 {
-    return std::make_unique<MaterialThumbnailProvider>(width, height, tracer_object_);
+    return newBox<MaterialThumbnailProvider>(width, height, tracer_object_);
 }
 
 void GlassWidget::save_asset(AssetSaver &saver)
@@ -106,9 +107,9 @@ void GlassWidget::load_asset(AssetLoader &loader)
     do_update_tracer_object();
 }
 
-std::shared_ptr<tracer::ConfigNode> GlassWidget::to_config(JSONExportContext &ctx) const
+RC<tracer::ConfigNode> GlassWidget::to_config(JSONExportContext &ctx) const
 {
-    auto grp = std::make_shared<tracer::ConfigGroup>();
+    auto grp = newRC<tracer::ConfigGroup>();
     grp->insert_str("type", "glass");
 
     if(use_color_refr_->isChecked())
@@ -143,7 +144,8 @@ void GlassWidget::do_update_tracer_object()
     tracer_object_ = create_glass(color, color_refr, ior);
 }
 
-ResourceWidget<tracer::Material> *GlassWidgetCreator::create_widget(ObjectContext &obj_ctx) const
+ResourceWidget<tracer::Material> *GlassWidgetCreator::create_widget(
+    ObjectContext &obj_ctx) const
 {
     return new GlassWidget({}, obj_ctx);
 }

@@ -19,7 +19,8 @@ public:
         return (std::numeric_limits<int>::max)();
     }
 
-    Spectrum tr(const Vec3 &a, const Vec3 &b, Sampler &sampler) const noexcept override
+    Spectrum tr(
+        const Vec3 &a, const Vec3 &b, Sampler &sampler) const noexcept override
     {
         const Spectrum exp = -sigma_a_ * (a - b).length();
         return {
@@ -29,17 +30,19 @@ public:
         };
     }
 
-    SampleOutScatteringResult sample_scattering(const Vec3 &a, const Vec3 &b, Sampler &sampler, Arena &arena) const override
+    SampleOutScatteringResult sample_scattering(
+        const Vec3 &a, const Vec3 &b,
+        Sampler &sampler, Arena &arena) const override
     {
         const Spectrum tr_value = tr(a, b, sampler);
         return { { }, tr_value, nullptr };
     }
 };
 
-std::shared_ptr<Medium> create_absorbtion_medium(
+RC<Medium> create_absorbtion_medium(
     const Spectrum &sigma_a)
 {
-    return std::make_shared<AbsorbtionMedium>(sigma_a);
+    return newRC<AbsorbtionMedium>(sigma_a);
 }
 
 AGZ_TRACER_END

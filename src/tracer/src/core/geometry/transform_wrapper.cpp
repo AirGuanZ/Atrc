@@ -4,7 +4,7 @@ AGZ_TRACER_BEGIN
 
 class TransformWrapper : public Geometry
 {
-    std::shared_ptr<const Geometry> internal_;
+    RC<const Geometry> internal_;
 
     Transform3 local_to_world_;
     real scale_ratio_ = 1;
@@ -31,7 +31,8 @@ class TransformWrapper : public Geometry
 
 public:
 
-    TransformWrapper(std::shared_ptr<const Geometry> internal, const Transform3 &local_to_world)
+    TransformWrapper(
+        RC<const Geometry> internal, const Transform3 &local_to_world)
         : internal_(std::move(internal))
     {
         init_transform(local_to_world);
@@ -47,7 +48,8 @@ public:
         return internal_->has_intersection(local_r);
     }
 
-    bool closest_intersection(const Ray &r, GeometryIntersection *inct) const noexcept override
+    bool closest_intersection(
+        const Ray &r, GeometryIntersection *inct) const noexcept override
     {
         const Ray local_r(
             local_to_world_.apply_inverse_to_point(r.o),
@@ -88,9 +90,11 @@ public:
         return spt;
     }
 
-    SurfacePoint sample(const Vec3 &ref, real *pdf, const Sample3 &sam) const noexcept override
+    SurfacePoint sample(
+        const Vec3 &ref, real *pdf, const Sample3 &sam) const noexcept override
     {
-        SurfacePoint spt = internal_->sample(local_to_world_.apply_inverse_to_point(ref), pdf, sam);
+        SurfacePoint spt = internal_->sample(
+            local_to_world_.apply_inverse_to_point(ref), pdf, sam);
 
         spt.pos            = local_to_world_.apply_to_point(spt.pos);
         spt.geometry_coord = local_to_world_.apply_to_coord(spt.geometry_coord);
@@ -103,7 +107,8 @@ public:
 
     real pdf(const Vec3 &pos) const noexcept override
     {
-        return internal_->pdf(local_to_world_.apply_inverse_to_point(pos)) / (scale_ratio_ * scale_ratio_);
+        return internal_->pdf(local_to_world_.apply_inverse_to_point(pos))
+             / (scale_ratio_ * scale_ratio_);
     }
 
     real pdf(const Vec3 &ref, const Vec3 &pos) const noexcept override
@@ -115,10 +120,10 @@ public:
     }
 };
 
-std::shared_ptr<Geometry> create_transform_wrapper(
-    std::shared_ptr<const Geometry> internal, const Transform3 &local_to_world)
+RC<Geometry> create_transform_wrapper(
+    RC<const Geometry> internal, const Transform3 &local_to_world)
 {
-    return std::make_shared<TransformWrapper>(std::move(internal), local_to_world);
+    return newRC<TransformWrapper>(std::move(internal), local_to_world);
 }
 
 AGZ_TRACER_END

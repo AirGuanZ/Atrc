@@ -13,7 +13,8 @@ class ACESToneMapper : public PostProcessor
         constexpr real tC = real(2.43);
         constexpr real tD = real(0.59);
         constexpr real tE = real(0.14);
-        return math::clamp((x * (tA * x + tB)) / (x * (tC * x + tD) + tE), real(0), real(1));
+        return math::clamp(
+            (x * (tA * x + tB)) / (x * (tC * x + tD) + tE), real(0), real(1));
     }
 
     static Spectrum avg_lum(const Image2D<Spectrum> &img)
@@ -23,9 +24,12 @@ class ACESToneMapper : public PostProcessor
         {
             for(int x = 0; x < img.width(); ++x)
             {
-                sum.r += std::log(real(0.01) + math::clamp<real>(img(y, x).r, 0, 4));
-                sum.g += std::log(real(0.01) + math::clamp<real>(img(y, x).g, 0, 4));
-                sum.b += std::log(real(0.01) + math::clamp<real>(img(y, x).b, 0, 4));
+                sum.r += std::log(real(0.01) +
+                         math::clamp<real>(img(y, x).r, 0, 4));
+                sum.g += std::log(real(0.01) +
+                         math::clamp<real>(img(y, x).g, 0, 4));
+                sum.b += std::log(real(0.01) +
+                         math::clamp<real>(img(y, x).b, 0, 4));
             }
         }
 
@@ -68,9 +72,9 @@ public:
     }
 };
 
-std::shared_ptr<PostProcessor> create_aces_tone_mapper(real exposure)
+RC<PostProcessor> create_aces_tone_mapper(real exposure)
 {
-    return std::make_shared<ACESToneMapper>(exposure);
+    return newRC<ACESToneMapper>(exposure);
 }
 
 AGZ_TRACER_END

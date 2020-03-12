@@ -26,7 +26,7 @@ public:
 
     ~PreviewWindow();
 
-    std::shared_ptr<tracer::Camera> create_camera();
+    RC<tracer::Camera> create_camera();
 
     CameraPanel *get_camera_panel();
 
@@ -58,7 +58,7 @@ public:
 
     void load_asset(AssetLoader &loader);
 
-    std::shared_ptr<tracer::ConfigGroup> to_config() const;
+    RC<tracer::ConfigGroup> to_config() const;
 
 signals:
 
@@ -151,7 +151,7 @@ private:
 
     GizmoSelector *gizmo_selector_ = nullptr;
 
-    std::unique_ptr<Im3d::Im3dInst> im3d_;
+    Box<Im3d::Im3dInst> im3d_;
 
     QMatrix4x4 proj_view_;
 
@@ -167,7 +167,7 @@ private:
 
     EntityShaderUniforms entity_uniforms_;
 
-    std::unique_ptr<QOpenGLShaderProgram> entity_shader_;
+    Box<QOpenGLShaderProgram> entity_shader_;
 
     // preview image rendering
 
@@ -178,9 +178,9 @@ private:
 
     PreviewShaderUniforms preview_uniforms_;
 
-    std::unique_ptr<QOpenGLShaderProgram> preview_shader_;
+    Box<QOpenGLShaderProgram> preview_shader_;
 
-    std::unique_ptr<QOpenGLTexture> preview_tex_;
+    Box<QOpenGLTexture> preview_tex_;
 
     QOpenGLBuffer            preview_vbo_;
     QOpenGLVertexArrayObject preview_vao_;
@@ -194,7 +194,7 @@ private:
 
     RenderFrameShaderUniforms render_frame_uniforms_;
 
-    std::unique_ptr<QOpenGLShaderProgram> render_frame_shader_;
+    Box<QOpenGLShaderProgram> render_frame_shader_;
 
     QOpenGLBuffer            render_frame_vbo_;
     QOpenGLVertexArrayObject render_frame_vao_;

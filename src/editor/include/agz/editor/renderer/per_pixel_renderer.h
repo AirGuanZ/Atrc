@@ -12,7 +12,7 @@ public:
         int worker_count, int task_grid_size, int init_pixel_size,
         int framebuffer_width, int framebuffer_height,
         bool enable_fast_rendering, int fast_resolution, int fast_task_grid_size,
-        std::shared_ptr<const tracer::Scene> scene);
+        RC<const tracer::Scene> scene);
 
     ~PerPixelRenderer();
 
@@ -24,15 +24,21 @@ protected:
 
     void stop_rendering();
 
-    virtual Spectrum fast_render_pixel(const tracer::Scene &scene, const tracer::Ray &ray, tracer::Sampler &sampler, tracer::Arena &arena) = 0;
+    virtual Spectrum fast_render_pixel(
+        const tracer::Scene &scene, const tracer::Ray &ray,
+        tracer::Sampler &sampler, tracer::Arena &arena) = 0;
 
-    virtual Spectrum render_pixel(const tracer::Scene &scene, const tracer::Ray &ray, tracer::Sampler &sampler, tracer::Arena &arena) = 0;
+    virtual Spectrum render_pixel(
+        const tracer::Scene &scene, const tracer::Ray &ray,
+        tracer::Sampler &sampler, tracer::Arena &arena) = 0;
 
 private:
 
     Image2D<Spectrum> do_fast_rendering();
 
-    void exec_fast_render_task(Image2D<Spectrum> &target, const Vec2i &beg, const Vec2i &end, tracer::Sampler &sampler);
+    void exec_fast_render_task(
+        Image2D<Spectrum> &target, const Vec2i &beg, const Vec2i &end,
+        tracer::Sampler &sampler);
 
     void exec_render_task(Framebuffer::Task &task, tracer::Sampler *sampler);
 
@@ -45,7 +51,7 @@ private:
     int fast_resolution_;
     int fast_task_grid_size_;
 
-    std::shared_ptr<const tracer::Scene> scene_;
+    RC<const tracer::Scene> scene_;
 
     Framebuffer framebuffer_;
 

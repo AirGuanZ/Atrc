@@ -80,7 +80,8 @@ void GUI::on_load_config()
         mbox.setWindowTitle("Error");
 
         std::vector<std::string> err_strs;
-        agz::misc::extract_hierarchy_exceptions(err, std::back_inserter(err_strs));
+        agz::misc::extract_hierarchy_exceptions(
+            err, std::back_inserter(err_strs));
 
         QString err_msg;
         for(auto &s : err_strs)
@@ -121,7 +122,8 @@ void GUI::on_update_pbar(double percent)
 
 void GUI::on_exec_post_processor()
 {
-    if(render_session_.render_settings && render_session_.render_settings->renderer->is_waitable())
+    if(render_session_.render_settings &&
+       render_session_.render_settings->renderer->is_waitable())
     {
         if(render_session_.render_settings->renderer->is_doing_rendering())
         {
@@ -132,7 +134,8 @@ void GUI::on_exec_post_processor()
         }
         else
         {
-            auto render_target = render_session_.render_settings->renderer->wait_async();
+            auto render_target = render_session_.render_settings
+                                    ->renderer->wait_async();
             for(auto &p : render_session_.render_settings->post_processors)
                 p->process(render_target);
 
@@ -156,10 +159,14 @@ void GUI::start_rendering(const std::string &input_filename)
 
     auto path_mapper = std::make_unique<agz::tracer::factory::BasicPathMapper>();
     {
-        const auto working_dir = absolute(std::filesystem::current_path()).lexically_normal().string();
+        const auto working_dir = absolute(
+            std::filesystem::current_path()).lexically_normal().string();
         path_mapper->add_replacer(WORKING_DIR_PATH_NAME, working_dir);
 
-        const auto scene_dir = absolute(std::filesystem::path(input_filename)).parent_path().lexically_normal().string();
+        const auto scene_dir = absolute(
+            std::filesystem::path(input_filename))
+                .parent_path().lexically_normal().string();
+
         path_mapper->add_replacer(SCENE_DESC_PATH_NAME, scene_dir);
     }
     render_context_->path_mapper = std::move(path_mapper);
@@ -169,9 +176,11 @@ void GUI::start_rendering(const std::string &input_filename)
     render_context_->root_params = agz::tracer::factory::json_to_config(
         agz::tracer::factory::string_to_json(input_content));
 
-    const auto rendering_config = render_context_->root_params.child_group("rendering");
+    const auto rendering_config = render_context_->root_params
+                                                 .child_group("rendering");
     if(!rendering_config.is_group())
-        throw std::runtime_error("rendering setting array is not supported by Atrc GUI");
+        throw std::runtime_error(
+            "rendering setting array is not supported by Atrc GUI");
 
     agz::tracer::real eps = agz::tracer::real(3e-4);
     if(auto node = rendering_config.find_child_value("eps"))
@@ -183,10 +192,12 @@ void GUI::start_rendering(const std::string &input_filename)
 
     auto scene = render_context_->context.create<agz::tracer::Scene>(scene_config);
 
-    render_session_ = create_render_session(scene, rendering_config, render_context_->context);
+    render_session_ = create_render_session(
+        scene, rendering_config, render_context_->context);
 
     reporter_ = std::make_shared<GUIProgressReporter>(
-        std::chrono::duration_cast<GUIProgressReporter::Clock::duration>(std::chrono::milliseconds(500)));
+        std::chrono::duration_cast<GUIProgressReporter::Clock::duration>(
+            std::chrono::milliseconds(500)));
     render_session_.render_settings->reporter = reporter_;
 
     agz::tracer::FilmFilterApplier film_filter_applier(
@@ -197,8 +208,10 @@ void GUI::start_rendering(const std::string &input_filename)
     scene->set_camera(render_session_.render_settings->camera);
     scene->start_rendering();
 
-    connect(reporter_.get(), &GUIProgressReporter::update_preview, this, &GUI::on_update_preview);
-    connect(reporter_.get(), &GUIProgressReporter::update_pbar, this, &GUI::on_update_pbar);
+    connect(reporter_.get(), &GUIProgressReporter::update_preview,
+            this, &GUI::on_update_preview);
+    connect(reporter_.get(), &GUIProgressReporter::update_pbar,
+            this, &GUI::on_update_pbar);
 
     render_session_.render_settings->renderer->render_async(
         film_filter_applier,

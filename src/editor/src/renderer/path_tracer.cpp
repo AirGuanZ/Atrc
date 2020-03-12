@@ -2,7 +2,8 @@
 
 AGZ_EDITOR_BEGIN
 
-PathTracer::PathTracer(const Params &params, int fb_width, int fb_height, std::shared_ptr<const tracer::Scene> scene)
+PathTracer::PathTracer(const Params &params, int fb_width, int fb_height,
+                       RC<const tracer::Scene> scene)
     : PerPixelRenderer(
         params.worker_count, params.task_grid_size, 3,
         fb_width, fb_height, params.enable_preview, 128, 32, scene)
@@ -26,7 +27,8 @@ PathTracer::~PathTracer()
 }
 
 Spectrum PathTracer::fast_render_pixel(
-    const tracer::Scene &scene, const tracer::Ray &ray, tracer::Sampler &sampler, tracer::Arena &arena)
+    const tracer::Scene &scene, const tracer::Ray &ray,
+    tracer::Sampler &sampler, tracer::Arena &arena)
 {
     if(fast_preview_)
         return trace_albedo_ao(fast_preview_params_, scene, ray, sampler, arena).value;
@@ -34,7 +36,8 @@ Spectrum PathTracer::fast_render_pixel(
 }
 
 Spectrum PathTracer::render_pixel(
-    const tracer::Scene &scene, const tracer::Ray &ray, tracer::Sampler &sampler, tracer::Arena &arena)
+    const tracer::Scene &scene, const tracer::Ray &ray,
+    tracer::Sampler &sampler, tracer::Arena &arena)
 {
     return trace_std(trace_params_, scene, ray, sampler, arena).value;
 }

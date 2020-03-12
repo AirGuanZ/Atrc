@@ -21,7 +21,7 @@ namespace scene
             return "default";
         }
 
-        std::shared_ptr<Scene> create(const ConfigGroup &params, CreatingContext &context) const override
+        RC<Scene> create(const ConfigGroup &params, CreatingContext &context) const override
         {
             DefaultSceneParams scene_params;
 
@@ -54,7 +54,7 @@ namespace scene
             else
                 scene_params.aggregate = create_native_aggregate();
 
-            std::vector<std::shared_ptr<const Entity>> const_entities;
+            std::vector<RC<const Entity>> const_entities;
             const_entities.reserve(scene_params.entities.size());
             for(auto ent : scene_params.entities)
                 const_entities.push_back(ent);
@@ -68,7 +68,7 @@ namespace scene
 
 void initialize_scene_factory(Factory<Scene> &factory)
 {
-    factory.add_creator(std::make_unique<scene::DefaultSceneCreator>());
+    factory.add_creator(newBox<scene::DefaultSceneCreator>());
 }
 
 AGZ_TRACER_FACTORY_END

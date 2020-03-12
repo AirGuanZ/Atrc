@@ -10,20 +10,24 @@ namespace
 {
     class DiffuseLight : public AreaLight
     {
-        std::shared_ptr<const Geometry> geometry_;
+        RC<const Geometry> geometry_;
         Spectrum radiance_;
         MediumInterface medium_interface_;
 
     public:
 
-        DiffuseLight(std::shared_ptr<const Geometry> geometry, const Spectrum &radiance, const MediumInterface &med)
+        DiffuseLight(
+            RC<const Geometry> geometry,
+            const Spectrum &radiance,
+            const MediumInterface &med)
         {
             geometry_ = std::move(geometry);
             radiance_ = radiance;
             medium_interface_ = med;
         }
 
-        LightSampleResult sample(const Vec3 &ref, const Sample5 &sam) const noexcept override
+        LightSampleResult sample(
+            const Vec3 &ref, const Sample5 &sam) const noexcept override
         {
             real pdf_area;
             const auto spt = geometry_->sample(ref, &pdf_area, { sam.u, sam.v, sam.r });
@@ -39,12 +43,14 @@ namespace
             ret.nor      = spt.geometry_coord.z;
             ret.ref      = ref;
             ret.radiance = radiance_;
-            ret.pdf      = pdf_area * dist2 / std::abs(cos(spt.geometry_coord.z, spt_to_ref));
+            ret.pdf      = pdf_area * dist2
+                         / std::abs(cos(spt.geometry_coord.z, spt_to_ref));
 
             return ret;
         }
 
-        real pdf(const Vec3 &ref, const SurfacePoint &spt) const noexcept override
+        real pdf(
+            const Vec3 &ref, const SurfacePoint &spt) const noexcept override
         {
             if(dot(spt.geometry_coord.z, ref - spt.pos) <= 0)
                 return 0;
@@ -52,17 +58,24 @@ namespace
             const real area_pdf = geometry_->pdf(ref, spt.pos);
             const Vec3 spt_to_ref = ref - spt.pos;
             const real dist2 = spt_to_ref.length_square();
-            const real area_to_solid_angle_factor = dist2 / std::abs(cos(spt.geometry_coord.z, spt_to_ref));
+            const real abscos = std::abs(cos(spt.geometry_coord.z, spt_to_ref));
+            const real area_to_solid_angle_factor = dist2 / abscos;
+
             return area_pdf * area_to_solid_angle_factor;
         }
 
         LightEmitResult sample_emit(const Sample5 &sam) const noexcept override
         {
             real pdf_pos;
-            const auto surface_point = geometry_->sample(&pdf_pos, { sam.u, sam.v, sam.w });
+            const auto surface_point = geometry_->sample(
+                &pdf_pos, { sam.u, sam.v, sam.w });
 
-            const auto [local_dir, pdf_dir] = math::distribution::zweighted_on_hemisphere(sam.r, sam.s);
-            const Vec3 global_dir = surface_point.geometry_coord.local_to_global(local_dir);
+            const auto [local_dir, pdf_dir] = math::distribution
+                    ::zweighted_on_hemisphere(sam.r, sam.s);
+
+            const Vec3 global_dir = surface_point
+                .geometry_coord
+                .local_to_global(local_dir);
 
             LightEmitResult ret;
             ret.pos  = surface_point.eps_offset(global_dir);
@@ -75,11 +88,15 @@ namespace
             return ret;
         }
 
-        LightEmitPDFResult emit_pdf(const Vec3 &position, const Vec3 &direction, const Vec3 &normal) const noexcept override
+        LightEmitPDFResult emit_pdf(
+            const Vec3 &pos, const Vec3 &dir, const Vec3 &nor) const noexcept override
         {
-            const real local_dir_z = cos(direction, normal);
-            const real pdf_pos = geometry_->pdf(position);
-            const real pdf_dir = math::distribution::zweighted_on_hemisphere_pdf(local_dir_z);
+            const real local_dir_z = cos(dir, nor);
+            const real pdf_pos = geometry_->pdf(pos);
+
+            const real pdf_dir = math::distribution
+                ::zweighted_on_hemisphere_pdf(local_dir_z);
+
             return { pdf_pos, pdf_dir };
         }
 
@@ -88,7 +105,9 @@ namespace
             return PI_r * radiance_ * geometry_->surface_area();
         }
 
-        Spectrum radiance(const Vec3 &pos, const Vec3 &nor, const Vec2 &uv, const Vec3 &light_to_out) const noexcept override
+        Spectrum radiance(
+            const Vec3 &pos, const Vec3 &nor, const Vec2 &uv,
+            const Vec3 &light_to_out) const noexcept override
         {
             return dot(nor, light_to_out) > 0 ? radiance_ : Spectrum();
         }
@@ -107,15 +126,17 @@ namespace
 
 class DiffuseLightEntity : public Entity
 {
-    std::unique_ptr<DiffuseLight> light_;
-    std::shared_ptr<Material> material_;
+    Box<DiffuseLight> light_;
+    RC<Material> material_;
 
 public:
 
     void initialize(
-        std::shared_ptr<const Geometry> geometry, const Spectrum &radiance, const MediumInterface &med, bool no_denoise)
+        RC<const Geometry> geometry,
+        const Spectrum &radiance,
+        const MediumInterface &med, bool no_denoise)
     {
-        light_ = std::make_unique<DiffuseLight>(std::move(geometry), radiance, med);
+        light_ = newBox<DiffuseLight>(std::move(geometry), radiance, med);
         material_ = create_ideal_black();
         set_no_denoise_flag(no_denoise);
     }
@@ -125,7 +146,8 @@ public:
         return light_->geometry()->has_intersection(r);
     }
 
-    bool closest_intersection(const Ray &r, EntityIntersection *inct) const noexcept override
+    bool closest_intersection(
+        const Ray &r, EntityIntersection *inct) const noexcept override
     {
         if(!light_->geometry()->closest_intersection(r, inct))
             return false;
@@ -152,13 +174,13 @@ public:
     }
 };
 
-std::shared_ptr<Entity> create_diffuse_light(
-    std::shared_ptr<const Geometry> geometry,
+RC<Entity> create_diffuse_light(
+    RC<const Geometry> geometry,
     const Spectrum &radiance,
     const MediumInterface &med,
     bool no_denoise)
 {
-    auto ret = std::make_shared<DiffuseLightEntity>();
+    auto ret = newRC<DiffuseLightEntity>();
     ret->initialize(geometry, radiance, med, no_denoise);
     return ret;
 }

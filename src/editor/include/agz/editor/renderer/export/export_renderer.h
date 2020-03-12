@@ -14,7 +14,7 @@ public:
 
     virtual ~ExportRendererWidget() = default;
 
-    virtual std::shared_ptr<tracer::ConfigGroup> to_config() const = 0;
+    virtual RC<tracer::ConfigGroup> to_config() const = 0;
 };
 
 class ExportRendererPanel : public QWidget
@@ -23,7 +23,7 @@ public:
 
     ExportRendererPanel();
 
-    std::shared_ptr<tracer::ConfigGroup> to_config() const;
+    RC<tracer::ConfigGroup> to_config() const;
 
 private:
 

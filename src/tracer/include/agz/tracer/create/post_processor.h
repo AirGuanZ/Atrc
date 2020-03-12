@@ -4,27 +4,27 @@
 
 AGZ_TRACER_BEGIN
 
-std::shared_ptr<PostProcessor> create_aces_tone_mapper(
+RC<PostProcessor> create_aces_tone_mapper(
     real exposure);
 
-std::shared_ptr<PostProcessor> create_film_flipper(
+RC<PostProcessor> create_film_flipper(
     bool vertically, bool horizontally);
 
-std::shared_ptr<PostProcessor> create_gamma_corrector(
+RC<PostProcessor> create_gamma_corrector(
     real gamma);
 
-std::shared_ptr<PostProcessor> create_oidn_denoiser(
+RC<PostProcessor> create_oidn_denoiser(
     bool clamp_color);
 
-std::shared_ptr<PostProcessor> create_saving_gbuffer_to_png(
+RC<PostProcessor> create_saving_gbuffer_to_png(
     std::string albedo_filename,
     std::string normal_filename);
 
-std::shared_ptr<PostProcessor> create_saving_to_img(
+RC<PostProcessor> create_saving_to_img(
     std::string filename, std::string ext,
     bool open, real gamma);
 
-std::shared_ptr<PostProcessor> create_img_resizer(
+RC<PostProcessor> create_img_resizer(
     const Vec2i &target_size);
 
 AGZ_TRACER_END

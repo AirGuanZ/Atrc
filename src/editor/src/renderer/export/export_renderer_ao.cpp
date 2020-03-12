@@ -64,17 +64,20 @@ ExportRendererAO::ExportRendererAO(QWidget *parent)
     layout->setContentsMargins(0, 0, 0, 0);
 }
 
-std::shared_ptr<tracer::ConfigGroup> ExportRendererAO::to_config() const
+RC<tracer::ConfigGroup> ExportRendererAO::to_config() const
 {
-    auto grp = std::make_shared<tracer::ConfigGroup>();
+    auto grp = newRC<tracer::ConfigGroup>();
 
     grp->insert_str("type", "ao");
     grp->insert_int("worker_count", worker_count_->value());
     grp->insert_int("task_grid_size", task_grid_size_->value());
     grp->insert_int("ao_sample_count", ao_sps_->value());
-    grp->insert_child("low_color", tracer::ConfigArray::from_spectrum(bottom_->get_color()));
-    grp->insert_child("high_color", tracer::ConfigArray::from_spectrum(top_->get_color()));
-    grp->insert_child("background_color", tracer::ConfigArray::from_spectrum(background_->get_color()));
+    grp->insert_child(
+        "low_color", tracer::ConfigArray::from_spectrum(bottom_->get_color()));
+    grp->insert_child(
+        "high_color", tracer::ConfigArray::from_spectrum(top_->get_color()));
+    grp->insert_child(
+        "background_color", tracer::ConfigArray::from_spectrum(background_->get_color()));
     grp->insert_real("max_occlusion_distance", max_occlusion_distance_->get_value());
     grp->insert_int("spp", spp_->value());
 

@@ -26,11 +26,14 @@ struct Texture3DCommonParams
         Transform3 ret;
         
         if(inv_u)
-            ret *= Transform3(Trans4::translate(1, 0, 0) * Trans4::scale(-1, 1, 1));
+            ret *= Transform3(Trans4::translate(1, 0, 0) *
+                              Trans4::scale(-1, 1, 1));
         if(inv_v)
-            ret *= Transform3(Trans4::translate(0, 1, 0) * Trans4::scale(1, -1, 1));
+            ret *= Transform3(Trans4::translate(0, 1, 0) *
+                              Trans4::scale(1, -1, 1));
         if(inv_w)
-            ret *= Transform3(Trans4::translate(0, 0, 1) * Trans4::scale(1, 1, -1));
+            ret *= Transform3(Trans4::translate(0, 0, 1) *
+                              Trans4::scale(1, 1, -1));
 
         auto perm_to_row = [&](int perm)
         {
@@ -44,10 +47,10 @@ struct Texture3DCommonParams
         const Vec3 v_row = perm_to_row(uvw_perm.y);
         const Vec3 w_row = perm_to_row(uvw_perm.z);
 
-        ret *= Transform3(Mat4::from_rows(Vec4(u_row,          0),
-                                            Vec4(v_row,          0),
-                                            Vec4(w_row,          0),
-                                            Vec4(0, 0, 0, 1)));
+        ret *= Transform3(Mat4::from_rows(Vec4(u_row, 0),
+                                          Vec4(v_row, 0),
+                                          Vec4(w_row, 0),
+                                          Vec4(0, 0, 0, 1)));
 
         ret *= transform;
 

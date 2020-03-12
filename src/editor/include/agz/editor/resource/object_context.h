@@ -12,7 +12,7 @@ class ObjectContext
     using FactoryTuple = std::tuple<ResourceWidgetFactory<TracerObjects>...>;
 
     template<typename...TracerObjects>
-    using PoolTuple = std::tuple<std::unique_ptr<ResourcePool<TracerObjects>>...>;
+    using PoolTuple = std::tuple<Box<ResourcePool<TracerObjects>>...>;
 
     template <typename T, typename Tuple>
     struct has_type;
@@ -49,10 +49,10 @@ public:
     template<typename TracerObject>
     const ResourcePool<TracerObject> *pool() const noexcept
     {
-        if constexpr(!has_type<std::unique_ptr<ResourcePool<TracerObject>>, decltype(pools_)>::value)
+        if constexpr(!has_type<Box<ResourcePool<TracerObject>>, decltype(pools_)>::value)
             return nullptr;
         else
-            return std::get<std::unique_ptr<ResourcePool<TracerObject>>>(pools_).get();
+            return std::get<Box<ResourcePool<TracerObject>>>(pools_).get();
     }
 
     template<typename TracerObject>
@@ -64,10 +64,10 @@ public:
     template<typename TracerObject>
     ResourcePool<TracerObject> *pool() noexcept
     {
-        if constexpr(!has_type<std::unique_ptr<ResourcePool<TracerObject>>, decltype(pools_)>::value)
+        if constexpr(!has_type<Box<ResourcePool<TracerObject>>, decltype(pools_)>::value)
             return nullptr;
         else
-            return std::get<std::unique_ptr<ResourcePool<TracerObject>>>(pools_).get();
+            return std::get<Box<ResourcePool<TracerObject>>>(pools_).get();
     }
 };
 

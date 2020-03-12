@@ -9,17 +9,17 @@ AGZ_TRACER_BEGIN
 
 class GeometricEntity : public Entity
 {
-    std::shared_ptr<const Geometry> geometry_;
-    std::shared_ptr<const Material> material_;
+    RC<const Geometry> geometry_;
+    RC<const Material> material_;
     MediumInterface medium_interface_;
 
-    std::unique_ptr<GeometryToDiffuseLight> diffuse_light_;
+    Box<GeometryToDiffuseLight> diffuse_light_;
 
 public:
 
     GeometricEntity(
-        std::shared_ptr<const Geometry> geometry,
-        std::shared_ptr<const Material> material,
+        RC<const Geometry> geometry,
+        RC<const Material> material,
         const MediumInterface &med,
         const Spectrum &emit_radiance,
         bool no_denoise)
@@ -31,7 +31,10 @@ public:
         set_no_denoise_flag(no_denoise);
 
         if(!emit_radiance.is_black())
-            diffuse_light_ = std::make_unique<GeometryToDiffuseLight>(geometry_.get(), emit_radiance);
+        {
+            diffuse_light_ = newBox<GeometryToDiffuseLight>(
+                geometry_.get(), emit_radiance);
+        }
     }
 
     bool has_intersection(const Ray &r) const noexcept override
@@ -39,7 +42,8 @@ public:
         return geometry_->has_intersection(r);
     }
 
-    bool closest_intersection(const Ray &r, EntityIntersection *inct) const noexcept override
+    bool closest_intersection(
+        const Ray &r, EntityIntersection *inct) const noexcept override
     {
         if(!geometry_->closest_intersection(r, inct))
             return false;
@@ -68,15 +72,16 @@ public:
     }
 };
 
-std::shared_ptr<Entity> create_geometric(
-    std::shared_ptr<const Geometry> geometry,
-    std::shared_ptr<const Material> material,
+RC<Entity> create_geometric(
+    RC<const Geometry> geometry,
+    RC<const Material> material,
     const MediumInterface &med,
     const Spectrum &emit_radiance,
     bool no_denoise)
 {
-    return std::make_shared<GeometricEntity>(
-        std::move(geometry), std::move(material), med, emit_radiance, no_denoise);
+    return newRC<GeometricEntity>(
+        std::move(geometry), std::move(material),
+        med, emit_radiance, no_denoise);
 }
 
 AGZ_TRACER_END

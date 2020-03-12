@@ -12,8 +12,9 @@ public:
 
     explicit ParticleTracerWidget(QWidget *parent);
 
-    std::unique_ptr<Renderer> create_renderer(
-        std::shared_ptr<tracer::Scene> scene, const Vec2i &framebuffer_size, bool enable_preview) const override;
+    Box<Renderer> create_renderer(
+        RC<tracer::Scene> scene, const Vec2i &framebuffer_size,
+        bool enable_preview) const override;
 
 private:
 

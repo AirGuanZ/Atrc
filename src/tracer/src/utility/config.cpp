@@ -27,7 +27,8 @@ namespace
             return Vec2(x, y);
         }
 
-        throw ConfigException(stdstr::cat("invalid array size (actual = ", arr.size(), ")"));
+        throw ConfigException(stdstr::cat(
+            "invalid array size (actual = ", arr.size(), ")"));
 
         AGZ_HIERARCHY_WRAP("in config to_vec2")
     }
@@ -245,6 +246,9 @@ namespace
 
         if(type == "scale")
         {
+            auto ratio_node = group.find_child("ratio");
+            if(ratio_node->is_array())
+                return Transform3::scale(group.child_vec3("ratio"));
             const real ratio = group.child_real("ratio");
             return Transform3::scale(ratio, ratio, ratio);
         }
@@ -571,7 +575,7 @@ std::string ConfigGroup::child_str_or(const std::string &name, const std::string
     return default_val;
 }
 
-void ConfigGroup::insert_child(const std::string &name, std::shared_ptr<ConfigNode> child)
+void ConfigGroup::insert_child(const std::string &name, RC<ConfigNode> child)
 {
     assert(child != nullptr);
     group_[name] = std::move(child);
@@ -579,22 +583,22 @@ void ConfigGroup::insert_child(const std::string &name, std::shared_ptr<ConfigNo
 
 void ConfigGroup::insert_real(const std::string &name, real value)
 {
-    insert_child(name, std::make_shared<ConfigValue>(std::to_string(value)));
+    insert_child(name, newRC<ConfigValue>(std::to_string(value)));
 }
 
 void ConfigGroup::insert_int(const std::string &name, int value)
 {
-    insert_child(name, std::make_shared<ConfigValue>(std::to_string(value)));
+    insert_child(name, newRC<ConfigValue>(std::to_string(value)));
 }
 
 void ConfigGroup::insert_str(const std::string &name, const std::string &str)
 {
-    insert_child(name, std::make_shared<ConfigValue>(str));
+    insert_child(name, newRC<ConfigValue>(str));
 }
 
 void ConfigGroup::insert_bool(const std::string &name, bool value)
 {
-    insert_child(name, std::make_shared<ConfigValue>(value ? "1" : "0"));
+    insert_child(name, newRC<ConfigValue>(value ? "1" : "0"));
 }
 
 const char *ConfigArray::type() const noexcept
@@ -721,51 +725,51 @@ const std::string& ConfigArray::at_str(size_t idx) const
     return at_value(idx).as_str();
 }
 
-void ConfigArray::push_back(std::shared_ptr<ConfigNode> elem)
+void ConfigArray::push_back(RC<ConfigNode> elem)
 {
     array_.push_back(std::move(elem));
 }
 
 void ConfigArray::push_back_real(real value)
 {
-    push_back(std::make_shared<ConfigValue>(std::to_string(value)));
+    push_back(newRC<ConfigValue>(std::to_string(value)));
 }
 
 void ConfigArray::push_back_int(int value)
 {
-    push_back(std::make_shared<ConfigValue>(std::to_string(value)));
+    push_back(newRC<ConfigValue>(std::to_string(value)));
 }
 
 void ConfigArray::push_back_str(const std::string &str)
 {
-    push_back(std::make_shared<ConfigValue>(str));
+    push_back(newRC<ConfigValue>(str));
 }
 
 void ConfigArray::push_back_bool(bool value)
 {
-    push_back(std::make_shared<ConfigValue>(value ? "1" : "0"));
+    push_back(newRC<ConfigValue>(value ? "1" : "0"));
 }
 
-std::shared_ptr<ConfigArray> ConfigArray::from_vec2(const Vec2 &v)
+RC<ConfigArray> ConfigArray::from_vec2(const Vec2 &v)
 {
-    auto arr = std::make_shared<ConfigArray>();
+    auto arr = newRC<ConfigArray>();
     arr->push_back_real(v.x);
     arr->push_back_real(v.y);
     return arr;
 }
 
-std::shared_ptr<ConfigArray> ConfigArray::from_vec3(const Vec3 &v)
+RC<ConfigArray> ConfigArray::from_vec3(const Vec3 &v)
 {
-    auto arr = std::make_shared<ConfigArray>();
+    auto arr = newRC<ConfigArray>();
     arr->push_back_real(v.x);
     arr->push_back_real(v.y);
     arr->push_back_real(v.z);
     return arr;
 }
 
-std::shared_ptr<ConfigArray> ConfigArray::from_vec4(const Vec4 &v)
+RC<ConfigArray> ConfigArray::from_vec4(const Vec4 &v)
 {
-    auto arr = std::make_shared<ConfigArray>();
+    auto arr = newRC<ConfigArray>();
     arr->push_back_real(v.x);
     arr->push_back_real(v.y);
     arr->push_back_real(v.z);
@@ -773,26 +777,26 @@ std::shared_ptr<ConfigArray> ConfigArray::from_vec4(const Vec4 &v)
     return arr;
 }
 
-std::shared_ptr<ConfigArray> ConfigArray::from_vec2i(const Vec2i &v)
+RC<ConfigArray> ConfigArray::from_vec2i(const Vec2i &v)
 {
-    auto arr = std::make_shared<ConfigArray>();
+    auto arr = newRC<ConfigArray>();
     arr->push_back_int(v.x);
     arr->push_back_int(v.y);
     return arr;
 }
 
-std::shared_ptr<ConfigArray> ConfigArray::from_vec3i(const Vec3i &v)
+RC<ConfigArray> ConfigArray::from_vec3i(const Vec3i &v)
 {
-    auto arr = std::make_shared<ConfigArray>();
+    auto arr = newRC<ConfigArray>();
     arr->push_back_int(v.x);
     arr->push_back_int(v.y);
     arr->push_back_int(v.z);
     return arr;
 }
 
-std::shared_ptr<ConfigArray> ConfigArray::from_spectrum(const Spectrum &v)
+RC<ConfigArray> ConfigArray::from_spectrum(const Spectrum &v)
 {
-    auto arr = std::make_shared<ConfigArray>();
+    auto arr = newRC<ConfigArray>();
     for(int i = 0; i < SPECTRUM_COMPONENT_COUNT; ++i)
         arr->push_back_real(v[i]);
     return arr;

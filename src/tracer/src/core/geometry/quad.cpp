@@ -27,7 +27,8 @@ public:
                has_intersection_with_triangle(r, a_, c_a_, d_a_);
     }
 
-    bool closest_intersection(const Ray &r, GeometryIntersection *inct) const noexcept override
+    bool closest_intersection(
+        const Ray &r, GeometryIntersection *inct) const noexcept override
     {
         TriangleIntersectionRecord inct_rcd;
 
@@ -78,7 +79,8 @@ public:
 
     SurfacePoint sample(real *pdf, const Sample3 &sam) const noexcept override
     {
-        const Vec2 bi_coord = math::distribution::uniform_on_triangle(sam.u, sam.v);
+        const Vec2 bi_coord = math::distribution
+                                ::uniform_on_triangle(sam.u, sam.v);
         SurfacePoint spt;
 
         if(sam.w < sample_abc_prob_)
@@ -102,7 +104,8 @@ public:
         return spt;
     }
 
-    SurfacePoint sample(const Vec3&, real *pdf, const Sample3 &sam) const noexcept override
+    SurfacePoint sample(
+        const Vec3&, real *pdf, const Sample3 &sam) const noexcept override
     {
         return sample(pdf, sam);
     }
@@ -161,13 +164,13 @@ private:
     }
 };
 
-std::shared_ptr<Geometry> create_quad(
+RC<Geometry> create_quad(
     const Vec3 &a, const Vec3 &b, const Vec3 &c, const Vec3 &d,
     const Vec2 &t_a, const Vec2 &t_b, const Vec2 &t_c, const Vec2 &t_d,
     const Transform3 &local_to_world)
 {
     Quad::Params params = { a, b, c, d, t_a, t_b, t_c, t_d, local_to_world };
-    return std::make_shared<Quad>(params);
+    return newRC<Quad>(params);
 }
 
 AGZ_TRACER_END

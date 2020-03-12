@@ -3,7 +3,8 @@
 AGZ_EDITOR_BEGIN
 
 template<typename TracerObject>
-ResourceReference<TracerObject>::ResourceReference(ResourceInPool<TracerObject> *rsc_in_pool)
+ResourceReference<TracerObject>::ResourceReference(
+    ResourceInPool<TracerObject> *rsc_in_pool)
     : rsc_in_pool_(rsc_in_pool)
 {
     assert(rsc_in_pool);
@@ -20,19 +21,21 @@ ResourceReference<TracerObject>::~ResourceReference()
 }
 
 template<typename TracerObject>
-void ResourceReference<TracerObject>::set_dirty_callback(std::function<void()> callback)
+void ResourceReference<TracerObject>::set_dirty_callback(
+    std::function<void()> callback)
 {
     dirty_callback_ = std::move(callback);
 }
 
 template<typename TracerObject>
-void ResourceReference<TracerObject>::set_removed_callback(std::function<void()> callback)
+void ResourceReference<TracerObject>::set_removed_callback(
+    std::function<void()> callback)
 {
     removed_callback_ = std::move(callback);
 }
 
 template<typename TracerObject>
-std::shared_ptr<TracerObject> ResourceReference<TracerObject>::get_tracer_object()
+RC<TracerObject> ResourceReference<TracerObject>::get_tracer_object()
 {
     assert(rsc_in_pool_);
     return rsc_in_pool_->get_tracer_object();
@@ -56,9 +59,9 @@ QWidget *ResourceReference<TracerObject>::get_name_widget()
 }
 
 template<typename TracerObject>
-std::shared_ptr<tracer::ConfigNode> ResourceReference<TracerObject>::to_config() const
+RC<tracer::ConfigNode> ResourceReference<TracerObject>::to_config() const
 {
-    auto grp = std::make_shared<tracer::ConfigGroup>();
+    auto grp = newRC<tracer::ConfigGroup>();
     auto name = rsc_in_pool_->get_config_ref_name();
     grp->insert_str("type", "reference");
     grp->insert_child("name", name);
@@ -106,7 +109,8 @@ void ResourceReference<TracerObject>::call_remove_callback()
 }
 
 template<typename TracerObject>
-ResourceInPool<TracerObject>::ResourceInPool(const QString &name, std::unique_ptr<ResourcePanel<TracerObject>> panel)
+ResourceInPool<TracerObject>::ResourceInPool(
+    const QString &name, Box<ResourcePanel<TracerObject>> panel)
     : name_(name)
 {
     panel_ = panel.release();
@@ -137,7 +141,8 @@ ResourceInPool<TracerObject>::ResourceInPool(const QString &name, std::unique_pt
 template<typename TracerObject>
 ResourceInPool<TracerObject>::ResourceInPool(
     const QString &name,
-    const ResourceWidgetFactory<TracerObject> &factory, const QString &default_type)
+    const ResourceWidgetFactory<TracerObject> &factory,
+    const QString &default_type)
     : name_(name)
 {
     panel_ = new ResourcePanel<TracerObject>(factory, default_type);
@@ -180,28 +185,30 @@ ResourceInPool<TracerObject>::~ResourceInPool()
 }
 
 template<typename TracerObject>
-void ResourceInPool<TracerObject>::set_dirty_callback(std::function<void()> callback)
+void ResourceInPool<TracerObject>::set_dirty_callback(
+    std::function<void()> callback)
 {
     dirty_callback_ = std::move(callback);
 }
 
 template<typename TracerObject>
-std::unique_ptr<ResourceReference<TracerObject>> ResourceInPool<TracerObject>::create_reference()
+Box<ResourceReference<TracerObject>> ResourceInPool<TracerObject>::create_reference()
 {
-    auto ret = std::make_unique<ResourceReference<TracerObject>>(this);
+    auto ret = newBox<ResourceReference<TracerObject>>(this);
     references_.insert(ret.get());
     return ret;
 }
 
 template<typename TracerObject>
-void ResourceInPool<TracerObject>::remove_reference(ResourceReference<TracerObject> *ref)
+void ResourceInPool<TracerObject>::remove_reference(
+    ResourceReference<TracerObject> *ref)
 {
     ref->rsc_in_pool_ = nullptr;
     references_.erase(ref);
 }
 
 template<typename TracerObject>
-std::shared_ptr<TracerObject> ResourceInPool<TracerObject>::get_tracer_object()
+RC<TracerObject> ResourceInPool<TracerObject>::get_tracer_object()
 {
     return panel_->get_tracer_object();
 }
@@ -219,7 +226,8 @@ ResourcePanel<TracerObject> *ResourceInPool<TracerObject>::clone_panel()
 }
 
 template<typename TracerObject>
-std::unique_ptr<ResourceThumbnailProvider> ResourceInPool<TracerObject>::get_thumbnail(int width, int height) const
+Box<ResourceThumbnailProvider> ResourceInPool<TracerObject>::get_thumbnail(
+    int width, int height) const
 {
     assert(panel_);
     return panel_->get_thumbnail(width, height);
@@ -247,10 +255,12 @@ void ResourceInPool<TracerObject>::save_asset(AssetSaver &saver) const
 }
 
 template<typename TracerObject>
-void ResourceInPool<TracerObject>::load_asset(ResourcePool<TracerObject> &pool, AssetLoader &loader)
+void ResourceInPool<TracerObject>::load_asset(
+    ResourcePool<TracerObject> &pool, AssetLoader &loader)
 {
     // loaded name can be valid
-    // in this case, a new name is asked from the pool, and 'loaded_name -> new_name' is recorded by the loader
+    // in this case, a new name is asked from the pool, and
+    //  'loaded_name -> new_name' is recorded by the loader
 
     assert(references_.empty() && !dirty_callback_);
     name_ = loader.read_string();
@@ -265,15 +275,16 @@ void ResourceInPool<TracerObject>::load_asset(ResourcePool<TracerObject> &pool, 
 }
 
 template<typename TracerObject>
-std::shared_ptr<tracer::ConfigNode> ResourceInPool<TracerObject>::to_config(JSONExportContext &ctx) const
+RC<tracer::ConfigNode> ResourceInPool<TracerObject>::to_config(
+    JSONExportContext &ctx) const
 {
     return panel_->to_config(ctx);
 }
 
 template<typename TracerObject>
-std::shared_ptr<tracer::ConfigArray> ResourceInPool<TracerObject>::get_config_ref_name() const
+RC<tracer::ConfigArray> ResourceInPool<TracerObject>::get_config_ref_name() const
 {
-    auto arr = std::make_shared<tracer::ConfigArray>();
+    auto arr = newRC<tracer::ConfigArray>();
 
     arr->push_back_str("pool");
     arr->push_back_str(

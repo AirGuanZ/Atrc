@@ -3,7 +3,7 @@
 AGZ_EDITOR_BEGIN
 
 BDPTRenderer::BDPTRenderer(
-    const Params &params, int width, int height, std::shared_ptr<const tracer::Scene> scene)
+    const Params &params, int width, int height, RC<const tracer::Scene> scene)
     : ParticleRenderer(
         params.worker_count, params.task_grid_size, 3, width, height,
         params.enable_preview, 128, 32, scene)
@@ -15,7 +15,6 @@ BDPTRenderer::BDPTRenderer(
 
     bdpt_params_.max_cam_vtx_cnt = params.max_cam_depth;
     bdpt_params_.max_lht_vtx_cnt = params.max_lht_depth;
-    bdpt_params_.use_mis         = params.use_mis;
 }
 
 BDPTRenderer::~BDPTRenderer()
@@ -24,14 +23,17 @@ BDPTRenderer::~BDPTRenderer()
 }
 
 Spectrum BDPTRenderer::fast_render_pixel(
-    const tracer::Scene &scene, const tracer::Ray &ray, tracer::Sampler &sampler, tracer::Arena &arena)
+    const tracer::Scene &scene, const tracer::Ray &ray,
+    tracer::Sampler &sampler, tracer::Arena &arena)
 {
     return trace_std(preview_params_, scene, ray, sampler, arena).value;
 }
 
 Spectrum BDPTRenderer::render_pixel(
-    const tracer::Scene &scene, const tracer::Ray &ray, tracer::Sampler &sampler,
-    tracer::Arena &arena, tracer::FilmFilterApplier::FilmGridView<Spectrum> &particle_film, uint64_t *particle_count)
+    const tracer::Scene &scene, const tracer::Ray &ray,
+    tracer::Sampler &sampler, tracer::Arena &arena,
+    tracer::FilmFilterApplier::FilmGridView<Spectrum> &particle_film,
+    uint64_t *particle_count)
 {
     return Spectrum(0);
 }
@@ -64,7 +66,8 @@ uint64_t BDPTRenderer::exec_render_task(
 
                 auto opt_pixel = trace_bdpt(
                     bdpt_params_, *scene_, px, py, task.full_res, sampler, arena,
-                    cam_subpath_space.data(), lht_subpath_space.data(), &particle_film);
+                    cam_subpath_space.data(), lht_subpath_space.data(),
+                    &particle_film);
                 ++ret;
 
                 const int lx = px - sam_bound.low.x;

@@ -31,11 +31,14 @@ void run(int argc, char *argv[])
 
     agz::tracer::factory::BasicPathMapper path_mapper;
     {
-        const auto working_dir = absolute(std::filesystem::current_path()).lexically_normal().string();
+        const auto working_dir = absolute(
+            std::filesystem::current_path()).lexically_normal().string();
         path_mapper.add_replacer(WORKING_DIR_PATH_NAME, working_dir);
         AGZ_INFO("working directory: {}", working_dir);
 
-        const auto scene_dir = absolute(std::filesystem::path(params->scene_filename)).parent_path().lexically_normal().string();
+        const auto scene_dir = absolute(
+            std::filesystem::path(params->scene_filename))
+                .parent_path().lexically_normal().string();
         path_mapper.add_replacer(SCENE_DESC_PATH_NAME, scene_dir);
         AGZ_INFO("scene directory: {}", scene_dir);
     }
@@ -58,13 +61,15 @@ void run(int argc, char *argv[])
         for(size_t i = 0; i < rendering_config_arr.size(); ++i)
         {
             AGZ_INFO("processing rendering session [{}]", i);
-            auto render_session = create_render_session(scene, rendering_config_arr.at_group(i), context);
+            auto render_session = create_render_session(
+                scene, rendering_config_arr.at_group(i), context);
             render_session.execute();
         }
     }
     else
     {
-        auto render_session = create_render_session(scene, rendering_config.as_group(), context);
+        auto render_session = create_render_session(
+            scene, rendering_config.as_group(), context);
         render_session.execute();
     }
 }

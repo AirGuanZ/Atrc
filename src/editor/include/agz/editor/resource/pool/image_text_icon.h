@@ -43,7 +43,7 @@ public:
             setToolTip(text);
     }
 
-    void set_image(std::unique_ptr<ResourceThumbnailProvider> thumbnail_provider)
+    void set_image(Box<ResourceThumbnailProvider> thumbnail_provider)
     {
         thumbnail_provider_ = std::move(thumbnail_provider);
 
@@ -160,7 +160,7 @@ private:
     bool is_pressed_  = false;
     bool is_selected_ = false;
 
-    std::unique_ptr<ResourceThumbnailProvider> thumbnail_provider_;
+    Box<ResourceThumbnailProvider> thumbnail_provider_;
 };
 
 AGZ_EDITOR_END

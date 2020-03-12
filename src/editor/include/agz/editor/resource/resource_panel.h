@@ -26,17 +26,17 @@ public:
 
     void set_dirty_callback(std::function<void()> callback);
 
-    std::shared_ptr<TracerObject> get_tracer_object();
+    RC<TracerObject> get_tracer_object();
 
     ResourcePanel<TracerObject> *clone() const;
 
-    std::unique_ptr<ResourceThumbnailProvider> get_thumbnail(int width, int height) const;
+    Box<ResourceThumbnailProvider> get_thumbnail(int width, int height) const;
 
     void save_asset(AssetSaver &saver) const;
 
     void load_asset(AssetLoader &loader);
 
-    std::shared_ptr<tracer::ConfigNode> to_config(JSONExportContext &ctx) const;
+    RC<tracer::ConfigNode> to_config(JSONExportContext &ctx) const;
 
     std::vector<Vertex> get_vertices() const override;
 

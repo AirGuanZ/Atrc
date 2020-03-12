@@ -7,9 +7,9 @@ AGZ_EDITOR_BEGIN
 
 void init_envir_light_factory(EnvirLightWidgetFactory &factory)
 {
-    factory.add_creator(std::make_unique<IBLCreator>());
-    factory.add_creator(std::make_unique<NativeSkyCreator>());
-    factory.add_creator(std::make_unique<NoEnvirLightWidgetCreaotr>());
+    factory.add_creator(newBox<IBLCreator>());
+    factory.add_creator(newBox<NativeSkyCreator>());
+    factory.add_creator(newBox<NoEnvirLightWidgetCreaotr>());
 }
 
 AGZ_EDITOR_END

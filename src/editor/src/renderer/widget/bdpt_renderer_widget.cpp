@@ -11,7 +11,6 @@ BDPTRendererWidget::BDPTRendererWidget(QWidget *parent)
 {
     max_cam_depth_ = new QSlider(this);
     max_lht_depth_ = new QSlider(this);
-    use_mis_       = new QCheckBox("Use MIS", this);
 
     QLabel *max_cam_depth_text = new QLabel("Max Camera Depth", this);
     QLabel *max_lht_depth_text = new QLabel("Max Light  Depth", this);
@@ -19,8 +18,10 @@ BDPTRendererWidget::BDPTRendererWidget(QWidget *parent)
     QLabel *max_cam_depth_display = new QLabel(this);
     QLabel *max_lht_depth_display = new QLabel(this);
 
-    max_cam_depth_display->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
-    max_lht_depth_display->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
+    max_cam_depth_display->setSizePolicy(
+        QSizePolicy::Fixed, QSizePolicy::Preferred);
+    max_lht_depth_display->setSizePolicy(
+        QSizePolicy::Fixed, QSizePolicy::Preferred);
 
     max_cam_depth_display->setAlignment(Qt::AlignCenter);
     max_lht_depth_display->setAlignment(Qt::AlignCenter);
@@ -37,8 +38,6 @@ BDPTRendererWidget::BDPTRendererWidget(QWidget *parent)
     max_cam_depth_display->setText("5");
     max_lht_depth_display->setText("5");
 
-    use_mis_->setChecked(true);
-
     QGridLayout *layout = new QGridLayout(this);
 
     layout->addWidget(max_cam_depth_text, 0, 0);
@@ -48,8 +47,6 @@ BDPTRendererWidget::BDPTRendererWidget(QWidget *parent)
     layout->addWidget(max_lht_depth_text, 1, 0);
     layout->addWidget(max_lht_depth_display, 1, 1);
     layout->addWidget(max_lht_depth_, 1, 2);
-
-    layout->addWidget(use_mis_, 2, 0, 1, 3);
 
     connect(max_cam_depth_, &QSlider::valueChanged, [=](int new_value)
     {
@@ -62,23 +59,20 @@ BDPTRendererWidget::BDPTRendererWidget(QWidget *parent)
         max_lht_depth_display->setText(QString::number(new_value));
         emit change_renderer_params();
     });
-
-    connect(use_mis_, &QCheckBox::stateChanged, [=](int)
-    {
-        emit change_renderer_params();
-    });
 }
 
-std::unique_ptr<Renderer> BDPTRendererWidget::create_renderer(
-    std::shared_ptr<tracer::Scene> scene, const Vec2i &framebuffer_size, bool enable_preview) const
+Box<Renderer> BDPTRendererWidget::create_renderer(
+    RC<tracer::Scene> scene, const Vec2i &framebuffer_size,
+    bool enable_preview) const
 {
     BDPTRenderer::Params params = {
         -2, 32,
         max_cam_depth_->value(),
         max_lht_depth_->value(),
-        use_mis_->isChecked(), enable_preview
+        enable_preview
     };
-    return std::make_unique<BDPTRenderer>(params, framebuffer_size.x, framebuffer_size.y, std::move(scene));
+    return newBox<BDPTRenderer>(
+        params, framebuffer_size.x, framebuffer_size.y, std::move(scene));
 }
 
 RendererWidget *BDPTRendererWidgetCreator::create_widget(QWidget *parent) const

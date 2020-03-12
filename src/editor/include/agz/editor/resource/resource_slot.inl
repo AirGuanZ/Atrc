@@ -8,7 +8,8 @@ AGZ_EDITOR_BEGIN
 template<typename TracerObject>
 ResourceSlot<TracerObject>::ResourceSlot(
     ObjectContext &obj_ctx, const QString &default_type)
-    : ResourceSlot(obj_ctx, default_type, nullptr, new ResourcePanel<TracerObject>(obj_ctx, default_type))
+    : ResourceSlot(obj_ctx, default_type, nullptr,
+                   new ResourcePanel<TracerObject>(obj_ctx, default_type))
 {
 
 }
@@ -32,7 +33,8 @@ ResourceSlot<TracerObject>::~ResourceSlot()
 }
 
 template<typename TracerObject>
-void ResourceSlot<TracerObject>::set_reference(std::unique_ptr<ResourceReference<TracerObject>> reference)
+void ResourceSlot<TracerObject>::set_reference(
+    Box<ResourceReference<TracerObject>> reference)
 {
     if(reference_)
         reference_.reset();
@@ -77,7 +79,7 @@ void ResourceSlot<TracerObject>::set_dirty_callback(std::function<void()> callba
 }
 
 template<typename TracerObject>
-std::shared_ptr<TracerObject> ResourceSlot<TracerObject>::get_tracer_object()
+RC<TracerObject> ResourceSlot<TracerObject>::get_tracer_object()
 {
     if(reference_)
         return reference_->get_tracer_object();
@@ -88,7 +90,7 @@ std::shared_ptr<TracerObject> ResourceSlot<TracerObject>::get_tracer_object()
 template<typename TracerObject>
 ResourceSlot<TracerObject> *ResourceSlot<TracerObject>::clone() const
 {
-    std::unique_ptr<ResourceReference<TracerObject>> reference;
+    Box<ResourceReference<TracerObject>> reference;
     if(reference_)
         reference = reference_->get_resource()->create_reference();
 
@@ -149,7 +151,7 @@ void ResourceSlot<TracerObject>::load_asset(AssetLoader &loader)
 }
 
 template<typename TracerObject>
-std::shared_ptr<tracer::ConfigNode> ResourceSlot<TracerObject>::to_config(JSONExportContext &ctx) const
+RC<tracer::ConfigNode> ResourceSlot<TracerObject>::to_config(JSONExportContext &ctx) const
 {
     if(reference_)
         return reference_->to_config();
@@ -185,7 +187,8 @@ void ResourceSlot<TracerObject>::set_transform(const DirectTransform &transform)
 template<typename TracerObject>
 ResourceSlot<TracerObject>::ResourceSlot(
     ObjectContext &obj_ctx, const QString &default_type,
-    std::unique_ptr<ResourceReference<TracerObject>> reference, ResourcePanel<TracerObject> *owned_panel)
+    Box<ResourceReference<TracerObject>> reference,
+    ResourcePanel<TracerObject> *owned_panel)
     : obj_ctx_(obj_ctx), default_panel_type_(default_type)
 {
     auto pool = obj_ctx_.pool<TracerObject>();
@@ -266,7 +269,8 @@ ResourceSlot<TracerObject>::ResourceSlot(
 
             reference_.reset();
 
-            owned_panel_ = new ResourcePanel<TracerObject>(obj_ctx_, default_panel_type_);
+            owned_panel_ = new ResourcePanel<TracerObject>(
+                obj_ctx_, default_panel_type_);
             owned_panel_->set_dirty_callback([=]
             {
                 if(dirty_callback_)
@@ -293,7 +297,8 @@ ResourceSlot<TracerObject>::ResourceSlot(
         });
 
         // delete current reference and select a new one from pool
-        signal_to_callback_.connect_callback(select_in_pool, &QPushButton::clicked, [=]
+        signal_to_callback_.connect_callback(
+            select_in_pool, &QPushButton::clicked, [=]
         {
             assert(reference_ && !owned_panel_);
 
@@ -305,14 +310,17 @@ ResourceSlot<TracerObject>::ResourceSlot(
         });
 
         // edit the referenced resource
-        signal_to_callback_.connect_callback(edit_rsc, &QPushButton::clicked, [=]
+        signal_to_callback_.connect_callback(
+            edit_rsc, &QPushButton::clicked, [=]
         {
             assert(reference_ && !owned_panel_);
-            obj_ctx_.pool<TracerObject>()->show_edit_panel(reference_->get_resource()->get_panel(), true);
+            obj_ctx_.pool<TracerObject>()->show_edit_panel(
+                reference_->get_resource()->get_panel(), true);
         });
 
         // clone the referenced resource as my own panel and destroy the reference
-        signal_to_callback_.connect_callback(break_link, &QPushButton::clicked, [=]
+        signal_to_callback_.connect_callback(
+            break_link, &QPushButton::clicked, [=]
         {
             assert(reference_ && !owned_panel_);
 
@@ -345,7 +353,8 @@ ResourceSlot<TracerObject>::ResourceSlot(
         });
 
         // delete current panel and select a new one from pool
-        signal_to_callback_.connect_callback(owned_select_in_pool, &QPushButton::clicked, [=]
+        signal_to_callback_.connect_callback(
+            owned_select_in_pool, &QPushButton::clicked, [=]
         {
             assert(!reference_ && owned_panel_);
 
@@ -357,18 +366,20 @@ ResourceSlot<TracerObject>::ResourceSlot(
         });
 
         // add current panel to pool and hold a reference to it
-        signal_to_callback_.connect_callback(add_to_pool, &QPushButton::clicked, [=]
+        signal_to_callback_.connect_callback(
+            add_to_pool, &QPushButton::clicked, [=]
         {
             assert(!reference_ && owned_panel_);
 
             bool ok = false;
-            const QString name = obj_ctx_.pool<TracerObject>()->to_valid_name(QInputDialog::getText(
-                this, "Name", "Enter resource name", QLineEdit::Normal, {}, &ok));
+            const QString name = obj_ctx_.pool<TracerObject>()
+                ->to_valid_name(QInputDialog::getText(
+                    this, "Name", "Enter resource name", QLineEdit::Normal, {}, &ok));
             if(!ok)
                 return;
 
             auto rsc = obj_ctx_.pool<TracerObject>()->add_resource(
-                name, std::unique_ptr<ResourcePanel<TracerObject>>(owned_panel_));
+                name, Box<ResourcePanel<TracerObject>>(owned_panel_));
             owned_panel_ = nullptr;
 
             set_reference(rsc->create_reference());

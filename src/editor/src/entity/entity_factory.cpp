@@ -6,7 +6,7 @@ AGZ_EDITOR_BEGIN
 
 void init_entity_factory(EntityWidgetFactory &factory)
 {
-    factory.add_creator(std::make_unique<GeometricEntityWidgetCreator>());
+    factory.add_creator(newBox<GeometricEntityWidgetCreator>());
 }
 
 AGZ_EDITOR_END

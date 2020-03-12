@@ -2,11 +2,13 @@
 
 AGZ_TRACER_BEGIN
 
-void Renderer::render_async(FilmFilterApplier filter, Scene &scene, RendererInteractor &reporter)
+void Renderer::render_async(
+    FilmFilterApplier filter, Scene &scene, RendererInteractor &reporter)
 {
     stop_rendering_ = false;
     doing_rendering_ = true;
-    async_thread_ = std::async(std::launch::async, [this, filter, &scene, &reporter]()
+    async_thread_ = std::async(
+        std::launch::async, [this, filter, &scene, &reporter]()
     {
         AGZ_SCOPE_GUARD({ doing_rendering_ = false; });
         return this->render(std::move(filter), scene, reporter);

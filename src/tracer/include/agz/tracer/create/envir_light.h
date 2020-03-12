@@ -5,11 +5,11 @@
 
 AGZ_TRACER_BEGIN
 
-std::shared_ptr<EnvirLight> create_ibl_light(
-    std::shared_ptr<const Texture2D> tex,
+RC<EnvirLight> create_ibl_light(
+    RC<const Texture2D> tex,
     bool no_importance_sampling = false);
 
-std::shared_ptr<EnvirLight> create_native_sky(
+RC<EnvirLight> create_native_sky(
     const Spectrum &top,
     const Spectrum &bottom);
 

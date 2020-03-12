@@ -9,8 +9,6 @@ struct BDPTParams
 {
     int max_cam_vtx_cnt = 10;
     int max_lht_vtx_cnt = 10;
-
-    bool use_mis = true;
 };
 
 /*

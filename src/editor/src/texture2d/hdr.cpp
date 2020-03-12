@@ -18,9 +18,14 @@ HDRWidget::HDRWidget(const CloneState &clone_state)
             sys::open_with_default_app(filename_.toStdString());
     });
 
-    connect(filename_button_, &QPushButton::clicked, [=] { browse_filename(); });
+    connect(filename_button_, &QPushButton::clicked,
+            [=] { browse_filename(); });
 
-    connect(adv_widget_, &Texture2DCommonParamsWidget::change_params, [=] { set_dirty_flag(); });
+    connect(sample_method_, &QComboBox::currentTextChanged,
+            [=](const QString &) { set_dirty_flag(); });
+
+    connect(adv_widget_, &Texture2DCommonParamsWidget::change_params,
+            [=] { set_dirty_flag(); });
 
     do_update_tracer_object();
 }
@@ -30,6 +35,7 @@ ResourceWidget<tracer::Texture2D> *HDRWidget::clone()
     CloneState clone_state;
     clone_state.filename               = filename_;
     clone_state.img_data               = img_data_;
+    clone_state.sample_method          = sample_method_->currentText();
     clone_state.adv                    = adv_widget_->clone();
     return new HDRWidget(clone_state);
 }
@@ -45,11 +51,14 @@ void HDRWidget::do_update_tracer_object()
 
     if(!img_data_)
     {
-        tracer_object_ = create_constant2d_texture(common_params, Spectrum(real(0.5)));
+        tracer_object_ = create_constant2d_texture(
+            common_params, Spectrum(real(0.5)));
         return;
     }
 
-    tracer_object_ = create_hdr_texture(common_params, img_data_, "linear");
+    tracer_object_ = create_hdr_texture(
+        common_params, img_data_,
+        sample_method_->currentText().toLower().toStdString());
 }
 
 void HDRWidget::init_ui(const CloneState &clone_state)
@@ -75,6 +84,12 @@ void HDRWidget::init_ui(const CloneState &clone_state)
 
     preview_button_ = new QPushButton("Preview");
 
+    // sample method
+
+    sample_method_ = new QComboBox(this);
+    sample_method_->addItems({ "Linear", "Nearest" });
+    sample_method_->setCurrentText(clone_state.sample_method);
+
     // transform
 
     adv_section_ = new Collapsible(this, "Advanced");
@@ -89,13 +104,15 @@ void HDRWidget::init_ui(const CloneState &clone_state)
     layout_ = new QVBoxLayout(this);
     layout_->addWidget(filename_widget);
     layout_->addWidget(preview_button_);
+    layout_->addWidget(sample_method_);
     layout_->addWidget(adv_section_);
 
     setContentsMargins(0, 0, 0, 0);
     layout_->setContentsMargins(0, 0, 0, 0);
 }
 
-std::unique_ptr<ResourceThumbnailProvider> HDRWidget::get_thumbnail(int width, int height) const
+Box<ResourceThumbnailProvider> HDRWidget::get_thumbnail(
+    int width, int height) const
 {
     if(!img_data_)
     {
@@ -104,7 +121,8 @@ std::unique_ptr<ResourceThumbnailProvider> HDRWidget::get_thumbnail(int width, i
 
         QPixmap pixmap;
         pixmap.convertFromImage(img);
-        return std::make_unique<FixedResourceThumbnailProvider>(pixmap.scaled(width, height));
+        return newBox<FixedResourceThumbnailProvider>(
+            pixmap.scaled(width, height));
     }
 
     auto imgu8 = img_data_->map(&math::to_color3b<float>);
@@ -118,12 +136,14 @@ std::unique_ptr<ResourceThumbnailProvider> HDRWidget::get_thumbnail(int width, i
     QPixmap pixmap;
     pixmap.convertFromImage(img);
 
-    return std::make_unique<FixedResourceThumbnailProvider>(pixmap.scaled(width, height));
+    return newBox<FixedResourceThumbnailProvider>(
+        pixmap.scaled(width, height));
 }
 
 void HDRWidget::save_asset(AssetSaver &saver)
 {
     saver.write_string(filename_);
+    saver.write_string(sample_method_->currentText());
 
     if(img_data_)
     {
@@ -145,13 +165,15 @@ void HDRWidget::load_asset(AssetLoader &loader)
     filename_label_->setText(filename_);
     filename_label_->setToolTip(filename_);
 
+    sample_method_->setCurrentText(loader.read_string());
+
     const uint32_t img_data_byte_size = loader.read<uint32_t>();
     if(img_data_byte_size)
     {
         std::vector<unsigned char> img_data(img_data_byte_size);
         loader.read_raw(img_data.data(), img_data_byte_size);
 
-        img_data_ = std::make_shared<Image2D<math::color3f>>(
+        img_data_ = newRC<Image2D<math::color3f>>(
             img::load_rgb_from_hdr_memory(img_data.data(), img_data.size()));
     }
     else
@@ -162,23 +184,26 @@ void HDRWidget::load_asset(AssetLoader &loader)
     do_update_tracer_object();
 }
 
-std::shared_ptr<tracer::ConfigNode> HDRWidget::to_config(JSONExportContext &ctx) const
+RC<tracer::ConfigNode> HDRWidget::to_config(JSONExportContext &ctx) const
 {
-    auto grp = std::make_shared<tracer::ConfigGroup>();
+    auto grp = newRC<tracer::ConfigGroup>();
 
     if(!img_data_)
     {
         grp->insert_str("type", "constant");
-        grp->insert_child("texel", tracer::ConfigArray::from_spectrum(Spectrum(0.5f)));
+        grp->insert_child(
+            "texel", tracer::ConfigArray::from_spectrum(Spectrum(0.5f)));
         return grp;
     }
 
     grp->insert_str("type", "hdr");
 
     auto [ref_filename, filename] = ctx.gen_filename(".hdr");
-    img::save_rgb_to_hdr_file(filename, img_data_->raw_data(), img_data_->width(), img_data_->height());
+    img::save_rgb_to_hdr_file(
+        filename, img_data_->raw_data(), img_data_->width(), img_data_->height());
 
     grp->insert_str("filename", ref_filename);
+    grp->insert_str("sample", sample_method_->currentText().toLower().toStdString());
 
     adv_widget_->to_config(*grp);
 
@@ -197,7 +222,7 @@ void HDRWidget::browse_filename()
         if(!data.is_available())
             throw std::runtime_error("failed");
 
-        img_data_ = std::make_shared<Image2D<math::color3f>>(std::move(data));
+        img_data_ = newRC<Image2D<math::color3f>>(std::move(data));
     }
     catch(...)
     {
@@ -215,7 +240,8 @@ void HDRWidget::browse_filename()
     set_dirty_flag();
 }
 
-ResourceWidget<tracer::Texture2D> *HDRWidgetCreator::create_widget(ObjectContext &obj_ctx) const
+ResourceWidget<tracer::Texture2D> *HDRWidgetCreator::create_widget(
+    ObjectContext &obj_ctx) const
 {
     return new HDRWidget({});
 }

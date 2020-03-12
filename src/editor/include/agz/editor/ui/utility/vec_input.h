@@ -28,7 +28,7 @@ signals:
 private:
 
     QLineEdit *edit_ = nullptr;
-    std::unique_ptr<QDoubleValidator> validator_;
+    Box<QDoubleValidator> validator_;
 };
 
 class Vec2Input : public QWidget
@@ -50,7 +50,7 @@ signals:
 private:
 
     QLineEdit *edit_ = nullptr;
-    std::unique_ptr<Vec2Validator> validator_;
+    Box<Vec2Validator> validator_;
 };
 
 class Vec3Input : public QWidget
@@ -74,7 +74,7 @@ signals:
 private:
 
     QLineEdit *edit_ = nullptr;
-    std::unique_ptr<Vec3Validator> validator_;
+    Box<Vec3Validator> validator_;
 };
 
 class SpectrumInput : public QWidget
@@ -98,7 +98,7 @@ signals:
 private:
 
     QLineEdit *edit_ = nullptr;
-    std::unique_ptr<Vec3Validator> validator_;
+    Box<Vec3Validator> validator_;
 };
 
 AGZ_EDITOR_END

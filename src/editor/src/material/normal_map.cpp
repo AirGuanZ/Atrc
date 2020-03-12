@@ -4,7 +4,8 @@
 
 AGZ_EDITOR_BEGIN
 
-NormalMapWidget::NormalMapWidget(const InitData &init_data, ObjectContext &obj_ctx)
+NormalMapWidget::NormalMapWidget(
+    const InitData &init_data, ObjectContext &obj_ctx)
     : obj_ctx_(obj_ctx)
 {
     QVBoxLayout *layout = new QVBoxLayout(this);
@@ -56,14 +57,14 @@ void NormalMapWidget::load_asset(AssetLoader &loader)
     normal_map_->load_asset(loader);
 }
 
-std::unique_ptr<tracer::NormalMapper> NormalMapWidget::get_tracer_object() const
+Box<tracer::NormalMapper> NormalMapWidget::get_tracer_object() const
 {
     if(apply_normal_map_->isChecked())
     {
         auto normal_map = normal_map_->get_tracer_object();
-        return std::make_unique<tracer::NormalMapper>(std::move(normal_map));
+        return newBox<tracer::NormalMapper>(std::move(normal_map));
     }
-    return std::make_unique<tracer::NormalMapper>(nullptr);
+    return newBox<tracer::NormalMapper>(nullptr);
 }
 
 bool NormalMapWidget::is_enabled() const noexcept
@@ -71,7 +72,7 @@ bool NormalMapWidget::is_enabled() const noexcept
     return apply_normal_map_->isChecked();
 }
 
-std::shared_ptr<tracer::ConfigNode> NormalMapWidget::to_config(JSONExportContext &ctx) const
+RC<tracer::ConfigNode> NormalMapWidget::to_config(JSONExportContext &ctx) const
 {
     return normal_map_->to_config(ctx);
 }

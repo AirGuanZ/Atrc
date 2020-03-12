@@ -9,7 +9,7 @@ RealInput::RealInput(QWidget *parent)
 {
     QVBoxLayout *layout = new QVBoxLayout(this);
     edit_ = new QLineEdit(this);
-    validator_ = std::make_unique<QDoubleValidator>();
+    validator_ = newBox<QDoubleValidator>();
 
     layout->addWidget(edit_);
     edit_->setText("0");
@@ -44,7 +44,7 @@ Vec2Input::Vec2Input(QWidget *parent)
 {
     QVBoxLayout *layout = new QVBoxLayout(this);
     edit_      = new QLineEdit(this);
-    validator_ = std::make_unique<Vec2Validator>();
+    validator_ = newBox<Vec2Validator>();
 
     layout->addWidget(edit_);
     edit_->setText("0 0");
@@ -77,7 +77,7 @@ Vec3Input::Vec3Input(QWidget *parent)
 {
     QVBoxLayout *layout = new QVBoxLayout(this);
     edit_      = new QLineEdit(this);
-    validator_ = std::make_unique<Vec3Validator>();
+    validator_ = newBox<Vec3Validator>();
 
     layout->addWidget(edit_);
     edit_->setText("0 0 0");
@@ -115,7 +115,7 @@ SpectrumInput::SpectrumInput(QWidget *parent)
 {
     QVBoxLayout *layout = new QVBoxLayout(this);
     edit_ = new QLineEdit(this);
-    validator_ = std::make_unique<Vec3Validator>();
+    validator_ = newBox<Vec3Validator>();
 
     layout->addWidget(edit_);
     edit_->setText("0 0 0");

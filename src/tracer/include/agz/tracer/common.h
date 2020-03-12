@@ -16,6 +16,8 @@
 
 AGZ_TRACER_BEGIN
 
+// fwd decls
+
 class Aggregate;
 class BSDF;
 class Camera;
@@ -33,6 +35,8 @@ class Scene;
 class Texture2D;
 class Texture3D;
 
+// real number
+
 using real = float;
 
 extern real EPS;
@@ -45,6 +49,8 @@ constexpr real invPI_r = 1 / PI_r;
 constexpr real REAL_INF = std::numeric_limits<real>::infinity();
 constexpr real REAL_MAX = std::numeric_limits<real>::max();
 constexpr real REAL_MIN = std::numeric_limits<real>::lowest();
+
+// vec, mat, trans and coord
 
 using Vec2 = math::tvec2<real>;
 using Vec3 = math::tvec3<real>;
@@ -65,9 +71,18 @@ using Coord = math::tcoord3<real>;
 using Transform2 = math::ttransform2<real>;
 using Transform3 = math::ttransform3<real>;
 
+// spectrum
+
 using Spectrum = math::tcolor3<real>;
 
 constexpr int SPECTRUM_COMPONENT_COUNT = 3;
+
+inline bool has_inf(const Spectrum &s) noexcept
+{
+    return std::isinf(s.r) || std::isinf(s.g) || std::isinf(s.b);
+}
+
+// image
 
 template<typename T>
 using Image2D = texture::texture2d_t<T>;
@@ -75,13 +90,7 @@ using Image2D = texture::texture2d_t<T>;
 template<typename T>
 using Image3D = texture::texture3d_t<T>;
 
-/**
- * @brief is there any inf component in given spectrum value
- */
-inline bool has_inf(const Spectrum &s) noexcept
-{
-    return std::isinf(s.r) || std::isinf(s.g) || std::isinf(s.b);
-}
+// arena and exception
 
 using Arena = alloc::obj_arena_t;
 
@@ -91,6 +100,39 @@ public:
 
     using runtime_error::runtime_error;
 };
+
+// sample
+
+struct Sample1 { real u; };
+struct Sample2 { real u, v; };
+struct Sample3 { real u, v, w; };
+struct Sample4 { real u, v, w, r; };
+struct Sample5 { real u, v, w, r, s; };
+
+template<int N>
+struct SampleN { real u[N]; };
+
+// smart pointers
+
+template<typename T>
+using RC = std::shared_ptr<T>;
+
+template<typename T, typename...Args>
+RC<T> newRC(Args&&...args)
+{
+    return std::make_shared<T>(std::forward<Args>(args)...);
+}
+
+template<typename T>
+using Box = std::unique_ptr<T>;
+
+template<typename T, typename...Args>
+Box<T> newBox(Args&&...args)
+{
+    return std::make_unique<T>(std::forward<Args>(args)...);
+}
+
+// local angle
 
 namespace local_angle
 {
@@ -155,18 +197,22 @@ namespace local_angle
     /**
      * @brief correction factor for shading normal
      */
-    inline real normal_corr_factor(const Vec3 &geo, const Vec3 &shd, const Vec3 &wi) noexcept
+    inline real normal_corr_factor(
+        const Vec3 &geo, const Vec3 &shd, const Vec3 &wi) noexcept
     {
         const real dem = std::abs(cos(geo, wi));
         return  dem < EPS ? 1 : std::abs(cos(shd, wi) / dem);
     }
 
-    inline real normal_corr_factor(const Coord &geo, const Coord &shd, const Vec3 &wi) noexcept
+    inline real normal_corr_factor(
+        const Coord &geo, const Coord &shd, const Vec3 &wi) noexcept
     {
         return normal_corr_factor(geo.z, shd.z, wi);
     }
 
 } // namespace local_angle
+
+// ray and aabb
 
 class Ray
 {
@@ -178,7 +224,8 @@ public:
     real t_max;
 
     Ray();
-    Ray(const Vec3 &o, const Vec3 &d, real t_min = 0, real t_max = REAL_INF) noexcept;
+    Ray(const Vec3 &o, const Vec3 &d,
+        real t_min = 0, real t_max = REAL_INF) noexcept;
 
     Vec3 at(real t) const noexcept;
 
@@ -203,34 +250,14 @@ public:
 
     AABB &operator|=(const Vec3 &p) noexcept;
 
-    bool contains(const Vec3 &pnt) const noexcept
-    {
-        return low.x <= pnt.x && pnt.x <= high.x &&
-               low.y <= pnt.y && pnt.y <= high.y &&
-               low.z <= pnt.z && pnt.z <= high.z;
-    }
+    bool contains(const Vec3 &pnt) const noexcept;
 
-    bool intersect(const Vec3 &ori, const Vec3 &inv_dir, real t_min, real t_max) const noexcept
-    {
-        const real nx = inv_dir[0] * (low[0] - ori[0]);
-        const real ny = inv_dir[1] * (low[1] - ori[1]);
-        const real nz = inv_dir[2] * (low[2] - ori[2]);
-
-        const real fx = inv_dir[0] * (high[0] - ori[0]);
-        const real fy = inv_dir[1] * (high[1] - ori[1]);
-        const real fz = inv_dir[2] * (high[2] - ori[2]);
-
-        t_min = (std::max)(t_min, (std::min)(nx, fx));
-        t_min = (std::max)(t_min, (std::min)(ny, fy));
-        t_min = (std::max)(t_min, (std::min)(nz, fz));
-
-        t_max = (std::min)(t_max, (std::max)(nx, fx));
-        t_max = (std::min)(t_max, (std::max)(ny, fy));
-        t_max = (std::min)(t_max, (std::max)(nz, fz));
-
-        return t_min <= t_max;
-    }
+    bool intersect(
+        const Vec3 &ori, const Vec3 &inv_dir,
+        real t_min, real t_max) const noexcept;
 };
+
+static_assert(sizeof(AABB) == 6 * sizeof(real));
 
 AABB operator|(const AABB &lhs, const AABB &rhs) noexcept;
 
@@ -308,15 +335,33 @@ inline AABB &AABB::operator|=(const Vec3 &p) noexcept
     return *this;
 }
 
-struct Sample1 { real u; };
-struct Sample2 { real u, v; };
-struct Sample3 { real u, v, w; };
-struct Sample4 { real u, v, w, r; };
-struct Sample5 { real u, v, w, r, s; };
+inline bool AABB::contains(const Vec3 &pnt) const noexcept
+{
+    return low.x <= pnt.x && pnt.x <= high.x &&
+           low.y <= pnt.y && pnt.y <= high.y &&
+           low.z <= pnt.z && pnt.z <= high.z;
+}
 
-template<int N>
-struct SampleN { real u[N]; };
+inline bool AABB::intersect(
+    const Vec3 &ori, const Vec3 &inv_dir, real t_min, real t_max) const noexcept
+{
+    const real nx = inv_dir[0] * (low[0] - ori[0]);
+    const real ny = inv_dir[1] * (low[1] - ori[1]);
+    const real nz = inv_dir[2] * (low[2] - ori[2]);
 
-static_assert(sizeof(AABB) == 6 * sizeof(real));
+    const real fx = inv_dir[0] * (high[0] - ori[0]);
+    const real fy = inv_dir[1] * (high[1] - ori[1]);
+    const real fz = inv_dir[2] * (high[2] - ori[2]);
+
+    t_min = (std::max)(t_min, (std::min)(nx, fx));
+    t_min = (std::max)(t_min, (std::min)(ny, fy));
+    t_min = (std::max)(t_min, (std::min)(nz, fz));
+
+    t_max = (std::min)(t_max, (std::max)(nx, fx));
+    t_max = (std::min)(t_max, (std::max)(ny, fy));
+    t_max = (std::min)(t_max, (std::max)(nz, fz));
+
+    return t_min <= t_max;
+}
 
 AGZ_TRACER_END

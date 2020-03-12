@@ -54,7 +54,7 @@ private:
     QCheckBox *apply_inv_gamma_ = nullptr;
     QLineEdit *inv_gamma_       = nullptr;
 
-    std::unique_ptr<QValidator> inv_gamma_validator_;
+    Box<QValidator> inv_gamma_validator_;
 
     QCheckBox *inv_u_ = nullptr;
     QCheckBox *inv_v_ = nullptr;

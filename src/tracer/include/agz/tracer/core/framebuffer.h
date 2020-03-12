@@ -23,7 +23,9 @@ Rect2i sample_bound_of(real filter_radius, const Rect2i &rect) noexcept;
  *         call func(x, y, |px - sample.x|, |py - sample.y|)
  */
 template<typename Func>
-void apply_image_filter(const Rect2i &pixel_range, real filter_radius, const Vec2 &sample, const Func &func);
+void apply_image_filter(
+    const Rect2i &pixel_range, real filter_radius,
+    const Vec2 &sample, const Func &func);
 
 /**
  * @brief initialize all images with size (w, h) and default pixel value
@@ -33,20 +35,30 @@ void initialize_framebuffers(int w, int h, Image2D<Texels>&...images);
 
 inline Rect2i sample_bound_of(real filter_radius, const Rect2i &rect) noexcept
 {
-    const int lxi = static_cast<int>(std::floor(rect.low.x + real(0.5) - filter_radius));
-    const int lyi = static_cast<int>(std::floor(rect.low.y + real(0.5) - filter_radius));
-    const int hxi = static_cast<int>(std::floor(rect.high.x + real(0.49999) + filter_radius));
-    const int hyi = static_cast<int>(std::floor(rect.high.y + real(0.49999) + filter_radius));
+    const int lxi = static_cast<int>(
+        std::floor(rect.low.x + real(0.5) - filter_radius));
+    const int lyi = static_cast<int>(
+        std::floor(rect.low.y + real(0.5) - filter_radius));
+    const int hxi = static_cast<int>(
+        std::floor(rect.high.x + real(0.49999) + filter_radius));
+    const int hyi = static_cast<int>(
+        std::floor(rect.high.y + real(0.49999) + filter_radius));
     return { { lxi, lyi }, { hxi, hyi } };
 }
 
 template<typename Func>
-void apply_image_filter(const Rect2i &pixel_range, real filter_radius, const Vec2 &sample, const Func &func)
+void apply_image_filter(
+    const Rect2i &pixel_range, real filter_radius,
+    const Vec2 &sample, const Func &func)
 {
-    const int x_min = (std::max)(pixel_range.low.x, static_cast<int>(std::ceil(sample.x - filter_radius - real(0.5))));
-    const int y_min = (std::max)(pixel_range.low.y, static_cast<int>(std::ceil(sample.y - filter_radius - real(0.5))));
-    const int x_max = (std::min)(pixel_range.high.x, static_cast<int>(std::floor(sample.x + filter_radius - real(0.5))));
-    const int y_max = (std::min)(pixel_range.high.y, static_cast<int>(std::floor(sample.y + filter_radius - real(0.5))));
+    const int x_min = (std::max)(pixel_range.low.x,
+        static_cast<int>(std::ceil(sample.x - filter_radius - real(0.5))));
+    const int y_min = (std::max)(pixel_range.low.y,
+        static_cast<int>(std::ceil(sample.y - filter_radius - real(0.5))));
+    const int x_max = (std::min)(pixel_range.high.x,
+        static_cast<int>(std::floor(sample.x + filter_radius - real(0.5))));
+    const int y_max = (std::min)(pixel_range.high.y,
+        static_cast<int>(std::floor(sample.y + filter_radius - real(0.5))));
 
     real y_rel = std::abs(y_min + real(0.5) - sample.y);
     for(int y = y_min; y <= y_max; ++y)

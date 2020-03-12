@@ -11,9 +11,10 @@ AGZ_TRACER_BEGIN
 
 namespace
 {
-    std::unique_ptr<RenderSession::RenderSetting> parse_rendering_settings(Config rendering_config, factory::CreatingContext &context)
+    Box<RenderSession::RenderSetting> parse_rendering_settings(
+        Config rendering_config, factory::CreatingContext &context)
     {
-        auto settings = std::make_unique<RenderSession::RenderSetting>();
+        auto settings = newBox<RenderSession::RenderSetting>();
 
         const int film_width = rendering_config.child_int("width");
         const int film_height = rendering_config.child_int("height");
@@ -29,7 +30,8 @@ namespace
 
         AGZ_INFO("creating camera");
         const auto &camera_params = rendering_config.child_group("camera");
-        settings->camera = context.create<Camera>(camera_params, static_cast<real>(film_width) / film_height);
+        settings->camera = context.create<Camera>(
+            camera_params, static_cast<real>(film_width) / film_height);
 
         AGZ_INFO("creating renderer");
         const auto &renderer_params = rendering_config.child_group("renderer");
@@ -64,7 +66,8 @@ namespace
     }
 }
 
-RenderSession::RenderSession(std::shared_ptr<Scene> scene, std::unique_ptr<RenderSetting> render_setting) noexcept
+RenderSession::RenderSession(
+    RC<Scene> scene, Box<RenderSetting> render_setting) noexcept
     : scene(std::move(scene)), render_settings(std::move(render_setting))
 {
     
@@ -79,9 +82,12 @@ void RenderSession::execute()
     scene->set_camera(render_settings->camera);
     scene->start_rendering();
 
-    FilmFilterApplier filter_applier(render_settings->width, render_settings->height, render_settings->film_filter);
+    FilmFilterApplier filter_applier(
+        render_settings->width, render_settings->height,
+        render_settings->film_filter);
 
-    RenderTarget render_target = render_settings->renderer->render(filter_applier, *scene, *render_settings->reporter);
+    RenderTarget render_target = render_settings->renderer->render(
+        filter_applier, *scene, *render_settings->reporter);
 
     AGZ_INFO("running post processors");
 
@@ -90,7 +96,7 @@ void RenderSession::execute()
 }
 
 RenderSession create_render_session(
-    std::shared_ptr<Scene> scene,
+    RC<Scene> scene,
     const ConfigGroup &rendering_setting_config,
     factory::CreatingContext &context)
 {
@@ -108,7 +114,8 @@ std::vector<RenderSession> parse_render_sessions(
     
     if(rendering_setting_config.is_group())
     {
-        auto setting = parse_rendering_settings(rendering_setting_config.as_group(), context);
+        auto setting = parse_rendering_settings(
+            rendering_setting_config.as_group(), context);
         ret.emplace_back(std::move(scene), std::move(setting));
         return ret;
     }

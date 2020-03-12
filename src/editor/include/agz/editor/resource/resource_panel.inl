@@ -3,7 +3,8 @@
 AGZ_EDITOR_BEGIN
 
 template<typename TracerObject>
-ResourcePanel<TracerObject>::ResourcePanel(ObjectContext &obj_ctx, const QString &default_type)
+ResourcePanel<TracerObject>::ResourcePanel(
+    ObjectContext &obj_ctx, const QString &default_type)
     : obj_ctx_(obj_ctx)
 {
     type_selector_ = new ComboBoxWithoutWheelFocus(this);
@@ -15,7 +16,8 @@ ResourcePanel<TracerObject>::ResourcePanel(ObjectContext &obj_ctx, const QString
         if(rsc_widget_)
             delete rsc_widget_;
 
-        rsc_widget_ = obj_ctx_.factory<TracerObject>().create_widget(new_type, obj_ctx_);
+        rsc_widget_ = obj_ctx_.factory<TracerObject>()
+                              .create_widget(new_type, obj_ctx_);
         rsc_widget_->set_dirty_callback([=]
         {
             if(dirty_callback_)
@@ -40,7 +42,8 @@ ResourcePanel<TracerObject>::ResourcePanel(ObjectContext &obj_ctx, const QString
     };
 
     signal_to_callback_.connect_callback(
-        type_selector_, &ComboBoxWithoutWheelFocus::currentTextChanged, change_type);
+        type_selector_, &ComboBoxWithoutWheelFocus::currentTextChanged,
+        change_type);
 
     layout_ = new QVBoxLayout(this);
     layout_->addWidget(type_selector_);
@@ -62,7 +65,8 @@ ResourcePanel<TracerObject>::ResourcePanel(
     type_selector_->setCurrentText(current_type_name);
 
     signal_to_callback_.connect_callback(
-        type_selector_, &ComboBoxWithoutWheelFocus::currentTextChanged, [=](const QString &new_type)
+        type_selector_, &ComboBoxWithoutWheelFocus::currentTextChanged,
+        [=](const QString &new_type)
     {
         on_change_selected_type();
     });
@@ -97,7 +101,7 @@ void ResourcePanel<TracerObject>::set_dirty_callback(std::function<void()> callb
 }
 
 template<typename TracerObject>
-std::shared_ptr<TracerObject> ResourcePanel<TracerObject>::get_tracer_object()
+RC<TracerObject> ResourcePanel<TracerObject>::get_tracer_object()
 {
     return rsc_widget_->get_tracer_object();
 }
@@ -105,11 +109,13 @@ std::shared_ptr<TracerObject> ResourcePanel<TracerObject>::get_tracer_object()
 template<typename TracerObject>
 ResourcePanel<TracerObject> *ResourcePanel<TracerObject>::clone() const
 {
-    return new ResourcePanel(obj_ctx_, rsc_widget_->clone(), type_selector_->currentText());
+    return new ResourcePanel(
+        obj_ctx_, rsc_widget_->clone(), type_selector_->currentText());
 }
 
 template<typename TracerObject>
-std::unique_ptr<ResourceThumbnailProvider> ResourcePanel<TracerObject>::get_thumbnail(int width, int height) const
+Box<ResourceThumbnailProvider> ResourcePanel<TracerObject>::get_thumbnail(
+    int width, int height) const
 {
     return rsc_widget_->get_thumbnail(width, height);
 }
@@ -130,7 +136,8 @@ void ResourcePanel<TracerObject>::load_asset(AssetLoader &loader)
 }
 
 template<typename TracerObject>
-std::shared_ptr<tracer::ConfigNode> ResourcePanel<TracerObject>::to_config(JSONExportContext &ctx) const
+RC<tracer::ConfigNode> ResourcePanel<TracerObject>::to_config(
+    JSONExportContext &ctx) const
 {
     return rsc_widget_->to_config(ctx);
 }
@@ -161,7 +168,8 @@ void ResourcePanel<TracerObject>::on_change_selected_type()
 
     const QString new_type = type_selector_->currentText();
 
-    rsc_widget_ = obj_ctx_.factory<TracerObject>().create_widget(new_type, obj_ctx_);
+    rsc_widget_ = obj_ctx_.factory<TracerObject>()
+                          .create_widget(new_type, obj_ctx_);
     rsc_widget_->set_dirty_callback([=]
     {
         if(dirty_callback_)

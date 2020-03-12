@@ -38,6 +38,7 @@
 #include <agz/tracer/render/direct_illum.h>
 #include <agz/tracer/render/particle_tracing.h>
 #include <agz/tracer/render/path_tracing.h>
+#include <agz/tracer/render/photon_mapping.h>
 
 #include <agz/tracer/utility/config.h>
 #include <agz/tracer/utility/embree.h>

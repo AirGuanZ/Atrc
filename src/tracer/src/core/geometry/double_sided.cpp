@@ -5,11 +5,11 @@ AGZ_TRACER_BEGIN
 
 class DoubleSidedGeometry : public Geometry
 {
-    std::shared_ptr<const Geometry> internal_;
+    RC<const Geometry> internal_;
 
 public:
 
-    explicit DoubleSidedGeometry(std::shared_ptr<const Geometry> internal)
+    explicit DoubleSidedGeometry(RC<const Geometry> internal)
     {
         internal_ = internal;
     }
@@ -19,7 +19,8 @@ public:
         return internal_->has_intersection(r);
     }
 
-    bool closest_intersection(const Ray &r, GeometryIntersection *inct) const noexcept override
+    bool closest_intersection(
+        const Ray &r, GeometryIntersection *inct) const noexcept override
     {
         if(!internal_->closest_intersection(r, inct))
             return false;
@@ -64,7 +65,8 @@ public:
         return spt;
     }
 
-    SurfacePoint sample(const Vec3 &ref, real *pdf, const Sample3 &sam) const noexcept override
+    SurfacePoint sample(
+        const Vec3 &ref, real *pdf, const Sample3 &sam) const noexcept override
     {
         Sample3 new_sam = sam;
         const bool backface = new_sam.u < real(0.5);
@@ -97,10 +99,10 @@ public:
     }
 };
 
-std::shared_ptr<Geometry> create_double_sided(
-    std::shared_ptr<const Geometry> internal)
+RC<Geometry> create_double_sided(
+    RC<const Geometry> internal)
 {
-    return std::make_shared<DoubleSidedGeometry>(std::move(internal));
+    return newRC<DoubleSidedGeometry>(std::move(internal));
 }
 
 AGZ_TRACER_END

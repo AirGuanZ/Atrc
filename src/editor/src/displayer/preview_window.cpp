@@ -128,7 +128,8 @@ void PreviewWindow::init_ui()
     gizmo_selector_                 = new GizmoSelector;
 
     switch_mode->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    always_highlight_selected_mesh_->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    always_highlight_selected_mesh_->setSizePolicy(
+        QSizePolicy::Fixed, QSizePolicy::Fixed);
     always_highlight_selected_mesh_->setCheckable(true);
     always_highlight_selected_mesh_->setChecked(false);
 
@@ -168,7 +169,7 @@ void PreviewWindow::init_ui()
     update();
 }
 
-std::shared_ptr<tracer::Camera> PreviewWindow::create_camera()
+RC<tracer::Camera> PreviewWindow::create_camera()
 {
     const auto &camera_params = camera_panel_->get_preview_params();
 
@@ -218,12 +219,13 @@ void PreviewWindow::set_preview_image(const Image2D<Spectrum> &img)
 
     if(img.width() > 0 && img.height() > 0)
     {
-        preview_tex_ = std::make_unique<QOpenGLTexture>(QOpenGLTexture::Target2D);
+        preview_tex_ = newBox<QOpenGLTexture>(QOpenGLTexture::Target2D);
         preview_tex_->create();
         preview_tex_->setSize(img.width(), img.height());
         preview_tex_->setFormat(QOpenGLTexture::RGB16F);
         preview_tex_->setMipLevels(1);
-        preview_tex_->allocateStorage(QOpenGLTexture::RGB, QOpenGLTexture::Float16);
+        preview_tex_->allocateStorage(
+            QOpenGLTexture::RGB, QOpenGLTexture::Float16);
         preview_tex_->setData(
             QOpenGLTexture::RGB, QOpenGLTexture::Float32, img.raw_data());
         preview_tex_->setMinMagFilters(
@@ -329,12 +331,12 @@ void PreviewWindow::load_asset(AssetLoader &loader)
     update_im3d_camera();
 }
 
-std::shared_ptr<tracer::ConfigGroup> PreviewWindow::to_config() const
+RC<tracer::ConfigGroup> PreviewWindow::to_config() const
 {
     assert(camera_panel_);
-    const auto &params = camera_panel_->get_render_params();
+    const auto &params = camera_panel_->get_export_params();
 
-    auto grp = std::make_shared<tracer::ConfigGroup>();
+    auto grp = newRC<tracer::ConfigGroup>();
     grp->insert_str("type", "thin_lens");
     grp->insert_child("pos", tracer::ConfigArray::from_vec3(params.position));
     grp->insert_child("dst", tracer::ConfigArray::from_vec3(params.look_at));
@@ -366,7 +368,7 @@ void PreviewWindow::initializeGL()
 
     // entity shader
 
-    entity_shader_ = std::make_unique<QOpenGLShaderProgram>();
+    entity_shader_ = newBox<QOpenGLShaderProgram>();
     entity_shader_->addShaderFromSourceCode(QOpenGLShader::Vertex,   ENTITY_VERTEX_SHADER_SOURCE);
     entity_shader_->addShaderFromSourceCode(QOpenGLShader::Fragment, ENTITY_FRAGMENT_SHADER_SOURCE);
     entity_shader_->link();
@@ -383,7 +385,7 @@ void PreviewWindow::initializeGL()
 
     // background shader
 
-    preview_shader_ = std::make_unique<QOpenGLShaderProgram>();
+    preview_shader_ = newBox<QOpenGLShaderProgram>();
     preview_shader_->addShaderFromSourceCode(QOpenGLShader::Vertex,   PREVIEW_VERTEX_SHADER_SOURCE);
     preview_shader_->addShaderFromSourceCode(QOpenGLShader::Fragment, PREVIEW_FRAGMENT_SHADER_SOURCE);
     preview_shader_->link();
@@ -437,7 +439,7 @@ void PreviewWindow::initializeGL()
 
     // render frame shader
     
-    render_frame_shader_ = std::make_unique<QOpenGLShaderProgram>();
+    render_frame_shader_ = newBox<QOpenGLShaderProgram>();
     render_frame_shader_->addShaderFromSourceCode(QOpenGLShader::Vertex,   RENDER_FRAME_VERTEX_SHADER_SOURCE);
     render_frame_shader_->addShaderFromSourceCode(QOpenGLShader::Fragment, RENDER_FRAME_FRAGMENT_SHADER_SOURCE);
     render_frame_shader_->link();
@@ -468,7 +470,8 @@ void PreviewWindow::initializeGL()
         { { 1, 1 } }, { { 1, 0 } },
         { { 1, 0 } }, { { 0, 0 } }
     };
-    render_frame_vbo_.allocate(render_frame_vertices, sizeof(render_frame_vertices));
+    render_frame_vbo_.allocate(
+        render_frame_vertices, sizeof(render_frame_vertices));
 
     gl->glEnableVertexAttribArray(0);
     gl->glVertexAttribPointer(
@@ -486,7 +489,7 @@ void PreviewWindow::initializeGL()
     const Vec3 cam_dir = cam.dir();
     const Vec3 cam_up  = cam.up;
 
-    im3d_ = std::make_unique<Im3d::Im3dInst>(width(), height());
+    im3d_ = newBox<Im3d::Im3dInst>(width(), height());
     im3d_->set_camera(
         { cam_pos.x, cam_pos.y, cam_pos.z },
         { cam_dir.x, cam_dir.y, cam_dir.z },
@@ -533,7 +536,8 @@ void PreviewWindow::resizeEvent(QResizeEvent *event)
     update_im3d_camera();
     editor_->on_change_camera();
 
-    get_camera_panel()->set_preview_aspect(real(event->size().width()) / event->size().height());
+    get_camera_panel()->set_preview_aspect(
+        real(event->size().width()) / event->size().height());
 }
 
 void PreviewWindow::mousePressEvent(QMouseEvent *event)
@@ -600,11 +604,13 @@ void PreviewWindow::mouseMoveEvent(QMouseEvent *event)
 
         const Vec3 dst_to_pos = -camera_panel_->get_preview_params().dir();
 
-        const Vec3 ex = -cross(camera_panel_->get_preview_params().up, dst_to_pos).normalize();
+        const Vec3 ex = -cross(
+            camera_panel_->get_preview_params().up, dst_to_pos).normalize();
         const Vec3 ey = -cross(dst_to_pos, ex).normalize().normalize();
 
-        const Vec3 new_look_at = press_dst_ + panning_speed_ * camera_panel_->get_preview_params().distance
-                                                             * (real(dx) * ex + real(dy) * ey);
+        const Vec3 new_look_at = press_dst_
+                               + panning_speed_ * camera_panel_->get_preview_params().distance
+                                                * (real(dx) * ex + real(dy) * ey);
         camera_panel_->set_look_at(new_look_at);
 
         update_im3d_camera();
@@ -747,7 +753,8 @@ void PreviewWindow::render_entities()
         std::sin(cam_vert_rad + 0.3f) * std::sin(cam_hori_rad - 0.2f),
         std::cos(cam_vert_rad + 0.3f)).normalized();
 
-    auto render_mesh = [&](Mesh &mesh, const QVector3D &color, const QVector3D &light_d)
+    auto render_mesh = [&](
+        Mesh &mesh, const QVector3D &color, const QVector3D &light_d)
     {
         mesh.vao.bind();
 
@@ -802,14 +809,15 @@ void PreviewWindow::render_entities()
 
 void PreviewWindow::render_renderframe()
 {
-    if(!get_camera_panel()->is_render_frame_enabled())
+    if(!get_camera_panel()->is_export_frame_enabled())
         return;
 
     const auto &preview_cam = camera_panel_->get_preview_params();
-    const auto &render_cam  = camera_panel_->get_render_params();
+    const auto &render_cam  = camera_panel_->get_export_params();
 
     const real preview_aspect = real(width()) / height();
-    const real render_aspect  = real(camera_panel_->get_render_frame_width()) / camera_panel_->get_render_frame_height();
+    const real render_aspect  = real(camera_panel_->get_export_frame_width())
+                              / camera_panel_->get_export_frame_height();
 
     const real H = 2 * std::tan(math::deg2rad(preview_cam.fov_deg / 2));
     const real W = preview_aspect * H;
@@ -895,9 +903,11 @@ void PreviewWindow::render_gizmo()
     bool is_edited;
 
     if(gizmo_type == GizmoSelector::GizmoType::Translate)
-        is_edited = Im3d::GizmoTranslation(id, &mesh.world.translate[0], gizmo_selector_->is_local());
+        is_edited = Im3d::GizmoTranslation(id, &mesh.world.translate[0],
+        gizmo_selector_->is_local());
     else if(gizmo_type == GizmoSelector::GizmoType::Rotate)
-        is_edited = Im3d::GizmoRotation(id, &mesh.world.rotate.data[0][0], gizmo_selector_->is_local());
+        is_edited = Im3d::GizmoRotation(id, &mesh.world.rotate.data[0][0],
+        gizmo_selector_->is_local());
     else
     {
         float scale[3] = { mesh.world.scale, mesh.world.scale, mesh.world.scale };

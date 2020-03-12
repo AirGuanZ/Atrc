@@ -13,9 +13,11 @@ SpectrumGrid3DWidget::SpectrumGrid3DWidget(const InitData &clone_state)
 {
     init_ui(clone_state);
 
-    connect(filename_button_, &QPushButton::clicked, [=] { browse_filename(); });
+    connect(filename_button_, &QPushButton::clicked,
+            [=] { browse_filename(); });
 
-    connect(adv_widget_, &Texture3DCommonParamsWidget::change_params, [=] { set_dirty_flag(); });
+    connect(adv_widget_, &Texture3DCommonParamsWidget::change_params,
+            [=] { set_dirty_flag(); });
 
     do_update_tracer_object();
 }
@@ -39,7 +41,8 @@ void SpectrumGrid3DWidget::do_update_tracer_object()
     
     if(!img_data_)
     {
-        tracer_object_ = create_constant3d_texture(common_params, Spectrum(real(0.5)));
+        tracer_object_ = create_constant3d_texture(
+            common_params, Spectrum(real(0.5)));
         return;
     }
 
@@ -79,10 +82,11 @@ void SpectrumGrid3DWidget::init_ui(const InitData &clone_state)
     layout_->setContentsMargins(0, 0, 0, 0);
 }
 
-std::unique_ptr<ResourceThumbnailProvider> SpectrumGrid3DWidget::get_thumbnail(int width, int height) const
+Box<ResourceThumbnailProvider> SpectrumGrid3DWidget::get_thumbnail(
+    int width, int height) const
 {
     // TODO
-    return std::make_unique<EmptyResourceThumbnailProvider>(width, height);
+    return newBox<EmptyResourceThumbnailProvider>(width, height);
 }
 
 void SpectrumGrid3DWidget::save_asset(AssetSaver &saver)
@@ -124,7 +128,7 @@ void SpectrumGrid3DWidget::load_asset(AssetLoader &loader)
     std::vector<unsigned char> img_data(byte_size);
     loader.read_raw(img_data.data(), img_data.size());
 
-    img_data_ = std::make_shared<Image3D<Spectrum>>(
+    img_data_ = newRC<Image3D<Spectrum>>(
         depth, height, width, reinterpret_cast<const Spectrum *>(img_data.data()));
 
     adv_widget_->load_asset(loader);
@@ -132,14 +136,16 @@ void SpectrumGrid3DWidget::load_asset(AssetLoader &loader)
     do_update_tracer_object();
 }
 
-std::shared_ptr<tracer::ConfigNode> SpectrumGrid3DWidget::to_config(JSONExportContext &ctx) const
+RC<tracer::ConfigNode> SpectrumGrid3DWidget::to_config(
+    JSONExportContext &ctx) const
 {
-    auto grp = std::make_shared<tracer::ConfigGroup>();
+    auto grp = newRC<tracer::ConfigGroup>();
 
     if(!img_data_)
     {
         grp->insert_str("type", "constant");
-        grp->insert_child("texel", tracer::ConfigArray::from_spectrum(Spectrum(real(0.5))));
+        grp->insert_child(
+            "texel", tracer::ConfigArray::from_spectrum(Spectrum(real(0.5))));
         return grp;
     }
 
@@ -148,7 +154,9 @@ std::shared_ptr<tracer::ConfigNode> SpectrumGrid3DWidget::to_config(JSONExportCo
     auto [ref_filename, filename] = ctx.gen_filename(".spectrum_grid");
 
     tracer::texture3d_load::save_rgb_to_binary(
-        filename, { img_data_->width(), img_data_->height(), img_data_->depth() }, &img_data_->raw_data()->r);
+        filename,
+        { img_data_->width(), img_data_->height(), img_data_->depth() },
+        &img_data_->raw_data()->r);
 
     grp->insert_str("binary_filename", ref_filename);
 
@@ -162,7 +170,8 @@ void SpectrumGrid3DWidget::browse_filename()
     try
     {
         const QStringList item_list = { "ASCII", "Binary", "Images" };
-        const QString item = QInputDialog::getItem(this, "Type", "Select file type", item_list);
+        const QString item = QInputDialog::getItem(
+            this, "Type", "Select file type", item_list);
 
         Image3D<Spectrum> data;
         if(item == "ASCII")
@@ -180,7 +189,8 @@ void SpectrumGrid3DWidget::browse_filename()
             if(filename.isEmpty())
                 return;
 
-            std::ifstream fin(filename.toStdString(), std::ios::in | std::ios::binary);
+            std::ifstream fin(
+                filename.toStdString(), std::ios::in | std::ios::binary);
             data = tracer::texture3d_load::load_rgb_from_binary(fin);
         }
         else
@@ -195,10 +205,11 @@ void SpectrumGrid3DWidget::browse_filename()
                 std_filenames.push_back(f.toStdString());
 
             data = tracer::texture3d_load::load_rgb_from_images(
-                std_filenames.data(), filenames.size(), tracer::factory::BasicPathMapper());
+                std_filenames.data(), filenames.size(),
+                tracer::factory::BasicPathMapper());
         }
 
-        img_data_ = std::make_shared<Image3D<Spectrum>>(std::move(data));
+        img_data_ = newRC<Image3D<Spectrum>>(std::move(data));
     }
     catch(...)
     {
@@ -209,7 +220,8 @@ void SpectrumGrid3DWidget::browse_filename()
     set_dirty_flag();
 }
 
-ResourceWidget<tracer::Texture3D> *SpectrumGrid3DWidgetCreator::create_widget(ObjectContext &obj_ctx) const
+ResourceWidget<tracer::Texture3D> *SpectrumGrid3DWidgetCreator::create_widget(
+    ObjectContext &obj_ctx) const
 {
     return new SpectrumGrid3DWidget({});
 }

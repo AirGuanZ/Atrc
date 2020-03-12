@@ -5,12 +5,12 @@ AGZ_TRACER_BEGIN
 
 class NativeAggregate : public Aggregate
 {
-    std::vector<std::shared_ptr<const Entity>> entities_;
+    std::vector<RC<const Entity>> entities_;
     std::vector<const Entity*> raw_entities_;
 
 public:
 
-    void build(const std::vector<std::shared_ptr<const Entity>> &entities) override
+    void build(const std::vector<RC<const Entity>> &entities) override
     {
         raw_entities_.clear();
         entities_ = entities;
@@ -28,7 +28,8 @@ public:
         return false;
     }
 
-    bool closest_intersection(const Ray &r, EntityIntersection *inct) const noexcept override
+    bool closest_intersection(
+        const Ray &r, EntityIntersection *inct) const noexcept override
     {
         Ray ray = r;
         bool ret = false;
@@ -44,9 +45,9 @@ public:
     }
 };
 
-std::shared_ptr<Aggregate> create_native_aggregate()
+RC<Aggregate> create_native_aggregate()
 {
-    return std::make_shared<NativeAggregate>();
+    return newRC<NativeAggregate>();
 }
 
 AGZ_TRACER_END

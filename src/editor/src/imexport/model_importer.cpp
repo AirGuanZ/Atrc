@@ -47,7 +47,8 @@ ModelImporter::ModelImporter(QWidget *parent, SceneManager *scene_mgr)
 
     to_unit_cube_->setChecked(false);
 
-    connect(up_dir_, &QComboBox::currentTextChanged, [=](const QString &up)
+    connect(up_dir_, &QComboBox::currentTextChanged,
+        [=](const QString &up)
     {
         const int up_axis    = str_to_axis(up);
         const int front_axis = str_to_axis(front_dir_->currentText());
@@ -60,7 +61,8 @@ ModelImporter::ModelImporter(QWidget *parent, SceneManager *scene_mgr)
         }
     });
 
-    connect(front_dir_, &QComboBox::currentTextChanged, [=](const QString &front)
+    connect(front_dir_, &QComboBox::currentTextChanged,
+        [=](const QString &front)
     {
         const int up_axis    = str_to_axis(up_dir_->currentText());
         const int front_axis = str_to_axis(front);
@@ -124,7 +126,8 @@ ModelImporter::ModelImporter(QWidget *parent, SceneManager *scene_mgr)
     layout->addWidget(cancel_, layout_row, 2, 1, 1);
 }
 
-std::vector<mesh::mesh_t> ModelImporter::load_meshes_from(const std::string &filename) const
+std::vector<mesh::mesh_t> ModelImporter::load_meshes_from(
+    const std::string &filename) const
 {
     if(stdstr::ends_with(filename, ".obj"))
         return mesh::load_meshes_from_obj(filename);

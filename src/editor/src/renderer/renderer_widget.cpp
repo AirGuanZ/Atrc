@@ -8,14 +8,15 @@
 
 AGZ_EDITOR_BEGIN
 
-void RendererWidgetFactory::add_creator(std::unique_ptr<RendererWidgetCreator> creator)
+void RendererWidgetFactory::add_creator(Box<RendererWidgetCreator> creator)
 {
     assert(creator);
     std::string name = creator->name();
     name2creator_.insert(std::make_pair(std::move(name), std::move(creator)));
 }
 
-RendererWidget *RendererWidgetFactory::create_widget(std::string_view name, QWidget *parent) const
+RendererWidget *RendererWidgetFactory::create_widget(
+    std::string_view name, QWidget *parent) const
 {
     auto it = name2creator_.find(name);
     if(it == name2creator_.end())
@@ -31,15 +32,16 @@ std::vector<std::string> RendererWidgetFactory::get_type_names() const
     return ret;
 }
 
-RendererPanel::RendererPanel(QWidget *parent, const std::string &default_renderer_type)
+RendererPanel::RendererPanel(
+    QWidget *parent, const std::string &default_renderer_type)
     : QWidget(parent)
 {
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
-    factory_.add_creator(std::make_unique<AOWidgetCreator>());
-    factory_.add_creator(std::make_unique<BDPTRendererWidgetCreator>());
-    factory_.add_creator(std::make_unique<ParticleTracerWidgetCreator>());
-    factory_.add_creator(std::make_unique<PathTracerWidgetCreator>());
+    factory_.add_creator(newBox<AOWidgetCreator>());
+    factory_.add_creator(newBox<BDPTRendererWidgetCreator>());
+    factory_.add_creator(newBox<ParticleTracerWidgetCreator>());
+    factory_.add_creator(newBox<PathTracerWidgetCreator>());
 
     const auto raw_type_names = factory_.get_type_names();
 
@@ -52,22 +54,27 @@ RendererPanel::RendererPanel(QWidget *parent, const std::string &default_rendere
 
     renderer_type_selector_ = new QComboBox(this);
     renderer_type_selector_->addItems(renderer_types);
-    renderer_type_selector_->setCurrentText(QString::fromStdString(default_renderer_type));
+    renderer_type_selector_->setCurrentText(
+        QString::fromStdString(default_renderer_type));
 
     renderer_widget_ = factory_.create_widget(default_renderer_type, this);
     if(!renderer_widget_)
-        throw std::runtime_error("failed to create default renderer widget: " + default_renderer_type);
+        throw std::runtime_error(
+            "failed to create default renderer widget: " + default_renderer_type);
 
-    connect(renderer_type_selector_, &QComboBox::currentTextChanged, [=](const QString &new_type)
+    connect(renderer_type_selector_, &QComboBox::currentTextChanged,
+        [=](const QString &new_type)
     {
         delete renderer_widget_;
         renderer_widget_ = factory_.create_widget(new_type.toStdString(), this);
         layout_->insertWidget(1, renderer_widget_);
-        connect(renderer_widget_, &RendererWidget::change_renderer_params, this, &RendererPanel::on_change_renderer_params);
+        connect(renderer_widget_, &RendererWidget::change_renderer_params,
+                this, &RendererPanel::on_change_renderer_params);
         emit change_renderer_type();
     });
 
-    connect(renderer_widget_, &RendererWidget::change_renderer_params, this, &RendererPanel::on_change_renderer_params);
+    connect(renderer_widget_, &RendererWidget::change_renderer_params,
+            this, &RendererPanel::on_change_renderer_params);
 
     layout_->addWidget(renderer_type_selector_);
     layout_->addWidget(renderer_widget_);
@@ -80,15 +87,17 @@ RendererPanel::RendererPanel(QWidget *parent, const std::string &default_rendere
     layout_->addWidget(export_sec);
 }
 
-std::unique_ptr<Renderer> RendererPanel::create_renderer(
-    std::shared_ptr<tracer::Scene> scene, const Vec2i &framebuffer_size, bool enable_preview) const
+Box<Renderer> RendererPanel::create_renderer(
+    RC<tracer::Scene> scene, const Vec2i &framebuffer_size,
+    bool enable_preview) const
 {
     if(renderer_widget_)
-        return renderer_widget_->create_renderer(std::move(scene), framebuffer_size, enable_preview);
+        return renderer_widget_->create_renderer(
+            std::move(scene), framebuffer_size, enable_preview);
     return nullptr;
 }
 
-std::shared_ptr<tracer::ConfigGroup> RendererPanel::to_config() const
+RC<tracer::ConfigGroup> RendererPanel::to_config() const
 {
     return export_renderer_->to_config();
 }

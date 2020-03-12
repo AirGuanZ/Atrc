@@ -12,7 +12,7 @@ public:
         int worker_count, int task_grid_size, int init_pixel_size,
         int framebuffer_width, int framebuffer_height,
         bool enable_fast_rendering, int fast_resolution, int fast_task_size,
-        std::shared_ptr<const tracer::Scene> scene);
+        RC<const tracer::Scene> scene);
 
     ~ParticleRenderer();
 
@@ -25,11 +25,14 @@ protected:
     void stop_rendering();
 
     virtual Spectrum fast_render_pixel(
-        const tracer::Scene &scene, const tracer::Ray &ray, tracer::Sampler &sampler, tracer::Arena &arena) = 0;
+        const tracer::Scene &scene, const tracer::Ray &ray,
+        tracer::Sampler &sampler, tracer::Arena &arena) = 0;
 
     virtual Spectrum render_pixel(
-        const tracer::Scene &scene, const tracer::Ray &ray, tracer::Sampler &sampler,
-        tracer::Arena &arena, tracer::FilmFilterApplier::FilmGridView<Spectrum> &particle_film, uint64_t *particle_count) = 0;
+        const tracer::Scene &scene, const tracer::Ray &ray,
+        tracer::Sampler &sampler, tracer::Arena &arena,
+        tracer::FilmFilterApplier::FilmGridView<Spectrum> &particle_film,
+        uint64_t *particle_count) = 0;
 
     virtual uint64_t exec_render_task(
         Framebuffer::Task &task, tracer::Sampler &sampler,
@@ -40,14 +43,15 @@ private:
     Image2D<Spectrum> do_fast_rendering();
 
     void exec_fast_render_task(
-        Image2D<Spectrum> &target, const Vec2i &beg, const Vec2i &end, tracer::Sampler &sampler);
+        Image2D<Spectrum> &target,
+        const Vec2i &beg, const Vec2i &end, tracer::Sampler &sampler);
 
 protected:
 
     int framebuffer_width_;
     int framebuffer_height_;
 
-    std::shared_ptr<const tracer::Scene> scene_;
+    RC<const tracer::Scene> scene_;
 
     std::atomic<bool> stop_rendering_;
 
@@ -67,11 +71,11 @@ private:
     Image2D<Spectrum> output_img_;
     mutable std::mutex output_img_mutex_;
 
-    std::unique_ptr<std::mutex[]> particle_film_mutex_;
+    Box<std::mutex[]> particle_film_mutex_;
     std::vector<Image2D<Spectrum>> particle_film_;
     std::atomic<uint64_t> total_particle_count_;
 
-    std::unique_ptr<tracer::FilmFilterApplier> film_filter_;
+    Box<tracer::FilmFilterApplier> film_filter_;
     tracer::Arena sampler_arena_;
 
     std::atomic<int> global_particle_film_version_;

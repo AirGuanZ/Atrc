@@ -7,7 +7,8 @@
 
 AGZ_EDITOR_BEGIN
 
-Texture2DCommonParamsWidget::Texture2DCommonParamsWidget(const InitData &init_data)
+Texture2DCommonParamsWidget::Texture2DCommonParamsWidget(
+    const InitData &init_data)
 {
     QVBoxLayout *layout = new QVBoxLayout(this);
 
@@ -17,7 +18,7 @@ Texture2DCommonParamsWidget::Texture2DCommonParamsWidget(const InitData &init_da
     apply_inv_gamma_ = new QCheckBox("Inverse Gamma Correction", inv_gamma_widget);
     inv_gamma_       = new QLineEdit(inv_gamma_widget);
 
-    inv_gamma_validator_ = std::make_unique<QDoubleValidator>();
+    inv_gamma_validator_ = newBox<QDoubleValidator>();
 
     QWidget     *uv_widget = new QWidget(this);
     QHBoxLayout *uv_layout = new QHBoxLayout(uv_widget);
@@ -98,16 +99,23 @@ Texture2DCommonParamsWidget::Texture2DCommonParamsWidget(const InitData &init_da
         emit change_params();
     });
 
-    connect(inv_gamma_, &QLineEdit::returnPressed, [=] { emit change_params(); });
+    connect(inv_gamma_, &QLineEdit::returnPressed,
+            [=] { emit change_params(); });
 
-    connect(inv_u_,   &QCheckBox::stateChanged, [=](int) { emit change_params(); });
-    connect(inv_v_,   &QCheckBox::stateChanged, [=](int) { emit change_params(); });
-    connect(swap_uv_, &QCheckBox::stateChanged, [=](int) { emit change_params(); });
+    connect(inv_u_,   &QCheckBox::stateChanged,
+            [=](int) { emit change_params(); });
+    connect(inv_v_,   &QCheckBox::stateChanged,
+            [=](int) { emit change_params(); });
+    connect(swap_uv_, &QCheckBox::stateChanged,
+            [=](int) { emit change_params(); });
 
-    connect(transform_, &Transform2DWidget::change_transform, [=] { emit change_params(); });
+    connect(transform_, &Transform2DWidget::change_transform,
+            [=] { emit change_params(); });
 
-    connect(wrap_u_, &QComboBox::currentTextChanged, [=](const QString &) { emit change_params(); });
-    connect(wrap_v_, &QComboBox::currentTextChanged, [=](const QString &) { emit change_params(); });
+    connect(wrap_u_, &QComboBox::currentTextChanged,
+            [=](const QString &) { emit change_params(); });
+    connect(wrap_v_, &QComboBox::currentTextChanged,
+            [=](const QString &) { emit change_params(); });
 }
 
 Texture2DCommonParamsWidget *Texture2DCommonParamsWidget::clone() const

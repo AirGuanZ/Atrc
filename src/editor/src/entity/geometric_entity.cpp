@@ -6,7 +6,8 @@
 
 AGZ_EDITOR_BEGIN
 
-GeometricEntityWidget::GeometricEntityWidget(const CloneState &clone_state, ObjectContext &obj_ctx)
+GeometricEntityWidget::GeometricEntityWidget(
+    const CloneState &clone_state, ObjectContext &obj_ctx)
     : obj_ctx_(obj_ctx)
 {
     QGridLayout *layout = new QGridLayout(this);
@@ -129,12 +130,13 @@ void GeometricEntityWidget::load_asset(AssetLoader &loader)
     do_update_tracer_object();
 }
 
-std::shared_ptr<tracer::ConfigNode> GeometricEntityWidget::to_config(JSONExportContext &ctx) const
+RC<tracer::ConfigNode> GeometricEntityWidget::to_config(
+    JSONExportContext &ctx) const
 {
-    auto grp = std::make_shared<tracer::ConfigGroup>();
+    auto grp = newRC<tracer::ConfigGroup>();
     grp->insert_str("type", "geometric");
 
-    auto geo_grp = std::make_shared<tracer::ConfigGroup>();
+    auto geo_grp = newRC<tracer::ConfigGroup>();
     geo_grp->insert_str("type", "transform_wrapper");
     geo_grp->insert_child("internal", geometry_->to_config(ctx));
     geo_grp->insert_child("transform", transform_->get_transform().to_config());
@@ -143,7 +145,8 @@ std::shared_ptr<tracer::ConfigNode> GeometricEntityWidget::to_config(JSONExportC
     grp->insert_child("material", material_->to_config(ctx));
     grp->insert_child("med_in",   medium_in_->to_config(ctx));
     grp->insert_child("med_out",  medium_out_->to_config(ctx));
-    grp->insert_child("emit_radiance", tracer::ConfigArray::from_spectrum(emit_radiance_->get_value()));
+    grp->insert_child(
+        "emit_radiance", tracer::ConfigArray::from_spectrum(emit_radiance_->get_value()));
 
     return grp;
 }
@@ -181,12 +184,15 @@ void GeometricEntityWidget::do_update_tracer_object()
 
     const Spectrum emit_radiance = emit_radiance_->get_value();
 
-    auto geometry_wrapper = create_transform_wrapper(geometry, tracer::Transform3(get_transform().compose()));
+    auto geometry_wrapper = create_transform_wrapper(
+        geometry, tracer::Transform3(get_transform().compose()));
 
-    tracer_object_ = create_geometric(geometry_wrapper, material, med, emit_radiance, false);
+    tracer_object_ = create_geometric(
+        geometry_wrapper, material, med, emit_radiance, false);
 }
 
-ResourceWidget<tracer::Entity> *GeometricEntityWidgetCreator::create_widget(ObjectContext &obj_ctx) const
+ResourceWidget<tracer::Entity> *GeometricEntityWidgetCreator::create_widget(
+    ObjectContext &obj_ctx) const
 {
     return new GeometricEntityWidget({}, obj_ctx);
 }

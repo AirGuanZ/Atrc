@@ -34,7 +34,8 @@ public:
      * 
      * reported values are not guaranteed to ↗ in multi-thread rendering
      */
-    virtual void progress(double percent, const PreviewFunc &get_image_preview) = 0;
+    virtual void progress(
+        double percent, const PreviewFunc &get_image_preview) = 0;
 
     /**
      * @brief output a ordinary message
@@ -52,7 +53,8 @@ public:
     virtual void end() = 0;
 
     /**
-     * @brief start a new rendering stage. progress percentage will be reset to 0
+     * @brief start a new rendering stage.
+     *  progress percentage will be reset to 0
      */
     virtual void new_stage() = 0;
 

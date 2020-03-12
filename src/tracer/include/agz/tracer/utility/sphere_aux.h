@@ -15,9 +15,11 @@ inline std::tuple<real, real, real> get_abc(real radius_square, const Ray &r)
     return { A, B, C };
 }
 
-inline void local_geometry_uv_and_coord(const Vec3 &local_pos, Vec2 *uv, Coord *local_coord, real radius) noexcept
+inline void local_geometry_uv_and_coord(
+    const Vec3 &local_pos, Vec2 *uv, Coord *local_coord, real radius) noexcept
 {
-    real phi = (!local_pos.x && !local_pos.y) ? real(0) : std::atan2(local_pos.y, local_pos.x);
+    real phi = (!local_pos.x && !local_pos.y) ?
+               real(0) : std::atan2(local_pos.y, local_pos.x);
     if(phi < 0)
         phi += 2 * PI_r;
     const real sin_theta = math::clamp<real>(local_pos.z / radius, -1, 1);

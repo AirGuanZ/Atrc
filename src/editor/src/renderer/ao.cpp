@@ -4,7 +4,8 @@
 
 AGZ_EDITOR_BEGIN
 
-AO::AO(const Params &params, int fb_width, int fb_height, std::shared_ptr<const tracer::Scene> scene)
+AO::AO(const Params &params, int fb_width, int fb_height,
+       RC<const tracer::Scene> scene)
     : PerPixelRenderer(
         params.worker_count, params.task_grid_size, 2,
         fb_width, fb_height, params.enable_preview, 128, 32, scene)
@@ -24,12 +25,16 @@ AO::~AO()
     stop_rendering();
 }
 
-Spectrum AO::fast_render_pixel(const tracer::Scene &scene, const tracer::Ray &ray, tracer::Sampler &sampler, tracer::Arena &arena)
+Spectrum AO::fast_render_pixel(
+    const tracer::Scene &scene, const tracer::Ray &ray,
+    tracer::Sampler &sampler, tracer::Arena &arena)
 {
     return trace_ao(ao_params_, scene, ray, sampler).value;
 }
 
-Spectrum AO::render_pixel(const tracer::Scene &scene, const tracer::Ray &ray, tracer::Sampler &sampler, tracer::Arena &arena)
+Spectrum AO::render_pixel(
+    const tracer::Scene &scene, const tracer::Ray &ray,
+    tracer::Sampler &sampler, tracer::Arena &arena)
 {
     return trace_ao(fast_params_, scene, ray, sampler).value;
 }

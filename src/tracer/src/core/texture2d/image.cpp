@@ -11,21 +11,26 @@ AGZ_TRACER_BEGIN
 
 class ImageTexture : public Texture2D
 {
-    std::shared_ptr<const Image2D<math::color3b>> data_;
+    RC<const Image2D<math::color3b>> data_;
 
-    static Spectrum nearest_sample_impl(const texture::texture2d_t<math::color3b> *data, const Vec2 &uv) noexcept
+    static Spectrum nearest_sample_impl(
+        const texture::texture2d_t<math::color3b> *data, const Vec2 &uv) noexcept
     {
-        const auto tex = [&t = *data](int x, int y) { return math::from_color3b<real>(t(y, x)); };
+        const auto tex = [&t = *data](int x, int y)
+            { return math::from_color3b<real>(t(y, x)); };
         return texture::nearest_sample2d(uv, tex, data->width(), data->height());
     }
 
-    static Spectrum linear_sample_impl(const texture::texture2d_t<math::color3b> *data, const Vec2 &uv) noexcept
+    static Spectrum linear_sample_impl(
+        const texture::texture2d_t<math::color3b> *data, const Vec2 &uv) noexcept
     {
-        const auto tex = [&t = *data](int x, int y) { return math::from_color3b<real>(t(y, x)); };
+        const auto tex = [&t = *data](int x, int y)
+            { return math::from_color3b<real>(t(y, x)); };
         return texture::linear_sample2d(uv, tex, data->width(), data->height());
     }
 
-    using SampleImplFuncPtr = Spectrum(*)(const texture::texture2d_t<math::color3b>*, const Vec2&);
+    using SampleImplFuncPtr = Spectrum(*)(
+        const texture::texture2d_t<math::color3b>*, const Vec2&);
     SampleImplFuncPtr sample_impl_ = linear_sample_impl;
 
 protected:
@@ -39,7 +44,7 @@ public:
 
     ImageTexture(
         const Texture2DCommonParams &common_params,
-        std::shared_ptr<const Image2D<math::color3b>> data,
+        RC<const Image2D<math::color3b>> data,
         const std::string &sampler)
     {
         init_common_params(common_params);
@@ -67,11 +72,11 @@ public:
     }
 };
 
-std::shared_ptr<Texture2D> create_image_texture(
+RC<Texture2D> create_image_texture(
     const Texture2DCommonParams &common_params,
-    std::shared_ptr<const Image2D<math::color3b>> data, const std::string &sampler)
+    RC<const Image2D<math::color3b>> data, const std::string &sampler)
 {
-    return std::make_shared<ImageTexture>(common_params, std::move(data), sampler);
+    return newRC<ImageTexture>(common_params, std::move(data), sampler);
 }
 
 AGZ_TRACER_END

@@ -21,7 +21,7 @@ public:
 
     void load_asset(AssetLoader &loader) override;
 
-    std::shared_ptr<tracer::ConfigNode> to_config(JSONExportContext &ctx) const override;
+    RC<tracer::ConfigNode> to_config(JSONExportContext &ctx) const override;
 
 protected:
 
@@ -43,7 +43,8 @@ public:
 
     QString name() const override { return "IBL"; }
 
-    ResourceWidget<tracer::EnvirLight> *create_widget(ObjectContext &obj_ctx) const override;
+    ResourceWidget<tracer::EnvirLight> *create_widget(
+        ObjectContext &obj_ctx) const override;
 };
 
 AGZ_EDITOR_END

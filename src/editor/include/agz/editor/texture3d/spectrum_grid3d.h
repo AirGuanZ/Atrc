@@ -15,7 +15,7 @@ public:
 
     struct InitData
     {
-        std::shared_ptr<const Image3D<Spectrum>> img_data;
+        RC<const Image3D<Spectrum>> img_data;
         Texture3DCommonParamsWidget *adv = nullptr;
     };
 
@@ -23,13 +23,14 @@ public:
 
     ResourceWidget<tracer::Texture3D> *clone() override;
 
-    std::unique_ptr<ResourceThumbnailProvider> get_thumbnail(int width, int height) const override;
+    Box<ResourceThumbnailProvider> get_thumbnail(
+        int width, int height) const override;
 
     void save_asset(AssetSaver &saver) override;
 
     void load_asset(AssetLoader &loader) override;
 
-    std::shared_ptr<tracer::ConfigNode> to_config(JSONExportContext &ctx) const override;
+    RC<tracer::ConfigNode> to_config(JSONExportContext &ctx) const override;
 
 protected:
 
@@ -43,7 +44,7 @@ private:
 
     void browse_filename();
 
-    std::shared_ptr<const Image3D<Spectrum>> img_data_;
+    RC<const Image3D<Spectrum>> img_data_;
 
     QVBoxLayout *layout_ = nullptr;
 
@@ -62,7 +63,8 @@ public:
         return "Spectrum Grid";
     }
 
-    ResourceWidget<tracer::Texture3D> *create_widget(ObjectContext &obj_ctx) const override;
+    ResourceWidget<tracer::Texture3D> *create_widget(
+        ObjectContext &obj_ctx) const override;
 };
 
 AGZ_EDITOR_END

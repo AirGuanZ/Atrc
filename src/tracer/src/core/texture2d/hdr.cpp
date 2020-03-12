@@ -10,21 +10,24 @@ AGZ_TRACER_BEGIN
 
 class HDRTexture : public Texture2D
 {
-    std::shared_ptr<const Image2D<math::color3f>> data_;
+    RC<const Image2D<math::color3f>> data_;
 
-    static Spectrum nearest_sample_impl(const texture::texture2d_t<math::color3f> *data, const Vec2 &uv) noexcept
+    static Spectrum nearest_sample_impl(
+        const texture::texture2d_t<math::color3f> *data, const Vec2 &uv) noexcept
     {
         const auto tex = [&t = *data](int x, int y) { return t(y, x); };
         return texture::nearest_sample2d(uv, tex, data->width(), data->height());
     }
 
-    static Spectrum linear_sample_impl(const texture::texture2d_t<math::color3f> *data, const Vec2 &uv) noexcept
+    static Spectrum linear_sample_impl(
+        const texture::texture2d_t<math::color3f> *data, const Vec2 &uv) noexcept
     {
         const auto tex = [&t = *data](int x, int y) { return t(y, x); };
         return texture::linear_sample2d(uv, tex, data->width(), data->height());
     }
 
-    using SampleImplFuncPtr = Spectrum(*)(const texture::texture2d_t<math::color3f>*, const Vec2&);
+    using SampleImplFuncPtr = Spectrum(*)(
+        const texture::texture2d_t<math::color3f>*, const Vec2&);
     SampleImplFuncPtr sample_impl_ = linear_sample_impl;
 
 protected:
@@ -38,7 +41,7 @@ public:
 
     HDRTexture(
         const Texture2DCommonParams &common_params,
-        std::shared_ptr<const Image2D<math::color3f>> data,
+        RC<const Image2D<math::color3f>> data,
         const std::string &sampler)
     {
         AGZ_HIERARCHY_TRY
@@ -68,11 +71,11 @@ public:
     }
 };
 
-std::shared_ptr<Texture2D> create_hdr_texture(
+RC<Texture2D> create_hdr_texture(
     const Texture2DCommonParams &common_params,
-    std::shared_ptr<const Image2D<math::color3f>> data, const std::string &sampler)
+    RC<const Image2D<math::color3f>> data, const std::string &sampler)
 {
-    return std::make_shared<HDRTexture>(common_params, data, sampler);
+    return newRC<HDRTexture>(common_params, data, sampler);
 }
 
 AGZ_TRACER_END

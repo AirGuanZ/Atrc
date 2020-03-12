@@ -21,7 +21,7 @@ public:
     Sampler(int seed, bool use_time_seed);
 
     /**
-     * @brief combine the new seed with internal seed to create a new sampler instance
+     * @brief combine new seed with internal seed to create a sampler instance
      */
     Sampler *clone(int seed, Arena &arena) const;
 
@@ -38,7 +38,8 @@ inline Sampler::Sampler(int seed, bool use_time_seed)
     if(use_time_seed)
     {
         seed_ = static_cast<seed_t>(
-            std::chrono::high_resolution_clock::now().time_since_epoch().count());
+            std::chrono::high_resolution_clock::now()
+            .time_since_epoch().count());
     }
     else
         seed_ = static_cast<seed_t>(seed);

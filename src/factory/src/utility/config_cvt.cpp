@@ -36,26 +36,26 @@ namespace
         return ret;
     }
 
-    std::shared_ptr<ConfigValue> get_child(const JSON &val)
+    RC<ConfigValue> get_child(const JSON &val)
     {
         if(val.is_boolean())
-            return std::make_shared<ConfigValue>(val.get<bool>() ? "1" : "0");
+            return newRC<ConfigValue>(val.get<bool>() ? "1" : "0");
         if(val.is_number_float())
-            return std::make_shared<ConfigValue>(std::to_string(val.get<real>()));
+            return newRC<ConfigValue>(std::to_string(val.get<real>()));
         if(val.is_number_integer())
-            return std::make_shared<ConfigValue>(std::to_string(val.get<int>()));
-        return std::make_shared<ConfigValue>(val.get<std::string>());
+            return newRC<ConfigValue>(std::to_string(val.get<int>()));
+        return newRC<ConfigValue>(val.get<std::string>());
     }
 
-    std::shared_ptr<ConfigNode> from_json_impl(const JSON &json)
+    RC<ConfigNode> from_json_impl(const JSON &json)
     {
         if(json.is_object())
         {
-            auto ret = std::make_shared<ConfigGroup>();
+            auto ret = newRC<ConfigGroup>();
             for(auto it = json.begin(); it != json.end(); ++it)
             {
                 const auto &val = it.value();
-                std::shared_ptr<ConfigNode> child;
+                RC<ConfigNode> child;
                 if(!val.is_array() && !val.is_object())
                     child = get_child(val);
                 else
@@ -66,10 +66,10 @@ namespace
         }
 
         assert(json.is_array());
-        auto ret = std::make_shared<ConfigArray>();
+        auto ret = newRC<ConfigArray>();
         for(auto &elem : json)
         {
-            std::shared_ptr<ConfigNode> child;
+            RC<ConfigNode> child;
             if(!elem.is_array() && !elem.is_object())
                 child = get_child(elem);
             else

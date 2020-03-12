@@ -54,8 +54,9 @@ PathTracerWidget::~PathTracerWidget()
     delete ui_;
 }
 
-std::unique_ptr<Renderer> PathTracerWidget::create_renderer(
-    std::shared_ptr<tracer::Scene> scene, const Vec2i &framebuffer_size, bool enable_preview) const
+Box<Renderer> PathTracerWidget::create_renderer(
+    RC<tracer::Scene> scene, const Vec2i &framebuffer_size,
+    bool enable_preview) const
 {
     PathTracer::Params params = {
         -2, 32,
@@ -63,7 +64,8 @@ std::unique_ptr<Renderer> PathTracerWidget::create_renderer(
         ui_->fast_preview->isChecked(),
         enable_preview
     };
-    return std::make_unique<PathTracer>(params, framebuffer_size.x, framebuffer_size.y, std::move(scene));
+    return newBox<PathTracer>(
+        params, framebuffer_size.x, framebuffer_size.y, std::move(scene));
 }
 
 RendererWidget *PathTracerWidgetCreator::create_widget(QWidget *parent) const

@@ -15,7 +15,8 @@ namespace aggregate
             return "bvh";
         }
 
-        std::shared_ptr<Aggregate> create(const ConfigGroup &params, CreatingContext &context) const override
+        RC<Aggregate> create(
+            const ConfigGroup &params, CreatingContext &context) const override
         {
             const int max_leaf_size = params.child_int_or("max_leaf_size", 5);
             return create_entity_bvh(max_leaf_size);
@@ -31,7 +32,8 @@ namespace aggregate
             return "native";
         }
 
-        std::shared_ptr<Aggregate> create(const ConfigGroup &params, CreatingContext &context) const override
+        RC<Aggregate> create(
+            const ConfigGroup &params, CreatingContext &context) const override
         {
             return create_native_aggregate();
         }
@@ -41,8 +43,8 @@ namespace aggregate
 
 void initialize_aggregate_factory(Factory<Aggregate> &factory)
 {
-    factory.add_creator(std::make_unique<aggregate::EntityBVHCreator>());
-    factory.add_creator(std::make_unique<aggregate::NativeAggregateCreator>());
+    factory.add_creator(newBox<aggregate::EntityBVHCreator>());
+    factory.add_creator(newBox<aggregate::NativeAggregateCreator>());
 }
 
 AGZ_TRACER_FACTORY_END

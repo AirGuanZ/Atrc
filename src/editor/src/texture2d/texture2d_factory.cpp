@@ -9,10 +9,10 @@ AGZ_EDITOR_BEGIN
 
 void init_texture2d_factory(Texture2DWidgetFactory &factory)
 {
-    factory.add_creator(std::make_unique<Constant2DCreator>());
-    factory.add_creator(std::make_unique<Image2DCreator>());
-    factory.add_creator(std::make_unique<HDRWidgetCreator>());
-    factory.add_creator(std::make_unique<RangeWidgetCreator>());
+    factory.add_creator(newBox<Constant2DCreator>());
+    factory.add_creator(newBox<Image2DCreator>());
+    factory.add_creator(newBox<HDRWidgetCreator>());
+    factory.add_creator(newBox<RangeWidgetCreator>());
 }
 
 AGZ_EDITOR_END

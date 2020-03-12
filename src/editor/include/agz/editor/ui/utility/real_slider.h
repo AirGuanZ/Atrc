@@ -12,7 +12,8 @@ class RealSlider : public QWidget
 
 public:
 
-    explicit RealSlider(QWidget *parent, double low = 0, double high = 1, double value = 0);
+    explicit RealSlider(
+        QWidget *parent, double low = 0, double high = 1, double value = 0);
 
     void set_orientation(Qt::Orientation orientation);
 

@@ -28,16 +28,19 @@ public:
         return has_intersection_with_triangle(local_r, a_, b_a_, c_a_);
     }
 
-    bool closest_intersection(const Ray &r, GeometryIntersection *inct) const noexcept override
+    bool closest_intersection(
+        const Ray &r, GeometryIntersection *inct) const noexcept override
     {
         const Ray local_r = to_local(r);
         TriangleIntersectionRecord inct_rcd;
-        if(!closest_intersection_with_triangle(local_r, a_, b_a_, c_a_, &inct_rcd))
+        if(!closest_intersection_with_triangle(
+            local_r, a_, b_a_, c_a_, &inct_rcd))
             return false;
 
         inct->pos            = local_r.at(inct_rcd.t_ray);
         inct->geometry_coord = Coord(x_, cross(z_, x_), z_);
-        inct->uv             = t_a_ + inct_rcd.uv.x * t_b_a_ + inct_rcd.uv.y * t_c_a_;
+        inct->uv             = t_a_ + inct_rcd.uv.x * t_b_a_
+                                    + inct_rcd.uv.y * t_c_a_;
         inct->user_coord     = inct->geometry_coord;
         inct->wr             = -local_r.d;
         inct->t              = inct_rcd.t_ray;
@@ -68,7 +71,8 @@ public:
 
     SurfacePoint sample(real *pdf, const Sample3 &sam) const noexcept override
     {
-        const Vec2 bi_coord = math::distribution::uniform_on_triangle(sam.u, sam.v);
+        const Vec2 bi_coord = math::distribution
+                                ::uniform_on_triangle(sam.u, sam.v);
 
         SurfacePoint spt;
         spt.pos            = a_ + bi_coord.x * b_a_ + bi_coord.y * c_a_;
@@ -82,7 +86,8 @@ public:
         return spt;
     }
 
-    SurfacePoint sample(const Vec3&, real *pdf, const Sample3 &sam) const noexcept override
+    SurfacePoint sample(
+        const Vec3&, real *pdf, const Sample3 &sam) const noexcept override
     {
         return sample(pdf, sam);
     }
@@ -128,13 +133,13 @@ private:
 
 };
 
-std::shared_ptr<Geometry> create_triangle(
+RC<Geometry> create_triangle(
     const Vec3 &a, const Vec3 &b, const Vec3 &c,
     const Vec2 &t_a, const Vec2 &t_b, const Vec2 &t_c,
     const Transform3 &local_to_world)
 {
     Triangle::Params params = { a, b, c, t_a, t_b, t_c, local_to_world };
-    return std::make_shared<Triangle>(params);
+    return newRC<Triangle>(params);
 }
 
 AGZ_TRACER_END

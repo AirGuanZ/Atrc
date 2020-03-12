@@ -30,12 +30,16 @@ public:
     /**
      * @brief blocking rendering
      */
-    virtual RenderTarget render(FilmFilterApplier filter, Scene &scene, RendererInteractor &reporter) = 0;
+    virtual RenderTarget render(
+        FilmFilterApplier filter, Scene &scene,
+        RendererInteractor &reporter) = 0;
 
     /**
      * @brief start the async rendering
      */
-    void render_async(FilmFilterApplier filter, Scene &scene, RendererInteractor &reporter);
+    void render_async(
+        FilmFilterApplier filter, Scene &scene,
+        RendererInteractor &reporter);
 
     /**
      * @brief stop the async rendering
@@ -48,7 +52,8 @@ public:
     RenderTarget wait_async();
 
     /**
-     * @brief returns true after calling render_async and before calling stop_async/wait_async
+     * @brief returns true after calling render_async and
+     *  before calling stop_async/wait_async
      */
     bool is_waitable() const noexcept { return is_waitable_; }
 

@@ -7,8 +7,8 @@ AGZ_EDITOR_BEGIN
 
 void init_geometry_factory(GeometryWidgetFactory &factory)
 {
-    factory.add_creator(std::make_unique<SphereWidgetCreator>());
-    factory.add_creator(std::make_unique<TriangleBVHWidgetCreator>());
+    factory.add_creator(newBox<SphereWidgetCreator>());
+    factory.add_creator(newBox<TriangleBVHWidgetCreator>());
 }
 
 AGZ_EDITOR_END

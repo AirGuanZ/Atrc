@@ -34,13 +34,13 @@ public:
     virtual ~Scene() = default;
 
     /** @brief set current active camera */
-    virtual void set_camera(std::shared_ptr<const Camera> camera) = 0;
+    virtual void set_camera(RC<const Camera> camera) = 0;
 
     /** @brief get current active camera */
     virtual const Camera *get_camera() const noexcept = 0;
 
     /** @brief get current active camera */
-    virtual std::shared_ptr<const Camera> get_shared_camera() const noexcept = 0;
+    virtual RC<const Camera> get_shared_camera() const noexcept = 0;
 
     /** @brief get all light sources */
     virtual misc::span<const Light* const> lights() const noexcept = 0;
@@ -49,7 +49,8 @@ public:
     virtual const EnvirLight *envir_light() const noexcept = 0;
 
     /** @brief sample a light source */
-    virtual SceneSampleLightResult sample_light(const Sample1 &sam) const noexcept = 0;
+    virtual SceneSampleLightResult sample_light(
+        const Sample1 &sam) const noexcept = 0;
 
     /**
      * @brief pdf of sample_light
@@ -73,7 +74,10 @@ public:
      *
      * @return whether there is an intersection
      */
-    virtual bool closest_intersection(const Ray &r, EntityIntersection *inct) const noexcept = 0;
+    virtual bool closest_intersection(
+        const Ray &r, EntityIntersection *inct) const noexcept = 0;
+
+    virtual AABB world_bound() const noexcept = 0;;
 
     /**
      * @brief must be called before rendering

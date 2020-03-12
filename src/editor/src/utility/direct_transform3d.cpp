@@ -49,14 +49,14 @@ Mat4 DirectTransform::compose() const noexcept
     return ret;
 }
 
-std::shared_ptr<tracer::ConfigArray> DirectTransform::to_config() const
+RC<tracer::ConfigArray> DirectTransform::to_config() const
 {
-    auto trans_grp = std::make_shared<tracer::ConfigGroup>();
+    auto trans_grp = newRC<tracer::ConfigGroup>();
     trans_grp->insert_str("type", "translate");
     trans_grp->insert_child("offset", tracer::ConfigArray::from_vec3(translate));
 
-    auto rot_grp = std::make_shared<tracer::ConfigGroup>();
-    auto rot_m = std::make_shared<tracer::ConfigArray>();
+    auto rot_grp = newRC<tracer::ConfigGroup>();
+    auto rot_m = newRC<tracer::ConfigArray>();
     rot_grp->insert_str("type", "mat3");
     rot_m->push_back_real(rotate[0][0]);
     rot_m->push_back_real(rotate[0][1]);
@@ -69,11 +69,11 @@ std::shared_ptr<tracer::ConfigArray> DirectTransform::to_config() const
     rot_m->push_back_real(rotate[2][2]);
     rot_grp->insert_child("col_major", rot_m);
 
-    auto scale_grp = std::make_shared<tracer::ConfigGroup>();
+    auto scale_grp = newRC<tracer::ConfigGroup>();
     scale_grp->insert_str("type", "scale");
     scale_grp->insert_real("ratio", scale);
 
-    auto arr = std::make_shared<tracer::ConfigArray>();
+    auto arr = newRC<tracer::ConfigArray>();
     arr->push_back(trans_grp);
     arr->push_back(rot_grp);
     arr->push_back(scale_grp);

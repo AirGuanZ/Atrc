@@ -16,12 +16,12 @@ public:
 
     explicit ExportRendererPT(QWidget *parent = nullptr);
 
-    std::shared_ptr<tracer::ConfigGroup> to_config() const override;
+    RC<tracer::ConfigGroup> to_config() const override;
 
 private:
 
-    QSlider *min_depth_ = nullptr;
-    QSlider *max_depth_ = nullptr;
+    QSpinBox *min_depth_ = nullptr;
+    QSpinBox *max_depth_ = nullptr;
 
     RealSlider *cont_prob_ = nullptr;
 

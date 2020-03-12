@@ -8,9 +8,9 @@ AGZ_EDITOR_BEGIN
 
 void init_medium_factory(MediumWidgetFactory &factory)
 {
-    factory.add_creator(std::make_unique<HeterogeneousWidgetCreator>());
-    factory.add_creator(std::make_unique<HomogeneousWidgetCreator>());
-    factory.add_creator(std::make_unique<VoidWidgetCreator>());
+    factory.add_creator(newBox<HeterogeneousWidgetCreator>());
+    factory.add_creator(newBox<HomogeneousWidgetCreator>());
+    factory.add_creator(newBox<VoidWidgetCreator>());
 }
 
 AGZ_EDITOR_END

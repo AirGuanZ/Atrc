@@ -27,7 +27,8 @@ inline Vec3 reflect(const Vec3 &w, const Vec3 &n) noexcept
  * 
  * both w and n should be normalized
  */
-inline std::optional<Vec3> refract(const Vec3 &w, const Vec3 &n, real eta) noexcept
+inline std::optional<Vec3> refract(
+    const Vec3 &w, const Vec3 &n, real eta) noexcept
 {
     const real cos_theta_i = dot(w, n);
     const real sin2_theta_t = math::sqr(eta) * (1 - math::sqr(cos_theta_i));
@@ -44,7 +45,8 @@ inline std::optional<Vec3> refract(const Vec3 &w, const Vec3 &n, real eta) noexc
  * @param eta_i inner IOR
  * @param eta_o outer IOR
  */
-inline real dielectric_fresnel(real eta_i, real eta_o, real cos_theta_i) noexcept
+inline real dielectric_fresnel(
+    real eta_i, real eta_o, real cos_theta_i) noexcept
 {
     if(cos_theta_i < 0)
     {
@@ -52,15 +54,19 @@ inline real dielectric_fresnel(real eta_i, real eta_o, real cos_theta_i) noexcep
         cos_theta_i = -cos_theta_i;
     }
 
-    const real sin_theta_i = std::sqrt((std::max)(real(0), 1 - cos_theta_i * cos_theta_i));
+    const real sin_theta_i = std::sqrt((std::max)(
+        real(0), 1 - cos_theta_i * cos_theta_i));
     const real sin_theta_t = eta_o / eta_i * sin_theta_i;
 
     if(sin_theta_t >= 1)
         return 1;
 
-    const real cos_theta_t = std::sqrt((std::max)(real(0), 1 - sin_theta_t * sin_theta_t));
-    const real para = (eta_i * cos_theta_i - eta_o * cos_theta_t) / (eta_i * cos_theta_i + eta_o * cos_theta_t);
-    const real perp = (eta_o * cos_theta_i - eta_i * cos_theta_t) / (eta_o * cos_theta_i + eta_i * cos_theta_t);
+    const real cos_theta_t = std::sqrt((std::max)(
+        real(0), 1 - sin_theta_t * sin_theta_t));
+    const real para = (eta_i * cos_theta_i - eta_o * cos_theta_t)
+                    / (eta_i * cos_theta_i + eta_o * cos_theta_t);
+    const real perp = (eta_o * cos_theta_i - eta_i * cos_theta_t)
+                    / (eta_o * cos_theta_i + eta_i * cos_theta_t);
 
     return real(0.5) * (para * para + perp * perp);
 }

@@ -17,12 +17,15 @@ namespace
             
         }
 
-        Spectrum eval(const Vec3 &wi, const Vec3 &wo, TransportMode mode) const noexcept override
+        Spectrum eval(
+            const Vec3 &wi, const Vec3 &wo, TransMode mode) const noexcept override
         {
             return {};
         }
 
-        BSDFSampleResult sample(const Vec3 &wo, TransportMode mode, const Sample3 &sam) const noexcept override
+        BSDFSampleResult sample(
+            const Vec3 &wo, TransMode mode,
+            const Sample3 &sam) const noexcept override
         {
             const real cosv = std::abs(cos(geometry_normal_, wo));
 
@@ -48,6 +51,11 @@ namespace
         {
             return true;
         }
+
+        bool has_diffuse_component() const noexcept override
+        {
+            return false;
+        }
     };
 }
 
@@ -58,15 +66,16 @@ public:
     ShadingPoint shade(const SurfacePoint &inct, Arena &arena) const override
     {
         ShadingPoint shd;
-        shd.bsdf           = arena.create<InvisibleSurfaceBSDF>(inct.geometry_coord.z);
+        shd.bsdf = arena.create<InvisibleSurfaceBSDF>(
+                                inct.geometry_coord.z);
         shd.shading_normal = inct.user_coord.z;
         return shd;
     }
 };
 
-std::shared_ptr<Material> create_invisible_surface()
+RC<Material> create_invisible_surface()
 {
-    return std::make_shared<InvisibleSurfaceMaterial>();
+    return newRC<InvisibleSurfaceMaterial>();
 }
 
 AGZ_TRACER_END

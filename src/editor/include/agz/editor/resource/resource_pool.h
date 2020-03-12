@@ -17,7 +17,8 @@ class ResourcePool;
 /**
  * @brief reference to a resource instance in pool
  *
- * when the resource is destroyed, all its references's `removed_callback` is automatically called
+ * when the resource is destroyed, all its references's `removed_callback` is
+ *  automatically called
  */
 template<typename TracerObject>
 class ResourceReference : public misc::uncopyable_t, public EntityInterface
@@ -32,13 +33,13 @@ public:
 
     void set_removed_callback(std::function<void()> callback);
 
-    std::shared_ptr<TracerObject> get_tracer_object();
+    RC<TracerObject> get_tracer_object();
 
     ResourceInPool<TracerObject> *get_resource();
 
     QWidget *get_name_widget();
 
-    std::shared_ptr<tracer::ConfigNode> to_config() const;
+    RC<tracer::ConfigNode> to_config() const;
 
     std::vector<Vertex> get_vertices() const override;
 
@@ -68,7 +69,8 @@ private:
 /**
  * @brief resource instance in pool
  *
- * when an instance is destroyed, all its references's 'removed_callback' is automatically called.
+ * when an instance is destroyed, all its references's 'removed_callback' is
+ *  automatically called.
  * After that, those references become invalid.
  */
 template<typename TracerObject>
@@ -76,23 +78,25 @@ class ResourceInPool : public misc::uncopyable_t, public EntityInterface
 {
 public:
 
-    explicit ResourceInPool(const QString &name, std::unique_ptr<ResourcePanel<TracerObject>> panel);
+    explicit ResourceInPool(const QString &name, Box<ResourcePanel<TracerObject>> panel);
 
-    ResourceInPool(const QString &name, const ResourceWidgetFactory<TracerObject> &factory, const QString &default_type);
+    ResourceInPool(
+        const QString &name, const ResourceWidgetFactory<TracerObject> &factory,
+        const QString &default_type);
 
     ~ResourceInPool();
 
     void set_dirty_callback(std::function<void()> callback);
 
-    std::unique_ptr<ResourceReference<TracerObject>> create_reference();
+    Box<ResourceReference<TracerObject>> create_reference();
 
-    std::shared_ptr<TracerObject> get_tracer_object();
+    RC<TracerObject> get_tracer_object();
 
     ResourcePanel<TracerObject> *get_panel();
 
     ResourcePanel<TracerObject> *clone_panel();
 
-    std::unique_ptr<ResourceThumbnailProvider> get_thumbnail(int width, int height) const;
+    Box<ResourceThumbnailProvider> get_thumbnail(int width, int height) const;
 
     const QString &get_name() const;
 
@@ -102,9 +106,9 @@ public:
 
     void load_asset(ResourcePool<TracerObject> &pool, AssetLoader &loader);
 
-    std::shared_ptr<tracer::ConfigNode> to_config(JSONExportContext &ctx) const;
+    RC<tracer::ConfigNode> to_config(JSONExportContext &ctx) const;
 
-    std::shared_ptr<tracer::ConfigArray> get_config_ref_name() const;
+    RC<tracer::ConfigArray> get_config_ref_name() const;
 
     std::vector<Vertex> get_vertices() const override;
 
@@ -138,16 +142,17 @@ public:
 
     virtual ~ResourcePool() = default;
 
-    virtual std::unique_ptr<ResourceReference<TracerObject>> select_resource() = 0;
+    virtual Box<ResourceReference<TracerObject>> select_resource() = 0;
 
     virtual ResourceInPool<TracerObject> *add_resource(
-        const QString &name, std::unique_ptr<ResourcePanel<TracerObject>> panel) = 0;
+        const QString &name, Box<ResourcePanel<TracerObject>> panel) = 0;
 
     virtual void save_asset(AssetSaver &saver) const = 0;
 
     virtual void load_asset(AssetLoader &loader) = 0;
 
-    virtual void to_config(tracer::ConfigGroup &scene_grp, JSONExportContext &ctx) const = 0;
+    virtual void to_config(
+        tracer::ConfigGroup &scene_grp, JSONExportContext &ctx) const = 0;
 
     virtual ResourceInPool<TracerObject> *name_to_rsc(const QString &name) = 0;
 
@@ -155,7 +160,8 @@ public:
 
     virtual QString to_valid_name(const QString &name) const = 0;
 
-    virtual void show_edit_panel(ResourcePanel<TracerObject> *rsc, bool display_rsc_panel) = 0;
+    virtual void show_edit_panel(
+        ResourcePanel<TracerObject> *rsc, bool display_rsc_panel) = 0;
 
     virtual QWidget *get_widget() = 0;
 };

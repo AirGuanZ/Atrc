@@ -41,13 +41,15 @@ namespace
 
             const real tan_theta_i = local_angle::tan_theta(lwi);
             const real tan_theta_o = local_angle::tan_theta(lwo);
-            const real G = std::abs(microfacet::smith_gtr2(tan_theta_i, alpha_) * microfacet::smith_gtr2(tan_theta_o, alpha_));
+            const real G = std::abs(microfacet::smith_gtr2(tan_theta_i, alpha_)
+                         * microfacet::smith_gtr2(tan_theta_o, alpha_));
 
             const Spectrum ret = color_ * Fr * std::abs(D * G / (4 * lwi.z * lwo.z));
             return ret.is_finite() ? ret : Spectrum();
         }
 
-        Spectrum eval_refraction(const Vec3 &lwi, const Vec3 &lwo, TransportMode mode) const noexcept
+        Spectrum eval_refraction(
+            const Vec3 &lwi, const Vec3 &lwo, TransMode mode) const noexcept
         {
             assert(lwi.z * lwo.z < 0);
 
@@ -67,13 +69,15 @@ namespace
 
             const real tan_theta_i = local_angle::tan_theta(lwi);
             const real tan_theta_o = local_angle::tan_theta(lwo);
-            const real G = std::abs(microfacet::smith_gtr2(tan_theta_i, alpha_) * microfacet::smith_gtr2(tan_theta_o, alpha_));
+            const real G = std::abs(microfacet::smith_gtr2(tan_theta_i, alpha_)
+                         * microfacet::smith_gtr2(tan_theta_o, alpha_));
 
             const real ho = dot(lwo, posh), hi = dot(lwi, posh);
             const real sdem = eta_i * ho + eta_t * hi;
-            real val = (1 - Fr) * D * G * eta_t * eta_t * ho * hi / (sdem * sdem * lwi.z * lwo.z);
+            real val = (1 - Fr) * D * G * eta_t * eta_t * ho * hi
+                     / (sdem * sdem * lwi.z * lwo.z);
 
-            if(mode == TransportMode::Importance)
+            if(mode == TransMode::Importance)
                 val *= eta_i * eta_i / (eta_t * eta_t);
 
             if(!std::isfinite(val))
@@ -82,7 +86,8 @@ namespace
             return color_ * Spectrum(std::abs(val));
         }
 
-        std::optional<Vec3> refract(const Vec3 &wi, const Vec3 &nor, real eta) const
+        std::optional<Vec3> refract(
+            const Vec3 &wi, const Vec3 &nor, real eta) const
         {
             const real cos_theta_i = dot(wi, nor);
             if(cos_theta_i < 0)
@@ -98,14 +103,16 @@ namespace
 
         FrostedGlassBSDF(
             const Coord &geometry_coord, const Coord &shading_coord,
-            const Spectrum &color, real alpha, const DielectricFresnelPoint *fresnel) noexcept
+            const Spectrum &color, real alpha,
+            const DielectricFresnelPoint *fresnel) noexcept
             : LocalBSDF(geometry_coord, shading_coord),
               color_(color), alpha_(alpha), fresnel_(fresnel)
         {
             
         }
 
-        Spectrum eval(const Vec3 &wi, const Vec3 &wo, TransportMode mode) const noexcept override
+        Spectrum eval(
+            const Vec3 &wi, const Vec3 &wo, TransMode mode) const noexcept override
         {
             // black fringes
 
@@ -120,12 +127,16 @@ namespace
                 return {};
 
             const bool is_reflection = lwi.z * lwo.z > 0;
-            Spectrum ret = is_reflection ? eval_reflection(lwi, lwo) : eval_refraction(lwi, lwo, mode);
-            ret *= local_angle::normal_corr_factor(geometry_coord_, shading_coord_, wi);
+            Spectrum ret = is_reflection ?
+                           eval_reflection(lwi, lwo) :
+                           eval_refraction(lwi, lwo, mode);
+            ret *= local_angle::normal_corr_factor(
+                geometry_coord_, shading_coord_, wi);
             return ret;
         }
 
-        BSDFSampleResult sample(const Vec3 &wo, TransportMode mode, const Sample3 &sam) const noexcept override
+        BSDFSampleResult sample(
+            const Vec3 &wo, TransMode mode, const Sample3 &sam) const noexcept override
         {
             if(cause_black_fringes(wo))
                 return BSDF_SAMPLE_RESULT_INVALID;
@@ -147,7 +158,8 @@ namespace
 
                 const real tan_theta_i = local_angle::tan_theta(lwi);
                 const real tan_theta_o = local_angle::tan_theta(lwo);
-                const real G = std::abs(microfacet::smith_gtr2(tan_theta_i, alpha_) * microfacet::smith_gtr2(tan_theta_o, alpha_));
+                const real G = std::abs(microfacet::smith_gtr2(tan_theta_i, alpha_)
+                             * microfacet::smith_gtr2(tan_theta_o, alpha_));
 
                 BSDFSampleResult ret;
                 ret.f        = color_ * Fr * D * G / std::abs(4 * lwi.z * lwo.z);
@@ -158,7 +170,8 @@ namespace
                 if(cause_black_fringes(ret.dir) || !ret.f.is_finite() || ret.pdf < EPS)
                     return BSDF_SAMPLE_RESULT_INVALID;
 
-                ret.f *= local_angle::normal_corr_factor(geometry_coord_, shading_coord_, ret.dir);
+                ret.f *= local_angle::normal_corr_factor(
+                    geometry_coord_, shading_coord_, ret.dir);
                 return ret;
             }
 
@@ -183,12 +196,14 @@ namespace
 
             const real tan_theta_i = local_angle::tan_theta(lwi);
             const real tan_theta_o = local_angle::tan_theta(lwo);
-            const real G = std::abs(microfacet::smith_gtr2(tan_theta_i, alpha_) * microfacet::smith_gtr2(tan_theta_o, alpha_));
+            const real G = std::abs(microfacet::smith_gtr2(tan_theta_i, alpha_)
+                         * microfacet::smith_gtr2(tan_theta_o, alpha_));
 
             const real dhdwi = eta_t * eta_t * hi / (sdem * sdem);
-            real val = (1 - Fr) * D * G * eta_t * eta_t * ho * hi / (sdem * sdem * lwo.z * lwi.z);
+            real val = (1 - Fr) * D * G * eta_t * eta_t * ho * hi
+                     / (sdem * sdem * lwo.z * lwi.z);
 
-            if(mode == TransportMode::Importance)
+            if(mode == TransMode::Importance)
                 val *= eta_i * eta_i / (eta_t * eta_t);
 
             BSDFSampleResult ret;
@@ -200,7 +215,8 @@ namespace
             if(cause_black_fringes(ret.dir) || !ret.f.is_finite() || ret.pdf < EPS)
                 return BSDF_SAMPLE_RESULT_INVALID;
 
-            ret.f *= local_angle::normal_corr_factor(geometry_coord_, shading_coord_, ret.dir);
+            ret.f *= local_angle::normal_corr_factor(
+                geometry_coord_, shading_coord_, ret.dir);
             return ret;
         }
 
@@ -255,22 +271,27 @@ namespace
         {
             return false;
         }
+
+        bool has_diffuse_component() const noexcept override
+        {
+            return false;
+        }
     };
 
 } // namespace anonymous
 
 class FrostedGlass : public Material
 {
-    std::shared_ptr<const Texture2D> ior_;
-    std::shared_ptr<const Texture2D> color_map_;
-    std::shared_ptr<const Texture2D> roughness_;
+    RC<const Texture2D> ior_;
+    RC<const Texture2D> color_map_;
+    RC<const Texture2D> roughness_;
 
 public:
 
     FrostedGlass(
-        std::shared_ptr<const Texture2D> color_map,
-        std::shared_ptr<const Texture2D> roughness,
-        std::shared_ptr<const Texture2D> ior)
+        RC<const Texture2D> color_map,
+        RC<const Texture2D> roughness,
+        RC<const Texture2D> ior)
     {
         color_map_ = std::move(color_map);
         ior_       = std::move(ior);
@@ -280,10 +301,12 @@ public:
     ShadingPoint shade(const SurfacePoint &inct, Arena &arena) const override
     {
         const Spectrum color = color_map_->sample_spectrum(inct.uv);
-        const real roughness = math::clamp<real>(roughness_->sample_real(inct.uv), real(0.01), 1);
+        const real roughness = math::clamp<real>(
+            roughness_->sample_real(inct.uv), real(0.01), 1);
         const real ior = ior_->sample_real(inct.uv);
 
-        const DielectricFresnelPoint *fresnel = arena.create<DielectricFresnelPoint>(ior, real(1));
+        const DielectricFresnelPoint *fresnel =
+            arena.create<DielectricFresnelPoint>(ior, real(1));
 
         const BSDF *bsdf = arena.create<FrostedGlassBSDF>(
             inct.geometry_coord, inct.user_coord, color, roughness, fresnel);
@@ -291,12 +314,12 @@ public:
     }
 };
 
-std::shared_ptr<Material> create_frosted_glass(
-    std::shared_ptr<const Texture2D> color_map,
-    std::shared_ptr<const Texture2D> roughness,
-    std::shared_ptr<const Texture2D> ior)
+RC<Material> create_frosted_glass(
+    RC<const Texture2D> color_map,
+    RC<const Texture2D> roughness,
+    RC<const Texture2D> ior)
 {
-    return std::make_shared<FrostedGlass>(color_map, roughness, ior);
+    return newRC<FrostedGlass>(color_map, roughness, ior);
 }
 
 AGZ_TRACER_END

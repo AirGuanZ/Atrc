@@ -11,7 +11,7 @@ SphereWidget::SphereWidget(const CloneState &clone_state)
 
     layout->addWidget(new QLabel("Radius", this));
 
-    radius_edit_validator_ = std::make_unique<QDoubleValidator>();
+    radius_edit_validator_ = newBox<QDoubleValidator>();
     radius_edit_ = new QLineEdit(this);
 
     radius_edit_->setText(QString::number(clone_state.radius));
@@ -51,12 +51,12 @@ void SphereWidget::load_asset(AssetLoader &loader)
     do_update_tracer_object();
 }
 
-std::shared_ptr<tracer::ConfigNode> SphereWidget::to_config(JSONExportContext &ctx) const
+RC<tracer::ConfigNode> SphereWidget::to_config(JSONExportContext &ctx) const
 {
-    auto grp = std::make_shared<tracer::ConfigGroup>();
+    auto grp = newRC<tracer::ConfigGroup>();
     grp->insert_str("type", "sphere");
     grp->insert_real("radius", radius_edit_->text().toFloat());
-    grp->insert_child("transform", std::make_shared<tracer::ConfigArray>());
+    grp->insert_child("transform", newRC<tracer::ConfigArray>());
     return grp;
 }
 
@@ -80,7 +80,8 @@ void SphereWidget::do_update_tracer_object()
     tracer_object_ = tracer::create_sphere(radius, {});
 }
 
-ResourceWidget<tracer::Geometry> *SphereWidgetCreator::create_widget(ObjectContext &obj_ctx) const
+ResourceWidget<tracer::Geometry> *SphereWidgetCreator::create_widget(
+    ObjectContext &obj_ctx) const
 {
     return new SphereWidget({});
 }

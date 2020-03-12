@@ -10,9 +10,9 @@ class HeterogeneousMedium : public Medium
 {
     Transform3 local_to_world_;
 
-    std::shared_ptr<const Texture3D> density_;
-    std::shared_ptr<const Texture3D> albedo_;
-    std::shared_ptr<const Texture3D> g_;
+    RC<const Texture3D> density_;
+    RC<const Texture3D> albedo_;
+    RC<const Texture3D> g_;
 
     real max_density_;
     real inv_max_density_;
@@ -23,9 +23,9 @@ public:
 
     HeterogeneousMedium(
         const Transform3 &local_to_world,
-        std::shared_ptr<const Texture3D> density,
-        std::shared_ptr<const Texture3D> albedo,
-        std::shared_ptr<const Texture3D> g,
+        RC<const Texture3D> density,
+        RC<const Texture3D> albedo,
+        RC<const Texture3D> g,
         int max_scattering_count)
     {
         local_to_world_ = local_to_world;
@@ -46,7 +46,8 @@ public:
         return max_scattering_count_;
     }
 
-    Spectrum tr(const Vec3 &a, const Vec3 &b, Sampler &sampler) const noexcept override
+    Spectrum tr(
+        const Vec3 &a, const Vec3 &b, Sampler &sampler) const noexcept override
     {
         real result = 1;
         real t = 0;
@@ -54,7 +55,8 @@ public:
 
         for(;;)
         {
-            const real delta_t = -std::log(1 - sampler.sample1().u) * inv_max_density_;
+            const real delta_t = -std::log(1 - sampler.sample1().u)
+                               * inv_max_density_;
             t += delta_t;
             if(t >= t_max)
                 break;
@@ -68,14 +70,17 @@ public:
         return Spectrum(result);
     }
 
-    SampleOutScatteringResult sample_scattering(const Vec3 &a, const Vec3 &b, Sampler &sampler, Arena &arena) const noexcept override
+    SampleOutScatteringResult sample_scattering(
+        const Vec3 &a, const Vec3 &b,
+        Sampler &sampler, Arena &arena) const noexcept override
     {
         const real t_max = distance(a, b);
         real t = 0;
 
         for(;;)
         {
-            const real delta_t = -std::log(1 - sampler.sample1().u) * inv_max_density_;
+            const real delta_t = -std::log(1 - sampler.sample1().u)
+                               * inv_max_density_;
             t += delta_t;
             if(t >= t_max)
                 break;
@@ -97,7 +102,9 @@ public:
                 result.scattering_point = scattering;
                 result.throughput       = Spectrum(albedo);
 
-                result.phase_function = arena.create<HenyeyGreensteinPhaseFunction>(g, Spectrum(albedo));
+                result.phase_function =
+                    arena.create<HenyeyGreensteinPhaseFunction>(
+                        g, Spectrum(albedo));
 
                 return result;
             }
@@ -109,15 +116,16 @@ public:
     }
 };
 
-std::shared_ptr<Medium> create_heterogeneous_medium(
+RC<Medium> create_heterogeneous_medium(
     const Transform3 &local_to_world,
-    std::shared_ptr<const Texture3D> density,
-    std::shared_ptr<const Texture3D> albedo,
-    std::shared_ptr<const Texture3D> g,
+    RC<const Texture3D> density,
+    RC<const Texture3D> albedo,
+    RC<const Texture3D> g,
     int max_scattering_count)
 {
-    return std::make_shared<HeterogeneousMedium>(
-        local_to_world, std::move(density), std::move(albedo), std::move(g), max_scattering_count);
+    return newRC<HeterogeneousMedium>(
+        local_to_world, std::move(density),
+        std::move(albedo), std::move(g), max_scattering_count);
 }
 
 AGZ_TRACER_END

@@ -20,8 +20,8 @@ public:
         // !vertices && !tracer_object completely new widget
 
         QString                              filename;
-        std::shared_ptr<std::vector<Vertex>> vertices;
-        std::shared_ptr<tracer::Geometry>    tracer_object;
+        RC<std::vector<Vertex>> vertices;
+        RC<tracer::Geometry>    tracer_object;
     };
 
     explicit TriangleBVHWidget(const CloneState &clone_state);
@@ -32,7 +32,7 @@ public:
 
     void load_asset(AssetLoader &loader) override;
 
-    std::shared_ptr<tracer::ConfigNode> to_config(JSONExportContext &ctx) const override;
+    RC<tracer::ConfigNode> to_config(JSONExportContext &ctx) const override;
 
     std::vector<EntityInterface::Vertex> get_vertices() const override;
 
@@ -49,7 +49,7 @@ private:
     void do_update_tracer_object();
 
     QString                              filename_;
-    std::shared_ptr<std::vector<Vertex>> vertices_;
+    RC<std::vector<Vertex>> vertices_;
 
     ElidedLabel *filename_label_  = nullptr;
 };
@@ -63,7 +63,8 @@ public:
         return "Triangle Mesh";
     }
 
-    ResourceWidget<tracer::Geometry> *create_widget(ObjectContext &obj_ctx) const override;
+    ResourceWidget<tracer::Geometry> *create_widget(
+        ObjectContext &obj_ctx) const override;
 };
 
 AGZ_EDITOR_END

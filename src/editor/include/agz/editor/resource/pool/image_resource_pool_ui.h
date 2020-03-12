@@ -52,7 +52,8 @@ public:
 
         scroll_area->setWidget(scroll_area_widget);
         scroll_area->setWidgetResizable(true);
-        scroll_area_widget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        scroll_area_widget->setSizePolicy(
+            QSizePolicy::Expanding, QSizePolicy::Expanding);
         scroll_area_widget->setContentsMargins(0, 0, 0, 0);
     }
 };

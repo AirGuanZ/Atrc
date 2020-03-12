@@ -14,7 +14,8 @@ namespace
     {
     public:
 
-        explicit Translate3DSeqUnitWidget(QWidget *parent, const Vec3 &offset = {})
+        explicit Translate3DSeqUnitWidget(
+            QWidget *parent, const Vec3 &offset = {})
             : Transform3DSeqUnitWidget(parent)
         {
             QHBoxLayout *layout = new QHBoxLayout(this);
@@ -23,10 +24,11 @@ namespace
 
             text->setAlignment(Qt::AlignCenter);
 
-            edit_validator_ = std::make_unique<Vec3Validator>();
+            edit_validator_ = newBox<Vec3Validator>();
 
             offset_edit_ = new QLineEdit(this);
-            offset_edit_->setText(QString("%1 %2 %3").arg(offset.x).arg(offset.y).arg(offset.z));
+            offset_edit_->setText(
+                QString("%1 %2 %3").arg(offset.x).arg(offset.y).arg(offset.z));
             offset_edit_->setAlignment(Qt::AlignCenter);
             offset_edit_->setValidator(edit_validator_.get());
 
@@ -79,15 +81,16 @@ namespace
             offset_edit_->setText(loader.read_string());
         }
 
-        std::shared_ptr<tracer::ConfigGroup> to_config() const override
+        RC<tracer::ConfigGroup> to_config() const override
         {
             real x, y, z;
             QString line = offset_edit_->text();
             QTextStream(&line) >> x >> y >> z;
 
-            auto grp = std::make_shared<tracer::ConfigGroup>();
+            auto grp = newRC<tracer::ConfigGroup>();
             grp->insert_str("type", "translate");
-            grp->insert_child("offset", tracer::ConfigArray::from_vec3({ x, y, z }));
+            grp->insert_child(
+                "offset", tracer::ConfigArray::from_vec3({ x, y, z }));
             return grp;
         }
 
@@ -95,20 +98,21 @@ namespace
 
         QLineEdit *offset_edit_;
 
-        std::unique_ptr<Vec3Validator> edit_validator_;
+        Box<Vec3Validator> edit_validator_;
     };
 
     class Rotate3DSeqUnitWidget : public Transform3DSeqUnitWidget
     {
     public:
 
-        explicit Rotate3DSeqUnitWidget(QWidget *parent, const Vec3 &axis = { 1, 0, 0 }, real deg = 0)
+        explicit Rotate3DSeqUnitWidget(
+            QWidget *parent, const Vec3 &axis = { 1, 0, 0 }, real deg = 0)
             : Transform3DSeqUnitWidget(parent)
         {
             QHBoxLayout *layout = new QHBoxLayout(this);
             QPushButton *rm_button = new QPushButton("-", this);
 
-            edit_validator_ = std::make_unique<QDoubleValidator>();
+            edit_validator_ = newBox<QDoubleValidator>();
 
             deg_edit_ = new QLineEdit(this);
             deg_edit_->setText(QString::number(deg));
@@ -176,12 +180,12 @@ namespace
             axis_->set_value(loader.read<Vec3>());
         }
 
-        std::shared_ptr<tracer::ConfigGroup> to_config() const override
+        RC<tracer::ConfigGroup> to_config() const override
         {
             const real deg = deg_edit_->text().toFloat();
             const Vec3 axis = axis_->get_value();
 
-            auto grp = std::make_shared<tracer::ConfigGroup>();
+            auto grp = newRC<tracer::ConfigGroup>();
             grp->insert_str("type", "rotate");
             grp->insert_child("axis", tracer::ConfigArray::from_vec3(axis));
             grp->insert_real("deg", deg);
@@ -193,7 +197,7 @@ namespace
         QLineEdit *deg_edit_;
         Vec3Input *axis_;
 
-        std::unique_ptr<QValidator> edit_validator_;
+        Box<QValidator> edit_validator_;
     };
 
     template<int Axis>
@@ -258,7 +262,8 @@ namespace
 
         Transform3DSeqUnitWidget *clone() const override
         {
-            return new RotateAxis3DSeqUnitWidget<Axis>(nullptr, deg_->get_value());
+            return new RotateAxis3DSeqUnitWidget<Axis>(
+                nullptr, deg_->get_value());
         }
 
         void save_asset(AssetSaver &saver) const override
@@ -271,9 +276,9 @@ namespace
             deg_->set_value(loader.read<real>());
         }
 
-        std::shared_ptr<tracer::ConfigGroup> to_config() const override
+        RC<tracer::ConfigGroup> to_config() const override
         {
-            auto grp = std::make_shared<tracer::ConfigGroup>();
+            auto grp = newRC<tracer::ConfigGroup>();
 
             if constexpr(Axis == 0)
                 grp->insert_str("type", "rotate_x");
@@ -296,7 +301,8 @@ namespace
     {
     public:
 
-        explicit Scale3DSeqUnitWidget(QWidget *parent, const Vec3 &ratio = { 1, 1, 1 })
+        explicit Scale3DSeqUnitWidget(
+            QWidget *parent, const Vec3 &ratio = { 1, 1, 1 })
             : Transform3DSeqUnitWidget(parent)
         {
             QHBoxLayout *layout = new QHBoxLayout(this);
@@ -305,10 +311,11 @@ namespace
 
             text->setAlignment(Qt::AlignCenter);
 
-            edit_validator_ = std::make_unique<Vec3Validator>();
+            edit_validator_ = newBox<Vec3Validator>();
 
             ratio_edit_ = new QLineEdit(this);
-            ratio_edit_->setText(QString("%1 %2 %3").arg(ratio.x).arg(ratio.y).arg(ratio.z));
+            ratio_edit_->setText(
+                QString("%1 %2 %3").arg(ratio.x).arg(ratio.y).arg(ratio.z));
             ratio_edit_->setAlignment(Qt::AlignCenter);
             ratio_edit_->setValidator(edit_validator_.get());
 
@@ -361,15 +368,16 @@ namespace
             ratio_edit_->setText(loader.read_string());
         }
 
-        std::shared_ptr<tracer::ConfigGroup> to_config() const override
+        RC<tracer::ConfigGroup> to_config() const override
         {
             real x, y, z;
             QString line = ratio_edit_->text();
             QTextStream(&line) >> x >> y >> z;
 
-            auto grp = std::make_shared<tracer::ConfigGroup>();
+            auto grp = newRC<tracer::ConfigGroup>();
             grp->insert_str("type", "scale");
-            grp->insert_child("ratio", tracer::ConfigArray::from_vec3({ x, y, z }));
+            grp->insert_child(
+                "ratio", tracer::ConfigArray::from_vec3({ x, y, z }));
             return grp;
         }
 
@@ -377,7 +385,7 @@ namespace
 
         QLineEdit *ratio_edit_;
 
-        std::unique_ptr<QValidator> edit_validator_;
+        Box<QValidator> edit_validator_;
     };
 }
 
@@ -430,9 +438,9 @@ void Transform3DSeqWidget::load_asset(AssetLoader &loader)
     }
 }
 
-std::shared_ptr<tracer::ConfigArray> Transform3DSeqWidget::to_config() const
+RC<tracer::ConfigArray> Transform3DSeqWidget::to_config() const
 {
-    auto arr = std::make_shared<tracer::ConfigArray>();
+    auto arr = newRC<tracer::ConfigArray>();
     for(auto &u : units_)
         arr->push_back(u->to_config());
     return arr;
@@ -440,8 +448,10 @@ std::shared_ptr<tracer::ConfigArray> Transform3DSeqWidget::to_config() const
 
 Transform3DSeqUnitWidget::UnitType Transform3DSeqWidget::get_unit_type()
 {
-    const QStringList item_list = { "Translate", "RotateX", "RotateY", "RotateZ", "Rotate", "Scale" };
-    const QString item = QInputDialog::getItem(this, "Type", "Select transform type", item_list);
+    const QStringList item_list =
+        { "Translate", "RotateX", "RotateY", "RotateZ", "Rotate", "Scale" };
+    const QString item = QInputDialog::getItem(
+        this, "Type", "Select transform type", item_list);
     if(item == "Translate")
         return Transform3DSeqUnitWidget::UnitType::Translate;
     if(item == "RotateX")
@@ -455,7 +465,8 @@ Transform3DSeqUnitWidget::UnitType Transform3DSeqWidget::get_unit_type()
     return Transform3DSeqUnitWidget::UnitType::Scale;
 }
 
-Transform3DSeqUnitWidget *Transform3DSeqWidget::create_new_unit_widget(Transform3DSeqUnitWidget::UnitType type)
+Transform3DSeqUnitWidget *Transform3DSeqWidget::create_new_unit_widget(
+    Transform3DSeqUnitWidget::UnitType type)
 {
     if(type == Transform3DSeqUnitWidget::UnitType::Translate)
         return new Translate3DSeqUnitWidget(this);
@@ -470,7 +481,8 @@ Transform3DSeqUnitWidget *Transform3DSeqWidget::create_new_unit_widget(Transform
     return new Scale3DSeqUnitWidget(this);
 }
 
-Transform3DSeqWidget::Transform3DSeqWidget(std::vector<Transform3DSeqUnitWidget *> units)
+Transform3DSeqWidget::Transform3DSeqWidget(
+    std::vector<Transform3DSeqUnitWidget *> units)
 {
     units_ = std::move(units);
 
@@ -483,7 +495,8 @@ Transform3DSeqWidget::Transform3DSeqWidget(std::vector<Transform3DSeqUnitWidget 
         layout_->addWidget(u);
     layout_->addWidget(add_down_);
 
-    add_up_->hide();
+    if(units_.empty())
+        add_up_->hide();
 
     connect(add_up_, &QPushButton::clicked, [=] { add_up(); });
     connect(add_down_, &QPushButton::clicked, [=] { add_down(); });

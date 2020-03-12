@@ -75,9 +75,10 @@ ResourceWidget<tracer::Material> *PhongWidget::clone()
     return new PhongWidget(init_data, obj_ctx_);
 }
 
-std::unique_ptr<ResourceThumbnailProvider> PhongWidget::get_thumbnail(int width, int height) const
+Box<ResourceThumbnailProvider> PhongWidget::get_thumbnail(
+    int width, int height) const
 {
-    return std::make_unique<MaterialThumbnailProvider>(width, height, tracer_object_);
+    return newBox<MaterialThumbnailProvider>(width, height, tracer_object_);
 }
 
 void PhongWidget::save_asset(AssetSaver &saver)
@@ -98,9 +99,9 @@ void PhongWidget::load_asset(AssetLoader &loader)
     do_update_tracer_object();
 }
 
-std::shared_ptr<tracer::ConfigNode> PhongWidget::to_config(JSONExportContext &ctx) const
+RC<tracer::ConfigNode> PhongWidget::to_config(JSONExportContext &ctx) const
 {
-    auto grp = std::make_shared<tracer::ConfigGroup>();
+    auto grp = newRC<tracer::ConfigGroup>();
     grp->insert_str("type", "phong");
 
     grp->insert_child("d", d_->to_config(ctx));
@@ -129,7 +130,8 @@ void PhongWidget::do_update_tracer_object()
         std::move(d), std::move(s), std::move(ns), std::move(nor));
 }
 
-ResourceWidget<tracer::Material> *PhongWidgetCreator::create_widget(ObjectContext &obj_ctx) const
+ResourceWidget<tracer::Material> *PhongWidgetCreator::create_widget(
+    ObjectContext &obj_ctx) const
 {
     return new PhongWidget({}, obj_ctx);
 }

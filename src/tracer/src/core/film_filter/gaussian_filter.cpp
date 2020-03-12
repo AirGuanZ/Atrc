@@ -16,10 +16,12 @@ public:
         AGZ_HIERARCHY_TRY
 
         if(radius <= 0)
-            throw ObjectConstructionException("invalid radius value: " + std::to_string(radius));
+            throw ObjectConstructionException(
+                "invalid radius value: " + std::to_string(radius));
             
         if(alpha <= 0)
-            throw ObjectConstructionException("invalid alpha value: " + std::to_string(alpha));
+            throw ObjectConstructionException(
+                "invalid alpha value: " + std::to_string(alpha));
 
         radius_ = radius;
         alpha_  = alpha;
@@ -43,10 +45,10 @@ public:
     }
 };
 
-std::shared_ptr<FilmFilter> create_gaussian_filter(
+RC<FilmFilter> create_gaussian_filter(
     real radius, real alpha)
 {
-    return std::make_shared<GaussianFilter>(radius, alpha);
+    return newRC<GaussianFilter>(radius, alpha);
 }
 
 AGZ_TRACER_END

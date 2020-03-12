@@ -18,7 +18,8 @@ Transform3DWidget::Transform3DWidget(const DirectTransform &init_data)
     rotate_ = init_data.rotate;
 
     translate_->set_value(init_data.translate);
-    euler_zyx_->set_value(DirectTransform::to_euler_zyx(rotate_).map(math::rad2deg<real>));
+    euler_zyx_->set_value(
+        DirectTransform::to_euler_zyx(rotate_).map(math::rad2deg<real>));
     scale_    ->set_value(init_data.scale);
 
     QPushButton *clear_button = new QPushButton("Clear Transform", this);
@@ -39,7 +40,8 @@ Transform3DWidget::Transform3DWidget(const DirectTransform &init_data)
 
     connect(euler_zyx_, &Vec3Input::edit_value, [=](const Vec3 &new_zyx)
     {
-        rotate_ = DirectTransform::from_euler_zyx(new_zyx.map(math::deg2rad<real>));
+        rotate_ = DirectTransform::from_euler_zyx(
+            new_zyx.map(math::deg2rad<real>));
         emit edit_transform();
     });
 
@@ -73,7 +75,8 @@ void Transform3DWidget::set_transform(const DirectTransform &transform)
 {
     rotate_ = transform.rotate;
     translate_->set_value(transform.translate);
-    euler_zyx_->set_value(DirectTransform::to_euler_zyx(rotate_).map(math::rad2deg<real>));
+    euler_zyx_->set_value(
+        DirectTransform::to_euler_zyx(rotate_).map(math::rad2deg<real>));
     scale_    ->set_value(transform.scale);
 }
 

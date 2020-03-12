@@ -42,4 +42,9 @@ inline Spectrum qcolor_to_spectrum(const QColor &color) noexcept
     };
 }
 
+using tracer::RC;
+using tracer::Box;
+using tracer::newRC;
+using tracer::newBox;
+
 AGZ_EDITOR_END

@@ -30,17 +30,20 @@ public:
 
     virtual void set_transform(const DirectTransform &transform)
     {
-        throw std::runtime_error("EntityInterface::set_transform is unimplemented");
+        throw std::runtime_error(
+            "EntityInterface::set_transform is unimplemented");
     }
 
     virtual DirectTransform get_transform() const
     {
-        throw std::runtime_error("EntityInterface::get_transform is unimplemented");
+        throw std::runtime_error(
+            "EntityInterface::get_transform is unimplemented");
     }
 
     virtual std::vector<Vertex> get_vertices() const
     {
-        throw std::runtime_error("EntityInterface::get_vertices is unimplemented");
+        throw std::runtime_error(
+            "EntityInterface::get_vertices is unimplemented");
     }
 
 protected:

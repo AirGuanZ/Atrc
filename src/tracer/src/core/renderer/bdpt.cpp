@@ -17,11 +17,14 @@ public:
 
     explicit BDPTRenderer(const BDPTRendererParams &params);
 
-    RenderTarget render(FilmFilterApplier filter, Scene &scene, RendererInteractor &reporter) override;
+    RenderTarget render(
+        FilmFilterApplier filter, Scene &scene,
+        RendererInteractor &reporter) override;
 
 private:
 
-    using FilmGrid     = FilmFilterApplier::FilmGrid<Spectrum, real, Spectrum, Vec3, real>;
+    using FilmGrid = FilmFilterApplier::FilmGrid<
+        Spectrum, real, Spectrum, Vec3, real>;
     using ParticleFilm = FilmFilterApplier::FilmGridView<Spectrum>;
 
     struct GridParams
@@ -36,12 +39,15 @@ private:
     };
 
     template<bool REPORTER_WITH_PREVIEW>
-    RenderTarget render_impl(FilmFilterApplier filter, Scene &scene, RendererInteractor &reporter);
+    RenderTarget render_impl(
+        FilmFilterApplier filter, Scene &scene, RendererInteractor &reporter);
 
     int render_grid(
-        const Scene &scene, Sampler &sampler, FilmGrid &film_grid, ParticleFilm &particle_film, const Vec2i &full_res);
+        const Scene &scene, Sampler &sampler, FilmGrid &film_grid,
+        ParticleFilm &particle_film, const Vec2i &full_res);
 
-    void eval_sample(int px, int py, const GridParams &grid_params, Arena &arena);
+    void eval_sample(
+        int px, int py, const GridParams &grid_params, Arena &arena);
 
     render::BDPTParams algo_params_;
 
@@ -53,10 +59,10 @@ BDPTRenderer::BDPTRenderer(const BDPTRendererParams &params)
 {
     algo_params_.max_cam_vtx_cnt = params_.cam_max_vtx_cnt;
     algo_params_.max_lht_vtx_cnt = params_.lht_max_vtx_cnt;
-    algo_params_.use_mis = params_.use_mis;
 }
 
-RenderTarget BDPTRenderer::render(FilmFilterApplier filter, Scene &scene, RendererInteractor &reporter)
+RenderTarget BDPTRenderer::render(
+    FilmFilterApplier filter, Scene &scene, RendererInteractor &reporter)
 {
     if(reporter.need_image_preview())
         return render_impl<true>(filter, scene, reporter);
@@ -64,15 +70,18 @@ RenderTarget BDPTRenderer::render(FilmFilterApplier filter, Scene &scene, Render
 }
 
 template<bool REPORTER_WITH_PREVIEW>
-RenderTarget BDPTRenderer::render_impl(FilmFilterApplier filter, Scene &scene, RendererInteractor &reporter)
+RenderTarget BDPTRenderer::render_impl(
+    FilmFilterApplier filter, Scene &scene, RendererInteractor &reporter)
 {
     reporter.begin();
     reporter.new_stage();
 
     const int width = filter.width();
     const int height = filter.height();
-    const int x_task_count = (width + params_.task_grid_size - 1) / params_.task_grid_size;
-    const int y_task_count = (height + params_.task_grid_size - 1) / params_.task_grid_size;
+    const int x_task_count = (width + params_.task_grid_size - 1)
+                           / params_.task_grid_size;
+    const int y_task_count = (height + params_.task_grid_size - 1)
+                           / params_.task_grid_size;
     const int total_task_count = x_task_count * y_task_count;
 
     std::mutex reporter_mutex;
@@ -81,11 +90,14 @@ RenderTarget BDPTRenderer::render_impl(FilmFilterApplier filter, Scene &scene, R
     std::atomic<uint64_t> total_particle_count = 0;
 
     const int worker_count = thread::actual_worker_count(params_.worker_count);
-    auto particle_images_lock = std::make_unique<std::mutex[]>(worker_count);
+    auto particle_images_lock = newBox<std::mutex[]>(worker_count);
 
     std::vector<Image2D<Spectrum>> particle_output_film;
     if constexpr(REPORTER_WITH_PREVIEW)
-        particle_output_film.resize(worker_count, Image2D<Spectrum>(filter.height(), filter.width()));
+    {
+        particle_output_film.resize(
+            worker_count, Image2D<Spectrum>(filter.height(), filter.width()));
+    }
 
     ImageBufferTemplate<true, true, true, true, true> image_buffer(width, height);
 
@@ -108,7 +120,8 @@ RenderTarget BDPTRenderer::render_impl(FilmFilterApplier filter, Scene &scene, R
     {
         const Vec2i full_res = { filter.width(), filter.height() };
         ParticleFilm particle_film = filter.create_subgrid_view(
-            { { 0, 0 }, { filter.width() - 1, filter.height() - 1 } }, *particle_image);
+            { { 0, 0 }, { filter.width() - 1, filter.height() - 1 } },
+            *particle_image);
 
         for(;;)
         {
@@ -127,9 +140,12 @@ RenderTarget BDPTRenderer::render_impl(FilmFilterApplier filter, Scene &scene, R
             const int x_end = (std::min)(x_beg + task_grid_size, filter.width());
             const int y_end = (std::min)(y_beg + task_grid_size, filter.height());
 
-            FilmGrid film_grid = filter.create_subgrid<Spectrum, real, Spectrum, Vec3, real>(
-                { { x_beg, y_beg }, { x_end - 1, y_end - 1 } });
-            int task_particle_count = this->render_grid(scene, *sampler, film_grid, particle_film, full_res);
+            FilmGrid film_grid = filter.create_subgrid<
+                Spectrum, real, Spectrum, Vec3, real>(
+                    { { x_beg, y_beg }, { x_end - 1, y_end - 1 } });
+
+            int task_particle_count = this->render_grid(
+                scene, *sampler, film_grid, particle_film, full_res);
 
             if constexpr(REPORTER_WITH_PREVIEW)
             {
@@ -159,7 +175,8 @@ RenderTarget BDPTRenderer::render_impl(FilmFilterApplier filter, Scene &scene, R
                         ret = ret + particle_output_film[j];
                     }
 
-                    real ratio_particle = filter.width() * filter.height() * (pc ? real(1) / pc : real(0));
+                    real ratio_particle = filter.width() * filter.height()
+                                        * (pc ? real(1) / pc : real(0));
                     ret = ratio_particle * ret;
 
                     auto ratio_forward = image_buffer.weight.map([](real w)
@@ -206,7 +223,7 @@ RenderTarget BDPTRenderer::render_impl(FilmFilterApplier filter, Scene &scene, R
     threads.reserve(worker_count);
     particle_images.resize(worker_count, Image2D<Spectrum>(height, width));
 
-    auto sampler_prototype = std::make_shared<Sampler>(42, false);
+    auto sampler_prototype = newRC<Sampler>(42, false);
 
     for(int i = 0; i < worker_count; ++i)
     {
@@ -232,7 +249,9 @@ RenderTarget BDPTRenderer::render_impl(FilmFilterApplier filter, Scene &scene, R
 
     // merge particle images
 
-    const real particle_scale = static_cast<real>(width * height) / (std::max<uint64_t>)(1, total_particle_count.load());
+    const real particle_scale = static_cast<real>(width * height)
+                              / (std::max<uint64_t>)(
+                                    1, total_particle_count.load());
     for(auto &pi : particle_images)
         render_target.image = render_target.image + particle_scale * pi;
 
@@ -242,7 +261,9 @@ RenderTarget BDPTRenderer::render_impl(FilmFilterApplier filter, Scene &scene, R
     return render_target;
 }
 
-int BDPTRenderer::render_grid(const Scene &scene, Sampler &sampler, FilmGrid &film_grid, ParticleFilm &particle_film, const Vec2i &full_res)
+int BDPTRenderer::render_grid(
+    const Scene &scene, Sampler &sampler, FilmGrid &film_grid,
+    ParticleFilm &particle_film, const Vec2i &full_res)
 {
     if(scene.lights().empty())
         return 0;
@@ -254,7 +275,8 @@ int BDPTRenderer::render_grid(const Scene &scene, Sampler &sampler, FilmGrid &fi
     std::vector<render::BDPTVertex> lht_subpath_space(params_.lht_max_vtx_cnt);
 
     GridParams grid_params = {
-        scene, sampler, film_grid, particle_film, { real(full_res.x), real(full_res.y) },
+        scene, sampler, film_grid, particle_film,
+        { real(full_res.x), real(full_res.y) },
         cam_subpath_space.data(), lht_subpath_space.data()
     };
 
@@ -280,7 +302,8 @@ int BDPTRenderer::render_grid(const Scene &scene, Sampler &sampler, FilmGrid &fi
     return particle_count;
 }
 
-void BDPTRenderer::eval_sample(int px, int py, const GridParams &grid_params, Arena &arena)
+void BDPTRenderer::eval_sample(
+    int px, int py, const GridParams &grid_params, Arena &arena)
 {
     const auto pixel = trace_bdpt(
         algo_params_, grid_params.scene,
@@ -301,9 +324,9 @@ void BDPTRenderer::eval_sample(int px, int py, const GridParams &grid_params, Ar
     }
 }
 
-std::shared_ptr<Renderer> create_bdpt_renderer(const BDPTRendererParams &params)
+RC<Renderer> create_bdpt_renderer(const BDPTRendererParams &params)
 {
-    return std::make_shared<BDPTRenderer>(params);
+    return newRC<BDPTRenderer>(params);
 }
 
 AGZ_TRACER_END

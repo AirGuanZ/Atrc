@@ -8,7 +8,8 @@ AGZ_TRACER_FACTORY_BEGIN
 namespace entity
 {
 
-    MediumInterface create_medium_interface(const ConfigGroup &params, CreatingContext &context)
+    MediumInterface create_medium_interface(
+        const ConfigGroup &params, CreatingContext &context)
     {
         MediumInterface ret;
 
@@ -34,7 +35,8 @@ namespace entity
             return "diffuse";
         }
 
-        std::shared_ptr<Entity> create(const ConfigGroup &params, CreatingContext &context) const override
+        RC<Entity> create(
+            const ConfigGroup &params, CreatingContext &context) const override
         {
             const auto geometry = context.create<Geometry>(params.child_group("geometry"));
             const auto radiance = params.child_spectrum("radiance");
@@ -53,14 +55,16 @@ namespace entity
             return "geometric";
         }
 
-        std::shared_ptr<Entity> create(const ConfigGroup &params, CreatingContext &context) const override
+        RC<Entity> create(
+            const ConfigGroup &params, CreatingContext &context) const override
         {
             const auto geometry   = context.create<Geometry>(params.child_group("geometry"));
             const auto material   = context.create<Material>(params.child_group("material"));
             const auto medium     = create_medium_interface(params, context);
             const auto emit_rad   = params.child_spectrum_or("emit_radiance", Spectrum());
             const auto no_denoise = params.child_int_or("no_denoise", 0);
-            return create_geometric(std::move(geometry), std::move(material), medium, emit_rad, no_denoise);
+            return create_geometric(
+                std::move(geometry), std::move(material), medium, emit_rad, no_denoise);
         }
     };
 
@@ -68,8 +72,8 @@ namespace entity
 
 void initialize_entity_factory(Factory<Entity> &factory)
 {
-    factory.add_creator(std::make_unique<entity::DiffuseLightEntityCreator>());
-    factory.add_creator(std::make_unique<entity::GeometricEntityCreator>());
+    factory.add_creator(newBox<entity::DiffuseLightEntityCreator>());
+    factory.add_creator(newBox<entity::GeometricEntityCreator>());
 }
 
 AGZ_TRACER_FACTORY_END

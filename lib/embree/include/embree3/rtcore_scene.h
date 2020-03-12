@@ -1,5 +1,5 @@
 // ======================================================================== //
-// Copyright 2009-2018 Intel Corporation                                    //
+// Copyright 2009-2020 Intel Corporation                                    //
 //                                                                          //
 // Licensed under the Apache License, Version 2.0 (the "License");          //
 // you may not use this file except in compliance with the License.         //
@@ -148,6 +148,13 @@ RTC_API void rtcOccludedNM(RTCScene scene, struct RTCIntersectContext* context, 
 /* Tests a stream of M ray packets of size N in SOA format for occlusion with the scene. */
 RTC_API void rtcOccludedNp(RTCScene scene, struct RTCIntersectContext* context, const struct RTCRayNp* ray, unsigned int N);
 
+/*! collision callback */
+struct RTCCollision { unsigned int geomID0; unsigned int primID0; unsigned int geomID1; unsigned int primID1; };
+typedef void (*RTCCollideFunc) (void* userPtr, struct RTCCollision* collisions, unsigned int num_collisions);
+
+/*! Performs collision detection of two scenes */
+RTC_API void rtcCollide (RTCScene scene0, RTCScene scene1, RTCCollideFunc callback, void* userPtr);
+ 
 #if defined(__cplusplus)
 
 /* Helper for easily combining scene flags */

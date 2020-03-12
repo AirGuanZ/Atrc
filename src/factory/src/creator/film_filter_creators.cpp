@@ -15,7 +15,8 @@ namespace film_filter
             return "box";
         }
 
-        std::shared_ptr<FilmFilter> create(const ConfigGroup &params, CreatingContext &context) const override
+        RC<FilmFilter> create(
+            const ConfigGroup &params, CreatingContext &context) const override
         {
             const real radius = params.child_real("radius");
             return create_box_filter(radius);
@@ -31,7 +32,8 @@ namespace film_filter
             return "gaussian";
         }
 
-        std::shared_ptr<FilmFilter> create(const ConfigGroup &params, CreatingContext &context) const override
+        RC<FilmFilter> create(
+            const ConfigGroup &params, CreatingContext &context) const override
         {
             const real radius = params.child_real("radius");
             const real alpha = params.child_real("alpha");
@@ -43,8 +45,8 @@ namespace film_filter
 
 void initialize_film_filter_factory(Factory<FilmFilter> &factory)
 {
-    factory.add_creator(std::make_unique<film_filter::BoxCreator>());
-    factory.add_creator(std::make_unique<film_filter::GaussianCreator>());
+    factory.add_creator(newBox<film_filter::BoxCreator>());
+    factory.add_creator(newBox<film_filter::GaussianCreator>());
 }
 
 AGZ_TRACER_FACTORY_END

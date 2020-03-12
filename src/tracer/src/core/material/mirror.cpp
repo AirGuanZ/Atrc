@@ -18,17 +18,20 @@ namespace
 
         MirrorBSDF(const Coord &geometry_coord, const Coord &shading_coord,
                    const ConductorPoint *fresnel_point, const Spectrum &rc) noexcept
-            : LocalBSDF(geometry_coord, shading_coord), fresnel_point_(fresnel_point), rc_(rc)
+            : LocalBSDF(geometry_coord, shading_coord),
+              fresnel_point_(fresnel_point), rc_(rc)
         {
             
         }
 
-        Spectrum eval(const Vec3 &, const Vec3 &, TransportMode) const noexcept override
+        Spectrum eval(const Vec3 &, const Vec3 &, TransMode) const noexcept override
         {
             return Spectrum();
         }
 
-        BSDFSampleResult sample(const Vec3 &out_dir, TransportMode transport_mode, const Sample3 &sam) const noexcept override
+        BSDFSampleResult sample(
+            const Vec3 &out_dir, TransMode transport_mode,
+            const Sample3 &sam) const noexcept override
         {
             const Vec3 local_out = shading_coord_.global_to_local(out_dir);
             if(local_out.z <= 0)
@@ -41,7 +44,8 @@ namespace
             ret.f        = fresnel_point_->eval(nwo.z) * rc_ / std::abs(nwo.z);
             ret.is_delta = true;
 
-            ret.f *= local_angle::normal_corr_factor(geometry_coord_, shading_coord_, ret.dir);
+            ret.f *= local_angle::normal_corr_factor(
+                        geometry_coord_, shading_coord_, ret.dir);
             return ret;
         }
 
@@ -59,18 +63,26 @@ namespace
         {
             return true;
         }
+
+        bool has_diffuse_component() const noexcept override
+        {
+            return false;
+        }
     };
 }
 
 class Mirror : public Material
 {
-    std::shared_ptr<const Texture2D> ior_;
-    std::shared_ptr<const Texture2D> k_;
-    std::shared_ptr<const Texture2D> rc_map_;
+    RC<const Texture2D> ior_;
+    RC<const Texture2D> k_;
+    RC<const Texture2D> rc_map_;
 
 public:
 
-    Mirror(std::shared_ptr<const Texture2D> color_map, std::shared_ptr<const Texture2D> ior, std::shared_ptr<const Texture2D> k)
+    Mirror(
+        RC<const Texture2D> color_map,
+        RC<const Texture2D> ior,
+        RC<const Texture2D> k)
     {
         rc_map_ = color_map;
         ior_    = ior;
@@ -83,11 +95,13 @@ public:
         const Spectrum ior = ior_   ->sample_spectrum(inct.uv);
         const Spectrum k   = k_     ->sample_spectrum(inct.uv);
 
-        const ConductorPoint *fresnel = arena.create<ConductorPoint>(ior, Spectrum(1), k);
+        const ConductorPoint *fresnel = arena.create<ConductorPoint>(
+                                            ior, Spectrum(1), k);
 
         ShadingPoint ret;
 
-        const BSDF *bsdf = arena.create<MirrorBSDF >(inct.geometry_coord, inct.user_coord, fresnel, rc);
+        const BSDF *bsdf = arena.create<MirrorBSDF>(
+            inct.geometry_coord, inct.user_coord, fresnel, rc);
         ret.bsdf = bsdf;
         ret.shading_normal = inct.user_coord.z;
 
@@ -95,12 +109,12 @@ public:
     }
 };
 
-std::shared_ptr<Material> create_mirror(
-    std::shared_ptr<const Texture2D> color_map,
-    std::shared_ptr<const Texture2D> eta,
-    std::shared_ptr<const Texture2D> k)
+RC<Material> create_mirror(
+    RC<const Texture2D> color_map,
+    RC<const Texture2D> eta,
+    RC<const Texture2D> k)
 {
-    return std::make_shared<Mirror>(color_map, eta, k);
+    return newRC<Mirror>(color_map, eta, k);
 }
 
 AGZ_TRACER_END

@@ -62,7 +62,8 @@ Editor::Editor()
     AGZ_INFO("initialize initial scene");
 
     scene_params_.envir_light = envir_light_slot_->get_tracer_object();
-    scene_params_.aggregate = scene_mgr_->update_tracer_aggregate(scene_params_.entities);
+    scene_params_.aggregate = scene_mgr_->update_tracer_aggregate(
+        scene_params_.entities);
     scene_ = create_default_scene(scene_params_);
     scene_->set_camera(preview_window_->create_camera());
 
@@ -103,7 +104,8 @@ void Editor::on_change_aggregate()
 
     renderer_.reset();
     scene_params_.entities.clear();
-    scene_params_.aggregate = scene_mgr_->update_tracer_aggregate(scene_params_.entities);
+    scene_params_.aggregate = scene_mgr_->update_tracer_aggregate(
+        scene_params_.entities);
     scene_ = create_default_scene(scene_params_);
     scene_->set_camera(old_camera);
 
@@ -125,7 +127,10 @@ void Editor::show_resource_panel(QWidget *widget, bool display_rsc_panel)
     editing_rsc_widget_ = widget;
 
     if(display_rsc_panel)
-        right_panel_->right_tab_widget->setCurrentWidget(right_panel_->resource_area);
+    {
+        right_panel_->right_tab_widget->setCurrentWidget(
+            right_panel_->resource_area);
+    }
 }
 
 void Editor::add_to_entity_panel(QWidget *widget)
@@ -143,7 +148,10 @@ void Editor::show_entity_panel(QWidget *widget, bool display_entity_panel)
     editing_entity_widget_ = widget;
 
     if(display_entity_panel)
-        right_panel_->right_tab_widget->setCurrentWidget(right_panel_->entity_area);
+    {
+        right_panel_->right_tab_widget->setCurrentWidget(
+            right_panel_->entity_area);
+    }
 }
 
 void Editor::on_update_display()
@@ -213,7 +221,7 @@ void Editor::init_log_widget()
     QVBoxLayout *down_panel_layout = new QVBoxLayout(down_panel_);
     down_panel_layout->addWidget(log_widget);
 
-    auto sink = std::make_shared<LogWidgetSink>();
+    auto sink = newRC<LogWidgetSink>();
     sink->log_widget = log_widget;
     spdlog::default_logger()->sinks().push_back(std::move(sink));
 }
@@ -233,13 +241,14 @@ void Editor::init_displayer()
 
     update_display_timer_ = new QTimer(this);
     update_display_timer_->setInterval(200);
-    connect(update_display_timer_, &QTimer::timeout, [=] { on_update_display(); });
+    connect(update_display_timer_, &QTimer::timeout,
+            [=] { on_update_display(); });
     update_display_timer_->start();
 }
 
 void Editor::init_obj_context()
 {
-    obj_ctx_ = std::make_unique<ObjectContext>(this);
+    obj_ctx_ = newBox<ObjectContext>(this);
 
     left_panel_->material_tab_layout->addWidget(
         obj_ctx_->pool<tracer::Material>()->get_widget());
@@ -259,7 +268,7 @@ void Editor::init_obj_context()
 
 void Editor::init_scene_mgr()
 {
-    scene_mgr_ = std::make_unique<SceneManager>(*obj_ctx_, this, preview_window_);
+    scene_mgr_ = newBox<SceneManager>(*obj_ctx_, this, preview_window_);
     left_panel_->up_panel_layout->addWidget(scene_mgr_->get_widget());
 
     connect(scene_mgr_.get(), &SceneManager::change_scene, [=]
@@ -272,15 +281,19 @@ void Editor::init_renderer_panel()
 {
     // renderer
 
-    renderer_panel_ = new RendererPanel(right_panel_->renderer_tab, "Path Tracer");
+    renderer_panel_ = new RendererPanel(
+        right_panel_->renderer_tab, "Path Tracer");
     right_panel_->renderer_tab_layout->addWidget(renderer_panel_);
 
-    connect(renderer_panel_, &RendererPanel::change_renderer_params, [=] { on_change_renderer(); });
-    connect(renderer_panel_, &RendererPanel::change_renderer_type, [=] { on_change_renderer(); });
+    connect(renderer_panel_, &RendererPanel::change_renderer_params,
+            [=] { on_change_renderer(); });
+    connect(renderer_panel_, &RendererPanel::change_renderer_type,
+            [=] { on_change_renderer(); });
 
     // camera
 
-    right_panel_->camera_tab_layout->addWidget(preview_window_->get_camera_panel());
+    right_panel_->camera_tab_layout->addWidget(
+        preview_window_->get_camera_panel());
 
     // environment light
 
@@ -302,8 +315,9 @@ void Editor::init_global_setting_widget()
     menuBar()->addMenu("Global Settings")->addAction(action);
 
     global_setting_->scene_eps->setValue(tracer::EPS);
-    connect(global_setting_->scene_eps, qOverload<double>(&QDoubleSpinBox::valueChanged),
-        [=](double new_eps)
+    connect(global_setting_->scene_eps,
+            qOverload<double>(&QDoubleSpinBox::valueChanged),
+            [=](double new_eps)
     {
         renderer_.reset();
         tracer::set_eps(new_eps);
@@ -319,8 +333,9 @@ void Editor::init_save_asset_dialog()
     {
         if(!asset_load_dialog_)
         {
-            asset_load_dialog_ = std::make_unique<AssetLoadDialog>(
-                scene_mgr_.get(), obj_ctx_.get(), envir_light_slot_, global_setting_, preview_window_);
+            asset_load_dialog_ = newBox<AssetLoadDialog>(
+                scene_mgr_.get(), obj_ctx_.get(),
+                envir_light_slot_, global_setting_, preview_window_);
         }
 
         asset_load_dialog_->exec();
@@ -332,7 +347,8 @@ void Editor::init_save_asset_dialog()
         renderer_.reset();
 
         scene_params_.envir_light = envir_light_slot_->get_tracer_object();
-        scene_params_.aggregate = scene_mgr_->update_tracer_aggregate(scene_params_.entities);
+        scene_params_.aggregate = scene_mgr_->update_tracer_aggregate(
+            scene_params_.entities);
 
         scene_ = create_default_scene(scene_params_);
         scene_->set_camera(preview_window_->create_camera());
@@ -346,8 +362,9 @@ void Editor::init_save_asset_dialog()
     {
         if(!asset_save_dialog_)
         {
-            asset_save_dialog_ = std::make_unique<AssetSaveDialog>(
-                scene_mgr_.get(), obj_ctx_.get(), envir_light_slot_, global_setting_, preview_window_);
+            asset_save_dialog_ = newBox<AssetSaveDialog>(
+                scene_mgr_.get(), obj_ctx_.get(),
+                envir_light_slot_, global_setting_, preview_window_);
         }
         asset_save_dialog_->exec();
     });
@@ -368,14 +385,18 @@ void Editor::init_save_asset_dialog()
 
 void Editor::redistribute_panels()
 {
-    const int ver_init_height = (std::max)(preview_window_->minimumSizeHint().height(),
-                                     down_panel_->minimumSizeHint().height());
-    vert_splitter_->setSizes(QList<int>({ 3 * ver_init_height, ver_init_height }));
+    const int ver_init_height = (std::max)(
+        preview_window_->minimumSizeHint().height(),
+        down_panel_->minimumSizeHint().height());
+    vert_splitter_->setSizes(QList<int>(
+        { 3 * ver_init_height, ver_init_height }));
 
-    const int hor_init_width = math::max3(left_panel_->minimumSizeHint().width(),
-                                          right_panel_->minimumSizeHint().width(),
-                                          vert_splitter_->minimumSizeHint().width());
-    hori_splitter_->setSizes(QList<int>({ hor_init_width, 2 * hor_init_width, hor_init_width }));
+    const int hor_init_width = math::max3(
+        left_panel_->minimumSizeHint().width(),
+        right_panel_->minimumSizeHint().width(),
+        vert_splitter_->minimumSizeHint().width());
+    hori_splitter_->setSizes(QList<int>(
+        { hor_init_width, 2 * hor_init_width, hor_init_width }));
 }
 
 void Editor::set_display_image(const Image2D<Spectrum> &img)

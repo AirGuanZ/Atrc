@@ -7,22 +7,22 @@
 
 AGZ_TRACER_BEGIN
 
-std::shared_ptr<Medium> create_absorbtion_medium(
+RC<Medium> create_absorbtion_medium(
     const Spectrum &sigma_a);
 
-std::shared_ptr<Medium> create_heterogeneous_medium(
+RC<Medium> create_heterogeneous_medium(
     const Transform3 &local_to_world,
-    std::shared_ptr<const Texture3D> density,
-    std::shared_ptr<const Texture3D> albedo,
-    std::shared_ptr<const Texture3D> g,
+    RC<const Texture3D> density,
+    RC<const Texture3D> albedo,
+    RC<const Texture3D> g,
     int max_scattering_count);
 
-std::shared_ptr<Medium> create_homogeneous_medium(
+RC<Medium> create_homogeneous_medium(
     const Spectrum &sigma_a,
     const Spectrum &sigma_s,
     real g,
     int max_scattering_count);
 
-std::shared_ptr<Medium> create_void();
+RC<Medium> create_void();
 
 AGZ_TRACER_END

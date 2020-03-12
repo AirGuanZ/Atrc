@@ -27,7 +27,8 @@ CameraPanel::CameraPanel(QWidget *parent)
 
     preview_.distance      ->set_value(4);
     preview_.radian        ->set_value({ 0, PI_r / 2 });
-    preview_.position      ->set_value(radian_to_pos({ 0, PI_r / 2 }, {}, 4, { 0, 0, 1 }));
+    preview_.position      ->set_value(
+        radian_to_pos({ 0, PI_r / 2 }, {}, 4, { 0, 0, 1 }));
     preview_.look_at       ->set_value({});
     preview_.up            ->set_value({ 0, 0, 1 });
     preview_.fov           ->set_value(60);
@@ -36,7 +37,8 @@ CameraPanel::CameraPanel(QWidget *parent)
     
     render_.distance      ->set_value(4);
     render_.radian        ->set_value({ 0, PI_r / 2 });
-    render_.position      ->set_value(radian_to_pos({ 0, PI_r / 2 }, {}, 4, { 0, 0, 1 }));
+    render_.position      ->set_value(
+        radian_to_pos({ 0, PI_r / 2 }, {}, 4, { 0, 0, 1 }));
     render_.look_at       ->set_value({});
     render_.up            ->set_value({ 0, 0, 1 });
     render_.fov           ->set_value(60);
@@ -45,21 +47,33 @@ CameraPanel::CameraPanel(QWidget *parent)
 
     fetch_params_from_ui();
 
-    connect(preview_.distance, &RealInput::edit_value, this, &CameraPanel::edit_distance);
-    connect(preview_.radian,   &Vec2Input::edit_value, this, &CameraPanel::edit_radian);
-    connect(preview_.position, &Vec3Input::edit_value, this, &CameraPanel::edit_position);
-    connect(preview_.look_at,  &Vec3Input::edit_value, this, &CameraPanel::edit_look_at);
-    connect(preview_.up,       &Vec3Input::edit_value, this, &CameraPanel::edit_up);
+    connect(preview_.distance, &RealInput::edit_value,
+            this, &CameraPanel::edit_distance);
+    connect(preview_.radian,   &Vec2Input::edit_value,
+            this, &CameraPanel::edit_radian);
+    connect(preview_.position, &Vec3Input::edit_value,
+            this, &CameraPanel::edit_position);
+    connect(preview_.look_at,  &Vec3Input::edit_value,
+            this, &CameraPanel::edit_look_at);
+    connect(preview_.up,       &Vec3Input::edit_value,
+            this, &CameraPanel::edit_up);
 
-    connect(preview_.fov,            &RealInput::edit_value, this, &CameraPanel::edit_fov);
-    connect(preview_.lens_radius,    &RealInput::edit_value, this, &CameraPanel::edit_lens_radius);
-    connect(preview_.focal_distance, &RealInput::edit_value, this, &CameraPanel::edit_focal_distance);
+    connect(preview_.fov,            &RealInput::edit_value,
+            this, &CameraPanel::edit_fov);
+    connect(preview_.lens_radius,    &RealInput::edit_value,
+            this, &CameraPanel::edit_lens_radius);
+    connect(preview_.focal_distance, &RealInput::edit_value,
+            this, &CameraPanel::edit_focal_distance);
 
-    connect(render_.display_render_camera, &QPushButton::clicked, this, &CameraPanel::click_set_render);
-    connect(render_.bind_render_camera,    &QPushButton::clicked, this, &CameraPanel::click_bind_render);
+    connect(render_.display_render_camera, &QPushButton::clicked,
+            this, &CameraPanel::click_set_render);
+    connect(render_.bind_render_camera,    &QPushButton::clicked,
+            this, &CameraPanel::click_bind_render);
 
-    connect(render_.render_width,  &QLineEdit::returnPressed, [=] { edit_render_framesize(); });
-    connect(render_.render_height, &QLineEdit::returnPressed, [=] { edit_render_framesize(); });
+    connect(render_.export_width,  &QLineEdit::returnPressed,
+            [=] { edit_render_framesize(); });
+    connect(render_.export_height, &QLineEdit::returnPressed,
+            [=] { edit_render_framesize(); });
 }
 
 void CameraPanel::set_preview_aspect(real aspect) noexcept
@@ -72,33 +86,34 @@ const CameraPanel::CameraParams &CameraPanel::get_preview_params() const noexcep
     return preview_params_;
 }
 
-const CameraPanel::CameraParams &CameraPanel::get_render_params() const noexcept
+const CameraPanel::CameraParams &CameraPanel::get_export_params() const noexcept
 {
-    return render_params_;
+    return export_params_;
 }
 
-int CameraPanel::get_render_frame_width() const noexcept
+int CameraPanel::get_export_frame_width() const noexcept
 {
-    return render_width_;
+    return export_width_;
 }
 
-int CameraPanel::get_render_frame_height() const noexcept
+int CameraPanel::get_export_frame_height() const noexcept
 {
-    return render_height_;
+    return export_height_;
 }
 
-bool CameraPanel::is_render_frame_enabled() const noexcept
+bool CameraPanel::is_export_frame_enabled() const noexcept
 {
-    return enable_render_frame_;
+    return enable_export_frame_;
 }
 
 void CameraPanel::set_distance(real new_distance)
 {
     if(!render_.bind_render_camera->isChecked())
-        enable_render_frame_ = false;
+        enable_export_frame_ = false;
 
     const Vec3 new_pos = radian_to_pos(
-        preview_params_.radian, preview_params_.look_at, new_distance, preview_params_.up);
+        preview_params_.radian, preview_params_.look_at,
+        new_distance, preview_params_.up);
 
     preview_.distance->set_value(new_distance);
     preview_.position->set_value(new_pos);
@@ -115,10 +130,11 @@ void CameraPanel::set_distance(real new_distance)
 void CameraPanel::set_radian(const Vec2 &new_radian)
 {
     if(!render_.bind_render_camera->isChecked())
-        enable_render_frame_ = false;
+        enable_export_frame_ = false;
 
     const Vec3 new_pos = radian_to_pos(
-        new_radian, preview_params_.look_at, preview_params_.distance, preview_params_.up);
+        new_radian, preview_params_.look_at,
+        preview_params_.distance, preview_params_.up);
 
     preview_.radian  ->set_value(new_radian);
     preview_.position->set_value(new_pos);
@@ -135,10 +151,11 @@ void CameraPanel::set_radian(const Vec2 &new_radian)
 void CameraPanel::set_look_at(const Vec3 &new_look_at)
 {
     if(!render_.bind_render_camera->isChecked())
-        enable_render_frame_ = false;
+        enable_export_frame_ = false;
 
     const Vec3 new_pos = radian_to_pos(
-        preview_params_.radian, new_look_at, preview_params_.distance, preview_params_.up);
+        preview_params_.radian, new_look_at,
+        preview_params_.distance, preview_params_.up);
 
     preview_.look_at ->set_value(new_look_at);
     preview_.position->set_value(new_pos);
@@ -155,20 +172,20 @@ void CameraPanel::set_look_at(const Vec3 &new_look_at)
 void CameraPanel::save_asset(AssetSaver &saver) const
 {
     saver.write(preview_params_);
-    saver.write(render_params_);
-    saver.write(int32_t(render_width_));
-    saver.write(int32_t(render_height_));
+    saver.write(export_params_);
+    saver.write(int32_t(export_width_));
+    saver.write(int32_t(export_height_));
 }
 
 void CameraPanel::load_asset(AssetLoader &loader)
 {
     preview_params_ = loader.read<CameraParams>();
-    render_params_  = loader.read<CameraParams>();
+    export_params_  = loader.read<CameraParams>();
 
-    render_width_  = int(loader.read<int32_t>());
-    render_height_ = int(loader.read<int32_t>());
-    render_.render_width ->setText(QString::number(render_width_));
-    render_.render_height->setText(QString::number(render_height_));
+    export_width_  = int(loader.read<int32_t>());
+    export_height_ = int(loader.read<int32_t>());
+    render_.export_width ->setText(QString::number(export_width_));
+    render_.export_height->setText(QString::number(export_height_));
 
     preview_.distance      ->set_value(preview_params_.distance);
     preview_.radian        ->set_value(preview_params_.radian);
@@ -179,19 +196,21 @@ void CameraPanel::load_asset(AssetLoader &loader)
     preview_.lens_radius   ->set_value(preview_params_.lens_radius);
     preview_.focal_distance->set_value(preview_params_.focal_distance);
 
-    render_.distance      ->set_value(render_params_.distance);
-    render_.radian        ->set_value(render_params_.radian);
-    render_.position      ->set_value(render_params_.position);
-    render_.look_at       ->set_value(render_params_.look_at);
-    render_.up            ->set_value(render_params_.up);
-    render_.fov           ->set_value(render_params_.fov_deg);
-    render_.lens_radius   ->set_value(render_params_.lens_radius);
-    render_.focal_distance->set_value(render_params_.focal_distance);
+    render_.distance      ->set_value(export_params_.distance);
+    render_.radian        ->set_value(export_params_.radian);
+    render_.position      ->set_value(export_params_.position);
+    render_.look_at       ->set_value(export_params_.look_at);
+    render_.up            ->set_value(export_params_.up);
+    render_.fov           ->set_value(export_params_.fov_deg);
+    render_.lens_radius   ->set_value(export_params_.lens_radius);
+    render_.focal_distance->set_value(export_params_.focal_distance);
 }
 
 void CameraPanel::edit_distance(real new_distance)
 {
-    const Vec3 new_pos = radian_to_pos(preview_params_.radian, preview_params_.look_at, new_distance, preview_params_.up);
+    const Vec3 new_pos = radian_to_pos(
+        preview_params_.radian, preview_params_.look_at,
+        new_distance, preview_params_.up);
     preview_.position->set_value(new_pos);
 
     if(render_.bind_render_camera->isChecked())
@@ -200,7 +219,7 @@ void CameraPanel::edit_distance(real new_distance)
         render_.position->set_value(new_pos);
     }
     else
-        enable_render_frame_ = false;
+        enable_export_frame_ = false;
 
     fetch_params_from_ui();
     emit edit_params();
@@ -208,7 +227,9 @@ void CameraPanel::edit_distance(real new_distance)
 
 void CameraPanel::edit_radian(const Vec2 &new_radian)
 {
-    const Vec3 new_pos = radian_to_pos(new_radian, preview_params_.look_at, preview_params_.distance, preview_params_.up);
+    const Vec3 new_pos = radian_to_pos(
+        new_radian, preview_params_.look_at,
+        preview_params_.distance, preview_params_.up);
     preview_.position->set_value(new_pos);
 
     if(render_.bind_render_camera->isChecked())
@@ -217,7 +238,7 @@ void CameraPanel::edit_radian(const Vec2 &new_radian)
         render_.position->set_value(new_pos);
     }
     else
-        enable_render_frame_ = false;
+        enable_export_frame_ = false;
 
     fetch_params_from_ui();
     emit edit_params();
@@ -225,7 +246,8 @@ void CameraPanel::edit_radian(const Vec2 &new_radian)
 
 void CameraPanel::edit_position(const Vec3 &new_position)
 {
-    const Vec2 new_rad = pos_to_radian(new_position, preview_params_.look_at, preview_params_.up);
+    const Vec2 new_rad = pos_to_radian(
+        new_position, preview_params_.look_at, preview_params_.up);
     const real new_dis = distance(new_position, preview_params_.look_at);
 
     preview_.radian  ->set_value(new_rad);
@@ -238,7 +260,7 @@ void CameraPanel::edit_position(const Vec3 &new_position)
         render_.distance->set_value(new_dis);
     }
     else
-        enable_render_frame_ = false;
+        enable_export_frame_ = false;
 
     fetch_params_from_ui();
     emit edit_params();
@@ -247,7 +269,8 @@ void CameraPanel::edit_position(const Vec3 &new_position)
 void CameraPanel::edit_look_at(const Vec3 &new_look_at)
 {
     const Vec3 new_pos = radian_to_pos(
-        preview_params_.radian, new_look_at, preview_params_.distance, preview_params_.up);
+        preview_params_.radian, new_look_at,
+        preview_params_.distance, preview_params_.up);
     preview_.position->set_value(new_pos);
 
     if(render_.bind_render_camera->isChecked())
@@ -256,7 +279,7 @@ void CameraPanel::edit_look_at(const Vec3 &new_look_at)
         render_.position->set_value(new_pos);
     }
     else
-        enable_render_frame_ = false;
+        enable_export_frame_ = false;
 
     fetch_params_from_ui();
     emit edit_params();
@@ -267,7 +290,7 @@ void CameraPanel::edit_up(const Vec3 &up)
     if(render_.bind_render_camera->isChecked())
         render_.up->set_value(up);
     else
-        enable_render_frame_ = false;
+        enable_export_frame_ = false;
 
     fetch_params_from_ui();
     emit edit_params();
@@ -303,12 +326,13 @@ void CameraPanel::edit_focal_distance(real new_focal_distance)
 
 void CameraPanel::edit_render_framesize()
 {
-    render_width_  = render_.render_width ->text().toInt();
-    render_height_ = render_.render_height->text().toInt();
+    export_width_  = render_.export_width ->text().toInt();
+    export_height_ = render_.export_height->text().toInt();
 
     if(render_.bind_render_camera->isChecked())
     {
-        preview_.fov->set_value((std::max)(preview_.fov->get_value(), min_preview_fov_deg()));
+        preview_.fov->set_value(
+            (std::max)(preview_.fov->get_value(), min_preview_fov_deg()));
         fetch_params_from_ui();
     }
     emit edit_params();
@@ -316,7 +340,7 @@ void CameraPanel::edit_render_framesize()
 
 void CameraPanel::click_set_render()
 {
-    enable_render_frame_ = true;
+    enable_export_frame_ = true;
 
     preview_.distance->set_value(render_.distance->get_value());
     preview_.radian  ->set_value(render_.radian  ->get_value());
@@ -324,7 +348,8 @@ void CameraPanel::click_set_render()
     preview_.look_at ->set_value(render_.look_at ->get_value());
     preview_.up      ->set_value(render_.up      ->get_value());
 
-    preview_.fov->set_value((std::max)(preview_.fov->get_value(), min_preview_fov_deg()));
+    preview_.fov->set_value(
+        (std::max)(preview_.fov->get_value(), min_preview_fov_deg()));
 
     fetch_params_from_ui();
     emit edit_params();
@@ -343,9 +368,10 @@ void CameraPanel::click_bind_render()
     if(!render_.bind_render_camera->isChecked())
         return;
 
-    enable_render_frame_ = true;
+    enable_export_frame_ = true;
 
-    preview_.fov->set_value((std::max)(preview_.fov->get_value(), min_preview_fov_deg()));
+    preview_.fov->set_value(
+        (std::max)(preview_.fov->get_value(), min_preview_fov_deg()));
 
     render_.distance->set_value(preview_.distance->get_value());
     render_.radian  ->set_value(preview_.radian  ->get_value());
@@ -357,7 +383,8 @@ void CameraPanel::click_bind_render()
     emit edit_params();
 }
 
-Vec2 CameraPanel::pos_to_radian(const Vec3 &pos, const Vec3 &dst, const Vec3 &up)
+Vec2 CameraPanel::pos_to_radian(
+    const Vec3 &pos, const Vec3 &dst, const Vec3 &up)
 {
     const tracer::Coord up_coord = tracer::Coord::from_z(up);
     const Vec3 local_dir = up_coord.global_to_local(pos - dst).normalize();
@@ -366,7 +393,8 @@ Vec2 CameraPanel::pos_to_radian(const Vec3 &pos, const Vec3 &dst, const Vec3 &up
     return { hori_radian, vert_radian };
 }
 
-Vec3 CameraPanel::radian_to_pos(const Vec2 &radian, const Vec3 &dst, real distance, const Vec3 up)
+Vec3 CameraPanel::radian_to_pos(
+    const Vec2 &radian, const Vec3 &dst, real distance, const Vec3 up)
 {
     const auto up_coord = tracer::Coord::from_z(up);
     const Vec3 local_dir = {
@@ -435,16 +463,16 @@ void CameraPanel::init_ui()
     render_.bind_render_camera->setCheckable(true);
     render_.bind_render_camera->setChecked(false);
 
-    render_.render_width  = new QLineEdit(this);
-    render_.render_height = new QLineEdit(this);
+    render_.export_width  = new QLineEdit(this);
+    render_.export_height = new QLineEdit(this);
 
-    render_framesize_validator_ = std::make_unique<QIntValidator>(this);
-    render_framesize_validator_->setRange(1, 999999);
+    export_framesize_validator_ = newBox<QIntValidator>(this);
+    export_framesize_validator_->setRange(1, 999999);
 
-    render_.render_width ->setValidator(render_framesize_validator_.get());
-    render_.render_height->setValidator(render_framesize_validator_.get());
-    render_.render_width ->setText(QString::number(render_width_));
-    render_.render_height->setText(QString::number(render_height_));
+    render_.export_width ->setValidator(export_framesize_validator_.get());
+    render_.export_height->setValidator(export_framesize_validator_.get());
+    render_.export_width ->setText(QString::number(export_width_));
+    render_.export_height->setText(QString::number(export_height_));
     
     int render_row = 0;
 
@@ -452,10 +480,10 @@ void CameraPanel::init_ui()
     render_layout->addWidget(render_.bind_render_camera,    ++render_row, 0, 1, 2);
 
     render_layout->addWidget(new QLabel("Frame Width"), ++render_row, 0);
-    render_layout->addWidget(render_.render_width, render_row, 1);
+    render_layout->addWidget(render_.export_width, render_row, 1);
 
     render_layout->addWidget(new QLabel("Frame Height"), ++render_row, 0);
-    render_layout->addWidget(render_.render_height, render_row, 1);
+    render_layout->addWidget(render_.export_height, render_row, 1);
 
     render_layout->addWidget(new QLabel("Distance"), ++render_row, 0);
     render_layout->addWidget(render_.distance,         render_row, 1);
@@ -484,8 +512,9 @@ void CameraPanel::init_ui()
     render_widget->setContentsMargins(0, 0, 0, 0);
     render_layout->setContentsMargins(0, 0, 0, 0);
 
-    Collapsible *render_sec = new Collapsible(this, "Render");
+    Collapsible *render_sec = new Collapsible(this, "Exported Camera");
     render_sec->set_content_widget(render_widget);
+    render_sec->open();
     
     // panel layout
 
@@ -508,25 +537,26 @@ void CameraPanel::fetch_params_from_ui()
     preview_params_.lens_radius    = preview_.lens_radius   ->get_value();
     preview_params_.focal_distance = preview_.focal_distance->get_value();
     
-    render_params_.distance       = render_.distance      ->get_value();
-    render_params_.radian         = render_.radian        ->get_value();
-    render_params_.position       = render_.position      ->get_value();
-    render_params_.look_at        = render_.look_at       ->get_value();
-    render_params_.up             = render_.up            ->get_value();
-    render_params_.fov_deg        = render_.fov           ->get_value();
-    render_params_.lens_radius    = render_.lens_radius   ->get_value();
-    render_params_.focal_distance = render_.focal_distance->get_value();
+    export_params_.distance       = render_.distance      ->get_value();
+    export_params_.radian         = render_.radian        ->get_value();
+    export_params_.position       = render_.position      ->get_value();
+    export_params_.look_at        = render_.look_at       ->get_value();
+    export_params_.up             = render_.up            ->get_value();
+    export_params_.fov_deg        = render_.fov           ->get_value();
+    export_params_.lens_radius    = render_.lens_radius   ->get_value();
+    export_params_.focal_distance = render_.focal_distance->get_value();
 }
 
 real CameraPanel::min_preview_fov_deg()
 {
-    const real render_aspect = real(render_width_) / render_height_;
+    const real render_aspect = real(export_width_) / export_height_;
 
-    const real a = math::deg2rad(render_params_.fov_deg);
+    const real a = math::deg2rad(export_params_.fov_deg);
     const real b1 = math::rad2deg(
         2 * std::atan(real(1.1) * std::tan(a / 2)));
     const real b2 = math::rad2deg(
-        2 * std::atan(real(1.1) * render_aspect / preview_aspect_ * std::tan(a / 2)));
+        2 * std::atan(real(1.1) * render_aspect / preview_aspect_
+          * std::tan(a / 2)));
 
     return (std::max)(b1, b2);
 }

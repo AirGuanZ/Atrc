@@ -12,7 +12,9 @@ class FlowLayout : public QLayout
 {
 public:
 
-    explicit FlowLayout(QWidget *parent = nullptr, int margin = -1, int hori_spacing = -1, int vert_spacing = -1);
+    explicit FlowLayout(
+        QWidget *parent = nullptr, int margin = -1,
+        int hori_spacing = -1, int vert_spacing = -1);
 
     ~FlowLayout();
 

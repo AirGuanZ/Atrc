@@ -40,7 +40,8 @@ namespace texture3d_load
     texture::texture3d_t<real> load_gray_from_binary(std::ifstream &fin);
 
     texture::texture3d_t<real> load_gray_from_images(
-        const std::string *filenames, int image_count, const factory::PathMapper &path_mapper);
+        const std::string *filenames, int image_count,
+        const factory::PathMapper &path_mapper);
 
     /**
      * @brief load vol data from ascii file
@@ -73,11 +74,14 @@ namespace texture3d_load
     texture::texture3d_t<Spectrum> load_rgb_from_binary(std::ifstream &fin);
 
     texture::texture3d_t<Spectrum> load_rgb_from_images(
-        const std::string *filenames, int image_count, const factory::PathMapper &path_mapper);
+        const std::string *filenames, int image_count,
+        const factory::PathMapper &path_mapper);
 
-    void save_gray_to_binary(const std::string &filename, const Vec3i &size, const float *data);
+    void save_gray_to_binary(
+        const std::string &filename, const Vec3i &size, const float *data);
 
-    void save_rgb_to_binary(const std::string &filename, const Vec3i &size, const float *data);
+    void save_rgb_to_binary(
+        const std::string &filename, const Vec3i &size, const float *data);
 
 } // namespace texture3d_load
 

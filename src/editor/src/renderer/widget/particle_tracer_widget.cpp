@@ -93,8 +93,9 @@ ParticleTracerWidget::ParticleTracerWidget(QWidget *parent)
     });
 }
 
-std::unique_ptr<Renderer> ParticleTracerWidget::create_renderer(
-    std::shared_ptr<tracer::Scene> scene, const Vec2i &framebuffer_size, bool enable_preview) const
+Box<Renderer> ParticleTracerWidget::create_renderer(
+    RC<tracer::Scene> scene, const Vec2i &framebuffer_size,
+    bool enable_preview) const
 {
     ParticleTracer::Params params = {
         -2, 32,
@@ -104,7 +105,8 @@ std::unique_ptr<Renderer> ParticleTracerWidget::create_renderer(
         cont_prob_->value() / real(10),
         enable_preview
     };
-    return std::make_unique<ParticleTracer>(params, framebuffer_size.x, framebuffer_size.y, std::move(scene));
+    return newBox<ParticleTracer>(
+        params, framebuffer_size.x, framebuffer_size.y, std::move(scene));
 }
 
 RendererWidget *ParticleTracerWidgetCreator::create_widget(QWidget *parent) const

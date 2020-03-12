@@ -105,13 +105,16 @@ namespace tri_bvh_embree_ws
             AGZ_SCOPE_GUARD({ rtcReleaseGeometry(mesh); });
 
             const size_t vertex_count = triangle_count * 3;
-            const auto vertices = static_cast<EmbreeVertex*>(rtcSetNewGeometryBuffer(
-                mesh, RTC_BUFFER_TYPE_VERTEX, 0, RTC_FORMAT_FLOAT3, sizeof(EmbreeVertex), vertex_count));
+            const auto vertices = static_cast<EmbreeVertex*>(
+                rtcSetNewGeometryBuffer(
+                    mesh, RTC_BUFFER_TYPE_VERTEX, 0, RTC_FORMAT_FLOAT3,
+                    sizeof(EmbreeVertex), vertex_count));
             if(!vertices)
                 throw_embree_error();
 
             const auto indices = static_cast<EmbreeIndex*>(rtcSetNewGeometryBuffer(
-                mesh, RTC_BUFFER_TYPE_INDEX, 0, RTC_FORMAT_UINT3, sizeof(EmbreeIndex), triangle_count));
+                mesh, RTC_BUFFER_TYPE_INDEX, 0, RTC_FORMAT_UINT3,
+                sizeof(EmbreeIndex), triangle_count));
             if(!indices)
                 throw_embree_error();
 
@@ -200,7 +203,8 @@ namespace tri_bvh_embree_ws
             return ray.tfar < 0 && std::isinf(ray.tfar);
         }
 
-        bool closest_intersection(const Ray &r, GeometryIntersection *inct) const noexcept
+        bool closest_intersection(
+            const Ray &r, GeometryIntersection *inct) const noexcept
         {
             alignas(16) RTCRayHit rayhit = {
             {
@@ -249,11 +253,17 @@ namespace tri_bvh_embree_ws
             auto uv = math::distribution::uniform_on_triangle(sam.v, sam.w);
 
             SurfacePoint spt;
+
             spt.pos = prim.a + uv.x * prim.b_a + uv.y * prim.c_a;
-            spt.geometry_coord = Coord(prim_info.x, cross(prim_info.z, prim_info.x), prim_info.z);
+
+            spt.geometry_coord = Coord(
+                prim_info.x, cross(prim_info.z, prim_info.x), prim_info.z);
+
             spt.uv = prim_info.t_a + uv.x * prim_info.t_b_a + uv.y * prim_info.t_c_a;
 
-            const Vec3 user_z = prim_info.n_a + uv.x * prim_info.n_b_a + uv.y * prim_info.n_c_a;
+            const Vec3 user_z = prim_info.n_a + uv.x * prim_info.n_b_a
+                                              + uv.y * prim_info.n_c_a;
+
             spt.user_coord = spt.geometry_coord.rotate_to_new_z(user_z);
 
             return spt;
@@ -279,25 +289,32 @@ namespace tri_bvh_embree_ws
 
 class TriangleBVHEmbree : public Geometry
 {
-    std::unique_ptr<const tri_bvh_embree_ws::UntransformedTriangleBVH> untransformed_;
+    Box<const tri_bvh_embree_ws::UntransformedTriangleBVH> untransformed_;
     AABB world_bound_;
 
     real surface_area_ = 0;
 
-    static std::unique_ptr<const tri_bvh_embree_ws::UntransformedTriangleBVH> load(
-        std::vector<mesh::triangle_t> build_triangles, const Transform3 &local_to_world)
+    static Box<const tri_bvh_embree_ws::UntransformedTriangleBVH> load(
+        std::vector<mesh::triangle_t> build_triangles,
+        const Transform3 &local_to_world)
     {
         for(auto &tri : build_triangles)
         {
-            tri.vertices[0].position = local_to_world.apply_to_point(tri.vertices[0].position);
-            tri.vertices[1].position = local_to_world.apply_to_point(tri.vertices[1].position);
-            tri.vertices[2].position = local_to_world.apply_to_point(tri.vertices[2].position);
-            tri.vertices[0].normal   = local_to_world.apply_to_vector(tri.vertices[0].normal);
-            tri.vertices[1].normal   = local_to_world.apply_to_vector(tri.vertices[1].normal);
-            tri.vertices[2].normal   = local_to_world.apply_to_vector(tri.vertices[2].normal);
+            tri.vertices[0].position = local_to_world.apply_to_point(
+                tri.vertices[0].position);
+            tri.vertices[1].position = local_to_world.apply_to_point(
+                tri.vertices[1].position);
+            tri.vertices[2].position = local_to_world.apply_to_point(
+                tri.vertices[2].position);
+            tri.vertices[0].normal   = local_to_world.apply_to_vector(
+                tri.vertices[0].normal);
+            tri.vertices[1].normal   = local_to_world.apply_to_vector(
+                tri.vertices[1].normal);
+            tri.vertices[2].normal   = local_to_world.apply_to_vector(
+                tri.vertices[2].normal);
         }
 
-        auto ret = std::make_unique<tri_bvh_embree_ws::UntransformedTriangleBVH>();
+        auto ret = newBox<tri_bvh_embree_ws::UntransformedTriangleBVH>();
         ret->initialize(build_triangles.data(), build_triangles.size());
 
         return ret;
@@ -305,7 +322,9 @@ class TriangleBVHEmbree : public Geometry
 
 public:
 
-    TriangleBVHEmbree(std::vector<mesh::triangle_t> build_triangles, const Transform3 &local_to_world)
+    TriangleBVHEmbree(
+        std::vector<mesh::triangle_t> build_triangles,
+        const Transform3 &local_to_world)
     {
         AGZ_HIERARCHY_TRY
 
@@ -324,7 +343,8 @@ public:
         for(int i = 0; i != 3; ++i)
         {
             if(world_bound_.low[i] >= world_bound_.high[i])
-                world_bound_.low[i] = world_bound_.high[i] - real(0.1) * std::abs(world_bound_.high[i]);
+                world_bound_.low[i] = world_bound_.high[i] -
+                                    real(0.1) * std::abs(world_bound_.high[i]);
         }
 
         AGZ_HIERARCHY_WRAP("in initializing triangle_bvh_embree_ws geometry object")
@@ -335,7 +355,8 @@ public:
         return untransformed_->has_intersection(r);
     }
 
-    bool closest_intersection(const Ray &r, GeometryIntersection *inct) const noexcept override
+    bool closest_intersection(
+        const Ray &r, GeometryIntersection *inct) const noexcept override
     {
         return untransformed_->closest_intersection(r, inct);
     }
@@ -356,7 +377,8 @@ public:
         return untransformed_->uniformly_sample(sam);
     }
 
-    SurfacePoint sample(const Vec3&, real *pdf, const Sample3 &sam) const noexcept override
+    SurfacePoint sample(
+        const Vec3&, real *pdf, const Sample3 &sam) const noexcept override
     {
         return sample(pdf, sam);
     }
@@ -372,14 +394,14 @@ public:
     }
 };
 
-std::shared_ptr<Geometry> create_triangle_bvh_embree(
+RC<Geometry> create_triangle_bvh_embree(
     std::vector<mesh::triangle_t> build_triangles,
     const Transform3 &local_to_world)
 {
-    return std::make_shared<TriangleBVHEmbree>(std::move(build_triangles), local_to_world);
+    return newRC<TriangleBVHEmbree>(std::move(build_triangles), local_to_world);
 }
 
-std::shared_ptr<Geometry> create_triangle_bvh(
+RC<Geometry> create_triangle_bvh(
     std::vector<mesh::triangle_t> build_triangles,
     const Transform3 &local_to_world)
 {

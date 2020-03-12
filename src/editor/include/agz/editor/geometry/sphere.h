@@ -23,7 +23,7 @@ public:
 
     void load_asset(AssetLoader &loader) override;
 
-    std::shared_ptr<tracer::ConfigNode> to_config(JSONExportContext &ctx) const override;
+    RC<tracer::ConfigNode> to_config(JSONExportContext &ctx) const override;
 
     std::vector<Vertex> get_vertices() const override;
 
@@ -38,7 +38,7 @@ private:
     void do_update_tracer_object();
 
     QLineEdit *radius_edit_ = nullptr;
-    std::unique_ptr<QValidator> radius_edit_validator_;
+    Box<QValidator> radius_edit_validator_;
 };
 
 class SphereWidgetCreator : public GeometryWidgetCreator
@@ -47,7 +47,8 @@ public:
 
     QString name() const override { return "Sphere"; }
 
-    ResourceWidget<tracer::Geometry> *create_widget(ObjectContext &obj_ctx) const override;
+    ResourceWidget<tracer::Geometry> *create_widget(
+        ObjectContext &obj_ctx) const override;
 };
 
 AGZ_EDITOR_END

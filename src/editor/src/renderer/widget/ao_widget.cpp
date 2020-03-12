@@ -72,8 +72,9 @@ AOWidget::AOWidget(QWidget *parent)
     });
 }
 
-std::unique_ptr<Renderer> AOWidget::create_renderer(
-    std::shared_ptr<tracer::Scene> scene, const Vec2i &framebuffer_size, bool enable_preview) const
+Box<Renderer> AOWidget::create_renderer(
+    RC<tracer::Scene> scene, const Vec2i &framebuffer_size,
+    bool enable_preview) const
 {
     const AO::Params params = {
         -2, 32, ao_sample_count_, occlusion_distance_,
@@ -82,7 +83,8 @@ std::unique_ptr<Renderer> AOWidget::create_renderer(
         qcolor_to_spectrum(high_color_),
         enable_preview
     };
-    return std::make_unique<AO>(params, framebuffer_size.x, framebuffer_size.y, std::move(scene));
+    return newBox<AO>(
+        params, framebuffer_size.x, framebuffer_size.y, std::move(scene));
 }
 
 void AOWidget::set_button_color(QPushButton *button, const QColor &color)

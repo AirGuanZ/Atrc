@@ -27,7 +27,8 @@ class ConductorPoint : public FresnelPoint
 
 public:
 
-    ConductorPoint(const Spectrum &eta_out, const Spectrum &eta_in, const Spectrum &k) noexcept
+    ConductorPoint(
+        const Spectrum &eta_out, const Spectrum &eta_in, const Spectrum &k) noexcept
     {
         eta_out_ = eta_out;
         eta_in_ = eta_in;

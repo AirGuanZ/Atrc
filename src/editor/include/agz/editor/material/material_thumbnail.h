@@ -11,7 +11,7 @@ class MaterialThumbnailProvider : public ResourceThumbnailProvider
 {
     int width_;
     int height_;
-    std::shared_ptr<const tracer::Material> mat_;
+    RC<const tracer::Material> mat_;
 
     std::atomic<bool> exit_;
     std::thread render_thread_;
@@ -22,7 +22,7 @@ class MaterialThumbnailProvider : public ResourceThumbnailProvider
     int finished_iters_;
     int finished_spp_;
     Image2D<Spectrum> accum_color_;
-    std::shared_ptr<tracer::Sampler> sampler_;
+    RC<tracer::Sampler> sampler_;
 
     void run_one_iter(int spp);
 
@@ -34,10 +34,11 @@ public:
      * @param iter_spp spp per iteration
      * @param iter_count number of iteration
      *
-     * the first iteration uses only 1 spp and provides the initial thumbnail (returned by start())
+     * the first iteration uses only 1 spp and provides the initial thumbnail
+     *  (returned by start())
      */
     MaterialThumbnailProvider(
-        int width, int height, std::shared_ptr<const tracer::Material> mat,
+        int width, int height, RC<const tracer::Material> mat,
         int iter_spp = 8, int iter_count = 16);
 
     ~MaterialThumbnailProvider();

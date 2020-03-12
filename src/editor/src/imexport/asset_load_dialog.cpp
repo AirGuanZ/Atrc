@@ -74,10 +74,12 @@ void AssetLoadDialog::ok()
 
     AGZ_SCOPE_GUARD({ this->close(); });
 
-    std::ifstream fin(load_filename.toStdString(), std::ios::in | std::ios::binary);
+    std::ifstream fin(
+        load_filename.toStdString(), std::ios::in | std::ios::binary);
     if(!fin)
     {
-        QMessageBox::information(this, "Error", "Failed to open file: " + load_filename);
+        QMessageBox::information(
+            this, "Error", "Failed to open file: " + load_filename);
         is_ok_clicked_ = false;
         return;
     }

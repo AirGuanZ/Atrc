@@ -20,7 +20,14 @@ Image2DWidget::Image2DWidget(const InitData &clone_state)
 
     connect(filename_button_, &QPushButton::clicked, [=] { browse_filename(); });
 
-    connect(adv_widget_, &Texture2DCommonParamsWidget::change_params, [=] { set_dirty_flag(); });
+    connect(sample_method_, &QComboBox::currentTextChanged,
+        [=](const QString &new_sample_method)
+    {
+        set_dirty_flag();
+    });
+
+    connect(adv_widget_, &Texture2DCommonParamsWidget::change_params,
+        [=] { set_dirty_flag(); });
 
     do_update_tracer_object();
 }
@@ -30,11 +37,13 @@ ResourceWidget<tracer::Texture2D> *Image2DWidget::clone()
     InitData clone_state;
     clone_state.filename               = filename_;
     clone_state.img_data               = img_data_;
+    clone_state.sample_method          = sample_method_->currentText();
     clone_state.adv                    = adv_widget_->clone();
     return new Image2DWidget(clone_state);
 }
 
-std::unique_ptr<ResourceThumbnailProvider> Image2DWidget::get_thumbnail(int width, int height) const
+Box<ResourceThumbnailProvider> Image2DWidget::get_thumbnail(
+    int width, int height) const
 {
     if(!img_data_)
     {
@@ -43,7 +52,8 @@ std::unique_ptr<ResourceThumbnailProvider> Image2DWidget::get_thumbnail(int widt
 
         QPixmap pixmap;
         pixmap.convertFromImage(img);
-        return std::make_unique<FixedResourceThumbnailProvider>(pixmap.scaled(width, height));
+        return newBox<FixedResourceThumbnailProvider>(
+            pixmap.scaled(width, height));
     }
 
     const QImage img(
@@ -55,12 +65,14 @@ std::unique_ptr<ResourceThumbnailProvider> Image2DWidget::get_thumbnail(int widt
     QPixmap pixmap;
     pixmap.convertFromImage(img);
 
-    return std::make_unique<FixedResourceThumbnailProvider>(pixmap.scaled(width, height));
+    return newBox<FixedResourceThumbnailProvider>(
+        pixmap.scaled(width, height));
 }
 
 void Image2DWidget::save_asset(AssetSaver &saver)
 {
     saver.write_string(filename_);
+    saver.write_string(sample_method_->currentText());
 
     if(img_data_)
     {
@@ -81,13 +93,15 @@ void Image2DWidget::load_asset(AssetLoader &loader)
     filename_label_->setText(filename_);
     filename_label_->setToolTip(filename_);
 
+    sample_method_->setCurrentText(loader.read_string());
+
     const uint32_t img_data_byte_size = loader.read<uint32_t>();
 
     if(img_data_byte_size)
     {
         std::vector<unsigned char> img_data(img_data_byte_size);
         loader.read_raw(img_data.data(), img_data_byte_size);
-        img_data_ = std::make_shared<Image2D<math::color3b>>(
+        img_data_ = newRC<Image2D<math::color3b>>(
             img::load_rgb_from_memory(img_data.data(), img_data.size()));
     }
     else
@@ -98,9 +112,9 @@ void Image2DWidget::load_asset(AssetLoader &loader)
     do_update_tracer_object();
 }
 
-std::shared_ptr<tracer::ConfigNode> Image2DWidget::to_config(JSONExportContext &ctx) const
+RC<tracer::ConfigNode> Image2DWidget::to_config(JSONExportContext &ctx) const
 {
-    auto grp = std::make_shared<tracer::ConfigGroup>();
+    auto grp = newRC<tracer::ConfigGroup>();
 
     if(!img_data_)
     {
@@ -112,9 +126,12 @@ std::shared_ptr<tracer::ConfigNode> Image2DWidget::to_config(JSONExportContext &
     grp->insert_str("type", "image");
 
     auto [ref_filename, filename] = ctx.gen_filename(".png");
-    img::save_rgb_to_png_file(filename, img_data_->raw_data(), img_data_->width(), img_data_->height());
+    img::save_rgb_to_png_file(
+        filename, img_data_->raw_data(), img_data_->width(), img_data_->height());
 
     grp->insert_str("filename", ref_filename);
+    grp->insert_str(
+        "sample", sample_method_->currentText().toLower().toStdString());
 
     adv_widget_->to_config(*grp);
 
@@ -132,11 +149,14 @@ void Image2DWidget::do_update_tracer_object()
     
     if(!img_data_)
     {
-        tracer_object_ = create_constant2d_texture(common_params, Spectrum(real(0.5)));
+        tracer_object_ = create_constant2d_texture(
+            common_params, Spectrum(real(0.5)));
         return;
     }
 
-    tracer_object_ = create_image_texture(common_params, img_data_, "linear");
+    tracer_object_ = create_image_texture(
+        common_params, img_data_,
+        sample_method_->currentText().toLower().toStdString());
 }
 
 void Image2DWidget::init_ui(const InitData &clone_state)
@@ -162,6 +182,12 @@ void Image2DWidget::init_ui(const InitData &clone_state)
 
     preview_button_ = new QPushButton("Preview");
 
+    // sample
+
+    sample_method_ = new QComboBox(this);
+    sample_method_->addItems({ "Linear", "Nearest" });
+    sample_method_->setCurrentText(clone_state.sample_method);
+
     // transform
 
     adv_section_ = new Collapsible(this, "Advanced");
@@ -175,6 +201,7 @@ void Image2DWidget::init_ui(const InitData &clone_state)
 
     layout_ = new QVBoxLayout(this);
     layout_->addWidget(filename_widget);
+    layout_->addWidget(sample_method_);
     layout_->addWidget(preview_button_);
     layout_->addWidget(adv_section_);
 
@@ -194,7 +221,7 @@ void Image2DWidget::browse_filename()
         if(!data.is_available())
             throw std::runtime_error("failed");
 
-        img_data_ = std::make_shared<Image2D<math::color3b>>(std::move(data));
+        img_data_ = newRC<Image2D<math::color3b>>(std::move(data));
     }
     catch(...)
     {
@@ -212,7 +239,8 @@ void Image2DWidget::browse_filename()
     set_dirty_flag();
 }
 
-ResourceWidget<tracer::Texture2D> *Image2DCreator::create_widget(ObjectContext &obj_ctx) const
+ResourceWidget<tracer::Texture2D> *Image2DCreator::create_widget(
+    ObjectContext &obj_ctx) const
 {
     return new Image2DWidget({});
 }

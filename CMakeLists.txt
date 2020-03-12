@@ -1,8 +1,8 @@
 ﻿CMAKE_MINIMUM_REQUIRED(VERSION 3.10)
 
-INCLUDE(ExternalProject)
-
 PROJECT(Atrc)
+
+SET_PROPERTY(GLOBAL PROPERTY USE_FOLDERS ON)
 
 ############## optional submodules
 

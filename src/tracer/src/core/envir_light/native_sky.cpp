@@ -10,7 +10,9 @@ class NativeSky : public EnvirLight
 
     Spectrum radiance_impl(const Vec3 &ref_to_light) const noexcept
     {
-        const real cos_theta = math::clamp<real>(ref_to_light.normalize().z, -1, 1);
+        const real cos_theta = math::clamp<real>(
+            ref_to_light.normalize().z, -1, 1);
+        
         const real s = (cos_theta + 1) / 2;
         return s * top_ + (1 - s) * bottom_;
     }
@@ -27,7 +29,8 @@ public:
         AGZ_HIERARCHY_WRAP("in initializing native sky")
     }
 
-    LightSampleResult sample(const Vec3 &ref, const Sample5 &sam) const noexcept override
+    LightSampleResult sample(
+        const Vec3 &ref, const Sample5 &sam) const noexcept override
     {
         const auto [dir, pdf] = math::distribution::uniform_on_sphere(sam.u, sam.v);
 
@@ -48,11 +51,14 @@ public:
 
     LightEmitResult sample_emit(const Sample5 &sam) const noexcept override
     {
-        const auto [dir, pdf_dir] = math::distribution::uniform_on_sphere(sam.u, sam.v);
+        const auto [dir, pdf_dir] = math::distribution
+                                        ::uniform_on_sphere(sam.u, sam.v);
 
-        const Vec2 disk_sam   = math::distribution::uniform_on_unit_disk(sam.w, sam.r);
+        const Vec2 disk_sam   = math::distribution
+                                    ::uniform_on_unit_disk(sam.w, sam.r);
         const Coord dir_coord = Coord::from_z(dir);
-        const Vec3 pos        = world_radius_ * (disk_sam.x * dir_coord.x + disk_sam.y * dir_coord.y - dir) + world_centre_;
+        const Vec3 pos        = world_radius_ *
+            (disk_sam.x * dir_coord.x + disk_sam.y * dir_coord.y - dir) + world_centre_;
 
         LightEmitResult ret;
         ret.pos       = pos;
@@ -65,14 +71,16 @@ public:
         return ret;
     }
 
-    LightEmitPDFResult emit_pdf(const Vec3 &position, const Vec3 &direction, const Vec3 &normal) const noexcept override
+    LightEmitPDFResult emit_pdf(
+        const Vec3 &pos, const Vec3 &dir, const Vec3 &nor) const noexcept override
     {
         const real pdf_dir = math::distribution::uniform_on_sphere_pdf<real>;
         const real pdf_pos = 1 / (PI_r * world_radius_ * world_radius_);
         return { pdf_pos, pdf_dir };
     }
 
-    LightEmitPosResult emit_pos(const Vec3 &ref, const Vec3 &ref_to_light) const noexcept override
+    LightEmitPosResult emit_pos(
+        const Vec3 &ref, const Vec3 &ref_to_light) const noexcept override
     {
         // o: world_center
         // r: world_radius
@@ -113,17 +121,18 @@ public:
         return 4 * PI_r * PI_r * radius * radius * mean_radiance;
     }
 
-    Spectrum radiance(const Vec3 &ref, const Vec3 &ref_to_light) const noexcept override
+    Spectrum radiance(
+        const Vec3 &ref, const Vec3 &ref_to_light) const noexcept override
     {
         return radiance_impl(ref_to_light);
     }
 };
 
-std::shared_ptr<EnvirLight> create_native_sky(
+RC<EnvirLight> create_native_sky(
     const Spectrum &top,
     const Spectrum &bottom)
 {
-    return std::make_shared<NativeSky>(top, bottom);
+    return newRC<NativeSky>(top, bottom);
 }
 
 AGZ_TRACER_END

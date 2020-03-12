@@ -30,7 +30,8 @@ public:
         init_common_params(common_params);
 
         if(grid_count <= 0)
-            throw ObjectConstructionException("invalid grid_count value: " + std::to_string(grid_count));
+            throw ObjectConstructionException(
+                "invalid grid_count value: " + std::to_string(grid_count));
         grid_size_ = real(1) / grid_count;
 
         color_1_ = color1;
@@ -48,11 +49,11 @@ public:
     }
 };
 
-std::shared_ptr<Texture2D> create_checker_board(
+RC<Texture2D> create_checker_board(
     const Texture2DCommonParams &common_params,
     int grid_count, const Spectrum &color1, const Spectrum &color2)
 {
-    return std::make_shared<CheckerBoard>(common_params, grid_count, color1, color2);
+    return newRC<CheckerBoard>(common_params, grid_count, color1, color2);
 }
 
 AGZ_TRACER_END

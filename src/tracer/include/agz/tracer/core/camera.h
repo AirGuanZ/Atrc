@@ -65,26 +65,30 @@ public:
     /**
      * @brief generate a ray
      *
-     * @param film_coord film coordinate. origin is at the left-bottom corner and the coord range is [0, 1]^2
+     * @param film_coord film coordinate. origin is at the left-bottom corner
+     *  and the coord range is [0, 1]^2
      * @param aperture_sample used to sample the aperture
      */
     virtual CameraSampleWeResult sample_we(
-        const Vec2 &film_coord, const Sample2 &aperture_sample) const noexcept = 0;
+        const Vec2 &film_coord, const Sample2 &aperture_sam) const noexcept = 0;
 
     /**
      * @brief eval we(pos_on_cam -> pos_to_out)
      */
-    virtual CameraEvalWeResult eval_we(const Vec3 &pos_on_cam, const Vec3 &pos_to_out) const noexcept = 0;
+    virtual CameraEvalWeResult eval_we(
+        const Vec3 &pos_on_cam, const Vec3 &pos_to_out) const noexcept = 0;
 
     /**
      * @brief pdf of sample_we
      */
-    virtual CameraWePDFResult pdf_we(const Vec3 &pos_on_cam, const Vec3 &pos_to_out) const noexcept = 0;
+    virtual CameraWePDFResult pdf_we(
+        const Vec3 &pos_on_cam, const Vec3 &pos_to_out) const noexcept = 0;
 
     /**
      * @brief sample camera wi
      */
-    virtual CameraSampleWiResult sample_wi(const Vec3 &ref, const Sample2 &sam) const noexcept = 0;
+    virtual CameraSampleWiResult sample_wi(
+        const Vec3 &ref, const Sample2 &sam) const noexcept = 0;
 };
 
 AGZ_TRACER_END

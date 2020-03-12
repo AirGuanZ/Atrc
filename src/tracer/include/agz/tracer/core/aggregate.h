@@ -1,6 +1,5 @@
 ﻿#pragma once
 
-#include <memory>
 #include <vector>
 
 #include <agz/tracer/core/intersection.h>
@@ -25,7 +24,7 @@ public:
      *
      * recall this method will rebuild the dt
      */
-    virtual void build(const std::vector<std::shared_ptr<const Entity>> &entities) = 0;
+    virtual void build(const std::vector<RC<const Entity>> &entities) = 0;
 
     /**
      * @brief test whether an intersection exists
@@ -35,7 +34,8 @@ public:
     /**
      * @brief find the closest intersection between ray and entities
      */
-    virtual bool closest_intersection(const Ray &r, EntityIntersection *inct) const noexcept = 0;
+    virtual bool closest_intersection(
+        const Ray &r, EntityIntersection *inct) const noexcept = 0;
 };
 
 AGZ_TRACER_END

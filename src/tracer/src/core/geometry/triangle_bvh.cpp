@@ -42,7 +42,8 @@ namespace
         // internal node when start == uint32_t.max; otherwise, leaf node
         uint32_t start, end_or_right_offset;
 
-        static Node new_leaf(const real *low, const real *high, uint32_t start, uint32_t end)
+        static Node new_leaf(
+            const real *low, const real *high, uint32_t start, uint32_t end)
         {
             const Node ret = {
                 { low[0],  low[1],  low[2] },
@@ -53,7 +54,8 @@ namespace
             return ret;
         }
 
-        static Node new_interior(const real *low, const real *high, uint32_t right_offset)
+        static Node new_interior(
+            const real *low, const real *high, uint32_t right_offset)
         {
             const Node ret = {
                 { low[0],  low[1],  low[2] },
@@ -70,7 +72,9 @@ namespace
             return start < std::numeric_limits<uint32_t>::max();
         }
 
-        bool has_intersection(const real *ori, const real *inv_dir, real t_min, real t_max, real *inct_t) const noexcept
+        bool has_intersection(
+            const real *ori, const real *inv_dir,
+            real t_min, real t_max, real *inct_t) const noexcept
         {
             const real nx = inv_dir[0] * (low[0] - ori[0]);
             const real ny = inv_dir[1] * (low[1] - ori[1]);
@@ -115,8 +119,9 @@ namespace
         uint32_t node_count;
     };
 
-    BuildingResult build_bvh(BuildingTriangle *triangles, uint32_t triangle_count,
-                             uint32_t leaf_size_threshold, uint32_t depth_threshold, Arena &arena)
+    BuildingResult build_bvh(
+        BuildingTriangle *triangles, uint32_t triangle_count,
+        uint32_t leaf_size_threshold, uint32_t depth_threshold, Arena &arena)
     {
         struct BuildingTask
         {
@@ -171,11 +176,13 @@ namespace
                 (centroid_delta[0] > centroid_delta[2] ? 0 : 2) :
                 (centroid_delta[1] > centroid_delta[2] ? 1 : 2);
 
-            // divide the axis with centroid position when recursive depth is small. otherwise, divide with triangle count
+            // divide the axis with centroid position when recursive depth is
+            // small. otherwise, divide with triangle count
             uint32_t split_middle;
             if(task.depth < depth_threshold)
             {
-                const real split_pos = real(0.5) * (centroid_bound.high[split_axis] + centroid_bound.low[split_axis]);
+                const real split_pos = real(0.5) * (
+                    centroid_bound.high[split_axis] + centroid_bound.low[split_axis]);
                 split_middle = task.start;
                 for(uint32_t i = task.start; i < task.end; ++i)
                 {
@@ -190,8 +197,11 @@ namespace
             {
                 std::sort(
                     triangles + task.start, triangles + task.end,
-                    [axis = split_axis](const BuildingTriangle &L, const BuildingTriangle &R)
-                { return L.centroid[axis] < R.centroid[axis]; });
+                    [axis = split_axis]
+                    (const BuildingTriangle &L, const BuildingTriangle &R)
+                {
+                    return L.centroid[axis] < R.centroid[axis];
+                });
                 split_middle = task.start + n / 2;
             }
 
@@ -212,8 +222,9 @@ namespace
         return ret;
     }
 
-    void compact_bvh(const BuildingNode *building_node, const BuildingTriangle *triangles,
-                     Node *node_arr, Primitive *prim_arr, PrimitiveInfo *prim_info_arr)
+    void compact_bvh(
+        const BuildingNode *building_node, const BuildingTriangle *triangles,
+        Node *node_arr, Primitive *prim_arr, PrimitiveInfo *prim_info_arr)
     {
         struct CompactingTask
         {
@@ -282,7 +293,9 @@ namespace
                     if(dot(mean_nor, prim_info.z_) < 0)
                         prim_info.z_ = -prim_info.z_;
 
-                    prim_info.x_ = dpdu_as_ex(prim.b_a_, prim.c_a_, prim_info.t_b_a_, prim_info.t_c_a_, prim_info.z_);
+                    prim_info.x_ = dpdu_as_ex(
+                        prim.b_a_, prim.c_a_,
+                        prim_info.t_b_a_, prim_info.t_c_a_, prim_info.z_);
                 }
 
                 next_prim_idx = end;
@@ -316,7 +329,9 @@ namespace
             {
                 build_triangles[i].vtx = triangles[i].vertices;
                 build_triangles[i].centroid = (
-                    triangles[i].vertices[0].position + triangles[i].vertices[1].position + triangles[i].vertices[2].position) / real(3);
+                    triangles[i].vertices[0].position +
+                    triangles[i].vertices[1].position +
+                    triangles[i].vertices[2].position) / real(3);
                 surface_area_ += triangle_area(
                     triangles[i].vertices[1].position - triangles[i].vertices[0].position,
                     triangles[i].vertices[2].position - triangles[i].vertices[0].position);
@@ -333,12 +348,16 @@ namespace
             prims_.resize(triangle_count);
             prim_info_.resize(triangle_count);
 
-            compact_bvh(root, build_triangles.data(), nodes_.data(), prims_.data(), prim_info_.data());
+            compact_bvh(
+                root, build_triangles.data(),
+                nodes_.data(), prims_.data(), prim_info_.data());
 
             std::vector<real> area_arr(triangle_count);
             for(uint32_t i = 0; i < triangle_count; ++i)
                 area_arr[i] = triangle_area(prims_[i].b_a_, prims_[i].c_a_);
-            prim_sampler_.initialize(area_arr.data(), static_cast<int>(triangle_count));
+
+            prim_sampler_.initialize(
+                area_arr.data(), static_cast<int>(triangle_count));
         }
 
         bool has_intersection(const Ray &r) const noexcept
@@ -369,9 +388,11 @@ namespace
                 else
                 {
                     assert(top + 2 < TRAVERSAL_STACK_SIZE);
-                    if(nodes_[task_node_idx + 1].has_intersection(&r.o[0], inv_dir, r.t_min, r.t_max, &t))
+                    if(nodes_[task_node_idx + 1].has_intersection(
+                        &r.o[0], inv_dir, r.t_min, r.t_max, &t))
                         traversal_stack[top++] = task_node_idx + 1;
-                    if(nodes_[node.end_or_right_offset].has_intersection(&r.o[0], inv_dir, r.t_min, r.t_max, &t))
+                    if(nodes_[node.end_or_right_offset].has_intersection(
+                        &r.o[0], inv_dir, r.t_min, r.t_max, &t))
                         traversal_stack[top++] = node.end_or_right_offset;
                 }
             }
@@ -405,7 +426,8 @@ namespace
                     for(uint32_t i = node.start; i < node.end_or_right_offset; ++i)
                     {
                         const Primitive &prim = prims_[i];
-                        if(closest_intersection_with_triangle(r, prim.a_, prim.b_a_, prim.c_a_, &tmp_rcd))
+                        if(closest_intersection_with_triangle(
+                            r, prim.a_, prim.b_a_, prim.c_a_, &tmp_rcd))
                         {
                             rcd = tmp_rcd;
                             r.t_max = tmp_rcd.t_ray;
@@ -417,8 +439,10 @@ namespace
                 {
                     real t_left, t_right;
 
-                    const bool add_left = nodes_[task_node_idx + 1].has_intersection(ori, inv_dir, r.t_min, r.t_max, &t_left);
-                    const bool add_right = nodes_[node.end_or_right_offset].has_intersection(ori, inv_dir, r.t_min, r.t_max, &t_right);
+                    const bool add_left  = nodes_[task_node_idx + 1]
+                        .has_intersection(ori, inv_dir, r.t_min, r.t_max, &t_left);
+                    const bool add_right = nodes_[node.end_or_right_offset]
+                        .has_intersection(ori, inv_dir, r.t_min, r.t_max, &t_right);
 
                     assert(top + 2 <= TRAVERSAL_STACK_SIZE);
 
@@ -448,11 +472,14 @@ namespace
             const PrimitiveInfo &prim_info = prim_info_[final_prim_idx];
 
             inct->pos            = r.at(rcd.t_ray);
-            inct->geometry_coord = Coord(prim_info.x_, cross(prim_info.z_, prim_info.x_), prim_info.z_);
-            inct->uv             = prim_info.t_a_ + rcd.uv.x * prim_info.t_b_a_ + rcd.uv.y * prim_info.t_c_a_;
+            inct->geometry_coord = Coord(prim_info.x_, cross(
+                prim_info.z_, prim_info.x_), prim_info.z_);
+            inct->uv             = prim_info.t_a_ + rcd.uv.x * prim_info.t_b_a_
+                                                  + rcd.uv.y * prim_info.t_c_a_;
             inct->t              = rcd.t_ray;
 
-            const Vec3 user_z = prim_info.n_a_ + rcd.uv.x * prim_info.n_b_a_ + rcd.uv.y * prim_info.n_c_a_;
+            const Vec3 user_z = prim_info.n_a_ + rcd.uv.x * prim_info.n_b_a_
+                                               + rcd.uv.y * prim_info.n_c_a_;
             inct->user_coord = inct->geometry_coord.rotate_to_new_z(user_z);
 
             inct->wr = -r.d;
@@ -476,10 +503,13 @@ namespace
 
             SurfacePoint spt;
             spt.pos            = prim.a_ + uv.x * prim.b_a_ + uv.y * prim.c_a_;
-            spt.geometry_coord = Coord(prim_info.x_, cross(prim_info.z_, prim_info.x_), prim_info.z_);
-            spt.uv             = prim_info.t_a_ + uv.x * prim_info.t_b_a_ + uv.y * prim_info.t_c_a_;
+            spt.geometry_coord = Coord(
+                prim_info.x_, cross(prim_info.z_, prim_info.x_), prim_info.z_);
+            spt.uv             = prim_info.t_a_ + uv.x * prim_info.t_b_a_
+                                                + uv.y * prim_info.t_c_a_;
 
-            const Vec3 user_z = prim_info.n_a_ + uv.x * prim_info.n_b_a_ + uv.y * prim_info.n_c_a_;
+            const Vec3 user_z = prim_info.n_a_ + uv.x * prim_info.n_b_a_
+                                               + uv.y * prim_info.n_c_a_;
             spt.user_coord = spt.geometry_coord.rotate_to_new_z(user_z);
 
             *pdf = 1 / surface_area_;
@@ -497,31 +527,41 @@ namespace
 
 class TriangleBVH : public Geometry
 {
-    std::unique_ptr<const UntransformedTriangleBVH> untransformed_;
+    Box<const UntransformedTriangleBVH> untransformed_;
     AABB world_bound_;
 
-    static std::unique_ptr<const UntransformedTriangleBVH> load(
+    static Box<const UntransformedTriangleBVH> load(
         std::vector<mesh::triangle_t> build_triangles, const Transform3 &local_to_world)
     {
         for(auto &tri : build_triangles)
         {
-            tri.vertices[0].position = local_to_world.apply_to_point(tri.vertices[0].position);
-            tri.vertices[1].position = local_to_world.apply_to_point(tri.vertices[1].position);
-            tri.vertices[2].position = local_to_world.apply_to_point(tri.vertices[2].position);
-            tri.vertices[0].normal   = local_to_world.apply_to_vector(tri.vertices[0].normal);
-            tri.vertices[1].normal   = local_to_world.apply_to_vector(tri.vertices[1].normal);
-            tri.vertices[2].normal   = local_to_world.apply_to_vector(tri.vertices[2].normal);
+            tri.vertices[0].position = local_to_world.apply_to_point(
+                tri.vertices[0].position);
+            tri.vertices[1].position = local_to_world.apply_to_point(
+                tri.vertices[1].position);
+            tri.vertices[2].position = local_to_world.apply_to_point(
+                tri.vertices[2].position);
+            tri.vertices[0].normal   = local_to_world.apply_to_vector(
+                tri.vertices[0].normal);
+            tri.vertices[1].normal   = local_to_world.apply_to_vector(
+                tri.vertices[1].normal);
+            tri.vertices[2].normal   = local_to_world.apply_to_vector(
+                tri.vertices[2].normal);
         }
 
-        auto ret = std::make_unique<UntransformedTriangleBVH>();
-        ret->initialize(build_triangles.data(), static_cast<uint32_t>(build_triangles.size()));
+        auto ret = newBox<UntransformedTriangleBVH>();
+        ret->initialize(
+            build_triangles.data(),
+            static_cast<uint32_t>(build_triangles.size()));
 
         return ret;
     }
 
 public:
 
-    TriangleBVH(std::vector<mesh::triangle_t> build_triangles, const Transform3 &local_to_world)
+    TriangleBVH(
+        std::vector<mesh::triangle_t> build_triangles,
+        const Transform3 &local_to_world)
     {
         AGZ_HIERARCHY_TRY
 
@@ -538,7 +578,8 @@ public:
         for(int i = 0; i != 3; ++i)
         {
             if(world_bound_.low[i] >= world_bound_.high[i])
-                world_bound_.low[i] = world_bound_.high[i] - real(0.1) * std::abs(world_bound_.high[i]);
+                world_bound_.low[i] = world_bound_.high[i] -
+                                      real(0.1) * std::abs(world_bound_.high[i]);
         }
 
         AGZ_HIERARCHY_WRAP("in initializing triangle_bvh geometry object")
@@ -549,7 +590,8 @@ public:
         return untransformed_->has_intersection(r);
     }
 
-    bool closest_intersection(const Ray &r, GeometryIntersection *inct) const noexcept override
+    bool closest_intersection(
+        const Ray &r, GeometryIntersection *inct) const noexcept override
     {
         return untransformed_->closest_intersection(r, inct);
     }
@@ -569,7 +611,8 @@ public:
         return untransformed_->sample(pdf, sam);
     }
 
-    SurfacePoint sample(const Vec3&, real *pdf, const Sample3 &sam) const noexcept override
+    SurfacePoint sample(
+        const Vec3&, real *pdf, const Sample3 &sam) const noexcept override
     {
         return sample(pdf, sam);
     }
@@ -585,20 +628,21 @@ public:
     }
 };
 
-std::shared_ptr<Geometry> create_triangle_bvh_noembree(
+RC<Geometry> create_triangle_bvh_noembree(
     std::vector<mesh::triangle_t> build_triangles,
     const Transform3 &local_to_world)
 {
-    return std::make_shared<TriangleBVH>(std::move(build_triangles), local_to_world);
+    return newRC<TriangleBVH>(std::move(build_triangles), local_to_world);
 }
 
 #ifndef USE_EMBREE
 
-std::shared_ptr<Geometry> create_triangle_bvh(
+RC<Geometry> create_triangle_bvh(
     std::vector<mesh::triangle_t> build_triangles,
     const Transform3 &local_to_world)
 {
-    return create_triangle_bvh_noembree(std::move(build_triangles), local_to_world);
+    return create_triangle_bvh_noembree(
+        std::move(build_triangles), local_to_world);
 }
 
 #endif

@@ -11,7 +11,9 @@
 
 AGZ_TRACER_RENDER_BEGIN
 
-Pixel trace_std(const TraceParams &params, const Scene &scene, const Ray &ray, Sampler &sampler, Arena &arena)
+Pixel trace_std(
+    const TraceParams &params, const Scene &scene, const Ray &ray,
+    Sampler &sampler, Arena &arena)
 {
     Spectrum coef(1);
     Ray r = ray;
@@ -62,7 +64,8 @@ Pixel trace_std(const TraceParams &params, const Scene &scene, const Ray &ray, S
 
         if(scattering_count < medium->get_max_scattering_count())
         {
-            const auto medium_sample = medium->sample_scattering(r.o, ent_inct.pos, sampler, arena);
+            const auto medium_sample = medium->sample_scattering(
+                r.o, ent_inct.pos, sampler, arena);
             coef *= medium_sample.throughput;
 
             // process medium scattering
@@ -80,16 +83,20 @@ Pixel trace_std(const TraceParams &params, const Scene &scene, const Ray &ray, S
                 for(int i = 0; i < params.direct_illum_sample_count; ++i)
                 {
                     for(auto light : scene.lights())
-                        direct_illum += coef * mis_sample_light(scene, light, scattering_point, phase_function, sampler);
-                    direct_illum += coef * mis_sample_bsdf(scene, scattering_point, phase_function, sampler);
+                    {
+                        direct_illum += coef * mis_sample_light(
+                            scene, light, scattering_point, phase_function, sampler);
+                    }
+                    direct_illum += coef * mis_sample_bsdf(
+                        scene, scattering_point, phase_function, sampler);
                 }
 
-                pixel.value += real(1) / params.direct_illum_sample_count * direct_illum;
+                pixel.value += direct_illum / real(params.direct_illum_sample_count);
 
                 // sample phase function
 
                 const auto bsdf_sample = phase_function->sample(
-                    scattering_point.wr, TransportMode::Radiance, sampler.sample3());
+                    scattering_point.wr, TransMode::Radiance, sampler.sample3());
                 if(!bsdf_sample.f || bsdf_sample.pdf < EPS)
                     return pixel;
 
@@ -106,7 +113,10 @@ Pixel trace_std(const TraceParams &params, const Scene &scene, const Ray &ray, S
         if(depth == 1)
         {
             if(auto light = ent_inct.entity->as_light())
-                pixel.value += coef * light->radiance(ent_inct.pos, ent_inct.geometry_coord.z, ent_inct.uv, ent_inct.wr);
+            {
+                pixel.value += coef * light->radiance(
+                    ent_inct.pos, ent_inct.geometry_coord.z, ent_inct.uv, ent_inct.wr);
+            }
         }
 
         // direct illumination
@@ -115,26 +125,35 @@ Pixel trace_std(const TraceParams &params, const Scene &scene, const Ray &ray, S
         for(int i = 0; i < params.direct_illum_sample_count; ++i)
         {
             for(auto light : scene.lights())
-                direct_illum += coef * mis_sample_light(scene, light, ent_inct, ent_shd, sampler);
-            direct_illum += coef * mis_sample_bsdf(scene, ent_inct, ent_shd, sampler);
+            {
+                direct_illum += coef * mis_sample_light(
+                    scene, light, ent_inct, ent_shd, sampler);
+            }
+            direct_illum += coef * mis_sample_bsdf(
+                scene, ent_inct, ent_shd, sampler);
         }
 
         pixel.value += real(1) / params.direct_illum_sample_count * direct_illum;
 
         // sample bsdf
 
-        auto bsdf_sample = ent_shd.bsdf->sample(ent_inct.wr, TransportMode::Radiance, sampler.sample3());
+        auto bsdf_sample = ent_shd.bsdf->sample(
+            ent_inct.wr, TransMode::Radiance, sampler.sample3());
         if(!bsdf_sample.f || bsdf_sample.pdf < EPS)
             return pixel;
 
         r = Ray(ent_inct.eps_offset(bsdf_sample.dir), bsdf_sample.dir.normalize());
-        coef *= bsdf_sample.f * std::abs(cos(ent_inct.geometry_coord.z, bsdf_sample.dir)) / bsdf_sample.pdf;
+
+        const real abscos = std::abs(cos(ent_inct.geometry_coord.z, bsdf_sample.dir));
+        coef *= bsdf_sample.f * abscos / bsdf_sample.pdf;
     }
 
     return pixel;
 }
 
-Pixel trace_nomis(const TraceParams &params, const Scene &scene, const Ray &ray, Sampler &sampler, Arena &arena)
+Pixel trace_nomis(
+    const TraceParams &params, const Scene &scene, const Ray &ray,
+    Sampler &sampler, Arena &arena)
 {
     Spectrum coef(1);
     Ray r = ray;
@@ -182,7 +201,8 @@ Pixel trace_nomis(const TraceParams &params, const Scene &scene, const Ray &ray,
 
         if(scattering_count < medium->get_max_scattering_count())
         {
-            const auto medium_sample = medium->sample_scattering(r.o, ent_inct.pos, sampler, arena);
+            const auto medium_sample = medium->sample_scattering(
+                r.o, ent_inct.pos, sampler, arena);
             coef *= medium_sample.throughput;
 
             // process medium scattering
@@ -194,7 +214,8 @@ Pixel trace_nomis(const TraceParams &params, const Scene &scene, const Ray &ray,
                 const auto &scattering_point = medium_sample.scattering_point;
                 const auto phase_function = medium_sample.phase_function;
 
-                const auto phase_sample = phase_function->sample(ent_inct.wr, TransportMode::Radiance, sampler.sample3());
+                const auto phase_sample = phase_function->sample(
+                    ent_inct.wr, TransMode::Radiance, sampler.sample3());
                 if(!phase_sample.f)
                     return pixel;
 
@@ -210,24 +231,30 @@ Pixel trace_nomis(const TraceParams &params, const Scene &scene, const Ray &ray,
         // process surface scattering
 
         if(auto light = ent_inct.entity->as_light())
-            pixel.value += coef * light->radiance(ent_inct.pos, ent_inct.geometry_coord.z, ent_inct.uv, ent_inct.wr);
+        {
+            pixel.value += coef * light->radiance(
+                ent_inct.pos, ent_inct.geometry_coord.z, ent_inct.uv, ent_inct.wr);
+        }
 
-        const auto bsdf_sample = ent_shd.bsdf->sample(ent_inct.wr, TransportMode::Radiance, sampler.sample3());
+        const auto bsdf_sample = ent_shd.bsdf->sample(
+            ent_inct.wr, TransMode::Radiance, sampler.sample3());
         if(!bsdf_sample.f)
             return pixel;
 
-        coef *= bsdf_sample.f * std::abs(cos(ent_inct.geometry_coord.z, bsdf_sample.dir)) / bsdf_sample.pdf;
+        const real abscos = std::abs(cos(ent_inct.geometry_coord.z, bsdf_sample.dir));
+        coef *= bsdf_sample.f * abscos / bsdf_sample.pdf;
         r = Ray(ent_inct.eps_offset(bsdf_sample.dir), bsdf_sample.dir);
     }
 
     return pixel;
 }
 
-Pixel trace_ao(const AOParams &params, const Scene &scene, const Ray &ray, Sampler &sampler)
+Pixel trace_ao(
+    const AOParams &params, const Scene &scene, const Ray &ray, Sampler &sampler)
 {
     EntityIntersection inct;
     if(!scene.closest_intersection(ray, &inct))
-        return { params.background_color, {}, {}, 1 };
+        return { { {}, {}, 1 }, params.background_color };
 
     Spectrum pixel_albedo = params.high_color;
     Vec3     pixel_normal = inct.geometry_coord.z;
@@ -239,8 +266,10 @@ Pixel trace_ao(const AOParams &params, const Scene &scene, const Ray &ray, Sampl
     for(int i = 0; i < params.ao_sample_count; ++i)
     {
         const Sample2 sam = sampler.sample2();
-        const Vec3 local_dir = math::distribution::zweighted_on_hemisphere(sam.u, sam.v).first;
-        const Vec3 global_dir = inct.geometry_coord.local_to_global(local_dir).normalize();
+        const Vec3 local_dir = math::distribution
+                                    ::zweighted_on_hemisphere(sam.u, sam.v).first;
+        const Vec3 global_dir = inct.geometry_coord.local_to_global(local_dir)
+                                                   .normalize();
 
         const Vec3 end_pos = start_pos + global_dir * params.max_occlusion_distance;
         if(scene.visible(start_pos, end_pos))
@@ -249,12 +278,14 @@ Pixel trace_ao(const AOParams &params, const Scene &scene, const Ray &ray, Sampl
     ao_factor /= params.ao_sample_count;
 
     return {
-        lerp(params.low_color, params.high_color, math::saturate(ao_factor)),
-        pixel_albedo, pixel_normal, pixel_denoise
+        { pixel_albedo, pixel_normal, pixel_denoise },
+        lerp(params.low_color, params.high_color, math::saturate(ao_factor))
     };
 }
 
-Pixel trace_albedo_ao(const AlbedoAOParams &params, const Scene &scene, const Ray &ray, Sampler &sampler, Arena &arena)
+Pixel trace_albedo_ao(
+    const AlbedoAOParams &params, const Scene &scene, const Ray &ray,
+    Sampler &sampler, Arena &arena)
 {
     Pixel pixel;
 
@@ -283,8 +314,10 @@ Pixel trace_albedo_ao(const AlbedoAOParams &params, const Scene &scene, const Ra
     for(int i = 0; i < params.ao_sample_count; ++i)
     {
         const Sample2 sam = sampler.sample2();
-        const Vec3 local_dir = math::distribution::zweighted_on_hemisphere(sam.u, sam.v).first;
-        const Vec3 global_dir = inct.geometry_coord.local_to_global(local_dir).normalize();
+        const Vec3 local_dir = math::distribution
+                                    ::zweighted_on_hemisphere(sam.u, sam.v).first;
+        const Vec3 global_dir = inct.geometry_coord.local_to_global(local_dir)
+                                                   .normalize();
 
         const Vec3 end_pos = start_pos + global_dir * params.max_occlusion_distance;
         if(scene.visible(start_pos, end_pos))

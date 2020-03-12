@@ -16,7 +16,7 @@ struct DirectTransform
 
     Mat4 compose() const noexcept;
 
-    std::shared_ptr<tracer::ConfigArray> to_config() const;
+    RC<tracer::ConfigArray> to_config() const;
 };
 
 AGZ_EDITOR_END

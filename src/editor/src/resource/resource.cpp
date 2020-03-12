@@ -18,16 +18,16 @@ ObjectContext::ObjectContext(Editor *editor)
     init_texture2d_factory  (factory<tracer::Texture2D>());
     init_texture3d_factory  (factory<tracer::Texture3D>());
 
-    std::get<std::unique_ptr<ResourcePool<tracer::Material>>>(pools_) =
-        std::make_unique<MaterialPool>(*this, editor, "Ideal Diffuse");
-    std::get<std::unique_ptr<ResourcePool<tracer::Texture2D>>>(pools_) =
-        std::make_unique<Texture2DPool>(*this, editor, "Constant");
-    std::get<std::unique_ptr<ResourcePool<tracer::Texture3D>>>(pools_) =
-        std::make_unique<Texture3DPool>(*this, editor, "Constant");
-    std::get<std::unique_ptr<ResourcePool<tracer::Geometry>>>(pools_) =
-        std::make_unique<GeometryPool>(*this, editor, "Sphere");
-    std::get<std::unique_ptr<ResourcePool<tracer::Medium>>>(pools_) =
-        std::make_unique<MediumPool>(*this, editor, "Void");
+    std::get<Box<ResourcePool<tracer::Material>>>(pools_) =
+        newBox<MaterialPool>(*this, editor, "Ideal Diffuse");
+    std::get<Box<ResourcePool<tracer::Texture2D>>>(pools_) =
+        newBox<Texture2DPool>(*this, editor, "Constant");
+    std::get<Box<ResourcePool<tracer::Texture3D>>>(pools_) =
+        newBox<Texture3DPool>(*this, editor, "Constant");
+    std::get<Box<ResourcePool<tracer::Geometry>>>(pools_) =
+        newBox<GeometryPool>(*this, editor, "Sphere");
+    std::get<Box<ResourcePool<tracer::Medium>>>(pools_) =
+        newBox<MediumPool>(*this, editor, "Void");
 }
 
 AGZ_EDITOR_END

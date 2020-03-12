@@ -7,8 +7,9 @@ ParticleRenderer::ParticleRenderer(
     int worker_count, int task_grid_size, int init_pixel_size,
     int framebuffer_width, int framebuffer_height,
     bool enable_fast_rendering, int fast_resolution, int fast_task_size,
-    std::shared_ptr<const tracer::Scene> scene)
-    : framebuffer_(framebuffer_width, framebuffer_height, task_grid_size, init_pixel_size)
+    RC<const tracer::Scene> scene)
+    : framebuffer_(
+        framebuffer_width, framebuffer_height, task_grid_size, init_pixel_size)
 {
     worker_count_          = worker_count;
     framebuffer_width_     = framebuffer_width;
@@ -35,7 +36,8 @@ Image2D<Spectrum> ParticleRenderer::start()
         auto &particle_film_mutex = particle_film_mutex_[thread_idx];
         auto &particle_film       = particle_film_      [thread_idx];
 
-        Image2D<Spectrum> local_particle_film(film_filter_->height(), film_filter_->width());
+        Image2D<Spectrum> local_particle_film(
+            film_filter_->height(), film_filter_->width());
         auto local_particle_film_view = film_filter_->create_subgrid_view(
             { { 0, 0 }, { film_filter_->width() - 1, film_filter_->height() - 1 } },
             local_particle_film);
@@ -54,7 +56,8 @@ Image2D<Spectrum> ParticleRenderer::start()
             const int task_count = framebuffer_.get_tasks(2, tasks);
 
             for(int i = 0; i < task_count; ++i)
-                local_particle_count += exec_render_task(tasks[i], *sampler, local_particle_film_view);
+                local_particle_count += exec_render_task(
+                    tasks[i], *sampler, local_particle_film_view);
 
             framebuffer_.merge_tasks(task_count, tasks.data());
 
@@ -73,15 +76,15 @@ Image2D<Spectrum> ParticleRenderer::start()
 
     const auto ret = do_fast_rendering();
 
-    const auto sampler_prototype = std::make_shared<tracer::Sampler>(0, true);
+    const auto sampler_prototype = newRC<tracer::Sampler>(0, true);
     const int worker_count = thread::actual_worker_count(worker_count_);
 
-    film_filter_ = std::make_unique<tracer::FilmFilterApplier>(
+    film_filter_ = newBox<tracer::FilmFilterApplier>(
         framebuffer_width_, framebuffer_height_,
         tracer::create_box_filter(real(0.5)));
 
     particle_film_.resize(worker_count);
-    particle_film_mutex_ = std::make_unique<std::mutex[]>(worker_count);
+    particle_film_mutex_ = newBox<std::mutex[]>(worker_count);
 
     for(int i = 0; i < worker_count; ++i)
     {
@@ -95,7 +98,8 @@ Image2D<Spectrum> ParticleRenderer::start()
     {
         const std::chrono::milliseconds wait_ms(20);
 
-        Image2D<Spectrum> particle_output(framebuffer_height_, framebuffer_width_);
+        Image2D<Spectrum> particle_output(
+            framebuffer_height_, framebuffer_width_);
 
         for(;;)
         {
@@ -121,7 +125,8 @@ Image2D<Spectrum> ParticleRenderer::start()
                     particle_output += particle_film_[i];
             }
 
-            const real particle_ratio = real(framebuffer_width_ * framebuffer_height_) / total_particle_count_;
+            const real particle_ratio = real(
+                framebuffer_width_ * framebuffer_height_) / total_particle_count_;
 
             for(int y = 0; y < framebuffer_height_; ++y)
             {
@@ -129,7 +134,8 @@ Image2D<Spectrum> ParticleRenderer::start()
                     return;
 
                 for(int x = 0; x < framebuffer_width_; ++x)
-                    framebuffer_output(y, x) += particle_ratio * particle_output(y, x);
+                    framebuffer_output(y, x) += particle_ratio
+                                              * particle_output(y, x);
             }
 
             ++global_particle_film_version_;
@@ -169,24 +175,29 @@ Image2D<Spectrum> ParticleRenderer::do_fast_rendering()
     if(!enable_fast_rendering_)
         return {};
 
-    const real target_ratio = static_cast<real>(framebuffer_width_) / framebuffer_height_;
+    const real target_ratio = static_cast<real>(framebuffer_width_)
+                            / framebuffer_height_;
 
     int small_width, small_height;
     if(target_ratio < 1)
     {
-        small_width = (std::max)(1, static_cast<int>(std::floor(fast_resolution_ * target_ratio)));
+        small_width = (std::max)(
+            1, static_cast<int>(std::floor(fast_resolution_ * target_ratio)));
         small_height = fast_resolution_;
     }
     else
     {
         small_width = fast_resolution_;
-        small_height = (std::max)(1, static_cast<int>(std::floor(fast_resolution_ / target_ratio)));
+        small_height = (std::max)(
+            1, static_cast<int>(std::floor(fast_resolution_ / target_ratio)));
     }
 
     Image2D<Spectrum> small_target(small_height, small_width);
 
-    const int x_task_count = (small_width + fast_task_grid_size_ - 1) / fast_task_grid_size_;
-    const int y_task_count = (small_height + fast_task_grid_size_ - 1) / fast_task_grid_size_;
+    const int x_task_count = (small_width + fast_task_grid_size_ - 1)
+                           / fast_task_grid_size_;
+    const int y_task_count = (small_height + fast_task_grid_size_ - 1)
+                           / fast_task_grid_size_;
     const int total_task_count = x_task_count * y_task_count;
     std::atomic<int> next_task_id = 0;
 
@@ -212,15 +223,18 @@ Image2D<Spectrum> ParticleRenderer::do_fast_rendering()
             const int x_beg = x_task_id * fast_task_grid_size_;
             const int y_beg = y_task_id * fast_task_grid_size_;
 
-            const int x_end = (std::min)(x_beg + fast_task_grid_size_, small_target.width());
-            const int y_end = (std::min)(y_beg + fast_task_grid_size_, small_target.height());
+            const int x_end = (std::min)(
+                x_beg + fast_task_grid_size_, small_target.width());
+            const int y_end = (std::min)(
+                y_beg + fast_task_grid_size_, small_target.height());
 
-            exec_fast_render_task(small_target, { x_beg, y_beg }, { x_end, y_end }, *sampler);
+            exec_fast_render_task(
+                small_target, { x_beg, y_beg }, { x_end, y_end }, *sampler);
         }
     };
 
     const int worker_count = thread::actual_worker_count(worker_count_);
-    auto sampler_prototype = std::make_shared<tracer::Sampler>(42, true);
+    auto sampler_prototype = newRC<tracer::Sampler>(42, true);
 
     Arena sampler_arena;
     std::vector<std::thread> threads;
@@ -237,7 +251,8 @@ Image2D<Spectrum> ParticleRenderer::do_fast_rendering()
 }
 
 void ParticleRenderer::exec_fast_render_task(
-    Image2D<Spectrum> &target, const Vec2i &beg, const Vec2i &end, tracer::Sampler &sampler)
+    Image2D<Spectrum> &target, const Vec2i &beg, const Vec2i &end,
+    tracer::Sampler &sampler)
 {
     using namespace tracer;
 
@@ -255,10 +270,12 @@ void ParticleRenderer::exec_fast_render_task(
             const real film_x = pixel_x / target.width();
             const real film_y = pixel_y / target.height();
 
-            const auto cam_ray = camera->sample_we({ film_x, film_y }, sampler.sample2());
+            const auto cam_ray = camera->sample_we(
+                { film_x, film_y }, sampler.sample2());
 
             const Ray ray(cam_ray.pos_on_cam, cam_ray.pos_to_out);
-            const Spectrum radiance = cam_ray.throughput * fast_render_pixel(*scene_, ray, sampler, arena);
+            const Spectrum radiance = cam_ray.throughput
+                                    * fast_render_pixel(*scene_, ray, sampler, arena);
 
             if(arena.used_bytes() > 4 * 1024 * 1024)
                 arena.release();
@@ -298,7 +315,8 @@ uint64_t ParticleRenderer::exec_render_task(
                 const real film_x = pixel_x / task.full_res.x;
                 const real film_y = pixel_y / task.full_res.y;
 
-                auto cam_ray = camera->sample_we({ film_x, film_y }, sampler.sample2());
+                auto cam_ray = camera->sample_we(
+                    { film_x, film_y }, sampler.sample2());
 
                 const Ray ray(cam_ray.pos_on_cam, cam_ray.pos_to_out);
                 const Spectrum radiance = cam_ray.throughput * this->render_pixel(

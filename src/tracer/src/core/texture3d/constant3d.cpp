@@ -66,11 +66,11 @@ public:
     }
 };
 
-std::shared_ptr<Texture3D> create_constant3d_texture(
+RC<Texture3D> create_constant3d_texture(
     const Texture3DCommonParams &common_params,
     const Spectrum &texel)
 {
-    return std::make_shared<Constant3D>(common_params, texel);
+    return newRC<Constant3D>(common_params, texel);
 }
 
 AGZ_TRACER_END

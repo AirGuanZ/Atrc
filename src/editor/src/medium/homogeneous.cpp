@@ -35,7 +35,8 @@ HomogeneousWidget::HomogeneousWidget(const InitData &init_data)
         set_dirty_flag();
     });
 
-    connect(max_scattering_count_, qOverload<int>(&QSpinBox::valueChanged), [=](int)
+    connect(max_scattering_count_, qOverload<int>(&QSpinBox::valueChanged),
+        [=](int)
     {
         set_dirty_flag();
     });
@@ -93,13 +94,16 @@ void HomogeneousWidget::load_asset(AssetLoader &loader)
     do_update_tracer_object();
 }
 
-std::shared_ptr<tracer::ConfigNode> HomogeneousWidget::to_config(JSONExportContext &ctx) const
+RC<tracer::ConfigNode> HomogeneousWidget::to_config(
+    JSONExportContext &ctx) const
 {
-    auto grp = std::make_shared<tracer::ConfigGroup>();
+    auto grp = newRC<tracer::ConfigGroup>();
     grp->insert_str("type", "homogeneous");
 
-    grp->insert_child("sigma_a", tracer::ConfigArray::from_spectrum(sigma_a_->get_value()));
-    grp->insert_child("sigma_s", tracer::ConfigArray::from_spectrum(sigma_s_->get_value()));
+    grp->insert_child(
+        "sigma_a", tracer::ConfigArray::from_spectrum(sigma_a_->get_value()));
+    grp->insert_child(
+        "sigma_s", tracer::ConfigArray::from_spectrum(sigma_s_->get_value()));
     grp->insert_real("g", g_->value());
 
     grp->insert_int("max_scattering_count", max_scattering_count_->value());
@@ -123,7 +127,8 @@ void HomogeneousWidget::do_update_tracer_object()
         sigma_a, sigma_s, g, max_scattering_count);
 }
 
-ResourceWidget<tracer::Medium> *HomogeneousWidgetCreator::create_widget(ObjectContext &obj_ctx) const
+ResourceWidget<tracer::Medium> *HomogeneousWidgetCreator::create_widget(
+    ObjectContext &obj_ctx) const
 {
     return new HomogeneousWidget({});
 }

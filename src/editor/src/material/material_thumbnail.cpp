@@ -7,7 +7,7 @@ namespace
 {
     class MaterialThumbnailEnvLight
     {
-        std::shared_ptr<const tracer::EnvirLight> env_light_;
+        RC<const tracer::EnvirLight> env_light_;
 
     public:
 
@@ -18,7 +18,7 @@ namespace
             };
 
             auto tex_data = img::load_rgb_from_hdr_memory(data, sizeof(data));
-            auto img_data = std::make_shared<Image2D<math::color3f>>(std::move(tex_data));
+            auto img_data = newRC<Image2D<math::color3f>>(std::move(tex_data));
             auto tex = tracer::create_hdr_texture({}, img_data, "linear");
             env_light_ = create_ibl_light(tex);
         }
@@ -36,7 +36,8 @@ namespace
     {
         Spectrum bsdf_illum, light_illum;
 
-        const auto bsdf_sample = bsdf->sample(wo, tracer::TransportMode::Radiance, sampler.sample3());
+        const auto bsdf_sample = bsdf->sample(
+            wo, tracer::TransMode::Radiance, sampler.sample3());
         if(!bsdf_sample.f.is_black())
         {
             const real cos_v = std::abs(cos(bsdf_sample.dir, nor));
@@ -47,7 +48,8 @@ namespace
             else
             {
                 const real env_pdf = light->pdf({}, bsdf_sample.dir);
-                bsdf_illum = bsdf_sample.f * cos_v * env / (bsdf_sample.pdf + env_pdf);
+                bsdf_illum = bsdf_sample.f * cos_v * env
+                           / (bsdf_sample.pdf + env_pdf);
             }
         }
 
@@ -55,11 +57,12 @@ namespace
         if(!light_sample.radiance.is_black())
         {
             const Vec3 wi = light_sample.ref_to_light();
-            const Spectrum f = bsdf->eval(wi, wo, tracer::TransportMode::Radiance);
+            const Spectrum f = bsdf->eval(wi, wo, tracer::TransMode::Radiance);
             const real cos_v = std::abs(cos(wi, nor));
             const real bsdf_pdf = bsdf->pdf(wi, wo);
 
-            light_illum = light_sample.radiance * f * cos_v / (light_sample.pdf + bsdf_pdf);
+            light_illum = light_sample.radiance * f * cos_v
+                        / (light_sample.pdf + bsdf_pdf);
         }
 
         return bsdf_illum + light_illum;
@@ -118,7 +121,8 @@ void MaterialThumbnailProvider::run_one_iter(int spp)
                     for(int j = 0; j < 4; ++j)
                     {
                         color += illum(
-                            { 0, -1, 0 }, spt.geometry_coord.z, shd.bsdf, env, *sampler_);
+                            { 0, -1, 0 }, spt.geometry_coord.z,
+                            shd.bsdf, env, *sampler_);
                     }
                     accum_color_(y, x) += real(0.25) * color;
                 }
@@ -161,7 +165,8 @@ QPixmap MaterialThumbnailProvider::compute_pixmap()
 }
 
 MaterialThumbnailProvider::MaterialThumbnailProvider(
-    int width, int height, std::shared_ptr<const tracer::Material> mat, int iter_spp, int iter_count)
+    int width, int height, RC<const tracer::Material> mat,
+    int iter_spp, int iter_count)
     : width_(width), height_(height), mat_(std::move(mat)), exit_(false)
 {
     iter_spp_ = iter_spp;
@@ -184,7 +189,7 @@ QPixmap MaterialThumbnailProvider::start()
     assert(!exit_);
 
     accum_color_.initialize(height_, width_, Spectrum());
-    sampler_ = std::make_shared<tracer::Sampler>(42, false);
+    sampler_ = newRC<tracer::Sampler>(42, false);
 
     run_one_iter(1);
     auto ret = compute_pixmap();

@@ -4,7 +4,8 @@
 #include <agz/tracer/tracer.h>
 
 GUIProgressReporter::GUIProgressReporter(Clock::duration update_preview_interval)
-    : update_preview_interval_(update_preview_interval), last_update_preview_time_(Clock::now())
+    : update_preview_interval_(update_preview_interval),
+      last_update_preview_time_(Clock::now())
 {
 
 }
@@ -14,7 +15,8 @@ bool GUIProgressReporter::need_image_preview() const noexcept
     return true;
 }
 
-void GUIProgressReporter::progress(double percent, const PreviewFunc &get_image_preview)
+void GUIProgressReporter::progress(
+    double percent, const PreviewFunc &get_image_preview)
 {
     if(percent > percent_)
     {
@@ -22,7 +24,9 @@ void GUIProgressReporter::progress(double percent, const PreviewFunc &get_image_
         emit update_pbar(percent_);
     }
 
-    if(get_image_preview && (Clock::now() - last_update_preview_time_ >= update_preview_interval_ || percent_ >= 100))
+    const auto delta_t = Clock::now() - last_update_preview_time_;
+    const bool its_update_time = delta_t >= update_preview_interval_;
+    if(get_image_preview && (its_update_time || percent_ >= 100))
     {
         last_update_preview_time_ = Clock::now();
 

@@ -33,7 +33,8 @@ struct LightSampleResult
 /**
  * @brief return value when sampling light wi fails
  */
-inline const LightSampleResult LIGHT_SAMPLE_RESULT_NULL = { { }, { }, { }, { }, 0 };
+inline const LightSampleResult LIGHT_SAMPLE_RESULT_NULL =
+    { { }, { }, { }, { }, 0 };
 
 /**
  * @brief result of sampling light emission
@@ -95,7 +96,8 @@ public:
     /**
      * @brief sample light wi at ref
      */
-    virtual LightSampleResult sample(const Vec3 &ref, const Sample5 &sam) const noexcept = 0;
+    virtual LightSampleResult sample(
+        const Vec3 &ref, const Sample5 &sam) const noexcept = 0;
 
     /**
      * @brief sample emission
@@ -107,7 +109,8 @@ public:
     /**
      * @brief pdf of sample_emit
      */
-    virtual LightEmitPDFResult emit_pdf(const Vec3 &position, const Vec3 &direction, const Vec3 &normal) const noexcept = 0;
+    virtual LightEmitPDFResult emit_pdf(
+        const Vec3 &pos, const Vec3 &dir, const Vec3 &nor) const noexcept = 0;
 
     /**
      * @brief emission power
@@ -133,7 +136,9 @@ public:
      * @param nor normal at pos
      * @param light_to_out direction from light source to outside
      */
-    virtual Spectrum radiance(const Vec3 &pos, const Vec3 &nor, const Vec2 &uv, const Vec3 &light_to_out) const noexcept = 0;
+    virtual Spectrum radiance(
+        const Vec3 &pos, const Vec3 &nor, const Vec2 &uv,
+        const Vec3 &light_to_out) const noexcept = 0;
 
     /**
      * @brief pdf of sample_wi (w.r.t. solid angle)
@@ -141,7 +146,8 @@ public:
      * @param ref reference point
      * @param spt point on light source
      */
-    virtual real pdf(const Vec3 &ref, const SurfacePoint &spt) const noexcept = 0;
+    virtual real pdf(
+        const Vec3 &ref, const SurfacePoint &spt) const noexcept = 0;
 };
 
 /**
@@ -167,19 +173,22 @@ public:
      * @param ref_to_light direction from outside to light source
      * @return radiance from light source to outside
      */
-    virtual Spectrum radiance(const Vec3 &ref, const Vec3 &ref_to_light) const noexcept = 0;
+    virtual Spectrum radiance(
+        const Vec3 &ref, const Vec3 &ref_to_light) const noexcept = 0;
 
     /**
      * @brief pdf of sample_wi (w.r.t. solid angle)
      */
-    virtual real pdf(const Vec3 &ref, const Vec3 &ref_to_light) const noexcept = 0;
+    virtual real pdf(
+        const Vec3 &ref, const Vec3 &ref_to_light) const noexcept = 0;
 
     /**
-     * @brief find the emitting position according to outside point and emitting direction
+     * @brief find the emitting pos according to ref point and emitting dir
      *
      * used in bidirectional rendering algorithms
      */
-    virtual LightEmitPosResult emit_pos(const Vec3 &ref, const Vec3 &ref_to_light) const noexcept = 0;
+    virtual LightEmitPosResult emit_pos(
+        const Vec3 &ref, const Vec3 &ref_to_light) const noexcept = 0;
 
     /**
      * @brief preprocess before the rendering start

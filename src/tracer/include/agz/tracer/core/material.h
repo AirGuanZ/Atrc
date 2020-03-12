@@ -15,7 +15,8 @@ public:
     virtual ~Material() = default;
 
     /** @brief entity intersection -> shading point */
-    virtual ShadingPoint shade(const SurfacePoint &inct, Arena &arena) const = 0;
+    virtual ShadingPoint shade(
+        const SurfacePoint &inct, Arena &arena) const = 0;
 };
 
 /**
@@ -23,13 +24,13 @@ public:
  */
 class NormalMapper : public misc::uncopyable_t
 {
-    std::shared_ptr<const Texture2D> normal_map_;
+    RC<const Texture2D> normal_map_;
 
 public:
 
     NormalMapper() = default;
 
-    explicit NormalMapper(std::shared_ptr<Texture2D> normal_map) noexcept
+    explicit NormalMapper(RC<Texture2D> normal_map) noexcept
         : normal_map_(std::move(normal_map))
     {
         

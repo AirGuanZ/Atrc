@@ -20,7 +20,9 @@ public:
     struct CloneState
     {
         QString filename;
-        std::shared_ptr<const Image2D<math::color3f>> img_data;
+        RC<const Image2D<math::color3f>> img_data;
+
+        QString sample_method = "Linear";
 
         Texture2DCommonParamsWidget *adv = nullptr;
     };
@@ -29,13 +31,14 @@ public:
 
     ResourceWidget<tracer::Texture2D> *clone() override;
 
-    std::unique_ptr<ResourceThumbnailProvider> get_thumbnail(int width, int height) const override;
+    Box<ResourceThumbnailProvider> get_thumbnail(
+        int width, int height) const override;
 
     void save_asset(AssetSaver &saver) override;
 
     void load_asset(AssetLoader &loader) override;
 
-    std::shared_ptr<tracer::ConfigNode> to_config(JSONExportContext &ctx) const override;
+    RC<tracer::ConfigNode> to_config(JSONExportContext &ctx) const override;
 
 protected:
 
@@ -50,13 +53,15 @@ private:
     void browse_filename();
 
     QString filename_;
-    std::shared_ptr<const Image2D<math::color3f>> img_data_;
+    RC<const Image2D<math::color3f>> img_data_;
 
     QVBoxLayout *layout_ = nullptr;
 
     ElidedLabel *filename_label_   = nullptr;
     QPushButton *filename_button_  = nullptr;
     QPushButton *preview_button_  = nullptr;
+
+    QComboBox *sample_method_ = nullptr;
 
     Collapsible                 *adv_section_ = nullptr;
     Texture2DCommonParamsWidget *adv_widget_  = nullptr;
@@ -68,7 +73,8 @@ public:
 
     QString name() const override { return "HDR"; }
 
-    ResourceWidget<tracer::Texture2D> *create_widget(ObjectContext &obj_ctx) const override;
+    ResourceWidget<tracer::Texture2D> *create_widget(
+        ObjectContext &obj_ctx) const override;
 };
 
 AGZ_EDITOR_END

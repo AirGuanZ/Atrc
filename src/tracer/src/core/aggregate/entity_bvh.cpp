@@ -39,7 +39,7 @@ class EntityBVH : public Aggregate
     std::vector<Node> nodes_;
     std::vector<EntityPtr> prims_;
 
-    std::vector<std::shared_ptr<const Entity>> entities_;
+    std::vector<RC<const Entity>> entities_;
     
     int max_leaf_size_ = 5;
 
@@ -86,8 +86,10 @@ class EntityBVH : public Aggregate
         std::sort(entities, entities + count,
             [split_axis](const EntityRecord &lhs, const EntityRecord &rhs)
         {
-            const real L = lhs.bound.low[split_axis] + lhs.bound.high[split_axis];
-            const real R = rhs.bound.low[split_axis] + rhs.bound.high[split_axis];
+            const real L = lhs.bound.low[split_axis] +
+                           lhs.bound.high[split_axis];
+            const real R = rhs.bound.low[split_axis] +
+                           rhs.bound.high[split_axis];
             return L < R;
         });
 
@@ -100,7 +102,8 @@ class EntityBVH : public Aggregate
 
         const size_t split_idx = count / 2;
         const size_t left_idx  = build_aux(entities, split_idx);
-        const size_t right_idx = build_aux(entities + split_idx, count - split_idx);
+        const size_t right_idx = build_aux(
+            entities + split_idx, count - split_idx);
 
         // fill interior node
 
@@ -112,7 +115,8 @@ class EntityBVH : public Aggregate
         return interior_idx;
     }
 
-    bool has_intersection_aux(const Vec3 &inv_dir, const Ray &r, const Node &node) const noexcept
+    bool has_intersection_aux(
+        const Vec3 &inv_dir, const Ray &r, const Node &node) const noexcept
     {
         if(const Leaf *leaf = node.as_if<Leaf>())
         {
@@ -134,7 +138,9 @@ class EntityBVH : public Aggregate
                has_intersection_aux(inv_dir, r, nodes_[interior.right]);
     }
 
-    bool closest_intersection_aux(const Vec3 &inv_dir, Ray &r, const Node &node, EntityIntersection *inct) const noexcept
+    bool closest_intersection_aux(
+        const Vec3 &inv_dir, Ray &r, const Node &node,
+        EntityIntersection *inct) const noexcept
     {
         if(const Leaf *leaf = node.as_if<Leaf>())
         {
@@ -157,8 +163,11 @@ class EntityBVH : public Aggregate
         if(!interior.bound.intersect(r.o, inv_dir, r.t_min, r.t_max))
             return false;
 
-        const bool left = closest_intersection_aux(inv_dir, r, nodes_[interior.left], inct);
-        const bool right = closest_intersection_aux(inv_dir, r, nodes_[interior.right], inct);
+        const bool left  = closest_intersection_aux(
+            inv_dir, r, nodes_[interior.left], inct);
+        const bool right = closest_intersection_aux(
+            inv_dir, r, nodes_[interior.right], inct);
+
         return left || right;
     }
 
@@ -171,7 +180,7 @@ public:
             throw ObjectConstructionException("invalid max_leaf_size value");
     }
 
-    void build(const std::vector<std::shared_ptr<const Entity>> &entities) override
+    void build(const std::vector<RC<const Entity>> &entities) override
     {
         nodes_.clear();
         prims_.clear();
@@ -197,7 +206,8 @@ public:
         return has_intersection_aux(inv_dir, r, nodes_[0]);
     }
 
-    bool closest_intersection(const Ray &r, EntityIntersection *inct) const noexcept override
+    bool closest_intersection(
+        const Ray &r, EntityIntersection *inct) const noexcept override
     {
         Vec3 inv_dir(1 / r.d.x, 1 / r.d.y, 1 / r.d.z);
         Ray ray = r;
@@ -205,9 +215,9 @@ public:
     }
 };
 
-std::shared_ptr<Aggregate> create_entity_bvh(int max_leaf_size)
+RC<Aggregate> create_entity_bvh(int max_leaf_size)
 {
-    return std::make_shared<EntityBVH>(max_leaf_size);
+    return newRC<EntityBVH>(max_leaf_size);
 }
 
 AGZ_TRACER_END

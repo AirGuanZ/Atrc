@@ -42,12 +42,14 @@ public:
     /**
      * @brief transmittance between two points
      */
-    virtual Spectrum tr(const Vec3 &a, const Vec3 &b, Sampler &sampler) const noexcept = 0;
+    virtual Spectrum tr(
+        const Vec3 &a, const Vec3 &b, Sampler &sampler) const noexcept = 0;
 
     /**
      * @brief sample out-scattering event from a to b
      */
-    virtual SampleOutScatteringResult sample_scattering(const Vec3 &a, const Vec3 &b, Sampler &sampler, Arena &arena) const = 0;
+    virtual SampleOutScatteringResult sample_scattering(
+        const Vec3 &a, const Vec3 &b, Sampler &sampler, Arena &arena) const = 0;
 };
 
 /**
@@ -55,8 +57,8 @@ public:
  */
 struct MediumInterface
 {
-    std::shared_ptr<const Medium> in;
-    std::shared_ptr<const Medium> out;
+    RC<const Medium> in;
+    RC<const Medium> out;
 };
 
 AGZ_TRACER_END

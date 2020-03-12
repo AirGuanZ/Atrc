@@ -19,7 +19,8 @@ public:
         init_transform(local_to_world);
         radius_ = radius;
         if(radius_ <= 0)
-            throw ObjectConstructionException("invalid sphere radius: " + std::to_string(radius_));
+            throw ObjectConstructionException(
+                "invalid sphere radius: " + std::to_string(radius_));
         world_radius_ = local_to_world_ratio_ * radius_;
 
         AGZ_HIERARCHY_WRAP("in initializing sphere")
@@ -31,7 +32,8 @@ public:
         return sphere::has_intersection(local_r, radius_);
     }
 
-    bool closest_intersection(const Ray &r, GeometryIntersection *inct) const noexcept override
+    bool closest_intersection(
+        const Ray &r, GeometryIntersection *inct) const noexcept override
     {
         const Ray local_r = to_local(r);
 
@@ -76,7 +78,8 @@ public:
     {
         assert(pdf);
 
-        const auto [unit_pos, unit_pdf] = math::distribution::uniform_on_sphere(sam.u, sam.v);
+        const auto [unit_pos, unit_pdf] = math::distribution
+                                            ::uniform_on_sphere(sam.u, sam.v);
         *pdf = unit_pdf / (world_radius_ * world_radius_);
         const Vec3 pos = radius_ * unit_pos;
 
@@ -94,7 +97,8 @@ public:
         return spt;
     }
 
-    SurfacePoint sample(const Vec3 &ref, real *pdf, const Sample3 &sam) const noexcept override
+    SurfacePoint sample(
+        const Vec3 &ref, real *pdf, const Sample3 &sam) const noexcept override
     {
         const Vec3 local_ref = local_to_world_.apply_inverse_to_point(ref);
         const real d = local_ref.length();
@@ -102,8 +106,11 @@ public:
             return sample(pdf, sam);
 
         const real cos_theta = (std::min)(radius_ / d, real(1));
-        const auto [dir, l_pdf] = math::distribution::uniform_on_cone(cos_theta, sam.u, sam.v);
-        const Vec3 pos = radius_ * Coord::from_z(local_ref).local_to_global(dir).normalize();
+        const auto [dir, l_pdf] = math::distribution
+                                    ::uniform_on_cone(cos_theta, sam.u, sam.v);
+                                    
+        const Vec3 pos = radius_ *
+                         Coord::from_z(local_ref).local_to_global(dir).normalize();
 
         Vec2 geometry_uv; Coord geometry_coord;
         sphere::local_geometry_uv_and_coord(
@@ -136,14 +143,16 @@ public:
 
         const real cos_theta = (std::min)(radius_ / d, real(1));
         const real world_radius_square = world_radius_ * world_radius_;
-        return math::distribution::uniform_on_cone_pdf(cos_theta) / world_radius_square;
+        
+        return math::distribution::uniform_on_cone_pdf(
+            cos_theta) / world_radius_square;
     }
 };
 
-std::shared_ptr<Geometry> create_sphere(
+RC<Geometry> create_sphere(
     real radius, const Transform3 &local_to_world)
 {
-    return std::make_shared<Sphere>(radius, local_to_world);
+    return newRC<Sphere>(radius, local_to_world);
 }
 
 AGZ_TRACER_END

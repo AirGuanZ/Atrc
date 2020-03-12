@@ -3,7 +3,7 @@
 AGZ_EDITOR_BEGIN
 
 ParticleTracer::ParticleTracer(
-    const Params &params, int width, int height, std::shared_ptr<const tracer::Scene> scene)
+    const Params &params, int width, int height, RC<const tracer::Scene> scene)
     : ParticleRenderer(params.worker_count, params.task_grid_size, 3,
                        width, height, params.enable_preview, 128, 32, scene)
 {
@@ -26,14 +26,17 @@ ParticleTracer::~ParticleTracer()
 }
 
 Spectrum ParticleTracer::fast_render_pixel(
-    const tracer::Scene &scene, const tracer::Ray &ray, tracer::Sampler &sampler, tracer::Arena &arena)
+    const tracer::Scene &scene, const tracer::Ray &ray,
+    tracer::Sampler &sampler, tracer::Arena &arena)
 {
     return trace_std(preview_params_, scene, ray, sampler, arena).value;
 }
 
 Spectrum ParticleTracer::render_pixel(
-    const tracer::Scene &scene, const tracer::Ray &ray, tracer::Sampler &sampler,
-    tracer::Arena &arena, tracer::FilmFilterApplier::FilmGridView<Spectrum> &particle_film, uint64_t *particle_count)
+    const tracer::Scene &scene, const tracer::Ray &ray,
+    tracer::Sampler &sampler, tracer::Arena &arena,
+    tracer::FilmFilterApplier::FilmGridView<Spectrum> &particle_film,
+    uint64_t *particle_count)
 {
     using namespace tracer;
 

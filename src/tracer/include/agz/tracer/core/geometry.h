@@ -24,11 +24,12 @@ public:
      * @brief find closest intersection with given ray
      *
      * @param r ray
-     * @param inct intersection information. only be modified when true is returned
+     * @param inct intersection. only be modified when true is returned
      *
      * @return whether there is an intersection
      */
-    virtual bool closest_intersection(const Ray &r, GeometryIntersection *inct) const noexcept = 0;
+    virtual bool closest_intersection(
+        const Ray &r, GeometryIntersection *inct) const noexcept = 0;
 
     /**
      * @brief aabb in world space
@@ -47,7 +48,8 @@ public:
      * 
      * @param pdf w.r.t. surface area
      */
-    virtual SurfacePoint sample(real *pdf, const Sample3 &sam) const noexcept = 0;
+    virtual SurfacePoint sample(
+        real *pdf, const Sample3 &sam) const noexcept = 0;
 
     /**
      * @brief pdf of sample
@@ -60,7 +62,8 @@ public:
      * @param ref reference point. returned point must be visible from ref
      * @param pdf pdf w.r.t. surface area
      */
-    virtual SurfacePoint sample(const Vec3 &ref, real *pdf, const Sample3 &sam) const noexcept = 0;
+    virtual SurfacePoint sample(
+        const Vec3 &ref, real *pdf, const Sample3 &sam) const noexcept = 0;
 
     /**
      *

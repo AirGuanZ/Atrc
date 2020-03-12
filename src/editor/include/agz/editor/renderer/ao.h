@@ -23,15 +23,20 @@ public:
         bool enable_preview = true;
     };
 
-    AO(const Params &params, int fb_width, int fb_height, std::shared_ptr<const tracer::Scene> scene);
+    AO(const Params &params, int fb_width, int fb_height,
+       RC<const tracer::Scene> scene);
 
     ~AO();
 
 protected:
 
-    Spectrum fast_render_pixel(const tracer::Scene &scene, const tracer::Ray &ray, tracer::Sampler &sampler, tracer::Arena &arena) override;
+    Spectrum fast_render_pixel(
+        const tracer::Scene &scene, const tracer::Ray &ray,
+        tracer::Sampler &sampler, tracer::Arena &arena) override;
 
-    Spectrum render_pixel(const tracer::Scene &scene, const tracer::Ray &ray, tracer::Sampler &sampler, tracer::Arena &arena) override;
+    Spectrum render_pixel(
+        const tracer::Scene &scene, const tracer::Ray &ray,
+        tracer::Sampler &sampler, tracer::Arena &arena) override;
 
 private:
 

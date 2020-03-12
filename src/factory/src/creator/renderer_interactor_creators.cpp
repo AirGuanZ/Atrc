@@ -15,7 +15,7 @@ namespace reporter
             return "stdout";
         }
 
-        std::shared_ptr<RendererInteractor> create(const ConfigGroup &params, CreatingContext &context) const override
+        RC<RendererInteractor> create(const ConfigGroup &params, CreatingContext &context) const override
         {
             return create_stdout_reporter();
         }
@@ -30,7 +30,7 @@ namespace reporter
             return "noout";
         }
 
-        std::shared_ptr<RendererInteractor> create(const ConfigGroup &params, CreatingContext &context) const override
+        RC<RendererInteractor> create(const ConfigGroup &params, CreatingContext &context) const override
         {
             return create_noout_reporter();
         }
@@ -40,8 +40,8 @@ namespace reporter
 
 void initialize_renderer_interactor_factory(Factory<RendererInteractor> &factory)
 {
-    factory.add_creator(std::make_unique<reporter::StdOutCreator>());
-    factory.add_creator(std::make_unique<reporter::NoOutCreator>());
+    factory.add_creator(newBox<reporter::StdOutCreator>());
+    factory.add_creator(newBox<reporter::NoOutCreator>());
 }
 
 AGZ_TRACER_FACTORY_END

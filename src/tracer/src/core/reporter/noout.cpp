@@ -45,9 +45,9 @@ public:
     }
 };
 
-std::shared_ptr<RendererInteractor> create_noout_reporter()
+RC<RendererInteractor> create_noout_reporter()
 {
-    return std::make_shared<NoOutput>();
+    return newRC<NoOutput>();
 }
 
 AGZ_TRACER_END

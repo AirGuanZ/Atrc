@@ -4,7 +4,8 @@
 
 AGZ_EDITOR_BEGIN
 
-HeterogeneousWidget::HeterogeneousWidget(const InitData &init_data, ObjectContext &obj_ctx)
+HeterogeneousWidget::HeterogeneousWidget(
+    const InitData &init_data, ObjectContext &obj_ctx)
     : obj_ctx_(obj_ctx)
 {
     transform_ = init_data.transform;
@@ -51,7 +52,8 @@ HeterogeneousWidget::HeterogeneousWidget(const InitData &init_data, ObjectContex
         set_dirty_flag();
     });
 
-    connect(max_scattering_count_, qOverload<int>(&QSpinBox::valueChanged), [=](int)
+    connect(max_scattering_count_, qOverload<int>(&QSpinBox::valueChanged),
+        [=](int)
     {
         set_dirty_flag();
     });
@@ -96,9 +98,10 @@ ResourceWidget<tracer::Medium> *HeterogeneousWidget::clone()
     return new HeterogeneousWidget(init_data, obj_ctx_);
 }
 
-std::unique_ptr<ResourceThumbnailProvider> HeterogeneousWidget::get_thumbnail(int width, int height) const
+Box<ResourceThumbnailProvider> HeterogeneousWidget::get_thumbnail(
+    int width, int height) const
 {
-    return std::make_unique<EmptyResourceThumbnailProvider>(width, height);
+    return newBox<EmptyResourceThumbnailProvider>(width, height);
 }
 
 void HeterogeneousWidget::save_asset(AssetSaver &saver)
@@ -125,9 +128,10 @@ void HeterogeneousWidget::load_asset(AssetLoader &loader)
     do_update_tracer_object();
 }
 
-std::shared_ptr<tracer::ConfigNode> HeterogeneousWidget::to_config(JSONExportContext &ctx) const
+RC<tracer::ConfigNode> HeterogeneousWidget::to_config(
+    JSONExportContext &ctx) const
 {
-    auto grp = std::make_shared<tracer::ConfigGroup>();
+    auto grp = newRC<tracer::ConfigGroup>();
     grp->insert_str("type", "heterogeneous");
 
     grp->insert_child("transform", transform_->to_config());
@@ -157,7 +161,8 @@ void HeterogeneousWidget::do_update_tracer_object()
         transform, density, albedo, g, max_scattering_count);
 }
 
-ResourceWidget<tracer::Medium> *HeterogeneousWidgetCreator::create_widget(ObjectContext &obj_ctx) const
+ResourceWidget<tracer::Medium> *HeterogeneousWidgetCreator::create_widget(
+    ObjectContext &obj_ctx) const
 {
     return new HeterogeneousWidget({}, obj_ctx);
 }

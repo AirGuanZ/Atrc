@@ -36,10 +36,10 @@ public:
     }
 };
 
-std::shared_ptr<PostProcessor> create_film_flipper(
+RC<PostProcessor> create_film_flipper(
     bool vertically, bool horizontally)
 {
-    return std::make_shared<Flip>(vertically, horizontally);
+    return newRC<Flip>(vertically, horizontally);
 }
 
 AGZ_TRACER_END

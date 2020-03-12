@@ -1,11 +1,1 @@
-FIND_PACKAGE(OpenImageDenoise QUIET)
-
-IF(NOT OpenImageDenoise_FOUND)
-    IF(MSVC)
-        SET(OIDN_FIND_PATH "${PROJECT_SOURCE_DIR}/lib/oidn/vc14/lib/cmake/OpenImageDenoise")
-    ELSE()
-        SET(OIDN_FIND_PATH "${PROJECT_SOURCE_DIR}/lib/oidn/linux/lib/cmake/OpenImageDenoise")
-    ENDIF()
-    MESSAGE("OpenImageDenoise not found in system; use ${PROJECT_SOURCE_DIR}/lib/oidn/linux/lib/cmake/OpenImageDenoise")
-    FIND_PACKAGE(OpenImageDenoise REQUIRED PATHS ${OIDN_FIND_PATH})
-ENDIF()
+FIND_PACKAGE(OpenImageDenoise REQUIRED)

@@ -15,7 +15,7 @@ namespace post_processor
             return "aces";
         }
 
-        std::shared_ptr<PostProcessor> create(const ConfigGroup &params, CreatingContext &context) const override
+        RC<PostProcessor> create(const ConfigGroup &params, CreatingContext &context) const override
         {
             const real exposure = params.child_real("exposure");
             return create_aces_tone_mapper(exposure);
@@ -31,7 +31,7 @@ namespace post_processor
             return "flip";
         }
 
-        std::shared_ptr<PostProcessor> create(const ConfigGroup &params, CreatingContext &context) const override
+        RC<PostProcessor> create(const ConfigGroup &params, CreatingContext &context) const override
         {
             const bool vertically = params.child_int_or("vertically", 0) != 0;
             const bool horizontally = params.child_int_or("horizontally", 0) != 0;
@@ -48,7 +48,7 @@ namespace post_processor
             return "gamma";
         }
 
-        std::shared_ptr<PostProcessor> create(const ConfigGroup &params, CreatingContext &context) const override
+        RC<PostProcessor> create(const ConfigGroup &params, CreatingContext &context) const override
         {
             real gamma;
             if(auto node = params.find_child("gamma"))
@@ -70,7 +70,7 @@ namespace post_processor
             return "oidn_denoiser";
         }
 
-        std::shared_ptr<PostProcessor> create(const ConfigGroup &params, CreatingContext &context) const override
+        RC<PostProcessor> create(const ConfigGroup &params, CreatingContext &context) const override
         {
             const bool clamp_color = params.child_int_or("clamp", 0) != 0;
             return create_oidn_denoiser(clamp_color);
@@ -88,7 +88,7 @@ namespace post_processor
             return "resize";
         }
 
-        std::shared_ptr<PostProcessor> create(const ConfigGroup &params, CreatingContext &context) const override
+        RC<PostProcessor> create(const ConfigGroup &params, CreatingContext &context) const override
         {
             const Vec2i target_size = params.child_vec2i("size");
             return create_img_resizer(target_size);
@@ -104,7 +104,7 @@ namespace post_processor
             return "save_gbuffer_to_png";
         }
 
-        std::shared_ptr<PostProcessor> create(const ConfigGroup &params, CreatingContext &context) const override
+        RC<PostProcessor> create(const ConfigGroup &params, CreatingContext &context) const override
         {
             std::string albedo_filename, normal_filename;
 
@@ -128,9 +128,11 @@ namespace post_processor
             return "save_to_img";
         }
 
-        std::shared_ptr<PostProcessor> create(const ConfigGroup &params, CreatingContext &context) const override
+        RC<PostProcessor> create(const ConfigGroup &params, CreatingContext &context) const override
         {
-            const std::string filename = context.path_mapper->map(params.child_str("filename"));
+            const std::string filename = context.path_mapper->map(
+                params.child_str("filename"));
+
             const bool open = params.child_int_or("open", 0) != 0;
 
             real gamma = 1;
@@ -151,7 +153,8 @@ namespace post_processor
                 else if(stdstr::ends_with(filename, ".hdr"))
                     ext = "hdr";
                 else
-                    throw ObjectConstructionException("unknown image file format: " + filename);
+                    throw ObjectConstructionException(
+                        "unknown image file format: " + filename);
             }
 
             return create_saving_to_img(
@@ -163,15 +166,15 @@ namespace post_processor
 
 void initialize_post_processor_factory(Factory<PostProcessor> &factory)
 {
-    factory.add_creator(std::make_unique<post_processor::ACESCreator>());
-    factory.add_creator(std::make_unique<post_processor::FlipCreator>());
-    factory.add_creator(std::make_unique<post_processor::GammaCreator>());
+    factory.add_creator(newBox<post_processor::ACESCreator>());
+    factory.add_creator(newBox<post_processor::FlipCreator>());
+    factory.add_creator(newBox<post_processor::GammaCreator>());
 #ifdef USE_OIDN
-    factory.add_creator(std::make_unique<post_processor::OIDNDenoiserCreator>());
+    factory.add_creator(newBox<post_processor::OIDNDenoiserCreator>());
 #endif
-    factory.add_creator(std::make_unique<post_processor::ResizeImageCreator>());
-    factory.add_creator(std::make_unique<post_processor::SaveGBufferCreator>());
-    factory.add_creator(std::make_unique<post_processor::SaveImgCreator>());
+    factory.add_creator(newBox<post_processor::ResizeImageCreator>());
+    factory.add_creator(newBox<post_processor::SaveGBufferCreator>());
+    factory.add_creator(newBox<post_processor::SaveImgCreator>());
 }
 
 AGZ_TRACER_FACTORY_END

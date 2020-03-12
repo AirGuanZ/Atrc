@@ -19,7 +19,8 @@ public:
 
 private:
 
-    std::vector<mesh::mesh_t> load_meshes_from(const std::string &filename) const;
+    std::vector<mesh::mesh_t> load_meshes_from(
+        const std::string &filename) const;
 
     void transform_mesh(mesh::mesh_t &m, int to_pz, int to_px) const;
 

@@ -21,7 +21,8 @@ class AORenderer : public PerPixelRenderer
 public:
 
     explicit AORenderer(const AORendererParams &params)
-        : PerPixelRenderer(params.worker_count, params.task_grid_size, params.spp)
+        : PerPixelRenderer(
+            params.worker_count, params.task_grid_size, params.spp)
     {
         params_.background_color       = params.background_color;
         params_.low_color              = params.low_color;
@@ -32,15 +33,17 @@ public:
 
 protected:
 
-    Pixel eval_pixel(const Scene &scene, const Ray &ray, Sampler &sampler, Arena &arena) const override
+    Pixel eval_pixel(
+        const Scene &scene, const Ray &ray,
+        Sampler &sampler, Arena &arena) const override
     {
         return trace_ao(params_, scene, ray, sampler);
     }
 };
 
-std::shared_ptr<Renderer> create_ao_renderer(const AORendererParams &params)
+RC<Renderer> create_ao_renderer(const AORendererParams &params)
 {
-    return std::make_shared<AORenderer>(params);
+    return newRC<AORenderer>(params);
 }
 
 AGZ_TRACER_END

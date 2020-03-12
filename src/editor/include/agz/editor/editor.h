@@ -82,10 +82,10 @@ private:
 
     void launch_renderer(bool enable_preview);
 
-    std::unique_ptr<Renderer> renderer_;
+    Box<Renderer> renderer_;
 
     tracer::DefaultSceneParams scene_params_;
-    std::shared_ptr<tracer::Scene> scene_;
+    RC<tracer::Scene> scene_;
 
     QFrame *up_panel_    = nullptr;
     QFrame *down_panel_  = nullptr;
@@ -96,16 +96,16 @@ private:
     QPointer<QWidget> editing_entity_widget_;
     QPointer<QWidget> editing_rsc_widget_;
 
-    std::unique_ptr<ObjectContext> obj_ctx_;
+    Box<ObjectContext> obj_ctx_;
 
     GlobalSettingWidget *global_setting_ = nullptr;
 
     EnvirLightSlot *envir_light_slot_ = nullptr;
 
-    std::unique_ptr<AssetLoadDialog> asset_load_dialog_;
-    std::unique_ptr<AssetSaveDialog> asset_save_dialog_;
+    Box<AssetLoadDialog> asset_load_dialog_;
+    Box<AssetSaveDialog> asset_save_dialog_;
 
-    std::unique_ptr<SceneManager> scene_mgr_;
+    Box<SceneManager> scene_mgr_;
     
     QSplitter *hori_splitter_ = nullptr;
     QSplitter *vert_splitter_ = nullptr;

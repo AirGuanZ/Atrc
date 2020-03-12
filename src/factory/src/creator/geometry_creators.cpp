@@ -16,7 +16,8 @@ namespace geometry
             return "disk";
         }
 
-        std::shared_ptr<Geometry> create(const ConfigGroup &params, CreatingContext &context) const override
+        RC<Geometry> create(
+            const ConfigGroup &params, CreatingContext &context) const override
         {
             const auto local_to_world = params.child_transform3("transform");
             const real radius = params.child_real("radius");
@@ -33,7 +34,8 @@ namespace geometry
             return "double_sided";
         }
 
-        std::shared_ptr<Geometry> create(const ConfigGroup &params, CreatingContext &context) const override
+        RC<Geometry> create(
+            const ConfigGroup &params, CreatingContext &context) const override
         {
             const auto internal = context.create<Geometry>(params.child_group("internal"));
             return create_double_sided(std::move(internal));
@@ -49,7 +51,8 @@ namespace geometry
             return "quad";
         }
 
-        std::shared_ptr<Geometry> create(const ConfigGroup &params, CreatingContext &context) const override
+        RC<Geometry> create(
+            const ConfigGroup &params, CreatingContext &context) const override
         {
             const auto local_to_world = params.child_transform3("transform");
             
@@ -76,7 +79,8 @@ namespace geometry
             return "sphere";
         }
 
-        std::shared_ptr<Geometry> create(const ConfigGroup &params, CreatingContext &context) const override
+        RC<Geometry> create(
+            const ConfigGroup &params, CreatingContext &context) const override
         {
             const auto local_to_world = params.child_transform3("transform");
             const real radius = params.child_real("radius");
@@ -93,7 +97,8 @@ namespace geometry
             return "transform_wrapper";
         }
 
-        std::shared_ptr<Geometry> create(const ConfigGroup &params, CreatingContext &context) const override
+        RC<Geometry> create(
+            const ConfigGroup &params, CreatingContext &context) const override
         {
             auto internal = context.create<Geometry>(params.child_group("internal"));
             const auto local_to_world = params.child_transform3("transform");
@@ -110,7 +115,8 @@ namespace geometry
             return "triangle";
         }
 
-        std::shared_ptr<Geometry> create(const ConfigGroup &params, CreatingContext &context) const override
+        RC<Geometry> create(
+            const ConfigGroup &params, CreatingContext &context) const override
         {
             const auto local_to_world = params.child_transform3("transform");
 
@@ -135,7 +141,8 @@ namespace geometry
             return "triangle_bvh_noembree";
         }
 
-        std::shared_ptr<Geometry> create(const ConfigGroup &params, CreatingContext &context) const override
+        RC<Geometry> create(
+            const ConfigGroup &params, CreatingContext &context) const override
         {
             const auto local_to_world = params.child_transform3("transform");
             const auto filename = context.path_mapper->map(params.child_str("filename"));
@@ -144,7 +151,8 @@ namespace geometry
             auto build_triangles = mesh::load_from_file(filename);
             AGZ_INFO("triangle count: {}", build_triangles.size());
 
-            return create_triangle_bvh_noembree(std::move(build_triangles), local_to_world);
+            return create_triangle_bvh_noembree(
+                std::move(build_triangles), local_to_world);
         }
     };
 
@@ -159,7 +167,7 @@ namespace geometry
             return "triangle_bvh_embree";
         }
 
-        std::shared_ptr<Geometry> create(const ConfigGroup &params, CreatingContext &context) const override
+        RC<Geometry> create(const ConfigGroup &params, CreatingContext &context) const override
         {
             const auto local_to_world = params.child_transform3("transform");
             const auto filename = context.path_mapper->map(params.child_str("filename"));
@@ -200,16 +208,16 @@ namespace geometry
 
 void initialize_geometry_factory(Factory<Geometry> &factory)
 {
-    factory.add_creator(std::make_unique<geometry::DiskCreator>());
-    factory.add_creator(std::make_unique<geometry::DoubleSidedGeometryCreator>());
-    factory.add_creator(std::make_unique<geometry::QuadCreator>());
-    factory.add_creator(std::make_unique<geometry::SphereCreator>());
-    factory.add_creator(std::make_unique<geometry::TransformWrapperCreator>());
-    factory.add_creator(std::make_unique<geometry::TriangleCreator>());
-    factory.add_creator(std::make_unique<geometry::TriangleBVHCreator>());
-    factory.add_creator(std::make_unique<geometry::TriangleBVHNoEmbreeCreator>());
+    factory.add_creator(newBox<geometry::DiskCreator>());
+    factory.add_creator(newBox<geometry::DoubleSidedGeometryCreator>());
+    factory.add_creator(newBox<geometry::QuadCreator>());
+    factory.add_creator(newBox<geometry::SphereCreator>());
+    factory.add_creator(newBox<geometry::TransformWrapperCreator>());
+    factory.add_creator(newBox<geometry::TriangleCreator>());
+    factory.add_creator(newBox<geometry::TriangleBVHCreator>());
+    factory.add_creator(newBox<geometry::TriangleBVHNoEmbreeCreator>());
 #ifdef USE_EMBREE
-    factory.add_creator(std::make_unique<geometry::TriangleBVHEmbreeCreator>());
+    factory.add_creator(newBox<geometry::TriangleBVHEmbreeCreator>());
 #endif
 }
 

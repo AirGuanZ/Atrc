@@ -7,8 +7,9 @@ PerPixelRenderer::PerPixelRenderer(
     int worker_count, int task_grid_size, int init_pixel_size,
     int framebuffer_width, int framebuffer_height,
     bool enable_fast_rendering, int fast_resolution, int fast_task_grid_size,
-    std::shared_ptr<const tracer::Scene> scene)
-    : framebuffer_(framebuffer_width, framebuffer_height, task_grid_size, init_pixel_size)
+    RC<const tracer::Scene> scene)
+    : framebuffer_(
+        framebuffer_width, framebuffer_height, task_grid_size, init_pixel_size)
 {
     worker_count_          = worker_count;
     framebuffer_width_     = framebuffer_width;
@@ -48,7 +49,7 @@ Image2D<Spectrum> PerPixelRenderer::start()
 
     auto ret = do_fast_rendering();
 
-    const auto sampler_prototype = std::make_shared<tracer::Sampler>(0, true);
+    const auto sampler_prototype = newRC<tracer::Sampler>(0, true);
     const int worker_count = thread::actual_worker_count(worker_count_);
     for(int i = 0; i < worker_count; ++i)
     {
@@ -84,24 +85,29 @@ Image2D<Spectrum> PerPixelRenderer::do_fast_rendering()
     if(!enable_fast_rendering_)
         return {};
 
-    const real target_ratio = static_cast<real>(framebuffer_width_) / framebuffer_height_;
+    const real target_ratio = static_cast<real>(framebuffer_width_)
+                            / framebuffer_height_;
     
     int small_width, small_height;
     if(target_ratio < 1)
     {
-        small_width = (std::max)(1, static_cast<int>(std::floor(fast_resolution_ * target_ratio)));
+        small_width = (std::max)(
+            1, static_cast<int>(std::floor(fast_resolution_ * target_ratio)));
         small_height = fast_resolution_;
     }
     else
     {
         small_width = fast_resolution_;
-        small_height = (std::max)(1, static_cast<int>(std::floor(fast_resolution_ / target_ratio)));
+        small_height = (std::max)(
+            1, static_cast<int>(std::floor(fast_resolution_ / target_ratio)));
     }
 
     Image2D<Spectrum> small_target(small_height, small_width);
 
-    const int x_task_count = (small_width + fast_task_grid_size_ - 1) / fast_task_grid_size_;
-    const int y_task_count = (small_height + fast_task_grid_size_ - 1) / fast_task_grid_size_;
+    const int x_task_count = (small_width + fast_task_grid_size_ - 1)
+                           / fast_task_grid_size_;
+    const int y_task_count = (small_height + fast_task_grid_size_ - 1)
+                           / fast_task_grid_size_;
     const int total_task_count = x_task_count * y_task_count;
     std::atomic<int> next_task_id = 0;
 
@@ -135,7 +141,7 @@ Image2D<Spectrum> PerPixelRenderer::do_fast_rendering()
     };
 
     const int worker_count = thread::actual_worker_count(worker_count_);
-    auto sampler_prototype = std::make_shared<Sampler>(42, true);
+    auto sampler_prototype = newRC<Sampler>(42, true);
 
     Arena sampler_arena;
     std::vector<std::thread> threads;

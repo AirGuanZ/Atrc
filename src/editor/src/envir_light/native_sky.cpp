@@ -53,12 +53,15 @@ void NativeSkyWidget::load_asset(AssetLoader &loader)
     do_update_tracer_object();
 }
 
-std::shared_ptr<tracer::ConfigNode> NativeSkyWidget::to_config(JSONExportContext &ctx) const
+RC<tracer::ConfigNode> NativeSkyWidget::to_config(
+    JSONExportContext &ctx) const
 {
-    auto grp = std::make_shared<tracer::ConfigGroup>();
+    auto grp = newRC<tracer::ConfigGroup>();
     grp->insert_str("type", "native_sky");
-    grp->insert_child("top",    tracer::ConfigArray::from_spectrum(top_->get_color()));
-    grp->insert_child("bottom", tracer::ConfigArray::from_spectrum(bottom_->get_color()));
+    grp->insert_child(
+        "top", tracer::ConfigArray::from_spectrum(top_->get_color()));
+    grp->insert_child(
+        "bottom", tracer::ConfigArray::from_spectrum(bottom_->get_color()));
     return grp;
 }
 
@@ -69,10 +72,12 @@ void NativeSkyWidget::update_tracer_object_impl()
 
 void NativeSkyWidget::do_update_tracer_object()
 {
-    tracer_object_ = tracer::create_native_sky(top_->get_color(), bottom_->get_color());
+    tracer_object_ = tracer::create_native_sky(
+        top_->get_color(), bottom_->get_color());
 }
 
-ResourceWidget<tracer::EnvirLight> *NativeSkyCreator::create_widget(ObjectContext &obj_ctx) const
+ResourceWidget<tracer::EnvirLight> *NativeSkyCreator::create_widget(
+    ObjectContext &obj_ctx) const
 {
     return new NativeSkyWidget({});
 }

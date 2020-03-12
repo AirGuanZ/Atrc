@@ -1,5 +1,5 @@
 // ======================================================================== //
-// Copyright 2009-2018 Intel Corporation                                    //
+// Copyright 2009-2020 Intel Corporation                                    //
 //                                                                          //
 // Licensed under the Apache License, Version 2.0 (the "License");          //
 // you may not use this file except in compliance with the License.         //
@@ -198,7 +198,7 @@ struct RTCFilterFunctionNArguments
 {
   uniform int* uniform valid;
   void* uniform geometryUserPtr;
-  const RTCIntersectContext* uniform context;
+  RTCIntersectContext* uniform context;
   struct RTCRayN* uniform ray;
   struct RTCHitN* uniform hit;
   uniform unsigned int N;

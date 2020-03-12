@@ -11,7 +11,8 @@ namespace
     constexpr int WIDGET_ITEM_HEIGHT = 35;
 }
 
-SceneManager::SceneManager(ObjectContext &obj_ctx, Editor *editor, PreviewWindow *preview_window)
+SceneManager::SceneManager(
+    ObjectContext &obj_ctx, Editor *editor, PreviewWindow *preview_window)
     : obj_ctx_(obj_ctx), editor_(editor), preview_window_(preview_window)
 {
     ui_ = new SceneManagerWidget;
@@ -31,12 +32,14 @@ SceneManager::SceneManager(ObjectContext &obj_ctx, Editor *editor, PreviewWindow
         rename_selected_entity();
     });
 
-    connect(ui_->name_list, &QListWidget::currentTextChanged, [=](const QString&)
+    connect(ui_->name_list, &QListWidget::currentTextChanged,
+        [=](const QString&)
     {
         selected_entity_changed();
     });
 
-    connect(preview_window_, &PreviewWindow::left_click_to_emit_ray, [=](const Vec3 &o, const Vec3 &d)
+    connect(preview_window_, &PreviewWindow::left_click_to_emit_ray,
+        [=](const Vec3 &o, const Vec3 &d)
     {
         const tracer::Ray ray(o, d);
         real t = (std::numeric_limits<real>::max)();
@@ -44,7 +47,8 @@ SceneManager::SceneManager(ObjectContext &obj_ctx, Editor *editor, PreviewWindow
         for(auto &p : name2record_)
         {
             tracer::EntityIntersection inct;
-            if(p.second->panel->get_tracer_object()->closest_intersection(ray, &inct))
+            if(p.second->panel->get_tracer_object()
+                              ->closest_intersection(ray, &inct))
             {
                 if(inct.t < t)
                 {
@@ -57,13 +61,15 @@ SceneManager::SceneManager(ObjectContext &obj_ctx, Editor *editor, PreviewWindow
         if(selected_record)
         {
             ui_->name_list->setCurrentItem(
-                ui_->name_list->findItems(selected_record->name, Qt::MatchExactly).front());
+                ui_->name_list->findItems(
+                    selected_record->name, Qt::MatchExactly).front());
         }
         else
             ui_->name_list->setCurrentItem(nullptr);
     });
 
-    connect(preview_window_, &PreviewWindow::edit_gizmo, [=](const DirectTransform &new_world)
+    connect(preview_window_, &PreviewWindow::edit_gizmo,
+        [=](const DirectTransform &new_world)
     {
         edit_entity_gizmo(new_world);
     });
@@ -89,10 +95,10 @@ QWidget *SceneManager::get_widget()
     return ui_;
 }
 
-std::shared_ptr<tracer::Aggregate> SceneManager::update_tracer_aggregate(
-    std::vector<std::shared_ptr<tracer::Entity>> &entities)
+RC<tracer::Aggregate> SceneManager::update_tracer_aggregate(
+    std::vector<RC<tracer::Entity>> &entities)
 {
-    std::vector<std::shared_ptr<const tracer::Entity>> entity_arr;
+    std::vector<RC<const tracer::Entity>> entity_arr;
     for(auto &p : name2record_)
     {
         auto ent = p.second->panel->get_tracer_object();
@@ -144,9 +150,9 @@ void SceneManager::load_asset(AssetLoader &loader)
     }
 }
 
-std::shared_ptr<tracer::ConfigArray> SceneManager::to_config(JSONExportContext &ctx) const
+RC<tracer::ConfigArray> SceneManager::to_config(JSONExportContext &ctx) const
 {
-    auto arr = std::make_shared<tracer::ConfigArray>();
+    auto arr = newRC<tracer::ConfigArray>();
     for(auto &p : name2record_)
         arr->push_back(p.second->panel->to_config(ctx));
     return arr;
@@ -251,7 +257,7 @@ void SceneManager::add_single_mesh(const mesh::mesh_t &mesh)
 {
     TriangleBVHWidget::CloneState geometry_clone_state;
     geometry_clone_state.filename = "";
-    geometry_clone_state.vertices = std::make_shared<std::vector<TriangleBVHWidget::Vertex>>();
+    geometry_clone_state.vertices = newRC<std::vector<TriangleBVHWidget::Vertex>>();
     geometry_clone_state.vertices->reserve(3 * mesh.triangles.size());
     for(auto &tri : mesh.triangles)
     {
@@ -271,7 +277,8 @@ void SceneManager::add_single_mesh(const mesh::mesh_t &mesh)
     GeometricEntityWidget::CloneState entity_clone_state;
     entity_clone_state.geometry = geometry_slot;
 
-    GeometricEntityWidget *entity_widget = new GeometricEntityWidget(entity_clone_state, obj_ctx_);
+    GeometricEntityWidget *entity_widget = new GeometricEntityWidget(
+        entity_clone_state, obj_ctx_);
     EntityPanel *entity_panel = new EntityPanel(obj_ctx_, entity_widget, "Geometric");
 
     add_record(QString::fromStdString(mesh.name), entity_panel);
@@ -288,7 +295,7 @@ void SceneManager::add_record(const ::QString &name, EntityPanel *entity_panel)
     const QString final_name = to_valid_name(name);
 
     Record record = { final_name, entity_panel, mesh_id };
-    name2record_[final_name] = std::make_unique<Record>(record);
+    name2record_[final_name] = newBox<Record>(record);
 
     // add entity widget to editor
 
@@ -305,19 +312,23 @@ void SceneManager::add_record(const ::QString &name, EntityPanel *entity_panel)
     // add mesh to gl widget
 
     const auto geometry_data = entity_panel->get_vertices();
-    preview_window_->add_mesh(mesh_id, geometry_data.data(), static_cast<int>(geometry_data.size()));
+    preview_window_->add_mesh(
+        mesh_id, geometry_data.data(), static_cast<int>(geometry_data.size()));
 
     entity_panel->set_geometry_vertices_dirty_callback([=]
     {
         preview_window_->remove_mesh(mesh_id);
         const auto data = entity_panel->get_vertices();
-        preview_window_->add_mesh(mesh_id, data.data(), static_cast<int>(data.size()));
-        preview_window_->set_mesh_transform(mesh_id, entity_panel->get_transform());
+        preview_window_->add_mesh(
+            mesh_id, data.data(), static_cast<int>(data.size()));
+        preview_window_->set_mesh_transform(
+            mesh_id, entity_panel->get_transform());
     });
 
     entity_panel->set_entity_transform_dirty_callback([=]
     {
-        preview_window_->set_mesh_transform(mesh_id, entity_panel->get_transform());
+        preview_window_->set_mesh_transform(
+            mesh_id, entity_panel->get_transform());
     });
 }
 

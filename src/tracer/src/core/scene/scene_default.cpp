@@ -16,16 +16,16 @@ AGZ_TRACER_BEGIN
 
 class DefaultScene : public Scene
 {
-    std::shared_ptr<Medium> void_medium_;
+    RC<Medium> void_medium_;
 
-    std::shared_ptr<const Camera> camera_;
+    RC<const Camera> camera_;
 
     std::vector<Light*>         lights_;
-    std::shared_ptr<EnvirLight> envir_light_;
+    RC<EnvirLight> envir_light_;
 
-    std::vector<std::shared_ptr<Entity>> entities_;
+    std::vector<RC<Entity>> entities_;
 
-    std::shared_ptr<const Aggregate> aggregate_;
+    RC<const Aggregate> aggregate_;
     
     math::distribution::alias_sampler_t<real, size_t> light_selector_;
     std::vector<real> light_pdf_table_;
@@ -43,12 +43,14 @@ class DefaultScene : public Scene
         for(size_t i = 0; i < lights_.size(); ++i)
             light_pdf_table_[i] = lights_[i]->power().lum();
 
-        const real sum = std::accumulate(light_pdf_table_.begin(), light_pdf_table_.end(), real(0));
+        const real sum = std::accumulate(
+            light_pdf_table_.begin(), light_pdf_table_.end(), real(0));
         const real ratio = 1 / sum;
         for(auto &p : light_pdf_table_)
             p *= ratio;
 
-        light_selector_.initialize(light_pdf_table_.data(), light_pdf_table_.size());
+        light_selector_.initialize(
+            light_pdf_table_.data(), light_pdf_table_.size());
 
         light_ptr_to_pdf_.clear();
         for(size_t i = 0; i < light_pdf_table_.size(); ++i)
@@ -79,7 +81,7 @@ public:
         entities_ = params.entities;
     }
 
-    void set_camera(std::shared_ptr<const Camera> camera) override
+    void set_camera(RC<const Camera> camera) override
     {
         camera_ = camera;
     }
@@ -89,7 +91,7 @@ public:
         return camera_.get();
     }
 
-    std::shared_ptr<const Camera> get_shared_camera() const noexcept override
+    RC<const Camera> get_shared_camera() const noexcept override
     {
         return camera_;
     }
@@ -105,7 +107,8 @@ public:
         return envir_light_.get();
     }
 
-    SceneSampleLightResult sample_light(const Sample1 &sam) const noexcept override
+    SceneSampleLightResult sample_light(
+        const Sample1 &sam) const noexcept override
     {
         SceneSampleLightResult ret = { nullptr, 0 };
         if(!light_selector_.available())
@@ -137,9 +140,23 @@ public:
         return !has_intersection(shadow_ray);
     }
 
-    bool closest_intersection(const Ray &r, EntityIntersection *inct) const noexcept override
+    bool closest_intersection(
+        const Ray &r, EntityIntersection *inct) const noexcept override
     {
         return aggregate_->closest_intersection(r, inct);
+    }
+
+    AABB world_bound() const noexcept override
+    {
+        AABB world_bound;
+        for(auto &ent : entities_)
+            world_bound |= ent->world_bound();
+
+        const real diag = (world_bound.high - world_bound.low).length();
+        world_bound.low  -= Vec3(real(0.01) * diag);
+        world_bound.high += Vec3(real(0.01) * diag);
+
+        return world_bound;
     }
 
     void start_rendering() override
@@ -155,9 +172,9 @@ public:
     }
 };
 
-std::shared_ptr<Scene> create_default_scene(const DefaultSceneParams &params)
+RC<Scene> create_default_scene(const DefaultSceneParams &params)
 {
-    return std::make_shared<DefaultScene>(params);
+    return newRC<DefaultScene>(params);
 }
 
 AGZ_TRACER_END

@@ -29,12 +29,24 @@ struct AlbedoAOParams
     real max_occlusion_distance = 1;
 };
 
-Pixel trace_std(const TraceParams &params, const Scene &scene, const Ray &ray, Sampler &sampler, Arena &arena);
+Pixel trace_std(
+    const TraceParams &params,
+    const Scene &scene, const Ray &ray,
+    Sampler &sampler, Arena &arena);
 
-Pixel trace_nomis(const TraceParams &params, const Scene &scene, const Ray &ray, Sampler &sampler, Arena &arena);
+Pixel trace_nomis(
+    const TraceParams &params,
+    const Scene &scene, const Ray &ray,
+    Sampler &sampler, Arena &arena);
 
-Pixel trace_ao(const AOParams &params, const Scene &scene, const Ray &ray, Sampler &sampler);
+Pixel trace_ao(
+    const AOParams &params,
+    const Scene &scene, const Ray &ray,
+    Sampler &sampler);
 
-Pixel trace_albedo_ao(const AlbedoAOParams &params, const Scene &scene, const Ray &ray, Sampler &sampler, Arena &arena);
+Pixel trace_albedo_ao(
+    const AlbedoAOParams &params,
+    const Scene &scene, const Ray &ray,
+    Sampler &sampler, Arena &arena);
 
 AGZ_TRACER_RENDER_END

@@ -11,7 +11,7 @@ namespace
 template<typename TracerObject>
 NameResourcePool<TracerObject>::NameResourcePool(
     ObjectContext &obj_ctx, Editor *editor, const QString &default_type)
-    : obj_ctx_(obj_ctx), editor_(editor), default_type_(default_type)
+    : default_type_(default_type), obj_ctx_(obj_ctx), editor_(editor)
 {
     widget_ = new NameResourcePoolWidget;
 
@@ -19,14 +19,15 @@ NameResourcePool<TracerObject>::NameResourcePool(
     {
         bool ok = false;
         const QString name = to_valid_name(QInputDialog::getText(
-            widget_, "Name", "Enter resource name", QLineEdit::Normal, {}, &ok));
+            widget_, "Name", "Enter resource name",
+            QLineEdit::Normal, {}, &ok));
         if(!ok)
             return;
 
         AGZ_INFO("create new '{}' with name: {}",
                  typeid(TracerObject).name(), name.toStdString());
 
-        auto panel = std::make_unique<ResourcePanel<TracerObject>>(obj_ctx_, default_type);
+        auto panel = newBox<ResourcePanel<TracerObject>>(obj_ctx_, default_type);
         add_resource(name, std::move(panel));
     });
 
@@ -59,15 +60,17 @@ NameResourcePool<TracerObject>::NameResourcePool(
 
         bool ok = false;
         const QString new_name = to_valid_name(QInputDialog::getText(
-            widget_, "Name", "Enter resource name", QLineEdit::Normal, {}, &ok));
+            widget_, "Name", "Enter resource name",
+            QLineEdit::Normal, {}, &ok));
         if(!ok)
             return;
 
         AGZ_INFO("duplicate '{}' : {} -> {}",
-            typeid(TracerObject).name(), it->second->name.toStdString(), new_name.toStdString());
+            typeid(TracerObject).name(), 
+            it->second->name.toStdString(), new_name.toStdString());
 
         auto panel = it->second->rsc->clone_panel();
-        add_resource(new_name, std::unique_ptr<ResourcePanel<TracerObject>>(panel));
+        add_resource(new_name, Box<ResourcePanel<TracerObject>>(panel));
     });
 
     connect(widget_->edit, &QPushButton::clicked, [=]
@@ -91,7 +94,8 @@ NameResourcePool<TracerObject>::NameResourcePool(
 
         bool ok = false;
         const QString new_name = to_valid_name(QInputDialog::getText(
-            widget_, "Name", "Enter resource name", QLineEdit::Normal, {}, &ok));
+            widget_, "Name", "Enter resource name",
+            QLineEdit::Normal, {}, &ok));
         if(!ok)
             return;
 
@@ -118,7 +122,7 @@ NameResourcePool<TracerObject>::NameResourcePool(
 }
 
 template<typename TracerObject>
-std::unique_ptr<ResourceReference<TracerObject>>
+Box<ResourceReference<TracerObject>>
     NameResourcePool<TracerObject>::select_resource()
 {
     auto selected = widget_->name_list->currentItem();
@@ -132,15 +136,15 @@ std::unique_ptr<ResourceReference<TracerObject>>
 
 template<typename TracerObject>
 ResourceInPool<TracerObject> *NameResourcePool<TracerObject>::add_resource(
-    const QString &name, std::unique_ptr<ResourcePanel<TracerObject>> panel)
+    const QString &name, Box<ResourcePanel<TracerObject>> panel)
 {
     auto *raw_panel = panel.get();
-    auto rsc = std::make_unique<ResourceInPool<TracerObject>>(name, std::move(panel));
+    auto rsc = newBox<ResourceInPool<TracerObject>>(name, std::move(panel));
 
     auto raw_rsc = rsc.get();
     editor_->add_to_resource_panel(raw_panel);
 
-    auto record = std::make_unique<Record>();
+    auto record = newBox<Record>();
     auto raw_record = record.get();
     record->name = name;
     record->rsc = std::move(rsc);
@@ -168,8 +172,8 @@ void NameResourcePool<TracerObject>::load_asset(AssetLoader &loader)
     const uint32_t count = loader.read<uint32_t>();
     for(uint32_t i = 0; i < count; ++i)
     {
-        auto rsc = std::make_unique<ResourceInPool<TracerObject>>(
-            "", std::make_unique<ResourcePanel<TracerObject>>(obj_ctx_, default_type_));
+        auto rsc = newBox<ResourceInPool<TracerObject>>(
+            "", newBox<ResourcePanel<TracerObject>>(obj_ctx_, default_type_));
         rsc->load_asset(*this, loader);
         const QString name = rsc->get_name();
 
@@ -177,7 +181,7 @@ void NameResourcePool<TracerObject>::load_asset(AssetLoader &loader)
         auto raw_panel = rsc->get_panel();
         editor_->add_to_resource_panel(raw_panel);
 
-        auto record = std::make_unique<Record>();
+        auto record = newBox<Record>();
         auto raw_record = record.get();
         record->name = name;
         record->rsc = std::move(rsc);
@@ -191,7 +195,8 @@ void NameResourcePool<TracerObject>::load_asset(AssetLoader &loader)
 }
 
 template<typename TracerObject>
-void NameResourcePool<TracerObject>::to_config(tracer::ConfigGroup &scene_grp, JSONExportContext &ctx) const
+void NameResourcePool<TracerObject>::to_config(
+    tracer::ConfigGroup &scene_grp, JSONExportContext &ctx) const
 {
     for(auto &p : name2record_)
     {
@@ -208,7 +213,7 @@ void NameResourcePool<TracerObject>::to_config(tracer::ConfigGroup &scene_grp, J
                 continue;
             }
 
-            auto new_grp = std::make_shared<tracer::ConfigGroup>();
+            auto new_grp = newRC<tracer::ConfigGroup>();
             grp->insert_child(ref_name->at_str(i), new_grp);
             grp = new_grp.get();
         }
@@ -220,7 +225,8 @@ void NameResourcePool<TracerObject>::to_config(tracer::ConfigGroup &scene_grp, J
 }
 
 template<typename TracerObject>
-ResourceInPool<TracerObject> *NameResourcePool<TracerObject>::name_to_rsc(const QString &name)
+ResourceInPool<TracerObject> *NameResourcePool<TracerObject>::name_to_rsc(
+    const QString &name)
 {
     auto it = name2record_.find(name);
     return it == name2record_.end() ? nullptr : it->second->rsc.get();

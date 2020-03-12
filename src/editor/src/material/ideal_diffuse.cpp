@@ -4,7 +4,8 @@
 
 AGZ_EDITOR_BEGIN
 
-IdealDiffuseWidget::IdealDiffuseWidget(const InitData &clone_state, ObjectContext &obj_ctx)
+IdealDiffuseWidget::IdealDiffuseWidget(
+    const InitData &clone_state, ObjectContext &obj_ctx)
     : obj_ctx_(obj_ctx)
 {
     QVBoxLayout *layout             = new QVBoxLayout(this);
@@ -49,9 +50,10 @@ ResourceWidget<tracer::Material> *IdealDiffuseWidget::clone()
     return new IdealDiffuseWidget(clone_state, obj_ctx_);
 }
 
-std::unique_ptr<ResourceThumbnailProvider> IdealDiffuseWidget::get_thumbnail(int width, int height) const
+Box<ResourceThumbnailProvider> IdealDiffuseWidget::get_thumbnail(
+    int width, int height) const
 {
-    return std::make_unique<MaterialThumbnailProvider>(width, height, tracer_object_);
+    return newBox<MaterialThumbnailProvider>(width, height, tracer_object_);
 }
 
 void IdealDiffuseWidget::save_asset(AssetSaver &saver)
@@ -68,9 +70,10 @@ void IdealDiffuseWidget::load_asset(AssetLoader &loader)
     do_update_tracer_object();
 }
 
-std::shared_ptr<tracer::ConfigNode> IdealDiffuseWidget::to_config(JSONExportContext &ctx) const
+RC<tracer::ConfigNode> IdealDiffuseWidget::to_config(
+    JSONExportContext &ctx) const
 {
-    auto grp = std::make_shared<tracer::ConfigGroup>();
+    auto grp = newRC<tracer::ConfigGroup>();
     grp->insert_str("type", "ideal_diffuse");
 
     grp->insert_child("albedo", albedo_->to_config(ctx));
@@ -93,7 +96,8 @@ void IdealDiffuseWidget::do_update_tracer_object()
     tracer_object_ = create_ideal_diffuse(albedo_tex, std::move(normal_map));
 }
 
-ResourceWidget<tracer::Material> *IdealDiffuseWidgetCreator::create_widget(ObjectContext &obj_ctx) const
+ResourceWidget<tracer::Material> *IdealDiffuseWidgetCreator::create_widget(
+    ObjectContext &obj_ctx) const
 {
     return new IdealDiffuseWidget({}, obj_ctx);
 }

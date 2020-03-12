@@ -16,13 +16,17 @@ namespace phong_impl
         real diffuse_pdf_;
         real specular_pdf_;
 
-        Vec3 sample_pow_cos_on_hemisphere(real e, const Sample2 &sam) const noexcept
+        Vec3 sample_pow_cos_on_hemisphere(
+            real e, const Sample2 &sam) const noexcept
         {
             const real cos_theta_h = std::pow(sam.u, 1 / (e + 1));
             const real sin_theta_h = local_angle::cos_2_sin(cos_theta_h);
             const real phi = 2 * PI_r * sam.v;
 
-            return Vec3(sin_theta_h * std::cos(phi), sin_theta_h * std::sin(phi), cos_theta_h).normalize();
+            return Vec3(
+                sin_theta_h * std::cos(phi),
+                sin_theta_h * std::sin(phi),
+                cos_theta_h).normalize();
         }
 
         real pow_cos_on_hemisphere_pdf(real e, real cos_theta) const noexcept
@@ -46,13 +50,15 @@ namespace phong_impl
             return s_ * D / (4 * lwi.z * lwo.z);
         }
 
-        std::pair<Vec3, real> sample_diffuse(const Vec3 &lwo, const Sample2 &sam) const noexcept
+        std::pair<Vec3, real> sample_diffuse(
+            const Vec3 &lwo, const Sample2 &sam) const noexcept
         {
             assert(lwo.z > 0);
             return math::distribution::zweighted_on_hemisphere(sam.u, sam.v);
         }
 
-        std::pair<Vec3, real> sample_specular(const Vec3 &lwo, const Sample2 &sam) const noexcept
+        std::pair<Vec3, real> sample_specular(
+            const Vec3 &lwo, const Sample2 &sam) const noexcept
         {
             assert(lwo.z > 0);
 
@@ -98,10 +104,12 @@ namespace phong_impl
             specular_pdf_ = 1 - diffuse_pdf_;
         }
 
-        Spectrum eval(const Vec3 &wi, const Vec3 &wo, TransportMode mode) const noexcept override
+        Spectrum eval(
+            const Vec3 &wi, const Vec3 &wo,
+            TransMode mode) const noexcept override
         {
             if(cause_black_fringes(wi, wo))
-                return eval_for_black_fringes(wi, wo);
+                return eval_black_fringes(wi, wo);
 
             const Vec3 lwi = shading_coord_.global_to_local(wi);
             const Vec3 lwo = shading_coord_.global_to_local(wo);
@@ -111,15 +119,18 @@ namespace phong_impl
             const Spectrum d = eval_diffuse(lwi, lwo);
             const Spectrum s = eval_specular(lwi, lwo);
 
-            const real nor_corr = local_angle::normal_corr_factor(geometry_coord_, shading_coord_, wi);
+            const real nor_corr = local_angle::normal_corr_factor(
+                    geometry_coord_, shading_coord_, wi);
 
             return (d + s) * nor_corr;
         }
 
-        BSDFSampleResult sample(const Vec3 &wo, TransportMode mode, const Sample3 &sam) const noexcept override
+        BSDFSampleResult sample(
+            const Vec3 &wo, TransMode mode, 
+            const Sample3 &sam) const noexcept override
         {
             if(cause_black_fringes(wo))
-                return sample_for_black_fringes(wo, mode, sam);
+                return sample_black_fringes(wo, mode, sam);
 
             const Vec3 &lwo = shading_coord_.global_to_local(wo);
             if(lwo.z <= 0)
@@ -130,7 +141,8 @@ namespace phong_impl
                 auto [lwi, pdf_d] = sample_diffuse(lwo, { sam.v, sam.w });
 
                 const Vec3 wi = shading_coord_.local_to_global(lwi);
-                const real nor_corr = local_angle::normal_corr_factor(geometry_coord_, shading_coord_, wi);
+                const real nor_corr = local_angle::normal_corr_factor(
+                    geometry_coord_, shading_coord_, wi);
 
                 BSDFSampleResult ret;
                 ret.f   = (eval_diffuse(lwi, lwo) + eval_specular(lwi, lwo)) * nor_corr;
@@ -146,7 +158,8 @@ namespace phong_impl
                 return BSDF_SAMPLE_RESULT_INVALID;
 
             const Vec3 wi = shading_coord_.local_to_global(lwi);
-            const real nor_corr = local_angle::normal_corr_factor(geometry_coord_, shading_coord_, wi);
+            const real nor_corr = local_angle::normal_corr_factor(
+                geometry_coord_, shading_coord_, wi);
 
             BSDFSampleResult ret;
             ret.f   = (eval_diffuse(lwi, lwo) + eval_specular(lwi, lwo)) * nor_corr;
@@ -170,7 +183,8 @@ namespace phong_impl
             if(lwi.z <= 0 || lwo.z <= 0)
                 return 0;
 
-            return diffuse_pdf_ * pdf_diffuse(lwi, lwo) + specular_pdf_ * pdf_specular(lwi, lwo);
+            return diffuse_pdf_ * pdf_diffuse(lwi, lwo) +
+                   specular_pdf_ * pdf_specular(lwi, lwo);
         }
 
         Spectrum albedo() const noexcept override
@@ -182,26 +196,32 @@ namespace phong_impl
         {
             return false;
         }
+
+        bool has_diffuse_component() const noexcept override
+        {
+            return !d_.is_black();
+        }
     };
 
 } // namespace phong_impl
 
 class Phong : public Material
 {
-    std::shared_ptr<const Texture2D> d_;
-    std::shared_ptr<const Texture2D> s_;
-    std::shared_ptr<const Texture2D> ns_;
+    RC<const Texture2D> d_;
+    RC<const Texture2D> s_;
+    RC<const Texture2D> ns_;
 
-    std::unique_ptr<NormalMapper> nor_map_;
+    Box<NormalMapper> nor_map_;
 
 public:
 
     Phong(
-        std::shared_ptr<const Texture2D> d,
-        std::shared_ptr<const Texture2D> s,
-        std::shared_ptr<const Texture2D> ns,
-        std::unique_ptr<NormalMapper> nor_map)
-        : d_(std::move(d)), s_(std::move(s)), ns_(std::move(ns)), nor_map_(std::move(nor_map))
+        RC<const Texture2D> d,
+        RC<const Texture2D> s,
+        RC<const Texture2D> ns,
+        Box<NormalMapper> nor_map)
+        : d_(std::move(d)), s_(std::move(s)),
+          ns_(std::move(ns)), nor_map_(std::move(nor_map))
     {
         
     }
@@ -221,20 +241,22 @@ public:
         const Coord shading_coord = nor_map_->reorient(inct.uv, inct.user_coord);
 
         ShadingPoint shd;
-        shd.bsdf = arena.create<phong_impl::PhongBSDF>(inct.geometry_coord, shading_coord, d, s, ns);
+        shd.bsdf = arena.create<phong_impl::PhongBSDF>(
+            inct.geometry_coord, shading_coord, d, s, ns);
         shd.shading_normal = shading_coord.z;
 
         return shd;
     }
 };
 
-std::shared_ptr<Material> create_phong(
-    std::shared_ptr<const Texture2D> d,
-    std::shared_ptr<const Texture2D> s,
-    std::shared_ptr<const Texture2D> ns,
-    std::unique_ptr<NormalMapper> nor_map)
+RC<Material> create_phong(
+    RC<const Texture2D> d,
+    RC<const Texture2D> s,
+    RC<const Texture2D> ns,
+    Box<NormalMapper> nor_map)
 {
-    return std::make_shared<Phong>(std::move(d), std::move(s), std::move(ns), std::move(nor_map));
+    return newRC<Phong>(
+        std::move(d), std::move(s), std::move(ns), std::move(nor_map));
 }
 
 AGZ_TRACER_END

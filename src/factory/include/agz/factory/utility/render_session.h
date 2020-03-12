@@ -25,25 +25,25 @@ public:
 
         real eps = real(3e-4);
 
-        std::shared_ptr<Camera>                     camera;
-        std::shared_ptr<FilmFilter>                 film_filter;
-        std::shared_ptr<Renderer>                   renderer;
-        std::shared_ptr<RendererInteractor>           reporter;
-        std::vector<std::shared_ptr<PostProcessor>> post_processors;
+        RC<Camera>                     camera;
+        RC<FilmFilter>                 film_filter;
+        RC<Renderer>                   renderer;
+        RC<RendererInteractor>           reporter;
+        std::vector<RC<PostProcessor>> post_processors;
     };
 
     RenderSession() = default;
 
-    RenderSession(std::shared_ptr<Scene> scene, std::unique_ptr<RenderSetting> render_setting) noexcept;
+    RenderSession(RC<Scene> scene, Box<RenderSetting> render_setting) noexcept;
 
     void execute();
 
-    std::shared_ptr<Scene> scene;
-    std::unique_ptr<RenderSetting> render_settings;
+    RC<Scene> scene;
+    Box<RenderSetting> render_settings;
 };
 
 RenderSession create_render_session(
-    std::shared_ptr<Scene> scene,
+    RC<Scene> scene,
     const ConfigGroup &rendering_setting_config,
     factory::CreatingContext &context);
 

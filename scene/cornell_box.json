@@ -188,6 +188,25 @@
             "type": "constant",
             "texel": [ 1.5 ]
           }
+        },
+        "material//": {
+          "type": "disney",
+          "base_color": {
+            "type": "constant",
+            "texel": [ 0.6 ]
+          },
+          "metallic": {
+            "type": "constant",
+            "texel": [ 0 ]
+          },
+          "roughness": {
+            "type": "constant",
+            "texel": [ 0.2 ]
+          },
+          "transmission": {
+            "type": "constant",
+            "texel": [ 1 ]
+          }
         }
       }
     ]

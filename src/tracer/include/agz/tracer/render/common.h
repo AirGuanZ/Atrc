@@ -7,12 +7,16 @@
 
 AGZ_TRACER_RENDER_BEGIN
 
-struct Pixel
+struct GBufferPixel
 {
-    Spectrum value;
     Spectrum albedo;
     Vec3 normal;
     real denoise = 1;
+};
+
+struct Pixel : GBufferPixel
+{
+    Spectrum value;
 };
 
 AGZ_TRACER_RENDER_END

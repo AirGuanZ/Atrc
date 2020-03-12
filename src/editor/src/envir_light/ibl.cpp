@@ -57,9 +57,9 @@ void IBLWidget::load_asset(AssetLoader &loader)
     do_update_tracer_object();
 }
 
-std::shared_ptr<tracer::ConfigNode> IBLWidget::to_config(JSONExportContext &ctx) const
+RC<tracer::ConfigNode> IBLWidget::to_config(JSONExportContext &ctx) const
 {
-    auto grp = std::make_shared<tracer::ConfigGroup>();
+    auto grp = newRC<tracer::ConfigGroup>();
     grp->insert_str("type", "ibl");
     grp->insert_child("tex", tex_->to_config(ctx));
     return grp;
@@ -73,10 +73,12 @@ void IBLWidget::update_tracer_object_impl()
 void IBLWidget::do_update_tracer_object()
 {
     const bool use_importance_sampling = importance_sampling_->isChecked();
-    tracer_object_ = create_ibl_light(tex_->get_tracer_object(), !use_importance_sampling);
+    tracer_object_ = create_ibl_light(
+        tex_->get_tracer_object(), !use_importance_sampling);
 }
 
-ResourceWidget<tracer::EnvirLight> *IBLCreator::create_widget(ObjectContext &obj_ctx) const
+ResourceWidget<tracer::EnvirLight> *IBLCreator::create_widget(
+    ObjectContext &obj_ctx) const
 {
     return new IBLWidget(nullptr, obj_ctx);
 }

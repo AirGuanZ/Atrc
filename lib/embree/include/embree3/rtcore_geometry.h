@@ -1,5 +1,5 @@
 // ======================================================================== //
-// Copyright 2009-2018 Intel Corporation                                    //
+// Copyright 2009-2020 Intel Corporation                                    //
 //                                                                          //
 // Licensed under the Apache License, Version 2.0 (the "License");          //
 // you may not use this file except in compliance with the License.         //
@@ -17,6 +17,7 @@
 #pragma once
 
 #include "rtcore_buffer.h"
+#include "rtcore_quaternion.h"
 
 RTC_NAMESPACE_BEGIN
 
@@ -99,6 +100,7 @@ struct RTCIntersectFunctionNArguments
   struct RTCIntersectContext* context;
   struct RTCRayHitN* rayhit;
   unsigned int N;
+  unsigned int geomID;
 };
 
 /* Intersection callback function */
@@ -113,6 +115,7 @@ struct RTCOccludedFunctionNArguments
   struct RTCIntersectContext* context;
   struct RTCRayN* ray;
   unsigned int N;
+  unsigned int geomID;
 };
 
 /* Occlusion callback function */
@@ -230,6 +233,9 @@ RTC_API void rtcSetGeometryInstancedScene(RTCGeometry geometry, RTCScene scene);
 
 /* Sets the transformation of an instance for the specified time step. */
 RTC_API void rtcSetGeometryTransform(RTCGeometry geometry, unsigned int timeStep, enum RTCFormat format, const void* xfm);
+
+/* Sets the transformation quaternion of an instance for the specified time step. */
+RTC_API void rtcSetGeometryTransformQuaternion(RTCGeometry geometry, unsigned int timeStep, const struct RTCQuaternionDecomposition* qd);
 
 /* Returns the interpolated transformation of an instance for the specified time. */
 RTC_API void rtcGetGeometryTransform(RTCGeometry geometry, float time, enum RTCFormat format, void* xfm);

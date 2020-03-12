@@ -149,7 +149,8 @@ void Im3dInst::update(const Vec2 &cursor_pos, bool left_button_down)
     AppData &ad = GetAppData();
 
     ad.m_deltaTime     = 1;
-    ad.m_viewportSize  = { static_cast<float>(fb_width_), static_cast<float>(fb_height_) };
+    ad.m_viewportSize  = { static_cast<float>(fb_width_),
+                           static_cast<float>(fb_height_) };
     ad.m_viewOrigin    = cam_pos_;
     ad.m_viewDirection = cam_dir_;
     ad.m_worldUp       = { 0, 0, 1 };
@@ -232,7 +233,8 @@ void Im3dInst::draw(QOpenGLFunctions *gl)
         QOpenGLBuffer vbo;
         vbo.create();
         vbo.bind();
-        vbo.allocate(draw_list.m_vertexData, sizeof(VertexData) * draw_list.m_vertexCount);
+        vbo.allocate(
+            draw_list.m_vertexData, sizeof(VertexData) * draw_list.m_vertexCount);
 
         gl->glEnableVertexAttribArray(0);
         gl->glEnableVertexAttribArray(1);

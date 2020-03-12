@@ -56,9 +56,9 @@ public:
     }
 };
 
-std::shared_ptr<RendererInteractor> create_stdout_reporter()
+RC<RendererInteractor> create_stdout_reporter()
 {
-    return std::make_shared<StdOutput>();
+    return newRC<StdOutput>();
 }
 
 AGZ_TRACER_END

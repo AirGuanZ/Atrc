@@ -6,14 +6,14 @@ AGZ_TRACER_FACTORY_BEGIN
 
 namespace material
 {
-    std::unique_ptr<NormalMapper> init_normal_mapper(const ConfigGroup &params, CreatingContext &context)
+    Box<NormalMapper> init_normal_mapper(const ConfigGroup &params, CreatingContext &context)
     {
         if(auto node = params.find_child_group("normal_map"))
         {
             const auto map = context.create<Texture2D>(*node);
-            return std::make_unique<NormalMapper>(map);
+            return newBox<NormalMapper>(map);
         }
-        return std::make_unique<NormalMapper>(nullptr);
+        return newBox<NormalMapper>(nullptr);
     }
     
     class DisneyCreator : public Creator<Material>
@@ -25,7 +25,7 @@ namespace material
             return "disney";
         }
 
-        std::shared_ptr<Material> create(const ConfigGroup &params, CreatingContext &context) const override
+        RC<Material> create(const ConfigGroup &params, CreatingContext &context) const override
         {
             const auto base_color   = context.create<Texture2D>(params.child_group("base_color"));
             const auto metallic     = context.create<Texture2D>(params.child_group("metallic"));
@@ -74,7 +74,7 @@ namespace material
             return "disney_reflection";
         }
 
-        std::shared_ptr<Material> create(const ConfigGroup &params, CreatingContext &context) const override
+        RC<Material> create(const ConfigGroup &params, CreatingContext &context) const override
         {
             const auto base_color      = context.create<Texture2D>(params.child_group("base_color"));
             const auto metallic        = context.create<Texture2D>(params.child_group("metallic"));
@@ -115,7 +115,7 @@ namespace material
             return "frosted_glass";
         }
 
-        std::shared_ptr<Material> create(const ConfigGroup &params, CreatingContext &context) const override
+        RC<Material> create(const ConfigGroup &params, CreatingContext &context) const override
         {
             const auto color_map = context.create<Texture2D>(params.child_group("color_map"));
             const auto ior       = context.create<Texture2D>(params.child_group("ior"));
@@ -133,11 +133,11 @@ namespace material
             return "glass";
         }
 
-        std::shared_ptr<Material> create(const ConfigGroup &params, CreatingContext &context) const override
+        RC<Material> create(const ConfigGroup &params, CreatingContext &context) const override
         {
             const auto ior = context.create<Texture2D>(params.child_group("ior"));
 
-            std::shared_ptr<Texture2D> color_reflection_map, color_refraction_map;
+            RC<Texture2D> color_reflection_map, color_refraction_map;
 
             if(auto color_map_node = params.find_child_group("color_map"))
             {
@@ -171,7 +171,7 @@ namespace material
             return "ideal_black";
         }
 
-        std::shared_ptr<Material> create(const ConfigGroup &params, CreatingContext &context) const override
+        RC<Material> create(const ConfigGroup &params, CreatingContext &context) const override
         {
             return create_ideal_black();
         }
@@ -186,7 +186,7 @@ namespace material
             return "ideal_diffuse";
         }
 
-        std::shared_ptr<Material> create(const ConfigGroup &params, CreatingContext &context) const override
+        RC<Material> create(const ConfigGroup &params, CreatingContext &context) const override
         {
             const auto albedo = context.create<Texture2D>(params.child_group("albedo"));
             auto normal_mapper = init_normal_mapper(params, context);
@@ -203,47 +203,9 @@ namespace material
             return "invisible_surface";
         }
 
-        std::shared_ptr<Material> create(const ConfigGroup &params, CreatingContext &context) const override
+        RC<Material> create(const ConfigGroup &params, CreatingContext &context) const override
         {
             return create_invisible_surface();
-        }
-    };
-
-    class MaterialAdderCreator : public Creator<Material>
-    {
-    public:
-
-        std::string name() const override
-        {
-            return "add";
-        }
-
-        std::shared_ptr<Material> create(const ConfigGroup &params, CreatingContext &context) const override
-        {
-            std::vector<std::shared_ptr<const Material>> mats;
-            
-            auto &arr = params.child_array("mats");
-            for(size_t i = 0; i < arr.size(); ++i)
-                mats.push_back(context.create<Material>(arr.at(i).as_group()));
-
-            return create_mat_adder(std::move(mats));
-        }
-    };
-
-    class MaterialScalerCreator : public Creator<Material>
-    {
-    public:
-
-        std::string name() const override
-        {
-            return "scale";
-        }
-
-        std::shared_ptr<Material> create(const ConfigGroup &params, CreatingContext &context) const override
-        {
-            auto internal = context.create<Material>(params.child_group("internal"));
-            auto scale = context.create<Texture2D>(params.child_group("texture"));
-            return create_mat_scaler(std::move(internal), std::move(scale));
         }
     };
 
@@ -256,49 +218,12 @@ namespace material
             return "mirror";
         }
 
-        std::shared_ptr<Material> create(const ConfigGroup &params, CreatingContext &context) const override
+        RC<Material> create(const ConfigGroup &params, CreatingContext &context) const override
         {
             auto color_map = context.create<Texture2D>(params.child_group("color_map"));
             auto eta = context.create<Texture2D>(params.child_group("eta"));
             auto k   = context.create<Texture2D>(params.child_group("k"));
             return create_mirror(std::move(color_map), std::move(eta), std::move(k));
-        }
-    };
-
-    class MTLCreator : public Creator<Material>
-    {
-    public:
-
-        std::string name() const override
-        {
-            return "mtl";
-        }
-
-        std::shared_ptr<Material> create(const ConfigGroup &params, CreatingContext &context) const override
-        {
-            auto kd = context.create<Texture2D>(params.child_group("kd"));
-            auto ks = context.create<Texture2D>(params.child_group("ks"));
-            auto ns = context.create<Texture2D>(params.child_group("ns"));
-            return create_mtl(std::move(kd), std::move(ks), std::move(ns));
-        }
-    };
-
-    class MirrorVarnishCreator : public Creator<Material>
-    {
-    public:
-
-        std::string name() const override
-        {
-            return "mirror_varnish";
-        }
-
-        std::shared_ptr<Material> create(const ConfigGroup &params, CreatingContext &context) const override
-        {
-            auto internal = context.create<Material>(params.child_group("internal"));
-            auto color_map = context.create<Texture2D>(params.child_group("color_map"));
-            auto eta_in = context.create<Texture2D>(params.child_group("eta_in"));
-            auto eta_out = helper::child_texture_or_constant(context, params, "eta_out", 1);
-            return create_mirror_varnish(std::move(internal), std::move(eta_in), std::move(eta_out), std::move(color_map));
         }
     };
 
@@ -311,7 +236,7 @@ namespace material
             return "phong";
         }
 
-        std::shared_ptr<Material> create(const ConfigGroup &params, CreatingContext &context) const override
+        RC<Material> create(const ConfigGroup &params, CreatingContext &context) const override
         {
             auto d  = context.create<Texture2D>(params.child_group("d"));
             auto s  = context.create<Texture2D>(params.child_group("s"));
@@ -325,19 +250,15 @@ namespace material
 
 void initialize_material_factory(Factory<Material> &factory)
 {
-    factory.add_creator(std::make_unique<material::DisneyCreator>());
-    factory.add_creator(std::make_unique<material::DisneyReflectionCreator>());
-    factory.add_creator(std::make_unique<material::FrostedGlassCreator>());
-    factory.add_creator(std::make_unique<material::GlassCreator>());
-    factory.add_creator(std::make_unique<material::IdealBlackCreator>());
-    factory.add_creator(std::make_unique<material::IdealDiffuseCreator>());
-    factory.add_creator(std::make_unique<material::InvisibleSurfaceCreator>());
-    factory.add_creator(std::make_unique<material::MaterialAdderCreator>());
-    factory.add_creator(std::make_unique<material::MaterialScalerCreator>());
-    factory.add_creator(std::make_unique<material::MirrorCreator>());
-    factory.add_creator(std::make_unique<material::MTLCreator>());
-    factory.add_creator(std::make_unique<material::MirrorVarnishCreator>());
-    factory.add_creator(std::make_unique<material::PhongCreator>());
+    factory.add_creator(newBox<material::DisneyCreator>());
+    factory.add_creator(newBox<material::DisneyReflectionCreator>());
+    factory.add_creator(newBox<material::FrostedGlassCreator>());
+    factory.add_creator(newBox<material::GlassCreator>());
+    factory.add_creator(newBox<material::IdealBlackCreator>());
+    factory.add_creator(newBox<material::IdealDiffuseCreator>());
+    factory.add_creator(newBox<material::InvisibleSurfaceCreator>());
+    factory.add_creator(newBox<material::MirrorCreator>());
+    factory.add_creator(newBox<material::PhongCreator>());
 }
 
 AGZ_TRACER_FACTORY_END

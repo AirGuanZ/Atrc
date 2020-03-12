@@ -68,9 +68,10 @@ ResourceWidget<tracer::Material> *MirrorWidget::clone()
     return new MirrorWidget(init_data, obj_ctx_);
 }
 
-std::unique_ptr<ResourceThumbnailProvider> MirrorWidget::get_thumbnail(int width, int height) const
+Box<ResourceThumbnailProvider> MirrorWidget::get_thumbnail(
+    int width, int height) const
 {
-    return std::make_unique<MaterialThumbnailProvider>(width, height, tracer_object_);
+    return newBox<MaterialThumbnailProvider>(width, height, tracer_object_);
 }
 
 void MirrorWidget::save_asset(AssetSaver &saver)
@@ -89,9 +90,9 @@ void MirrorWidget::load_asset(AssetLoader &loader)
     do_update_tracer_object();
 }
 
-std::shared_ptr<tracer::ConfigNode> MirrorWidget::to_config(JSONExportContext &ctx) const
+RC<tracer::ConfigNode> MirrorWidget::to_config(JSONExportContext &ctx) const
 {
-    auto grp = std::make_shared<tracer::ConfigGroup>();
+    auto grp = newRC<tracer::ConfigGroup>();
     grp->insert_str("type", "mirror");
     grp->insert_child("color_map", color_map_->to_config(ctx));
     grp->insert_child("eta",       eta_->to_config(ctx));
@@ -112,7 +113,8 @@ void MirrorWidget::do_update_tracer_object()
     tracer_object_ = create_mirror(color_map, ior, k);
 }
 
-ResourceWidget<tracer::Material> *MirrorWidgetCreator::create_widget(ObjectContext &obj_ctx) const
+ResourceWidget<tracer::Material> *MirrorWidgetCreator::create_widget(
+    ObjectContext &obj_ctx) const
 {
     return new MirrorWidget({}, obj_ctx);
 }

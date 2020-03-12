@@ -115,11 +115,16 @@ void AssetSaveDialog::init_ui()
         }
     });
 
-    connect(save_material_pool_,  &QCheckBox::clicked, [=] { update_all_pools_state(); });
-    connect(save_medium_pool_,    &QCheckBox::clicked, [=] { update_all_pools_state(); });
-    connect(save_geometry_pool_,  &QCheckBox::clicked, [=] { update_all_pools_state(); });
-    connect(save_texture2d_pool_, &QCheckBox::clicked, [=] { update_all_pools_state(); });
-    connect(save_texture3d_pool_, &QCheckBox::clicked, [=] { update_all_pools_state(); });
+    connect(save_material_pool_,  &QCheckBox::clicked,
+            [=] { update_all_pools_state(); });
+    connect(save_medium_pool_,    &QCheckBox::clicked,
+            [=] { update_all_pools_state(); });
+    connect(save_geometry_pool_,  &QCheckBox::clicked,
+            [=] { update_all_pools_state(); });
+    connect(save_texture2d_pool_, &QCheckBox::clicked,
+            [=] { update_all_pools_state(); });
+    connect(save_texture3d_pool_, &QCheckBox::clicked,
+            [=] { update_all_pools_state(); });
 
     connect(ok,     &QPushButton::clicked, [=] { this->ok(); });
     connect(cancel, &QPushButton::clicked, [=] { this->close(); });
@@ -133,7 +138,8 @@ void AssetSaveDialog::ok()
 
     AGZ_SCOPE_GUARD({ this->close(); });
 
-    std::ofstream fout(save_filename.toStdString(), std::ios::binary | std::ios::trunc);
+    std::ofstream fout(
+        save_filename.toStdString(), std::ios::binary | std::ios::trunc);
     if(!fout)
     {
         QMessageBox::information(

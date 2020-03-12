@@ -10,22 +10,23 @@ AGZ_TRACER_BEGIN
 
 class IBL : public EnvirLight
 {
-    std::shared_ptr<const Texture2D> tex_;
+    RC<const Texture2D> tex_;
 
     Spectrum avg_rad_;
 
-    std::unique_ptr<EnvironmentLightSampler> sampler_;
+    Box<EnvironmentLightSampler> sampler_;
 
 public:
 
-    IBL(std::shared_ptr<const Texture2D> tex, bool no_importance_sampling)
+    IBL(RC<const Texture2D> tex, bool no_importance_sampling)
     {
         tex_     = tex;
 
         if(no_importance_sampling)
-            sampler_ = std::make_unique<EnvironmentLightSampler>(create_constant2d_texture({}, Spectrum(1)));
+            sampler_ = newBox<EnvironmentLightSampler>(
+                create_constant2d_texture({}, Spectrum(1)));
         else
-            sampler_ = std::make_unique<EnvironmentLightSampler>(tex_);
+            sampler_ = newBox<EnvironmentLightSampler>(tex_);
 
         if(no_importance_sampling)
         {
@@ -44,7 +45,9 @@ public:
                     const real u0 = real(x) / tex_width;
                     const real u1 = real(x + 1) / tex_width;
 
-                    const real delta_area = std::abs(2 * PI_r * (u1 - u0) * (std::cos(PI_r * v1) - std::cos(PI_r * v0)));
+                    const real delta_area = std::abs(2 * PI_r * (u1 - u0) *
+                                            (std::cos(PI_r * v1) - std::cos(PI_r * v0)));
+
                     const real u = (u0 + u1) / 2, v = (v0 + v1) / 2;
                     avg_rad_ += PI_r * delta_area * tex_->sample_spectrum({ u, v });
                 }
@@ -52,7 +55,8 @@ public:
         }
     }
 
-    LightSampleResult sample(const Vec3 &ref, const Sample5 &sam) const noexcept override
+    LightSampleResult sample(
+        const Vec3 &ref, const Sample5 &sam) const noexcept override
     {
         const auto [dir, pdf] = sampler_->sample({ sam.u, sam.v, sam.w });
 
@@ -76,9 +80,12 @@ public:
         auto [dir, pdf_dir] = sampler_->sample({ sam.u, sam.v, sam.w });
         dir = -dir;
 
-        const Vec2 disk_sam = math::distribution::uniform_on_unit_disk(sam.r, sam.s);
+        const Vec2 disk_sam = math::distribution
+                                ::uniform_on_unit_disk(sam.r, sam.s);
         const Coord dir_coord = Coord::from_z(dir);
-        const Vec3 pos = world_centre_ + (disk_sam.x * dir_coord.x + disk_sam.y * dir_coord.y - dir) * world_radius_;
+        
+        const Vec3 pos = world_centre_ +
+            (disk_sam.x * dir_coord.x + disk_sam.y * dir_coord.y - dir) * world_radius_;
 
         LightEmitResult ret;
         ret.pos       = pos;
@@ -91,14 +98,16 @@ public:
         return ret;
     }
 
-    LightEmitPDFResult emit_pdf(const Vec3 &position, const Vec3 &direction, const Vec3 &normal) const noexcept override
+    LightEmitPDFResult emit_pdf(
+        const Vec3 &pos, const Vec3 &dir, const Vec3 &nor) const noexcept override
     {
         const real pdf_pos = 1 / (PI_r * world_radius_ * world_radius_);
-        const real pdf_dir = sampler_->pdf(-direction);
+        const real pdf_dir = sampler_->pdf(-dir);
         return { pdf_pos, pdf_dir };
     }
 
-    LightEmitPosResult emit_pos(const Vec3 &ref, const Vec3 &ref_to_light) const noexcept override
+    LightEmitPosResult emit_pos(
+        const Vec3 &ref, const Vec3 &ref_to_light) const noexcept override
     {
         // o: world_center
         // r: world_radius
@@ -138,9 +147,9 @@ public:
         return avg_rad_ * radius * radius;
     }
 
-    Spectrum radiance(const Vec3 &ref, const Vec3 &ref_to_light) const noexcept override
+    Spectrum radiance(
+        const Vec3 &ref, const Vec3 &ref_to_light) const noexcept override
     {
-        //const Vec3 dir   = Coord::from_z(up_).global_to_local(ref_to_light).normalize();
         const Vec3 dir   = ref_to_light.normalize();
         const real phi   = local_angle::phi(dir);
         const real theta = local_angle::theta(dir);
@@ -150,11 +159,11 @@ public:
     }
 };
 
-std::shared_ptr<EnvirLight> create_ibl_light(
-    std::shared_ptr<const Texture2D> tex,
+RC<EnvirLight> create_ibl_light(
+    RC<const Texture2D> tex,
     bool no_importance_sampling = false)
 {
-    return std::make_shared<IBL>(tex, no_importance_sampling);
+    return newRC<IBL>(tex, no_importance_sampling);
 }
 
 AGZ_TRACER_END

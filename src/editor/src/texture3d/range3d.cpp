@@ -11,7 +11,7 @@ Range3DWidget::Range3DWidget(const CloneState &clone_state)
     QWidget     *hwidget = new QWidget(this);
     QHBoxLayout *hlayout = new QHBoxLayout(hwidget);
 
-    range_edit_validator_ = std::make_unique<RealRangeValidator>();
+    range_edit_validator_ = newBox<RealRangeValidator>();
 
     range_edit_ = new QLineEdit(hwidget);
     value_      = new QDoubleSpinBox(hwidget);
@@ -65,7 +65,8 @@ Range3DWidget::Range3DWidget(const CloneState &clone_state)
         set_range(low, high);
     });
 
-    connect(value_, qOverload<double>(&QDoubleSpinBox::valueChanged), [=](double new_value)
+    connect(value_, qOverload<double>(&QDoubleSpinBox::valueChanged),
+        [=](double new_value)
     {
         slider_->set_value(new_value);
         set_dirty_flag();
@@ -91,7 +92,8 @@ ResourceWidget<tracer::Texture3D> *Range3DWidget::clone()
     return new Range3DWidget(clone_state);
 }
 
-std::unique_ptr<ResourceThumbnailProvider> Range3DWidget::get_thumbnail(int width, int height) const
+Box<ResourceThumbnailProvider> Range3DWidget::get_thumbnail(
+    int width, int height) const
 {
     const double value = slider_->value();
 
@@ -101,7 +103,7 @@ std::unique_ptr<ResourceThumbnailProvider> Range3DWidget::get_thumbnail(int widt
     QPixmap pixmap;
     pixmap.convertFromImage(img);
 
-    return std::make_unique<FixedResourceThumbnailProvider>(pixmap.scaled(width, height));
+    return newBox<FixedResourceThumbnailProvider>(pixmap.scaled(width, height));
 }
 
 void Range3DWidget::save_asset(AssetSaver &saver)
@@ -134,11 +136,12 @@ void Range3DWidget::load_asset(AssetLoader &loader)
     do_update_tracer_object();
 }
 
-std::shared_ptr<tracer::ConfigNode> Range3DWidget::to_config(JSONExportContext &ctx) const
+RC<tracer::ConfigNode> Range3DWidget::to_config(JSONExportContext &ctx) const
 {
-    auto grp = std::make_shared<tracer::ConfigGroup>();
+    auto grp = newRC<tracer::ConfigGroup>();
     grp->insert_str("type", "constant");
-    grp->insert_child("texel", tracer::ConfigArray::from_spectrum(Spectrum(real(value_->value()))));
+    grp->insert_child(
+        "texel", tracer::ConfigArray::from_spectrum(Spectrum(real(value_->value()))));
     return grp;
 }
 
@@ -165,10 +168,12 @@ void Range3DWidget::set_range(double low, double high)
 
 void Range3DWidget::do_update_tracer_object()
 {
-    tracer_object_ = tracer::create_constant3d_texture({}, Spectrum(slider_->value()));
+    tracer_object_ = tracer::create_constant3d_texture(
+        {}, Spectrum(slider_->value()));
 }
 
-ResourceWidget<tracer::Texture3D> *Range3DWidgetCreator::create_widget(ObjectContext &obj_ctx) const
+ResourceWidget<tracer::Texture3D> *Range3DWidgetCreator::create_widget(
+    ObjectContext &obj_ctx) const
 {
     return new Range3DWidget({});
 }

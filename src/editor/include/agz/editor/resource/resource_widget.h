@@ -51,7 +51,7 @@ public:
     /**
      * @brief get the newest tracer object
      */
-    std::shared_ptr<TracerObject> get_tracer_object();
+    RC<TracerObject> get_tracer_object();
 
     /**
      * @brief clone the resource widget and tracer object
@@ -61,7 +61,8 @@ public:
     /**
      * @brief get the thumbnail image
      */
-    virtual std::unique_ptr<ResourceThumbnailProvider> get_thumbnail(int width, int height) const;
+    virtual Box<ResourceThumbnailProvider> get_thumbnail(
+        int width, int height) const;
 
     /**
      * @brief serialize
@@ -76,12 +77,12 @@ public:
     /**
      * @brief convert to tracer config node
      */
-    virtual std::shared_ptr<tracer::ConfigNode> to_config(JSONExportContext &ctx) const = 0;
+    virtual RC<tracer::ConfigNode> to_config(JSONExportContext &ctx) const = 0;
 
 protected:
 
     /**
-     * @brief set the dirty flag to true and call the dirty_callback function (if presents)
+     * @brief set the dirty flag and call the dirty_callback function (if presents)
      */
     void set_dirty_flag();
 
@@ -90,7 +91,7 @@ protected:
      */
     virtual void update_tracer_object_impl() = 0;
 
-    std::shared_ptr<TracerObject> tracer_object_;
+    RC<TracerObject> tracer_object_;
     
 private:
 
@@ -109,7 +110,8 @@ public:
 
     virtual QString name() const = 0;
 
-    virtual ResourceWidget<TracerObject> *create_widget(ObjectContext &obj_ctx) const = 0;
+    virtual ResourceWidget<TracerObject> *create_widget(
+        ObjectContext &obj_ctx) const = 0;
 };
 
 /**
@@ -123,7 +125,7 @@ public:
     using Widget  = ResourceWidget<TracerObject>;
     using Creator = ResourceWidgetCreator<TracerObject>;
 
-    void add_creator(std::unique_ptr<Creator> creator);
+    void add_creator(Box<Creator> creator);
 
     const QStringList &get_type_names() const noexcept;
 
@@ -133,7 +135,7 @@ private:
 
     QStringList type_names_;
 
-    std::map<QString, std::unique_ptr<Creator>, std::less<>> name2creator_;
+    std::map<QString, Box<Creator>, std::less<>> name2creator_;
 };
 
 

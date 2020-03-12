@@ -19,7 +19,7 @@ class EnvironmentLightSampler : public misc::uncopyable_t
 
 public:
 
-    explicit EnvironmentLightSampler(std::shared_ptr<const Texture2D> tex)
+    explicit EnvironmentLightSampler(RC<const Texture2D> tex)
     {
         const int width = tex->width(), height = tex->height();
         const int new_width  = (std::min)(width, 200);
@@ -63,52 +63,15 @@ public:
                     }
                 }
 
-                const real delta_area = std::abs(2 * PI_r * (x1 - x0) * (std::cos(PI_r * y1) - std::cos(PI_r * y0)));
+                const real delta_area = std::abs(
+                    2 * PI_r * (x1 - x0) * (std::cos(PI_r * y1)
+                  - std::cos(PI_r * y0)));
+                  
                 const real area_lum = pixel_lum * delta_area;
                 probs_(y, x) = area_lum;
                 math::atomic_add(lum_sum, area_lum);
             }
         });
-
-        /*for(int y = 0; y < new_height; ++y)
-        {
-            const real y0 = real(y)     / real(new_height);
-            const real y1 = real(y + 1) / real(new_height);
-
-            const real y0_src = y0 * height;
-            const real y1_src = y1 * height;
-
-            const int y_src_beg = (std::max)(0, int(std::floor(y0_src) - 1));
-            const int y_src_lst = (std::min)(height - 1, int(std::floor(y1_src) + 1));
-
-            for(int x = 0; x < new_width; ++x)
-            {
-                const real x0 = real(x) / new_width;
-                const real x1 = real(x + 1) / new_width;
-
-                const real x0_src = x0 * width;
-                const real x1_src = x1 * width;
-
-                const int x_src_beg = (std::max)(0, int(std::floor(x0_src) - 1));
-                const int x_src_lst = (std::min)(width - 1, int(std::floor(x1_src) + 1));
-
-                real pixel_lum = 0;
-                for(int y_src = y_src_beg; y_src <= y_src_lst; ++y_src)
-                {
-                    for(int x_src = x_src_beg; x_src <= x_src_lst; ++x_src)
-                    {
-                        const real src_u = (real(x_src) + real(0.5)) / real(width);
-                        const real src_v = (real(y_src) + real(0.5)) / real(height);
-                        pixel_lum += tex->sample_spectrum({ src_u, src_v }).lum();
-                    }
-                }
-
-                const real delta_area = std::abs(2 * PI_r * (x1 - x0) * (std::cos(PI_r * y1) - std::cos(PI_r * y0)));
-                const real area_lum = pixel_lum * delta_area;
-                probs_(y, x) = area_lum;
-                lum_sum += area_lum;
-            }
-        }*/
 
         // normalize the energy distribution
 
@@ -156,14 +119,19 @@ public:
         const real v0 = real(patch_y)     / real(probs_.height());
         const real v1 = real(patch_y + 1) / real(probs_.height());
 
-        const auto [cvmin, cvmax] = math::minmax(std::cos(PI_r * v1), std::cos(PI_r * v0));
+        const auto [cvmin, cvmax] = math::minmax(
+            std::cos(PI_r * v1), std::cos(PI_r * v0));
 
         const real cos_theta = cvmin + sam.w * (cvmax - cvmin);
         const real sin_theta = local_angle::cos_2_sin(cos_theta);
         const real u         = math::mix(u0, u1, sam.v);
         const real phi       = 2 * PI_r * u;
 
-        const Vec3 dir(sin_theta * std::cos(phi), sin_theta * std::sin(phi), cos_theta);
+        const Vec3 dir = {
+            sin_theta * std::cos(phi),
+            sin_theta * std::sin(phi),
+            cos_theta
+        };
         const real in_patch_pdf = 1 / (2 * PI_r * ((u1 - u0) * (cvmax - cvmin)));
 
         return { dir, patch_pdf * in_patch_pdf };
@@ -179,8 +147,11 @@ public:
         const real u = phi / (2 * PI_r);
         const real v = theta / PI_r;
 
-        const int patch_x = (std::min)(probs_.width() - 1, int(std::floor(u * probs_.width())));
-        const int patch_y = (std::min)(probs_.height() - 1, int(std::floor(v * probs_.height())));
+        const int patch_x = (std::min)(probs_.width() - 1,
+                                       int(std::floor(u * probs_.width())));
+        const int patch_y = (std::min)(probs_.height() - 1,
+                                       int(std::floor(v * probs_.height())));
+
         const real patch_pdf = probs_(patch_y, patch_x);
 
         const real u0 = real(patch_x)     / real(probs_.width());
@@ -188,7 +159,9 @@ public:
         const real v0 = real(patch_y)     / real(probs_.height());
         const real v1 = real(patch_y + 1) / real(probs_.height());
 
-        const auto [cvmin, cvmax] = math::minmax(std::cos(PI_r * v1), std::cos(PI_r * v0));
+        const auto [cvmin, cvmax] = math::minmax(
+            std::cos(PI_r * v1), std::cos(PI_r * v0));
+        
         const real in_patch_pdf = 1 / (2 * PI_r * ((u1 - u0) * (cvmax - cvmin)));
 
         return patch_pdf * in_patch_pdf;

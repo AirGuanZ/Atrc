@@ -11,7 +11,7 @@ RangeWidget::RangeWidget(const CloneState &clone_state)
     QWidget     *hwidget = new QWidget(this);
     QHBoxLayout *hlayout = new QHBoxLayout(hwidget);
 
-    range_edit_validator_ = std::make_unique<RealRangeValidator>();
+    range_edit_validator_ = newBox<RealRangeValidator>();
 
     range_edit_ = new QLineEdit(hwidget);
     value_      = new QDoubleSpinBox(hwidget);
@@ -20,7 +20,8 @@ RangeWidget::RangeWidget(const CloneState &clone_state)
     slider_->set_orientation(Qt::Horizontal);
 
     range_edit_->setAlignment(Qt::AlignCenter);
-    range_edit_->setText(QString("%1 %2").arg(clone_state.low).arg(clone_state.high));
+    range_edit_->setText(
+        QString("%1 %2").arg(clone_state.low).arg(clone_state.high));
     range_edit_->setValidator(range_edit_validator_.get());
 
     hlayout->addWidget(value_);
@@ -65,7 +66,8 @@ RangeWidget::RangeWidget(const CloneState &clone_state)
         set_range(low, high);
     });
 
-    connect(value_, qOverload<double>(&QDoubleSpinBox::valueChanged), [=](double new_value)
+    connect(value_, qOverload<double>(&QDoubleSpinBox::valueChanged),
+        [=](double new_value)
     {
         slider_->set_value(new_value);
         set_dirty_flag();
@@ -91,7 +93,8 @@ ResourceWidget<tracer::Texture2D> *RangeWidget::clone()
     return new RangeWidget(clone_state);
 }
 
-std::unique_ptr<ResourceThumbnailProvider> RangeWidget::get_thumbnail(int width, int height) const
+Box<ResourceThumbnailProvider> RangeWidget::get_thumbnail(
+    int width, int height) const
 {
     const double value = slider_->value();
 
@@ -101,7 +104,7 @@ std::unique_ptr<ResourceThumbnailProvider> RangeWidget::get_thumbnail(int width,
     QPixmap pixmap;
     pixmap.convertFromImage(img);
 
-    return std::make_unique<FixedResourceThumbnailProvider>(pixmap.scaled(width, height));
+    return newBox<FixedResourceThumbnailProvider>(pixmap.scaled(width, height));
 }
 
 void RangeWidget::save_asset(AssetSaver &saver)
@@ -134,11 +137,12 @@ void RangeWidget::load_asset(AssetLoader &loader)
     do_update_tracer_object();
 }
 
-std::shared_ptr<tracer::ConfigNode> RangeWidget::to_config(JSONExportContext &ctx) const
+RC<tracer::ConfigNode> RangeWidget::to_config(JSONExportContext &ctx) const
 {
-    auto grp = std::make_shared<tracer::ConfigGroup>();
+    auto grp = newRC<tracer::ConfigGroup>();
     grp->insert_str("type", "constant");
-    grp->insert_child("texel", tracer::ConfigArray::from_spectrum(Spectrum(real(value_->value()))));
+    grp->insert_child(
+        "texel", tracer::ConfigArray::from_spectrum(Spectrum(real(value_->value()))));
     return grp;
 }
 
@@ -168,7 +172,8 @@ void RangeWidget::do_update_tracer_object()
     tracer_object_ = tracer::create_constant2d_texture({}, slider_->value());
 }
 
-ResourceWidget<tracer::Texture2D> *RangeWidgetCreator::create_widget(ObjectContext &obj_ctx) const
+ResourceWidget<tracer::Texture2D> *RangeWidgetCreator::create_widget(
+    ObjectContext &obj_ctx) const
 {
     return new RangeWidget({});
 }

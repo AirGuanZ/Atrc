@@ -15,8 +15,10 @@ class ImageResizer : public PostProcessor
         avir::CImageResizer image_resizer(8);
         texture::texture2d_t<T> out_img(target_size_.y, target_size_.x);
         image_resizer.resizeImage(
-            reinterpret_cast<float*>(img.raw_data()), img.width(), img.height(), 0,
-            reinterpret_cast<float*>(out_img.raw_data()), target_size_.x, target_size_.y, N, 0);
+            reinterpret_cast<float*>(
+                img.raw_data()), img.width(), img.height(), 0,
+            reinterpret_cast<float*>(
+                out_img.raw_data()), target_size_.x, target_size_.y, N, 0);
         img = std::move(out_img);
     }
 
@@ -42,9 +44,9 @@ public:
     }
 };
 
-std::shared_ptr<PostProcessor> create_img_resizer(const Vec2i &target_size)
+RC<PostProcessor> create_img_resizer(const Vec2i &target_size)
 {
-    return std::make_shared<ImageResizer>(target_size);
+    return newRC<ImageResizer>(target_size);
 }
 
 AGZ_TRACER_END

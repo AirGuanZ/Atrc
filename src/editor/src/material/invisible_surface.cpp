@@ -13,14 +13,15 @@ ResourceWidget<tracer::Material> *InvisibleSurfaceWidget::clone()
     return new InvisibleSurfaceWidget;
 }
 
-std::unique_ptr<ResourceThumbnailProvider> InvisibleSurfaceWidget::get_thumbnail(int width, int height) const
+Box<ResourceThumbnailProvider> InvisibleSurfaceWidget::get_thumbnail(
+    int width, int height) const
 {
-    return std::make_unique<MaterialThumbnailProvider>(width, height, tracer_object_);
+    return newBox<MaterialThumbnailProvider>(width, height, tracer_object_);
 }
 
-std::shared_ptr<tracer::ConfigNode> InvisibleSurfaceWidget::to_config(JSONExportContext &ctx) const
+RC<tracer::ConfigNode> InvisibleSurfaceWidget::to_config(JSONExportContext &ctx) const
 {
-    auto grp = std::make_shared<tracer::ConfigGroup>();
+    auto grp = newRC<tracer::ConfigGroup>();
     grp->insert_str("type", "invisible_surface");
     return grp;
 }
@@ -35,7 +36,8 @@ void InvisibleSurfaceWidget::do_update_tracer_object()
     tracer_object_ = tracer::create_invisible_surface();
 }
 
-ResourceWidget<tracer::Material> *InvisibleSurfaceWidgetCreator::create_widget(ObjectContext &obj_ctx) const
+ResourceWidget<tracer::Material> *InvisibleSurfaceWidgetCreator::create_widget(
+    ObjectContext &obj_ctx) const
 {
     return new InvisibleSurfaceWidget;
 }

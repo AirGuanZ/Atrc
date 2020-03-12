@@ -25,13 +25,15 @@ public:
 
     }
 
-    Spectrum eval(const Vec3 &wi, const Vec3 &wo, TransportMode mode) const noexcept override
+    Spectrum eval(
+        const Vec3 &wi, const Vec3 &wo, TransMode mode) const noexcept override
     {
         const real u = -cos(wi, wo);
         return Spectrum(phase_func(u));
     }
 
-    BSDFSampleResult sample(const Vec3 &wo, TransportMode mode, const Sample3 &sam) const noexcept override
+    BSDFSampleResult sample(
+        const Vec3 &wo, TransMode, const Sample3 &sam) const noexcept override
     {
         const real s = 2 * sam.u - 1;
         real u;
@@ -47,7 +49,11 @@ public:
         const real sin_theta = local_angle::cos_2_sin(cos_theta);
         const real phi = 2 * PI_r * sam.v;
 
-        const Vec3 local_wi{ sin_theta * std::sin(phi), sin_theta * std::cos(phi), cos_theta };
+        const Vec3 local_wi = {
+            sin_theta * std::sin(phi),
+            sin_theta * std::cos(phi),
+            cos_theta
+        };
 
         BSDFSampleResult ret;
         ret.pdf      = phase_func(u);
@@ -71,6 +77,11 @@ public:
     bool is_delta() const noexcept override
     {
         return false;
+    }
+
+    bool has_diffuse_component() const noexcept override
+    {
+        return true;
     }
 };
 

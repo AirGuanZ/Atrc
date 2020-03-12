@@ -1,5 +1,5 @@
 // ======================================================================== //
-// Copyright 2009-2018 Intel Corporation                                    //
+// Copyright 2009-2020 Intel Corporation                                    //
 //                                                                          //
 // Licensed under the Apache License, Version 2.0 (the "License");          //
 // you may not use this file except in compliance with the License.         //
@@ -40,7 +40,7 @@ struct RTC_ALIGN(16) RTCRay
 };
 
 /* Hit structure for a single ray */
-struct RTCHit
+struct RTC_ALIGN(16) RTCHit
 {
   float Ng_x;          // x coordinate of geometry normal
   float Ng_y;          // y coordinate of geometry normal

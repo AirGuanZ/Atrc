@@ -6,7 +6,8 @@ RightPanel::RightPanel(QWidget *parent)
     : QWidget(parent)
 {
     right_tab_widget = new QTabWidget(this);
-    right_tab_widget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    right_tab_widget->setSizePolicy(
+        QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     entity_area      = new QScrollArea;
     resource_area    = new QScrollArea;

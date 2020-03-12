@@ -27,7 +27,8 @@ class LogWidget : public QWidget
 {
 public:
 
-    explicit LogWidget(QWidget *parent = nullptr, int max_char_count = 20 * 1024 * 1024);
+    explicit LogWidget(
+        QWidget *parent = nullptr, int max_char_count = 20 * 1024 * 1024);
 
     void info(const QString &msg);
 

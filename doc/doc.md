@@ -20,14 +20,12 @@
 * [nlohmann json](https://github.com/nlohmann/json) for parsing comfiguration file
 * [stl reader](https://github.com/sreiter/stl_reader) for parsing STL model file
 * [tiny obj loader](https://github.com/syoyo/tinyobjloader) for parsing OBJ model file
-* [Embree 3.6.1](https://www.embree.org/) for better ray-mesh intersection test
 
 **Dependencies Need to Be Prepared**
 
 * [oidn](https://openimagedenoise.github.io/) for denoising (only when `USE_OIDN` is `ON`)
+* [Embree 3.6.1](https://www.embree.org/) for better ray-mesh intersection test (only when `USE_EMBREE` is `ON`)
 * Qt5 (only when `BUILD_GUI` or `BUILD_EDITOR` is `ON`)
-
-When using MSVC under Windows, copy all files in [oidn-1.1.0.x64.vc14.windows.zip](https://github.com/OpenImageDenoise/oidn/releases/download/v1.1.0/oidn-1.1.0. x64.vc14.windows.zip) to `lib/oidn/vc14`; when using linux, copy all files in [oidn-1.1.0.x86_64.linux.tar.gz](https://github.com/OpenImageDenoise/oidn/releases/download/v1.1.0/oidn-1.1.0.x86_64.linux.tar.gz) to `lib/oidn/linux`. Please refer to` cmake/ cmake-oidn` for details.
 
 ### CMake Options
 
@@ -51,7 +49,7 @@ git clone --recursive --depth=1 https://github.com/AirGuanZ/Atrc
 cd Atrc
 mkdir build
 cd build
-cmake -DUSE_EMBREE=ON -DUSE_OIDN=ON -DBUILD_GUI=ON -DBUILD_EDITOR=ON -DQt5_DIR="../../Qt5" -G "Visual Studio 15 2017 Win64" ..
+cmake -DUSE_EMBREE=ON -DUSE_OIDN=ON -DBUILD_GUI=ON -DBUILD_EDITOR=ON -DQt5_DIR="..." -DOpenImageDenoise_DIR="..." -Dembree_DIR="..." ..
 ```
 
 **Full-featured Building on *nix**
@@ -63,7 +61,7 @@ mkdir build
 cd build
 export CC=clang
 export CXX=clang++
-cmake -DUSE_EMBREE=ON -DUSE_OIDN=ON -DBUILD_GUI=ON -DBUILD_EDITOR=ON -DQt5_DIR="../../Qt5" -G "Unix Makefiles" ..
+cmake -DUSE_EMBREE=ON -DUSE_OIDN=ON -DBUILD_GUI=ON -DBUILD_EDITOR=ON -DQt5_DIR="..." -DOpenImageDenoise_DIR="..." -Dembree_DIR="..." -G "Unix Makefiles" ..
 ```
 
 ## Usage
@@ -536,48 +534,6 @@ Ideal mirror reflection
 | eta | Texture2D |        | index of refraction |
 | k | Texture2D | | index of absorbtion |
 
-**mtl**
-
-Standard reflection model, constructed with a diffuse component and a specular component.
-
-| Field Name | Type      | Default Value | Explanation                           |
-| ---------- | --------- | ------------- | ------------------------------------- |
-| kd         | Texture2D |               | strength of diffuse component         |
-| ks         | Fresnel   |               | strength of specular component        |
-| ns         | Texture2D |               | specular gloss; range: $(0, +\infty)$ |
-
-**add**
-
-![pic](./pictures/adder.png)
-
-Combine multiple materials together. The third image in the figure above is the effect obtained by summing the object materials in the first two images with a weight of $ 1/2 $.
-
-| Field Name | Type       | Default Value | Explanation             |
-| ---------- | ---------- | ------------- | ----------------------- |
-| mats       | [Material] |               | combined material array |
-
-**scale**
-
-Scales the reflection/refraction component of a material linearly.
-
-| Field Name | Type      | Default Value | Explanation     |
-| ---------- | --------- | ------------- | --------------- |
-| internal   | Material  |               | scaled material |
-| scale      | Texture2D |               | scaling ratio   |
-
-**mirror_varnish**
-
-![pic](./pictures/mirror_varnish.png)
-
-Absolutely smooth varnish, where the interior material must be opaque.
-
-| Field Name | Type      | Default Value | Explanation                      |
-| ---------- | --------- | ------------- | -------------------------------- |
-| internal   | Material  |               | material under the varnish layer |
-| eta_in     | Texture2D |               | inner ior of varnish             |
-| eta_out    | Texture2D | all_one       | outer ior of varnish             |
-| color      | Texture2D |               | varnish color                    |
-
 **phong**
 
 BRDF:
@@ -738,7 +694,6 @@ Traditional path tracing. You can specify the tracing strategy by `integrator`.
 | min_depth      | int  | 5             | minimum path depth before using RR policy |
 | max_depth      | int  | 10            | maximum depth of the path                 |
 | cont_prob      | real | 0.9           | pass probability when using RR strategy   |
-| use_mis        | bool | true          | use mis to computing direct illumination  |
 
 The entire image is divided into multiple square pixel blocks (rendering tasks), and each pixel block is assigned to a worker thread for execution as a subtask.
 
@@ -857,71 +812,6 @@ Textures loaded from common image file formats (`.bmp, .jpg, .png, .tga`, etc)
 | filename   | string |               | image filename                           |
 | sample     | string | "linear"      | sampling strategy; range: linear/nearest |
 
-**scale**
-
-A wrapper that linearly scales another texture
-
-| Field Name | Type      | Default Value | Explanation    |
-| ---------- | --------- | ------------- | -------------- |
-| scale      | Spectrum  |               | scaling ratio  |
-| internal   | Texture2D |               | scaled texture |
-
-**gradient**
-
-Linear gradient texture along the `u` direction. You can achieve gradients in other directions through texture coordinate transformation.
-
-| Field Name | Type     | Default Value | Explanation    |
-| ---------- | -------- | ------------- | -------------- |
-| color1     | Spectrum |               | color at $u=0$ |
-| color2     | Spectrum |               | color at $u=1$ |
-
-**add**
-
-Add two textures together
-
-| Field Name | Type      | Default Value | Explanation               |
-| ---------- | --------- | ------------- | ------------------------- |
-| lhs        | Texture2D |               | the first added Texture2D |
-| rhs        | Texture2D |               | the second added texture  |
-
-**mul**
-
-Multiply two textures together
-
-| Field Name | Type      | Default Value | Explanation                   |
-| ---------- | --------- | ------------- | ----------------------------- |
-| lhs        | Texture2D |               | the first multiplied texture  |
-| rhs        | Texture2D |               | the second multiplied texture |
-
-**lum_classify**
-
-Use $T(u, v)$ to represent the result of sampling texture $T$ at $(u, v)$, then `lum_classify` is defined as:
-$$
-\mathrm{lum\_classify}(u, v) := \begin{cases}\begin{aligned}
-    &\mathrm{high}(u,v), &\mathrm{internal}(u, v) \ge \mathrm{threshold}(u, v) \\
-    &\mathrm{low}(u, v), &\text{otherwise}
-\end{aligned}\end{cases}
-$$
-
-| Field Name | Type      | Default Value | Explanation |
-| ---------- | --------- | ------------- | ----------- |
-| internal   | Texture2D |               |             |
-| threshold  | Texture2D |               |             |
-| high       | Texture2D |               |             |
-| low        | Texture2D |               |             |
-
-**reverse**
-
-Invert the color of a texture
-
-| Field Name | Type      | Default Value | Explanation      |
-| ---------- | --------- | ------------- | ---------------- |
-| internal   | Texture2D |               | inverted texture |
-
-$$
-\mathrm{reverse}(u, v) := \mathrm{clamp}(1 - \mathrm{internal}(u, v), 0, 1)
-$$
-
 ### Texture3D
 
 All 3d textures contain the following fields (these fields are not listed in the subsequent textures):
@@ -1005,47 +895,6 @@ for z in 0 to texture depth
 The data arrangement of binary voxel data is similar to the text format, except that all data is stored as binary data in little-endian order.
 
 The file name array of image slices refers to the file names of a series of two-dimensional images obtained by decomposing the voxels in the depth direction. These two-dimensional images must be the same size, the number of which corresponds to the depth value of the texture.
-
-**add**
-
-Add two textures together
-
-| Field Name | Type      | Default Value | Explanation               |
-| ---------- | --------- | ------------- | ------------------------- |
-| lhs        | Texture3D |               | the first added Texture2D |
-| rhs        | Texture3D |               | the second added texture  |
-
-**mul**
-
-Multiply two textures together
-
-| Field Name | Type      | Default Value | Explanation                   |
-| ---------- | --------- | ------------- | ----------------------------- |
-| lhs        | Texture3D |               | the first multiplied texture  |
-| rhs        | Texture3D |               | the second multiplied texture |
-
-**scale**
-
-A wrapper that linearly scales another texture
-
-| Field Name | Type      | Default Value | Explanation    |
-| ---------- | --------- | ------------- | -------------- |
-| scale      | Spectrum  |               | scaling ratio  |
-| internal   | Texture3D |               | scaled texture |
-
-**lum_classify**
-
-| Field Name    | Type      | Default Value | Explanation |
-| ------------- | --------- | ------------- | ----------- |
-| lhs           | Texture3D |               |             |
-| rhs           | Texture3D |               |             |
-| less_or_equal | Texture3D |               |             |
-| greater       | Texture3D |               |             |
-
-Use $T(u, v)$ to represent the result of sampling texture $T$ at $(u, v)$, then `lum_classify` is defined as:
-$$
-\mathrm{lum\_classify}(u, v) := \begin{cases}\begin{aligned}    &\mathrm{less\_or\_equal}(u,v), &\mathrm{lhs}(u, v) \ge \mathrm{rhs}(u, v) \\    &\mathrm{greater}(u, v), &\text{otherwise}\end{aligned}\end{cases}
-$$
 
 ### Transform
 

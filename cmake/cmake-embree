@@ -1,53 +1,27 @@
-IF(MSVC)
-	SET(EMBREE_IGNORE_CMAKE_CXX_FLAGS "")
-ELSE()
-	SET(EMBREE_IGNORE_CMAKE_CXX_FLAGS "-DEMBREE_IGNORE_CMAKE_CXX_FLAGS=OFF")
-ENDIF()
+#IF(MSVC)
+#	SET(EMBREE_IGNORE_CMAKE_CXX_FLAGS "")
+#ELSE()
+#	SET(EMBREE_IGNORE_CMAKE_CXX_FLAGS "-DEMBREE_IGNORE_CMAKE_CXX_FLAGS=OFF")
+#ENDIF()
+#
+#IF(NOT DEFINED EMBREE_MAX_ISA)
+#	SET(EMBREE_MAX_ISA AVX2)
+#ENDIF()
+#
+#SET(EMBREE_IGNORE_CMAKE_CXX_FLAGS OFF CACHE BOOL "" FORCE)
+#ADD_SUBDIRECTORY(lib/embree)
+#
+#SET(EMBREE_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/lib/embree/include/")
+#
+## 下面的一系列embree的静态库必须按此顺序链接
+#IF(WIN32)
+#	SET(EMBREE_LIBRARIES embree embree_sse42 embree_avx embree_avx2 lexers math simd tasking sys)
+#ELSE()
+#	SET(EMBREE_LIBRARIES embree embree_sse42 embree_avx embree_avx2 lexers math simd tasking sys)
+#ENDIF()
+#
+#SET_TARGET_PROPERTIES(embree embree_sse42 embree_avx embree_avx2 lexers math simd tasking sys algorithms PROPERTIES FOLDER "ThirdParty")
 
-IF(NOT DEFINED EMBREE_MAX_ISA)
-	SET(EMBREE_MAX_ISA AVX2)
-ENDIF()
+FIND_PACKAGE(embree 3.0 REQUIRED)
 
-#SET(Embree3_VERSION "3.6.1")
-#ExternalProject_Add(
-#	Embree3
-#	PREFIX "${PROJECT_SOURCE_DIR}/lib/embree/atrc_build"
-#	#URL "https://github.com/embree/embree/archive/v${Embree3_VERSION}.tar.gz"
-#	#URL_MD5 d6e043321df048a427eff337eba04cf1
-#    DOWNLOAD_COMMAND ""
-#    SOURCE_DIR "${PROJECT_SOURCE_DIR}/lib/embree"
-#	CMAKE_ARGS
-#		"-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
-#		"-DEMBREE_TUTORIALS=OFF"
-#		"-DEMBREE_FILTER_FUNCTION=OFF"
-#		"-DEMBREE_RAY_PACKETS=OFF"
-#		"-DEMBREE_TASKING_SYSTEM=INTERNAL"
-#		"-DEMBREE_GEOMETRY_QUAD=OFF"
-#		"-DEMBREE_GEOMETRY_CURVE=OFF"
-#		"-DEMBREE_GEOMETRY_SUBDIVISION=OFF"
-#		"-DEMBREE_GEOMETRY_INSTANCE=OFF"
-#		"-DEMBREE_GEOMETRY_USER=OFF"
-#		"-DEMBREE_GEOMETRY_POINT=OFF"
-#		"-DEMBREE_ISPC_SUPPORT=OFF"
-#		"-DEMBREE_STATIC_LIB=ON"
-#		"-DEMBREE_MAX_ISA=${EMBREE_MAX_ISA}"
-#		"${EMBREE_IGNORE_CMAKE_CXX_FLAGS}"
-#		"-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}"
-#		"-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
-#		"-DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}"
-#	INSTALL_COMMAND ""
-#)
-
-SET(EMBREE_IGNORE_CMAKE_CXX_FLAGS OFF CACHE BOOL "" FORCE)
-ADD_SUBDIRECTORY(lib/embree)
-
-SET(EMBREE_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/lib/embree/include/")
-
-# 下面的一系列embree的静态库必须按此顺序链接
-IF(WIN32)
-	SET(EMBREE_LIBRARIES embree embree_sse42 embree_avx embree_avx2 lexers math simd tasking sys)
-ELSE()
-	SET(EMBREE_LIBRARIES embree embree_sse42 embree_avx embree_avx2 lexers math simd tasking sys)
-ENDIF()
-
-SET_TARGET_PROPERTIES(embree embree_sse42 embree_avx embree_avx2 lexers math simd tasking sys algorithms PROPERTIES FOLDER "ThirdParty")
+SET(EMBREE_LIBRARIES ${${EMBREE_LIBRARY}})

@@ -8,7 +8,8 @@ class Constant2D : public Texture2D
 
 public:
 
-    Constant2D(const Texture2DCommonParams &common_params, const Spectrum &texel)
+    Constant2D(
+        const Texture2DCommonParams &common_params, const Spectrum &texel)
     {
         init_common_params(common_params);
         texel_ = texel;
@@ -41,14 +42,14 @@ public:
     }
 };
 
-std::shared_ptr<Texture2D> create_constant2d_texture(
+RC<Texture2D> create_constant2d_texture(
     const Texture2DCommonParams &common_params,
     const Spectrum &texel)
 {
-    return std::make_shared<Constant2D>(common_params, texel);
+    return newRC<Constant2D>(common_params, texel);
 }
 
-std::shared_ptr<Texture2D> create_constant2d_texture(
+RC<Texture2D> create_constant2d_texture(
     const Texture2DCommonParams &common_params,
     real texel)
 {

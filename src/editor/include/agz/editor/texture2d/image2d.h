@@ -16,7 +16,9 @@ public:
     struct InitData
     {
         QString filename;
-        std::shared_ptr<const Image2D<math::color3b>> img_data;
+        RC<const Image2D<math::color3b>> img_data;
+
+        QString sample_method = "Linear";
 
         Texture2DCommonParamsWidget *adv = nullptr;
     };
@@ -25,13 +27,14 @@ public:
 
     ResourceWidget<tracer::Texture2D> *clone() override;
 
-    std::unique_ptr<ResourceThumbnailProvider> get_thumbnail(int width, int height) const override;
+    Box<ResourceThumbnailProvider> get_thumbnail(
+        int width, int height) const override;
 
     void save_asset(AssetSaver &saver) override;
 
     void load_asset(AssetLoader &loader) override;
 
-    std::shared_ptr<tracer::ConfigNode> to_config(JSONExportContext &ctx) const override;
+    RC<tracer::ConfigNode> to_config(JSONExportContext &ctx) const override;
 
 protected:
 
@@ -46,7 +49,7 @@ private:
     void browse_filename();
 
     QString filename_;
-    std::shared_ptr<const Image2D<math::color3b>> img_data_;
+    RC<const Image2D<math::color3b>> img_data_;
 
     QVBoxLayout *layout_ = nullptr;
 
@@ -57,6 +60,8 @@ private:
 
     Collapsible                 *adv_section_ = nullptr;
     Texture2DCommonParamsWidget *adv_widget_  = nullptr;
+
+    QComboBox *sample_method_ = nullptr;
 };
 
 class Image2DCreator : public Texture2DWidgetCreator
@@ -65,7 +70,8 @@ public:
 
     QString name() const override { return "Image"; }
 
-    ResourceWidget<tracer::Texture2D> *create_widget(ObjectContext &obj_ctx) const override;
+    ResourceWidget<tracer::Texture2D> *create_widget(
+        ObjectContext &obj_ctx) const override;
 };
 
 AGZ_EDITOR_END

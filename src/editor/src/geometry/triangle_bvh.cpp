@@ -78,11 +78,11 @@ void TriangleBVHWidget::load_asset(AssetLoader &loader)
     do_update_tracer_object();
 }
 
-std::shared_ptr<tracer::ConfigNode> TriangleBVHWidget::to_config(JSONExportContext &ctx) const
+RC<tracer::ConfigNode> TriangleBVHWidget::to_config(JSONExportContext &ctx) const
 {
-    auto grp = std::make_shared<tracer::ConfigGroup>();
+    auto grp = newRC<tracer::ConfigGroup>();
     grp->insert_str("type", "triangle_bvh");
-    grp->insert_child("transform", std::make_shared<tracer::ConfigArray>());
+    grp->insert_child("transform", newRC<tracer::ConfigArray>());
 
     const auto [ref_filename, filename] = ctx.gen_filename(".obj");
     std::ofstream fout(filename, std::ios::out | std::ios::trunc);
@@ -91,8 +91,12 @@ std::shared_ptr<tracer::ConfigNode> TriangleBVHWidget::to_config(JSONExportConte
 
     auto add_vtx = [&](const mesh::vertex_t &v)
     {
-        fout << "v " << v.position.x << " " << v.position.y << " " << v.position.z << std::endl;
-        fout << "vn " << v.normal.x << " " << v.normal.y << " " << v.normal.z << std::endl;
+        fout << "v " << v.position.x << " "
+                     << v.position.y << " "
+                     << v.position.z << std::endl;
+        fout << "vn " << v.normal.x << " "
+                      << v.normal.y << " "
+                      << v.normal.z << std::endl;
         fout << "vt " << v.tex_coord.x << " " << v.tex_coord.y << std::endl;
     };
 
@@ -132,7 +136,7 @@ void TriangleBVHWidget::update_tracer_object_impl()
 
 void TriangleBVHWidget::init_as_cube()
 {
-    vertices_ = std::make_shared<std::vector<Vertex>>();
+    vertices_ = newRC<std::vector<Vertex>>();
 
     // +x
 
@@ -202,7 +206,7 @@ void TriangleBVHWidget::load_from_file()
     try
     {
         const auto triangles = mesh::load_from_file(filename.toStdString());
-        vertices_ = std::make_shared<std::vector<Vertex>>();
+        vertices_ = newRC<std::vector<Vertex>>();
 
         for(auto &tri : triangles)
         {
@@ -213,7 +217,8 @@ void TriangleBVHWidget::load_from_file()
     }
     catch(...)
     {
-        QMessageBox::information(this, "Error", "Failed to load mesh from " + filename);
+        QMessageBox::information(
+            this, "Error", "Failed to load mesh from " + filename);
         return;
     }
 
@@ -245,7 +250,8 @@ void TriangleBVHWidget::do_update_tracer_object()
         std::move(triangles), {});
 }
 
-ResourceWidget<tracer::Geometry> *TriangleBVHWidgetCreator::create_widget(ObjectContext &obj_ctx) const
+ResourceWidget<tracer::Geometry> *TriangleBVHWidgetCreator::create_widget(
+    ObjectContext &obj_ctx) const
 {
     return new TriangleBVHWidget({});
 }

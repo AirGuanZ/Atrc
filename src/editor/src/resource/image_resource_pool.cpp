@@ -34,7 +34,7 @@ ImageResourcePool<TracerObject>::ImageResourcePool(
         AGZ_INFO("create new '{}' with name: {}",
                  typeid(TracerObject).name(), name.toStdString());
 
-        auto panel = std::make_unique<ResourcePanel<TracerObject>>(obj_ctx_, default_type);
+        auto panel = newBox<ResourcePanel<TracerObject>>(obj_ctx_, default_type);
         add_resource(name, std::move(panel));
     });
 
@@ -66,10 +66,11 @@ ImageResourcePool<TracerObject>::ImageResourcePool(
             return;
         
         AGZ_INFO("duplicate '{}' : {} -> {}",
-            typeid(TracerObject).name(), selected_rsc_->name.toStdString(), name.toStdString());
+            typeid(TracerObject).name(),
+            selected_rsc_->name.toStdString(), name.toStdString());
 
         auto panel = selected_rsc_->rsc->clone_panel();
-        add_resource(name, std::unique_ptr<ResourcePanel<TracerObject>>(panel));
+        add_resource(name, Box<ResourcePanel<TracerObject>>(panel));
     });
 
     connect(ui_->edit, &QPushButton::clicked, [=]
@@ -98,7 +99,7 @@ ImageResourcePool<TracerObject>::ImageResourcePool(
 }
 
 template<typename TracerObject>
-std::unique_ptr<ResourceReference<TracerObject>> ImageResourcePool<TracerObject>::select_resource()
+Box<ResourceReference<TracerObject>> ImageResourcePool<TracerObject>::select_resource()
 {
     if(selected_rsc_)
         return selected_rsc_->rsc->create_reference();
@@ -107,10 +108,10 @@ std::unique_ptr<ResourceReference<TracerObject>> ImageResourcePool<TracerObject>
 
 template<typename TracerObject>
 ResourceInPool<TracerObject> *ImageResourcePool<TracerObject>::add_resource(
-    const QString &name, std::unique_ptr<ResourcePanel<TracerObject>> panel)
+    const QString &name, Box<ResourcePanel<TracerObject>> panel)
 {
     auto *raw_panel = panel.get();
-    auto rsc = std::make_unique<ResourceInPool<TracerObject>>(name, std::move(panel));
+    auto rsc = newBox<ResourceInPool<TracerObject>>(name, std::move(panel));
 
     auto raw_rsc = rsc.get();
     editor_->add_to_resource_panel(raw_panel);
@@ -118,9 +119,10 @@ ResourceInPool<TracerObject> *ImageResourcePool<TracerObject>::add_resource(
     ImageTextIcon *icon = new ImageTextIcon(
         ui_->scroll_area_widget, icon_font_, TEXTURE2D_THUMBNAIL_RENDER_SIZE);
     icon->set_text(name);
-    icon->set_image(raw_panel->get_thumbnail(TEXTURE2D_THUMBNAIL_RENDER_SIZE, TEXTURE2D_THUMBNAIL_RENDER_SIZE));
+    icon->set_image(raw_panel->get_thumbnail(
+        TEXTURE2D_THUMBNAIL_RENDER_SIZE, TEXTURE2D_THUMBNAIL_RENDER_SIZE));
 
-    auto record = std::make_unique<Record>();
+    auto record = newBox<Record>();
     auto raw_record = record.get();
     record->name = name;
     record->rsc  = std::move(rsc);
@@ -163,8 +165,8 @@ void ImageResourcePool<TracerObject>::load_asset(AssetLoader &loader)
     const uint32_t count = loader.read<uint32_t>();
     for(uint32_t i = 0; i < count; ++i)
     {
-        auto rsc = std::make_unique<ResourceInPool<TracerObject>>(
-            "", std::make_unique<ResourcePanel<TracerObject>>(obj_ctx_, default_type_));
+        auto rsc = newBox<ResourceInPool<TracerObject>>(
+            "", newBox<ResourcePanel<TracerObject>>(obj_ctx_, default_type_));
         rsc->load_asset(*this, loader);
         const QString name = rsc->get_name();
 
@@ -175,9 +177,10 @@ void ImageResourcePool<TracerObject>::load_asset(AssetLoader &loader)
         ImageTextIcon *icon = new ImageTextIcon(
             ui_->scroll_area_widget, icon_font_, TEXTURE2D_THUMBNAIL_RENDER_SIZE);
         icon->set_text(name);
-        icon->set_image(raw_panel->get_thumbnail(TEXTURE2D_THUMBNAIL_RENDER_SIZE, TEXTURE2D_THUMBNAIL_RENDER_SIZE));
+        icon->set_image(raw_panel->get_thumbnail(
+            TEXTURE2D_THUMBNAIL_RENDER_SIZE, TEXTURE2D_THUMBNAIL_RENDER_SIZE));
 
-        auto record = std::make_unique<Record>();
+        auto record = newBox<Record>();
         auto raw_record = record.get();
         record->name = name;
         record->rsc  = std::move(rsc);
@@ -206,7 +209,8 @@ void ImageResourcePool<TracerObject>::load_asset(AssetLoader &loader)
 }
 
 template<typename TracerObject>
-void ImageResourcePool<TracerObject>::to_config(tracer::ConfigGroup &scene_grp, JSONExportContext &ctx) const
+void ImageResourcePool<TracerObject>::to_config(
+    tracer::ConfigGroup &scene_grp, JSONExportContext &ctx) const
 {
     for(auto &p : name2rsc_)
     {
@@ -223,7 +227,7 @@ void ImageResourcePool<TracerObject>::to_config(tracer::ConfigGroup &scene_grp, 
                 continue;
             }
 
-            auto new_grp = std::make_shared<tracer::ConfigGroup>();
+            auto new_grp = newRC<tracer::ConfigGroup>();
             grp->insert_child(ref_name->at_str(i), new_grp);
             grp = new_grp.get();
         }
@@ -235,7 +239,8 @@ void ImageResourcePool<TracerObject>::to_config(tracer::ConfigGroup &scene_grp, 
 }
 
 template<typename TracerObject>
-ResourceInPool<TracerObject> *ImageResourcePool<TracerObject>::name_to_rsc(const QString &name)
+ResourceInPool<TracerObject> *ImageResourcePool<TracerObject>::name_to_rsc(
+    const QString &name)
 {
     auto it = name2rsc_.find(name);
     return it == name2rsc_.end() ? nullptr : it->second->rsc.get();

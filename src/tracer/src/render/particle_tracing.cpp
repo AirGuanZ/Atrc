@@ -22,7 +22,8 @@ void trace_particle(
 
     const Camera *camera = scene.get_camera();
 
-    Spectrum coef = emit_result.radiance / (select_light_pdf * emit_result.pdf_pos * emit_result.pdf_dir);
+    Spectrum coef = emit_result.radiance /
+        (select_light_pdf * emit_result.pdf_pos * emit_result.pdf_dir);
     coef *= std::abs(cos(emit_result.dir, emit_result.nor));
 
     Ray r(emit_result.pos + EPS * emit_result.nor, emit_result.dir);
@@ -50,13 +51,18 @@ void trace_particle(
         {
             if(scene.visible(camera_sample.pos_on_cam, inct.pos))
             {
-                const Spectrum bsdf_f = shd.bsdf->eval(inct.wr, camera_sample.ref_to_pos, TransportMode::Radiance);
+                const Spectrum bsdf_f = shd.bsdf->eval(
+                    inct.wr, camera_sample.ref_to_pos, TransMode::Radiance);
                 if(!bsdf_f.is_black())
                 {
-                    const real pixel_x = camera_sample.film_coord.x * params.film_res.x;
-                    const real pixel_y = camera_sample.film_coord.y * params.film_res.y;
+                    const real pixel_x = camera_sample.film_coord.x
+                                       * params.film_res.x;
+                    const real pixel_y = camera_sample.film_coord.y
+                                       * params.film_res.y;
 
-                    const Spectrum f = coef * bsdf_f * std::abs(cos(inct.geometry_coord.z, camera_sample.ref_to_pos))
+                    const real abscos = std::abs(cos(
+                        inct.geometry_coord.z, camera_sample.ref_to_pos));
+                    const Spectrum f = coef * bsdf_f * abscos
                         * camera_sample.we / camera_sample.pdf;
                     film.apply(pixel_x, pixel_y, f);
                 }
@@ -65,11 +71,13 @@ void trace_particle(
 
         // sample bsdf & construct next ray
 
-        const auto bsdf_sample = shd.bsdf->sample(inct.wr, TransportMode::Importance, sampler.sample3());
+        const auto bsdf_sample = shd.bsdf->sample(
+            inct.wr, TransMode::Importance, sampler.sample3());
         if(!bsdf_sample.f)
             return;
 
-        coef *= bsdf_sample.f * std::abs(cos(bsdf_sample.dir, inct.geometry_coord.z)) / bsdf_sample.pdf;
+        const real abscos = std::abs(cos(bsdf_sample.dir, inct.geometry_coord.z));
+        coef *= bsdf_sample.f * abscos / bsdf_sample.pdf;
         r = Ray(inct.eps_offset(bsdf_sample.dir), bsdf_sample.dir);
     }
 }

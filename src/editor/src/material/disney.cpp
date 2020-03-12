@@ -10,7 +10,8 @@ DisneyWidget::DisneyWidget(const InitData &init_data, ObjectContext &obj_ctx)
 {
     QVBoxLayout *layout = new QVBoxLayout(this);
 
-    auto add_section = [=](const QString &title, QWidget *widget, bool open = false)
+    auto add_section = [=](
+        const QString &title, QWidget *widget, bool open = false)
     {
         Collapsible *section = new Collapsible(this, title);
         section->set_content_widget(widget);
@@ -141,9 +142,10 @@ ResourceWidget<tracer::Material> *DisneyWidget::clone()
     return new DisneyWidget(init_data, obj_ctx_);
 }
 
-std::unique_ptr<ResourceThumbnailProvider> DisneyWidget::get_thumbnail(int width, int height) const
+Box<ResourceThumbnailProvider> DisneyWidget::get_thumbnail(
+    int width, int height) const
 {
-    return std::make_unique<MaterialThumbnailProvider>(width, height, tracer_object_);
+    return newBox<MaterialThumbnailProvider>(width, height, tracer_object_);
 }
 
 void DisneyWidget::save_asset(AssetSaver &saver)
@@ -184,9 +186,9 @@ void DisneyWidget::load_asset(AssetLoader &loader)
     do_update_tracer_object();
 }
 
-std::shared_ptr<tracer::ConfigNode> DisneyWidget::to_config(JSONExportContext &ctx) const
+RC<tracer::ConfigNode> DisneyWidget::to_config(JSONExportContext &ctx) const
 {
-    auto grp = std::make_shared<tracer::ConfigGroup>();
+    auto grp = newRC<tracer::ConfigGroup>();
     grp->insert_str("type", "disney");
 
     grp->insert_child("base_color",             base_color_->to_config(ctx));
@@ -237,7 +239,8 @@ void DisneyWidget::do_update_tracer_object()
         clearcoat, clearcoat_gloss, std::move(normal_map));
 }
 
-ResourceWidget<tracer::Material> *DisneyWidgetCreator::create_widget(ObjectContext &obj_ctx) const
+ResourceWidget<tracer::Material> *DisneyWidgetCreator::create_widget(
+    ObjectContext &obj_ctx) const
 {
     return new DisneyWidget({}, obj_ctx);
 }

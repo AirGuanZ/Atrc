@@ -74,7 +74,8 @@ namespace disney_impl
             return lum > 0 ? base_color / lum : Spectrum(1);
         }
 
-        Spectrum f_diffuse(real cos_theta_i, real cos_theta_o, real cos_theta_d) const noexcept
+        Spectrum f_diffuse(
+            real cos_theta_i, real cos_theta_o, real cos_theta_d) const noexcept
         {
             const Spectrum f_lambert = C_ / PI_r;
             const real FL = one_minus_5(cos_theta_i);
@@ -87,7 +88,8 @@ namespace disney_impl
 
         Spectrum f_sheen(real cos_theta_d) const noexcept
         {
-            return 4 * sheen_ * mix(Spectrum(1), Ctint_, sheen_tint_) * one_minus_5(cos_theta_d);
+            return 4 * sheen_ * mix(Spectrum(1), Ctint_, sheen_tint_)
+                              * one_minus_5(cos_theta_d);
         }
 
         Spectrum f_clearcoat(
@@ -96,14 +98,17 @@ namespace disney_impl
             real sin_theta_h, real cos_theta_h, real cos_theta_d) const noexcept
         {
             assert(cos_theta_i > 0 && cos_theta_o > 0);
-            const real D = microfacet::gtr1(sin_theta_h, cos_theta_h, clearcoat_roughness_);
+            const real D = microfacet::gtr1(
+                sin_theta_h, cos_theta_h, clearcoat_roughness_);
             const real F = schlick(real(0.04), cos_theta_d);
             const real G = microfacet::smith_gtr2(tan_theta_i, real(0.25))
                          * microfacet::smith_gtr2(tan_theta_o, real(0.25));
-            return Spectrum(clearcoat_ * D * F * G / std::abs(4 * cos_theta_i * cos_theta_o));
+            return Spectrum(
+                clearcoat_ * D * F * G / std::abs(4 * cos_theta_i * cos_theta_o));
         }
 
-        Spectrum f_trans(const Vec3 &lwi, const Vec3 &lwo, TransportMode mode) const noexcept
+        Spectrum f_trans(
+            const Vec3 &lwi, const Vec3 &lwo, TransMode mode) const noexcept
         {
             assert(lwi.z * lwo.z < 0);
 
@@ -124,7 +129,9 @@ namespace disney_impl
             const real cos_theta_h = local_angle::cos_theta(lwh);
             const real sin_theta_h = local_angle::cos_2_sin(cos_theta_h);
             const real D = microfacet::anisotropic_gtr2(
-                sin_phi_h, cos_phi_h, sin_theta_h, cos_theta_h, trans_ax_, trans_ay_);
+                sin_phi_h, cos_phi_h,
+                sin_theta_h, cos_theta_h,
+                trans_ax_, trans_ay_);
 
             const real phi_i       = local_angle::phi(lwi);
             const real phi_o       = local_angle::phi(lwo);
@@ -132,18 +139,23 @@ namespace disney_impl
             const real sin_phi_o   = std::sin(phi_o), cos_phi_o = std::cos(phi_o);
             const real tan_theta_i = local_angle::tan_theta(lwi);
             const real tan_theta_o = local_angle::tan_theta(lwo);
-            const real G = microfacet::smith_anisotropic_gtr2(cos_phi_i, sin_phi_i, trans_ax_, trans_ay_, tan_theta_i)
-                         * microfacet::smith_anisotropic_gtr2(cos_phi_o, sin_phi_o, trans_ax_, trans_ay_, tan_theta_o);
+            const real G = microfacet::smith_anisotropic_gtr2(
+                                cos_phi_i, sin_phi_i,
+                                trans_ax_, trans_ay_, tan_theta_i)
+                         * microfacet::smith_anisotropic_gtr2(
+                                cos_phi_o, sin_phi_o,
+                                trans_ax_, trans_ay_, tan_theta_o);
 
             const real sdem = cos_theta_d + eta * dot(lwi, lwh);
-            const real corr_factor = mode == TransportMode::Radiance ? 1 / eta : 1;
+            const real corr_factor = mode == TransMode::Radiance ? 1 / eta : 1;
 
             real(*std_sqrt)(real) = std::sqrt;
             const Spectrum sqrtC = C_.map(std_sqrt);
 
-            const real val = (1 - F) * D * G * eta * eta * dot(lwi, lwh) * dot(lwo, lwh)
-                     * corr_factor * corr_factor
-                     / (cos_theta_i * cos_theta_o * sdem * sdem);
+            const real val = (1 - F) * D * G * eta * eta
+                           * dot(lwi, lwh) * dot(lwo, lwh)
+                           * corr_factor * corr_factor
+                           / (cos_theta_i * cos_theta_o * sdem * sdem);
 
             const real trans_factor = cos_theta_o > 0 ? transmission_ : 1;
             return (1 - metallic_) * trans_factor * sqrtC * std::abs(val);
@@ -165,16 +177,24 @@ namespace disney_impl
             const real cos_theta_h = local_angle::cos_theta(lwh);
             const real sin_theta_h = local_angle::cos_2_sin(cos_theta_h);
             const real D = microfacet::anisotropic_gtr2(
-                sin_phi_h, cos_phi_h, sin_theta_h, cos_theta_h, trans_ax_, trans_ay_);
+                sin_phi_h, cos_phi_h,
+                sin_theta_h, cos_theta_h,
+                trans_ax_, trans_ay_);
 
             const real phi_i       = local_angle::phi(lwi);
             const real phi_o       = local_angle::phi(lwo);
-            const real sin_phi_i   = std::sin(phi_i), cos_phi_i = std::cos(phi_i);
-            const real sin_phi_o   = std::sin(phi_o), cos_phi_o = std::cos(phi_o);
+            const real sin_phi_i   = std::sin(phi_i);
+            const real cos_phi_i   = std::cos(phi_i);
+            const real sin_phi_o   = std::sin(phi_o);
+            const real cos_phi_o   = std::cos(phi_o);
             const real tan_theta_i = local_angle::tan_theta(lwi);
             const real tan_theta_o = local_angle::tan_theta(lwo);
-            const real G = microfacet::smith_anisotropic_gtr2(cos_phi_i, sin_phi_i, trans_ax_, trans_ay_, tan_theta_i)
-                         * microfacet::smith_anisotropic_gtr2(cos_phi_o, sin_phi_o, trans_ax_, trans_ay_, tan_theta_o);
+            const real G = microfacet::smith_anisotropic_gtr2(
+                                cos_phi_i, sin_phi_i,
+                                trans_ax_, trans_ay_, tan_theta_i)
+                         * microfacet::smith_anisotropic_gtr2(
+                                cos_phi_o, sin_phi_o,
+                                trans_ax_, trans_ay_, tan_theta_o);
 
             return transmission_ * C_ * std::abs(F * D * G / (4 * lwi.z * lwo.z));
         }
@@ -192,9 +212,11 @@ namespace disney_impl
             const Spectrum Cspec = mix(
                 mix(Spectrum(1), Ctint_, specular_tint_),
                 C_, metallic_);
-            const Spectrum dielectric_fresnel = Cspec * refl_aux::dielectric_fresnel(IOR_, 1, cos_theta_d);
+            const Spectrum dielectric_fresnel = Cspec
+                * refl_aux::dielectric_fresnel(IOR_, 1, cos_theta_d);
             const Spectrum conductor_fresnel = schlick(Cspec, cos_theta_d);
-            const Spectrum F = mix(specular_scale_ * dielectric_fresnel, conductor_fresnel, metallic_);
+            const Spectrum F = mix(
+                specular_scale_ * dielectric_fresnel, conductor_fresnel, metallic_);
             
             const real phi_h       = local_angle::phi(lwh);
             const real sin_phi_h   = std::sin(phi_h);
@@ -210,20 +232,24 @@ namespace disney_impl
             const real sin_phi_o   = std::sin(phi_o), cos_phi_o = std::cos(phi_o);
             const real tan_theta_i = local_angle::tan_theta(lwi);
             const real tan_theta_o = local_angle::tan_theta(lwo);
-            const real G = microfacet::smith_anisotropic_gtr2(cos_phi_i, sin_phi_i, ax_, ay_, tan_theta_i)
-                         * microfacet::smith_anisotropic_gtr2(cos_phi_o, sin_phi_o, ax_, ay_, tan_theta_o);
+            const real G = microfacet::smith_anisotropic_gtr2(
+                                cos_phi_i, sin_phi_i, ax_, ay_, tan_theta_i)
+                         * microfacet::smith_anisotropic_gtr2(
+                                cos_phi_o, sin_phi_o, ax_, ay_, tan_theta_o);
 
             return F * D * G / std::abs(4 * cos_theta_i * cos_theta_o);
         }
 
         Vec3 sample_diffuse(const Sample2 &sam) const noexcept
         {
-            return math::distribution::zweighted_on_hemisphere(sam.u, sam.v).first;
+            return math::distribution::zweighted_on_hemisphere(
+                            sam.u, sam.v).first;
         }
 
         Vec3 sample_specular(const Vec3 &lwo, const Sample2 &sam) const noexcept
         {
-            const Vec3 lwh = microfacet::sample_anisotropic_gtr2_vnor(lwo, ax_, ay_, sam).normalize();
+            const Vec3 lwh = microfacet::sample_anisotropic_gtr2_vnor(
+                lwo, ax_, ay_, sam).normalize();
             if(lwh.z <= 0)
                 return {};
 
@@ -247,9 +273,11 @@ namespace disney_impl
             return lwi;
         }
 
-        Vec3 sample_transmission(const Vec3 &lwo, const Sample2 &sam) const noexcept
+        Vec3 sample_transmission(
+            const Vec3 &lwo, const Sample2 &sam) const noexcept
         {
-            const Vec3 lwh = microfacet::sample_anisotropic_gtr2(trans_ax_, trans_ay_, sam);
+            const Vec3 lwh = microfacet::sample_anisotropic_gtr2(
+                trans_ax_, trans_ay_, sam);
             if(lwh.z <= 0)
                 return {};
 
@@ -269,11 +297,13 @@ namespace disney_impl
             return lwi;
         }
 
-        Vec3 sample_inner_refl(const Vec3 &lwo, const Sample2 &sam) const noexcept
+        Vec3 sample_inner_refl(
+            const Vec3 &lwo, const Sample2 &sam) const noexcept
         {
             assert(lwo.z < 0);
             
-            const Vec3 lwh = microfacet::sample_anisotropic_gtr2(trans_ax_, trans_ay_, sam);
+            const Vec3 lwh = microfacet::sample_anisotropic_gtr2(
+                trans_ax_, trans_ay_, sam);
             if(lwh.z <= 0)
                 return {};
 
@@ -289,7 +319,8 @@ namespace disney_impl
             return math::distribution::zweighted_on_hemisphere_pdf(lwi.z);
         }
 
-        std::pair<real, real> pdf_specular_clearcoat(const Vec3 &lwi, const Vec3 &lwo) const noexcept
+        std::pair<real, real> pdf_specular_clearcoat(
+            const Vec3 &lwi, const Vec3 &lwo) const noexcept
         {
             assert(lwi.z > 0 && lwo.z > 0);
 
@@ -309,12 +340,13 @@ namespace disney_impl
             const real specular_D = microfacet::anisotropic_gtr2(
                 sin_phi_h, cos_phi_h, sin_theta_h, cos_theta_h, ax_, ay_);
 
-            //const real pdf_specular = cos_theta_h * specular_D / (4 * cos_theta_d);
             const real pdf_specular =
-                microfacet::smith_anisotropic_gtr2(cos_phi_o, sin_phi_o, ax_, ay_, tan_theta_o)
+                microfacet::smith_anisotropic_gtr2(
+                    cos_phi_o, sin_phi_o, ax_, ay_, tan_theta_o)
                 * specular_D / (4 * lwo.z);
 
-            const real clearcoat_D = microfacet::gtr1(sin_theta_h, cos_theta_h, clearcoat_roughness_);
+            const real clearcoat_D = microfacet::gtr1(
+                sin_theta_h, cos_theta_h, clearcoat_roughness_);
             const real pdf_clearcoat = cos_theta_h * clearcoat_D / (4 * cos_theta_d);
 
             return { pdf_specular, pdf_clearcoat };
@@ -343,7 +375,8 @@ namespace disney_impl
             const real sin_theta_h = local_angle::cos_2_sin(cos_theta_h);
 
             const real D = microfacet::anisotropic_gtr2(
-                sin_phi_h, cos_phi_h, sin_theta_h, cos_theta_h, trans_ax_, trans_ay_);
+                sin_phi_h, cos_phi_h,
+                sin_theta_h, cos_theta_h, trans_ax_, trans_ay_);
             return std::abs(dot(lwi, lwh) * D * dwh_to_dwi);
         }
 
@@ -360,7 +393,8 @@ namespace disney_impl
             const real cos_theta_d = dot(lwi, lwh);
             
             const real D = microfacet::anisotropic_gtr2(
-                sin_phi_h, cos_phi_h, sin_theta_h, cos_theta_h, trans_ax_, trans_ay_);
+                sin_phi_h, cos_phi_h,
+                sin_theta_h, cos_theta_h, trans_ax_, trans_ay_);
             return std::abs(cos_theta_h * D / (4 * cos_theta_d));
         }
 
@@ -397,7 +431,8 @@ namespace disney_impl
             transmission_roughness_ = transmission_roughness;
             IOR_           = (std::max)(real(1.01), IOR);
 
-            const real aspect = anisotropic > 0 ? std::sqrt(1 - real(0.9) * anisotropic) : real(1);
+            const real aspect = anisotropic > 0 ?
+                std::sqrt(1 - real(0.9) * anisotropic) : real(1);
             ax_ = std::max(real(0.001), sqr(roughness) / aspect);
             ay_ = std::max(real(0.001), sqr(roughness) * aspect);
 
@@ -409,7 +444,8 @@ namespace disney_impl
             clearcoat_roughness_ *= clearcoat_roughness_;
             clearcoat_roughness_ = (std::max)(clearcoat_roughness_, real(0.0001));
 
-            const real A = (math::clamp)(base_color.lum() * (1 - metallic_), real(0.3), real(0.7));
+            const real A = (math::clamp)(
+                base_color.lum() * (1 - metallic_), real(0.3), real(0.7));
             const real B = 1 - A;
             
             sample_w.diffuse      = A * (1 - transmission_);
@@ -418,10 +454,12 @@ namespace disney_impl
             sample_w.clearcoat    = B * clearcoat_ / (2 + clearcoat_);
         }
 
-        Spectrum eval(const Vec3 &wi, const Vec3 &wo, TransportMode mode) const noexcept override
+        Spectrum eval(
+            const Vec3 &wi, const Vec3 &wo,
+            TransMode mode) const noexcept override
         {
             if(cause_black_fringes(wi, wo))
-                return eval_for_black_fringes(wi, wo);
+                return eval_black_fringes(wi, wo);
 
             const Vec3 lwi = shading_coord_.global_to_local(wi).normalize();
             const Vec3 lwo = shading_coord_.global_to_local(wo).normalize();
@@ -436,7 +474,8 @@ namespace disney_impl
                 if(!transmission_)
                     return {};
                 const Spectrum value = f_trans(lwi, lwo, mode);
-                return value * local_angle::normal_corr_factor(geometry_coord_, shading_coord_, wi);
+                return value * local_angle::normal_corr_factor(
+                    geometry_coord_, shading_coord_, wi);
             }
 
             // inner refl
@@ -446,7 +485,8 @@ namespace disney_impl
                 if(!transmission_)
                     return {};
                 const Spectrum value = f_inner_refl(lwi, lwo);
-                return value * local_angle::normal_corr_factor(geometry_coord_, shading_coord_, wi);
+                return value * local_angle::normal_corr_factor(
+                    geometry_coord_, shading_coord_, wi);
             }
 
             // reflection
@@ -482,14 +522,17 @@ namespace disney_impl
                     sin_theta_h, cos_theta_h, cos_theta_d);
             }
 
-            const Spectrum value = (1 - metallic_) * (1 - transmission_) * (diffuse + sheen) + specular + clearcoat;
+            const Spectrum value = (1 - metallic_) * (1 - transmission_)
+                                 * (diffuse + sheen) + specular + clearcoat;
             return value * local_angle::normal_corr_factor(geometry_coord_, shading_coord_, wi);
         }
 
-        BSDFSampleResult sample(const Vec3 &wo, TransportMode mode, const Sample3 &sam) const noexcept override
+        BSDFSampleResult sample(
+            const Vec3 &wo, TransMode mode,
+            const Sample3 &sam) const noexcept override
         {
             if(cause_black_fringes(wo))
-                return sample_for_black_fringes(wo, mode, sam);
+                return sample_black_fringes(wo, mode, sam);
 
             const Vec3 lwo = shading_coord_.global_to_local(wo).normalize();
             if(std::abs(lwo.z) < EPS)
@@ -533,9 +576,11 @@ namespace disney_impl
             Vec3 lwi;
             if(sam_selector < sample_w.diffuse)
                 lwi = sample_diffuse(new_sam);
-            else if(sam_selector -= sample_w.diffuse; sam_selector < sample_w.transmission)
+            else if(sam_selector -= sample_w.diffuse;
+                    sam_selector < sample_w.transmission)
                 lwi = sample_transmission(lwo, new_sam);
-            else if(sam_selector -= sample_w.transmission; sam_selector < sample_w.specular)
+            else if(sam_selector -= sample_w.transmission;
+                    sam_selector < sample_w.specular)
                 lwi = sample_specular(lwo, new_sam);
             else
                 lwi = sample_clearcoat(lwo, new_sam);
@@ -601,45 +646,50 @@ namespace disney_impl
         {
             return false;
         }
+
+        bool has_diffuse_component() const noexcept override
+        {
+            return metallic_ < 1 && transmission_ < 1;
+        }
     };
 
 } // namespace disney_impl
 
 class Disney : public Material
 {
-    std::shared_ptr<const Texture2D> base_color_;
-    std::shared_ptr<const Texture2D> metallic_;
-    std::shared_ptr<const Texture2D> roughness_;
-    std::shared_ptr<const Texture2D> specular_scale_;
-    std::shared_ptr<const Texture2D> specular_tint_;
-    std::shared_ptr<const Texture2D> anisotropic_;
-    std::shared_ptr<const Texture2D> sheen_;
-    std::shared_ptr<const Texture2D> sheen_tint_;
-    std::shared_ptr<const Texture2D> clearcoat_;
-    std::shared_ptr<const Texture2D> clearcoat_gloss_;
-    std::shared_ptr<const Texture2D> transmission_;
-    std::shared_ptr<const Texture2D> transmission_roughness_;
-    std::shared_ptr<const Texture2D> IOR_;
+    RC<const Texture2D> base_color_;
+    RC<const Texture2D> metallic_;
+    RC<const Texture2D> roughness_;
+    RC<const Texture2D> specular_scale_;
+    RC<const Texture2D> specular_tint_;
+    RC<const Texture2D> anisotropic_;
+    RC<const Texture2D> sheen_;
+    RC<const Texture2D> sheen_tint_;
+    RC<const Texture2D> clearcoat_;
+    RC<const Texture2D> clearcoat_gloss_;
+    RC<const Texture2D> transmission_;
+    RC<const Texture2D> transmission_roughness_;
+    RC<const Texture2D> IOR_;
 
-    std::unique_ptr<const NormalMapper> normal_mapper_;
+    Box<const NormalMapper> normal_mapper_;
 
 public:
 
     Disney(
-        std::shared_ptr<const Texture2D> base_color,
-        std::shared_ptr<const Texture2D> metallic,
-        std::shared_ptr<const Texture2D> roughness,
-        std::shared_ptr<const Texture2D> transmission,
-        std::shared_ptr<const Texture2D> transmission_roughness,
-        std::shared_ptr<const Texture2D> ior,
-        std::shared_ptr<const Texture2D> specular_scale,
-        std::shared_ptr<const Texture2D> specular_tint,
-        std::shared_ptr<const Texture2D> anisotropic,
-        std::shared_ptr<const Texture2D> sheen,
-        std::shared_ptr<const Texture2D> sheen_tint,
-        std::shared_ptr<const Texture2D> clearcoat,
-        std::shared_ptr<const Texture2D> clearcoat_gloss,
-        std::unique_ptr<const NormalMapper> normal_mapper)
+        RC<const Texture2D> base_color,
+        RC<const Texture2D> metallic,
+        RC<const Texture2D> roughness,
+        RC<const Texture2D> transmission,
+        RC<const Texture2D> transmission_roughness,
+        RC<const Texture2D> ior,
+        RC<const Texture2D> specular_scale,
+        RC<const Texture2D> specular_tint,
+        RC<const Texture2D> anisotropic,
+        RC<const Texture2D> sheen,
+        RC<const Texture2D> sheen_tint,
+        RC<const Texture2D> clearcoat,
+        RC<const Texture2D> clearcoat_gloss,
+        Box<const NormalMapper> normal_mapper)
     {
         base_color_             = base_color;
         metallic_               = metallic;
@@ -697,23 +747,23 @@ public:
     }
 };
 
-std::shared_ptr<Material> create_disney(
-    std::shared_ptr<const Texture2D> base_color,
-    std::shared_ptr<const Texture2D> metallic,
-    std::shared_ptr<const Texture2D> roughness,
-    std::shared_ptr<const Texture2D> transmission,
-    std::shared_ptr<const Texture2D> transmission_roughness,
-    std::shared_ptr<const Texture2D> ior,
-    std::shared_ptr<const Texture2D> specular_scale,
-    std::shared_ptr<const Texture2D> specular_tint,
-    std::shared_ptr<const Texture2D> anisotropic,
-    std::shared_ptr<const Texture2D> sheen,
-    std::shared_ptr<const Texture2D> sheen_tint,
-    std::shared_ptr<const Texture2D> clearcoat,
-    std::shared_ptr<const Texture2D> clearcoat_gloss,
-    std::unique_ptr<const NormalMapper> normal_mapper)
+RC<Material> create_disney(
+    RC<const Texture2D> base_color,
+    RC<const Texture2D> metallic,
+    RC<const Texture2D> roughness,
+    RC<const Texture2D> transmission,
+    RC<const Texture2D> transmission_roughness,
+    RC<const Texture2D> ior,
+    RC<const Texture2D> specular_scale,
+    RC<const Texture2D> specular_tint,
+    RC<const Texture2D> anisotropic,
+    RC<const Texture2D> sheen,
+    RC<const Texture2D> sheen_tint,
+    RC<const Texture2D> clearcoat,
+    RC<const Texture2D> clearcoat_gloss,
+    Box<const NormalMapper> normal_mapper)
 {
-    return std::make_shared<Disney>(base_color,
+    return newRC<Disney>(base_color,
         metallic,
         roughness,
         transmission,

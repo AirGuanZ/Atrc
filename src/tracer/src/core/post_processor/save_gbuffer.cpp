@@ -15,7 +15,9 @@ class SaveGBufferToPNG : public PostProcessor
     {
         file::create_directory_for_file(filename);
         AGZ_INFO("saving gbuffer::albedo to {}", filename);
-        img::save_rgb_to_png_file(filename, albedo.flip_vertically().get_data().map(math::to_color3b<real>));
+        img::save_rgb_to_png_file(
+            filename, albedo.flip_vertically().get_data().map(
+                                    math::to_color3b<real>));
     }
 
     static void save_normal(const std::string &filename, Image2D<Vec3> &normal)
@@ -32,7 +34,9 @@ class SaveGBufferToPNG : public PostProcessor
         }
 
         AGZ_INFO("saving gbuffer::normal to {}", filename);
-        img::save_rgb_to_png_file(filename, imgf.flip_vertically().get_data().map(math::to_color3b<real>));
+        img::save_rgb_to_png_file(
+            filename, imgf.flip_vertically().get_data().map(
+                                    math::to_color3b<real>));
     }
 
 public:
@@ -54,11 +58,11 @@ public:
     }
 };
 
-std::shared_ptr<PostProcessor> create_saving_gbuffer_to_png(
+RC<PostProcessor> create_saving_gbuffer_to_png(
     std::string albedo_filename,
     std::string normal_filename)
 {
-    return std::make_shared<SaveGBufferToPNG>(
+    return newRC<SaveGBufferToPNG>(
         std::move(albedo_filename),
         std::move(normal_filename));
 }

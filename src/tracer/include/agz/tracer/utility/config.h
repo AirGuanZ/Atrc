@@ -43,7 +43,7 @@ public:
 
 class ConfigGroup : public ConfigNode
 {
-    std::map<std::string, std::shared_ptr<ConfigNode>> group_;
+    std::map<std::string, RC<ConfigNode>> group_;
 
 public:
 
@@ -84,8 +84,9 @@ public:
     Vec2 child_vec2_or(const std::string &name, const Vec2 &default_val) const;
     Vec3 child_vec3_or(const std::string &name, const Vec3 &default_val) const;
 
-    Spectrum   child_spectrum   (const std::string &name) const;
-    Spectrum   child_spectrum_or(const std::string &name, const Spectrum &default_val) const;
+    Spectrum child_spectrum   (const std::string &name) const;
+    Spectrum child_spectrum_or(
+        const std::string &name, const Spectrum &default_val) const;
 
     Transform2 child_transform2(const std::string &name) const;
     Transform3 child_transform3(const std::string &name) const;
@@ -99,9 +100,10 @@ public:
     real child_real_or(const std::string &name, real default_val) const;
 
     const std::string &child_str(const std::string &name) const;
-    std::string        child_str_or(const std::string &name, const std::string &default_val) const;
+    std::string child_str_or(
+        const std::string &name, const std::string &default_val) const;
 
-    void insert_child(const std::string &name, std::shared_ptr<ConfigNode> child);
+    void insert_child(const std::string &name, RC<ConfigNode> child);
 
     void insert_real(const std::string &name, real value);
     void insert_int (const std::string &name, int value);
@@ -119,7 +121,7 @@ public:
 
 class ConfigArray : public ConfigNode
 {
-    std::vector<std::shared_ptr<ConfigNode>> array_;
+    std::vector<RC<ConfigNode>> array_;
 
 public:
 
@@ -157,19 +159,19 @@ public:
 
     const std::string &at_str(size_t idx) const;
 
-    void push_back(std::shared_ptr<ConfigNode> elem);
+    void push_back(RC<ConfigNode> elem);
     
     void push_back_real(real value);
     void push_back_int (int value);
     void push_back_str (const std::string &str);
     void push_back_bool(bool value);
 
-    static std::shared_ptr<ConfigArray> from_vec2(const Vec2 &v);
-    static std::shared_ptr<ConfigArray> from_vec3(const Vec3 &v);
-    static std::shared_ptr<ConfigArray> from_vec4(const Vec4 &v);
-    static std::shared_ptr<ConfigArray> from_vec2i(const Vec2i &v);
-    static std::shared_ptr<ConfigArray> from_vec3i(const Vec3i &v);
-    static std::shared_ptr<ConfigArray> from_spectrum(const Spectrum &v);
+    static RC<ConfigArray> from_vec2(const Vec2 &v);
+    static RC<ConfigArray> from_vec3(const Vec3 &v);
+    static RC<ConfigArray> from_vec4(const Vec4 &v);
+    static RC<ConfigArray> from_vec2i(const Vec2i &v);
+    static RC<ConfigArray> from_vec3i(const Vec3i &v);
+    static RC<ConfigArray> from_spectrum(const Spectrum &v);
 };
 
 class ConfigValue : public ConfigNode
