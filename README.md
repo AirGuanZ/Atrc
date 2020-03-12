@@ -4,7 +4,7 @@ Offline rendering lab based on ray tracing
 
 ## Features
 
-- [x] volumetric path tracing, adjoint particle tracing, bidirectional path tracing
+- [x] volumetric path tracing, adjoint particle tracing, bidirectional path tracing, stochastic progressive photon mapping
 - [x] materials: disney bsdf, mirror, phong...
 - [x] hdr texture
 - [x] (optional) integrated [Embree](https://github.com/embree/embree) engine
@@ -22,7 +22,7 @@ Offline rendering lab based on ray tracing
 - [x] JSON exporter in editor
 - [ ] scene tree
 - [ ] variance buffer
-- [ ] more rendering algorithms: sppm, vcm, mlt, ...
+- [ ] more rendering algorithms: vcm, mlt, ...
 
 ## Documentation
 
