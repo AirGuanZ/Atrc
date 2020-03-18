@@ -4,6 +4,7 @@
 #include <QMessageBox>
 
 #include <agz/editor/imexport/asset_save_dialog.h>
+#include <agz/editor/renderer/renderer_widget.h>
 #include <agz/editor/scene/scene_mgr.h>
 
 AGZ_EDITOR_BEGIN
@@ -13,12 +14,14 @@ AssetSaveDialog::AssetSaveDialog(
     ObjectContext       *obj_ctx,
     EnvirLightSlot      *envir_light,
     GlobalSettingWidget *global_settings,
-    PreviewWindow       *preview_window)
+    PreviewWindow       *preview_window,
+    RendererPanel       *renderer_panel)
     : scene_mgr_      (scene_mgr),
       obj_ctx_        (obj_ctx),
       envir_light_    (envir_light),
       global_settings_(global_settings),
-      preview_window_ (preview_window)
+      preview_window_ (preview_window),
+      renderer_panel_ (renderer_panel)
 {
     init_ui();
 }
@@ -36,6 +39,7 @@ void AssetSaveDialog::init_ui()
     save_envir_light_     = new QCheckBox("Envir Light", this);
     save_global_settings_ = new QCheckBox("Global Settings", this);
     save_preview_window_  = new QCheckBox("Camera", this);
+    save_renderer_panel_  = new QCheckBox("Renderer", this);
 
     save_all_pools_->setTristate(true);
     save_all_pools_->setCheckState(Qt::Checked);
@@ -50,6 +54,7 @@ void AssetSaveDialog::init_ui()
     save_envir_light_    ->setChecked(true);
     save_global_settings_->setChecked(true);
     save_preview_window_ ->setChecked(true);
+    save_renderer_panel_ ->setChecked(true);
 
     QPushButton *ok     = new QPushButton("Ok",     this);
     QPushButton *cancel = new QPushButton("Cancel", this);
@@ -67,6 +72,7 @@ void AssetSaveDialog::init_ui()
     layout->addWidget(save_envir_light_,     ++row, 0, 1, 2);
     layout->addWidget(save_global_settings_, ++row, 0, 1, 2);
     layout->addWidget(save_preview_window_,  ++row, 0, 1, 2);
+    layout->addWidget(save_renderer_panel_,  ++row, 0, 1, 2);
     
     layout->addWidget(ok,   ++row, 0, 1, 1);
     layout->addWidget(cancel, row, 1, 1, 1);
@@ -223,6 +229,13 @@ void AssetSaveDialog::ok()
         ++section_count;
         saver.write(AssetSectionType::PreviewWindow);
         preview_window_->save_asset(saver);
+    }
+
+    if(save_renderer_panel_->isChecked())
+    {
+        ++section_count;
+        saver.write(AssetSectionType::Renderer);
+        renderer_panel_->save_asset(saver);
     }
 
     fout.seekp(0, std::ios::beg);

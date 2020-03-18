@@ -72,7 +72,7 @@ Range3DWidget::Range3DWidget(const CloneState &clone_state)
         set_dirty_flag();
     });
 
-    connect(slider_, &RealSlider::change_value, [=](double new_value)
+    connect(slider_, &RealSlider::change_value, [=](real new_value)
     {
         value_->blockSignals(true);
         value_->setValue(new_value);
@@ -115,9 +115,9 @@ void Range3DWidget::save_asset(AssetSaver &saver)
 
 void Range3DWidget::load_asset(AssetLoader &loader)
 {
-    const real low   = real(loader.read<double>());
-    const real high  = real(loader.read<double>());
-    const real value = real(loader.read<double>());
+    const real low   = real(loader.read<real>());
+    const real high  = real(loader.read<real>());
+    const real value = real(loader.read<real>());
 
     range_edit_->blockSignals(true);
     range_edit_->setText(QString("%1 %2").arg(low).arg(high));

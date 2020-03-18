@@ -30,7 +30,7 @@ public:
         std::atomic<real> lum_sum = 0;
         probs_.initialize(new_height, new_width);
 
-        thread::parallel_forrange(0, new_height, [&](int y)
+        thread::parallel_forrange(0, new_height, [&](int, int y)
         {
             const real y0 = real(y)     / real(new_height);
             const real y1 = real(y + 1) / real(new_height);

@@ -5,20 +5,6 @@
 
 AGZ_TRACER_BEGIN
 
-RC<Material> create_disney_reflection(
-    RC<const Texture2D> base_color,
-    RC<const Texture2D> metallic,
-    RC<const Texture2D> roughness,
-    RC<const Texture2D> subsurface,
-    RC<const Texture2D> specular,
-    RC<const Texture2D> specular_tint,
-    RC<const Texture2D> anisotropic,
-    RC<const Texture2D> sheen,
-    RC<const Texture2D> sheen_tint,
-    RC<const Texture2D> clearcoat,
-    RC<const Texture2D> clearcoat_gloss,
-    Box<const NormalMapper> normal_mapper);
-
 RC<Material> create_disney(
     RC<const Texture2D> base_color,
     RC<const Texture2D> metallic,

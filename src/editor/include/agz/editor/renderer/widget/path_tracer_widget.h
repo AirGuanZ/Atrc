@@ -21,6 +21,10 @@ public:
         RC<tracer::Scene> scene, const Vec2i &framebuffer_size,
         bool enable_preview) const override;
 
+    void save_asset(AssetSaver &saver) const override;
+
+    void load_asset(AssetLoader &loader) override;
+
 private:
 
     int min_depth_  = 5;

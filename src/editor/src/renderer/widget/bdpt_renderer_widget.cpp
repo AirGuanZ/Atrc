@@ -1,6 +1,8 @@
 #include <QGridLayout>
 #include <QLabel>
 
+#include <agz/editor/imexport/asset_loader.h>
+#include <agz/editor/imexport/asset_saver.h>
 #include <agz/editor/renderer/widget/bdpt_renderer_widget.h>
 #include <agz/editor/renderer/bdpt.h>
 
@@ -73,6 +75,20 @@ Box<Renderer> BDPTRendererWidget::create_renderer(
     };
     return newBox<BDPTRenderer>(
         params, framebuffer_size.x, framebuffer_size.y, std::move(scene));
+}
+
+void BDPTRendererWidget::save_asset(AssetSaver &saver) const
+{
+    saver.write(int32_t(max_cam_depth_->value()));
+    saver.write(int32_t(max_lht_depth_->value()));
+}
+
+void BDPTRendererWidget::load_asset(AssetLoader &loader)
+{
+    max_cam_depth_->setValue(int(loader.read<int32_t>()));
+    max_lht_depth_->setValue(int(loader.read<int32_t>()));
+
+    emit change_renderer_params();
 }
 
 RendererWidget *BDPTRendererWidgetCreator::create_widget(QWidget *parent) const

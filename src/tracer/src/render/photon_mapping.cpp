@@ -134,8 +134,11 @@ Pixel::VisiblePoint tracer_vp(
         EntityIntersection inct;
         if(!scene.closest_intersection(ray, &inct))
         {
-            if(auto env = scene.envir_light())
-                direct_illum += coef * env->radiance(ray.o, ray.d);
+            if(depth == 0)
+            {
+                if(auto env = scene.envir_light())
+                    direct_illum += coef * env->radiance(ray.o, ray.d);
+            }
             return { {}, {}, {}, nullptr };
         }
 

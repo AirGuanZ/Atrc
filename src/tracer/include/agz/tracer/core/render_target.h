@@ -212,6 +212,10 @@ public:
 
     int height() const noexcept;
 
+    real radius() const noexcept;
+
+    real eval_filter(real x_rel, real y_rel) const noexcept;
+
     /**
      * @brief create subgrid bound to a pixel range on given textures
      *
@@ -494,6 +498,16 @@ inline int FilmFilterApplier::width() const noexcept
 inline int FilmFilterApplier::height() const noexcept
 {
     return height_;
+}
+
+inline real FilmFilterApplier::radius() const noexcept
+{
+    return film_filter_->radius();
+}
+
+inline real FilmFilterApplier::eval_filter(real x_rel, real y_rel) const noexcept
+{
+    return film_filter_->eval(x_rel, y_rel);
 }
 
 template<typename...TexelTypes>

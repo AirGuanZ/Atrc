@@ -53,6 +53,10 @@ RenderTarget SPPMRenderer::render(
 
     // initialize pixels
 
+    Image2D<Spectrum> albedo_buffer (filter.height(), filter.width());
+    Image2D<Vec3>     normal_buffer (filter.height(), filter.width());
+    Image2D<real>     denoise_buffer(filter.height(), filter.width());
+
     Image2D<render::sppm::Pixel> sppm_pixels(filter.height(), filter.width());
     for(int y = 0; y < filter.height(); ++y)
     {
@@ -68,7 +72,7 @@ RenderTarget SPPMRenderer::render(
     // samplers
 
     Arena sampler_arena;
-    auto sampler_prototype = newRC<Sampler>(42, false);
+    auto sampler_prototype = newRC<NativeSampler>(42, false);
 
     std::vector<Sampler *> perthread_sampler;
     for(int i = 0; i < thread_count; ++i)
@@ -100,12 +104,15 @@ RenderTarget SPPMRenderer::render(
 
     real max_radius = init_radius;
 
+    thread::thread_group_t thread_group;
+
     for(int iter = 0; iter < params_.iteration_count; ++iter)
     {
         if(stop_rendering_)
             return {};
 
-        reporter.message("start iter " + std::to_string(iter + 1));
+        if(reporter.need_image_preview())
+            reporter.message("start iter " + std::to_string(iter + 1));
 
         const real progress_beg = 100 * real(iter)     / params_.iteration_count;
         const real progress_end = 100 * real(iter + 1) / params_.iteration_count;
@@ -125,7 +132,8 @@ RenderTarget SPPMRenderer::render(
 
         parallel_for_2d_grid(
             thread_count, filter.width(), filter.height(),
-            params_.forward_task_grid_size,
+            params_.forward_task_grid_size, params_.forward_task_grid_size,
+            thread_group,
             [&](int thread_index, const Rect2i &grid)
         {
             auto camera    = scene.get_camera();
@@ -147,14 +155,20 @@ RenderTarget SPPMRenderer::render(
 
                     const Ray ray(cam_sam.pos_on_cam, cam_sam.pos_to_out);
 
+                    render::GBufferPixel gpixel;
+
                     auto &pixel = sppm_pixels(y, x);
                     pixel.vp = render::sppm::tracer_vp(
                         params_.forward_max_depth, 1,
                         scene, ray, cam_sam.throughput,
-                        vp_arena, *sampler, nullptr, pixel.direct_illum);
+                        vp_arena, *sampler, &gpixel, pixel.direct_illum);
 
                     if(pixel.vp.is_valid())
                         vp_searcher.add_vp(pixel, vp_arena);
+
+                    albedo_buffer(y, x) += gpixel.albedo;
+                    normal_buffer(y, x) += gpixel.normal;
+                    denoise_buffer(y, x) += gpixel.denoise;
                 }
 
                 if(stop_rendering_)
@@ -177,15 +191,16 @@ RenderTarget SPPMRenderer::render(
         // trace photons
 
         int finished_photon_count = 0;
-        parallel_for_2d_grid(
+        parallel_for_1d_grid(
             thread_count,
             params_.photons_per_iteration,
-            1, 4096,
-            [&](int thread_index, const Rect2i &range)
+            4096,
+            thread_group,
+            [&](int thread_index, int beg, int end)
         {
             auto sampler = perthread_sampler[thread_index];
             Arena local_arena;
-            for(int i = range.low.x; i < range.high.x; ++i)
+            for(int i = beg; i < end; ++i)
             {
                 trace_photon(
                     params_.photon_min_depth,
@@ -201,7 +216,7 @@ RenderTarget SPPMRenderer::render(
             }
 
             std::lock_guard lk(reporter_mutex);
-            finished_photon_count += range.high.x - range.low.x;
+            finished_photon_count += end - beg;
 
             const real t = real(finished_photon_count)
                          / params_.photons_per_iteration;
@@ -219,22 +234,32 @@ RenderTarget SPPMRenderer::render(
             for(int x = 0; x < filter.width(); ++x)
             {
                 if(sppm_pixels(y, x).vp.is_valid())
-                    max_radius = (std::max)(max_radius, sppm_pixels(y, x).radius);
+                {
+                    max_radius = (std::max)(max_radius,
+                                            sppm_pixels(y, x).radius);
+                }
             }
         }
 
         if(max_radius == 0)
             max_radius = init_radius;
 
-        thread::parallel_forrange(0, filter.height(), [&](int y)
+        parallel_for_1d_grid(
+            thread_count, filter.height(), 128, thread_group,
+            [&](int thread_index, int beg, int end)
         {
-            for(int x = 0; x < filter.width(); ++x)
+            for(int y = beg; y < end; ++y)
             {
-                if(sppm_pixels(y, x).vp.is_valid())
-                    update_pixel_params(params_.update_alpha, sppm_pixels(y, x));
+                for(int x = 0; x < filter.width(); ++x)
+                {
+                    if(sppm_pixels(y, x).vp.is_valid())
+                    {
+                        update_pixel_params(
+                            params_.update_alpha, sppm_pixels(y, x));
+                    }
+                }
             }
-
-        }, thread_count);
+        });
 
         // report progress
 
@@ -243,8 +268,10 @@ RenderTarget SPPMRenderer::render(
             reporter.progress(
                 progress_end, [&compute_image, iter, this]
             {
+                int iter_cnt = iter + 1;
                 return compute_image(
-                    iter + 1, uint64_t(iter + 1) * params_.photons_per_iteration);
+                    iter_cnt,
+                    uint64_t(iter_cnt) * params_.photons_per_iteration);
             });
         }
         else
@@ -257,9 +284,15 @@ RenderTarget SPPMRenderer::render(
     // compute final image
 
     RenderTarget ret;
+
     const uint64_t photon_count = uint64_t(params_.iteration_count)
                                 * uint64_t(params_.photons_per_iteration);
     ret.image = compute_image(params_.iteration_count, photon_count);
+
+    const real gbuffer_ratio = 1 / real(params_.iteration_count);
+    ret.albedo  = albedo_buffer  * gbuffer_ratio;
+    ret.normal  = normal_buffer  * gbuffer_ratio;
+    ret.denoise = denoise_buffer * gbuffer_ratio;
 
     return ret;
 }

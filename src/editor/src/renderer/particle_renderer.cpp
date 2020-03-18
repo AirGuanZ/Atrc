@@ -76,7 +76,7 @@ Image2D<Spectrum> ParticleRenderer::start()
 
     const auto ret = do_fast_rendering();
 
-    const auto sampler_prototype = newRC<tracer::Sampler>(0, true);
+    const auto sampler_prototype = newRC<tracer::NativeSampler>(0, true);
     const int worker_count = thread::actual_worker_count(worker_count_);
 
     film_filter_ = newBox<tracer::FilmFilterApplier>(
@@ -234,7 +234,7 @@ Image2D<Spectrum> ParticleRenderer::do_fast_rendering()
     };
 
     const int worker_count = thread::actual_worker_count(worker_count_);
-    auto sampler_prototype = newRC<tracer::Sampler>(42, true);
+    auto sampler_prototype = newRC<NativeSampler>(42, true);
 
     Arena sampler_arena;
     std::vector<std::thread> threads;

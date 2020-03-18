@@ -11,8 +11,10 @@ Vec3 DirectTransform::to_euler_zyx(const Mat3 &m) noexcept
     {
         const real theta_1 = -std::asin(m[0][2]);
         const real cos_theta_1 = std::cos(theta_1);
-        const real psi_1 = std::atan2(m[1][2] / cos_theta_1, m[2][2] / cos_theta_1);
-        const real phi_1 = std::atan2(m[0][1] / cos_theta_1, m[0][0] / cos_theta_1);
+        const real psi_1 = std::atan2(
+            m[1][2] / cos_theta_1, m[2][2] / cos_theta_1);
+        const real phi_1 = std::atan2(
+            m[0][1] / cos_theta_1, m[0][0] / cos_theta_1);
         return { psi_1, theta_1, phi_1 };
     }
 

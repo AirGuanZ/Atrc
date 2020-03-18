@@ -11,7 +11,8 @@ class PerPixelRenderer : public Renderer
     using ImageBuffer = ImageBufferTemplate<true, true, true, true, true>;
 
     // image value, weight, albedo, normal, denoise
-    using Grid = FilmFilterApplier::FilmGrid<Spectrum, real, Spectrum, Vec3, real>;
+    using Grid = FilmFilterApplier::FilmGrid<
+        Spectrum, real, Spectrum, Vec3, real>;
 
     void render_grid(
         const Scene &scene, Sampler &sampler,

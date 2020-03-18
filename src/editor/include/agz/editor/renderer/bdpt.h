@@ -43,7 +43,7 @@ protected:
 private:
 
     tracer::render::TraceParams preview_params_;
-    tracer::render::BDPTParams  bdpt_params_;
+    tracer::render::bdpt::BDPTParams bdpt_params_;
 };
 
 AGZ_EDITOR_END

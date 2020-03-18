@@ -1,6 +1,8 @@
 #include <QGridLayout>
 #include <QLabel>
 
+#include <agz/editor/imexport/asset_loader.h>
+#include <agz/editor/imexport/asset_saver.h>
 #include <agz/editor/renderer/widget/particle_tracer_widget.h>
 #include <agz/editor/renderer/particle_tracer.h>
 
@@ -107,6 +109,24 @@ Box<Renderer> ParticleTracerWidget::create_renderer(
     };
     return newBox<ParticleTracer>(
         params, framebuffer_size.x, framebuffer_size.y, std::move(scene));
+}
+
+void ParticleTracerWidget::save_asset(AssetSaver &saver) const
+{
+    saver.write(int32_t(particle_sample_count_->value()));
+    saver.write(int32_t(min_depth_->value()));
+    saver.write(int32_t(max_depth_->value()));
+    saver.write(int32_t(cont_prob_->value()));
+}
+
+void ParticleTracerWidget::load_asset(AssetLoader &loader)
+{
+    particle_sample_count_->setValue(int(loader.read<int32_t>()));
+    min_depth_->setValue(int(loader.read<int32_t>()));
+    max_depth_->setValue(int(loader.read<int32_t>()));
+    cont_prob_->setValue(int(loader.read<int32_t>()));
+
+    emit change_renderer_params();
 }
 
 RendererWidget *ParticleTracerWidgetCreator::create_widget(QWidget *parent) const

@@ -105,8 +105,10 @@ void Framebuffer::merge_tasks(int task_count, Task *tasks)
             const int new_x_min = task.pixel_range.low.x * 2;
             const int new_y_min = task.pixel_range.low.y * 2;
             
-            const int old_x_size = task.pixel_range.high.x - task.pixel_range.low.x + 1;
-            const int old_y_size = task.pixel_range.high.y - task.pixel_range.low.y + 1;
+            const int old_x_size = task.pixel_range.high.x
+                                 - task.pixel_range.low.x + 1;
+            const int old_y_size = task.pixel_range.high.y
+                                 - task.pixel_range.low.y + 1;
 
             const int new_x_size = old_x_size * 2;
             const int new_y_size = old_y_size * 2;
@@ -251,7 +253,7 @@ void Framebuffer::build_task_queue()
 {
     // assert(queue_mutex is locked);
 
-    const int x_task_count = (width_ + task_grid_size_ - 1) / task_grid_size_;
+    const int x_task_count = (width_ + task_grid_size_  - 1) / task_grid_size_;
     const int y_task_count = (height_ + task_grid_size_ - 1) / task_grid_size_;
 
     std::vector<Task> tasks;

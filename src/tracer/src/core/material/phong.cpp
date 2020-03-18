@@ -232,6 +232,8 @@ public:
         Spectrum s = s_->sample_spectrum(inct.uv);
         const real ns = ns_->sample_real(inct.uv);
 
+        // ensure energy conservation
+
         real dem = 1;
         for(int i = 0; i < SPECTRUM_COMPONENT_COUNT; ++i)
             dem = (std::max)(dem, d[i] + s[i]);

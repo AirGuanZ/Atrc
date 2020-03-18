@@ -15,7 +15,8 @@ Texture2DCommonParamsWidget::Texture2DCommonParamsWidget(
     QWidget     *inv_gamma_widget = new QWidget(this);
     QHBoxLayout *inv_gamma_layout = new QHBoxLayout(inv_gamma_widget);
 
-    apply_inv_gamma_ = new QCheckBox("Inverse Gamma Correction", inv_gamma_widget);
+    apply_inv_gamma_ = new QCheckBox(
+        "Inverse Gamma Correction", inv_gamma_widget);
     inv_gamma_       = new QLineEdit(inv_gamma_widget);
 
     inv_gamma_validator_ = newBox<QDoubleValidator>();

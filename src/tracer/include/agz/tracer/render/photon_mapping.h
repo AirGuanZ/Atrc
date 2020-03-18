@@ -8,17 +8,19 @@ namespace sppm
 {
 
 /**
- * there are 4 phases in a standard sppm process:
+ * standard sppm process contains 4 steps:
  *  1. trace camera rays to create records of visible points
- *  2. build accelerate ds to detect visible points in any spherical range
- *  3. trace photons to update density estimations of flux at each vp
- *  4. update args at each pixel, and go back to step 1
+ *  2. build range search ds
+ *  3. trace photons to update density estimations of flux at visible points
+ *  4. update params at each pixel, and go back to step 1
  */
 
+/**
+ * @brief pixel params
+ */
 struct Pixel
 {
-    // current visible point
-
+    // visible point
     struct VisiblePoint
     {
         Vec3 pos;
@@ -48,6 +50,8 @@ struct Pixel
         tau          = p.tau;
         direct_illum = p.direct_illum;
     }
+
+    // current visible point
 
     VisiblePoint vp;
 

@@ -23,7 +23,8 @@ int main(int argc, char *argv[])
 
     //app.setStyle(new DarkStyle);
     
-    const int font_id = QFontDatabase::addApplicationFont(":/darkstyle/Ubuntu-R.ttf");
+    const int font_id = QFontDatabase::addApplicationFont(
+        ":/darkstyle/Ubuntu-R.ttf");
     QFont font(QFontDatabase::applicationFontFamilies(font_id).at(0));
     font.setPointSize(9);
     QApplication::setFont(font);

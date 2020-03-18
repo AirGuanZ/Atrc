@@ -1,5 +1,7 @@
 #include <QColorDialog>
 
+#include <agz/editor/imexport/asset_loader.h>
+#include <agz/editor/imexport/asset_saver.h>
 #include <agz/editor/renderer/ao.h>
 #include <agz/editor/renderer/widget/ao_widget.h>
 
@@ -85,6 +87,32 @@ Box<Renderer> AOWidget::create_renderer(
     };
     return newBox<AO>(
         params, framebuffer_size.x, framebuffer_size.y, std::move(scene));
+}
+
+void AOWidget::save_asset(AssetSaver &saver) const
+{
+    saver.write(int32_t(ao_sample_count_));
+    saver.write(real(occlusion_distance_));
+    saver.write(qcolor_to_spectrum(background_color_));
+    saver.write(qcolor_to_spectrum(low_color_));
+    saver.write(qcolor_to_spectrum(high_color_));
+}
+
+void AOWidget::load_asset(AssetLoader &loader)
+{
+    ui_->sample_count_spinbox->setValue(int(loader.read<int32_t>()));
+    ui_->occlusion_distance_spinbox->setValue(loader.read<real>());
+
+    background_color_ = spectrum_to_qcolor(loader.read<Spectrum>());
+    set_button_color(ui_->background_color, background_color_);
+
+    low_color_ = spectrum_to_qcolor(loader.read<Spectrum>());
+    set_button_color(ui_->low_color, low_color_);
+
+    high_color_ = spectrum_to_qcolor(loader.read<Spectrum>());
+    set_button_color(ui_->high_color, high_color_);
+
+    emit change_renderer_params();
 }
 
 void AOWidget::set_button_color(QPushButton *button, const QColor &color)

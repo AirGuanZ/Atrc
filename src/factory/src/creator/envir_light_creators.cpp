@@ -18,7 +18,8 @@ namespace envir_light
         RC<EnvirLight> create(
             const ConfigGroup &params, CreatingContext &context) const override
         {
-            const auto tex = context.create<Texture2D>(params.child_group("tex"));
+            const auto tex = context.create<Texture2D>(
+                params.child_group("tex"));
             return create_ibl_light(std::move(tex));
         }
     };

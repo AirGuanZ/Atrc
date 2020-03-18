@@ -34,8 +34,8 @@ private:
         FilmGrid     &film_grid;
         ParticleFilm &particle_film;
         const Vec2   &full_res;
-        render::BDPTVertex *cam_subpath_space = nullptr;
-        render::BDPTVertex *lht_subpath_space = nullptr;
+        render::bdpt::BDPTVertex *cam_subpath_space = nullptr;
+        render::bdpt::BDPTVertex *lht_subpath_space = nullptr;
     };
 
     template<bool REPORTER_WITH_PREVIEW>
@@ -49,7 +49,7 @@ private:
     void eval_sample(
         int px, int py, const GridParams &grid_params, Arena &arena);
 
-    render::BDPTParams algo_params_;
+    render::bdpt::BDPTParams algo_params_;
 
     BDPTRendererParams params_;
 };
@@ -223,7 +223,7 @@ RenderTarget BDPTRenderer::render_impl(
     threads.reserve(worker_count);
     particle_images.resize(worker_count, Image2D<Spectrum>(height, width));
 
-    auto sampler_prototype = newRC<Sampler>(42, false);
+    auto sampler_prototype = newRC<NativeSampler>(42, false);
 
     for(int i = 0; i < worker_count; ++i)
     {
@@ -271,8 +271,10 @@ int BDPTRenderer::render_grid(
     const Rect2i sample_pixels = film_grid.sample_pixels();
     
     Arena arena;
-    std::vector<render::BDPTVertex> cam_subpath_space(params_.cam_max_vtx_cnt);
-    std::vector<render::BDPTVertex> lht_subpath_space(params_.lht_max_vtx_cnt);
+    std::vector<render::bdpt::BDPTVertex> cam_subpath_space(
+        params_.cam_max_vtx_cnt);
+    std::vector<render::bdpt::BDPTVertex> lht_subpath_space(
+        params_.lht_max_vtx_cnt);
 
     GridParams grid_params = {
         scene, sampler, film_grid, particle_film,

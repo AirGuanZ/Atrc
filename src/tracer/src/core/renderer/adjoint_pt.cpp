@@ -23,7 +23,7 @@ class ParticleTracingRenderer : public Renderer
 public:
 
     explicit ParticleTracingRenderer(
-        const ParticleTracingRendererParams &params)
+        const AdjointPTRendererParams &params)
         : params_(params)
     {
         particle_params_.min_depth = params.min_depth;
@@ -120,7 +120,7 @@ private:
         const int thread_count = thread::actual_worker_count(
             params_.worker_count);
 
-        auto sampler_prototype = newRC<Sampler>(42, false);
+        auto sampler_prototype = newRC<NativeSampler >(42, false);
         Arena sampler_arena;
 
         std::vector<Sampler *> perthread_sampler;
@@ -135,7 +135,7 @@ private:
 
         parallel_for_2d_grid(
             thread_count, filter.width(), filter.height(),
-            params_.forward_task_grid_size,
+            params_.forward_task_grid_size, params_.forward_task_grid_size,
             [&](int thread_index, const Rect2i &rect)
         {
             auto sampler = perthread_sampler[thread_index];
@@ -226,9 +226,9 @@ private:
         });
 
         RenderTarget ret;
-        ret.image   = image_buffer.value * ratio;
-        ret.albedo  = image_buffer.albedo * ratio;
-        ret.normal  = image_buffer.normal * ratio;
+        ret.image   = image_buffer.value   * ratio;
+        ret.albedo  = image_buffer.albedo  * ratio;
+        ret.normal  = image_buffer.normal  * ratio;
         ret.denoise = image_buffer.denoise * ratio;
 
         return ret;
@@ -339,7 +339,7 @@ private:
                 filter.height(), filter.width()));
         }
 
-        auto particle_sampler_prototype = newRC<Sampler>(42, false);
+        auto particle_sampler_prototype = newRC<NativeSampler>(42, false);
 
         for(int i = 0; i < worker_count; ++i)
         {
@@ -361,12 +361,12 @@ private:
         return ret;
     }
 
-    ParticleTracingRendererParams params_;
+    AdjointPTRendererParams params_;
     render::ParticleTraceParams particle_params_;
 };
 
-RC<Renderer> create_particle_tracing_renderer(
-    const ParticleTracingRendererParams &params)
+RC<Renderer> create_adjoint_pt_renderer(
+    const AdjointPTRendererParams &params)
 {
     return newRC<ParticleTracingRenderer>(params);
 }

@@ -10,6 +10,7 @@ AGZ_EDITOR_BEGIN
 
 class ObjectContext;
 class PreviewWindow;
+class RendererPanel;
 class SceneManager;
 
 class AssetSaveDialog : public QDialog
@@ -23,7 +24,8 @@ public:
         ObjectContext       *obj_ctx,
         EnvirLightSlot      *envir_light,
         GlobalSettingWidget *global_settings,
-        PreviewWindow       *preview_window);
+        PreviewWindow       *preview_window,
+        RendererPanel       *renderer);
 
 private:
 
@@ -42,12 +44,14 @@ private:
     QCheckBox *save_envir_light_     = nullptr;
     QCheckBox *save_global_settings_ = nullptr;
     QCheckBox *save_preview_window_  = nullptr;
+    QCheckBox *save_renderer_panel_  = nullptr;
 
     SceneManager        *scene_mgr_       = nullptr;
     ObjectContext       *obj_ctx_         = nullptr;
     EnvirLightSlot      *envir_light_     = nullptr;
     GlobalSettingWidget *global_settings_ = nullptr;
     PreviewWindow       *preview_window_  = nullptr;
+    RendererPanel       *renderer_panel_ = nullptr;
 };
 
 AGZ_EDITOR_END

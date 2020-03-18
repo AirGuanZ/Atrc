@@ -47,8 +47,10 @@ uint64_t BDPTRenderer::exec_render_task(
     uint64_t ret = 0;
 
     Arena arena;
-    std::vector<render::BDPTVertex> cam_subpath_space(bdpt_params_.max_cam_vtx_cnt);
-    std::vector<render::BDPTVertex> lht_subpath_space(bdpt_params_.max_lht_vtx_cnt);
+    std::vector<render::bdpt::BDPTVertex> cam_subpath_space(
+        bdpt_params_.max_cam_vtx_cnt);
+    std::vector<render::bdpt::BDPTVertex> lht_subpath_space(
+        bdpt_params_.max_lht_vtx_cnt);
 
     const Rect2i sam_bound = task.pixel_range;
     

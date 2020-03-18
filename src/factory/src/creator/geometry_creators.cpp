@@ -37,7 +37,8 @@ namespace geometry
         RC<Geometry> create(
             const ConfigGroup &params, CreatingContext &context) const override
         {
-            const auto internal = context.create<Geometry>(params.child_group("internal"));
+            const auto internal = context.create<Geometry>(
+                params.child_group("internal"));
             return create_double_sided(std::move(internal));
         }
     };
@@ -100,7 +101,8 @@ namespace geometry
         RC<Geometry> create(
             const ConfigGroup &params, CreatingContext &context) const override
         {
-            auto internal = context.create<Geometry>(params.child_group("internal"));
+            auto internal = context.create<Geometry>(
+                params.child_group("internal"));
             const auto local_to_world = params.child_transform3("transform");
             return create_transform_wrapper(std::move(internal), local_to_world);
         }

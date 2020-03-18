@@ -279,7 +279,8 @@ void SceneManager::add_single_mesh(const mesh::mesh_t &mesh)
 
     GeometricEntityWidget *entity_widget = new GeometricEntityWidget(
         entity_clone_state, obj_ctx_);
-    EntityPanel *entity_panel = new EntityPanel(obj_ctx_, entity_widget, "Geometric");
+    EntityPanel *entity_panel = new EntityPanel(
+        obj_ctx_, entity_widget, "Geometric");
 
     add_record(QString::fromStdString(mesh.name), entity_panel);
 }
@@ -302,8 +303,10 @@ void SceneManager::add_record(const ::QString &name, EntityPanel *entity_panel)
     editor_->add_to_entity_panel(entity_panel);
     ui_->name_list->addItem(final_name);
 
-    auto new_item = ui_->name_list->findItems(final_name, Qt::MatchExactly).front();
-    new_item->setSizeHint(QSize(new_item->sizeHint().width(), WIDGET_ITEM_HEIGHT));
+    auto new_item = ui_->name_list->findItems(
+        final_name, Qt::MatchExactly).front();
+    new_item->setSizeHint(
+        QSize(new_item->sizeHint().width(), WIDGET_ITEM_HEIGHT));
 
     // set widget callback
 

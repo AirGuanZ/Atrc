@@ -6,6 +6,7 @@
 #include <agz/editor/displayer/preview_window.h>
 #include <agz/editor/imexport/asset_load_dialog.h>
 #include <agz/editor/resource/object_context.h>
+#include <agz/editor/renderer/renderer_widget.h>
 #include <agz/editor/scene/scene_mgr.h>
 
 AGZ_EDITOR_BEGIN
@@ -15,12 +16,14 @@ AssetLoadDialog::AssetLoadDialog(
     ObjectContext       *obj_ctx,
     EnvirLightSlot      *envir_light,
     GlobalSettingWidget *global_settings,
-    PreviewWindow       *preview_window)
+    PreviewWindow       *preview_window,
+    RendererPanel       *renderer_panel)
     : scene_mgr_      (scene_mgr),
       obj_ctx_        (obj_ctx),
       envir_light_    (envir_light),
       global_settings_(global_settings),
-      preview_window_ (preview_window)
+      preview_window_ (preview_window),
+      renderer_panel_(renderer_panel)
 {
     init_ui();
 }
@@ -41,6 +44,9 @@ void AssetLoadDialog::init_ui()
     load_preview_window_ = new QCheckBox("Load Camera", this);
     load_preview_window_->setChecked(true);
 
+    load_renderer_panel_ = new QCheckBox("Load Renderer", this);
+    load_renderer_panel_->setChecked(true);
+
     QPushButton *ok     = new QPushButton("Ok",    this);
     QPushButton *cancel = new QPushButton("Cancel", this);
 
@@ -50,6 +56,7 @@ void AssetLoadDialog::init_ui()
     layout->addWidget(load_envir_light_,       row, 0, 1, 2);
     layout->addWidget(load_global_settings_, ++row, 0, 1, 2);
     layout->addWidget(load_preview_window_,  ++row, 0, 1, 2);
+    layout->addWidget(load_renderer_panel_,  ++row, 0, 1, 2);
 
     layout->addWidget(ok,   ++row, 0, 1, 1);
     layout->addWidget(cancel, row, 1, 1, 1);
@@ -128,6 +135,10 @@ void AssetLoadDialog::ok()
         case AssetSectionType::PreviewWindow:
             if(load_preview_window_->isChecked())
                 preview_window_->load_asset(loader);
+            break;
+        case AssetSectionType::Renderer:
+            if(load_renderer_panel_->isChecked())
+                renderer_panel_->load_asset(loader);
             break;
         }
     }

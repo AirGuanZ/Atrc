@@ -113,7 +113,8 @@ int FlowLayout::do_layout(const QRect &rect, bool test_only) const
         }
 
         if(!test_only)
-            item->setGeometry(QRect(QPoint(current_x, current_y), item->sizeHint()));
+            item->setGeometry(
+                QRect(QPoint(current_x, current_y), item->sizeHint()));
 
         current_x = next_x;
         line_height = (std::max)(line_height, item->sizeHint().height());

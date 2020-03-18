@@ -31,7 +31,8 @@ Spectrum PathTracer::fast_render_pixel(
     tracer::Sampler &sampler, tracer::Arena &arena)
 {
     if(fast_preview_)
-        return trace_albedo_ao(fast_preview_params_, scene, ray, sampler, arena).value;
+        return trace_albedo_ao(
+            fast_preview_params_, scene, ray, sampler, arena).value;
     return trace_std(preview_params_, scene, ray, sampler, arena).value;
 }
 

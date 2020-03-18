@@ -5,11 +5,10 @@
 
 AGZ_TRACER_RENDER_BEGIN
 
-struct BDPTParams
+namespace bdpt
 {
-    int max_cam_vtx_cnt = 10;
-    int max_lht_vtx_cnt = 10;
-};
+
+// =========================== bdpt operations ===========================
 
 /*
  * @brief bdpt path vertex
@@ -61,6 +60,83 @@ struct BDPTVertex
     bool is_entity() const noexcept { return entity != nullptr; }
 };
 
+/**
+ * @brief return value of build_camera_subpath
+ */
+struct CameraSubpath
+{
+    real pixel_x = 0;
+    real pixel_y = 0;
+
+    int vtx_cnt = 0;
+    BDPTVertex *subpath = nullptr;
+
+    struct GPixel
+    {
+        Spectrum albedo;
+        Vec3 normal;
+        real denoise = 1;
+    } gpixel;
+};
+
+/**
+ * @brief return value of build_light_subpath
+ */
+struct LightSubpath
+{
+    int vtx_cnt = 0;
+    BDPTVertex *subpath = nullptr;
+
+    real select_light_pdf = 0;
+    const Light *light = nullptr;
+};
+
+/**
+ * @brief result of connect two end points of camera/light subpath
+ *
+ * @note bdpt in atrc doesn't support sampling tech with s == 0
+ *  (eval inct with camera lens), thus assert(s >= 1)
+ */
+struct ConnectedPath
+{
+    const Scene &scene;
+    const Light *light;
+    const Camera *camera;
+
+    real select_light_pdf = 0;
+
+    BDPTVertex *cam_subpath; int s;
+    BDPTVertex *lht_subpath; int t;
+
+    Sampler &sampler;
+
+    Rect2 sample_pixel_bound;
+    const Vec2 full_res;
+};
+
+CameraSubpath build_camera_subpath(
+    int max_cam_vtx_cnt,
+    int px, int py, const Scene &scene, const Vec2 &full_res,
+    Sampler &sampler, Arena &arena, BDPTVertex *subpath_space);
+
+LightSubpath build_light_subpath(
+    int max_lht_vtx_cnt, const Scene &scene,
+    Sampler &sampler, Arena &arena, BDPTVertex *subpath_space);
+
+/**
+ * pixel_coord shall not be nullptr iff connected_path.s == 1
+ */
+Spectrum eval_connected_subpath(
+    const ConnectedPath &connected_path, Vec2 *pixel_coord);
+
+// =========================== final bdpt ===========================
+
+struct BDPTParams
+{
+    int max_cam_vtx_cnt = 10;
+    int max_lht_vtx_cnt = 10;
+};
+
 struct BDPTPixel
 {
     real px, py;
@@ -80,5 +156,7 @@ std::optional<BDPTPixel> trace_bdpt(
     BDPTVertex *cam_subpath_space,
     BDPTVertex *lht_subpath_space,
     FilmFilterApplier::FilmGridView<Spectrum> *particle_film);
+
+} // namespace bdpt
 
 AGZ_TRACER_RENDER_END

@@ -15,7 +15,8 @@ namespace reporter
             return "stdout";
         }
 
-        RC<RendererInteractor> create(const ConfigGroup &params, CreatingContext &context) const override
+        RC<RendererInteractor> create(
+            const ConfigGroup &params, CreatingContext &context) const override
         {
             return create_stdout_reporter();
         }
@@ -30,7 +31,8 @@ namespace reporter
             return "noout";
         }
 
-        RC<RendererInteractor> create(const ConfigGroup &params, CreatingContext &context) const override
+        RC<RendererInteractor> create(
+            const ConfigGroup &params, CreatingContext &context) const override
         {
             return create_noout_reporter();
         }

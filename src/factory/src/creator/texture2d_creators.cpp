@@ -34,13 +34,15 @@ namespace texture
             return "checker_board";
         }
 
-        RC<Texture2D> create(const ConfigGroup &params, CreatingContext &context) const override
+        RC<Texture2D> create(
+            const ConfigGroup &params, CreatingContext &context) const override
         {
             const auto common_params = init_common_params(params);
             const int grid_count = params.child_int("grid_count");
             const Spectrum color1 = params.child_spectrum("color1");
             const Spectrum color2 = params.child_spectrum("color2");
-            return create_checker_board(common_params, grid_count, color1, color2);
+            return create_checker_board(
+                common_params, grid_count, color1, color2);
         }
     };
 
@@ -53,7 +55,8 @@ namespace texture
             return "constant";
         }
 
-        RC<Texture2D> create(const ConfigGroup &params, CreatingContext &context) const override
+        RC<Texture2D> create(
+            const ConfigGroup &params, CreatingContext &context) const override
         {
             const auto common_params = init_common_params(params);
             const auto texel = params.child_spectrum("texel");
@@ -63,7 +66,8 @@ namespace texture
 
     class HDRCreator : public Creator<Texture2D>
     {
-        mutable std::map<std::string, RC<const Image2D<math::color3f>>> filename2data_;
+        mutable std::map<std::string, RC<const Image2D<math::color3f>>>
+            filename2data_;
 
     public:
 
@@ -72,20 +76,25 @@ namespace texture
             return "hdr";
         }
 
-        RC<Texture2D> create(const ConfigGroup &params, CreatingContext &context) const override
+        RC<Texture2D> create(
+            const ConfigGroup &params, CreatingContext &context) const override
         {
             const auto common_params = init_common_params(params);
-            const auto filename = context.path_mapper->map(params.child_str("filename"));
-            const auto sample = params.child_str_or("sample", "linear");
+            const auto filename =
+                context.path_mapper->map(params.child_str("filename"));
+            const auto sample =
+                params.child_str_or("sample", "linear");
 
             RC<const Image2D<math::color3f>> data;
-            if(auto it = filename2data_.find(filename); it != filename2data_.end())
+            if(auto it = filename2data_.find(filename);
+               it != filename2data_.end())
                 data = it->second;
             else
             {
                 const auto raw_data = img::load_rgb_from_hdr_file(filename);
                 if(!raw_data.is_available())
-                    throw ObjectConstructionException("failed to load texture from " + filename);
+                    throw ObjectConstructionException(
+                        "failed to load texture from " + filename);
 
                 data = newRC<Image2D<math::color3f>>(std::move(raw_data));
                 filename2data_[filename] = data;
@@ -97,7 +106,8 @@ namespace texture
 
     class ImageCreator : public Creator<Texture2D>
     {
-        mutable std::map<std::string, RC<const Image2D<math::color3b>>> filename2data_;
+        mutable std::map<std::string, RC<const Image2D<math::color3b>>>
+            filename2data_;
 
     public:
 
@@ -106,20 +116,25 @@ namespace texture
             return "image";
         }
 
-        RC<Texture2D> create(const ConfigGroup &params, CreatingContext &context) const override
+        RC<Texture2D> create(
+            const ConfigGroup &params, CreatingContext &context) const override
         {
             const auto common_params = init_common_params(params);
-            const auto filename = context.path_mapper->map(params.child_str("filename"));
-            const auto sample = params.child_str_or("sample", "linear");
+            const auto filename =
+                context.path_mapper->map(params.child_str("filename"));
+            const auto sample =
+                params.child_str_or("sample", "linear");
 
             RC<const Image2D<math::color3b>> data;
-            if(auto it = filename2data_.find(filename); it != filename2data_.end())
+            if(auto it = filename2data_.find(filename);
+               it != filename2data_.end())
                 data = it->second;
             else
             {
                 const auto raw_data = img::load_rgb_from_file(filename);
                 if(!raw_data.is_available())
-                    throw ObjectConstructionException("failed to load texture from " + filename);
+                    throw ObjectConstructionException(
+                        "failed to load texture from " + filename);
 
                 data = newRC<Image2D<math::color3b>>(std::move(raw_data));
                 filename2data_[filename] = data;

@@ -15,7 +15,8 @@ namespace medium
             return "absorb";
         }
 
-        RC<Medium> create(const ConfigGroup &params, CreatingContext &context) const override
+        RC<Medium> create(
+            const ConfigGroup &params, CreatingContext &context) const override
         {
             const auto sigma_a = params.child_spectrum("sigma_a");
             return create_absorbtion_medium(sigma_a);
@@ -31,18 +32,23 @@ namespace medium
             return "heterogeneous";
         }
 
-        RC<Medium> create(const ConfigGroup &params, CreatingContext &context) const override
+        RC<Medium> create(
+            const ConfigGroup &params, CreatingContext &context) const override
         {
             const auto local_to_world = params.child_transform3("transform");
-            const auto density = context.create<Texture3D>(params.child_group("density"));
-            const auto albedo  = context.create<Texture3D>(params.child_group("albedo"));
-            const auto g       = context.create<Texture3D>(params.child_group("g"));
+            const auto density = context.create<Texture3D>(
+                params.child_group("density"));
+            const auto albedo  = context.create<Texture3D>(
+                params.child_group("albedo"));
+            const auto g       = context.create<Texture3D>(
+                params.child_group("g"));
 
             const int max_scat_count = params.child_int_or(
                 "max_scattering_count", (std::numeric_limits<int>::max)());
 
             return create_heterogeneous_medium(
-                local_to_world, std::move(density), std::move(albedo), std::move(g), max_scat_count);
+                local_to_world, std::move(density),
+                std::move(albedo), std::move(g), max_scat_count);
         }
     };
 
@@ -55,7 +61,8 @@ namespace medium
             return "homogeneous";
         }
 
-        RC<Medium> create(const ConfigGroup &params, CreatingContext &context) const override
+        RC<Medium> create(
+            const ConfigGroup &params, CreatingContext &context) const override
         {
             const auto sigma_a = params.child_spectrum("sigma_a");
             const auto sigma_s = params.child_spectrum("sigma_s");
@@ -64,7 +71,8 @@ namespace medium
             const int max_scat_count = params.child_int_or(
                 "max_scattering_count", (std::numeric_limits<int>::max)());
             
-            return create_homogeneous_medium(sigma_a, sigma_s, g, max_scat_count);
+            return create_homogeneous_medium(
+                sigma_a, sigma_s, g, max_scat_count);
         }
     };
 
@@ -77,7 +85,8 @@ namespace medium
             return "void";
         }
 
-        RC<Medium> create(const ConfigGroup &params, CreatingContext &context) const override
+        RC<Medium> create(
+            const ConfigGroup &params, CreatingContext &context) const override
         {
             return create_void();
         }

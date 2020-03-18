@@ -282,15 +282,18 @@ RC<T> CreatingContext::create(const ConfigGroup &params, Args&&...args)
     const std::string &type_name = params.child_str("type");
     const Creator<T> *creator = this->factory<T>().get_creator(type_name);
     if(!creator)
-        throw CreatingObjectException("unknown creator type name: " + type_name);
+        throw CreatingObjectException(
+            "unknown creator type name: " + type_name);
 
     {
         AGZ_HIERARCHY_TRY
         return creator->create(params, *this, std::forward<Args>(args)...);
-        AGZ_HIERARCHY_WRAP("in creating object with creator: " + creator->name())
+        AGZ_HIERARCHY_WRAP(
+            "in creating object with creator: " + creator->name())
     }
 
-    AGZ_HIERARCHY_WRAP("in creating object with factory: " + this->factory<T>().name())
+    AGZ_HIERARCHY_WRAP(
+        "in creating object with factory: " + this->factory<T>().name())
 }
 
 AGZ_TRACER_FACTORY_END

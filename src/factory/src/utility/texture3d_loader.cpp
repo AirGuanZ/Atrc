@@ -5,7 +5,8 @@
 
 AGZ_TRACER_BEGIN
 
-texture::texture3d_t<real> texture3d_load::load_gray_from_ascii(std::ifstream &fin)
+texture::texture3d_t<real> texture3d_load::load_gray_from_ascii(
+    std::ifstream &fin)
 {
     int width, height, depth;
     fin >> width >> height >> depth;
@@ -31,7 +32,8 @@ texture::texture3d_t<real> texture3d_load::load_gray_from_ascii(std::ifstream &f
     return data;
 }
 
-texture::texture3d_t<real> texture3d_load::load_gray_from_binary(std::ifstream &fin)
+texture::texture3d_t<real> texture3d_load::load_gray_from_binary(
+    std::ifstream &fin)
 {
     int32_t width, height, depth;
     fin.read(reinterpret_cast<char *>(&width), sizeof(width));
@@ -51,7 +53,8 @@ texture::texture3d_t<real> texture3d_load::load_gray_from_binary(std::ifstream &
             {
                 float texel;
                 fin.read(reinterpret_cast<char *>(&texel), sizeof(texel));
-                data(z, y, x) = misc::to_local_endian<misc::endian_type::little>(texel);
+                data(z, y, x) =
+                    misc::to_local_endian<misc::endian_type::little>(texel);
             }
         }
     }
@@ -60,7 +63,8 @@ texture::texture3d_t<real> texture3d_load::load_gray_from_binary(std::ifstream &
 }
 
 texture::texture3d_t<real> texture3d_load::load_gray_from_images(
-    const std::string *filenames, int image_count, const factory::PathMapper &path_mapper)
+    const std::string *filenames, int image_count,
+    const factory::PathMapper &path_mapper)
 {
     texture::texture3d_t<real> data;
 
@@ -106,7 +110,8 @@ texture::texture3d_t<real> texture3d_load::load_gray_from_images(
     return data;
 }
 
-texture::texture3d_t<Spectrum> texture3d_load::load_rgb_from_ascii(std::ifstream &fin)
+texture::texture3d_t<Spectrum> texture3d_load::load_rgb_from_ascii(
+    std::ifstream &fin)
 {
     int width, height, depth;
     fin >> width >> height >> depth;
@@ -135,7 +140,8 @@ texture::texture3d_t<Spectrum> texture3d_load::load_rgb_from_ascii(std::ifstream
     return data;
 }
 
-texture::texture3d_t<Spectrum> texture3d_load::load_rgb_from_binary(std::ifstream &fin)
+texture::texture3d_t<Spectrum> texture3d_load::load_rgb_from_binary(
+    std::ifstream &fin)
 {
     int32_t width, height, depth;
     fin.read(reinterpret_cast<char *>(&width), sizeof(width));
@@ -157,8 +163,10 @@ texture::texture3d_t<Spectrum> texture3d_load::load_rgb_from_binary(std::ifstrea
                 for(int c = 0; c < SPECTRUM_COMPONENT_COUNT; ++c)
                 {
                     real component;
-                    fin.read(reinterpret_cast<char *>(&component), sizeof(component));
-                    texel[c] = misc::to_local_endian<misc::endian_type::little>(component);
+                    fin.read(
+                        reinterpret_cast<char *>(&component), sizeof(component));
+                    texel[c] =
+                        misc::to_local_endian<misc::endian_type::little>(component);
                 }
                 data(z, y, x) = texel;
             }
@@ -169,7 +177,8 @@ texture::texture3d_t<Spectrum> texture3d_load::load_rgb_from_binary(std::ifstrea
 }
 
 texture::texture3d_t<Spectrum> texture3d_load::load_rgb_from_images(
-    const std::string *filenames, int image_count, const factory::PathMapper &path_mapper)
+    const std::string *filenames, int image_count,
+    const factory::PathMapper &path_mapper)
 {
     texture::texture3d_t<Spectrum> data;
 
@@ -227,7 +236,8 @@ void texture3d_load::save_gray_to_binary(
     fout.write(reinterpret_cast<const char *>(&h), sizeof(h));
     fout.write(reinterpret_cast<const char *>(&d), sizeof(d));
 
-    fout.write(reinterpret_cast<const char *>(data), size.product() * sizeof(float));
+    fout.write(
+        reinterpret_cast<const char *>(data), size.product() * sizeof(float));
 }
 
 void texture3d_load::save_rgb_to_binary(
@@ -242,7 +252,8 @@ void texture3d_load::save_rgb_to_binary(
     fout.write(reinterpret_cast<const char *>(&h), sizeof(h));
     fout.write(reinterpret_cast<const char *>(&d), sizeof(d));
 
-    fout.write(reinterpret_cast<const char *>(data), size.product() * sizeof(float) * 3);
+    fout.write(
+        reinterpret_cast<const char *>(data), size.product() * sizeof(float) * 3);
 }
 
 AGZ_TRACER_END

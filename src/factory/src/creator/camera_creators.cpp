@@ -31,7 +31,8 @@ namespace camera
             const real dist   = params.child_real("dist");
             const real fov    = 2 * std::atan(height / (2 * dist));
 
-            return create_thin_lens_camera(film_aspect, pos, dst, up, fov, 0, 1);
+            return create_thin_lens_camera(
+                film_aspect, pos, dst, up, fov, 0, 1);
         }
     };
 
@@ -54,8 +55,10 @@ namespace camera
 
             const real fov    = math::deg2rad(params.child_real("fov"));
             
-            const real lens_radius    = params.child_real_or("lens_radius", 0);
-            const real focal_distance = params.child_real_or("focal_distance", 1);
+            const real lens_radius =
+                params.child_real_or("lens_radius", 0);
+            const real focal_distance =
+                params.child_real_or("focal_distance", 1);
 
             return create_thin_lens_camera(
                 film_aspect, pos, dst, up, fov, lens_radius, focal_distance);

@@ -105,7 +105,7 @@ Atrc uses JSON to describe scene and rendering settings. The input JSON file mus
 }
 ```
 
-where `scene` is a scene object with type `Scene` (interrupted later). `rendering` specifies rendering settings like camera, global illumination algorithm, progress reporter, and post processors.
+where `scene` is a scene object with type `Scene` (explained later). `rendering` specifies rendering settings like camera, global illumination algorithm, progress reporter, and post processors.
 
 ![metal_sphere](./pictures/metal_sphere.png)
 
@@ -176,7 +176,7 @@ Here is a simple example, which results in the above image (a bit rough metal sp
 }
 ```
 
-Atrc's configuration file consists of a series of nested JSON objects, and each field has its type and value. The syntax of some common field types is listed below:
+Atrc's configuration file consists of a series of nested JSON objects, and each field has its type and value. The syntaxes of some commonly used types are listed below:
 
 | field type | example                     | semantics                             |
 | ---------- | --------------------------- | ------------------------------------- |
@@ -197,9 +197,9 @@ Atrc's configuration file consists of a series of nested JSON objects, and each 
 | Vec3i      | [ 3, 4, -6 ]                | 3D integer vector `(3, 4, -6)`        |
 | [Type]     | [Instance0, Instance1, ...] | JSON array of objects with given Type |
 
-When a string represents a path or file name, `${scene-directory}` represents the absolute path of the directory where the configuration file is located, and `${working-directory}` represents the absolute path of the working directory of the current executable program. Take `${scene-directory}/output.png` at the end of the above example configuration file as an example, it represents the `output.png` file in the directory where the configuration file is located.
+When a string represents a path or file name, `${scene-directory}` means the absolute path of the directory where the configuration file is located, and `${working-directory}` means the absolute path of working directory. Take `${scene-directory}/output.png` as an example, it means  `output.png` file in the directory where the configuration file is.
 
-Except for above types of fields, other fields appear in the syntax of a JSON object. Each object contains a field `type`, representing its type in Atrc renderer.
+Except for fields with above types, other fields appear in the syntax of JSON object. Each object contains a field `type`, representing its type in Atrc renderer.
 
 In the following description, I will use a simplified tabular form to indicate which fields an object should contain and the meaning of these fields. Taking the last post-processor `save_to_img` in the above configuration file as an example, its JSON representation is:
 
@@ -327,7 +327,7 @@ The simplest box filter function, coincides with a single pixel with a radius of
 
 **gaussian**
 
-Gaussian filter function
+Gaussian filter function (buggy)
 
 | Field Name | Type | Default Value | Explanation                   |
 | ---------- | ---- | ------------- | ----------------------------- |
@@ -432,27 +432,6 @@ Triangle mesh implemented using simple BVH tree. It has the same parameters as `
 ![pic](C:/Users/lenovo/Documents/Programming/Code/agz/doc/pictures/normal_mapping.png)
 
 Some materials support normal mapping. The field list of these materials will include a `normal_map`.
-
-**disney_reflection (deprecated)**
-
-Complete implementation of [Disney Principled BRDF](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf)
-
-| Field Name      | Type      | Default Value   | Explanation                                                  |
-| --------------- | --------- | --------------- | ------------------------------------------------------------ |
-| base_color      | Texture2D |                 | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf) |
-| metallic        | Texture2D |                 | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf) |
-| roughness       | Texture2D |                 | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf) |
-| subsurface      | Texture2D | all_zero        | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf) |
-| specular        | Texture2D | all_zero        | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf) |
-| specular_tint   | Texture2D | all_zero        | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf) |
-| anisotropic     | Texture2D | all_zero        | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf) |
-| sheen           | Texture2D | all_zero        | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf) |
-| sheen_tint      | Texture2D | all_zero        | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf) |
-| clearcoat       | Texture2D | all_zero        | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf) |
-| clearcoat_gloss | Texture2D | all_one         | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf) |
-| normal_map      | Texture2D | all_{ 0, 0, 1 } | normal map                                                   |
-
-*NOTE*: `disney_reflection` is basically a subset of `disney` and is already deprecated, so the latter is recommended.
 
 **disney**
 
@@ -747,6 +726,24 @@ Adjoint particle tracer. `particle` builds path from light source to camera, mak
 `particle` uses the strategy of starting from a light source to construct a light path, called backward pass; for paths of length 1 (that is, the light source is directly seen from the camera), however, `particle` builds them from the camera to light sources, called forward pass. The two passes are independent executed and are combined to render the final image.
 
 Backward pass consists of `particle_task_count` particle tracing tasks. Each task contains `particles_per_task` particles, so a total number of `particle_task_count * particles_per_task` paths are traced in backward pass.
+
+**sppm**
+
+Stochastic progressive photon mapping
+
+| Field Name            | Type | Default  | Explanation                                       |
+| --------------------- | ---- | -------- | ------------------------------------------------- |
+| worker_count          | int  | 0        | rendering thread count                            |
+| task_grid_size        | int  | 128      | pixels per thread in finding visible points       |
+| forward_max_depth     | int  | 8        | max tracing depth in finding visible points       |
+| init_radius           | real | -1       | initial search radius. negative num means auto    |
+| iteration_count       | int  |          | number of iterations                              |
+| photons_per_iteration | int  |          | how many photons are traced per iteration         |
+| photon_min_depth      | int  | 5        | min depth when tracing photon before apply RR     |
+| photon_max_depth      | int  | 10       | max depth when tracing photon before apply RR     |
+| photon_cont_prob      | real | 0.9      | RR continuing probability                         |
+| alpha                 | real | 0.666667 | radius reduction factor                           |
+| grid_res              | int  | 64       | resolution of grids for range search acceleration |
 
 ### ProgressReporter
 

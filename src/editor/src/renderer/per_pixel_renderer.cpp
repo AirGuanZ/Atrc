@@ -49,7 +49,7 @@ Image2D<Spectrum> PerPixelRenderer::start()
 
     auto ret = do_fast_rendering();
 
-    const auto sampler_prototype = newRC<tracer::Sampler>(0, true);
+    const auto sampler_prototype = newRC<tracer::NativeSampler>(0, true);
     const int worker_count = thread::actual_worker_count(worker_count_);
     for(int i = 0; i < worker_count; ++i)
     {
@@ -133,15 +133,18 @@ Image2D<Spectrum> PerPixelRenderer::do_fast_rendering()
             const int x_beg = x_task_id * fast_task_grid_size_;
             const int y_beg = y_task_id * fast_task_grid_size_;
 
-            const int x_end = (std::min)(x_beg + fast_task_grid_size_, small_target.width());
-            const int y_end = (std::min)(y_beg + fast_task_grid_size_, small_target.height());
+            const int x_end = (std::min)(
+                x_beg + fast_task_grid_size_, small_target.width());
+            const int y_end = (std::min)(
+                y_beg + fast_task_grid_size_, small_target.height());
 
-            exec_fast_render_task(small_target, { x_beg, y_beg }, { x_end, y_end }, *sampler);
+            exec_fast_render_task(
+                small_target, { x_beg, y_beg }, { x_end, y_end }, *sampler);
         }
     };
 
     const int worker_count = thread::actual_worker_count(worker_count_);
-    auto sampler_prototype = newRC<Sampler>(42, true);
+    auto sampler_prototype = newRC<NativeSampler>(42, true);
 
     Arena sampler_arena;
     std::vector<std::thread> threads;
@@ -157,7 +160,9 @@ Image2D<Spectrum> PerPixelRenderer::do_fast_rendering()
     return small_target;
 }
 
-void PerPixelRenderer::exec_fast_render_task(Image2D<Spectrum> &target, const Vec2i &beg, const Vec2i &end, tracer::Sampler &sampler)
+void PerPixelRenderer::exec_fast_render_task(
+    Image2D<Spectrum> &target, const Vec2i &beg, const Vec2i &end,
+    tracer::Sampler &sampler)
 {
     using namespace tracer;
 
@@ -175,10 +180,13 @@ void PerPixelRenderer::exec_fast_render_task(Image2D<Spectrum> &target, const Ve
             const real film_x = pixel_x / target.width();
             const real film_y = pixel_y / target.height();
 
-            const auto cam_ray = camera->sample_we({ film_x, film_y }, sampler.sample2());
+            const auto cam_ray = camera->sample_we(
+                { film_x, film_y }, sampler.sample2());
 
             const Ray ray(cam_ray.pos_on_cam, cam_ray.pos_to_out);
-            const Spectrum radiance = cam_ray.throughput * fast_render_pixel(*scene_, ray, sampler, arena);
+            const Spectrum radiance = cam_ray.throughput
+                                    * fast_render_pixel(
+                                        *scene_, ray, sampler, arena);
 
             if(arena.used_bytes() > 4 * 1024 * 1024)
                 arena.release();
@@ -188,7 +196,8 @@ void PerPixelRenderer::exec_fast_render_task(Image2D<Spectrum> &target, const Ve
     }
 }
 
-void PerPixelRenderer::exec_render_task(Framebuffer::Task &task, tracer::Sampler *sampler)
+void PerPixelRenderer::exec_render_task(
+    Framebuffer::Task &task, tracer::Sampler *sampler)
 {
     using namespace tracer;
 
@@ -214,10 +223,13 @@ void PerPixelRenderer::exec_render_task(Framebuffer::Task &task, tracer::Sampler
                 const real film_x = pixel_x / task.full_res.x;
                 const real film_y = pixel_y / task.full_res.y;
 
-                auto cam_ray = camera->sample_we({ film_x, film_y }, sampler->sample2());
+                auto cam_ray = camera->sample_we(
+                    { film_x, film_y }, sampler->sample2());
 
                 const Ray ray(cam_ray.pos_on_cam, cam_ray.pos_to_out);
-                const Spectrum radiance = cam_ray.throughput * this->render_pixel(*scene_, ray, *sampler, arena);
+                const Spectrum radiance = cam_ray.throughput
+                                        * render_pixel(
+                                            *scene_, ray, *sampler, arena);
 
                 const int lx = px - sam_bound.low.x;
                 const int ly = py - sam_bound.low.y;

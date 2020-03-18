@@ -42,6 +42,12 @@ inline Spectrum qcolor_to_spectrum(const QColor &color) noexcept
     };
 }
 
+inline QColor spectrum_to_qcolor(const Spectrum &spec) noexcept
+{
+    const Spectrum s = spec.saturate();
+    return QColor::fromRgbF(s.r, s.g, s.b);
+}
+
 using tracer::RC;
 using tracer::Box;
 using tracer::newRC;

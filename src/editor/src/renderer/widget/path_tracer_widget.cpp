@@ -1,5 +1,7 @@
 #include <QVBoxLayout>
 
+#include <agz/editor/imexport/asset_loader.h>
+#include <agz/editor/imexport/asset_saver.h>
 #include <agz/editor/renderer/path_tracer.h>
 #include <agz/editor/renderer/widget/path_tracer_widget.h>
 
@@ -66,6 +68,24 @@ Box<Renderer> PathTracerWidget::create_renderer(
     };
     return newBox<PathTracer>(
         params, framebuffer_size.x, framebuffer_size.y, std::move(scene));
+}
+
+void PathTracerWidget::save_asset(AssetSaver &saver) const
+{
+    saver.write(int32_t(min_depth_));
+    saver.write(int32_t(max_depth_));
+    saver.write(cont_prob_);
+    saver.write(int32_t(ui_->fast_preview->isChecked() ? 1 : 0));
+}
+
+void PathTracerWidget::load_asset(AssetLoader &loader)
+{
+    ui_->min_depth_slider->setValue(int(loader.read<int32_t>()));
+    ui_->max_depth_slider->setValue(int(loader.read<int32_t>()));
+    ui_->cont_prob_slider->setValue(int(loader.read<real>() * 10));
+    ui_->fast_preview->setChecked(loader.read<int32_t>() != 0);
+
+    emit change_renderer_params();
 }
 
 RendererWidget *PathTracerWidgetCreator::create_widget(QWidget *parent) const

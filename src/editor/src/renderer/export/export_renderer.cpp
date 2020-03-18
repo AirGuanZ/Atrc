@@ -4,7 +4,9 @@
 #include <agz/editor/renderer/export/export_renderer_ao.h>
 #include <agz/editor/renderer/export/export_renderer_bdpt.h>
 #include <agz/editor/renderer/export/export_renderer_particle.h>
+#include <agz/editor/renderer/export/export_renderer_pssmlt_pt.h>
 #include <agz/editor/renderer/export/export_renderer_pt.h>
+#include <agz/editor/renderer/export/export_renderer_sppm.h>
 
 AGZ_EDITOR_BEGIN
 
@@ -18,6 +20,12 @@ namespace
             return new ExportRendererBDPT(parent);
         if(type == "Particle")
             return new ExportRendererParticle(parent);
+        if(type == "PSSMLT PT")
+            return new ExportRendererPSSMLTPT(parent);
+        if(type == "PT")
+            return new ExportRendererPT(parent);
+        if(type == "SPPM")
+            return new ExportRendererSPPM(parent);
         return new ExportRendererPT(parent);
     }
 }
@@ -25,7 +33,7 @@ namespace
 ExportRendererPanel::ExportRendererPanel()
 {
     type_selector_ = new QComboBox(this);
-    type_selector_->addItems({ "AO", "BDPT", "Particle", "PT" });
+    type_selector_->addItems({ "AO", "BDPT", "Particle", "PSSMLT PT", "PT", "SPPM" });
     type_selector_->setCurrentText("PT");
 
     renderer_widget_ = create_widget(type_selector_->currentText(), this);

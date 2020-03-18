@@ -1,5 +1,7 @@
 #include <QVBoxLayout>
 
+#include <agz/editor/imexport/asset_loader.h>
+#include <agz/editor/imexport/asset_saver.h>
 #include <agz/editor/renderer/widget/ao_widget.h>
 #include <agz/editor/renderer/widget/bdpt_renderer_widget.h>
 #include <agz/editor/renderer/widget/particle_tracer_widget.h>
@@ -60,7 +62,8 @@ RendererPanel::RendererPanel(
     renderer_widget_ = factory_.create_widget(default_renderer_type, this);
     if(!renderer_widget_)
         throw std::runtime_error(
-            "failed to create default renderer widget: " + default_renderer_type);
+            "failed to create default renderer widget: "
+            + default_renderer_type);
 
     connect(renderer_type_selector_, &QComboBox::currentTextChanged,
         [=](const QString &new_type)
@@ -95,6 +98,30 @@ Box<Renderer> RendererPanel::create_renderer(
         return renderer_widget_->create_renderer(
             std::move(scene), framebuffer_size, enable_preview);
     return nullptr;
+}
+
+void RendererPanel::save_asset(AssetSaver &saver) const
+{
+    saver.write_string(renderer_type_selector_->currentText());
+    renderer_widget_->save_asset(saver);
+}
+
+void RendererPanel::load_asset(AssetLoader &loader)
+{
+    const QString type = loader.read_string();
+
+    renderer_type_selector_->blockSignals(true);
+    renderer_type_selector_->setCurrentText(type);
+    renderer_type_selector_->blockSignals(false);
+
+    delete renderer_widget_;
+    renderer_widget_ = factory_.create_widget(type.toStdString(), this);
+    layout_->insertWidget(1, renderer_widget_);
+    connect(renderer_widget_, &RendererWidget::change_renderer_params,
+        this, &RendererPanel::on_change_renderer_params);
+    emit change_renderer_type();
+
+    renderer_widget_->load_asset(loader);
 }
 
 RC<tracer::ConfigGroup> RendererPanel::to_config() const

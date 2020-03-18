@@ -21,7 +21,8 @@ namespace scene
             return "default";
         }
 
-        RC<Scene> create(const ConfigGroup &params, CreatingContext &context) const override
+        RC<Scene> create(
+            const ConfigGroup &params, CreatingContext &context) const override
         {
             DefaultSceneParams scene_params;
 

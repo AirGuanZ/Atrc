@@ -13,33 +13,33 @@ class RealSlider : public QWidget
 public:
 
     explicit RealSlider(
-        QWidget *parent, double low = 0, double high = 1, double value = 0);
+        QWidget *parent, real low = 0, real high = 1, real value = 0);
 
     void set_orientation(Qt::Orientation orientation);
 
-    void set_range(double low, double high);
+    void set_range(real low, real high);
 
-    double value() const;
+    real value() const;
 
-    void set_value(double value);
+    void set_value(real value);
 
-    double low() const;
+    real low() const;
 
-    double high() const;
+    real high() const;
 
 signals:
 
-    void change_value(double value);
+    void change_value(real value);
 
 private:
 
     static int constexpr SLIDER_INT_MIN = 0;
     static int constexpr SLIDER_INT_MAX = 100000;
 
-    double low_;
-    double high_;
+    real low_;
+    real high_;
 
-    double value_;
+    real value_;
 
     QSlider *slider_;
 };

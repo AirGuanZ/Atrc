@@ -16,7 +16,9 @@ enum class AssetSectionType : uint8_t
     EnvirLight    = 7,
 
     GlobalSettings = 8,
-    PreviewWindow  = 9
+    PreviewWindow  = 9,
+
+    Renderer = 10,
 };
 
 AGZ_EDITOR_END

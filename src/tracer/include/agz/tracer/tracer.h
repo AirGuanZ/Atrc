@@ -43,6 +43,7 @@
 #include <agz/tracer/utility/config.h>
 #include <agz/tracer/utility/embree.h>
 #include <agz/tracer/utility/logger.h>
+#include <agz/tracer/utility/parallel_grid.h>
 #include <agz/tracer/utility/phase_function.h>
 #include <agz/tracer/utility/reflection.h>
 #include <agz/tracer/utility/sphere_aux.h>

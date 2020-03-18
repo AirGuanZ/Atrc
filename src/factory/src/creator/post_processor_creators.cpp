@@ -15,7 +15,8 @@ namespace post_processor
             return "aces";
         }
 
-        RC<PostProcessor> create(const ConfigGroup &params, CreatingContext &context) const override
+        RC<PostProcessor> create(
+            const ConfigGroup &params, CreatingContext &context) const override
         {
             const real exposure = params.child_real("exposure");
             return create_aces_tone_mapper(exposure);
@@ -31,7 +32,8 @@ namespace post_processor
             return "flip";
         }
 
-        RC<PostProcessor> create(const ConfigGroup &params, CreatingContext &context) const override
+        RC<PostProcessor> create(
+            const ConfigGroup &params, CreatingContext &context) const override
         {
             const bool vertically = params.child_int_or("vertically", 0) != 0;
             const bool horizontally = params.child_int_or("horizontally", 0) != 0;
@@ -48,7 +50,8 @@ namespace post_processor
             return "gamma";
         }
 
-        RC<PostProcessor> create(const ConfigGroup &params, CreatingContext &context) const override
+        RC<PostProcessor> create(
+            const ConfigGroup &params, CreatingContext &context) const override
         {
             real gamma;
             if(auto node = params.find_child("gamma"))
@@ -70,7 +73,8 @@ namespace post_processor
             return "oidn_denoiser";
         }
 
-        RC<PostProcessor> create(const ConfigGroup &params, CreatingContext &context) const override
+        RC<PostProcessor> create(
+            const ConfigGroup &params, CreatingContext &context) const override
         {
             const bool clamp_color = params.child_int_or("clamp", 0) != 0;
             return create_oidn_denoiser(clamp_color);
@@ -88,7 +92,8 @@ namespace post_processor
             return "resize";
         }
 
-        RC<PostProcessor> create(const ConfigGroup &params, CreatingContext &context) const override
+        RC<PostProcessor> create(
+            const ConfigGroup &params, CreatingContext &context) const override
         {
             const Vec2i target_size = params.child_vec2i("size");
             return create_img_resizer(target_size);
@@ -104,7 +109,8 @@ namespace post_processor
             return "save_gbuffer_to_png";
         }
 
-        RC<PostProcessor> create(const ConfigGroup &params, CreatingContext &context) const override
+        RC<PostProcessor> create(
+            const ConfigGroup &params, CreatingContext &context) const override
         {
             std::string albedo_filename, normal_filename;
 
@@ -128,9 +134,10 @@ namespace post_processor
             return "save_to_img";
         }
 
-        RC<PostProcessor> create(const ConfigGroup &params, CreatingContext &context) const override
+        RC<PostProcessor> create(
+            const ConfigGroup &params, CreatingContext &context) const override
         {
-            const std::string filename = context.path_mapper->map(
+            std::string filename = context.path_mapper->map(
                 params.child_str("filename"));
 
             const bool open = params.child_int_or("open", 0) != 0;

@@ -1,5 +1,4 @@
 #include <QGridLayout>
-#include <QLabel>
 
 #include <agz/editor/medium/homogeneous.h>
 
@@ -9,7 +8,7 @@ HomogeneousWidget::HomogeneousWidget(const InitData &init_data)
 {
     sigma_a_ = new SpectrumInput(this);
     sigma_s_ = new SpectrumInput(this);
-    g_ = new RealSlider(this, -0.99, 0.99, 0);
+    g_ = new RealSlider(this, real(-0.99), real(0.99), 0);
     max_scattering_count_ = new QSpinBox(this);
 
     sigma_a_->set_value(init_data.sigma_a);
@@ -30,7 +29,7 @@ HomogeneousWidget::HomogeneousWidget(const InitData &init_data)
         set_dirty_flag();
     });
 
-    connect(g_, &RealSlider::change_value, [=](double)
+    connect(g_, &RealSlider::change_value, [=](real)
     {
         set_dirty_flag();
     });

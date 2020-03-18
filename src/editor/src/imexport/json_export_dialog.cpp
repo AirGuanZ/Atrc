@@ -104,7 +104,7 @@ void export_json(
                 "failed to open file " + scene_desc_filename.toStdString());
         }
         
-        fout << json << std::endl;
+        fout << json.dump(4) << std::endl;
     }
     catch(const std::exception &e)
     {

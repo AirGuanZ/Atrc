@@ -15,7 +15,7 @@ class PathTracingRenderer : public PerPixelRenderer
 
 public:
 
-    explicit PathTracingRenderer(const PathTracingRendererParams &params)
+    explicit PathTracingRenderer(const PTRendererParams &params)
         : PerPixelRenderer(
             params.worker_count,
             params.task_grid_size, params.spp)
@@ -40,8 +40,8 @@ protected:
     }
 };
 
-RC<Renderer> create_path_tracing_renderer(
-    const PathTracingRendererParams &params)
+RC<Renderer> create_pt_renderer(
+    const PTRendererParams &params)
 {
     return newRC<PathTracingRenderer>(params);
 }

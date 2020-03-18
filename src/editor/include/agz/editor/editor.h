@@ -82,10 +82,20 @@ private:
 
     void launch_renderer(bool enable_preview);
 
+    // renderer
+
     Box<Renderer> renderer_;
+
+    RendererPanel *renderer_panel_ = nullptr;
+
+    // scene data
 
     tracer::DefaultSceneParams scene_params_;
     RC<tracer::Scene> scene_;
+
+    Box<SceneManager> scene_mgr_;
+
+    // ui
 
     QFrame *up_panel_    = nullptr;
     QFrame *down_panel_  = nullptr;
@@ -96,21 +106,27 @@ private:
     QPointer<QWidget> editing_entity_widget_;
     QPointer<QWidget> editing_rsc_widget_;
 
+    QSplitter *hori_splitter_ = nullptr;
+    QSplitter *vert_splitter_ = nullptr;
+
+    // obj ctx
+
     Box<ObjectContext> obj_ctx_;
+
+    // global setting
 
     GlobalSettingWidget *global_setting_ = nullptr;
 
+    // env light
+
     EnvirLightSlot *envir_light_slot_ = nullptr;
+
+    // loader/saver
 
     Box<AssetLoadDialog> asset_load_dialog_;
     Box<AssetSaveDialog> asset_save_dialog_;
 
-    Box<SceneManager> scene_mgr_;
-    
-    QSplitter *hori_splitter_ = nullptr;
-    QSplitter *vert_splitter_ = nullptr;
-
-    RendererPanel *renderer_panel_ = nullptr;
+    // preview
 
     PreviewWindow *preview_window_ = nullptr;
     QTimer *update_display_timer_ = nullptr;

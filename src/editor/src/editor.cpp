@@ -335,7 +335,8 @@ void Editor::init_save_asset_dialog()
         {
             asset_load_dialog_ = newBox<AssetLoadDialog>(
                 scene_mgr_.get(), obj_ctx_.get(),
-                envir_light_slot_, global_setting_, preview_window_);
+                envir_light_slot_, global_setting_, preview_window_,
+                renderer_panel_);
         }
 
         asset_load_dialog_->exec();
@@ -364,7 +365,8 @@ void Editor::init_save_asset_dialog()
         {
             asset_save_dialog_ = newBox<AssetSaveDialog>(
                 scene_mgr_.get(), obj_ctx_.get(),
-                envir_light_slot_, global_setting_, preview_window_);
+                envir_light_slot_, global_setting_, preview_window_,
+                renderer_panel_);
         }
         asset_save_dialog_->exec();
     });

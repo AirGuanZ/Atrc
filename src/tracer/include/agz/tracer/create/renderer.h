@@ -7,7 +7,7 @@ AGZ_TRACER_BEGIN
 
 // path tracing
 
-struct PathTracingRendererParams
+struct PTRendererParams
 {
     int min_depth  = 5;
     int max_depth  = 10;
@@ -21,12 +21,12 @@ struct PathTracingRendererParams
     int spp = 1;
 };
 
-RC<Renderer> create_path_tracing_renderer(
-    const PathTracingRendererParams &params);
+RC<Renderer> create_pt_renderer(
+    const PTRendererParams &params);
 
 // particle tracing
 
-struct ParticleTracingRendererParams
+struct AdjointPTRendererParams
 {
     int worker_count = 0;
 
@@ -45,8 +45,8 @@ struct ParticleTracingRendererParams
     int forward_spp = 1;
 };
 
-RC<Renderer> create_particle_tracing_renderer(
-    const ParticleTracingRendererParams &params);
+RC<Renderer> create_adjoint_pt_renderer(
+    const AdjointPTRendererParams &params);
 
 // ambient occlusion
 
@@ -102,9 +102,36 @@ struct SPPMRendererParams
 
     real update_alpha = real(2) / 3;
 
-    int grid_accel_resolution  = 128;
+    int grid_accel_resolution = 64;
 };
 
 RC<Renderer> create_sppm_renderer(const SPPMRendererParams &params);
+
+// pssmlt pt
+
+struct PSSMLTPTRendererParams
+{
+    int worker_count = 0;
+
+    // about pt
+
+    int min_depth = 5;
+    int max_depth = 10;
+    real cont_prob = real(0.9);
+
+    bool use_mis = true;
+
+    // about pssmlt
+
+    int startup_sample_count = 100000;
+    int mut_per_pixel = 100;
+
+    real sigma = real(0.01);
+    real large_step_prob = real(0.35);
+
+    int chain_count = 1000;
+};
+
+RC<Renderer> create_pssmlt_pt_renderer(const PSSMLTPTRendererParams &params);
 
 AGZ_TRACER_END

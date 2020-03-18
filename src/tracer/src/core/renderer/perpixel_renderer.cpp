@@ -10,7 +10,8 @@
 AGZ_TRACER_BEGIN
 
 void PerPixelRenderer::render_grid(
-    const Scene &scene, Sampler &sampler, Grid &grid, const Vec2i &full_res) const
+    const Scene &scene, Sampler &sampler,
+    Grid &grid, const Vec2i &full_res) const
 {
     Arena arena;
     const Camera *camera = scene.get_camera();
@@ -32,7 +33,8 @@ void PerPixelRenderer::render_grid(
                     { film_x, film_y }, sampler.sample2());
 
                 const Ray ray(cam_ray.pos_on_cam, cam_ray.pos_to_out);
-                const render::Pixel pixel = eval_pixel(scene, ray, sampler, arena);
+                const render::Pixel pixel = eval_pixel(
+                    scene, ray, sampler, arena);
 
                 grid.apply(
                     pixel_x, pixel_y, cam_ray.throughput * pixel.value, 1,
@@ -69,7 +71,7 @@ RenderTarget PerPixelRenderer::render_impl(
     // create per-thread samplers
 
     Arena sampler_arena;
-    auto sampler_prototype = newRC<Sampler>(42, false);
+    auto sampler_prototype = newRC<NativeSampler>(42, false);
     std::vector<Sampler *> perthread_sampler;
     for(int i = 0; i < thread_count; ++i)
         perthread_sampler.push_back(sampler_prototype->clone(i, sampler_arena));
@@ -83,7 +85,8 @@ RenderTarget PerPixelRenderer::render_impl(
     // start rendering
 
     parallel_for_2d_grid(
-        thread_count, filter.width(), filter.height(), task_grid_size_,
+        thread_count, filter.width(), filter.height(),
+        task_grid_size_, task_grid_size_,
         [
             &filter,
             &scene,

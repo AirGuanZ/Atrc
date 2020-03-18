@@ -77,8 +77,10 @@ RC<tracer::ConfigGroup> ExportRendererAO::to_config() const
     grp->insert_child(
         "high_color", tracer::ConfigArray::from_spectrum(top_->get_color()));
     grp->insert_child(
-        "background_color", tracer::ConfigArray::from_spectrum(background_->get_color()));
-    grp->insert_real("max_occlusion_distance", max_occlusion_distance_->get_value());
+        "background_color", tracer::ConfigArray::from_spectrum(
+            background_->get_color()));
+    grp->insert_real(
+        "max_occlusion_distance", max_occlusion_distance_->get_value());
     grp->insert_int("spp", spp_->value());
 
     return grp;

@@ -11,6 +11,9 @@
 
 AGZ_EDITOR_BEGIN
 
+class AssetLoader;
+class AssetSaver;
+
 class RendererWidget : public QWidget
 {
     Q_OBJECT
@@ -24,6 +27,10 @@ public:
     virtual Box<Renderer> create_renderer(
         RC<tracer::Scene> scene, const Vec2i &framebuffer_size,
         bool enable_preview) const = 0;
+
+    virtual void save_asset(AssetSaver &saver) const = 0;
+
+    virtual void load_asset(AssetLoader &loader) = 0;
 
 signals:
 
@@ -67,6 +74,10 @@ public:
     Box<Renderer> create_renderer(
         RC<tracer::Scene> scene, const Vec2i &framebuffer_size,
         bool enable_preview) const;
+
+    void save_asset(AssetSaver &saver) const;
+
+    void load_asset(AssetLoader &loader);
 
     RC<tracer::ConfigGroup> to_config() const;
 
