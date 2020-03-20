@@ -65,7 +65,7 @@ namespace tri_bvh_embree_ws
     class UntransformedTriangleBVH : public misc::uncopyable_t
     {
         RTCScene scene_ = nullptr;
-        unsigned int geo_id_ = 0;
+        unsigned int geo_id_  = 0;
 
         std::vector<Primitive> prims_;
         std::vector<PrimitiveInfo> prim_info_;
@@ -181,7 +181,9 @@ namespace tri_bvh_embree_ws
 
             rtcSetGeometryBuildQuality(mesh, RTC_BUILD_QUALITY_HIGH);
             rtcCommitGeometry(mesh);
+
             geo_id_ = rtcAttachGeometry(scene_, mesh);
+            
             rtcSetSceneBuildQuality(scene_, RTC_BUILD_QUALITY_HIGH);
             rtcCommitScene(scene_);
         }
@@ -215,6 +217,7 @@ namespace tri_bvh_embree_ws
                 r.t_max,
                 static_cast<unsigned>(-1), 0, 0
             }, { } };
+
             rayhit.hit.instID[0] = RTC_INVALID_GEOMETRY_ID;
             rayhit.hit.geomID = RTC_INVALID_GEOMETRY_ID;
             rayhit.hit.primID = RTC_INVALID_GEOMETRY_ID;

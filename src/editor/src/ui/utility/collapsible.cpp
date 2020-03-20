@@ -46,6 +46,11 @@ void Collapsible::open()
     toggle_button_->setChecked(true);
 }
 
+void Collapsible::set_toggle_button_disabled(bool disabled)
+{
+    toggle_button_->setDisabled(disabled);
+}
+
 void Collapsible::toggle(bool checked)
 {
     if(!content_)

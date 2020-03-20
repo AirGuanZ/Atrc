@@ -130,8 +130,6 @@ namespace
             {
                 *pixel_coord = { pixel.x, pixel.y };
                 return weight * contrib;
-                //connected_path.particle_film.apply(
-                //    pixel.x, pixel.y, weight * contrib);
             }
         }
     

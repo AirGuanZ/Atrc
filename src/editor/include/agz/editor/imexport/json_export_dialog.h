@@ -7,6 +7,7 @@ AGZ_EDITOR_BEGIN
 
 class GlobalSettingWidget;
 class ObjectContext;
+class PostProcessorSeq;
 class PreviewWindow;
 class RendererPanel;
 class SceneManager;
@@ -15,6 +16,7 @@ void export_json(
     SceneManager        *scene_mgr,
     ObjectContext       *obj_ctx,
     EnvirLightSlot      *envir_light,
+    PostProcessorSeq    *post_processors,
     PreviewWindow       *preview_window,
     GlobalSettingWidget *global_settings,
     RendererPanel       *renderer_panel);

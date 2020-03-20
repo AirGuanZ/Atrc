@@ -68,7 +68,8 @@ void GUI::on_load_config()
     try
     {
         const std::string input_filename = QFileDialog::getOpenFileName(
-            this, "Configuration File").toStdString();
+            this, "Configuration File",
+            QString(), "JSON (*.json)").toStdString();
         if(!input_filename.empty())
             start_rendering(input_filename);
     }

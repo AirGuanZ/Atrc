@@ -448,10 +448,13 @@ RC<tracer::ConfigArray> Transform3DSeqWidget::to_config() const
 
 Transform3DSeqUnitWidget::UnitType Transform3DSeqWidget::get_unit_type()
 {
+    bool ok = false;
     const QStringList item_list =
         { "Translate", "RotateX", "RotateY", "RotateZ", "Rotate", "Scale" };
     const QString item = QInputDialog::getItem(
-        this, "Type", "Select transform type", item_list);
+        this, "Type", "Select transform type", item_list, 0, false, &ok);
+    if(!ok)
+        return Transform3DSeqUnitWidget::UnitType::None;
     if(item == "Translate")
         return Transform3DSeqUnitWidget::UnitType::Translate;
     if(item == "RotateX")
@@ -468,6 +471,7 @@ Transform3DSeqUnitWidget::UnitType Transform3DSeqWidget::get_unit_type()
 Transform3DSeqUnitWidget *Transform3DSeqWidget::create_new_unit_widget(
     Transform3DSeqUnitWidget::UnitType type)
 {
+    assert(type == Transform3DSeqUnitWidget::UnitType::None);
     if(type == Transform3DSeqUnitWidget::UnitType::Translate)
         return new Translate3DSeqUnitWidget(this);
     if(type == Transform3DSeqUnitWidget::UnitType::Rotate)
@@ -508,6 +512,8 @@ Transform3DSeqWidget::Transform3DSeqWidget(
 void Transform3DSeqWidget::add_up()
 {
     const Transform3DSeqUnitWidget::UnitType unit_type = get_unit_type();
+    if(unit_type == Transform3DSeqUnitWidget::UnitType::None)
+        return;
     Transform3DSeqUnitWidget *unit_widget = create_new_unit_widget(unit_type);
 
     units_.insert(units_.begin(), unit_widget);
@@ -551,6 +557,8 @@ void Transform3DSeqWidget::add_up()
 void Transform3DSeqWidget::add_down()
 {
     const Transform3DSeqUnitWidget::UnitType unit_type = get_unit_type();
+    if(unit_type == Transform3DSeqUnitWidget::UnitType::None)
+        return;
     Transform3DSeqUnitWidget *unit_widget = create_new_unit_widget(unit_type);
     push_back(unit_widget);
 }

@@ -24,7 +24,8 @@ public:
         RotateY,
         RotateZ,
         Rotate,
-        Scale
+        Scale,
+        None
     };
 
     using QWidget::QWidget;

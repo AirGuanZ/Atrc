@@ -21,7 +21,8 @@ public:
     {
         Translate,
         Rotate,
-        Scale
+        Scale,
+        None
     };
 
     using QWidget::QWidget;

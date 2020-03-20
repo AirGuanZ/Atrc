@@ -1,6 +1,8 @@
 #include <QGridLayout>
 #include <QLabel>
 
+#include <agz/editor/imexport/asset_loader.h>
+#include <agz/editor/imexport/asset_saver.h>
 #include <agz/editor/renderer/export/export_renderer_bdpt.h>
 
 AGZ_EDITOR_BEGIN
@@ -72,6 +74,26 @@ RC<tracer::ConfigGroup> ExportRendererBDPT::to_config() const
     grp->insert_int("task_grid_size", task_grid_size_->value());
 
     return grp;
+}
+
+void ExportRendererBDPT::save_asset(AssetSaver &saver) const
+{
+    saver.write(int32_t(cam_max_vtx_cnt_->value()));
+    saver.write(int32_t(lht_max_vtx_cnt_->value()));
+    saver.write(int32_t(use_mis_->isChecked() ? 1 : 0));
+    saver.write(int32_t(spp_->value()));
+    saver.write(int32_t(worker_count_->value()));
+    saver.write(int32_t(task_grid_size_->value()));
+}
+
+void ExportRendererBDPT::load_asset(AssetLoader &loader)
+{
+    cam_max_vtx_cnt_->setValue(int(loader.read<int32_t>()));
+    lht_max_vtx_cnt_->setValue(int(loader.read<int32_t>()));
+    use_mis_->setChecked(loader.read<int32_t>() != 0);
+    spp_->setValue(int(loader.read<int32_t>()));
+    worker_count_->setValue(int(loader.read<int32_t>()));
+    task_grid_size_->setValue(int(loader.read<int32_t>()));
 }
 
 AGZ_EDITOR_END

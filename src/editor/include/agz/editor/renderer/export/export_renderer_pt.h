@@ -18,6 +18,10 @@ public:
 
     RC<tracer::ConfigGroup> to_config() const override;
 
+    void save_asset(AssetSaver &saver) const override;
+
+    void load_asset(AssetLoader &loader) override;
+
 private:
 
     QSpinBox *min_depth_ = nullptr;

@@ -1,4 +1,7 @@
 #include <QGridLayout>
+
+#include <agz/editor/imexport/asset_loader.h>
+#include <agz/editor/imexport/asset_saver.h>
 #include <agz/editor/renderer/export/export_renderer_ao.h>
 
 AGZ_EDITOR_BEGIN
@@ -84,6 +87,30 @@ RC<tracer::ConfigGroup> ExportRendererAO::to_config() const
     grp->insert_int("spp", spp_->value());
 
     return grp;
+}
+
+void ExportRendererAO::save_asset(AssetSaver &saver) const
+{
+    saver.write(int32_t(worker_count_->value()));
+    saver.write(int32_t(task_grid_size_->value()));
+    saver.write(int32_t(ao_sps_->value()));
+    saver.write(bottom_->get_color());
+    saver.write(top_->get_color());
+    saver.write(background_->get_color());
+    saver.write(max_occlusion_distance_->get_value());
+    saver.write(int32_t(spp_->value()));
+}
+
+void ExportRendererAO::load_asset(AssetLoader &loader)
+{
+    worker_count_->setValue(int(loader.read<int32_t>()));
+    task_grid_size_->setValue(int(loader.read<int32_t>()));
+    ao_sps_->setValue(int(loader.read<int32_t>()));
+    bottom_->set_color(loader.read<Spectrum>());
+    top_->set_color(loader.read<Spectrum>());
+    background_->set_color(loader.read<Spectrum>());
+    max_occlusion_distance_->set_value(loader.read<real>());
+    spp_->setValue(int(loader.read<int32_t>()));
 }
 
 AGZ_EDITOR_END

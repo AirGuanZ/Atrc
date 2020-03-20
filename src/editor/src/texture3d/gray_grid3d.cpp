@@ -166,9 +166,12 @@ void GrayGrid3DWidget::browse_filename()
 {
     try
     {
+        bool ok = false;
         const QStringList item_list = { "ASCII", "Binary", "Images" };
         const QString item = QInputDialog::getItem(
-            this, "Type", "Select file type", item_list);
+            this, "Type", "Select file type", item_list, 0, false, &ok);
+        if(!ok)
+            return;
 
         Image3D<real> data;
         if(item == "ASCII")

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QDialog>
 #include <QListWidget>
 #include <QVBoxLayout>
 
@@ -7,11 +8,11 @@
 
 AGZ_EDITOR_BEGIN
 
-class PostProcessorDialog : public QWidget
+class PostProcessorSeq : public QDialog
 {
 public:
 
-    explicit PostProcessorDialog(QWidget *parent = nullptr);
+    explicit PostProcessorSeq(QWidget *parent = nullptr);
 
     RC<tracer::ConfigArray> to_config() const;
 
@@ -27,9 +28,11 @@ private slots:
 
 private:
 
+    void init_pp_creators();
+
     PostProcessorWidget *create_pp(const QString &name) const;
 
-    std::vector<Box<PostProcessorWidgetCreator>> pp_creators_;
+    std::map<QString, Box<PostProcessorWidgetCreator>> pp_creators_;
 
     QVBoxLayout *display_pp_layout_;
     

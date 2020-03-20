@@ -1,6 +1,8 @@
 #include <QGridLayout>
 #include <QLabel>
 
+#include <agz/editor/imexport/asset_loader.h>
+#include <agz/editor/imexport/asset_saver.h>
 #include <agz/editor/renderer/export/export_renderer_pssmlt_pt.h>
 
 AGZ_EDITOR_BEGIN
@@ -181,6 +183,34 @@ RC<tracer::ConfigGroup> ExportRendererPSSMLTPT::to_config() const
     grp->insert_int("chain_count", chain_count_->value());
 
     return grp;
+}
+
+void ExportRendererPSSMLTPT::save_asset(AssetSaver &saver) const
+{
+    saver.write(int32_t(worker_count_->value()));
+    saver.write(int32_t(min_depth_->value()));
+    saver.write(int32_t(max_depth_->value()));
+    saver.write(cont_prob_->value());
+    saver.write(int32_t(use_mis_->isChecked() ? 1 : 0));
+    saver.write(int32_t(startup_sample_count_->value()));
+    saver.write(int32_t(mut_per_pixel_->value()));
+    saver.write(sigma_->get_value());
+    saver.write(large_step_prob_->value());
+    saver.write(int32_t(chain_count_->value()));
+}
+
+void ExportRendererPSSMLTPT::load_asset(AssetLoader &loader)
+{
+    worker_count_->setValue(int(loader.read<int32_t>()));
+    min_depth_->setValue(int(loader.read<int32_t>()));
+    max_depth_->setValue(int(loader.read<int32_t>()));
+    cont_prob_->setValue(loader.read<real>());
+    use_mis_->setChecked(loader.read<int32_t>() != 0);
+    startup_sample_count_->setValue(int(loader.read<int32_t>()));
+    mut_per_pixel_->setValue(int(loader.read<int32_t>()));
+    sigma_->set_value(loader.read<real>());
+    large_step_prob_->set_value(loader.read<real>());
+    chain_count_->setValue(int(loader.read<int32_t>()));
 }
 
 AGZ_EDITOR_END

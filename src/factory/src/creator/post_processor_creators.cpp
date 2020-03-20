@@ -23,24 +23,6 @@ namespace post_processor
         }
     };
 
-    class FlipCreator : public Creator<PostProcessor>
-    {
-    public:
-
-        std::string name() const override
-        {
-            return "flip";
-        }
-
-        RC<PostProcessor> create(
-            const ConfigGroup &params, CreatingContext &context) const override
-        {
-            const bool vertically = params.child_int_or("vertically", 0) != 0;
-            const bool horizontally = params.child_int_or("horizontally", 0) != 0;
-            return create_film_flipper(vertically, horizontally);
-        }
-    };
-
     class GammaCreator : public Creator<PostProcessor>
     {
     public:
@@ -174,7 +156,6 @@ namespace post_processor
 void initialize_post_processor_factory(Factory<PostProcessor> &factory)
 {
     factory.add_creator(newBox<post_processor::ACESCreator>());
-    factory.add_creator(newBox<post_processor::FlipCreator>());
     factory.add_creator(newBox<post_processor::GammaCreator>());
 #ifdef USE_OIDN
     factory.add_creator(newBox<post_processor::OIDNDenoiserCreator>());

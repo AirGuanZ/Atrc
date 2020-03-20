@@ -104,6 +104,8 @@ void RendererPanel::save_asset(AssetSaver &saver) const
 {
     saver.write_string(renderer_type_selector_->currentText());
     renderer_widget_->save_asset(saver);
+
+    export_renderer_->save_asset(saver);
 }
 
 void RendererPanel::load_asset(AssetLoader &loader)
@@ -122,6 +124,8 @@ void RendererPanel::load_asset(AssetLoader &loader)
     emit change_renderer_type();
 
     renderer_widget_->load_asset(loader);
+
+    export_renderer_->load_asset(loader);
 }
 
 RC<tracer::ConfigGroup> RendererPanel::to_config() const

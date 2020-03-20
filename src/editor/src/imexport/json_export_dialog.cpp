@@ -3,6 +3,7 @@
 
 #include <agz/editor/imexport/json_export_context.h>
 #include <agz/editor/imexport/json_export_dialog.h>
+#include <agz/editor/post_processor/post_processor_seq.h>
 #include <agz/editor/renderer/renderer_widget.h>
 #include <agz/editor/scene/scene_mgr.h>
 #include <agz/editor/ui/global_setting_widget.h>
@@ -14,6 +15,7 @@ void export_json(
     SceneManager        *scene_mgr,
     ObjectContext       *obj_ctx,
     EnvirLightSlot      *envir_light,
+    PostProcessorSeq    *post_processors,
     PreviewWindow       *preview_window,
     GlobalSettingWidget *global_settings,
     RendererPanel       *renderer_panel)
@@ -83,13 +85,7 @@ void export_json(
             setting_config->insert_real(
                 "eps", real(global_settings->scene_eps->value()));
 
-            auto post_processor_arr = newRC<tracer::ConfigArray>();
-            auto save_img_grp = newRC<tracer::ConfigGroup>();
-            save_img_grp->insert_str("type", "save_to_img");
-            save_img_grp->insert_str("filename", "${scene-directory}/output.png");
-            save_img_grp->insert_real("inv_gamma", real(2.2));
-
-            post_processor_arr->push_back(save_img_grp);
+            auto post_processor_arr = post_processors->to_config();
             setting_config->insert_child("post_processors", post_processor_arr);
 
             root_grp.insert_child("rendering", setting_config);

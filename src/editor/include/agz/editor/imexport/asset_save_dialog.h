@@ -9,6 +9,7 @@
 AGZ_EDITOR_BEGIN
 
 class ObjectContext;
+class PostProcessorSeq;
 class PreviewWindow;
 class RendererPanel;
 class SceneManager;
@@ -24,6 +25,7 @@ public:
         ObjectContext       *obj_ctx,
         EnvirLightSlot      *envir_light,
         GlobalSettingWidget *global_settings,
+        PostProcessorSeq    *post_processors,
         PreviewWindow       *preview_window,
         RendererPanel       *renderer);
 
@@ -43,6 +45,7 @@ private:
     QCheckBox *save_entities_        = nullptr;
     QCheckBox *save_envir_light_     = nullptr;
     QCheckBox *save_global_settings_ = nullptr;
+    QCheckBox *save_post_processors_ = nullptr;
     QCheckBox *save_preview_window_  = nullptr;
     QCheckBox *save_renderer_panel_  = nullptr;
 
@@ -50,8 +53,9 @@ private:
     ObjectContext       *obj_ctx_         = nullptr;
     EnvirLightSlot      *envir_light_     = nullptr;
     GlobalSettingWidget *global_settings_ = nullptr;
+    PostProcessorSeq    *post_processors_ = nullptr;
     PreviewWindow       *preview_window_  = nullptr;
-    RendererPanel       *renderer_panel_ = nullptr;
+    RendererPanel       *renderer_panel_  = nullptr;
 };
 
 AGZ_EDITOR_END

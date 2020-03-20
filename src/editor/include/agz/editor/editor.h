@@ -5,6 +5,7 @@
 
 #include <agz/editor/displayer/preview_window.h>
 #include <agz/editor/envir_light/envir_light.h>
+#include <agz/editor/post_processor/post_processor_seq.h>
 #include <agz/editor/renderer/renderer.h>
 #include <agz/editor/renderer/renderer_widget.h>
 #include <agz/editor/resource/resource.h>
@@ -72,6 +73,8 @@ private:
 
     void init_global_setting_widget();
 
+    void init_post_processor_widget();
+
     void init_save_asset_dialog();
 
     void redistribute_panels();
@@ -116,6 +119,10 @@ private:
     // global setting
 
     GlobalSettingWidget *global_setting_ = nullptr;
+
+    // post processors
+
+    Box<PostProcessorSeq> pp_seq_;
 
     // env light
 

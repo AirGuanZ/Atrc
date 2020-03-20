@@ -20,6 +20,8 @@ public:
 
     void open();
 
+    void set_toggle_button_disabled(bool disabled);
+
 private slots:
 
     void toggle(bool collapsed);

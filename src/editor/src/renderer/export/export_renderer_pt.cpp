@@ -1,5 +1,7 @@
 #include <QGridLayout>
 
+#include <agz/editor/imexport/asset_loader.h>
+#include <agz/editor/imexport/asset_saver.h>
 #include <agz/editor/renderer/export/export_renderer_pt.h>
 
 AGZ_EDITOR_BEGIN
@@ -103,6 +105,28 @@ RC<tracer::ConfigGroup> ExportRendererPT::to_config() const
     grp->insert_int("task_grid_size", task_grid_size_->value());
 
     return grp;
+}
+
+void ExportRendererPT::save_asset(AssetSaver &saver) const
+{
+    saver.write(int32_t(min_depth_->value()));
+    saver.write(int32_t(max_depth_->value()));
+    saver.write(cont_prob_->value());
+    saver.write(int32_t(use_mis_->isChecked() ? 1 : 0));
+    saver.write(int32_t(spp_->value()));
+    saver.write(int32_t(worker_count_->value()));
+    saver.write(int32_t(task_grid_size_->value()));
+}
+
+void ExportRendererPT::load_asset(AssetLoader &loader)
+{
+    min_depth_->setValue(int(loader.read<int32_t>()));
+    max_depth_->setValue(int(loader.read<int32_t>()));
+    cont_prob_->set_value(loader.read<real>());
+    use_mis_->setChecked(loader.read<int32_t>() != 0);
+    spp_->setValue(int(loader.read<int32_t>()));
+    worker_count_->setValue(int(loader.read<int32_t>()));
+    task_grid_size_->setValue(int(loader.read<int32_t>()));
 }
 
 AGZ_EDITOR_END

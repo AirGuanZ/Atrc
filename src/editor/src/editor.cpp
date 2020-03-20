@@ -27,6 +27,7 @@ Editor::Editor()
     
 #ifdef USE_EMBREE
     AGZ_INFO("Embree is enabled");
+    tracer::init_embree_device();
 #endif
 
 #ifdef USE_OIDN
@@ -57,6 +58,10 @@ Editor::Editor()
 
     init_global_setting_widget();
 
+    AGZ_INFO("initialize post processor editor");
+
+    init_post_processor_widget();
+
     redistribute_panels();
 
     AGZ_INFO("initialize initial scene");
@@ -81,6 +86,12 @@ Editor::~Editor()
     scene_mgr_.reset();
 
     obj_ctx_.reset();
+
+#ifdef USE_EMBREE
+    AGZ_SCOPE_GUARD({
+        agz::tracer::destroy_embree_device();
+    });
+#endif
 }
 
 void Editor::on_change_camera()
@@ -325,6 +336,18 @@ void Editor::init_global_setting_widget()
     });
 }
 
+void Editor::init_post_processor_widget()
+{
+    QAction *action = new QAction("Post Processors", this);
+    menuBar()->addAction(action);
+
+    pp_seq_ = newBox<PostProcessorSeq>(nullptr);
+    connect(action, &QAction::triggered, [=]
+    {
+        pp_seq_->exec();
+    });
+}
+
 void Editor::init_save_asset_dialog()
 {
     QAction *load_action = new QAction("Load", this);
@@ -335,7 +358,8 @@ void Editor::init_save_asset_dialog()
         {
             asset_load_dialog_ = newBox<AssetLoadDialog>(
                 scene_mgr_.get(), obj_ctx_.get(),
-                envir_light_slot_, global_setting_, preview_window_,
+                envir_light_slot_, global_setting_,
+                pp_seq_.get(), preview_window_,
                 renderer_panel_);
         }
 
@@ -365,7 +389,8 @@ void Editor::init_save_asset_dialog()
         {
             asset_save_dialog_ = newBox<AssetSaveDialog>(
                 scene_mgr_.get(), obj_ctx_.get(),
-                envir_light_slot_, global_setting_, preview_window_,
+                envir_light_slot_, global_setting_,
+                pp_seq_.get(), preview_window_,
                 renderer_panel_);
         }
         asset_save_dialog_->exec();
@@ -379,6 +404,7 @@ void Editor::init_save_asset_dialog()
             scene_mgr_.get(),
             obj_ctx_.get(),
             envir_light_slot_,
+            pp_seq_.get(),
             preview_window_,
             global_setting_,
             renderer_panel_);

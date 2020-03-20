@@ -5,6 +5,7 @@
 
 #include <agz/editor/displayer/preview_window.h>
 #include <agz/editor/imexport/asset_load_dialog.h>
+#include <agz/editor/post_processor/post_processor_seq.h>
 #include <agz/editor/resource/object_context.h>
 #include <agz/editor/renderer/renderer_widget.h>
 #include <agz/editor/scene/scene_mgr.h>
@@ -16,12 +17,14 @@ AssetLoadDialog::AssetLoadDialog(
     ObjectContext       *obj_ctx,
     EnvirLightSlot      *envir_light,
     GlobalSettingWidget *global_settings,
+    PostProcessorSeq    *post_processors,
     PreviewWindow       *preview_window,
     RendererPanel       *renderer_panel)
     : scene_mgr_      (scene_mgr),
       obj_ctx_        (obj_ctx),
       envir_light_    (envir_light),
       global_settings_(global_settings),
+      post_processors_(post_processors),
       preview_window_ (preview_window),
       renderer_panel_(renderer_panel)
 {
@@ -41,6 +44,9 @@ void AssetLoadDialog::init_ui()
     load_global_settings_ = new QCheckBox("Load Global Settings", this);
     load_global_settings_->setChecked(true);
 
+    load_post_processors_ = new QCheckBox("Load Post Processors", this);
+    load_post_processors_->setChecked(true);
+
     load_preview_window_ = new QCheckBox("Load Camera", this);
     load_preview_window_->setChecked(true);
 
@@ -55,6 +61,7 @@ void AssetLoadDialog::init_ui()
 
     layout->addWidget(load_envir_light_,       row, 0, 1, 2);
     layout->addWidget(load_global_settings_, ++row, 0, 1, 2);
+    layout->addWidget(load_post_processors_, ++row, 0, 1, 2);
     layout->addWidget(load_preview_window_,  ++row, 0, 1, 2);
     layout->addWidget(load_renderer_panel_,  ++row, 0, 1, 2);
 
@@ -75,7 +82,8 @@ void AssetLoadDialog::init_ui()
 
 void AssetLoadDialog::ok()
 {
-    const QString load_filename = QFileDialog::getOpenFileName(this);
+    const QString load_filename = QFileDialog::getOpenFileName(
+        this, QString(), QString(), "Atrc (*.atrc)");
     if(load_filename.isEmpty())
         return;
 
@@ -131,6 +139,10 @@ void AssetLoadDialog::ok()
         case AssetSectionType::GlobalSettings:
             if(load_global_settings_->isChecked())
                 global_settings_->load_asset(loader);
+            break;
+        case AssetSectionType::PostProcessors:
+            if(load_post_processors_->isChecked())
+                post_processors_->load_asset(loader);
             break;
         case AssetSectionType::PreviewWindow:
             if(load_preview_window_->isChecked())

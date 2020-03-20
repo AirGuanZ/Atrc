@@ -28,8 +28,6 @@ public:
     virtual void save_asset(AssetSaver &saver) const = 0;
 
     virtual void load_asset(AssetLoader &loader) = 0;
-
-    virtual RC<tracer::PostProcessor> create_post_processor() const = 0;
 };
 
 class PostProcessorWidgetCreator
@@ -43,7 +41,8 @@ public:
     virtual QString get_type() const = 0;
 };
 
-inline PostProcessorWidget::PostProcessorWidget(const PostProcessorWidgetCreator *creator)
+inline PostProcessorWidget::PostProcessorWidget(
+    const PostProcessorWidgetCreator *creator)
     : creator_(creator)
 {
     

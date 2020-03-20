@@ -1,6 +1,8 @@
 #include <QGridLayout>
 #include <QLabel>
 
+#include <agz/editor/imexport/asset_loader.h>
+#include <agz/editor/imexport/asset_saver.h>
 #include <agz/editor/renderer/export/export_renderer_particle.h>
 
 AGZ_EDITOR_BEGIN
@@ -105,6 +107,30 @@ RC<tracer::ConfigGroup> ExportRendererParticle::to_config() const
     grp->insert_int("worker_count", worker_count_->value());
 
     return grp;
+}
+
+void ExportRendererParticle::save_asset(AssetSaver &saver) const
+{
+    saver.write(int32_t(min_depth_->value()));
+    saver.write(int32_t(max_depth_->value()));
+    saver.write(cont_prob_->value());
+    saver.write(int32_t(particle_task_count_->value()));
+    saver.write(int32_t(particles_per_task_->value()));
+    saver.write(int32_t(forward_spp_->value()));
+    saver.write(int32_t(forward_task_size_->value()));
+    saver.write(int32_t(worker_count_->value()));
+}
+
+void ExportRendererParticle::load_asset(AssetLoader &loader)
+{
+    min_depth_->setValue(int(loader.read<int32_t>()));
+    max_depth_->setValue(int(loader.read<int32_t>()));
+    cont_prob_->set_value(loader.read<real>());
+    particle_task_count_->setValue(int(loader.read<int32_t>()));
+    particles_per_task_->setValue(int(loader.read<int32_t>()));
+    forward_spp_->setValue(int(loader.read<int32_t>()));
+    forward_task_size_->setValue(int(loader.read<int32_t>()));
+    worker_count_->setValue(int(loader.read<int32_t>()));
 }
 
 AGZ_EDITOR_END

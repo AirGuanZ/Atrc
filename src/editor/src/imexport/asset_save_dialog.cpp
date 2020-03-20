@@ -4,6 +4,7 @@
 #include <QMessageBox>
 
 #include <agz/editor/imexport/asset_save_dialog.h>
+#include <agz/editor/post_processor/post_processor_seq.h>
 #include <agz/editor/renderer/renderer_widget.h>
 #include <agz/editor/scene/scene_mgr.h>
 
@@ -14,12 +15,14 @@ AssetSaveDialog::AssetSaveDialog(
     ObjectContext       *obj_ctx,
     EnvirLightSlot      *envir_light,
     GlobalSettingWidget *global_settings,
+    PostProcessorSeq    *post_processors,
     PreviewWindow       *preview_window,
     RendererPanel       *renderer_panel)
     : scene_mgr_      (scene_mgr),
       obj_ctx_        (obj_ctx),
       envir_light_    (envir_light),
       global_settings_(global_settings),
+      post_processors_(post_processors),
       preview_window_ (preview_window),
       renderer_panel_ (renderer_panel)
 {
@@ -38,6 +41,7 @@ void AssetSaveDialog::init_ui()
     save_entities_        = new QCheckBox("Entities",    this);
     save_envir_light_     = new QCheckBox("Envir Light", this);
     save_global_settings_ = new QCheckBox("Global Settings", this);
+    save_post_processors_ = new QCheckBox("Post Processors", this);
     save_preview_window_  = new QCheckBox("Camera", this);
     save_renderer_panel_  = new QCheckBox("Renderer", this);
 
@@ -53,6 +57,7 @@ void AssetSaveDialog::init_ui()
     save_entities_       ->setChecked(true);
     save_envir_light_    ->setChecked(true);
     save_global_settings_->setChecked(true);
+    save_post_processors_->setChecked(true);
     save_preview_window_ ->setChecked(true);
     save_renderer_panel_ ->setChecked(true);
 
@@ -71,6 +76,7 @@ void AssetSaveDialog::init_ui()
     layout->addWidget(save_entities_,        ++row, 0, 1, 2);
     layout->addWidget(save_envir_light_,     ++row, 0, 1, 2);
     layout->addWidget(save_global_settings_, ++row, 0, 1, 2);
+    layout->addWidget(save_post_processors_, ++row, 0, 1, 2);
     layout->addWidget(save_preview_window_,  ++row, 0, 1, 2);
     layout->addWidget(save_renderer_panel_,  ++row, 0, 1, 2);
     
@@ -138,7 +144,8 @@ void AssetSaveDialog::init_ui()
 
 void AssetSaveDialog::ok()
 {
-    const QString save_filename = QFileDialog::getSaveFileName(this);
+    const QString save_filename = QFileDialog::getSaveFileName(
+        this, QString(), QString(), "Atrc (*.atrc)");
     if(save_filename.isEmpty())
         return;
 
@@ -222,6 +229,13 @@ void AssetSaveDialog::ok()
         ++section_count;
         saver.write(AssetSectionType::GlobalSettings);
         global_settings_->save_asset(saver);
+    }
+
+    if(save_post_processors_->isChecked())
+    {
+        ++section_count;
+        saver.write(AssetSectionType::PostProcessors);
+        post_processors_->save_asset(saver);
     }
 
     if(save_preview_window_->isChecked())

@@ -7,9 +7,6 @@ AGZ_TRACER_BEGIN
 RC<PostProcessor> create_aces_tone_mapper(
     real exposure);
 
-RC<PostProcessor> create_film_flipper(
-    bool vertically, bool horizontally);
-
 RC<PostProcessor> create_gamma_corrector(
     real gamma);
 

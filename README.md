@@ -11,7 +11,7 @@ Offline rendering lab based on ray tracing
 
 ## Roadmap
 
-- [ ] Post Processor editing in editor
+- [x] Post Processor editing in editor
 - [ ] MMLT
 - [ ] VCM
 

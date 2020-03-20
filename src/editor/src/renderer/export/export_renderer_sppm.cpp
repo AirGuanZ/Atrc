@@ -1,6 +1,8 @@
 #include <QGridLayout>
 #include <QLabel>
 
+#include <agz/editor/imexport/asset_loader.h>
+#include <agz/editor/imexport/asset_saver.h>
 #include <agz/editor/renderer/export/export_renderer_sppm.h>
 
 AGZ_EDITOR_BEGIN
@@ -197,6 +199,36 @@ RC<tracer::ConfigGroup> ExportRendererSPPM::to_config() const
     grp->insert_int("grid_res", grid_res_->value());
 
     return grp;
+}
+
+void ExportRendererSPPM::save_asset(AssetSaver &saver) const
+{
+    saver.write(int32_t(worker_count_->value()));
+    saver.write(int32_t(forward_task_grid_size_->value()));
+    saver.write(int32_t(forward_max_depth_->value()));
+    saver.write(init_radius_->get_value());
+    saver.write(int32_t(iteration_count_->value()));
+    saver.write(int32_t(photons_per_iteration_->value()));
+    saver.write(int32_t(photon_min_depth_->value()));
+    saver.write(int32_t(photon_max_depth_->value()));
+    saver.write(int32_t(photon_cont_prob_->value()));
+    saver.write(alpha_->get_value());
+    saver.write(int32_t(grid_res_->value()));
+}
+
+void ExportRendererSPPM::load_asset(AssetLoader &loader)
+{
+    worker_count_->setValue(int(loader.read<int32_t>()));
+    forward_task_grid_size_->setValue(int(loader.read<int32_t>()));
+    forward_max_depth_->setValue(int(loader.read<int32_t>()));
+    init_radius_->set_value(loader.read<real>());
+    iteration_count_->setValue(int(loader.read<int32_t>()));
+    photons_per_iteration_->setValue(int(loader.read<int32_t>()));
+    photon_min_depth_->setValue(int(loader.read<int32_t>()));
+    photon_max_depth_->setValue(int(loader.read<int32_t>()));
+    photon_cont_prob_->setValue(loader.read<real>());
+    alpha_->set_value(loader.read<real>());
+    grid_res_->setValue(int(loader.read<int32_t>()));
 }
 
 AGZ_EDITOR_END

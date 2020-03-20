@@ -23,9 +23,9 @@
 
 **Dependencies Need to Be Prepared**
 
-* [oidn](https://openimagedenoise.github.io/) for denoising (only when `USE_OIDN` is `ON`)
+* [oidn 1.1.0](https://openimagedenoise.github.io/) for denoising (only when `USE_OIDN` is `ON`)
 * [Embree 3.6.1](https://www.embree.org/) for better ray-mesh intersection test (only when `USE_EMBREE` is `ON`)
-* Qt5 (only when `BUILD_GUI` or `BUILD_EDITOR` is `ON`)
+* Qt 5.12 (only when `BUILD_GUI` or `BUILD_EDITOR` is `ON`)
 
 ### CMake Options
 
@@ -598,15 +598,6 @@ Environment light that represents a sky with a gradient of color from top to bot
 
 ### Post Processor
 
-**flip**
-
-Flip the image
-
-| Field Name   | Type | Default Value | Explanation                            |
-| ------------ | ---- | ------------- | -------------------------------------- |
-| vertically   | bool | false         | whether to flip the image vertically   |
-| horizontally | bool | false         | whether to flip the image horizontally |
-
 **gamma**
 
 Perform gamma correction on the image
@@ -712,20 +703,37 @@ Bidirectional path tracer
 
 Adjoint particle tracer. `particle` builds path from light source to camera, making the convergence very slow.
 
-| Field Name             | Type | Default Value | Explanation                               |
-| ---------------------- | ---- | ------------- | ----------------------------------------- |
-| worker_count           | int  | 0             | rendering thread count                    |
-| particle_task_count    | int  |               | particle tracing task count               |
-| particles_per_task     | int  |               | particles per task in backward pass       |
-| min_depth              | int  | 5             | min path depth before using RR policy     |
-| max_depth              | int  | 10            | max depth of the path                     |
-| cont_prob              | real | 0.9           | pass probability when using RR strategy   |
-| forward_task_grid_size | int  | 32            | rendering task pixel size in forward pass |
-| forward_spp            | int  |               | samples per pixel in forward pass         |
+| Field Name             | Type | Default Value | Explanation                                   |
+| ---------------------- | ---- | ------------- | --------------------------------------------- |
+| worker_count           | int  | 0             | rendering thread count                        |
+| particle_task_count    | int  |               | particle tracing task count                   |
+| particles_per_task     | int  |               | particles per task in backward pass           |
+| min_depth              | int  | 5             | min path depth before using RR policy         |
+| max_depth              | int  | 10            | max depth of the path                         |
+| cont_prob              | real | 0.9           | continuing probability when using RR strategy |
+| forward_task_grid_size | int  | 32            | rendering task pixel size in forward pass     |
+| forward_spp            | int  |               | samples per pixel in forward pass             |
 
 `particle` uses the strategy of starting from a light source to construct a light path, called backward pass; for paths of length 1 (that is, the light source is directly seen from the camera), however, `particle` builds them from the camera to light sources, called forward pass. The two passes are independent executed and are combined to render the final image.
 
 Backward pass consists of `particle_task_count` particle tracing tasks. Each task contains `particles_per_task` particles, so a total number of `particle_task_count * particles_per_task` paths are traced in backward pass.
+
+**pssmlt_pt**
+
+Primary sample space metropolis light transport on path tracing
+
+| Field Name           | Type | Default Value | Explanation                                     |
+| -------------------- | ---- | ------------- | ----------------------------------------------- |
+| worker_count         | int  | 0             | rendering thread count                          |
+| min_depth            | int  | 5             | min path depth before using RR policy           |
+| max_depth            | int  | 10            | max depth of the path                           |
+| cont_prob            | real | 0.9           | continuing probability when using RR strategy   |
+| use_mis              | bool | true          | use mis to compute direct illumination          |
+| startup_sample_count | int  | 100000        | number of startup samples in MLT                |
+| mut_per_pixel        | int  | 100           | mutations per pixel                             |
+| sigma                | real | 0.01          | small mutation size                             |
+| large_step_prob      | real | 0.35          | probability of large mutation in each iteration |
+| chain_count          | int  | 1000          | number of markov chains                         |
 
 **sppm**
 

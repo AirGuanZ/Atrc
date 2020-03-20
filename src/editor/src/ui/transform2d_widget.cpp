@@ -327,9 +327,12 @@ RC<tracer::ConfigArray> Transform2DWidget::to_config() const
 
 Transform2DUnitWidget::UnitType Transform2DWidget::get_unit_type()
 {
+    bool ok = false;
     const QStringList item_list = { "Translate", "Rotate", "Scale" };
     const QString item = QInputDialog::getItem(
-        this, "Type", "Select transform type", item_list);
+        this, "Type", "Select transform type", item_list, 0, false, &ok);
+    if(!ok)
+        return Transform2DUnitWidget::UnitType::None;
     if(item == "Translate")
         return Transform2DUnitWidget::UnitType::Translate;
     if(item == "Rotate")
@@ -340,6 +343,7 @@ Transform2DUnitWidget::UnitType Transform2DWidget::get_unit_type()
 Transform2DUnitWidget *Transform2DWidget::create_new_unit_widget(
     Transform2DUnitWidget::UnitType type)
 {
+    assert(type != Transform2DUnitWidget::UnitType::None);
     if(type == Transform2DUnitWidget::UnitType::Translate)
         return new Translate2DWidget(this);
     if(type == Transform2DUnitWidget::UnitType::Rotate)
@@ -372,6 +376,8 @@ Transform2DWidget::Transform2DWidget(std::vector<Transform2DUnitWidget*> units)
 void Transform2DWidget::add_up()
 {
     const Transform2DUnitWidget::UnitType unit_type = get_unit_type();
+    if(unit_type == Transform2DUnitWidget::UnitType::None)
+        return;
     Transform2DUnitWidget *unit_widget = create_new_unit_widget(unit_type);
 
     units_.insert(units_.begin(), unit_widget);
@@ -415,6 +421,8 @@ void Transform2DWidget::add_up()
 void Transform2DWidget::add_down()
 {
     const Transform2DUnitWidget::UnitType unit_type = get_unit_type();
+    if(unit_type == Transform2DUnitWidget::UnitType::None)
+        return;
     Transform2DUnitWidget *unit_widget = create_new_unit_widget(unit_type);
     push_back(unit_widget);
 }
