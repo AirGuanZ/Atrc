@@ -1,6 +1,6 @@
 # Atrc Renderer Documentation
 
-![pic](./gallery/editor.png)
+![pic](./gallery/food.png)
 
 [TOC]
 
@@ -434,6 +434,8 @@ Triangle mesh implemented using simple BVH tree. It has the same parameters as `
 Some materials support normal mapping. The field list of these materials will include a `normal_map`.
 
 **BSSRDF**
+
+![pic](./gallery/dragon.png)
 
 Some materials support [Normalized Diffusion BSSRDF](https://graphics.pixar.com/library/ApproxBSSRDF/paper.pdf), which contains following three fields:
 

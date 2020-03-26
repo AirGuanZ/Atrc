@@ -21,9 +21,13 @@ Offline rendering lab based on ray tracing
 
 ## Gallery
 
-Scene Editor (under development) (scene ref [here](https://luxcorerender.org/download/)):
+Food (scene ref [here](https://luxcorerender.org/download/)):
 
-![0](./doc/gallery/editor.png)
+![0](./doc/gallery/food.png)
+
+BSSRDF:
+
+![pic](./doc/gallery/dragon.png)
 
 Materials:
 
