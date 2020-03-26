@@ -4,16 +4,25 @@ Offline rendering lab based on ray tracing
 
 ## Features
 
-- [x] volumetric path tracing, adjoint particle tracing, bidirectional path tracing, stochastic progressive photon mapping, pssmlt on path tracing
-- [x] materials: disney bsdf, mirror, phong...
-- [x] (optional) integrated [Embree](https://github.com/embree/embree) engine
-- [x] (optional) integrated [OIDN](https://github.com/OpenImageDenoise/oidn) denoiser
-
-## Roadmap
-
-- [x] Post Processor editing in editor
-- [ ] MMLT
-- [ ] VCM
+- [x] Volumetric path tracing with next event estimation
+- [x] Adjoint particle tracing
+- [x] Bidirectional path tracing
+- [x] Stochastic progressive photon mapping
+- [x] Primary sample space MLT on path tracing
+- [x] Various material models: Disney Principled BSDF, (frosted) glass, Phong, ...
+- [x] Homogeneous/Heterogeneous Participating Medium
+- [x] Normalized Diffusion BSSRDF
+- [x] Almost all material properties can be specified with 2D/3D textures
+- [x] Various geometry models: sphere, quad, triangle, disk, mesh
+- [x] Two-level accelerating structure (SAH based BVH)
+- [x] Importance sampled environment light
+- [x] G-Buffer output (albedo, normal, ...)
+- [x] Depth of field
+- [x] ACES tone mapping
+- [x] Image sample space low-pass filter
+- [x] (Optional) Integrated OIDN library
+- [x] (Optional) Integrated Embree library
+- [x] Interactive scene editor
 
 ## Documentation
 
