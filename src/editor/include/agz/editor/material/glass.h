@@ -1,5 +1,6 @@
 #pragma once
 
+#include <agz/editor/material/bssrdf_surface.h>
 #include <agz/editor/material/material.h>
 #include <agz/editor/texture2d/texture2d.h>
 
@@ -16,6 +17,8 @@ public:
 
         bool use_color_refr = false;
         Texture2DSlot *color_refr = nullptr;
+
+        BSSRDFSurfaceWidget<true, false> *bssrdf = nullptr;
     };
 
     GlassWidget(const InitData &init_data, ObjectContext &obj_ctx);
@@ -47,6 +50,8 @@ private:
 
     QCheckBox     *use_color_refr_ = nullptr;
     Texture2DSlot *color_refr_     = nullptr;
+
+    BSSRDFSurfaceWidget<true, false> *bssrdf_ = nullptr;
 };
 
 class GlassWidgetCreator : public MaterialWidgetCreator

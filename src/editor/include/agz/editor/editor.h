@@ -5,6 +5,7 @@
 
 #include <agz/editor/displayer/preview_window.h>
 #include <agz/editor/envir_light/envir_light.h>
+#include <agz/editor/film_filter/film_filter.h>
 #include <agz/editor/post_processor/post_processor_seq.h>
 #include <agz/editor/renderer/renderer.h>
 #include <agz/editor/renderer/renderer_widget.h>
@@ -75,6 +76,8 @@ private:
 
     void init_post_processor_widget();
 
+    void init_film_filter();
+
     void init_save_asset_dialog();
 
     void redistribute_panels();
@@ -123,6 +126,10 @@ private:
     // post processors
 
     Box<PostProcessorSeq> pp_seq_;
+
+    // film filter
+
+    Box<FilmFilterPanel> film_filter_;
 
     // env light
 

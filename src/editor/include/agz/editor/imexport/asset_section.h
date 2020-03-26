@@ -21,6 +21,7 @@ enum class AssetSectionType : uint8_t
 
     Renderer = 11,
 
+    FilmFilter = 12,
 };
 
 AGZ_EDITOR_END

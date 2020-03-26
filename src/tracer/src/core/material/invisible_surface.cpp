@@ -1,4 +1,5 @@
 #include <agz/tracer/core/bsdf.h>
+#include <agz/tracer/core/bssrdf.h>
 #include <agz/tracer/core/material.h>
 
 AGZ_TRACER_BEGIN
@@ -61,21 +62,30 @@ namespace
 
 class InvisibleSurfaceMaterial : public Material
 {
+    RC<const BSSRDFSurface> bssrdf_;
+
 public:
 
-    ShadingPoint shade(const SurfacePoint &inct, Arena &arena) const override
+    explicit InvisibleSurfaceMaterial(RC<const BSSRDFSurface> bssrdf) noexcept
+        : bssrdf_(std::move(bssrdf))
+    {
+        
+    }
+
+    ShadingPoint shade(const EntityIntersection &inct, Arena &arena) const override
     {
         ShadingPoint shd;
         shd.bsdf = arena.create<InvisibleSurfaceBSDF>(
                                 inct.geometry_coord.z);
         shd.shading_normal = inct.user_coord.z;
+        shd.bssrdf = bssrdf_->create(inct, arena);
         return shd;
     }
 };
 
-RC<Material> create_invisible_surface()
+RC<Material> create_invisible_surface(RC<const BSSRDFSurface> bssrdf)
 {
-    return newRC<InvisibleSurfaceMaterial>();
+    return newRC<InvisibleSurfaceMaterial>(std::move(bssrdf));
 }
 
 AGZ_TRACER_END

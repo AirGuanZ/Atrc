@@ -1,5 +1,6 @@
 #pragma once
 
+#include <agz/editor/material/bssrdf_surface.h>
 #include <agz/editor/material/material.h>
 #include <agz/editor/material/normal_map.h>
 #include <agz/editor/texture2d/texture2d.h>
@@ -9,6 +10,8 @@ AGZ_EDITOR_BEGIN
 class DisneyWidget : public MaterialWidget
 {
 public:
+
+    using BSSRDFWidget = BSSRDFSurfaceWidget<false, false>;
 
     struct InitData
     {
@@ -25,7 +28,9 @@ public:
         Texture2DSlot *sheen_tint             = nullptr;
         Texture2DSlot *clearcoat              = nullptr;
         Texture2DSlot *clearcoat_gloss        = nullptr;
+
         NormalMapWidget *normal_map           = nullptr;
+        BSSRDFWidget    *bssrdf               = nullptr;
     };
 
     DisneyWidget(const InitData &init_data, ObjectContext &obj_ctx);
@@ -65,6 +70,7 @@ private:
     Texture2DSlot *clearcoat_              = nullptr;
     Texture2DSlot *clearcoat_gloss_        = nullptr;
     NormalMapWidget *normal_map_           = nullptr;
+    BSSRDFWidget    *bssrdf_ = nullptr;
 };
 
 class DisneyWidgetCreator : public MaterialWidgetCreator

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <agz/tracer/core/bssrdf.h>
 #include <agz/tracer/core/material.h>
 #include <agz/tracer/core/texture2d.h>
 
@@ -19,17 +20,20 @@ RC<Material> create_disney(
     RC<const Texture2D> sheen_tint,
     RC<const Texture2D> clearcoat,
     RC<const Texture2D> clearcoat_gloss,
-    Box<const NormalMapper> normal_mapper);
+    Box<const NormalMapper> normal_mapper,
+    RC<const BSSRDFSurface> bssrdf);
 
 RC<Material> create_frosted_glass(
     RC<const Texture2D> color_map,
     RC<const Texture2D> roughness,
-    RC<const Texture2D> ior);
+    RC<const Texture2D> ior,
+    RC<const BSSRDFSurface> bssrdf);
 
 RC<Material> create_glass(
     RC<const Texture2D> color_reflection_map,
     RC<const Texture2D> color_refraction_map,
-    RC<const Texture2D> ior);
+    RC<const Texture2D> ior,
+    RC<const BSSRDFSurface> bssrdf);
 
 RC<Material> create_ideal_black();
 
@@ -37,7 +41,8 @@ RC<Material> create_ideal_diffuse(
     RC<const Texture2D> albedo,
     Box<const NormalMapper> normal_mapper);
 
-RC<Material> create_invisible_surface();
+RC<Material> create_invisible_surface(
+    RC<const BSSRDFSurface> bssrdf);
 
 RC<Material> create_mirror(
     RC<const Texture2D> color_map,
@@ -49,5 +54,16 @@ RC<Material> create_phong(
     RC<const Texture2D> s,
     RC<const Texture2D> ns,
     Box<NormalMapper> nor_map);
+
+RC<Material> create_sss_wrapper(
+    RC<const Texture2D> A,
+    RC<const Texture2D> dmfp,
+    RC<const Texture2D> eta,
+    RC<const Material> internal);
+
+RC<BSSRDFSurface> create_normalized_diffusion_bssrdf_surface(
+    RC<const Texture2D> A,
+    RC<const Texture2D> dmfp,
+    RC<const Texture2D> eta);
 
 AGZ_TRACER_END

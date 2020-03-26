@@ -89,7 +89,7 @@ public:
         k_      = k;
     }
 
-    ShadingPoint shade(const SurfacePoint &inct, Arena &arena) const override
+    ShadingPoint shade(const EntityIntersection &inct, Arena &arena) const override
     {
         const Spectrum rc  = rc_map_->sample_spectrum(inct.uv);
         const Spectrum ior = ior_   ->sample_spectrum(inct.uv);

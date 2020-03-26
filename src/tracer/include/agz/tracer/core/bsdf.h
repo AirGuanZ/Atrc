@@ -6,15 +6,6 @@
 AGZ_TRACER_BEGIN
 
 /**
- * @brief what is carried by the path: radiance/importance
- */
-enum class TransMode
-{
-    Radiance   = 0, // camera -> light
-    Importance = 1  // light -> camera
-};
-
-/**
  * @brief result of sampling BSDF
  */
 struct BSDFSampleResult

@@ -36,9 +36,12 @@ void PerPixelRenderer::render_grid(
                 const render::Pixel pixel = eval_pixel(
                     scene, ray, sampler, arena);
 
-                grid.apply(
-                    pixel_x, pixel_y, cam_ray.throughput * pixel.value, 1,
-                    pixel.albedo, pixel.normal, pixel.denoise);
+                if(pixel.value.is_finite())
+                {
+                    grid.apply(
+                        pixel_x, pixel_y, cam_ray.throughput * pixel.value, 1,
+                        pixel.albedo, pixel.normal, pixel.denoise);
+                }
 
                 arena.release();
 

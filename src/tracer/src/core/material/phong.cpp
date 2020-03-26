@@ -1,6 +1,7 @@
 #include <agz/tracer/core/bsdf.h>
 #include <agz/tracer/core/material.h>
 #include <agz/tracer/core/texture2d.h>
+#include <agz/tracer/utility/reflection.h>
 
 AGZ_TRACER_BEGIN
 
@@ -44,10 +45,9 @@ namespace phong_impl
         {
             assert(lwi.z > 0 && lwo.z > 0);
 
-            const Vec3 wh = (lwi + lwo).normalize();
-            const real D = pow_cos_on_hemisphere_pdf(ns_, wh.z);
-
-            return s_ * D / (4 * lwi.z * lwo.z);
+            const Vec3 ideal_lwi = refl_aux::reflect(lwo, { 0, 0, 1 });
+            const real cos_val = cos(ideal_lwi, lwi);
+            return s_ * pow_cos_on_hemisphere_pdf(ns_, cos_val);
         }
 
         std::pair<Vec3, real> sample_diffuse(
@@ -62,14 +62,14 @@ namespace phong_impl
         {
             assert(lwo.z > 0);
 
-            const Vec3 wh = sample_pow_cos_on_hemisphere(ns_, sam);
-            const Vec3 lwi = (2 * dot(lwo, wh) * wh - lwo).normalize();
+            const Vec3 ideal_lwi = refl_aux::reflect(lwo, { 0, 0, 1 });
+            const Vec3 local_lwi = sample_pow_cos_on_hemisphere(ns_, sam);
+            const Vec3 lwi = Coord::from_z(ideal_lwi).local_to_global(
+                                local_lwi).normalize();
             if(lwi.z <= 0)
                 return { {}, 0 };
 
-            const real D = pow_cos_on_hemisphere_pdf(ns_, wh.z);
-            const real pdf = D / (4 * dot(lwo, wh));
-
+            const real pdf = pow_cos_on_hemisphere_pdf(ns_, local_lwi.z);
             return { lwi, pdf };
         }
 
@@ -81,9 +81,12 @@ namespace phong_impl
 
         real pdf_specular(const Vec3 &lwi, const Vec3 &lwo) const noexcept
         {
-            assert(lwi.z > 0 && lwo.z > 0);
-            const Vec3 wh = (lwi + lwo).normalize();
-            return pow_cos_on_hemisphere_pdf(ns_, wh.z) / (4 * dot(lwo, wh));
+            const Vec3 ideal_lwi = refl_aux::reflect(lwo, { 0, 0, 1 });
+            const Vec3 local_lwi = Coord::from_z(ideal_lwi).global_to_local(lwi);
+
+            if(local_lwi.z <= 0)
+                return 0;
+            return pow_cos_on_hemisphere_pdf(ns_, local_lwi.normalize().z);
         }
 
     public:
@@ -226,7 +229,7 @@ public:
         
     }
 
-    ShadingPoint shade(const SurfacePoint &inct, Arena &arena) const override
+    ShadingPoint shade(const EntityIntersection &inct, Arena &arena) const override
     {
         Spectrum d = d_->sample_spectrum(inct.uv);
         Spectrum s = s_->sample_spectrum(inct.uv);

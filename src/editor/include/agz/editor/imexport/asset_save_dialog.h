@@ -4,6 +4,7 @@
 #include <QDialog>
 
 #include <agz/editor/envir_light/envir_light.h>
+#include <agz/editor/film_filter/film_filter.h>
 #include <agz/editor/ui/global_setting_widget.h>
 
 AGZ_EDITOR_BEGIN
@@ -25,6 +26,7 @@ public:
         ObjectContext       *obj_ctx,
         EnvirLightSlot      *envir_light,
         GlobalSettingWidget *global_settings,
+        FilmFilterPanel     *film_filter,
         PostProcessorSeq    *post_processors,
         PreviewWindow       *preview_window,
         RendererPanel       *renderer);
@@ -45,6 +47,7 @@ private:
     QCheckBox *save_entities_        = nullptr;
     QCheckBox *save_envir_light_     = nullptr;
     QCheckBox *save_global_settings_ = nullptr;
+    QCheckBox *save_film_filter_     = nullptr;
     QCheckBox *save_post_processors_ = nullptr;
     QCheckBox *save_preview_window_  = nullptr;
     QCheckBox *save_renderer_panel_  = nullptr;
@@ -53,6 +56,7 @@ private:
     ObjectContext       *obj_ctx_         = nullptr;
     EnvirLightSlot      *envir_light_     = nullptr;
     GlobalSettingWidget *global_settings_ = nullptr;
+    FilmFilterPanel     *film_filter_     = nullptr;
     PostProcessorSeq    *post_processors_ = nullptr;
     PreviewWindow       *preview_window_  = nullptr;
     RendererPanel       *renderer_panel_  = nullptr;

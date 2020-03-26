@@ -1,1 +1,0 @@
-FIND_PACKAGE(embree 3.0 REQUIRED)

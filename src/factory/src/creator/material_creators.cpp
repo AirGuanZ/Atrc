@@ -16,6 +16,33 @@ namespace material
         }
         return newBox<NormalMapper>(nullptr);
     }
+
+    RC<BSSRDFSurface> init_bssrdf_surface(
+        const ConfigGroup &params,
+        RC<const Texture2D> default_A,
+        RC<const Texture2D> default_eta,
+        CreatingContext &context)
+    {
+        if(!params.find_child("bssrdf_dmfp"))
+            return newRC<BSSRDFSurface>();
+
+        auto dmfp = context.create<Texture2D>(params.child_group("bssrdf_dmfp"));
+
+        auto A = default_A;
+        if(auto nodeA = params.find_child_group("bssrdf_A"))
+            A = context.create<Texture2D>(*nodeA);
+        if(!A)
+            throw ObjectConstructionException("bssrdf_A not found");
+
+        auto eta = default_eta;
+        if(auto node_eta = params.find_child_group("bssrdf_eta"))
+            eta = context.create<Texture2D>(*node_eta);
+        if(!eta)
+            throw ObjectConstructionException("bssrdf_eta not found");
+
+        return create_normalized_diffusion_bssrdf_surface(
+            std::move(A), std::move(dmfp), std::move(eta));
+    }
     
     class DisneyCreator : public Creator<Material>
     {
@@ -64,6 +91,8 @@ namespace material
 
             auto normal_mapper = init_normal_mapper(params, context);
 
+            auto bssrdf = init_bssrdf_surface(params, base_color, ior, context);
+
             return create_disney(
                 std::move(base_color),
                 std::move(metallic),
@@ -78,7 +107,8 @@ namespace material
                 std::move(sheen_tint),
                 std::move(clearcoat),
                 std::move(clearcoat_gloss),
-                std::move(normal_mapper));
+                std::move(normal_mapper),
+                std::move(bssrdf));
         }
     };
 
@@ -100,8 +130,12 @@ namespace material
                 params.child_group("ior"));
             const auto roughness = context.create<Texture2D>(
                 params.child_group("roughness"));
+
+            auto bssrdf = init_bssrdf_surface(params, {}, ior, context);
+
             return create_frosted_glass(
-                std::move(color_map), std::move(roughness), std::move(ior));
+                std::move(color_map), std::move(roughness),
+                std::move(ior), std::move(bssrdf));
         }
     };
 
@@ -138,10 +172,13 @@ namespace material
                 throw CreatingObjectException(
                     "empty color reflection/refraction map");
 
+            auto bssrdf = init_bssrdf_surface(params, {}, ior, context);
+
             return create_glass(
                 std::move(color_reflection_map),
                 std::move(color_refraction_map),
-                std::move(ior));
+                std::move(ior),
+                std::move(bssrdf));
         }
     };
 
@@ -193,7 +230,8 @@ namespace material
         RC<Material> create(
             const ConfigGroup &params, CreatingContext &context) const override
         {
-            return create_invisible_surface();
+            auto bssrdf = init_bssrdf_surface(params, {}, {}, context);
+            return create_invisible_surface(std::move(bssrdf));
         }
     };
 
@@ -239,6 +277,31 @@ namespace material
         }
     };
 
+    class SSSWrapperCreator : public Creator<Material>
+    {
+    public:
+
+        std::string name() const override
+        {
+            return "sss";
+        }
+
+        std::shared_ptr<Material> create(
+            const ConfigGroup &params, CreatingContext &context) const override
+        {
+            auto A    = context.create<Texture2D>(params.child_group("A"));
+            auto dmfp = context.create<Texture2D>(params.child_group("dmfp"));
+            auto eta  = context.create<Texture2D>(params.child_group("eta"));
+
+            auto internal = context.create<Material>(
+                params.child_group("internal"));
+
+            return create_sss_wrapper(
+                std::move(A), std::move(dmfp),
+                std::move(eta), std::move(internal));
+        }
+    };
+
 } // namespace material;
 
 void initialize_material_factory(Factory<Material> &factory)
@@ -251,6 +314,7 @@ void initialize_material_factory(Factory<Material> &factory)
     factory.add_creator(newBox<material::InvisibleSurfaceCreator>());
     factory.add_creator(newBox<material::MirrorCreator>());
     factory.add_creator(newBox<material::PhongCreator>());
+    factory.add_creator(newBox<material::SSSWrapperCreator>());
 }
 
 AGZ_TRACER_FACTORY_END

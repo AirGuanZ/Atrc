@@ -38,6 +38,7 @@ Range3DWidget::Range3DWidget(const CloneState &clone_state)
     value_->setButtonSymbols(QDoubleSpinBox::NoButtons);
 
     value_->setRange(clone_state.low, clone_state.high);
+    value_->setDecimals(4);
     value_->setValue(clone_state.value);
 
     slider_->set_range(clone_state.low, clone_state.high);

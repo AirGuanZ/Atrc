@@ -5,7 +5,7 @@
 #include <agz/editor/editor.h>
 #include <agz/editor/imexport/asset_load_dialog.h>
 #include <agz/editor/imexport/asset_save_dialog.h>
-#include <agz/editor/imexport/json_export_dialog.h>
+#include <agz/editor/imexport/json_export.h>
 #include <agz/editor/renderer/renderer_widget.h>
 #include <agz/editor/ui/global_setting_widget.h>
 #include <agz/editor/ui/log_widget.h>
@@ -61,6 +61,10 @@ Editor::Editor()
     AGZ_INFO("initialize post processor editor");
 
     init_post_processor_widget();
+
+    AGZ_INFO("initialize film filter editor");
+
+    init_film_filter();
 
     redistribute_panels();
 
@@ -348,6 +352,18 @@ void Editor::init_post_processor_widget()
     });
 }
 
+void Editor::init_film_filter()
+{
+    QAction *action = new QAction("Film Filter", this);
+    menuBar()->addAction(action);
+
+    film_filter_ = newBox<FilmFilterPanel>(this);
+    connect(action, &QAction::triggered, [=]
+    {
+        film_filter_->exec();
+    });
+}
+
 void Editor::init_save_asset_dialog()
 {
     QAction *load_action = new QAction("Load", this);
@@ -359,8 +375,8 @@ void Editor::init_save_asset_dialog()
             asset_load_dialog_ = newBox<AssetLoadDialog>(
                 scene_mgr_.get(), obj_ctx_.get(),
                 envir_light_slot_, global_setting_,
-                pp_seq_.get(), preview_window_,
-                renderer_panel_);
+                film_filter_.get(), pp_seq_.get(),
+                preview_window_, renderer_panel_);
         }
 
         asset_load_dialog_->exec();
@@ -390,8 +406,8 @@ void Editor::init_save_asset_dialog()
             asset_save_dialog_ = newBox<AssetSaveDialog>(
                 scene_mgr_.get(), obj_ctx_.get(),
                 envir_light_slot_, global_setting_,
-                pp_seq_.get(), preview_window_,
-                renderer_panel_);
+                film_filter_.get(), pp_seq_.get(),
+                preview_window_, renderer_panel_);
         }
         asset_save_dialog_->exec();
     });
@@ -407,6 +423,7 @@ void Editor::init_save_asset_dialog()
             pp_seq_.get(),
             preview_window_,
             global_setting_,
+            film_filter_.get(),
             renderer_panel_);
     });
 }

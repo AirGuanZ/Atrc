@@ -93,7 +93,7 @@ public:
     /**
      * @brief accumulate photon flux to recorded visible points
      *
-     * parallel 'add_vp' is safe
+     * parallel 'add_photon' is safe
      */
     void add_photon(const Vec3 &photon_pos, const Spectrum &phi, const Vec3 &wr);
 

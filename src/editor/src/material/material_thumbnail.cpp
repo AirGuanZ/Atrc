@@ -115,7 +115,17 @@ void MaterialThumbnailProvider::run_one_iter(int spp)
                     spt.uv = uv;
                     spt.geometry_coord = coord;
                     spt.user_coord = coord;
-                    auto shd = mat_->shade(spt, arena);
+
+                    tracer::EntityIntersection inct;
+                    (tracer::SurfacePoint &)inct = spt;
+                    inct.entity     = nullptr;
+                    inct.material   = mat_.get();
+                    inct.medium_in  = nullptr;
+                    inct.medium_out = nullptr;
+                    inct.wr         = { 0, 0, 1 };
+                    inct.t          = 1;
+
+                    auto shd = mat_->shade(inct, arena);
 
                     Spectrum color;
                     for(int j = 0; j < 4; ++j)

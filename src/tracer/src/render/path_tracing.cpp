@@ -1,4 +1,5 @@
 #include <agz/tracer/core/bsdf.h>
+#include <agz/tracer/core/bssrdf.h>
 #include <agz/tracer/core/camera.h>
 #include <agz/tracer/core/entity.h>
 #include <agz/tracer/core/material.h>
@@ -142,10 +143,62 @@ Pixel trace_std(
         if(!bsdf_sample.f || bsdf_sample.pdf < EPS)
             return pixel;
 
-        r = Ray(ent_inct.eps_offset(bsdf_sample.dir), bsdf_sample.dir.normalize());
-
-        const real abscos = std::abs(cos(ent_inct.geometry_coord.z, bsdf_sample.dir));
+        const real abscos = std::abs(cos(
+            ent_inct.geometry_coord.z, bsdf_sample.dir));
         coef *= bsdf_sample.f * abscos / bsdf_sample.pdf;
+
+        r = Ray(ent_inct.eps_offset(bsdf_sample.dir),
+                bsdf_sample.dir.normalize());
+
+        // bssrdf
+
+        if(!ent_shd.bssrdf)
+            continue;
+
+        const bool pos_in = ent_inct.geometry_coord.in_positive_z_hemisphere(
+            bsdf_sample.dir);
+        const bool pos_out = ent_inct.geometry_coord.in_positive_z_hemisphere(
+            ent_inct.wr);
+
+        if(!pos_in && pos_out)
+        {
+            const auto bssrdf_sample = ent_shd.bssrdf->sample_pi(
+                sampler.sample3(), arena);
+            if(!bssrdf_sample.coef)
+                return pixel;
+
+            coef *= bssrdf_sample.coef / bssrdf_sample.pdf;
+
+            auto &new_inct = bssrdf_sample.inct;
+            auto new_shd = new_inct.material->shade(new_inct, arena);
+
+            Spectrum new_direct_illum;
+            for(int i = 0; i < params.direct_illum_sample_count; ++i)
+            {
+                for(auto light : scene.lights())
+                {
+                    new_direct_illum += coef * mis_sample_light(
+                        scene, light, new_inct, new_shd, sampler);
+                }
+                new_direct_illum += coef * mis_sample_bsdf(
+                    scene, new_inct, new_shd, sampler);
+            }
+
+            pixel.value += real(1) / params.direct_illum_sample_count
+                         * new_direct_illum;
+
+            const auto new_bsdf_sample = new_shd.bsdf->sample(
+                new_inct.wr, TransMode::Radiance, sampler.sample3());
+            if(!new_bsdf_sample.f)
+                return pixel;
+
+            const real new_abscos = std::abs(cos(
+                new_inct.geometry_coord.z, new_bsdf_sample.dir));
+            coef *= new_bsdf_sample.f * new_abscos / new_bsdf_sample.pdf;
+
+            r = Ray(new_inct.eps_offset(new_bsdf_sample.dir),
+                    new_bsdf_sample.dir.normalize());
+        }
     }
 
     return pixel;

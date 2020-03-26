@@ -109,6 +109,11 @@ ModelImporter::ModelImporter(QWidget *parent, SceneManager *scene_mgr)
         close();
     });
 
+    connect(cancel_, &QPushButton::clicked, [=]
+    {
+        close();
+    });
+
     QGridLayout *layout = new QGridLayout(this);
     int layout_row = 0;
 

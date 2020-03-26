@@ -63,6 +63,19 @@ PostProcessorSeq::PostProcessorSeq(QWidget *parent)
     init_pp_creators();
 
     {
+        auto init_pp = create_pp("Denoise");
+        display_pp_layout_->addWidget(init_pp);
+        init_pp->hide();
+
+        pp_list_->insertItem(pp_list_->count(), init_pp->get_type());
+        auto item = pp_list_->item(pp_list_->count() - 1);
+        item2pp_[item] = init_pp;
+
+        item->setSizeHint(
+            QSize(item->sizeHint().width(), WIDGET_ITEM_HEIGHT));
+    }
+
+    {
         auto init_pp = create_pp("Save to Image");
         display_pp_layout_->addWidget(init_pp);
         init_pp->hide();

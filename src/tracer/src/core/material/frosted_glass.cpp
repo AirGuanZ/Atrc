@@ -1,6 +1,7 @@
 ﻿#include <optional>
 
 #include <agz/tracer/core/bsdf.h>
+#include <agz/tracer/core/bssrdf.h>
 #include <agz/tracer/core/material.h>
 #include <agz/tracer/core/texture2d.h>
 #include <agz/utility/misc.h>
@@ -286,19 +287,24 @@ class FrostedGlass : public Material
     RC<const Texture2D> color_map_;
     RC<const Texture2D> roughness_;
 
+    RC<const BSSRDFSurface> bssrdf_;
+
 public:
 
     FrostedGlass(
         RC<const Texture2D> color_map,
         RC<const Texture2D> roughness,
-        RC<const Texture2D> ior)
+        RC<const Texture2D> ior,
+        RC<const BSSRDFSurface> bssrdf)
     {
         color_map_ = std::move(color_map);
         ior_       = std::move(ior);
         roughness_ = std::move(roughness);
+
+        bssrdf_ = std::move(bssrdf);
     }
 
-    ShadingPoint shade(const SurfacePoint &inct, Arena &arena) const override
+    ShadingPoint shade(const EntityIntersection &inct, Arena &arena) const override
     {
         const Spectrum color = color_map_->sample_spectrum(inct.uv);
         const real roughness = math::clamp<real>(
@@ -310,16 +316,20 @@ public:
 
         const BSDF *bsdf = arena.create<FrostedGlassBSDF>(
             inct.geometry_coord, inct.user_coord, color, roughness, fresnel);
-        return { bsdf, inct.user_coord.z };
+
+        const BSSRDF *bssrdf = bssrdf_->create(inct, arena);
+
+        return { bsdf, inct.user_coord.z, bssrdf };
     }
 };
 
 RC<Material> create_frosted_glass(
     RC<const Texture2D> color_map,
     RC<const Texture2D> roughness,
-    RC<const Texture2D> ior)
+    RC<const Texture2D> ior,
+    RC<const BSSRDFSurface> bssrdf)
 {
-    return newRC<FrostedGlass>(color_map, roughness, ior);
+    return newRC<FrostedGlass>(color_map, roughness, ior, std::move(bssrdf));
 }
 
 AGZ_TRACER_END

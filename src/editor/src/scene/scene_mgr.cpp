@@ -318,6 +318,9 @@ void SceneManager::add_record(const ::QString &name, EntityPanel *entity_panel)
     preview_window_->add_mesh(
         mesh_id, geometry_data.data(), static_cast<int>(geometry_data.size()));
 
+    preview_window_->set_mesh_transform(
+        mesh_id, entity_panel->get_transform());
+
     entity_panel->set_geometry_vertices_dirty_callback([=]
     {
         preview_window_->remove_mesh(mesh_id);

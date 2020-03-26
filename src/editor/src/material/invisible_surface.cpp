@@ -1,5 +1,6 @@
 #include <agz/editor/material/invisible_surface.h>
 #include <agz/editor/material/material_thumbnail.h>
+#include <agz/editor/ui/utility/collapsible.h>
 
 AGZ_EDITOR_BEGIN
 
@@ -33,7 +34,7 @@ void InvisibleSurfaceWidget::update_tracer_object_impl()
 
 void InvisibleSurfaceWidget::do_update_tracer_object()
 {
-    tracer_object_ = tracer::create_invisible_surface();
+    tracer_object_ = create_invisible_surface(newBox<tracer::BSSRDFSurface>());
 }
 
 ResourceWidget<tracer::Material> *InvisibleSurfaceWidgetCreator::create_widget(

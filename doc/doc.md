@@ -327,7 +327,7 @@ The simplest box filter function, coincides with a single pixel with a radius of
 
 **gaussian**
 
-Gaussian filter function (buggy)
+Gaussian filter function
 
 | Field Name | Type | Default Value | Explanation                   |
 | ---------- | ---- | ------------- | ----------------------------- |
@@ -433,6 +433,16 @@ Triangle mesh implemented using simple BVH tree. It has the same parameters as `
 
 Some materials support normal mapping. The field list of these materials will include a `normal_map`.
 
+**BSSRDF**
+
+Some materials support [Normalized Diffusion BSSRDF](https://graphics.pixar.com/library/ApproxBSSRDF/paper.pdf), which contains following three fields:
+
+1. `bssrdf_dmfp`. diffuse mean free path length.
+2. `bssrdf_A`. diffuse surface reflectance.
+3. `bssrdf_eta`. ior.
+
+BSSRDF is enabled only when `bssrdf_dmfp` is specified.  According to material type, `bssrdf_A` and `bssrdf_eta` may have default value. These fields and their default values are listed in fields of those materials.
+
 **disney**
 
 ![pic](./pictures/disney_bsdf.png)
@@ -455,6 +465,9 @@ see [Disney Principled BSDF](https://blog.selfshadow.com/publications/s2015-shad
 | transmission_roughness | Texture2D | roughness       | roughness of transmitted specular lobe; range: $[0, 1]$      |
 | ior                    | Texture2D | all_{1.5}       | see [original article](https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf); range: $[0,\infty)$ |
 | normal_map             | Texture2D | all_{ 0, 0, 1 } | normal map                                                   |
+| bssrdf_dmfp            | Texture2D | null            | specify this to enable BSSRDF                                |
+| bssrdf_A               | Texture2D | base_color      | diffuse surface reflectance for BSSRDF                       |
+| bssrdf_eta             | Texture2D | ior             | ior for BSSRDF                                               |
 
 **frosted_glass**
 
@@ -462,11 +475,14 @@ see [Disney Principled BSDF](https://blog.selfshadow.com/publications/s2015-shad
 
 Frosted glass material. Please refer to [Microfacet Models for Refraction through Rough Surfaces](https://www.cs.cornell.edu/~srm/publications/EGSR07-btdf.html).
 
-| Field Name | Type      | Default Value | Explanation         |
-| ---------- | --------- | ------------- | ------------------- |
-| color_map  | Texture2D |               | surface color       |
-| ior        | Texture2D |               | index of refraction |
-| roughness  | Texture2D |               | surface roughness   |
+| Field Name  | Type      | Default Value | Explanation                            |
+| ----------- | --------- | ------------- | -------------------------------------- |
+| color_map   | Texture2D |               | surface color                          |
+| ior         | Texture2D |               | index of refraction                    |
+| roughness   | Texture2D |               | surface roughness                      |
+| bssrdf_dmfp | Texture2D | null          | specify this to enable BSSRDF          |
+| bssrdf_A    | Texture2D | null          | diffuse surface reflectance for BSSRDF |
+| bssrdf_eta  | Texture2D | ior           | ior for BSSRDF                         |
 
 **glass**
 
@@ -474,12 +490,15 @@ Frosted glass material. Please refer to [Microfacet Models for Refraction throug
 
 Smooth glass
 
-| Field Name           | Type      | Default Value | Explanation         |
-| -------------------- | --------- | ------------- | ------------------- |
-| color_map            | Texture2D |               | surface color       |
-| color_reflection_map | Texture2D |               | reflection color    |
-| color_refraction_map | Texture2D |               | refraction color    |
-| ior                  | Texture2D |               | index of refraction |
+| Field Name           | Type      | Default Value | Explanation                            |
+| -------------------- | --------- | ------------- | -------------------------------------- |
+| color_map            | Texture2D |               | surface color                          |
+| color_reflection_map | Texture2D |               | reflection color                       |
+| color_refraction_map | Texture2D |               | refraction color                       |
+| ior                  | Texture2D |               | index of refraction                    |
+| bssrdf_dmfp          | Texture2D | null          | specify this to enable BSSRDF          |
+| bssrdf_A             | Texture2D | null          | diffuse surface reflectance for BSSRDF |
+| bssrdf_eta           | Texture2D | ior           | ior for BSSRDF                         |
 
 Two color assignment methods are provided:
 
@@ -514,12 +533,6 @@ Ideal mirror reflection
 | k | Texture2D | | index of absorbtion |
 
 **phong**
-
-BRDF:
-$$
-\begin{aligned}f_r(\omega_i, x, \omega_o) &= \frac d {\pi} + \frac{sD}{4\cos\langle\omega_i, n_x\rangle\cos\langle \omega_o, n_x\rangle} \\D &= \frac{e + 1}{2\pi}\cos^e\langle\omega_h, n_x\rangle \\\omega_h &= \mathrm{normalize}(\mathrm{normalize}(\omega_i) + \mathrm{normalize}(\omega_o))\end{aligned}
-$$
-where $d$ is diffuse color, $s$ is specular color, $e$ is specular glossness and $n_x$ is the normal vector at $x$.
 
 *NOTE*. Atrc will automatically scale $d$ and $s$ to keep energy conservation.
 
@@ -764,8 +777,6 @@ Print to standard output
 No progress output
 
 ### Texture2D
-
-![pic](./pictures/texture.png)
 
 All 2d textures contain the following fields (these fields are not listed in the subsequent textures):
 

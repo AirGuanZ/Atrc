@@ -1,6 +1,7 @@
 ﻿#include <optional>
 
 #include <agz/tracer/core/bsdf.h>
+#include <agz/tracer/core/bssrdf.h>
 #include <agz/tracer/core/material.h>
 #include <agz/tracer/core/texture2d.h>
 #include <agz/utility/misc.h>
@@ -130,19 +131,24 @@ class Glass : public Material
     RC<const Texture2D> color_refraction_map_;
     RC<const Texture2D> ior_;
 
+    RC<const BSSRDFSurface> bssrdf_;
+
 public:
 
     Glass(
         RC<const Texture2D> color_reflection_map,
         RC<const Texture2D> color_refraction_map,
-        RC<const Texture2D> ior)
+        RC<const Texture2D> ior,
+        RC<const BSSRDFSurface> bssrdf)
     {
         color_reflection_map_ = color_reflection_map;
         color_refraction_map_ = color_refraction_map;
         ior_                  = ior;
+
+        bssrdf_ = std::move(bssrdf);
     }
 
-    ShadingPoint shade(const SurfacePoint &inct, Arena &arena) const override
+    ShadingPoint shade(const EntityIntersection &inct, Arena &arena) const override
     {
         ShadingPoint ret;
 
@@ -157,6 +163,7 @@ public:
             inct.geometry_coord, inct.user_coord, fresnel_point,
             color_reflection, color_refraction);
         ret.shading_normal = inct.user_coord.z;
+        ret.bssrdf = bssrdf_->create(inct, arena);
 
         return ret;
     }
@@ -165,9 +172,11 @@ public:
 RC<Material> create_glass(
     RC<const Texture2D> color_reflection_map,
     RC<const Texture2D> color_refraction_map,
-    RC<const Texture2D> ior)
+    RC<const Texture2D> ior,
+    RC<const BSSRDFSurface> bssrdf)
 {
-    return newRC<Glass>(color_reflection_map, color_refraction_map, ior);
+    return newRC<Glass>(
+        color_reflection_map, color_refraction_map, ior, std::move(bssrdf));
 }
 
 AGZ_TRACER_END

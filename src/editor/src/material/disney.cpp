@@ -111,6 +111,12 @@ DisneyWidget::DisneyWidget(const InitData &init_data, ObjectContext &obj_ctx)
         normal_map_ = new NormalMapWidget({}, obj_ctx_);
     add_section("Normal Map", normal_map_);
 
+    bssrdf_ = init_data.bssrdf;
+    if(!bssrdf_)
+        bssrdf_ = new BSSRDFWidget({}, obj_ctx_);
+    add_section("BSSRDF", bssrdf_);
+    bssrdf_->set_dirty_callback([=] { set_dirty_flag(); });
+
     setContentsMargins(0, 0, 0, 0);
     layout->setContentsMargins(0, 0, 0, 0);
     
@@ -139,6 +145,7 @@ ResourceWidget<tracer::Material> *DisneyWidget::clone()
     init_data.clearcoat              = clearcoat_             ->clone();
     init_data.clearcoat_gloss        = clearcoat_gloss_       ->clone();
     init_data.normal_map             = normal_map_            ->clone();
+    init_data.bssrdf                 = bssrdf_                ->clone();
     return new DisneyWidget(init_data, obj_ctx_);
 }
 
@@ -164,6 +171,7 @@ void DisneyWidget::save_asset(AssetSaver &saver)
     clearcoat_             ->save_asset(saver);
     clearcoat_gloss_       ->save_asset(saver);
     normal_map_            ->save_asset(saver);
+    bssrdf_                ->save_asset(saver);
 }
 
 void DisneyWidget::load_asset(AssetLoader &loader)
@@ -182,6 +190,7 @@ void DisneyWidget::load_asset(AssetLoader &loader)
     clearcoat_             ->load_asset(loader);
     clearcoat_gloss_       ->load_asset(loader);
     normal_map_            ->load_asset(loader);
+    bssrdf_                ->load_asset(loader);
 
     do_update_tracer_object();
 }
@@ -208,6 +217,8 @@ RC<tracer::ConfigNode> DisneyWidget::to_config(JSONExportContext &ctx) const
     if(normal_map_->is_enabled())
         grp->insert_child("normal_map", normal_map_->to_config(ctx));
 
+    bssrdf_->to_config(*grp, ctx);
+
     return grp;
 }
 
@@ -233,10 +244,13 @@ void DisneyWidget::do_update_tracer_object()
     auto clearcoat_gloss        = clearcoat_gloss_       ->get_tracer_object();
     auto normal_map             = normal_map_            ->get_tracer_object();
 
+    auto bssrdf = bssrdf_->create_tracer_object(base_color, ior);
+
     tracer_object_ = create_disney(
         base_color, metallic, roughness, transmission, transmission_roughness,
         ior, specular_scale, specular_tint, anisotropic, sheen, sheen_tint,
-        clearcoat, clearcoat_gloss, std::move(normal_map));
+        clearcoat, clearcoat_gloss,
+        std::move(normal_map), std::move(bssrdf));
 }
 
 ResourceWidget<tracer::Material> *DisneyWidgetCreator::create_widget(

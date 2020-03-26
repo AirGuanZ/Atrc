@@ -4,13 +4,6 @@
 
 AGZ_TRACER_BEGIN
 
-class BSDF;
-class BSSRDF;
-class Entity;
-class Geometry;
-class Material;
-class Medium;
-
 /**
  * @brief point on geometry object
  */
@@ -92,7 +85,11 @@ struct MediumScattering : MediumPoint
 struct ShadingPoint
 {
     const BSDF *bsdf = nullptr;
+
     Vec3 shading_normal;
+
+    // optional bssrdf
+    const BSSRDF *bssrdf = nullptr;
 };
 
 AGZ_TRACER_END

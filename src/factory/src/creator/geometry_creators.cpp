@@ -1,4 +1,5 @@
 #include <agz/factory/creator/geometry_creators.h>
+#include <agz/factory/utility/bin_mesh.h>
 #include <agz/tracer/create/geometry.h>
 #include <agz/tracer/utility/logger.h>
 
@@ -6,6 +7,13 @@ AGZ_TRACER_FACTORY_BEGIN
 
 namespace geometry
 {
+    std::vector<mesh::triangle_t> load_triangle_mesh_from_file(
+        const std::string &filename)
+    {
+        if(stdstr::ends_with(filename, ".bm"))
+            return load_bin_mesh(filename);
+        return mesh::load_from_file(filename);
+    }
     
     class DiskCreator : public Creator<Geometry>
     {
@@ -150,7 +158,7 @@ namespace geometry
             const auto filename = context.path_mapper->map(params.child_str("filename"));
 
             AGZ_INFO("load mesh from {}", filename);
-            auto build_triangles = mesh::load_from_file(filename);
+            auto build_triangles = load_triangle_mesh_from_file(filename);
             AGZ_INFO("triangle count: {}", build_triangles.size());
 
             return create_triangle_bvh_noembree(
@@ -175,7 +183,7 @@ namespace geometry
             const auto filename = context.path_mapper->map(params.child_str("filename"));
 
             AGZ_INFO("load mesh from {}", filename);
-            auto build_triangles = mesh::load_from_file(filename);
+            auto build_triangles = load_triangle_mesh_from_file(filename);
             AGZ_INFO("triangle count: {}", build_triangles.size());
 
             return create_triangle_bvh_embree(std::move(build_triangles), local_to_world);

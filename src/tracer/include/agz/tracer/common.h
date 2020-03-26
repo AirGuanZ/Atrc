@@ -20,6 +20,8 @@ AGZ_TRACER_BEGIN
 
 class Aggregate;
 class BSDF;
+class BSSRDF;
+class BSSRDFSurface;
 class Camera;
 class Entity;
 class EnvirLight;
@@ -81,6 +83,17 @@ inline bool has_inf(const Spectrum &s) noexcept
 {
     return std::isinf(s.r) || std::isinf(s.g) || std::isinf(s.b);
 }
+
+// transport mode
+
+/**
+ * @brief what is carried by the path: radiance/importance
+ */
+enum class TransMode
+{
+    Radiance = 0, // camera -> light
+    Importance = 1  // light -> camera
+};
 
 // image
 

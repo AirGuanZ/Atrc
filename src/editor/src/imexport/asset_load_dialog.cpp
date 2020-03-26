@@ -17,6 +17,7 @@ AssetLoadDialog::AssetLoadDialog(
     ObjectContext       *obj_ctx,
     EnvirLightSlot      *envir_light,
     GlobalSettingWidget *global_settings,
+    FilmFilterPanel     *film_filter,
     PostProcessorSeq    *post_processors,
     PreviewWindow       *preview_window,
     RendererPanel       *renderer_panel)
@@ -24,9 +25,10 @@ AssetLoadDialog::AssetLoadDialog(
       obj_ctx_        (obj_ctx),
       envir_light_    (envir_light),
       global_settings_(global_settings),
+      film_filter_    (film_filter),
       post_processors_(post_processors),
       preview_window_ (preview_window),
-      renderer_panel_(renderer_panel)
+      renderer_panel_ (renderer_panel)
 {
     init_ui();
 }
@@ -43,6 +45,9 @@ void AssetLoadDialog::init_ui()
 
     load_global_settings_ = new QCheckBox("Load Global Settings", this);
     load_global_settings_->setChecked(true);
+
+    load_film_filter_ = new QCheckBox("Load Film Filter", this);
+    load_film_filter_->setChecked(true);
 
     load_post_processors_ = new QCheckBox("Load Post Processors", this);
     load_post_processors_->setChecked(true);
@@ -61,6 +66,7 @@ void AssetLoadDialog::init_ui()
 
     layout->addWidget(load_envir_light_,       row, 0, 1, 2);
     layout->addWidget(load_global_settings_, ++row, 0, 1, 2);
+    layout->addWidget(load_film_filter_,     ++row, 0, 1, 2);
     layout->addWidget(load_post_processors_, ++row, 0, 1, 2);
     layout->addWidget(load_preview_window_,  ++row, 0, 1, 2);
     layout->addWidget(load_renderer_panel_,  ++row, 0, 1, 2);
@@ -151,6 +157,10 @@ void AssetLoadDialog::ok()
         case AssetSectionType::Renderer:
             if(load_renderer_panel_->isChecked())
                 renderer_panel_->load_asset(loader);
+            break;
+        case AssetSectionType::FilmFilter:
+            if(load_film_filter_->isChecked())
+                film_filter_->load_asset(loader);
             break;
         }
     }

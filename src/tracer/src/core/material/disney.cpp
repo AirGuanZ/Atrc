@@ -1,4 +1,5 @@
 #include <agz/tracer/core/bsdf.h>
+#include <agz/tracer/core/bssrdf.h>
 #include <agz/tracer/core/material.h>
 #include <agz/tracer/core/texture2d.h>
 #include <agz/tracer/utility/reflection.h>
@@ -672,6 +673,7 @@ class Disney : public Material
     RC<const Texture2D> IOR_;
 
     Box<const NormalMapper> normal_mapper_;
+    RC<const BSSRDFSurface> bssrdf_;
 
 public:
 
@@ -689,7 +691,8 @@ public:
         RC<const Texture2D> sheen_tint,
         RC<const Texture2D> clearcoat,
         RC<const Texture2D> clearcoat_gloss,
-        Box<const NormalMapper> normal_mapper)
+        Box<const NormalMapper> normal_mapper,
+        RC<const BSSRDFSurface> bssrdf)
     {
         base_color_             = base_color;
         metallic_               = metallic;
@@ -706,9 +709,10 @@ public:
         clearcoat_gloss_        = clearcoat_gloss;
 
         normal_mapper_ = std::move(normal_mapper);
+        bssrdf_ = std::move(bssrdf);
     }
 
-    ShadingPoint shade(const SurfacePoint &inct, Arena &arena) const override
+    ShadingPoint shade(const EntityIntersection &inct, Arena &arena) const override
     {
         const Vec2 uv = inct.uv;
         const Spectrum base_color             = base_color_      ->sample_spectrum(uv);
@@ -742,7 +746,9 @@ public:
             std::pow(transmission_roughness, real(1.6)),
             ior);
 
-        ShadingPoint shd = { bsdf, shading_coord.z };
+        const BSSRDF *bssrdf = bssrdf_->create(inct, arena);
+
+        ShadingPoint shd = { bsdf, shading_coord.z, bssrdf };
         return shd;
     }
 };
@@ -761,7 +767,8 @@ RC<Material> create_disney(
     RC<const Texture2D> sheen_tint,
     RC<const Texture2D> clearcoat,
     RC<const Texture2D> clearcoat_gloss,
-    Box<const NormalMapper> normal_mapper)
+    Box<const NormalMapper> normal_mapper,
+    RC<const BSSRDFSurface> bssrdf)
 {
     return newRC<Disney>(base_color,
         metallic,
@@ -776,7 +783,8 @@ RC<Material> create_disney(
         sheen_tint,
         clearcoat,
         clearcoat_gloss,
-        std::move(normal_mapper));
+        std::move(normal_mapper),
+        std::move(bssrdf));
 }
 
 AGZ_TRACER_END

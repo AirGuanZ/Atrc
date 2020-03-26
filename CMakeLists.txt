@@ -21,14 +21,14 @@ ENDIF()
 ############## embree
 
 IF(USE_EMBREE)
-    INCLUDE("${PROJECT_SOURCE_DIR}/cmake/cmake-embree") 
+    FIND_PACKAGE(embree 3.0 REQUIRED)
 ENDIF()
 
 ############## oidn
 
 IF(USE_OIDN)
     ADD_DEFINITIONS(-DUSE_OIDN)
-    INCLUDE("${PROJECT_SOURCE_DIR}/cmake/cmake-oidn")
+    FIND_PACKAGE(OpenImageDenoise REQUIRED)
 ENDIF()
 
 ############## qt

@@ -2,6 +2,7 @@
 
 #include <agz/tracer/core/aggregate.h>
 #include <agz/tracer/core/bsdf.h>
+#include <agz/tracer/core/bssrdf.h>
 #include <agz/tracer/core/camera.h>
 #include <agz/tracer/core/entity.h>
 #include <agz/tracer/core/film_filter.h>

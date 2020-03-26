@@ -15,6 +15,7 @@ AssetSaveDialog::AssetSaveDialog(
     ObjectContext       *obj_ctx,
     EnvirLightSlot      *envir_light,
     GlobalSettingWidget *global_settings,
+    FilmFilterPanel     *film_filter,
     PostProcessorSeq    *post_processors,
     PreviewWindow       *preview_window,
     RendererPanel       *renderer_panel)
@@ -22,6 +23,7 @@ AssetSaveDialog::AssetSaveDialog(
       obj_ctx_        (obj_ctx),
       envir_light_    (envir_light),
       global_settings_(global_settings),
+      film_filter_(film_filter),
       post_processors_(post_processors),
       preview_window_ (preview_window),
       renderer_panel_ (renderer_panel)
@@ -41,6 +43,7 @@ void AssetSaveDialog::init_ui()
     save_entities_        = new QCheckBox("Entities",    this);
     save_envir_light_     = new QCheckBox("Envir Light", this);
     save_global_settings_ = new QCheckBox("Global Settings", this);
+    save_film_filter_     = new QCheckBox("Film Filter", this);
     save_post_processors_ = new QCheckBox("Post Processors", this);
     save_preview_window_  = new QCheckBox("Camera", this);
     save_renderer_panel_  = new QCheckBox("Renderer", this);
@@ -57,6 +60,7 @@ void AssetSaveDialog::init_ui()
     save_entities_       ->setChecked(true);
     save_envir_light_    ->setChecked(true);
     save_global_settings_->setChecked(true);
+    save_film_filter_    ->setChecked(true);
     save_post_processors_->setChecked(true);
     save_preview_window_ ->setChecked(true);
     save_renderer_panel_ ->setChecked(true);
@@ -76,6 +80,7 @@ void AssetSaveDialog::init_ui()
     layout->addWidget(save_entities_,        ++row, 0, 1, 2);
     layout->addWidget(save_envir_light_,     ++row, 0, 1, 2);
     layout->addWidget(save_global_settings_, ++row, 0, 1, 2);
+    layout->addWidget(save_film_filter_,     ++row, 0, 1, 2);
     layout->addWidget(save_post_processors_, ++row, 0, 1, 2);
     layout->addWidget(save_preview_window_,  ++row, 0, 1, 2);
     layout->addWidget(save_renderer_panel_,  ++row, 0, 1, 2);
@@ -250,6 +255,13 @@ void AssetSaveDialog::ok()
         ++section_count;
         saver.write(AssetSectionType::Renderer);
         renderer_panel_->save_asset(saver);
+    }
+
+    if(save_film_filter_->isChecked())
+    {
+        ++section_count;
+        saver.write(AssetSectionType::FilmFilter);
+        film_filter_->save_asset(saver);
     }
 
     fout.seekp(0, std::ios::beg);

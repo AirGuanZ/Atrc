@@ -29,11 +29,16 @@ GlassWidget::GlassWidget(const InitData &init_data, ObjectContext &obj_ctx)
     use_color_refr_ = new QCheckBox("Seperate Refraction Color");
     use_color_refr_->setChecked(init_data.use_color_refr);
 
+    bssrdf_ = init_data.bssrdf;
+    if(!bssrdf_)
+        bssrdf_ = new BSSRDFSurfaceWidget<true, false>({}, obj_ctx);
+
     color_refr_->setDisabled(!init_data.use_color_refr);
 
     Collapsible *color_sec = new Collapsible(this, "Color");
     Collapsible *ior_sec   = new Collapsible(this, "IOR");
     Collapsible *adv_sec   = new Collapsible(this, "Advanced");
+    Collapsible *sss_sec   = new Collapsible(this, "BSSRDF");
 
     QWidget     *adv_widget = new QWidget;
     QVBoxLayout *adv_layout = new QVBoxLayout(adv_widget);
@@ -45,6 +50,7 @@ GlassWidget::GlassWidget(const InitData &init_data, ObjectContext &obj_ctx)
     color_sec->set_content_widget(color_);
     ior_sec  ->set_content_widget(ior_);
     adv_sec  ->set_content_widget(adv_widget);
+    sss_sec  ->set_content_widget(bssrdf_);
 
     color_sec->open();
     ior_sec  ->open();
@@ -53,6 +59,7 @@ GlassWidget::GlassWidget(const InitData &init_data, ObjectContext &obj_ctx)
     layout->addWidget(color_sec);
     layout->addWidget(ior_sec);
     layout->addWidget(adv_sec);
+    layout->addWidget(sss_sec);
 
     setContentsMargins(0, 0, 0, 0);
     layout->setContentsMargins(0, 0, 0, 0);
@@ -60,6 +67,8 @@ GlassWidget::GlassWidget(const InitData &init_data, ObjectContext &obj_ctx)
     color_     ->set_dirty_callback([=] { set_dirty_flag(); });
     ior_       ->set_dirty_callback([=] { set_dirty_flag(); });
     color_refr_->set_dirty_callback([=] { set_dirty_flag(); });
+
+    bssrdf_->set_dirty_callback([=] { set_dirty_flag(); });
 
     connect(use_color_refr_, &QCheckBox::stateChanged, [=](int)
     {
@@ -77,6 +86,7 @@ ResourceWidget<tracer::Material> *GlassWidget::clone()
     init_data.ior            = ior_  ->clone();
     init_data.color_refr     = color_refr_->clone();
     init_data.use_color_refr = use_color_refr_->isChecked();
+    init_data.bssrdf         = bssrdf_->clone();
     return new GlassWidget(init_data, obj_ctx_);
 }
 
@@ -93,6 +103,8 @@ void GlassWidget::save_asset(AssetSaver &saver)
 
     saver.write(uint8_t(use_color_refr_->isChecked() ? 1 : 0));
     color_refr_->save_asset(saver);
+
+    bssrdf_->save_asset(saver);
 }
 
 void GlassWidget::load_asset(AssetLoader &loader)
@@ -103,6 +115,8 @@ void GlassWidget::load_asset(AssetLoader &loader)
     const bool use_color_refr = loader.read<uint8_t>() != 0;
     use_color_refr_->setChecked(use_color_refr);
     color_refr_->load_asset(loader);
+
+    bssrdf_->load_asset(loader);
 
     do_update_tracer_object();
 }
@@ -124,6 +138,8 @@ RC<tracer::ConfigNode> GlassWidget::to_config(JSONExportContext &ctx) const
 
     grp->insert_child("ior", ior_->to_config(ctx));
 
+    bssrdf_->to_config(*grp, ctx);
+
     return grp;
 }
 
@@ -141,7 +157,10 @@ void GlassWidget::do_update_tracer_object()
     if(use_color_refr_->isChecked())
         color_refr = color_refr_->get_tracer_object();
 
-    tracer_object_ = create_glass(color, color_refr, ior);
+    auto bssrdf = bssrdf_->create_tracer_object({}, ior);
+
+    tracer_object_ = create_glass(
+        color, color_refr, ior, bssrdf);
 }
 
 ResourceWidget<tracer::Material> *GlassWidgetCreator::create_widget(
