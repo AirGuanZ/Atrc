@@ -67,6 +67,8 @@ Pixel trace_std(
         {
             const auto medium_sample = medium->sample_scattering(
                 r.o, ent_inct.pos, sampler, arena);
+
+            // tr is accounted here
             coef *= medium_sample.throughput;
 
             // process medium scattering
@@ -105,6 +107,11 @@ Pixel trace_std(
                 coef *= bsdf_sample.f / bsdf_sample.pdf;
                 continue;
             }
+        }
+        else
+        {
+            const Spectrum tr = medium->tr(r.o, ent_inct.pos, sampler);
+            coef *= tr;
         }
 
         scattering_count = 0;
@@ -278,6 +285,11 @@ Pixel trace_nomis(
                 continue;
             }
         }
+        else
+        {
+            const Spectrum tr = medium->tr(r.o, ent_inct.pos, sampler);
+            coef *= tr;
+        }
 
         scattering_count = 0;
 
@@ -297,6 +309,40 @@ Pixel trace_nomis(
         const real abscos = std::abs(cos(ent_inct.geometry_coord.z, bsdf_sample.dir));
         coef *= bsdf_sample.f * abscos / bsdf_sample.pdf;
         r = Ray(ent_inct.eps_offset(bsdf_sample.dir), bsdf_sample.dir);
+        // bssrdf
+
+        if(!ent_shd.bssrdf)
+            continue;
+
+        const bool pos_in = ent_inct.geometry_coord.in_positive_z_hemisphere(
+            bsdf_sample.dir);
+        const bool pos_out = ent_inct.geometry_coord.in_positive_z_hemisphere(
+            ent_inct.wr);
+
+        if(!pos_in && pos_out)
+        {
+            const auto bssrdf_sample = ent_shd.bssrdf->sample_pi(
+                sampler.sample3(), arena);
+            if(!bssrdf_sample.coef)
+                return pixel;
+
+            coef *= bssrdf_sample.coef / bssrdf_sample.pdf;
+
+            auto &new_inct = bssrdf_sample.inct;
+            auto new_shd = new_inct.material->shade(new_inct, arena);
+
+            const auto new_bsdf_sample = new_shd.bsdf->sample(
+                new_inct.wr, TransMode::Radiance, sampler.sample3());
+            if(!new_bsdf_sample.f)
+                return pixel;
+
+            const real new_abscos = std::abs(cos(
+                new_inct.geometry_coord.z, new_bsdf_sample.dir));
+            coef *= new_bsdf_sample.f * new_abscos / new_bsdf_sample.pdf;
+
+            r = Ray(new_inct.eps_offset(new_bsdf_sample.dir),
+                new_bsdf_sample.dir.normalize());
+        }
     }
 
     return pixel;
