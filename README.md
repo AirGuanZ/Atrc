@@ -34,6 +34,10 @@ Food (scene ref [here](https://luxcorerender.org/download/)):
 
 ![0](./doc/gallery/food.png)
 
+Classroom (scene ref [here](https://www.blender.org/download/demo-files/)):
+
+![pic](./doc/gallery/classroom.png)
+
 BSSRDF:
 
 ![pic](./doc/gallery/dragon.png)
@@ -46,6 +50,4 @@ Fireplace Room (scene ref [here](http://casual-effects.com/data/index.html)):
 
 ![2](./doc/gallery/fireplace.png)
 
-DoF:
 
-![3](./doc/gallery/dof.png)
