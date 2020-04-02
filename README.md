@@ -24,6 +24,12 @@ Offline rendering lab based on ray tracing
 - [x] (Optional) Integrated Embree library
 - [x] Interactive scene editor
 
+## Roadmap
+
+- [ ] Light portal
+- [ ] Component based bsdf
+- [ ] Light sampling hints (sample count, user-specified power, env light portal)
+
 ## Documentation
 
 [doc](https://airguanz.github.io/atrc_doc/doc.html)
@@ -46,8 +52,8 @@ Materials:
 
 ![1](./doc/gallery/materials.png)
 
-Fireplace Room (scene ref [here](http://casual-effects.com/data/index.html)):
+Dining Room (scene ref [here](https://www.blendswap.com/blends/view/86457)):
 
-![2](./doc/gallery/fireplace.png)
+![2](./doc/gallery/dining.png)
 
 
