@@ -178,6 +178,7 @@ void AssetSaveDialog::ok()
         saver.enable_rsc_pool<tracer::Texture3D>();
 
     uint32_t section_count = 0;
+    auto section_cnt_pos = fout.tellp();
     saver.write(section_count);
 
     if(save_material_pool_->isChecked())
@@ -264,7 +265,7 @@ void AssetSaveDialog::ok()
         film_filter_->save_asset(saver);
     }
 
-    fout.seekp(0, std::ios::beg);
+    fout.seekp(section_cnt_pos, std::ios::beg);
     saver.write(section_count);
 }
 

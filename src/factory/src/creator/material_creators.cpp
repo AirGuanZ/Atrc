@@ -235,6 +235,41 @@ namespace material
         }
     };
 
+    class MetalCreator : public Creator<Material>
+    {
+    public:
+
+        std::string name() const override
+        {
+            return "metal";
+        }
+
+        RC<Material> create(
+            const ConfigGroup &params, CreatingContext &context) const override
+        {
+            auto texture2d = [&](const char *name)
+            {
+                return context.create<Texture2D>(params.child_group(name));
+            };
+
+            auto color       = texture2d("color");
+            auto eta         = texture2d("eta");
+            auto k           = texture2d("k");
+            auto roughness   = texture2d("roughness");
+            auto anisotropic = texture2d("anisotropci");
+
+            auto normal_mapper = init_normal_mapper(params, context);
+
+            return create_metal(
+                std::move(color),
+                std::move(eta),
+                std::move(k),
+                std::move(roughness),
+                std::move(anisotropic),
+                std::move(normal_mapper));
+        }
+    };
+
     class MirrorCreator : public Creator<Material>
     {
     public:
@@ -312,6 +347,7 @@ void initialize_material_factory(Factory<Material> &factory)
     factory.add_creator(newBox<material::IdealBlackCreator>());
     factory.add_creator(newBox<material::IdealDiffuseCreator>());
     factory.add_creator(newBox<material::InvisibleSurfaceCreator>());
+    factory.add_creator(newBox<material::MetalCreator>());
     factory.add_creator(newBox<material::MirrorCreator>());
     factory.add_creator(newBox<material::PhongCreator>());
     factory.add_creator(newBox<material::SSSWrapperCreator>());

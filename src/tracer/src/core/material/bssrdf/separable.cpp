@@ -49,7 +49,7 @@ namespace
         }
 
         Spectrum eval(
-            const Vec3 &wi, const Vec3&, TransMode) const noexcept override
+            const Vec3 &wi, const Vec3&, TransMode, uint8_t) const noexcept override
         {
             const real cosThetaI = cos(wi, coord_.z);
 
@@ -62,7 +62,7 @@ namespace
         }
 
         BSDFSampleResult sample(
-            const Vec3&, TransMode, const Sample3 &sam) const noexcept override
+            const Vec3&, TransMode, const Sample3 &sam, uint8_t) const noexcept override
         {
             const auto [local_dir, pdf] = math::distribution::
                     zweighted_on_hemisphere(sam.u, sam.v);
@@ -70,7 +70,7 @@ namespace
             const Vec3 dir = coord_.local_to_global(local_dir);
 
             BSDFSampleResult ret;
-            ret.f        = eval(dir, {}, TransMode::Radiance);
+            ret.f        = eval_all(dir, {}, TransMode::Radiance);
             ret.dir      = dir;
             ret.is_delta = false;
             ret.pdf      = pdf;
@@ -78,7 +78,7 @@ namespace
             return ret;
         }
 
-        real pdf(const Vec3 &wi, const Vec3&) const noexcept override
+        real pdf(const Vec3 &wi, const Vec3&, uint8_t) const noexcept override
         {
             const Vec3 lwi = coord_.global_to_local(wi).normalize();
             return math::distribution::zweighted_on_hemisphere_pdf(lwi.z);
@@ -224,9 +224,9 @@ BSSRDFSamplePiResult SeparableBSSRDF::sample_pi(
         sam.w, 0, inct_cnt);
     for(int i = 0; i < inct_idx; ++i)
     {
-        assert(inctListEntry);
+        assert(inct_list_entry);
         inct_list_entry = inct_list_entry->next;
-        assert(inctListEntry);
+        assert(inct_list_entry);
     }
 
     if(inct_list_entry->inct.material != po_.material)

@@ -44,6 +44,14 @@ RC<Material> create_ideal_diffuse(
 RC<Material> create_invisible_surface(
     RC<const BSSRDFSurface> bssrdf);
 
+RC<Material> create_metal(
+    RC<const Texture2D> color,
+    RC<const Texture2D> eta,
+    RC<const Texture2D> k,
+    RC<const Texture2D> roughness,
+    RC<const Texture2D> anisotropic,
+    Box<NormalMapper> normal_mapper);
+
 RC<Material> create_mirror(
     RC<const Texture2D> color_map,
     RC<const Texture2D> eta,

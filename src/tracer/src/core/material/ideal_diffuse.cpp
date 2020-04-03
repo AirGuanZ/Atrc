@@ -1,11 +1,13 @@
-#include <agz/tracer/core/bsdf.h>
 #include <agz/tracer/core/material.h>
 #include <agz/tracer/core/texture2d.h>
 #include <agz/utility/misc.h>
 
+#include "./component/aggregate.h"
+#include "./component/diffuse_comp.h"
+
 AGZ_TRACER_BEGIN
 
-namespace
+/*namespace
 {
     class IdealDiffuseBRDF : public LocalBSDF
     {
@@ -24,7 +26,7 @@ namespace
 
         Spectrum eval(
             const Vec3 &in_dir, const Vec3 &out_dir,
-            TransMode) const noexcept override
+            TransMode, uint8_t) const noexcept override
         {
             if(cause_black_fringes(in_dir, out_dir))
                 return eval_black_fringes(in_dir, out_dir);
@@ -39,7 +41,7 @@ namespace
 
         BSDFSampleResult sample(
             const Vec3 &dir, TransMode transport_mode,
-            const Sample3 &sam) const noexcept override
+            const Sample3 &sam, uint8_t) const noexcept override
         {
             if(cause_black_fringes(dir))
                 return sample_black_fringes(dir, transport_mode, sam);
@@ -62,7 +64,8 @@ namespace
             return ret;
         }
 
-        real pdf(const Vec3 &in_dir, const Vec3 &out_dir) const noexcept override
+        real pdf(
+            const Vec3 &in_dir, const Vec3 &out_dir, uint8_t) const noexcept override
         {
             if(cause_black_fringes(in_dir, out_dir))
                 return pdf_for_black_fringes(in_dir, out_dir);
@@ -89,7 +92,7 @@ namespace
             return true;
         }
     };
-}
+}*/
 
 class IdealDiffuse : public Material
 {
@@ -111,9 +114,12 @@ public:
         const Spectrum albedo = albedo_->sample_spectrum(inct.uv);
         Coord shading_coord = normal_mapper_->reorient(inct.uv, inct.user_coord);
 
-        ShadingPoint shd;
-        shd.bsdf = arena.create<IdealDiffuseBRDF>(
+        auto bsdf = arena.create<AggregateBSDF<1>>(
             inct.geometry_coord, shading_coord, albedo);
+        bsdf->add_component(1, arena.create<DiffuseComponent>(albedo));
+
+        ShadingPoint shd;
+        shd.bsdf = bsdf;
         shd.shading_normal = shading_coord.z;
 
         return shd;

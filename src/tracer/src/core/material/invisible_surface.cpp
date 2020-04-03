@@ -19,14 +19,15 @@ namespace
         }
 
         Spectrum eval(
-            const Vec3 &wi, const Vec3 &wo, TransMode mode) const noexcept override
+            const Vec3 &wi, const Vec3 &wo,
+            TransMode mode, uint8_t) const noexcept override
         {
             return {};
         }
 
         BSDFSampleResult sample(
             const Vec3 &wo, TransMode mode,
-            const Sample3 &sam) const noexcept override
+            const Sample3 &sam, uint8_t) const noexcept override
         {
             const real cosv = std::abs(cos(geometry_normal_, wo));
 
@@ -38,7 +39,7 @@ namespace
             return ret;
         }
 
-        real pdf(const Vec3 &wi, const Vec3 &wo) const noexcept override
+        real pdf(const Vec3 &wi, const Vec3 &wo, uint8_t) const noexcept override
         {
             return 0;
         }

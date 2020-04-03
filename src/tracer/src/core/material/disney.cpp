@@ -457,7 +457,7 @@ namespace disney_impl
 
         Spectrum eval(
             const Vec3 &wi, const Vec3 &wo,
-            TransMode mode) const noexcept override
+            TransMode mode, uint8_t) const noexcept override
         {
             if(cause_black_fringes(wi, wo))
                 return eval_black_fringes(wi, wo);
@@ -530,7 +530,7 @@ namespace disney_impl
 
         BSDFSampleResult sample(
             const Vec3 &wo, TransMode mode,
-            const Sample3 &sam) const noexcept override
+            const Sample3 &sam, uint8_t) const noexcept override
         {
             if(cause_black_fringes(wo))
                 return sample_black_fringes(wo, mode, sam);
@@ -559,8 +559,8 @@ namespace disney_impl
 
                 BSDFSampleResult ret;
                 ret.dir      = shading_coord_.local_to_global(lwi);
-                ret.f        = eval(ret.dir, wo, mode);
-                ret.pdf      = pdf(ret.dir, wo);
+                ret.f        = eval_all(ret.dir, wo, mode);
+                ret.pdf      = pdf_all(ret.dir, wo);
                 ret.is_delta = false;
 
                 if(!ret.f.is_finite() || ret.pdf < EPS)
@@ -591,8 +591,8 @@ namespace disney_impl
             
             BSDFSampleResult ret;
             ret.dir      = shading_coord_.local_to_global(lwi);
-            ret.f        = eval(ret.dir, wo, mode);
-            ret.pdf      = pdf(ret.dir, wo);
+            ret.f        = eval_all(ret.dir, wo, mode);
+            ret.pdf      = pdf_all(ret.dir, wo);
             ret.is_delta = false;
 
             if(!ret.f.is_finite() || ret.pdf < EPS)
@@ -601,7 +601,7 @@ namespace disney_impl
             return ret;
         }
 
-        real pdf(const Vec3 &wi, const Vec3 &wo) const noexcept override
+        real pdf(const Vec3 &wi, const Vec3 &wo, uint8_t) const noexcept override
         {
             if(cause_black_fringes(wi, wo))
                 return pdf_for_black_fringes(wi, wo);
@@ -734,7 +734,7 @@ public:
             inct.geometry_coord, shading_coord,
             base_color,
             metallic,
-            std::pow(roughness, real(1.6)),
+            roughness,
             specular_scale,
             specular_tint,
             anisotropic,
@@ -743,7 +743,7 @@ public:
             clearcoat,
             clearcoat_gloss,
             transmission,
-            std::pow(transmission_roughness, real(1.6)),
+            transmission_roughness,
             ior);
 
         const BSSRDF *bssrdf = bssrdf_->create(inct, arena);

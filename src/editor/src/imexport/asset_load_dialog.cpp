@@ -5,6 +5,7 @@
 
 #include <agz/editor/displayer/preview_window.h>
 #include <agz/editor/imexport/asset_load_dialog.h>
+#include <agz/editor/imexport/asset_version.h>
 #include <agz/editor/post_processor/post_processor_seq.h>
 #include <agz/editor/resource/object_context.h>
 #include <agz/editor/renderer/renderer_widget.h>
@@ -104,9 +105,17 @@ void AssetLoadDialog::ok()
         is_ok_clicked_ = false;
         return;
     }
-    is_ok_clicked_ = true;
 
     AssetLoader loader(fin);
+    if(versions::V_latest < loader.version())
+    {
+        QMessageBox::information(
+            this, "Error", "Editor.version < Asset.version");
+        is_ok_clicked_ = false;
+        return;
+    }
+
+    is_ok_clicked_ = true;
 
     const uint32_t section_count = loader.read<uint32_t>();
     for(uint32_t s = 0; s < section_count; ++s)

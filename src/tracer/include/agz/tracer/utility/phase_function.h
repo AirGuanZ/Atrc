@@ -26,14 +26,16 @@ public:
     }
 
     Spectrum eval(
-        const Vec3 &wi, const Vec3 &wo, TransMode mode) const noexcept override
+        const Vec3 &wi, const Vec3 &wo,
+        TransMode mode, uint8_t) const noexcept override
     {
         const real u = -cos(wi, wo);
         return Spectrum(phase_func(u));
     }
 
     BSDFSampleResult sample(
-        const Vec3 &wo, TransMode, const Sample3 &sam) const noexcept override
+        const Vec3 &wo, TransMode,
+        const Sample3 &sam, uint8_t) const noexcept override
     {
         const real s = 2 * sam.u - 1;
         real u;
@@ -64,7 +66,8 @@ public:
         return ret;
     }
 
-    real pdf(const Vec3 &wi, const Vec3 &wo) const noexcept override
+    real pdf(
+        const Vec3 &wi, const Vec3 &wo, uint8_t) const noexcept override
     {
         return phase_func(-cos(wi, wo));
     }

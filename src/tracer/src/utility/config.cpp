@@ -161,6 +161,11 @@ namespace
 
         if(type == "scale")
         {
+            if(group.find_child("ratio")->is_array())
+            {
+                const Vec2 ratio = group.child_vec2("ratio");
+                return Transform2::scale(ratio.x, ratio.y);
+            }
             const real ratio = group.child_real("ratio");
             return Transform2::scale(ratio, ratio);
         }

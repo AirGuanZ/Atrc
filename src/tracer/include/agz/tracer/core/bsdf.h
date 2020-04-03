@@ -5,6 +5,22 @@
 
 AGZ_TRACER_BEGIN
 
+enum BSDFComponentType : uint8_t
+{
+    BSDF_DIFFUSE    = 1 << 0,
+    BSDF_GLOSSY     = 1 << 1,
+    BSDF_SPECULAR   = 1 << 2,
+    BSDF_REFLECTION = 1 << 3,
+    BSDF_REFRACTION = 1 << 4
+};
+
+constexpr uint8_t BSDF_ALL =
+    BSDF_DIFFUSE | BSDF_GLOSSY | BSDF_SPECULAR |
+    BSDF_REFLECTION | BSDF_REFRACTION;
+
+constexpr uint8_t BSDF_REFL_REFR_MASK = BSDF_REFLECTION | BSDF_REFRACTION;
+constexpr uint8_t BSDF_DGS_MASK = BSDF_DIFFUSE | BSDF_GLOSSY | BSDF_SPECULAR;
+
 /**
  * @brief result of sampling BSDF
  */
@@ -39,19 +55,39 @@ public:
     /**
      * @brief eval f(in, out) or f*(in, out)
      */
+    virtual Spectrum eval_all(
+        const Vec3 &wi, const Vec3 &wo, TransMode mode) const noexcept;
+    /**
+     * @brief eval f(in, out) or f*(in, out)
+     */
     virtual Spectrum eval(
-        const Vec3 &wi, const Vec3 &wo, TransMode mode) const noexcept = 0;
+        const Vec3 &wi, const Vec3 &wo,
+        TransMode mode, uint8_t type) const noexcept = 0;
+
+    /**
+     * @brief given wo, sample wi
+     */
+    virtual BSDFSampleResult sample_all(
+        const Vec3 &wo, TransMode mode, const Sample3 &sam) const noexcept;
 
     /**
      * @brief given wo, sample wi
      */
     virtual BSDFSampleResult sample(
-        const Vec3 &wo, TransMode mode, const Sample3 &sam) const noexcept = 0;
+        const Vec3 &wo, TransMode mode,
+        const Sample3 &sam, uint8_t type) const noexcept = 0;
 
     /**
      * @brief pdf of sample
      */
-    virtual real pdf(const Vec3 &wi, const Vec3 &wo) const noexcept = 0;
+    virtual real pdf(
+        const Vec3 &wi, const Vec3 &wo,
+        uint8_t type) const noexcept = 0;
+
+    /**
+     * @brief pdf of sample
+     */
+    virtual real pdf_all(const Vec3 &wi, const Vec3 &wo) const noexcept;
 
     /**
      * @brief material albedo
@@ -79,9 +115,7 @@ protected:
     Coord geometry_coord_;
     Coord shading_coord_;
 
-    // black fringes: w is in different hemispheres of geometry/shading coord.
-    // in these cases, BSDF values are undefined
-    // following 5 methods are used for handling black bringes quickly
+    // following 5 methods are helpers for handling black bringes
 
     bool cause_black_fringes(const Vec3 &w) const noexcept
     {
@@ -151,5 +185,22 @@ public:
 
     }
 };
+
+inline Spectrum BSDF::eval_all(
+    const Vec3 &wi, const Vec3 &wo, TransMode mode) const noexcept
+{
+    return eval(wi, wo, mode, BSDF_ALL);
+}
+
+inline BSDFSampleResult BSDF::sample_all(
+    const Vec3 &wo, TransMode mode, const Sample3 &sam) const noexcept
+{
+    return sample(wo, mode, sam, BSDF_ALL);
+}
+
+inline real BSDF::pdf_all(const Vec3 &wi, const Vec3 &wo) const noexcept
+{
+    return pdf(wi, wo, BSDF_ALL);
+}
 
 AGZ_TRACER_END

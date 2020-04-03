@@ -51,7 +51,7 @@ void trace_particle(
         {
             if(scene.visible(camera_sample.pos_on_cam, inct.pos))
             {
-                const Spectrum bsdf_f = shd.bsdf->eval(
+                const Spectrum bsdf_f = shd.bsdf->eval_all(
                     inct.wr, camera_sample.ref_to_pos, TransMode::Radiance);
                 if(!bsdf_f.is_black())
                 {
@@ -71,7 +71,7 @@ void trace_particle(
 
         // sample bsdf & construct next ray
 
-        const auto bsdf_sample = shd.bsdf->sample(
+        const auto bsdf_sample = shd.bsdf->sample_all(
             inct.wr, TransMode::Importance, sampler.sample3());
         if(!bsdf_sample.f)
             return;

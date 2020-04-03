@@ -109,7 +109,7 @@ namespace phong_impl
 
         Spectrum eval(
             const Vec3 &wi, const Vec3 &wo,
-            TransMode mode) const noexcept override
+            TransMode mode, uint8_t) const noexcept override
         {
             if(cause_black_fringes(wi, wo))
                 return eval_black_fringes(wi, wo);
@@ -130,7 +130,7 @@ namespace phong_impl
 
         BSDFSampleResult sample(
             const Vec3 &wo, TransMode mode, 
-            const Sample3 &sam) const noexcept override
+            const Sample3 &sam, uint8_t) const noexcept override
         {
             if(cause_black_fringes(wo))
                 return sample_black_fringes(wo, mode, sam);
@@ -176,7 +176,7 @@ namespace phong_impl
             return ret;
         }
 
-        real pdf(const Vec3 &wi, const Vec3 &wo) const noexcept override
+        real pdf(const Vec3 &wi, const Vec3 &wo, uint8_t) const noexcept override
         {
             if(cause_black_fringes(wi, wo))
                 return pdf_for_black_fringes(wi, wo);

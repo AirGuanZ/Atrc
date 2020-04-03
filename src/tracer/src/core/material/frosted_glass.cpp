@@ -113,7 +113,7 @@ namespace
         }
 
         Spectrum eval(
-            const Vec3 &wi, const Vec3 &wo, TransMode mode) const noexcept override
+            const Vec3 &wi, const Vec3 &wo, TransMode mode, uint8_t) const noexcept override
         {
             // black fringes
 
@@ -137,7 +137,7 @@ namespace
         }
 
         BSDFSampleResult sample(
-            const Vec3 &wo, TransMode mode, const Sample3 &sam) const noexcept override
+            const Vec3 &wo, TransMode mode, const Sample3 &sam, uint8_t) const noexcept override
         {
             if(cause_black_fringes(wo))
                 return BSDF_SAMPLE_RESULT_INVALID;
@@ -221,7 +221,7 @@ namespace
             return ret;
         }
 
-        real pdf(const Vec3 &wi, const Vec3 &wo) const noexcept override
+        real pdf(const Vec3 &wi, const Vec3 &wo, uint8_t) const noexcept override
         {
             if(cause_black_fringes(wi) || cause_black_fringes(wo))
                 return 0;

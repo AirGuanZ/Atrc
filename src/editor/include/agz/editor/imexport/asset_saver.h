@@ -16,7 +16,7 @@ class AssetSaver : public misc::uncopyable_t
 
 public:
 
-    explicit AssetSaver(std::ostream &fout) noexcept;
+    explicit AssetSaver(std::ostream &fout);
 
     void write_raw(const void *data, size_t byte_size);
 
@@ -32,12 +32,6 @@ public:
     bool is_rsc_pool_enabled();
 };
 
-inline AssetSaver::AssetSaver(std::ostream &fout) noexcept
-    : fout_(fout)
-{
-    
-}
-
 inline void AssetSaver::write_raw(const void *data, size_t byte_size)
 {
     fout_.write(static_cast<const char*>(data), byte_size);
@@ -45,7 +39,7 @@ inline void AssetSaver::write_raw(const void *data, size_t byte_size)
 
 inline void AssetSaver::write_string(const QString &str)
 {
-    write(uint32_t(str.length()));
+    write<int32_t>(str.length());
     write_raw(str.data(), str.length() * sizeof(QChar));
 }
 

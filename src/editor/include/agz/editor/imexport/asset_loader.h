@@ -2,6 +2,7 @@
 
 #include <istream>
 
+#include <agz/editor/imexport/asset_consts.h>
 #include <agz/editor/imexport/asset_section.h>
 
 AGZ_EDITOR_BEGIN
@@ -15,9 +16,13 @@ class AssetLoader : public misc::uncopyable_t
     // typeinfo(TracerObject).name() + rsc_name -> new_rsc_name
     std::map<QString, QString> rsc_name_map_;
 
+    AssetVersion version_;
+
 public:
 
-    explicit AssetLoader(std::istream &fin) noexcept;
+    explicit AssetLoader(std::istream &fin);
+
+    const AssetVersion &version() const noexcept;
 
     template<typename TracerObject>
     void add_rsc_name_map(const QString &old_name, const QString &new_name);
@@ -37,10 +42,9 @@ public:
     T read();
 };
 
-inline AssetLoader::AssetLoader(std::istream &fin) noexcept
-    : fin_(fin)
+inline const AssetVersion &AssetLoader::version() const noexcept
 {
-    
+    return version_;
 }
 
 template<typename TracerObject>
@@ -78,7 +82,7 @@ inline void AssetLoader::read_raw(void *data, size_t byte_size)
 
 inline QString AssetLoader::read_string()
 {
-    const uint32_t len = read<uint32_t>();
+    const int32_t len = read<int32_t>();
     QString ret(len, ' ');
     read_raw(ret.data(), len * sizeof(QChar));
     return ret;

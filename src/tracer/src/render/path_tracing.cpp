@@ -23,7 +23,7 @@ Pixel trace_std(
 
     int scattering_count = 0;
 
-    for(int depth = 1; depth <= params.max_depth; ++depth)
+    for(int depth = 1, t_depth = 1; depth <= params.max_depth; ++depth, ++t_depth)
     {
         // apply RR strategy
 
@@ -98,7 +98,7 @@ Pixel trace_std(
 
                 // sample phase function
 
-                const auto bsdf_sample = phase_function->sample(
+                const auto bsdf_sample = phase_function->sample_all(
                     scattering_point.wr, TransMode::Radiance, sampler.sample3());
                 if(!bsdf_sample.f || bsdf_sample.pdf < EPS)
                     return pixel;
@@ -145,10 +145,16 @@ Pixel trace_std(
 
         // sample bsdf
 
-        auto bsdf_sample = ent_shd.bsdf->sample(
+        auto bsdf_sample = ent_shd.bsdf->sample_all(
             ent_inct.wr, TransMode::Radiance, sampler.sample3());
         if(!bsdf_sample.f || bsdf_sample.pdf < EPS)
             return pixel;
+
+        bool is_new_sample_delta = bsdf_sample.is_delta;
+        AGZ_SCOPE_GUARD({
+            if(is_new_sample_delta && depth >= 2 && t_depth < 100)
+                --depth;
+        });
 
         const real abscos = std::abs(cos(
             ent_inct.geometry_coord.z, bsdf_sample.dir));
@@ -194,7 +200,7 @@ Pixel trace_std(
             pixel.value += real(1) / params.direct_illum_sample_count
                          * new_direct_illum;
 
-            const auto new_bsdf_sample = new_shd.bsdf->sample(
+            const auto new_bsdf_sample = new_shd.bsdf->sample_all(
                 new_inct.wr, TransMode::Radiance, sampler.sample3());
             if(!new_bsdf_sample.f)
                 return pixel;
@@ -205,6 +211,8 @@ Pixel trace_std(
 
             r = Ray(new_inct.eps_offset(new_bsdf_sample.dir),
                     new_bsdf_sample.dir.normalize());
+
+            is_new_sample_delta = new_bsdf_sample.is_delta;
         }
     }
 
@@ -274,7 +282,7 @@ Pixel trace_nomis(
                 const auto &scattering_point = medium_sample.scattering_point;
                 const auto phase_function = medium_sample.phase_function;
 
-                const auto phase_sample = phase_function->sample(
+                const auto phase_sample = phase_function->sample_all(
                     ent_inct.wr, TransMode::Radiance, sampler.sample3());
                 if(!phase_sample.f)
                     return pixel;
@@ -301,7 +309,7 @@ Pixel trace_nomis(
                 ent_inct.pos, ent_inct.geometry_coord.z, ent_inct.uv, ent_inct.wr);
         }
 
-        const auto bsdf_sample = ent_shd.bsdf->sample(
+        const auto bsdf_sample = ent_shd.bsdf->sample_all(
             ent_inct.wr, TransMode::Radiance, sampler.sample3());
         if(!bsdf_sample.f)
             return pixel;
@@ -331,7 +339,7 @@ Pixel trace_nomis(
             auto &new_inct = bssrdf_sample.inct;
             auto new_shd = new_inct.material->shade(new_inct, arena);
 
-            const auto new_bsdf_sample = new_shd.bsdf->sample(
+            const auto new_bsdf_sample = new_shd.bsdf->sample_all(
                 new_inct.wr, TransMode::Radiance, sampler.sample3());
             if(!new_bsdf_sample.f)
                 return pixel;

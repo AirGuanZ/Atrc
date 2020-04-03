@@ -10,7 +10,7 @@ struct TraceParams
     int max_depth  = 10;
     real cont_prob = real(0.9);
 
-    int direct_illum_sample_count = 4;
+    int direct_illum_sample_count = 1;
 };
 
 struct AOParams

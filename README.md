@@ -48,9 +48,9 @@ BSSRDF:
 
 ![pic](./doc/gallery/dragon.png)
 
-Materials:
+Bedroom (scene ref [here](https://benedikt-bitterli.me/resources/)):
 
-![1](./doc/gallery/materials.png)
+![1](./doc/gallery/bedroom.png)
 
 Dining Room (scene ref [here](https://www.blendswap.com/blends/view/86457)):
 

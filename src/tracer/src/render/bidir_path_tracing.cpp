@@ -110,7 +110,7 @@ namespace
         if(!connected_path.scene.visible(cam_beg.pos, lht_end.pos))
             return {};
     
-        const Spectrum bsdf = lht_end.bsdf->eval(
+        const Spectrum bsdf = lht_end.bsdf->eval_all(
             lht_bend.pos - lht_end.pos, cam_beg.pos - lht_end.pos,
             TransMode::Radiance);
         if(!bsdf)
@@ -191,7 +191,7 @@ namespace
         if(!connected_path.scene.visible(cam_end.pos, lht_sam_wi.pos))
             return {};
     
-        const Spectrum bsdf = cam_end.bsdf->eval(
+        const Spectrum bsdf = cam_end.bsdf->eval_all(
             lht_sam_wi.ref_to_light(), cam_bend.pos - cam_end.pos, TransMode::Radiance);
     
         const real proj_pdf = lht_sam_wi.pdf
@@ -227,9 +227,9 @@ namespace
         const real pdf = cam_end.accu_proj_pdf * lht_end.accu_proj_pdf;
     
         const Vec3 cam_end_to_lht_end = lht_end.pos - cam_end.pos;
-        const Spectrum cam_bsdf = cam_end.bsdf->eval(
+        const Spectrum cam_bsdf = cam_end.bsdf->eval_all(
             cam_end_to_lht_end, cam_bend.pos - cam_end.pos, TransMode::Radiance);
-        const Spectrum lht_bsdf = lht_end.bsdf->eval(
+        const Spectrum lht_bsdf = lht_end.bsdf->eval_all(
             -cam_end_to_lht_end, lht_bend.pos - lht_end.pos, TransMode::Importance);
     
         const real g = G(cam_end.pos, lht_end.pos, cam_end.nor, lht_end.nor);
@@ -347,7 +347,7 @@ namespace
         {
             const Vec3 wo = cam_beg.pos - lht_end.pos;
             const Vec3 wi = lht_subpath[t - 2].pos - lht_end.pos;
-            const real pdf = lht_end.bsdf->pdf(wi, wo);
+            const real pdf = lht_end.bsdf->pdf_all(wi, wo);
             const real proj_pdf = pdf / std::abs(cos(lht_end.nor, wi));
     
             a1 = { &lht_subpath[t - 2].pdf_fwd, proj_pdf };
@@ -431,7 +431,7 @@ namespace
     
         TmpAssign a1;
         {
-            const real pdf = cam_end.bsdf->pdf(
+            const real pdf = cam_end.bsdf->pdf_all(
                 lht_sam_wi.ref_to_light(), cam_bend.pos - cam_end.pos);
             const real proj_pdf = pdf / std::abs(cos(
                     cam_end.nor, lht_sam_wi.ref_to_light()));
@@ -450,7 +450,7 @@ namespace
     
         TmpAssign a3;
         {
-            const real pdf = cam_end.bsdf->pdf(
+            const real pdf = cam_end.bsdf->pdf_all(
                 cam_bend.pos - cam_end.pos, lht_sam_wi.ref_to_light());
             const real proj_pdf = pdf / std::abs(cos(
                                     cam_end.nor, cam_bend.pos - cam_end.pos));
@@ -481,7 +481,7 @@ namespace
     
         TmpAssign a0;
         {
-            const real pdf = b.bsdf->pdf(c.pos - b.pos, a.pos - b.pos);
+            const real pdf = b.bsdf->pdf_all(c.pos - b.pos, a.pos - b.pos);
             const real proj_pdf = pdf / std::abs(cos(b.nor, c.pos - b.pos));
             a0 = { &c.pdf_fwd, proj_pdf };
         }
@@ -489,7 +489,7 @@ namespace
     
         TmpAssign a1;
         {
-            const real pdf = c.bsdf->pdf(d.pos - c.pos, b.pos - c.pos);
+            const real pdf = c.bsdf->pdf_all(d.pos - c.pos, b.pos - c.pos);
             const real proj_pdf = pdf / std::abs(cos(c.nor, d.pos - c.pos));
             a1 = { &d.pdf_fwd, proj_pdf };
         }
@@ -497,7 +497,7 @@ namespace
     
         TmpAssign a2;
         {
-            const real pdf = c.bsdf->pdf(b.pos - c.pos, d.pos - c.pos);
+            const real pdf = c.bsdf->pdf_all(b.pos - c.pos, d.pos - c.pos);
             const real proj_pdf = pdf / std::abs(cos(c.nor, b.pos - c.pos));
             a2 = { &b.pdf_bwd, proj_pdf };
         }
@@ -505,7 +505,7 @@ namespace
     
         TmpAssign a3;
         {
-            const real pdf = b.bsdf->pdf(a.pos - b.pos, c.pos - b.pos);
+            const real pdf = b.bsdf->pdf_all(a.pos - b.pos, c.pos - b.pos);
             const real proj_pdf = pdf / std::abs(cos(b.nor, a.pos - b.pos));
             a3 = { &a.pdf_bwd, proj_pdf };
         }
@@ -631,7 +631,7 @@ CameraSubpath build_camera_subpath(
 
         // sample bsdf
 
-        const auto bsdf_sample = shd.bsdf->sample(
+        const auto bsdf_sample = shd.bsdf->sample_all(
             inct.wr, TransMode::Radiance, sampler.sample3());
         if(!bsdf_sample.f)
             break;
@@ -658,7 +658,7 @@ CameraSubpath build_camera_subpath(
 
         // store pdf(c -> b -> a) into a.bwd_pdf
 
-        const real pdf = b.bsdf->pdf(c.pos - b.pos, a.pos - b.pos);
+        const real pdf = b.bsdf->pdf_all(c.pos - b.pos, a.pos - b.pos);
         a.pdf_bwd = pdf / std::abs(cos(b.nor, a.pos - b.pos));
     }
 
@@ -670,7 +670,7 @@ CameraSubpath build_camera_subpath(
         const BDPTVertex &b = subpath_space[cam_vtx_cnt - 2];
         const BDPTVertex &c = subpath_space[cam_vtx_cnt - 1];
 
-        const real pdf = b.bsdf->pdf(c.pos, a.pos - b.pos);
+        const real pdf = b.bsdf->pdf_all(c.pos, a.pos - b.pos);
         a.pdf_bwd = pdf / std::abs(cos(b.nor, a.pos - b.pos));
     }
 
@@ -755,7 +755,7 @@ LightSubpath build_light_subpath(
 
         // sample bsdf
 
-        const auto bsdf_sample = shd.bsdf->sample(
+        const auto bsdf_sample = shd.bsdf->sample_all(
             inct.wr, TransMode::Importance, sampler.sample3());
         if(!bsdf_sample.f)
             break;
@@ -781,7 +781,7 @@ LightSubpath build_light_subpath(
 
         // store pdf(c -> b -> a) into a.pdf_fwd
 
-        const real pdf = b.bsdf->pdf(c.pos - b.pos, a.pos - b.pos);
+        const real pdf = b.bsdf->pdf_all(c.pos - b.pos, a.pos - b.pos);
         a.pdf_fwd = pdf / std::abs(cos(b.nor, a.pos - b.pos));
     }
 
@@ -793,7 +793,7 @@ LightSubpath build_light_subpath(
         const BDPTVertex &b = subpath_space[1];
         const BDPTVertex &c = subpath_space[2];
 
-        const real pdf = b.bsdf->pdf(c.pos - b.pos, -light_emit.dir);
+        const real pdf = b.bsdf->pdf_all(c.pos - b.pos, -light_emit.dir);
         a.pdf_fwd = pdf / std::abs(cos(b.nor, light_emit.dir));
     }
 

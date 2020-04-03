@@ -82,7 +82,7 @@ void VisiblePointSearcher::add_photon(
         if(distance2(pixel.vp.pos, photon_pos) > pixel.radius * pixel.radius)
             continue;
 
-        const Spectrum delta_phi = phi * pixel.vp.bsdf->eval(
+        const Spectrum delta_phi = phi * pixel.vp.bsdf->eval_all(
             wr, pixel.vp.wr, TransMode::Radiance);
 
         if(!delta_phi.is_finite())
@@ -194,7 +194,7 @@ Pixel::VisiblePoint tracer_vp(
 
         // sample bsdf to create next ray
 
-        const auto bsdf_sample = shd.bsdf->sample(
+        const auto bsdf_sample = shd.bsdf->sample_all(
             inct.wr, TransMode::Radiance, sampler.sample3());
         if(!bsdf_sample.f)
             return { {}, {}, {}, nullptr };
@@ -255,7 +255,7 @@ void trace_photon(
         // sample bsdf to create next ray
 
         const ShadingPoint shd = inct.material->shade(inct, arena);
-        const auto bsdf_sample = shd.bsdf->sample(
+        const auto bsdf_sample = shd.bsdf->sample_all(
             inct.wr, TransMode::Importance, sampler.sample3());
         if(!bsdf_sample.f)
             return;

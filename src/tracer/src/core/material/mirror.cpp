@@ -24,14 +24,15 @@ namespace
             
         }
 
-        Spectrum eval(const Vec3 &, const Vec3 &, TransMode) const noexcept override
+        Spectrum eval(
+            const Vec3 &, const Vec3 &, TransMode, uint8_t) const noexcept override
         {
             return Spectrum();
         }
 
         BSDFSampleResult sample(
             const Vec3 &out_dir, TransMode transport_mode,
-            const Sample3 &sam) const noexcept override
+            const Sample3 &sam, uint8_t) const noexcept override
         {
             const Vec3 local_out = shading_coord_.global_to_local(out_dir);
             if(local_out.z <= 0)
@@ -49,7 +50,8 @@ namespace
             return ret;
         }
 
-        real pdf(const Vec3 &in_dir, const Vec3 &out_dir) const noexcept override
+        real pdf(
+            const Vec3 &in_dir, const Vec3 &out_dir, uint8_t) const noexcept override
         {
             return 0;
         }
