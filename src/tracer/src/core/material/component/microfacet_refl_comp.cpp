@@ -62,12 +62,11 @@ namespace
     }
 }
 
-GGXMicrofacetComponent::GGXMicrofacetComponent(
-    const Spectrum &color, const FresnelPoint *fresnel,
+GGXMicrofacetReflectionComponent::GGXMicrofacetReflectionComponent(
+    const FresnelPoint *fresnel,
     real roughness, real anisotropic) noexcept
-    : BSDFComponent(BSDF_GLOSSY | BSDF_REFLECTION)
+    : BSDFComponent(BSDF_GLOSSY)
 {
-    color_ = color;
     fresnel_ = fresnel;
 
     const real aspect = anisotropic > 0 ?
@@ -76,15 +75,15 @@ GGXMicrofacetComponent::GGXMicrofacetComponent(
     ay_ = std::max(real(0.001), math::sqr(roughness) * aspect);
 }
 
-Spectrum GGXMicrofacetComponent::eval(
+Spectrum GGXMicrofacetReflectionComponent::eval(
     const Vec3 &lwi, const Vec3 &lwo, TransMode mode) const noexcept
 {
     Spectrum ret;
     eval_and_pdf<true, false>(lwi, lwo, fresnel_, ax_, ay_, &ret, nullptr);
-    return color_ * ret;
+    return ret;
 }
 
-BSDFComponent::SampleResult GGXMicrofacetComponent::sample(
+BSDFComponent::SampleResult GGXMicrofacetReflectionComponent::sample(
     const Vec3 &lwo, TransMode mode, const Sample2 &sam) const noexcept
 {
     if(lwo.z <= 0)
@@ -102,12 +101,11 @@ BSDFComponent::SampleResult GGXMicrofacetComponent::sample(
     SampleResult ret;
     ret.lwi = lwi;
     eval_and_pdf<true, true>(lwi, lwo, fresnel_, ax_, ay_, &ret.f, &ret.pdf);
-    ret.f *= color_;
 
     return ret;
 }
 
-real GGXMicrofacetComponent::pdf(
+real GGXMicrofacetReflectionComponent::pdf(
     const Vec3 &lwi, const Vec3 &lwo) const noexcept
 {
     real ret;

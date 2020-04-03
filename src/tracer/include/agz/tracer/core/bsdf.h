@@ -9,17 +9,10 @@ enum BSDFComponentType : uint8_t
 {
     BSDF_DIFFUSE    = 1 << 0,
     BSDF_GLOSSY     = 1 << 1,
-    BSDF_SPECULAR   = 1 << 2,
-    BSDF_REFLECTION = 1 << 3,
-    BSDF_REFRACTION = 1 << 4
+    BSDF_SPECULAR   = 1 << 2
 };
 
-constexpr uint8_t BSDF_ALL =
-    BSDF_DIFFUSE | BSDF_GLOSSY | BSDF_SPECULAR |
-    BSDF_REFLECTION | BSDF_REFRACTION;
-
-constexpr uint8_t BSDF_REFL_REFR_MASK = BSDF_REFLECTION | BSDF_REFRACTION;
-constexpr uint8_t BSDF_DGS_MASK = BSDF_DIFFUSE | BSDF_GLOSSY | BSDF_SPECULAR;
+constexpr uint8_t BSDF_ALL = BSDF_DIFFUSE | BSDF_GLOSSY | BSDF_SPECULAR;
 
 /**
  * @brief result of sampling BSDF

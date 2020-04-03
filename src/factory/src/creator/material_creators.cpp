@@ -112,33 +112,6 @@ namespace material
         }
     };
 
-    class FrostedGlassCreator : public Creator<Material>
-    {
-    public:
-
-        std::string name() const override
-        {
-            return "frosted_glass";
-        }
-
-        RC<Material> create(
-            const ConfigGroup &params, CreatingContext &context) const override
-        {
-            const auto color_map = context.create<Texture2D>(
-                params.child_group("color_map"));
-            const auto ior       = context.create<Texture2D>(
-                params.child_group("ior"));
-            const auto roughness = context.create<Texture2D>(
-                params.child_group("roughness"));
-
-            auto bssrdf = init_bssrdf_surface(params, {}, ior, context);
-
-            return create_frosted_glass(
-                std::move(color_map), std::move(roughness),
-                std::move(ior), std::move(bssrdf));
-        }
-    };
-
     class GlassCreator : public Creator<Material>
     {
     public:
@@ -342,7 +315,6 @@ namespace material
 void initialize_material_factory(Factory<Material> &factory)
 {
     factory.add_creator(newBox<material::DisneyCreator>());
-    factory.add_creator(newBox<material::FrostedGlassCreator>());
     factory.add_creator(newBox<material::GlassCreator>());
     factory.add_creator(newBox<material::IdealBlackCreator>());
     factory.add_creator(newBox<material::IdealDiffuseCreator>());

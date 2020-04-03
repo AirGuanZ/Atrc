@@ -471,21 +471,6 @@ see [Disney Principled BSDF](https://blog.selfshadow.com/publications/s2015-shad
 | bssrdf_A               | Texture2D | base_color      | diffuse surface reflectance for BSSRDF                       |
 | bssrdf_eta             | Texture2D | ior             | ior for BSSRDF                                               |
 
-**frosted_glass**
-
-![pic](./pictures/frosted_glass.png)
-
-Frosted glass material. Please refer to [Microfacet Models for Refraction through Rough Surfaces](https://www.cs.cornell.edu/~srm/publications/EGSR07-btdf.html).
-
-| Field Name  | Type      | Default Value | Explanation                            |
-| ----------- | --------- | ------------- | -------------------------------------- |
-| color_map   | Texture2D |               | surface color                          |
-| ior         | Texture2D |               | index of refraction                    |
-| roughness   | Texture2D |               | surface roughness                      |
-| bssrdf_dmfp | Texture2D | null          | specify this to enable BSSRDF          |
-| bssrdf_A    | Texture2D | null          | diffuse surface reflectance for BSSRDF |
-| bssrdf_eta  | Texture2D | ior           | ior for BSSRDF                         |
-
 **glass**
 
 ![pic](./pictures/glass.png)

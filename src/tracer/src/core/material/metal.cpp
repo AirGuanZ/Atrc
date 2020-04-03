@@ -42,18 +42,19 @@ public:
         const Coord shading_coord = normal_mapper_->reorient(
             inct.uv, inct.user_coord);
 
-        const Spectrum color = color_->sample_spectrum(inct.uv);
-        const Spectrum k = k_->sample_spectrum(inct.uv);
-        const Spectrum eta = eta_->sample_spectrum(inct.uv);
-        const real roughness = roughness_->sample_real(inct.uv);
+        const Spectrum color   = color_->sample_spectrum(inct.uv);
+        const Spectrum k       = k_->sample_spectrum(inct.uv);
+        const Spectrum eta     = eta_->sample_spectrum(inct.uv);
+        const real roughness   = roughness_->sample_real(inct.uv);
         const real anisotropic = anisotropic_->sample_real(inct.uv);
 
-        const auto fresnel = arena.create<ConductorPoint>(Spectrum(1), eta, k);
+        const auto fresnel = arena.create<ColoredConductorPoint>(
+            color, Spectrum(1), eta, k);
 
         auto *bsdf = arena.create<AggregateBSDF<1>>(
             inct.geometry_coord, shading_coord, color);
-        bsdf->add_component(1, arena.create<GGXMicrofacetComponent>(
-            color, fresnel, roughness, anisotropic));
+        bsdf->add_component(1, arena.create<GGXMicrofacetReflectionComponent>(
+            fresnel, roughness, anisotropic));
 
         ShadingPoint shd;
         shd.bsdf = bsdf;

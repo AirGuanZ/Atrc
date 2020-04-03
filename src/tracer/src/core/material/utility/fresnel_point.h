@@ -66,6 +66,26 @@ public:
     }
 };
 
+class ColoredConductorPoint : public ConductorPoint
+{
+    Spectrum color_;
+
+public:
+
+    ColoredConductorPoint(
+        const Spectrum &color,
+        const Spectrum &eta_out, const Spectrum &eta_in, const Spectrum &k) noexcept
+        : ConductorPoint(eta_out, eta_in, k)
+    {
+        color_ = color;
+    }
+
+    Spectrum eval(real cos_theta_i) const noexcept override
+    {
+        return color_ * ConductorPoint::eval(cos_theta_i);
+    }
+};
+
 class DielectricFresnelPoint : public FresnelPoint
 {
     real eta_i_, eta_o_;
@@ -80,7 +100,8 @@ public:
 
     Spectrum eval(real cos_theta_i) const noexcept override
     {
-        return Spectrum(refl_aux::dielectric_fresnel(eta_i_, eta_o_, cos_theta_i));
+        return Spectrum(refl_aux::dielectric_fresnel(
+                    eta_i_, eta_o_, cos_theta_i));
     }
 
     real eta_i() const noexcept { return eta_i_; }

@@ -68,13 +68,6 @@ Spectrum AggregateBSDF<MAX_COMP_CNT>::eval(
     if(!lwi.z || !lwo.z)
         return {};
 
-    // refine type using lwi & lwo
-
-    const BSDFComponentType refl_or_refr = lwi.z * lwo.z > 0 ? BSDF_REFLECTION
-                                                             : BSDF_REFRACTION;
-    type = (type & BSDF_DGS_MASK) |
-           (type & BSDF_REFL_REFR_MASK & refl_or_refr);
-
     // traversal components
 
     Spectrum ret;
@@ -195,13 +188,6 @@ real AggregateBSDF<MAX_COMP_CNT>::pdf(
     const Vec3 lwo = shading_coord_.global_to_local(wo).normalize();
     if(!lwi.z || !lwo.z)
         return 0;
-
-    // refine bsdf type
-
-    const BSDFComponentType refl_or_refr = lwi.z * lwo.z > 0 ? BSDF_REFLECTION
-                                                             : BSDF_REFRACTION;
-    type = (type & BSDF_DGS_MASK) |
-           (type & BSDF_REFL_REFR_MASK & refl_or_refr);
 
     // traversal components
 

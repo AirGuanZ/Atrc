@@ -9,7 +9,7 @@ Offline rendering lab based on ray tracing
 - [x] Bidirectional path tracing
 - [x] Stochastic progressive photon mapping
 - [x] Primary sample space MLT on path tracing
-- [x] Various material models: Disney Principled BSDF, (frosted) glass, Phong, ...
+- [x] Various material models: Disney Principled BSDF, Phong, ...
 - [x] Homogeneous/Heterogeneous Participating Medium
 - [x] Normalized Diffusion BSSRDF
 - [x] Almost all material properties can be specified with 2D/3D textures
@@ -26,9 +26,9 @@ Offline rendering lab based on ray tracing
 
 ## Roadmap
 
-- [ ] Light portal
-- [ ] Component based bsdf
+- [x] Component based bsdf
 - [ ] Light sampling hints (sample count, user-specified power, env light portal)
+- [ ] Volumetric photon mapping
 
 ## Documentation
 

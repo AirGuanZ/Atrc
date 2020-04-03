@@ -3,7 +3,7 @@
 AGZ_TRACER_BEGIN
 
 DiffuseComponent::DiffuseComponent(const Spectrum &albedo) noexcept
-    : BSDFComponent(BSDF_REFLECTION | BSDF_DIFFUSE)
+    : BSDFComponent(BSDF_DIFFUSE)
 {
     coef_ = albedo / PI_r;
 }

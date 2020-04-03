@@ -3,210 +3,11 @@
 #include <agz/tracer/core/texture2d.h>
 #include <agz/tracer/utility/reflection.h>
 
+#include "./component/aggregate.h"
+#include "./component/diffuse_comp.h"
+#include "./component/phong_specular_comp.h"
+
 AGZ_TRACER_BEGIN
-
-namespace phong_impl
-{
-
-    class PhongBSDF : public LocalBSDF
-    {
-        Spectrum d_;
-        Spectrum s_;
-        real ns_;
-
-        real diffuse_pdf_;
-        real specular_pdf_;
-
-        Vec3 sample_pow_cos_on_hemisphere(
-            real e, const Sample2 &sam) const noexcept
-        {
-            const real cos_theta_h = std::pow(sam.u, 1 / (e + 1));
-            const real sin_theta_h = local_angle::cos_2_sin(cos_theta_h);
-            const real phi = 2 * PI_r * sam.v;
-
-            return Vec3(
-                sin_theta_h * std::cos(phi),
-                sin_theta_h * std::sin(phi),
-                cos_theta_h).normalize();
-        }
-
-        real pow_cos_on_hemisphere_pdf(real e, real cos_theta) const noexcept
-        {
-            return (e + 1) / (2 * PI_r) * std::pow(cos_theta, e);
-        }
-
-        Spectrum eval_diffuse(const Vec3 &lwi, const Vec3 &lwo) const noexcept
-        {
-            assert(lwi.z > 0 && lwo.z > 0);
-            return d_ / PI_r;
-        }
-
-        Spectrum eval_specular(const Vec3 &lwi, const Vec3 &lwo) const noexcept
-        {
-            assert(lwi.z > 0 && lwo.z > 0);
-
-            const Vec3 ideal_lwi = refl_aux::reflect(lwo, { 0, 0, 1 });
-            const real cos_val = cos(ideal_lwi, lwi);
-            return s_ * pow_cos_on_hemisphere_pdf(ns_, cos_val);
-        }
-
-        std::pair<Vec3, real> sample_diffuse(
-            const Vec3 &lwo, const Sample2 &sam) const noexcept
-        {
-            assert(lwo.z > 0);
-            return math::distribution::zweighted_on_hemisphere(sam.u, sam.v);
-        }
-
-        std::pair<Vec3, real> sample_specular(
-            const Vec3 &lwo, const Sample2 &sam) const noexcept
-        {
-            assert(lwo.z > 0);
-
-            const Vec3 ideal_lwi = refl_aux::reflect(lwo, { 0, 0, 1 });
-            const Vec3 local_lwi = sample_pow_cos_on_hemisphere(ns_, sam);
-            const Vec3 lwi = Coord::from_z(ideal_lwi).local_to_global(
-                                local_lwi).normalize();
-            if(lwi.z <= 0)
-                return { {}, 0 };
-
-            const real pdf = pow_cos_on_hemisphere_pdf(ns_, local_lwi.z);
-            return { lwi, pdf };
-        }
-
-        real pdf_diffuse(const Vec3 &lwi, const Vec3 &lwo) const noexcept
-        {
-            assert(lwi.z > 0 && lwo.z > 0);
-            return math::distribution::zweighted_on_hemisphere_pdf(lwi.z);
-        }
-
-        real pdf_specular(const Vec3 &lwi, const Vec3 &lwo) const noexcept
-        {
-            const Vec3 ideal_lwi = refl_aux::reflect(lwo, { 0, 0, 1 });
-            const Vec3 local_lwi = Coord::from_z(ideal_lwi).global_to_local(lwi);
-
-            if(local_lwi.z <= 0)
-                return 0;
-            return pow_cos_on_hemisphere_pdf(ns_, local_lwi.normalize().z);
-        }
-
-    public:
-
-        PhongBSDF(
-            const Coord &geometry_coord, const Coord &shading_coord,
-            const Spectrum &d, const Spectrum &s, real ns)
-            : LocalBSDF(geometry_coord, shading_coord),
-              d_(d), s_(s), ns_(ns)
-        {
-            const real diffuse_lum  = d_.lum();
-            const real specular_lum = s_.lum();
-            if(diffuse_lum + specular_lum > EPS)
-                diffuse_pdf_ = diffuse_lum / (diffuse_lum + specular_lum);
-            else
-                diffuse_pdf_ = real(0.5);
-
-            specular_pdf_ = 1 - diffuse_pdf_;
-        }
-
-        Spectrum eval(
-            const Vec3 &wi, const Vec3 &wo,
-            TransMode mode, uint8_t) const noexcept override
-        {
-            if(cause_black_fringes(wi, wo))
-                return eval_black_fringes(wi, wo);
-
-            const Vec3 lwi = shading_coord_.global_to_local(wi);
-            const Vec3 lwo = shading_coord_.global_to_local(wo);
-            if(lwi.z <= 0 || lwo.z <= 0)
-                return Spectrum();
-
-            const Spectrum d = eval_diffuse(lwi, lwo);
-            const Spectrum s = eval_specular(lwi, lwo);
-
-            const real nor_corr = local_angle::normal_corr_factor(
-                    geometry_coord_, shading_coord_, wi);
-
-            return (d + s) * nor_corr;
-        }
-
-        BSDFSampleResult sample(
-            const Vec3 &wo, TransMode mode, 
-            const Sample3 &sam, uint8_t) const noexcept override
-        {
-            if(cause_black_fringes(wo))
-                return sample_black_fringes(wo, mode, sam);
-
-            const Vec3 &lwo = shading_coord_.global_to_local(wo);
-            if(lwo.z <= 0)
-                return BSDF_SAMPLE_RESULT_INVALID;
-
-            if(sam.u < diffuse_pdf_)
-            {
-                auto [lwi, pdf_d] = sample_diffuse(lwo, { sam.v, sam.w });
-
-                const Vec3 wi = shading_coord_.local_to_global(lwi);
-                const real nor_corr = local_angle::normal_corr_factor(
-                    geometry_coord_, shading_coord_, wi);
-
-                BSDFSampleResult ret;
-                ret.f   = (eval_diffuse(lwi, lwo) + eval_specular(lwi, lwo)) * nor_corr;
-                ret.dir = wi;
-                ret.pdf = diffuse_pdf_ * pdf_d + specular_pdf_ * pdf_specular(lwi, lwo);
-                ret.is_delta = false;
-
-                return ret;
-            }
-
-            auto [lwi, pdf_s] = sample_specular(lwo, { sam.v, sam.w });
-            if(!pdf_s)
-                return BSDF_SAMPLE_RESULT_INVALID;
-
-            const Vec3 wi = shading_coord_.local_to_global(lwi);
-            const real nor_corr = local_angle::normal_corr_factor(
-                geometry_coord_, shading_coord_, wi);
-
-            BSDFSampleResult ret;
-            ret.f   = (eval_diffuse(lwi, lwo) + eval_specular(lwi, lwo)) * nor_corr;
-            ret.dir = wi;
-            ret.pdf = diffuse_pdf_ * pdf_diffuse(lwi, lwo) + specular_pdf_ * pdf_s;
-            ret.is_delta = false;
-
-            if(!ret.f.is_finite() || ret.pdf < EPS)
-                return BSDF_SAMPLE_RESULT_INVALID;
-
-            return ret;
-        }
-
-        real pdf(const Vec3 &wi, const Vec3 &wo, uint8_t) const noexcept override
-        {
-            if(cause_black_fringes(wi, wo))
-                return pdf_for_black_fringes(wi, wo);
-
-            const Vec3 lwi = shading_coord_.global_to_local(wi);
-            const Vec3 lwo = shading_coord_.global_to_local(wo);
-            if(lwi.z <= 0 || lwo.z <= 0)
-                return 0;
-
-            return diffuse_pdf_ * pdf_diffuse(lwi, lwo) +
-                   specular_pdf_ * pdf_specular(lwi, lwo);
-        }
-
-        Spectrum albedo() const noexcept override
-        {
-            return d_ + s_;
-        }
-
-        bool is_delta() const noexcept override
-        {
-            return false;
-        }
-
-        bool has_diffuse_component() const noexcept override
-        {
-            return !d_.is_black();
-        }
-    };
-
-} // namespace phong_impl
 
 class Phong : public Material
 {
@@ -243,11 +44,34 @@ public:
         d /= dem;
         s /= dem;
 
+        // shading coord
+
         const Coord shading_coord = nor_map_->reorient(inct.uv, inct.user_coord);
 
+        // compute diffuse/specular weight
+
+        const real diffuse_lum  = d.lum();
+        const real specular_lum = s.lum();
+
+        real diffuse_weight;
+        if(diffuse_lum + specular_lum > EPS)
+            diffuse_weight = diffuse_lum / (diffuse_lum + specular_lum);
+        else
+            diffuse_weight = real(0.5);
+
+        const real specular_weight = 1 - diffuse_weight;
+
+        // construct bsdf
+
+        auto bsdf = arena.create<AggregateBSDF<2>>(
+            inct.geometry_coord, shading_coord, d + s);
+        bsdf->add_component(
+            diffuse_weight, arena.create<DiffuseComponent>(d));
+        bsdf->add_component(
+            specular_weight, arena.create<PhongSpecularComponent>(s, ns));
+
         ShadingPoint shd;
-        shd.bsdf = arena.create<phong_impl::PhongBSDF>(
-            inct.geometry_coord, shading_coord, d, s, ns);
+        shd.bsdf = bsdf;
         shd.shading_normal = shading_coord.z;
 
         return shd;

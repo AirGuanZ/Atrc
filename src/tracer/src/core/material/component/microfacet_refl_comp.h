@@ -5,17 +5,16 @@
 
 AGZ_TRACER_BEGIN
 
-class GGXMicrofacetComponent : public BSDFComponent
+class GGXMicrofacetReflectionComponent : public BSDFComponent
 {
-    Spectrum color_;
     const FresnelPoint *fresnel_;
     real ax_;
     real ay_;
 
 public:
 
-    GGXMicrofacetComponent(
-        const Spectrum &color, const FresnelPoint *fresnel,
+    GGXMicrofacetReflectionComponent(
+        const FresnelPoint *fresnel,
         real roughness, real anisotropic) noexcept;
 
     Spectrum eval(

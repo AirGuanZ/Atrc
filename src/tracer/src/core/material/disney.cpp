@@ -82,9 +82,11 @@ namespace disney_impl
             const real FL = one_minus_5(cos_theta_i);
             const real FV = one_minus_5(cos_theta_o);
             const real RR = 2 * roughness_ * cos_theta_d * cos_theta_d;
-            const Spectrum F_retro_refl = C_ / PI_r * RR * (FL + FV + FL * FV * (RR - 1));
+            const Spectrum F_retro_refl =
+                C_ / PI_r * RR * (FL + FV + FL * FV * (RR - 1));
 
-            return f_lambert * (1 - real(0.5) * FL) * (1 - real(0.5) * FV) + F_retro_refl;
+            return f_lambert * (1 - real(0.5) * FL) * (1 - real(0.5) * FV)
+                 + F_retro_refl;
         }
 
         Spectrum f_sheen(real cos_theta_d) const noexcept
@@ -457,7 +459,7 @@ namespace disney_impl
 
         Spectrum eval(
             const Vec3 &wi, const Vec3 &wo,
-            TransMode mode, uint8_t) const noexcept override
+            TransMode mode, uint8_t type) const noexcept override
         {
             if(cause_black_fringes(wi, wo))
                 return eval_black_fringes(wi, wo);
@@ -472,8 +474,9 @@ namespace disney_impl
             
             if(lwi.z * lwo.z < 0)
             {
-                if(!transmission_)
+                if(!(type & BSDF_GLOSSY) || !transmission_)
                     return {};
+
                 const Spectrum value = f_trans(lwi, lwo, mode);
                 return value * local_angle::normal_corr_factor(
                     geometry_coord_, shading_coord_, wi);
@@ -483,8 +486,9 @@ namespace disney_impl
 
             if(lwi.z < 0 && lwo.z < 0)
             {
-                if(!transmission_)
+                if(!(type & BSDF_GLOSSY) || !transmission_)
                     return {};
+
                 const Spectrum value = f_inner_refl(lwi, lwo);
                 return value * local_angle::normal_corr_factor(
                     geometry_coord_, shading_coord_, wi);
@@ -504,20 +508,25 @@ namespace disney_impl
             Spectrum diffuse, sheen;
             if(metallic_ < 1)
             {
-                diffuse = f_diffuse(cos_theta_i, cos_theta_o, cos_theta_d);
-                if(sheen_ > 0)
+                if(type & BSDF_DIFFUSE)
+                    diffuse = f_diffuse(cos_theta_i, cos_theta_o, cos_theta_d);
+
+                if(sheen_ > 0 && (type & BSDF_GLOSSY))
                     sheen = f_sheen(cos_theta_d);
             }
 
-            const Spectrum specular = f_specular(lwi, lwo);
+            Spectrum specular;
+            if(type & BSDF_GLOSSY)
+                specular = f_specular(lwi, lwo);
 
             Spectrum clearcoat;
-            if(clearcoat_ > 0)
+            if(clearcoat_ > 0 && (type & BSDF_GLOSSY))
             {
                 const real tan_theta_i = local_angle::tan_theta(lwi);
                 const real tan_theta_o = local_angle::tan_theta(lwo);
                 const real cos_theta_h = local_angle::cos_theta(lwh);
                 const real sin_theta_h = local_angle::cos_2_sin(cos_theta_h);
+
                 clearcoat = f_clearcoat(
                     cos_theta_i, cos_theta_o, tan_theta_i, tan_theta_o,
                     sin_theta_h, cos_theta_h, cos_theta_d);
@@ -525,12 +534,16 @@ namespace disney_impl
 
             const Spectrum value = (1 - metallic_) * (1 - transmission_)
                                  * (diffuse + sheen) + specular + clearcoat;
-            return value * local_angle::normal_corr_factor(geometry_coord_, shading_coord_, wi);
+
+            const real normal_corr_factor = local_angle::normal_corr_factor(
+                geometry_coord_, shading_coord_, wi);
+
+            return value * normal_corr_factor;
         }
 
         BSDFSampleResult sample(
             const Vec3 &wo, TransMode mode,
-            const Sample3 &sam, uint8_t) const noexcept override
+            const Sample3 &sam, uint8_t type) const noexcept override
         {
             if(cause_black_fringes(wo))
                 return sample_black_fringes(wo, mode, sam);
@@ -543,7 +556,7 @@ namespace disney_impl
 
             if(lwo.z < 0)
             {
-                if(!transmission_)
+                if(!(type & BSDF_GLOSSY) || !transmission_)
                     return BSDF_SAMPLE_RESULT_INVALID;
 
                 Vec3 lwi;
@@ -574,25 +587,42 @@ namespace disney_impl
             real sam_selector = sam.u;
             const Sample2 new_sam{ sam.v, sam.w };
 
+            real pdf_sum = 0;
+            if(type & BSDF_DIFFUSE)
+                pdf_sum += sample_w.diffuse;
+            if(type & BSDF_GLOSSY)
+                pdf_sum += sample_w.clearcoat + sample_w.specular
+                         + sample_w.transmission;
+            sam_selector *= pdf_sum;
+
             Vec3 lwi;
-            if(sam_selector < sample_w.diffuse)
-                lwi = sample_diffuse(new_sam);
-            else if(sam_selector -= sample_w.diffuse;
-                    sam_selector < sample_w.transmission)
-                lwi = sample_transmission(lwo, new_sam);
-            else if(sam_selector -= sample_w.transmission;
-                    sam_selector < sample_w.specular)
-                lwi = sample_specular(lwo, new_sam);
-            else
-                lwi = sample_clearcoat(lwo, new_sam);
+
+            if(type & BSDF_DIFFUSE)
+            {
+                if(sam_selector < sample_w.diffuse)
+                    lwi = sample_diffuse(new_sam);
+                else
+                    sam_selector -= sample_w.diffuse;
+            }
+
+            if((type & BSDF_GLOSSY) && !lwi)
+            {
+                if(sam_selector < sample_w.transmission)
+                    lwi = sample_transmission(lwo, new_sam);
+                else if(sam_selector -= sample_w.specular;
+                        sam_selector < sample_w.specular)
+                    lwi = sample_specular(lwo, new_sam);
+                else
+                    lwi = sample_clearcoat(lwo, new_sam);
+            }
 
             if(!lwi)
                 return BSDF_SAMPLE_RESULT_INVALID;
             
             BSDFSampleResult ret;
             ret.dir      = shading_coord_.local_to_global(lwi);
-            ret.f        = eval_all(ret.dir, wo, mode);
-            ret.pdf      = pdf_all(ret.dir, wo);
+            ret.f        = eval(ret.dir, wo, mode, type);
+            ret.pdf      = pdf(ret.dir, wo, type);
             ret.is_delta = false;
 
             if(!ret.f.is_finite() || ret.pdf < EPS)
@@ -601,7 +631,8 @@ namespace disney_impl
             return ret;
         }
 
-        real pdf(const Vec3 &wi, const Vec3 &wo, uint8_t) const noexcept override
+        real pdf(
+            const Vec3 &wi, const Vec3 &wo, uint8_t type) const noexcept override
         {
             if(cause_black_fringes(wi, wo))
                 return pdf_for_black_fringes(wi, wo);
@@ -615,8 +646,9 @@ namespace disney_impl
 
             if(lwo.z < 0)
             {
-                if(!transmission_)
+                if(!(type & BSDF_GLOSSY) || !transmission_)
                     return 0;
+
                 real macro_F = refl_aux::dielectric_fresnel(IOR_, 1, lwo.z);
                 macro_F = math::clamp(macro_F, real(0.1), real(0.9));
                 if(lwi.z > 0)
@@ -628,14 +660,33 @@ namespace disney_impl
 
             // transmission and refl
 
-            if(lwi.z < 0)
-                return sample_w.transmission * pdf_transmission(lwi, lwo);
+            real pdf_sum = 0;
+            if(type & BSDF_DIFFUSE)
+                pdf_sum += sample_w.diffuse;
+            if(type & BSDF_GLOSSY)
+                pdf_sum += sample_w.clearcoat + sample_w.specular
+                                              + sample_w.transmission;
 
-            const real diffuse = pdf_diffuse(lwi, lwo);
-            auto [specular, clearcoat] = pdf_specular_clearcoat(lwi, lwo);
-            return sample_w.diffuse   * diffuse
-                 + sample_w.specular  * specular
-                 + sample_w.clearcoat * clearcoat;
+            if(!pdf_sum)
+                return 0;
+
+            if(lwi.z < 0)
+            {
+                if(!(type & BSDF_GLOSSY))
+                    return 0;
+                return sample_w.transmission * pdf_transmission(lwi, lwo)
+                                             / pdf_sum;
+            }
+
+            const real diffuse = (type & BSDF_DIFFUSE) ? pdf_diffuse(lwi, lwo) : 0;
+
+            auto [specular, clearcoat] = (type & BSDF_GLOSSY) ?
+                    pdf_specular_clearcoat(lwi, lwo) :
+                    std::make_pair(real(0), real(0));
+
+            return (sample_w.diffuse   * diffuse
+                  + sample_w.specular  * specular
+                  + sample_w.clearcoat * clearcoat) / pdf_sum;
         }
 
         Spectrum albedo() const noexcept override

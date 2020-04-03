@@ -27,8 +27,11 @@ namespace
 
         BSDFSampleResult sample(
             const Vec3 &wo, TransMode mode,
-            const Sample3 &sam, uint8_t) const noexcept override
+            const Sample3 &sam, uint8_t type) const noexcept override
         {
+            if(!(type & BSDF_SPECULAR))
+                return BSDF_SAMPLE_RESULT_INVALID;
+
             const real cosv = std::abs(cos(geometry_normal_, wo));
 
             BSDFSampleResult ret;
