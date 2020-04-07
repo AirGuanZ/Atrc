@@ -4,5 +4,6 @@ build2017/
 asset/
 doc/doc.html
 doc/doc-cn.html
+lib/embree
 lib/oidn
 nohup.out
