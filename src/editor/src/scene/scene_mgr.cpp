@@ -80,7 +80,7 @@ SceneManager::SceneManager(
         model_importer->exec();
     });
 
-    aggregate_ = tracer::create_entity_bvh(5);
+    aggregate_ = tracer::create_entity_bvh(4);
     aggregate_->build({});
 }
 

@@ -180,7 +180,7 @@ BSSRDFSamplePiResult SeparableBSSRDF::sample_pi(
     Ray inct_ray(
         po_.pos + proj_coord.local_to_global(inct_ray_ori),
         -proj_coord.z,
-        EPS, std::max(EPS, inct_ray_len));
+        EPS(), std::max(EPS(), inct_ray_len));
 
     // find all incts
 
@@ -211,8 +211,8 @@ BSSRDFSamplePiResult SeparableBSSRDF::sample_pi(
             ++inct_cnt;
         }
 
-        inct_ray.o = inct_ray.at(new_inct.t + EPS);
-        inct_ray.t_max -= new_inct.t + EPS;
+        inct_ray.o = inct_ray.at(new_inct.t + EPS());
+        inct_ray.t_max -= new_inct.t + EPS();
     }
 
     if(!inct_cnt)
@@ -249,7 +249,7 @@ BSSRDFSamplePiResult SeparableBSSRDF::sample_pi(
     ret.coef          = fro * eval_r(distance(ret.inct.pos, po_.pos));
     ret.pdf           = pdf_radius / (2 * PI_r) / inct_cnt;
 
-    if(!ret.coef.is_finite() || ret.pdf < EPS)
+    if(!ret.coef.is_finite() || ret.pdf < EPS())
         return {};
 
     return ret;

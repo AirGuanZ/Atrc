@@ -36,7 +36,7 @@ namespace
 
             BSDFSampleResult ret;
             ret.dir      = -wo;
-            ret.f        = Spectrum(1) / (cosv < EPS ? 1 : cosv);
+            ret.f        = Spectrum(1) / (cosv < EPS() ? 1 : cosv);
             ret.pdf      = 1;
             ret.is_delta = true;
             return ret;

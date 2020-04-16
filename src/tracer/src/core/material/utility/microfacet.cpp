@@ -107,7 +107,7 @@ namespace microfacet
         const Vec3 vh = Vec3(ax * ve.x, ay * ve.y, ve.z).normalize();
         const real lensq = vh.x * vh.x + vh.y * vh.y;
 
-        const Vec3 t1 = lensq > EPS ?
+        const Vec3 t1 = lensq > EPS() ?
             Vec3(-vh.y, vh.x, 0) / std::sqrt(lensq) : Vec3(1, 0, 0);
         const Vec3 t2 = cross(vh, t1);
 

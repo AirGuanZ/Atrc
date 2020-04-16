@@ -64,8 +64,8 @@ public:
     {
         const Vec3 world_origin = local_to_world_.apply_to_point(Vec3(0));
         return {
-            world_origin - Vec3(world_radius_ + EPS),
-            world_origin + Vec3(world_radius_ + EPS)
+            world_origin - Vec3(world_radius_ + EPS()),
+            world_origin + Vec3(world_radius_ + EPS())
         };
     }
 

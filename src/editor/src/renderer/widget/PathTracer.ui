@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>706</width>
+    <width>768</width>
     <height>543</height>
    </rect>
   </property>
@@ -25,72 +25,10 @@
      <x>0</x>
      <y>0</y>
      <width>721</width>
-     <height>108</height>
+     <height>153</height>
     </rect>
    </property>
    <layout class="QGridLayout" name="gridLayout">
-    <item row="1" column="1">
-     <widget class="QLabel" name="display_max_depth">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="minimumSize">
-       <size>
-        <width>72</width>
-        <height>0</height>
-       </size>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignCenter</set>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="0">
-     <widget class="QLabel" name="label_3">
-      <property name="text">
-       <string>Cont Prob</string>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="2">
-     <widget class="QSlider" name="cont_prob_slider">
-      <property name="minimum">
-       <number>1</number>
-      </property>
-      <property name="maximum">
-       <number>10</number>
-      </property>
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="0">
-     <widget class="QLabel" name="label">
-      <property name="text">
-       <string>Min Depth</string>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="2">
-     <widget class="QSlider" name="min_depth_slider">
-      <property name="minimum">
-       <number>1</number>
-      </property>
-      <property name="maximum">
-       <number>20</number>
-      </property>
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-     </widget>
-    </item>
     <item row="0" column="1">
      <widget class="QLabel" name="display_min_depth">
       <property name="sizePolicy">
@@ -113,6 +51,13 @@
       </property>
      </widget>
     </item>
+    <item row="3" column="0">
+     <widget class="QLabel" name="label_4">
+      <property name="text">
+       <string>Spec Depth</string>
+      </property>
+     </widget>
+    </item>
     <item row="1" column="2">
      <widget class="QSlider" name="max_depth_slider">
       <property name="minimum">
@@ -123,6 +68,59 @@
       </property>
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="2">
+     <widget class="QSlider" name="cont_prob_slider">
+      <property name="minimum">
+       <number>1</number>
+      </property>
+      <property name="maximum">
+       <number>10</number>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+    </item>
+    <item row="6" column="0" colspan="3">
+     <widget class="QCheckBox" name="fast_preview">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="text">
+       <string>Use Fast Previewing</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="2">
+     <widget class="QSlider" name="min_depth_slider">
+      <property name="minimum">
+       <number>1</number>
+      </property>
+      <property name="maximum">
+       <number>20</number>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="0">
+     <widget class="QLabel" name="label_3">
+      <property name="text">
+       <string>Cont Prob</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QLabel" name="label_2">
+      <property name="text">
+       <string>Max Depth</string>
       </property>
      </widget>
     </item>
@@ -148,25 +146,37 @@
       </property>
      </widget>
     </item>
-    <item row="1" column="0">
-     <widget class="QLabel" name="label_2">
+    <item row="0" column="0">
+     <widget class="QLabel" name="label">
       <property name="text">
-       <string>Max Depth</string>
+       <string>Min Depth</string>
       </property>
      </widget>
     </item>
-    <item row="3" column="0" colspan="3">
-     <widget class="QCheckBox" name="fast_preview">
+    <item row="1" column="1">
+     <widget class="QLabel" name="display_max_depth">
       <property name="sizePolicy">
-       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+       <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
+      <property name="minimumSize">
+       <size>
+        <width>72</width>
+        <height>0</height>
+       </size>
+      </property>
       <property name="text">
-       <string>Use Fast Previewing</string>
+       <string/>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
       </property>
      </widget>
+    </item>
+    <item row="3" column="2">
+     <widget class="QSpinBox" name="specular_depth"/>
     </item>
    </layout>
   </widget>

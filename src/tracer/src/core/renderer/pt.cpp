@@ -23,6 +23,7 @@ public:
         params_.min_depth = params.min_depth;
         params_.max_depth = params.max_depth;
         params_.cont_prob = params.cont_prob;
+        params_.specular_depth = params.specular_depth;
 
         if(params.use_mis)
             eval_func_ = &render::trace_std;

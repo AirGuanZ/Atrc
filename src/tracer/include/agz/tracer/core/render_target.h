@@ -141,6 +141,8 @@ public:
          */
         bool in_sample_pixel_bound(real px, real py);
 
+        Rect2 get_sample_pixel_bound() const noexcept;
+
         /**
          * @brief get sample pixel range
          */
@@ -198,6 +200,8 @@ public:
          * @brief is the given pixel coordinate in non-zero sample bounds
          */
         bool in_sample_pixel_bound(real px, real py) const noexcept;
+
+        Rect2 get_sample_pixel_bound() const noexcept;
 
         /**
          * @brief get sample pixel range
@@ -398,6 +402,13 @@ bool FilmFilterApplier::FilmGrid<TexelTypes...>::in_sample_pixel_bound(
            sample_pixel_bound_.low.y <= py && py <= sample_pixel_bound_.high.y;
 }
 
+template<typename ... TexelTypes>
+Rect2 FilmFilterApplier::FilmGrid<TexelTypes...>::get_sample_pixel_bound()
+    const noexcept
+{
+    return sample_pixel_bound_;
+}
+
 template<typename...TexelTypes>
 const Rect2i &FilmFilterApplier::FilmGrid<TexelTypes...>
     ::sample_pixels() const noexcept
@@ -474,6 +485,13 @@ bool FilmFilterApplier::FilmGridView<TexelTypes...>::in_sample_pixel_bound(
 {
     return sample_pixel_bound_.low.x <= px && px <= sample_pixel_bound_.high.x &&
            sample_pixel_bound_.low.y <= py && py <= sample_pixel_bound_.high.y;
+}
+
+template<typename ... TexelTypes>
+Rect2 FilmFilterApplier::FilmGridView<TexelTypes...>::get_sample_pixel_bound(
+    ) const noexcept
+{
+    return sample_pixel_bound_;
 }
 
 template<typename...TexelTypes>

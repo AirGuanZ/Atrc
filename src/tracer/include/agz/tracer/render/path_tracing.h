@@ -11,6 +11,9 @@ struct TraceParams
     real cont_prob = real(0.9);
 
     int direct_illum_sample_count = 1;
+
+    // additional depth for specular scattering
+    int specular_depth = 20;
 };
 
 struct AOParams

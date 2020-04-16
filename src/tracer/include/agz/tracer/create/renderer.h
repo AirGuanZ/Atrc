@@ -19,6 +19,8 @@ struct PTRendererParams
     bool use_mis = true;
 
     int spp = 1;
+
+    int specular_depth = 20;
 };
 
 RC<Renderer> create_pt_renderer(
@@ -81,6 +83,21 @@ struct BDPTRendererParams
 };
 
 RC<Renderer> create_bdpt_renderer(const BDPTRendererParams &params);
+
+// volumetric bidirectional path tracing
+
+struct VolBDPTRendererParams
+{
+    int worker_count   = 0;
+    int task_grid_size = 32;
+
+    int cam_max_vtx_cnt = 10;
+    int lht_max_vtx_cnt = 10;
+
+    int spp = 1;
+};
+
+RC<Renderer> create_vol_bdpt_renderer(const VolBDPTRendererParams &params);
 
 // sppm
 

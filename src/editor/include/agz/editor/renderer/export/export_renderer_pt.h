@@ -34,6 +34,8 @@ private:
 
     QSpinBox *worker_count_   = nullptr;
     QSpinBox *task_grid_size_ = nullptr;
+
+    QSpinBox *specular_depth_ = nullptr;
 };
 
 AGZ_EDITOR_END

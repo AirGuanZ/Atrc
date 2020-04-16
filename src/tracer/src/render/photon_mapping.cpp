@@ -226,7 +226,7 @@ void trace_photon(
     Spectrum coef = emit.radiance * std::abs(cos(emit.nor, emit.dir))
                   / (select_light_pdf * emit.pdf_pos * emit.pdf_dir);
 
-    Ray ray(emit.pos, emit.dir, EPS);
+    Ray ray(emit.pos, emit.dir, EPS());
 
     // trace the photon
 

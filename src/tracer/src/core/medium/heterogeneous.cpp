@@ -35,7 +35,7 @@ public:
         g_       = std::move(g);
 
         max_density_ = density_->max_real();
-        max_density_ = (std::max)(max_density_, EPS);
+        max_density_ = (std::max)(max_density_, EPS());
         inv_max_density_ = 1 / max_density_;
 
         max_scattering_count_ = max_scattering_count;
@@ -68,6 +68,13 @@ public:
         }
 
         return Spectrum(result);
+    }
+
+    Spectrum ab(
+        const Vec3 &a, const Vec3 &b, Sampler &sampler) const noexcept override
+    {
+        // FIXME
+        return tr(a, b, sampler);
     }
 
     SampleOutScatteringResult sample_scattering(

@@ -31,7 +31,9 @@ public:
         const Vec3 &pos, const Vec3 &nor, const Vec2 &uv,
         const Vec3 &light_to_out) const noexcept override;
 
-    real pdf(const Vec3 &ref, const SurfacePoint &spt) const noexcept override;
+    real pdf(
+        const Vec3 &ref,
+        const Vec3 &pos, const Vec3 &nor) const noexcept override;
 };
 
 AGZ_TRACER_END

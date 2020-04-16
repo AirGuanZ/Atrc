@@ -54,7 +54,7 @@ public:
         const real specular_lum = s.lum();
 
         real diffuse_weight;
-        if(diffuse_lum + specular_lum > EPS)
+        if(diffuse_lum + specular_lum > EPS())
             diffuse_weight = diffuse_lum / (diffuse_lum + specular_lum);
         else
             diffuse_weight = real(0.5);

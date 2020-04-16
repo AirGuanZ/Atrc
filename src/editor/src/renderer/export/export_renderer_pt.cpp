@@ -2,6 +2,7 @@
 
 #include <agz/editor/imexport/asset_loader.h>
 #include <agz/editor/imexport/asset_saver.h>
+#include <agz/editor/imexport/asset_version.h>
 #include <agz/editor/renderer/export/export_renderer_pt.h>
 
 AGZ_EDITOR_BEGIN
@@ -19,6 +20,8 @@ ExportRendererPT::ExportRendererPT(QWidget *parent)
 
     worker_count_   = new QSpinBox(this);
     task_grid_size_ = new QSpinBox(this);
+
+    specular_depth_ = new QSpinBox(this);
 
     min_depth_->setRange(1, 20);
     min_depth_->setValue(5);
@@ -63,6 +66,9 @@ ExportRendererPT::ExportRendererPT(QWidget *parent)
     task_grid_size_->setRange(1, 512);
     task_grid_size_->setValue(32);
 
+    specular_depth_->setRange(1, 99);
+    specular_depth_->setValue(20);
+
     QGridLayout *layout = new QGridLayout(this);
     int row = 0;
 
@@ -87,6 +93,9 @@ ExportRendererPT::ExportRendererPT(QWidget *parent)
     layout->addWidget(new QLabel("Thread Task Size"), ++row, 0);
     layout->addWidget(task_grid_size_, row, 1);
 
+    layout->addWidget(new QLabel("Specular Depth"), ++row, 0);
+    layout->addWidget(specular_depth_, row, 1);
+
     setContentsMargins(0, 0, 0, 0);
     layout->setContentsMargins(0, 0, 0, 0);
 }
@@ -103,6 +112,7 @@ RC<tracer::ConfigGroup> ExportRendererPT::to_config() const
     grp->insert_int("spp", spp_->value());
     grp->insert_int("worker_count", worker_count_->value());
     grp->insert_int("task_grid_size", task_grid_size_->value());
+    grp->insert_int("specular_depth", specular_depth_->value());
 
     return grp;
 }
@@ -116,6 +126,7 @@ void ExportRendererPT::save_asset(AssetSaver &saver) const
     saver.write(int32_t(spp_->value()));
     saver.write(int32_t(worker_count_->value()));
     saver.write(int32_t(task_grid_size_->value()));
+    saver.write(int32_t(specular_depth_->value()));
 }
 
 void ExportRendererPT::load_asset(AssetLoader &loader)
@@ -127,6 +138,9 @@ void ExportRendererPT::load_asset(AssetLoader &loader)
     spp_->setValue(int(loader.read<int32_t>()));
     worker_count_->setValue(int(loader.read<int32_t>()));
     task_grid_size_->setValue(int(loader.read<int32_t>()));
+
+    if(loader.version() >= versions::V2020_0404_1413)
+        specular_depth_->setValue(int(loader.read<int32_t>()));
 }
 
 AGZ_EDITOR_END

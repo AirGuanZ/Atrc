@@ -17,8 +17,8 @@ struct SurfacePoint
     Vec3 eps_offset(const Vec3 &dir) const noexcept
     {
         if(dot(dir, geometry_coord.z) > 0)
-            return pos + geometry_coord.z * EPS;
-        return pos - geometry_coord.z * EPS;
+            return pos + geometry_coord.z * EPS();
+        return pos - geometry_coord.z * EPS();
     }
 };
 

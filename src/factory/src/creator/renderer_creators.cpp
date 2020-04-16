@@ -73,6 +73,36 @@ namespace renderer
         }
     };
 
+    class VolBDPTRendererCreator : public Creator<Renderer>
+    {
+    public:
+
+        std::string name() const override
+        {
+            return "vol_bdpt";
+        }
+
+        std::shared_ptr<Renderer> create(
+            const ConfigGroup &params, CreatingContext &context) const override
+        {
+            VolBDPTRendererParams bdpt_params;
+
+            bdpt_params.worker_count =
+                params.child_int_or("worker_count", 0);
+            bdpt_params.task_grid_size =
+                params.child_int_or("task_grid_size", 32);
+
+            bdpt_params.cam_max_vtx_cnt =
+                params.child_int_or("camera_max_depth", 10) + 1;
+            bdpt_params.lht_max_vtx_cnt =
+                params.child_int_or("light_max_depth", 10) + 1;
+
+            bdpt_params.spp = params.child_int("spp");
+
+            return create_vol_bdpt_renderer(bdpt_params);
+        }
+    };
+
     class ParticleTracingRendererCreator : public Creator<Renderer>
     {
     public:
@@ -132,6 +162,8 @@ namespace renderer
 
             const bool use_mis = params.child_int_or("use_mis", 1) != 0;
 
+            const int specular_depth = params.child_int_or("specular_depth", 20);
+
             PTRendererParams pt_params;
             pt_params.worker_count      = worker_count;
             pt_params.task_grid_size    = task_grid_size;
@@ -140,6 +172,7 @@ namespace renderer
             pt_params.max_depth         = max_depth;
             pt_params.cont_prob         = cont_prob;
             pt_params.use_mis           = use_mis;
+            pt_params.specular_depth    = specular_depth;
 
             return create_pt_renderer(pt_params);
         }
@@ -237,6 +270,7 @@ void initialize_renderer_factory(Factory<Renderer> &factory)
     factory.add_creator(newBox<renderer::PathTracingRendererCreator>());
     factory.add_creator(newBox<renderer::PSSMLTPTCreator>());
     factory.add_creator(newBox<renderer::SPPMRendererCreator>());
+    factory.add_creator(newBox<renderer::VolBDPTRendererCreator>());
 }
 
 AGZ_TRACER_FACTORY_END

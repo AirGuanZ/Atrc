@@ -23,7 +23,7 @@ Pixel trace_std(
 
     int scattering_count = 0;
 
-    for(int depth = 1, t_depth = 1; depth <= params.max_depth; ++depth, ++t_depth)
+    for(int depth = 1, s_depth = 1; depth <= params.max_depth; ++depth)
     {
         // apply RR strategy
 
@@ -100,7 +100,7 @@ Pixel trace_std(
 
                 const auto bsdf_sample = phase_function->sample_all(
                     scattering_point.wr, TransMode::Radiance, sampler.sample3());
-                if(!bsdf_sample.f || bsdf_sample.pdf < EPS)
+                if(!bsdf_sample.f || bsdf_sample.pdf < EPS())
                     return pixel;
 
                 r = Ray(scattering_point.pos, bsdf_sample.dir.normalize());
@@ -110,8 +110,10 @@ Pixel trace_std(
         }
         else
         {
-            const Spectrum tr = medium->tr(r.o, ent_inct.pos, sampler);
-            coef *= tr;
+            // continus scattering count is too large
+            // only account absorbtion here
+            const Spectrum ab = medium->ab(r.o, ent_inct.pos, sampler);
+            coef *= ab;
         }
 
         scattering_count = 0;
@@ -147,13 +149,16 @@ Pixel trace_std(
 
         auto bsdf_sample = ent_shd.bsdf->sample_all(
             ent_inct.wr, TransMode::Radiance, sampler.sample3());
-        if(!bsdf_sample.f || bsdf_sample.pdf < EPS)
+        if(!bsdf_sample.f || bsdf_sample.pdf < EPS())
             return pixel;
 
         bool is_new_sample_delta = bsdf_sample.is_delta;
         AGZ_SCOPE_GUARD({
-            if(is_new_sample_delta && depth >= 2 && t_depth < 100)
+            if(is_new_sample_delta && depth >= 2 && s_depth <= params.specular_depth)
+            {
                 --depth;
+                ++s_depth;
+            }
         });
 
         const real abscos = std::abs(cos(
@@ -230,7 +235,7 @@ Pixel trace_nomis(
 
     int scattering_count = 0;
 
-    for(int depth = 1; depth <= params.max_depth; ++depth)
+    for(int depth = 1, s_depth = 1; depth <= params.max_depth; ++depth)
     {
         // RR strategy
 
@@ -295,9 +300,13 @@ Pixel trace_nomis(
         }
         else
         {
-            const Spectrum tr = medium->tr(r.o, ent_inct.pos, sampler);
-            coef *= tr;
+            // continus scattering count is too large
+            // only account absorbtion here
+            const Spectrum ab = medium->ab(r.o, ent_inct.pos, sampler);
+            coef *= ab;
         }
+
+        // surface intersection is sampled. clear continus scattering_count
 
         scattering_count = 0;
 
@@ -306,7 +315,8 @@ Pixel trace_nomis(
         if(auto light = ent_inct.entity->as_light())
         {
             pixel.value += coef * light->radiance(
-                ent_inct.pos, ent_inct.geometry_coord.z, ent_inct.uv, ent_inct.wr);
+                ent_inct.pos, ent_inct.geometry_coord.z,
+                ent_inct.uv, ent_inct.wr);
         }
 
         const auto bsdf_sample = ent_shd.bsdf->sample_all(
@@ -314,9 +324,21 @@ Pixel trace_nomis(
         if(!bsdf_sample.f)
             return pixel;
 
-        const real abscos = std::abs(cos(ent_inct.geometry_coord.z, bsdf_sample.dir));
+        const real abscos = std::abs(cos(
+            ent_inct.geometry_coord.z, bsdf_sample.dir));
         coef *= bsdf_sample.f * abscos / bsdf_sample.pdf;
         r = Ray(ent_inct.eps_offset(bsdf_sample.dir), bsdf_sample.dir);
+
+        bool is_new_sample_specular = bsdf_sample.is_delta;
+        AGZ_SCOPE_GUARD({
+            if(is_new_sample_specular && depth >= 2 &&
+               s_depth <= params.specular_depth)
+            {
+                --depth;
+                ++s_depth;
+            }
+        });
+
         // bssrdf
 
         if(!ent_shd.bssrdf)
@@ -350,6 +372,8 @@ Pixel trace_nomis(
 
             r = Ray(new_inct.eps_offset(new_bsdf_sample.dir),
                 new_bsdf_sample.dir.normalize());
+
+            is_new_sample_specular = new_bsdf_sample.is_delta;
         }
     }
 

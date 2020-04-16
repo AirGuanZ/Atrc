@@ -19,11 +19,11 @@ Spectrum mis_sample_area_light(
     if(!light_sample.radiance || !light_sample.pdf)
         return {};
 
-    const real shadow_ray_len = (light_sample.pos - inct.pos).length() - EPS;
-    if(shadow_ray_len <= EPS)
+    const real shadow_ray_len = (light_sample.pos - inct.pos).length() - EPS();
+    if(shadow_ray_len <= EPS())
         return {};
     const Vec3 inct_to_light = (light_sample.pos - inct.pos).normalize();
-    const Ray shadow_ray(inct.pos, inct_to_light, EPS, shadow_ray_len);
+    const Ray shadow_ray(inct.pos, inct_to_light, EPS(), shadow_ray_len);
     if(scene.has_intersection(shadow_ray))
         return {};
 
@@ -186,7 +186,8 @@ Spectrum mis_sample_bsdf(
     if(bsdf_sample.is_delta)
         return f / bsdf_sample.pdf;
 
-    const real light_pdf = light->pdf(new_ray.o, ent_inct);
+    const real light_pdf = light->pdf(
+        new_ray.o, ent_inct.pos, ent_inct.geometry_coord.z);
     return f / (bsdf_sample.pdf + light_pdf);
 }
 
@@ -246,7 +247,8 @@ Spectrum mis_sample_bsdf(
     if(bsdf_sample.is_delta)
         return f / bsdf_sample.pdf;
 
-    const real light_pdf = light->pdf(new_ray.o, ent_inct);
+    const real light_pdf = light->pdf(
+        new_ray.o, ent_inct.pos, ent_inct.geometry_coord.z);
     return f / (bsdf_sample.pdf + light_pdf);
 }
 

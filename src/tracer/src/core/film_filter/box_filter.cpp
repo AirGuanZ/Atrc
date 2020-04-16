@@ -14,7 +14,7 @@ public:
     {
         AGZ_HIERARCHY_TRY
 
-        radius_ = radius - EPS;
+        radius_ = radius - EPS();
         if(radius_ <= 0)
             throw ObjectConstructionException("invalid radius");
         value_ = 1 / (4 * radius_ * radius_);

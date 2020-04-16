@@ -105,7 +105,7 @@ public:
         const real det  = Mat3::from_cols(a, b, c).det();
         const real tdet = Mat3::from_cols(a, b, m).det();
 
-        if(std::abs(det) < EPS)
+        if(std::abs(det) < EPS())
             return { world_centre_, -ref_to_light };
 
         const real t = tdet / det;

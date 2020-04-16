@@ -45,9 +45,21 @@ public:
         return max_scattering_count_;
     }
 
-    Spectrum tr(const Vec3 &a, const Vec3 &b, Sampler &sampler) const noexcept override
+    Spectrum tr(
+        const Vec3 &a, const Vec3 &b, Sampler &sampler) const noexcept override
     {
         const Spectrum exp = -sigma_t_ * (a - b).length();
+        return {
+            std::exp(exp.r),
+            std::exp(exp.g),
+            std::exp(exp.b)
+        };
+    }
+
+    Spectrum ab(
+        const Vec3 &a, const Vec3 &b, Sampler &sampler) const noexcept override
+    {
+        const Spectrum exp = -sigma_a_ * (a - b).length();
         return {
             std::exp(exp.r),
             std::exp(exp.g),
@@ -78,7 +90,7 @@ public:
         for(int i = 0; i < SPECTRUM_COMPONENT_COUNT; ++i)
             pdf += density[i];
         pdf /= SPECTRUM_COMPONENT_COUNT;
-        pdf = (std::max)(pdf, EPS);
+        pdf = (std::max)(pdf, EPS());
 
         SampleOutScatteringResult result;
 

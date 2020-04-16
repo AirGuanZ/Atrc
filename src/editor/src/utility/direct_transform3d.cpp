@@ -7,7 +7,7 @@ AGZ_EDITOR_BEGIN
 // see https://www.gregslabaugh.net/publications/euler.pdf
 Vec3 DirectTransform::to_euler_zyx(const Mat3 &m) noexcept
 {
-    if(std::abs(std::abs(m[0][2]) - 1) > tracer::EPS)
+    if(std::abs(std::abs(m[0][2]) - 1) > tracer::EPS())
     {
         const real theta_1 = -std::asin(m[0][2]);
         const real cos_theta_1 = std::cos(theta_1);
@@ -19,7 +19,7 @@ Vec3 DirectTransform::to_euler_zyx(const Mat3 &m) noexcept
     }
 
     const real phi = 0;
-    if(std::abs(m[0][2] + 1) < tracer::EPS)
+    if(std::abs(m[0][2] + 1) < tracer::EPS())
     {
         const real theta = PI_r / 2;
         const real psi = phi + std::atan2(m[1][0], m[2][0]);

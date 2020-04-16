@@ -26,7 +26,7 @@ namespace
 
     real z2o(real x) noexcept
     {
-        return !std::isnan(x) && x > EPS ? x : real(1);
+        return !std::isnan(x) && x > EPS() ? x : real(1);
     }
 
     Spectrum contrib_s2_t0_path(const ConnectedPath &connected_path);
@@ -117,7 +117,7 @@ namespace
             return {};
     
         const real G_val = G(cam_beg.pos, lht_end.pos, cam_beg.nor, lht_end.nor);
-        if(G_val < EPS)
+        if(G_val < EPS())
             return {};
     
         const Spectrum contrib = cam_we.we * G_val * bsdf * lht_end.accu_bsdf
@@ -719,7 +719,7 @@ LightSubpath build_light_subpath(
     Vec3 last_nor = light_emit.nor;
 
     // current tracing ray
-    Ray ray(light_emit.pos, light_emit.dir, EPS);
+    Ray ray(light_emit.pos, light_emit.dir, EPS());
 
     int lht_vtx_cnt = 1;
     while(lht_vtx_cnt < max_lht_vtx_cnt)

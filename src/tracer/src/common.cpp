@@ -2,11 +2,19 @@
 
 AGZ_TRACER_BEGIN
 
-real EPS = real(3e-4);
+namespace
+{
+    real EPS_value = real(3e-4);
+}
+
+real EPS() noexcept
+{
+    return EPS_value;
+}
 
 void set_eps(real new_eps) noexcept
 {
-    EPS = new_eps;
+    EPS_value = new_eps;
 }
 
 AGZ_TRACER_END

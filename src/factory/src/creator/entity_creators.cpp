@@ -26,30 +26,6 @@ namespace entity
         return ret;
     }
     
-    class DiffuseLightEntityCreator : public Creator<Entity>
-    {
-    public:
-
-        std::string name() const override
-        {
-            return "diffuse";
-        }
-
-        RC<Entity> create(
-            const ConfigGroup &params, CreatingContext &context) const override
-        {
-            const auto geometry = context.create<Geometry>(
-                params.child_group("geometry"));
-
-            const auto radiance = params.child_spectrum("radiance");
-            const auto med = create_medium_interface(params, context);
-            const auto no_denoise = params.child_int_or("no_denoise", 0);
-
-            return create_diffuse_light(
-                std::move(geometry), radiance, med, no_denoise);
-        }
-    };
-
     class GeometricEntityCreator : public Creator<Entity>
     {
     public:
@@ -85,7 +61,6 @@ namespace entity
 
 void initialize_entity_factory(Factory<Entity> &factory)
 {
-    factory.add_creator(newBox<entity::DiffuseLightEntityCreator>());
     factory.add_creator(newBox<entity::GeometricEntityCreator>());
 }
 

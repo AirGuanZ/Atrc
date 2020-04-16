@@ -78,16 +78,17 @@ Spectrum GeometryToDiffuseLight::radiance(
 }
 
 real GeometryToDiffuseLight::pdf(
-    const Vec3 &ref, const SurfacePoint &spt) const noexcept
+    const Vec3 &ref,
+    const Vec3 &pos, const Vec3 &nor) const noexcept
 {
-    if(dot(spt.geometry_coord.z, ref - spt.pos) <= 0)
+    if(dot(nor, ref - pos) <= 0)
         return 0;
     
-    const real area_pdf = geometry_->pdf(ref, spt.pos);
+    const real area_pdf = geometry_->pdf(ref, pos);
     
-    const Vec3 spt_to_ref = ref - spt.pos;
+    const Vec3 spt_to_ref = ref - pos;
     const real dist2 = spt_to_ref.length_square();
-    const real abscos = std::abs(cos(spt.geometry_coord.z, spt_to_ref));
+    const real abscos = std::abs(cos(nor, spt_to_ref));
     const real area_to_solid_angle_factor = dist2 / abscos;
     
     return area_pdf * area_to_solid_angle_factor;

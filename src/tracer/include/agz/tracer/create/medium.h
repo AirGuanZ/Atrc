@@ -7,9 +7,6 @@
 
 AGZ_TRACER_BEGIN
 
-RC<Medium> create_absorbtion_medium(
-    const Spectrum &sigma_a);
-
 RC<Medium> create_heterogeneous_medium(
     const Transform3 &local_to_world,
     RC<const Texture3D> density,

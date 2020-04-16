@@ -148,7 +148,7 @@ BSDFSampleResult AggregateBSDF<MAX_COMP_CNT>::sample(
     for(int i = 0; i < comp_cnt_; ++i)
     {
         const auto comp = comps_[i];
-        if(!comp->is_contained_in(type))
+        if(comp == sam_comp || !comp->is_contained_in(type))
             continue;
 
         sam_ret.f += comp->eval(sam_ret.lwi, lwo, mode);
@@ -309,8 +309,11 @@ BSDFSampleResult AggregateBSDF<MAX_COMP_CNT>::sample_all(
 
     for(int i = 0; i < comp_cnt_; ++i)
     {
-        sam_ret.f += comps_[i]->eval(sam_ret.lwi, lwo, mode);
-        sam_ret.pdf += comps_[i]->pdf(sam_ret.lwi, lwo) * weights_[i];
+        if(comps_[i] != sam_comp)
+        {
+            sam_ret.f += comps_[i]->eval(sam_ret.lwi, lwo, mode);
+            sam_ret.pdf += comps_[i]->pdf(sam_ret.lwi, lwo) * weights_[i];
+        }
     }
 
     // construct sampling result

@@ -329,7 +329,7 @@ void Editor::init_global_setting_widget()
     action->setDefaultWidget(global_setting_);
     menuBar()->addMenu("Global Settings")->addAction(action);
 
-    global_setting_->scene_eps->setValue(tracer::EPS);
+    global_setting_->scene_eps->setValue(tracer::EPS());
     connect(global_setting_->scene_eps,
             qOverload<double>(&QDoubleSpinBox::valueChanged),
             [=](double new_eps)

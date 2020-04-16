@@ -5,23 +5,6 @@ AGZ_TRACER_FACTORY_BEGIN
 
 namespace medium
 {
-    
-    class AbsorbtionMediumCreator : public Creator<Medium>
-    {
-    public:
-
-        std::string name() const override
-        {
-            return "absorb";
-        }
-
-        RC<Medium> create(
-            const ConfigGroup &params, CreatingContext &context) const override
-        {
-            const auto sigma_a = params.child_spectrum("sigma_a");
-            return create_absorbtion_medium(sigma_a);
-        }
-    };
 
     class HeterogeneousMediumCreator : public Creator<Medium>
     {
@@ -96,7 +79,6 @@ namespace medium
 
 void initialize_medium_factory(Factory<Medium> &factory)
 {
-    factory.add_creator(newBox<medium::AbsorbtionMediumCreator>());
     factory.add_creator(newBox<medium::HeterogeneousMediumCreator>());
     factory.add_creator(newBox<medium::HomogeneousMediumCreator>());
     factory.add_creator(newBox<medium::VoidMediumCreator>());

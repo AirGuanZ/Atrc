@@ -125,7 +125,10 @@ public:
                               / (area_focal_film_ * area_lens_
                                * cos2_theta * cos2_theta);
 
-        return { Spectrum(we), film_coord };
+        const Vec3 nor = camera_to_world_
+            .apply_to_vector(Vec3(0, 0, 1)).normalize();
+
+        return { Spectrum(we), film_coord, nor };
     }
 
     CameraWePDFResult pdf_we(

@@ -2,6 +2,7 @@
 
 #include <agz/editor/imexport/asset_loader.h>
 #include <agz/editor/imexport/asset_saver.h>
+#include <agz/editor/imexport/asset_version.h>
 #include <agz/editor/renderer/path_tracer.h>
 #include <agz/editor/renderer/widget/path_tracer_widget.h>
 
@@ -24,6 +25,8 @@ PathTracerWidget::PathTracerWidget(QWidget *parent)
     ui_->display_min_depth->setText(QString::number(min_depth_));
     ui_->display_max_depth->setText(QString::number(max_depth_));
     ui_->display_cont_prob->setText(QString::number(cont_prob_));
+
+    ui_->specular_depth->setValue(specular_depth_);
     
     connect(ui_->min_depth_slider, &QSlider::valueChanged, [=](int value)
     {
@@ -49,6 +52,13 @@ PathTracerWidget::PathTracerWidget(QWidget *parent)
         ui_->display_cont_prob->setText(QString::number(cont_prob_));
         emit change_renderer_params();
     });
+
+    connect(ui_->specular_depth, qOverload<int>(&QSpinBox::valueChanged),
+        [=](int new_value)
+    {
+        specular_depth_ = new_value;
+        emit change_renderer_params();
+    });
 }
 
 PathTracerWidget::~PathTracerWidget()
@@ -64,7 +74,7 @@ Box<Renderer> PathTracerWidget::create_renderer(
         -2, 32,
         min_depth_, max_depth_, cont_prob_,
         ui_->fast_preview->isChecked(),
-        enable_preview
+        enable_preview, specular_depth_
     };
     return newBox<PathTracer>(
         params, framebuffer_size.x, framebuffer_size.y, std::move(scene));
@@ -76,6 +86,7 @@ void PathTracerWidget::save_asset(AssetSaver &saver) const
     saver.write(int32_t(max_depth_));
     saver.write(cont_prob_);
     saver.write(int32_t(ui_->fast_preview->isChecked() ? 1 : 0));
+    saver.write(int32_t(specular_depth_));
 }
 
 void PathTracerWidget::load_asset(AssetLoader &loader)
@@ -84,6 +95,9 @@ void PathTracerWidget::load_asset(AssetLoader &loader)
     ui_->max_depth_slider->setValue(int(loader.read<int32_t>()));
     ui_->cont_prob_slider->setValue(int(loader.read<real>() * 10));
     ui_->fast_preview->setChecked(loader.read<int32_t>() != 0);
+
+    if(loader.version() >= versions::V2020_0404_1413)
+        ui_->specular_depth->setValue(int(loader.read<int32_t>()));
 
     emit change_renderer_params();
 }

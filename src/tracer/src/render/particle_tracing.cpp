@@ -26,7 +26,7 @@ void trace_particle(
         (select_light_pdf * emit_result.pdf_pos * emit_result.pdf_dir);
     coef *= std::abs(cos(emit_result.dir, emit_result.nor));
 
-    Ray r(emit_result.pos + EPS * emit_result.nor, emit_result.dir);
+    Ray r(emit_result.pos + EPS() * emit_result.nor, emit_result.dir);
 
     for(int depth = 1; depth <= params.max_depth; ++depth)
     {

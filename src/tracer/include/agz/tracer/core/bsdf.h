@@ -138,7 +138,7 @@ protected:
 
         const auto [lwi, pdf] = math::distribution::
                                     zweighted_on_hemisphere(sam.u, sam.v);
-        if(pdf < EPS)
+        if(pdf < EPS())
             return BSDF_SAMPLE_RESULT_INVALID;
 
         const Vec3 wi = geometry_coord_.local_to_global(lwi).normalize();

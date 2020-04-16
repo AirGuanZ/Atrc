@@ -6,12 +6,12 @@ Offline rendering lab based on ray tracing
 
 - [x] Volumetric path tracing with next event estimation
 - [x] Adjoint particle tracing
-- [x] Bidirectional path tracing
+- [x] Volumetric Bidirectional path tracing
 - [x] Stochastic progressive photon mapping
 - [x] Primary sample space MLT on path tracing
-- [x] Various material models: Disney Principled BSDF, Phong, ...
-- [x] Homogeneous/Heterogeneous Participating Medium
-- [x] Normalized Diffusion BSSRDF
+- [x] Various material models: Disney Principled BSDF, phong, ...
+- [x] Homogeneous/Heterogeneous participating medium
+- [x] Normalized diffusion BSSRDF
 - [x] Almost all material properties can be specified with 2D/3D textures
 - [x] Various geometry models: sphere, quad, triangle, disk, mesh
 - [x] Two-level accelerating structure (SAH based BVH)
@@ -36,23 +36,27 @@ Offline rendering lab based on ray tracing
 
 ## Gallery
 
-Food (scene ref [here](https://luxcorerender.org/download/)):
+Food (rendered with bdpt) (scene ref [here](https://luxcorerender.org/download/)):
 
 ![0](./doc/gallery/food.png)
 
-Classroom (scene ref [here](https://www.blender.org/download/demo-files/)):
+Classroom (rendered with pt) (scene ref [here](https://www.blender.org/download/demo-files/)):
 
 ![pic](./doc/gallery/classroom.png)
 
-BSSRDF:
+Fog (rendered with vol_bdpt):
+
+![pic](./doc/gallery/fog.png)
+
+BSSRDF (rendered with pt):
 
 ![pic](./doc/gallery/dragon.png)
 
-Bedroom (scene ref [here](https://benedikt-bitterli.me/resources/)):
+Bedroom (rendered with pt) (scene ref [here](https://benedikt-bitterli.me/resources/)):
 
 ![1](./doc/gallery/bedroom.png)
 
-Dining Room (scene ref [here](https://www.blendswap.com/blends/view/86457)):
+Dining Room (rendered with bdpt) (scene ref [here](https://www.blendswap.com/blends/view/86457)):
 
 ![2](./doc/gallery/dining.png)
 

@@ -18,6 +18,12 @@ public:
         return Spectrum(1);
     }
 
+    Spectrum ab(
+        const Vec3 &a, const Vec3 &b, Sampler &sampler) const noexcept override
+    {
+        return Spectrum(1);
+    }
+
     SampleOutScatteringResult sample_scattering(
         const Vec3 &a, const Vec3 &b,
         Sampler &sampler, Arena &arena) const override

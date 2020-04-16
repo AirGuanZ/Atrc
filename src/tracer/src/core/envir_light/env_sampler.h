@@ -75,7 +75,7 @@ public:
 
         // normalize the energy distribution
 
-        if(lum_sum > EPS)
+        if(lum_sum > EPS())
         {
             const real ratio = 1 / lum_sum;
             for(int y = 0; y < new_height; ++y)

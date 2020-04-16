@@ -41,7 +41,7 @@ class Texture3D;
 
 using real = float;
 
-extern real EPS;
+real EPS() noexcept;
 
 void set_eps(real new_eps) noexcept;
 
@@ -72,6 +72,16 @@ using Trans4 = Mat4::left_transform;
 using Coord = math::tcoord3<real>;
 using Transform2 = math::ttransform2<real>;
 using Transform3 = math::ttransform3<real>;
+
+// world scale/offset
+// object pos = (actual pos - WORLD_OFFSET) * WORLD_SCALE
+
+real WORLD_SCALE() noexcept;
+const Vec3 &WORLD_OFFSET() noexcept;
+
+void set_world_offset(const Vec3 &offset) noexcept;
+
+void set_world_scale(real scale) noexcept;
 
 // spectrum
 
@@ -214,7 +224,7 @@ namespace local_angle
         const Vec3 &geo, const Vec3 &shd, const Vec3 &wi) noexcept
     {
         const real dem = std::abs(cos(geo, wi));
-        return  dem < EPS ? 1 : std::abs(cos(shd, wi) / dem);
+        return  dem < EPS() ? 1 : std::abs(cos(shd, wi) / dem);
     }
 
     inline real normal_corr_factor(

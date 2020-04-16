@@ -28,13 +28,13 @@ inline void local_geometry_uv_and_coord(
     *uv = Vec2(real(0.5) * invPI_r * phi, invPI_r * theta + real(0.5));
 
     Vec3 ex, ey, ez = local_pos.normalize();
-    if(std::abs(ez.z - 1) < EPS)
+    if(std::abs(ez.z - 1) < EPS())
     {
         ex = Vec3(1, 0, 0);
         ey = Vec3(0, 1, 0);
         ez = Vec3(0, 0, 1);
     }
-    else if(std::abs(ez.z + 1) < EPS)
+    else if(std::abs(ez.z + 1) < EPS())
     {
         ex = Vec3(0, 1, 0);
         ey = Vec3(1, 0, 0);

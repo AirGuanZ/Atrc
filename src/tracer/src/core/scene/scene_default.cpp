@@ -136,7 +136,7 @@ public:
     bool visible(const Vec3 &A, const Vec3 &B) const noexcept override
     {
         const real dis = (A - B).length();
-        const Ray shadow_ray(A, (B - A).normalize(), EPS, dis - EPS);
+        const Ray shadow_ray(A, (B - A).normalize(), EPS(), dis - EPS());
         return !has_intersection(shadow_ray);
     }
 

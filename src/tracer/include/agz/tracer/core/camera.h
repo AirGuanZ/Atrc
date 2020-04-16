@@ -33,9 +33,10 @@ struct CameraEvalWeResult
 {
     Spectrum we;
     Vec2 film_coord;
+    Vec3 nor_on_cam;
 };
 
-inline const CameraEvalWeResult CAMERA_EVAL_WE_RESULT_ZERO = { {}, {} };
+inline const CameraEvalWeResult CAMERA_EVAL_WE_RESULT_ZERO = { {}, {}, {} };
 
 /**
  * @brief result of sampling camera wi
@@ -66,8 +67,8 @@ public:
      * @brief generate a ray
      *
      * @param film_coord film coordinate. origin is at the left-bottom corner
-     *  and the coord range is [0, 1]^2
-     * @param aperture_sample used to sample the aperture
+     *  and the coordinate range is [0, 1]^2
+     * @param aperture_sam used to sample the aperture
      */
     virtual CameraSampleWeResult sample_we(
         const Vec2 &film_coord, const Sample2 &aperture_sam) const noexcept = 0;

@@ -144,10 +144,12 @@ public:
      * @brief pdf of sample_wi (w.r.t. solid angle)
      *
      * @param ref reference point
-     * @param spt point on light source
+     * @param pos position on light source
+     * @param nor surface normal at position
      */
     virtual real pdf(
-        const Vec3 &ref, const SurfacePoint &spt) const noexcept = 0;
+        const Vec3 &ref,
+        const Vec3 &pos, const Vec3 &nor) const noexcept = 0;
 };
 
 /**

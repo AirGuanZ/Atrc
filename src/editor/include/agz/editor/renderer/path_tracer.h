@@ -19,6 +19,8 @@ public:
 
         bool fast_preview = false;
         bool enable_preview = true;
+
+        int specular_depth = 20;
     };
 
     PathTracer(const Params &params, int fb_width, int fb_height,

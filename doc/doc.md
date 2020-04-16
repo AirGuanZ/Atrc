@@ -279,20 +279,6 @@ This section describes the possible type values for fields of type `Camera`.
 
 ### Entity
 
-**diffuse**
-
-![diffuse_light](./pictures/diffuse_light.png)
-
-Geometric diffuse light source, that is, a light source with a geometric shape. Each point on the surface emits the same radiance in all directions.
-
-| Field Name | Type  | Default Value | Explanation |
-| -------- | -------- | ------ | -------- |
-| geometry | Geometry |        | geometric shape |
-| radiance | Spectrum |        | emitted radiance |
-| med_in   | Medium   | void   | outer medium |
-| med_out  | Medium   | void   | inner medium |
-| no_denoise | bool | false | disable denoiser on this entity |
-
 **geometric**
 
 ![geometric](./pictures/geometric_entity.png)
@@ -429,7 +415,7 @@ Triangle mesh implemented using simple BVH tree. It has the same parameters as `
 
 **Normal Mapping**
 
-![pic](C:/Users/lenovo/Documents/Programming/Code/agz/doc/pictures/normal_mapping.png)
+![pic](./pictures/normal_mapping.png)
 
 Some materials support normal mapping. The field list of these materials will include a `normal_map`.
 
@@ -539,14 +525,6 @@ Surface material which is totally invisible
 **void**
 
 Vacuum, which means nothing.
-
-**absorb**
-
-Non-scattering medium.
-
-| Field Name | Type     | Default Value | Explanation     |
-| ---------- | -------- | ------------- | --------------- |
-| sigma_a    | Spectrum |               | absorption rate |
 
 **heterogeneous**
 
@@ -664,6 +642,7 @@ Traditional path tracing. You can specify the tracing strategy by `integrator`.
 | min_depth      | int  | 5             | minimum path depth before using RR policy |
 | max_depth      | int  | 10            | maximum depth of the path                 |
 | cont_prob      | real | 0.9           | pass probability when using RR strategy   |
+| specular_depth | int  | 20            | extra path depth for specular scattering  |
 
 The entire image is divided into multiple square pixel blocks (rendering tasks), and each pixel block is assigned to a worker thread for execution as a subtask.
 
@@ -752,6 +731,18 @@ Stochastic progressive photon mapping
 | photon_cont_prob      | real | 0.9      | RR continuing probability                         |
 | alpha                 | real | 0.666667 | radius reduction factor                           |
 | grid_res              | int  | 64       | resolution of grids for range search acceleration |
+
+**vol_bdpt**
+
+Volumetric bidirectional path tracing
+
+| Field Name       | Type | Default Value | Explanation                 |
+| ---------------- | ---- | ------------- | --------------------------- |
+| worker_count     | int  | 0             | rendering thread count      |
+| task_grid_size   | int  | 32            | rendering task pixel size   |
+| camera_max_depth | int  | 10            | max depth of camera subpath |
+| light_max_depth  | int  | 10            | max depth of light subpath  |
+| spp              | int  |               | samples per pixel           |
 
 ### ProgressReporter
 

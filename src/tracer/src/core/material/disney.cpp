@@ -467,7 +467,7 @@ namespace disney_impl
             const Vec3 lwi = shading_coord_.global_to_local(wi).normalize();
             const Vec3 lwo = shading_coord_.global_to_local(wo).normalize();
 
-            if(std::abs(lwi.z) < EPS || std::abs(lwo.z) < EPS)
+            if(std::abs(lwi.z) < EPS() || std::abs(lwo.z) < EPS())
                 return {};
 
             // transmission
@@ -549,7 +549,7 @@ namespace disney_impl
                 return sample_black_fringes(wo, mode, sam);
 
             const Vec3 lwo = shading_coord_.global_to_local(wo).normalize();
-            if(std::abs(lwo.z) < EPS)
+            if(std::abs(lwo.z) < EPS())
                 return BSDF_SAMPLE_RESULT_INVALID;
 
             // transmission and inner refl
@@ -576,7 +576,7 @@ namespace disney_impl
                 ret.pdf      = pdf_all(ret.dir, wo);
                 ret.is_delta = false;
 
-                if(!ret.f.is_finite() || ret.pdf < EPS)
+                if(!ret.f.is_finite() || ret.pdf < EPS())
                     return BSDF_SAMPLE_RESULT_INVALID;
 
                 return ret;
@@ -625,7 +625,7 @@ namespace disney_impl
             ret.pdf      = pdf(ret.dir, wo, type);
             ret.is_delta = false;
 
-            if(!ret.f.is_finite() || ret.pdf < EPS)
+            if(!ret.f.is_finite() || ret.pdf < EPS())
                 return BSDF_SAMPLE_RESULT_INVALID;
 
             return ret;
@@ -639,7 +639,7 @@ namespace disney_impl
 
             const Vec3 lwi = shading_coord_.global_to_local(wi).normalize();
             const Vec3 lwo = shading_coord_.global_to_local(wo).normalize();
-            if(std::abs(lwi.z) < EPS || std::abs(lwo.z) < EPS)
+            if(std::abs(lwi.z) < EPS() || std::abs(lwo.z) < EPS())
                 return 0;
 
             // transmission and inner refl

@@ -229,7 +229,7 @@ namespace material
             auto eta         = texture2d("eta");
             auto k           = texture2d("k");
             auto roughness   = texture2d("roughness");
-            auto anisotropic = texture2d("anisotropci");
+            auto anisotropic = texture2d("anisotropic");
 
             auto normal_mapper = init_normal_mapper(params, context);
 

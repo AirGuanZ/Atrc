@@ -31,6 +31,8 @@ private:
     int max_depth_  = 10;
     real cont_prob_ = real(0.9);
 
+    int specular_depth_ = 20;
+
     Ui::PathTracer *ui_;
 };
 

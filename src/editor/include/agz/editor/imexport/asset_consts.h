@@ -15,7 +15,14 @@ struct AssetVersion
 
     bool operator<(const AssetVersion &rhs) const noexcept
     {
-        return std::tie(major, minor, fix) < std::tie(rhs.major, minor, fix);
+        return std::tie(major, minor, fix) <
+               std::tie(rhs.major, rhs.minor, rhs.fix);
+    }
+
+    bool operator>=(const AssetVersion &rhs) const noexcept
+    {
+        return std::tie(major, minor, fix) >=
+               std::tie(rhs.major, rhs.minor, rhs.fix);
     }
 };
 
