@@ -6,15 +6,13 @@ BDPTRenderer::BDPTRenderer(
     const Params &params, int width, int height, RC<const tracer::Scene> scene)
     : ParticleRenderer(
         params.worker_count, params.task_grid_size, 3, width, height,
-        params.enable_preview, 128, 32, scene)
+        params.enable_preview, 128, 32, scene),
+      params_(params)
 {
     preview_params_.min_depth = (std::max)(1, params.max_cam_depth - 3);
     preview_params_.max_depth = params.max_cam_depth;
     preview_params_.cont_prob = real(0.9);
     preview_params_.direct_illum_sample_count = 1;
-
-    bdpt_params_.max_cam_vtx_cnt = params.max_cam_depth;
-    bdpt_params_.max_lht_vtx_cnt = params.max_lht_depth;
 }
 
 BDPTRenderer::~BDPTRenderer()
@@ -47,15 +45,25 @@ uint64_t BDPTRenderer::exec_render_task(
     uint64_t ret = 0;
 
     Arena arena;
-    std::vector<render::bdpt::BDPTVertex> cam_subpath_space(
-        bdpt_params_.max_cam_vtx_cnt);
-    std::vector<render::bdpt::BDPTVertex> lht_subpath_space(
-        bdpt_params_.max_lht_vtx_cnt);
+    std::vector<render::vol_bdpt::Vertex> cam_subpath_space(
+        params_.max_cam_depth);
+    std::vector<render::vol_bdpt::Vertex> lht_subpath_space(
+        params_.max_lht_depth);
 
     const Rect2i sam_bound = task.pixel_range;
     
     task.grid->value.clear(Spectrum());
     task.grid->weight.clear(0);
+
+    const Vec2 forward_full_res = task.full_res;
+    const Vec2 particle_full_res = {
+        real(framebuffer_width_), real(framebuffer_height_)
+    };
+
+    render::vol_bdpt::EvalBDPTPathParams eval_params = {
+        *scene_, particle_film.get_sample_pixel_bound(),
+        particle_full_res, sampler
+    };
 
     for(int py = sam_bound.low.y; py <= sam_bound.high.y; ++py)
     {
@@ -66,18 +74,60 @@ uint64_t BDPTRenderer::exec_render_task(
                 if(stop_rendering_)
                     return ret;
 
-                auto opt_pixel = trace_bdpt(
-                    bdpt_params_, *scene_, px, py, task.full_res, sampler, arena,
-                    cam_subpath_space.data(), lht_subpath_space.data(),
-                    &particle_film);
+                // sample camera ray
+
+                const Sample2 &film_sam = sampler.sample2();
+
+                const Vec2 pixel_coord = {
+                    px + film_sam.u,
+                    py + film_sam.v
+                };
+
+                const Vec2 film_coord = {
+                    pixel_coord.x / forward_full_res.x,
+                    pixel_coord.y / forward_full_res.y
+                };
+
+                const auto cam_sam = scene_->get_camera()->sample_we(
+                    film_coord, sampler.sample2());
+                const Ray cam_ray(cam_sam.pos_on_cam, cam_sam.pos_to_out);
+
+                // build camera/light subpath
+
+                const auto camera_subpath = build_camera_subpath(
+                    params_.max_cam_depth, cam_ray, *scene_,
+                    sampler, arena, cam_subpath_space.data());
+
+                const auto select_light = scene_->sample_light(sampler.sample1());
+                if(!select_light.light)
+                    continue;
+
+                const auto light_subpath = build_light_subpath(
+                    params_.max_lht_depth, select_light, *scene_,
+                    sampler, arena,lht_subpath_space.data());
+
+                // connect subpaths
+
+                const Spectrum radiance = render::vol_bdpt::eval_bdpt_path<true>(
+                    eval_params,
+                    camera_subpath.vertices, camera_subpath.vertex_count,
+                    light_subpath.vertices, light_subpath.vertex_count,
+                    select_light, [&](const Vec2 &particle_coord, const Spectrum &rad)
+                {
+                    if(rad.is_finite())
+                    {
+                        particle_film.apply(particle_coord.x, particle_coord.y, rad);
+                    }
+                });
+
                 ++ret;
 
                 const int lx = px - sam_bound.low.x;
                 const int ly = py - sam_bound.low.y;
 
-                if(opt_pixel)
+                if(radiance.is_finite())
                 {
-                    task.grid->value(ly, lx)  += opt_pixel->pixel.value;
+                    task.grid->value(ly, lx)  += radiance;
                     task.grid->weight(ly, lx) += 1;
                 }
                 else

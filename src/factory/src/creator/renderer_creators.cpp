@@ -99,6 +99,8 @@ namespace renderer
 
             bdpt_params.spp = params.child_int("spp");
 
+            bdpt_params.use_mis = params.child_int_or("use_mis", 1) != 0;
+
             return create_vol_bdpt_renderer(bdpt_params);
         }
     };

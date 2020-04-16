@@ -9,6 +9,7 @@
 #include <agz/editor/renderer/export/export_renderer_pssmlt_pt.h>
 #include <agz/editor/renderer/export/export_renderer_pt.h>
 #include <agz/editor/renderer/export/export_renderer_sppm.h>
+#include <agz/editor/renderer/export/export_renderer_vol_bdpt.h>
 
 AGZ_EDITOR_BEGIN
 
@@ -28,6 +29,8 @@ namespace
             return new ExportRendererPT(parent);
         if(type == "SPPM")
             return new ExportRendererSPPM(parent);
+        if(type == "VolBDPT")
+            return new ExportRendererVolBDPT(parent);
         return new ExportRendererPT(parent);
     }
 }
@@ -35,7 +38,11 @@ namespace
 ExportRendererPanel::ExportRendererPanel()
 {
     type_selector_ = new QComboBox(this);
-    type_selector_->addItems({ "AO", "BDPT", "Particle", "PSSMLT PT", "PT", "SPPM" });
+    type_selector_->addItems(
+        {
+            "AO", "BDPT", "Particle", "PSSMLT PT",
+            "PT", "SPPM", "VolBDPT"
+        });
     type_selector_->setCurrentText("PT");
 
     renderer_widget_ = create_widget(type_selector_->currentText(), this);

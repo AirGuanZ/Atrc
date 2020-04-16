@@ -95,6 +95,8 @@ struct VolBDPTRendererParams
     int lht_max_vtx_cnt = 10;
 
     int spp = 1;
+
+    bool use_mis = true;
 };
 
 RC<Renderer> create_vol_bdpt_renderer(const VolBDPTRendererParams &params);

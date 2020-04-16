@@ -57,12 +57,6 @@ RC<Material> create_phong(
     RC<const Texture2D> ns,
     Box<NormalMapper> nor_map);
 
-RC<Material> create_sss_wrapper(
-    RC<const Texture2D> A,
-    RC<const Texture2D> dmfp,
-    RC<const Texture2D> eta,
-    RC<const Material> internal);
-
 RC<BSSRDFSurface> create_normalized_diffusion_bssrdf_surface(
     RC<const Texture2D> A,
     RC<const Texture2D> dmfp,

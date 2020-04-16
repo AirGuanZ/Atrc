@@ -285,31 +285,6 @@ namespace material
         }
     };
 
-    class SSSWrapperCreator : public Creator<Material>
-    {
-    public:
-
-        std::string name() const override
-        {
-            return "sss";
-        }
-
-        std::shared_ptr<Material> create(
-            const ConfigGroup &params, CreatingContext &context) const override
-        {
-            auto A    = context.create<Texture2D>(params.child_group("A"));
-            auto dmfp = context.create<Texture2D>(params.child_group("dmfp"));
-            auto eta  = context.create<Texture2D>(params.child_group("eta"));
-
-            auto internal = context.create<Material>(
-                params.child_group("internal"));
-
-            return create_sss_wrapper(
-                std::move(A), std::move(dmfp),
-                std::move(eta), std::move(internal));
-        }
-    };
-
 } // namespace material;
 
 void initialize_material_factory(Factory<Material> &factory)
@@ -322,7 +297,6 @@ void initialize_material_factory(Factory<Material> &factory)
     factory.add_creator(newBox<material::MetalCreator>());
     factory.add_creator(newBox<material::MirrorCreator>());
     factory.add_creator(newBox<material::PhongCreator>());
-    factory.add_creator(newBox<material::SSSWrapperCreator>());
 }
 
 AGZ_TRACER_FACTORY_END

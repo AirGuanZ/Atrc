@@ -3,7 +3,6 @@
 #include <map>
 #include <memory>
 
-#include <QComboBox>
 #include <QVBoxLayout>
 
 #include <agz/editor/renderer/export/export_renderer.h>

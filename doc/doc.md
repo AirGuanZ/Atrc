@@ -736,13 +736,14 @@ Stochastic progressive photon mapping
 
 Volumetric bidirectional path tracing
 
-| Field Name       | Type | Default Value | Explanation                 |
-| ---------------- | ---- | ------------- | --------------------------- |
-| worker_count     | int  | 0             | rendering thread count      |
-| task_grid_size   | int  | 32            | rendering task pixel size   |
-| camera_max_depth | int  | 10            | max depth of camera subpath |
-| light_max_depth  | int  | 10            | max depth of light subpath  |
-| spp              | int  |               | samples per pixel           |
+| Field Name       | Type | Default Value | Explanation                      |
+| ---------------- | ---- | ------------- | -------------------------------- |
+| worker_count     | int  | 0             | rendering thread count           |
+| task_grid_size   | int  | 32            | rendering task pixel size        |
+| camera_max_depth | int  | 10            | max depth of camera subpath      |
+| light_max_depth  | int  | 10            | max depth of light subpath       |
+| spp              | int  |               | samples per pixel                |
+| use_mis          | bool | true          | use multiple importance sampling |
 
 ### ProgressReporter
 

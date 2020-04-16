@@ -6,17 +6,17 @@ Offline rendering lab based on ray tracing
 
 - [x] Volumetric path tracing with next event estimation
 - [x] Adjoint particle tracing
-- [x] Volumetric Bidirectional path tracing
+- [x] Volumetric bidirectional path tracing
 - [x] Stochastic progressive photon mapping
 - [x] Primary sample space MLT on path tracing
-- [x] Various material models: Disney Principled BSDF, phong, ...
-- [x] Homogeneous/Heterogeneous participating medium
+- [x] Various material models: Disney principled BSDF, phong, ...
+- [x] Homogeneous/heterogeneous participating medium
 - [x] Normalized diffusion BSSRDF
 - [x] Almost all material properties can be specified with 2D/3D textures
 - [x] Various geometry models: sphere, quad, triangle, disk, mesh
 - [x] Two-level accelerating structure (SAH based BVH)
 - [x] Importance sampled environment light
-- [x] G-Buffer output (albedo, normal, ...)
+- [x] G-buffer output (albedo, normal, ...)
 - [x] Depth of field
 - [x] ACES tone mapping
 - [x] Image sample space low-pass filter
@@ -27,6 +27,7 @@ Offline rendering lab based on ray tracing
 ## Roadmap
 
 - [x] Component based bsdf
+- [x] Volumetric bidirectional path tracing
 - [ ] Light sampling hints (sample count, user-specified power, env light portal)
 - [ ] Volumetric photon mapping
 

@@ -6,7 +6,7 @@
 #include <agz/tracer/core/medium.h>
 #include <agz/tracer/core/scene.h>
 
-#include <agz/tracer/render/vol_bdpt.h>
+#include <agz/tracer/render/vol_bidir_path_tracing.h>
 
 AGZ_TRACER_RENDER_BEGIN
 
