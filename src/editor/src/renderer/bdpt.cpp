@@ -116,7 +116,8 @@ uint64_t BDPTRenderer::exec_render_task(
                 {
                     if(rad.is_finite())
                     {
-                        particle_film.apply(particle_coord.x, particle_coord.y, rad);
+                        particle_film.apply(
+                            particle_coord.x, particle_coord.y, rad);
                     }
                 });
 

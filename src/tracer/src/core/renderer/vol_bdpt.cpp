@@ -145,8 +145,6 @@ int VolBDPTRenderer::render_bdpt_path(
         sampler
     };
 
-    int ret = 0;
-
     const Spectrum radiance = render::vol_bdpt::eval_bdpt_path<USE_MIS>(
         path_params,
         camera_subpath.vertices, camera_subpath.vertex_count,
@@ -162,7 +160,6 @@ int VolBDPTRenderer::render_bdpt_path(
                 const real weight = params.filter.eval_filter(rel_x, rel_y);
                 params.particle_image(piy, pix).add(weight * rad);
             });
-            ret = 1;
         }
     });
 
@@ -176,7 +173,7 @@ int VolBDPTRenderer::render_bdpt_path(
             camera_subpath.g_denoise);
     }
 
-    return ret;
+    return 1;
 }
 
 template<bool USE_MIS>

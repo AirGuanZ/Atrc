@@ -136,9 +136,8 @@ Spectrum unweighted_contrib_sx_t0(
 Spectrum unweighted_contrib_sx_t1(
     const Scene &scene,
     const Vertex *camera_subpath, int s,
-    Sampler &sampler,
-    SceneSampleLightResult &select_light,
-    LightSampleResult &light_sample);
+    const Vertex *light_subpath,
+    Sampler &sampler);
 
 Spectrum unweighted_contrib_s1_tx(
     const Scene &scene,
@@ -160,20 +159,18 @@ real mis_weight_sx_t0(
     Vertex *camera_subpath, int s);
 
 real mis_weight_sx_t1(
+    const Scene &scene,
     Vertex *camera_subpath, int s,
-    const SceneSampleLightResult &select_light,
-    const LightSampleResult &light_sample);
+    Vertex *light_subpath);
 
 real mis_weight_s1_tx(
     const Scene &scene,
     Vertex *camera_subpath,
-    Vertex *light_subpath, int t,
-    const SceneSampleLightResult &select_light);
+    Vertex *light_subpath, int t);
 
 real mis_weight_sx_tx(
     Vertex *camera_subpath, int s,
-    Vertex *light_subpath, int t,
-    const SceneSampleLightResult &select_light);
+    Vertex *light_subpath, int t);
 
 Spectrum weighted_contrib_sx_t0(
     const Scene &scene,
@@ -182,9 +179,8 @@ Spectrum weighted_contrib_sx_t0(
 Spectrum weighted_contrib_sx_t1(
     const Scene &scene,
     Vertex *camera_subpath, int s,
-    Sampler &sampler,
-    SceneSampleLightResult &select_light,
-    LightSampleResult &light_sample);
+    Vertex *light_subpath,
+    Sampler &sampler);
 
 Spectrum weighted_contrib_s1_tx(
     const Scene &scene,
@@ -193,15 +189,13 @@ Spectrum weighted_contrib_s1_tx(
     Sampler &sampler,
     const Rect2 &sample_pixel_bound,
     const Vec2 &full_res,
-    const SceneSampleLightResult &select_light,
     Vec2 &pixel_coord);
 
 Spectrum weighted_contrib_sx_tx(
     const Scene &scene,
     Vertex *camera_subpath, int s,
     Vertex *light_subpath, int t,
-    Sampler &sampler,
-    const SceneSampleLightResult &select_light);
+    Sampler &sampler);
 
 struct EvalBDPTPathParams
 {
@@ -253,7 +247,7 @@ Spectrum eval_bdpt_path(
                         params.scene, camera_subpath,
                         light_subpath, t, params.sampler,
                         params.sample_pixel_bound,
-                        params.full_res, select_light,
+                        params.full_res,
                         particle_pixel_coord);
                 }
                 else
@@ -267,9 +261,7 @@ Spectrum eval_bdpt_path(
                 }
 
                 if(particle_rad.is_finite() && !particle_rad.is_black())
-                {
                     particle_func(particle_pixel_coord, particle_rad);
-                }
 
                 continue;
             }
@@ -278,20 +270,17 @@ Spectrum eval_bdpt_path(
             {
                 assert(s >= 2);
 
-                SceneSampleLightResult new_select_light;
-                LightSampleResult light_sample;
-
                 if constexpr(UseMIS)
                 {
                     ret += weighted_contrib_sx_t1(
-                        params.scene, camera_subpath, s,
-                        params.sampler, new_select_light, light_sample);
+                        params.scene, camera_subpath, s, light_subpath,
+                        params.sampler);
                 }
                 else
                 {
                     ret += unweighted_contrib_sx_t1(
-                        params.scene, camera_subpath, s,
-                        params.sampler, new_select_light, light_sample) / real(s_t);
+                        params.scene, camera_subpath, s, light_subpath,
+                        params.sampler) / real(s_t);
                 }
 
                 continue;
@@ -323,7 +312,7 @@ Spectrum eval_bdpt_path(
                     params.scene,
                     camera_subpath, s,
                     light_subpath, t,
-                    params.sampler, select_light);
+                    params.sampler);
             }
             else
             {

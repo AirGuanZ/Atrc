@@ -1,4 +1,5 @@
 #include <agz/editor/material/disney.h>
+#include <agz/editor/material/fabric.h>
 #include <agz/editor/material/glass.h>
 #include <agz/editor/material/ideal_diffuse.h>
 #include <agz/editor/material/invisible_surface.h>
@@ -13,6 +14,7 @@ AGZ_EDITOR_BEGIN
 void init_material_factory(MaterialWidgetFactory &factory)
 {
     factory.add_creator(newBox<DisneyWidgetCreator>());
+    factory.add_creator(newBox<FabricWidgetCreator>());
     factory.add_creator(newBox<GlassWidgetCreator>());
     factory.add_creator(newBox<IdealDiffuseWidgetCreator>());
     factory.add_creator(newBox<InvisibleSurfaceWidgetCreator>());

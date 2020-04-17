@@ -112,6 +112,30 @@ namespace material
         }
     };
 
+    class DreamWorksFabricCreator : public Creator<Material>
+    {
+    public:
+
+        std::string name() const override
+        {
+            return "dream_works_fabric";
+        }
+
+        std::shared_ptr<Material> create(
+            const ConfigGroup &params, CreatingContext &context) const override
+        {
+            auto color = context.create<Texture2D>(
+                params.child_group("color"));
+            auto roughness = context.create<Texture2D>(
+                params.child_group("roughness"));
+            auto normal_mapper = init_normal_mapper(params, context);
+
+            return create_dream_works_fabric(
+                std::move(color), std::move(roughness),
+                std::move(normal_mapper));
+        }
+    };
+
     class GlassCreator : public Creator<Material>
     {
     public:
@@ -290,6 +314,7 @@ namespace material
 void initialize_material_factory(Factory<Material> &factory)
 {
     factory.add_creator(newBox<material::DisneyCreator>());
+    factory.add_creator(newBox<material::DreamWorksFabricCreator>());
     factory.add_creator(newBox<material::GlassCreator>());
     factory.add_creator(newBox<material::IdealBlackCreator>());
     factory.add_creator(newBox<material::IdealDiffuseCreator>());

@@ -142,21 +142,19 @@ namespace
 
     real mis_weight_common(
         const Vertex *C, int s,
-        const Vertex *L, int t,
-        real select_light_pdf, const Light *light,
-        real init_cur = 1)
+        const Vertex *L, int t)
     {
         assert(s >= 1 && s + t >= 3);
 
         real sum_pdf = 1;
-        real cur_pdf = init_cur;
+        real cur_pdf = 1;
 
         // ===== process light subpath =====
 
         //    [..., a] <-> [b, c, ...]
         // => [..., a, b] <-> [c, ...]
 
-        for(int i = t - 1; i >= 2; --i)
+        for(int i = t - 1; i >= 1; --i)
         {
             const real mul = z2o(L[i].pdf_fwd);
             const real div = z2o(L[i].pdf_bwd);
@@ -169,62 +167,6 @@ namespace
 
             if(!L[i].is_delta && !L[i - 1].is_delta)
                 sum_pdf += cur_pdf;
-        }
-
-        //    [..., a] <-> [b, c]
-        // => [..., a, b] <-> [c]
-
-        if(t >= 2)
-        {
-            const real mul = z2o(L[1].pdf_fwd);
-            const real div = z2o(L[1].pdf_bwd);
-
-            cur_pdf *= mul / div;
-
-            if(!L[1].is_delta && !L[0].is_delta)
-            {
-                // handle pdf of Light::Sample
-                // in sx_t1 case we use Light::Sample to sample the light
-                // instead of connect two subpaths, which means its pdf needs
-                // special consideration
-
-                assert(L[1].is_scattering_type());
-                const Vec3 L1_pos = L[1].type == VertexType::Surface ?
-                                                 L[1].surface.pos :
-                                                 L[1].medium.pos;
-
-                real pdf_li;
-                if(L[0].type == VertexType::Surface)
-                {
-                    assert(light->is_area());
-                    const AreaLight *area_light = light->as_area();
-
-                    pdf_li = area_light->pdf(
-                        L1_pos, L[0].surface.pos, L[0].surface.nor);
-                }
-                else if(L[0].type == VertexType::AreaLight)
-                {
-                    assert(light->is_area());
-                    const AreaLight *area_light = light->as_area();
-
-                    pdf_li = area_light->pdf(
-                        L1_pos, L[0].area_light.pos, L[0].area_light.nor);
-                }
-                else
-                {
-                    assert(L[0].type == VertexType::EnvLight);
-                    assert(!light->is_area());
-                    const EnvirLight *env_light = light->as_envir();
-
-                    pdf_li = env_light->pdf(
-                        L1_pos, -L[0].env_light.light_to_out);
-                }
-
-                pdf_li *= select_light_pdf;
-                pdf_li = pdf_sa_to_area(pdf_li, L1_pos, L[0]);
-
-                sum_pdf += cur_pdf * z2o(pdf_li) / z2o(L[0].pdf_bwd);
-            }
         }
 
         // light beg
@@ -242,62 +184,11 @@ namespace
 
         // ===== process camera subpath =====
 
-        cur_pdf = init_cur;
+        cur_pdf = 1;
 
         // camera end
 
-        // if t == 0, then we need to handle special case of Light::Sample
-        // otherwise we simply move C[s - 1] to light subpath
-        if(t == 0)
-        {
-            //    [..., a, b] <-> []
-            // => [..., a] <-> [b]
-
-            assert(s >= 3);
-            const Vertex &a = C[s - 2];
-            const Vertex &b = C[s - 1];
-
-            const real mul = z2o(b.pdf_bwd);
-            const real div = z2o(b.pdf_fwd);
-
-            cur_pdf *= mul / div;
-
-            if(!a.is_delta)
-            {
-                // b is sampled with Light::Sample and needs special process
-
-                const Vec3 a_pos = a.type == VertexType::Surface ?
-                                   a.surface.pos :
-                                   a.medium.pos;
-
-                assert(b.type == VertexType::Surface ||
-                       b.type == VertexType::EnvLight);
-
-                real pdf_li;
-                if(b.type == VertexType::Surface)
-                {
-                    assert(light->is_area());
-                    const AreaLight *area_light = light->as_area();
-
-                    pdf_li = area_light->pdf(
-                        a_pos, b.surface.pos, b.surface.nor);
-                }
-                else
-                {
-                    assert(!light->is_area());
-                    const EnvirLight *envir_light = light->as_envir();
-
-                    pdf_li = envir_light->pdf(
-                        a_pos, -b.env_light.light_to_out);
-                }
-
-                pdf_li *= select_light_pdf;
-                pdf_li = pdf_sa_to_area(pdf_li, a_pos, b);
-
-                sum_pdf += cur_pdf * z2o(pdf_li) / z2o(b.pdf_bwd);
-            }
-        }
-        else if(s >= 2)
+        if(s >= 2)
         {
             const real mul = z2o(C[s - 1].pdf_bwd);
             const real div = z2o(C[s - 1].pdf_fwd);
@@ -743,9 +634,8 @@ Spectrum unweighted_contrib_sx_t0(
 Spectrum unweighted_contrib_sx_t1(
     const Scene &scene,
     const Vertex *camera_subpath, int s,
-    Sampler &sampler,
-    SceneSampleLightResult &select_light,
-    LightSampleResult &light_sample)
+    const Vertex *light_subpath,
+    Sampler &sampler)
 {
     assert(s >= 2);
 
@@ -756,59 +646,68 @@ Spectrum unweighted_contrib_sx_t1(
 
     assert(cam_end.is_scattering_type());
 
-    // select a light source
-
-    select_light = scene.sample_light(sampler.sample1());
-    if(!select_light.light)
-        return {};
-
     // get cam_end.pos
 
     const Vec3 cam_end_pos = cam_end.type == VertexType::Surface ?
-                             cam_end.surface.pos :
-                             cam_end.medium.pos;
+        cam_end.surface.pos :
+        cam_end.medium.pos;
 
-    // sample dir to light source from cam_end_pos
+    const Vertex &light_vtx = light_subpath[0];
 
-    light_sample = select_light.light->sample(cam_end_pos, sampler.sample5());
-    if(!light_sample.radiance)
+    if(light_vtx.type == VertexType::AreaLight)
+    {
+        if(!scene.visible(cam_end_pos, light_vtx.area_light.pos))
+            return {};
+
+        const Vec3 cam_to_light = light_vtx.area_light.pos - cam_end_pos;
+
+        // IMPROVE: uv is not handled
+        const Spectrum light_rad = light_vtx.area_light.light->radiance(
+            light_vtx.area_light.pos, light_vtx.area_light.nor, {},
+            -cam_to_light);
+
+        const auto bsdf = get_scatter_bsdf(cam_end);
+        Spectrum bsdf_f = bsdf->eval_all(
+            cam_to_light,
+            get_scatter_wr(cam_end),
+            TransMode::Radiance);
+
+        const auto medium = cam_end.type == VertexType::Surface ?
+                            cam_end.surface.medium(cam_to_light) :
+                            cam_end.medium.med;;
+        const Spectrum tr = medium->tr(
+            cam_end_pos, light_vtx.area_light.pos, sampler);
+
+        if(cam_end.type == VertexType::Surface)
+            bsdf_f *= std::abs(cos(cam_end.surface.nor, cam_to_light));
+
+        bsdf_f *= std::abs(cos(light_vtx.area_light.nor, cam_to_light));
+
+        return cam_end.accu_coef * bsdf_f * tr * light_rad
+             / distance2(cam_end_pos, light_vtx.area_light.pos)
+             / light_vtx.pdf_bwd;
+    }
+
+    assert(light_vtx.type == VertexType::EnvLight);
+    const Vec3 cam_to_light = -light_vtx.env_light.light_to_out;
+
+    const Ray shadow_ray(cam_end_pos, cam_to_light, EPS());
+    if(scene.has_intersection(shadow_ray))
         return {};
 
-    // visibility test
-
-    if(!scene.visible(cam_end_pos, light_sample.pos))
-        return {};
-
-    // eval bsdf
+    const Spectrum light_rad = scene.envir_light()->radiance(
+        cam_end_pos, cam_to_light);
 
     const auto bsdf = get_scatter_bsdf(cam_end);
     Spectrum bsdf_f = bsdf->eval_all(
-        light_sample.ref_to_light(),
+        cam_to_light,
         get_scatter_wr(cam_end),
         TransMode::Radiance);
 
-    if(!bsdf_f)
-        return {};
-
-    // eval abscos
-
     if(cam_end.type == VertexType::Surface)
-    {
-        bsdf_f *= std::abs(cos(
-            cam_end.surface.nor, light_sample.ref_to_light()));
-    }
+        bsdf_f *= std::abs(cos(cam_end.surface.nor, cam_to_light));
 
-    // eval tr
-
-    const auto medium = cam_end.type == VertexType::Surface ?
-                        cam_end.surface.medium(light_sample.ref_to_light()) :
-                        cam_end.medium.med;;
-    const Spectrum tr = medium->tr(cam_end_pos, light_sample.pos, sampler);
-
-    // conpute contrib
-
-    return cam_end.accu_coef * bsdf_f * tr * light_sample.radiance
-         / light_sample.pdf;
+    return cam_end.accu_coef * bsdf_f * light_rad / light_vtx.pdf_bwd;
 }
 
 Spectrum unweighted_contrib_s1_tx(
@@ -994,7 +893,6 @@ real mis_weight_sx_t0(
     else if(b.type == VertexType::EnvLight)
     {
         auto env = scene.envir_light();
-        light = env;
         assert(env);
 
         select_light_pdf = scene.light_pdf(env);
@@ -1014,13 +912,12 @@ real mis_weight_sx_t0(
         return 0;
 
     return mis_weight_common(
-        camera_subpath, s, nullptr, 0, select_light_pdf, light);
+        camera_subpath, s, nullptr, 0);
 }
 
 real mis_weight_sx_t1(
-    Vertex *camera_subpath, int s,
-    const SceneSampleLightResult &select_light,
-    const LightSampleResult &light_sample)
+    const Scene &scene,
+    Vertex *camera_subpath, int s, Vertex *light_subpath)
 {
     assert(s >= 2);
 
@@ -1028,105 +925,75 @@ real mis_weight_sx_t1(
 
     Vertex &a = camera_subpath[s - 2];
     Vertex &b = camera_subpath[s - 1];
+    Vertex &c = light_subpath[0];
 
     const Vec3 b_pos = get_scatter_pos(b);
 
     TempAssign a_pdf_bwd_assign;
     TempAssign b_pdf_bwd_assign;
+    TempAssign c_pdf_fwd_assign;
 
     AGZ_UNACCESSED(a_pdf_bwd_assign);
     AGZ_UNACCESSED(b_pdf_bwd_assign);
+    AGZ_UNACCESSED(c_pdf_fwd_assign);
 
-    Vertex light_vertex;
-    real init_cur_pdf;
-
-    if(select_light.light->is_area())
+    if(c.type == VertexType::AreaLight)
     {
-        const AreaLight *area_light = select_light.light->as_area();
+        const Vec3 b_to_c = c.area_light.pos - b_pos;
 
-        const LightEmitPDFResult emit_pdf = area_light->emit_pdf(
-            light_sample.pos, b_pos - light_sample.pos, light_sample.nor);
-
-        // light vertex
-
-        light_vertex.type             = VertexType::AreaLight;
-        light_vertex.accu_coef        = Spectrum(1);
-        light_vertex.is_delta         = false;
-        light_vertex.area_light.pos   = light_sample.pos;
-        light_vertex.area_light.nor   = light_sample.nor;
-        light_vertex.area_light.light = area_light;
-
-        light_vertex.pdf_fwd = pdf_to(b, light_vertex);
-        light_vertex.pdf_bwd = select_light.pdf * emit_pdf.pdf_pos;
-
-        // b.pdf_bwd
-
-        const real b_pdf_bwd = pdf_sa_to_area(
-            emit_pdf.pdf_dir, light_sample.pos, b);
-
-        b_pdf_bwd_assign = { &b.pdf_bwd, b_pdf_bwd };
-
-        // a.pdf_bwd
+        const auto emit_pdf = c.area_light.light->emit_pdf(
+            c.area_light.pos, -b_to_c, c.area_light.nor);
+        b_pdf_bwd_assign = {
+            &b.pdf_bwd,
+            pdf_sa_to_area(emit_pdf.pdf_dir, c.area_light.pos, b)
+        };
 
         const real a_pdf_bwd_sa = get_scatter_bsdf(b)->pdf_all(
-            get_scatter_wr(b), light_sample.pos - b_pos);
-        const real a_pdf_bwd = pdf_sa_to_area(a_pdf_bwd_sa, b_pos, a);
+            get_scatter_wr(b), b_to_c);
+        a_pdf_bwd_assign = {
+            &a.pdf_bwd,
+            pdf_sa_to_area(a_pdf_bwd_sa, b_pos, a)
+        };
 
-        a_pdf_bwd_assign = { &a.pdf_bwd, a_pdf_bwd };
-
-        // initial 'current pdf'
-        // for eliminating effect of using Light::Sample
-
-        init_cur_pdf = emit_pdf.pdf_pos /
-                       pdf_sa_to_area(light_sample.pdf, b_pos, light_vertex);
+        c_pdf_fwd_assign = {
+            &c.pdf_fwd,
+            pdf_to(b, c)
+        };
     }
     else
     {
-        const EnvirLight *env_light = select_light.light->as_envir();
+        assert(c.type == VertexType::EnvLight);
 
-        const LightEmitPDFResult emit_pdf = env_light->emit_pdf(
-            light_sample.pos, light_sample.ref_to_light(), light_sample.nor);
+        const Vec3 b_to_c = -c.env_light.light_to_out;
 
-        // light vertex
-
-        light_vertex.type                   = VertexType::EnvLight;
-        light_vertex.accu_coef              = Spectrum(1);
-        light_vertex.is_delta               = false;
-        light_vertex.env_light.light_to_out = -light_sample.ref_to_light();
-
-        light_vertex.pdf_fwd = pdf_to(b, light_vertex);
-        light_vertex.pdf_bwd = select_light.pdf * emit_pdf.pdf_dir;
-
-        // b.pdf_bwd
-
-        b_pdf_bwd_assign = { &b.pdf_bwd, emit_pdf.pdf_pos };
-
-        // a.pdf_bwd
+        const auto emit_pdf = scene.envir_light()->emit_pdf(
+            {}, c.env_light.light_to_out, {});
+        b_pdf_bwd_assign = {
+            &b.pdf_bwd,
+            emit_pdf.pdf_pos
+        };
 
         const real a_pdf_bwd_sa = get_scatter_bsdf(b)->pdf_all(
-            get_scatter_wr(b), light_sample.ref_to_light());
-        const real a_pdf_bwd = pdf_sa_to_area(a_pdf_bwd_sa, b_pos, a);
+            get_scatter_wr(b), b_to_c);
+        a_pdf_bwd_assign = {
+            &a.pdf_bwd,
+            pdf_sa_to_area(a_pdf_bwd_sa, b_pos, a)
+        };
 
-        a_pdf_bwd_assign = { &a.pdf_bwd, a_pdf_bwd };
-
-        // initial 'current pdf'
-        // for using Light::Sample
-
-        init_cur_pdf = emit_pdf.pdf_dir /
-                       pdf_sa_to_area(light_sample.pdf, b_pos, light_vertex);
+        c_pdf_fwd_assign = {
+            &c.pdf_fwd,
+            pdf_to(b, c)
+        };
     }
 
     return mis_weight_common(
-        camera_subpath, s, &light_vertex, 1,
-        select_light.pdf, select_light.light,
-        init_cur_pdf);
+        camera_subpath, s, light_subpath, 1);
 }
 
 real mis_weight_s1_tx(
     const Scene &scene,
     Vertex *camera_subpath,
-    Vertex *light_subpath, int t,
-    const SceneSampleLightResult &select_light)
+    Vertex *light_subpath, int t)
 {
     assert(t >= 2);
 
@@ -1171,14 +1038,12 @@ real mis_weight_s1_tx(
     };
 
     return mis_weight_common(
-        &camera_vertex, 1, light_subpath, t,
-        select_light.pdf, select_light.light);
+        &camera_vertex, 1, light_subpath, t);
 }
 
 real mis_weight_sx_tx(
     Vertex *camera_subpath, int s,
-    Vertex *light_subpath, int t,
-    const SceneSampleLightResult &select_light)
+    Vertex *light_subpath, int t)
 {
     assert(s >= 2 && t >= 2);
 
@@ -1237,8 +1102,7 @@ real mis_weight_sx_tx(
 
     return mis_weight_common(
         camera_subpath, s,
-        light_subpath, t,
-        select_light.pdf, select_light.light);
+        light_subpath, t);
 }
 
 Spectrum weighted_contrib_sx_t0(
@@ -1260,19 +1124,18 @@ Spectrum weighted_contrib_sx_t0(
 Spectrum weighted_contrib_sx_t1(
     const Scene &scene,
     Vertex *camera_subpath, int s,
-    Sampler &sampler,
-    SceneSampleLightResult &select_light,
-    LightSampleResult &light_sample)
+    Vertex *light_subpath,
+    Sampler &sampler)
 {
     const Spectrum unweighted_contrib = unweighted_contrib_sx_t1(
-        scene, camera_subpath, s, sampler, select_light, light_sample);
+        scene, camera_subpath, s, light_subpath, sampler);
     if(!unweighted_contrib.is_finite())
         return Spectrum(REAL_INF);
     if(unweighted_contrib.is_black())
         return {};
 
     const real weight = mis_weight_sx_t1(
-        camera_subpath, s, select_light, light_sample);
+        scene, camera_subpath, s, light_subpath);
 
     return weight * unweighted_contrib;
 }
@@ -1284,7 +1147,6 @@ Spectrum weighted_contrib_s1_tx(
     Sampler &sampler,
     const Rect2 &sample_pixel_bound,
     const Vec2 &full_res,
-    const SceneSampleLightResult &select_light,
     Vec2 &pixel_coord)
 {
     const Spectrum unweighted_contrib = unweighted_contrib_s1_tx(
@@ -1297,7 +1159,7 @@ Spectrum weighted_contrib_s1_tx(
         return {};
 
     const real weight = mis_weight_s1_tx(
-        scene, camera_subpath, light_subpath, t, select_light);
+        scene, camera_subpath, light_subpath, t);
 
     return weight * unweighted_contrib;
 }
@@ -1306,8 +1168,7 @@ Spectrum weighted_contrib_sx_tx(
     const Scene &scene,
     Vertex *camera_subpath, int s,
     Vertex *light_subpath, int t,
-    Sampler &sampler,
-    const SceneSampleLightResult &select_light)
+    Sampler &sampler)
 {
     const Spectrum unweighted_contrib = unweighted_contrib_sx_tx(
         scene, camera_subpath, s, light_subpath, t, sampler);
@@ -1317,7 +1178,7 @@ Spectrum weighted_contrib_sx_tx(
         return {};
 
     const real weight = mis_weight_sx_tx(
-        camera_subpath, s, light_subpath, t, select_light);
+        camera_subpath, s, light_subpath, t);
 
     return weight * unweighted_contrib;
 }

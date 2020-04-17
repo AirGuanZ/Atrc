@@ -23,6 +23,11 @@ RC<Material> create_disney(
     Box<const NormalMapper> normal_mapper,
     RC<const BSSRDFSurface> bssrdf);
 
+RC<Material> create_dream_works_fabric(
+    RC<const Texture2D> color,
+    RC<const Texture2D> roughness,
+    Box<const NormalMapper> normal_mapper);
+
 RC<Material> create_glass(
     RC<const Texture2D> color_reflection_map,
     RC<const Texture2D> color_refraction_map,
