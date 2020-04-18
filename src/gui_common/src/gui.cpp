@@ -1,5 +1,7 @@
 #include <filesystem>
 
+#include <QApplication>
+#include <QDesktopWidget>
 #include <QFileDialog>
 #include <QMenuBar>
 #include <QMessageBox>
@@ -37,23 +39,18 @@ GUI::GUI()
 
     preview_label_ = new QLabel("Preview", central_widget);
     preview_label_->setAlignment(Qt::AlignCenter);
+    preview_label_->setMinimumSize(100, 100);
     layout->addWidget(preview_label_);
 
     pbar_ = new QProgressBar(central_widget);
     pbar_->setRange(0, 100);
     pbar_->setValue(0);
     layout->addWidget(pbar_);
-
-#ifdef USE_EMBREE
-    agz::tracer::init_embree_device();
-#endif
 }
 
 GUI::~GUI()
 {
-#ifdef USE_EMBREE
-    agz::tracer::destroy_embree_device();
-#endif
+
 }
 
 void GUI::load_config(const std::string &scene_filename)
@@ -94,6 +91,18 @@ void GUI::load_config(const std::string &scene_filename)
 void GUI::closeEvent(QCloseEvent *event)
 {
     stop_rendering();
+}
+
+void GUI::resizeEvent(QResizeEvent *event)
+{
+    if(pixmap_.width() > 0)
+    {
+        const int label_width  = preview_label_->width();
+        const int label_height = preview_label_->height();
+        preview_label_->setPixmap(pixmap_.scaled(
+            label_width, label_height,
+            Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    }
 }
 
 void GUI::on_load_config()
@@ -256,8 +265,11 @@ void GUI::set_preview_img(const agz::tracer::Image2D<agz::tracer::Spectrum> &img
         sizeof(agz::math::color3b) *imgu8.width(),
         QImage::Format::Format_RGB888);
 
-    QPixmap qpixmap;
-    qpixmap.convertFromImage(qimg);
+    pixmap_.convertFromImage(qimg);
 
-    preview_label_->setPixmap(qpixmap);
+    const int label_width  = preview_label_->width();
+    const int label_height = preview_label_->height();
+    preview_label_->setPixmap(pixmap_.scaled(
+        label_width, label_height,
+        Qt::KeepAspectRatio, Qt::SmoothTransformation));
 }

@@ -27,6 +27,8 @@ protected:
 
 class LogWidget : public QWidget
 {
+    Q_OBJECT
+
 public:
 
     explicit LogWidget(
@@ -37,6 +39,14 @@ public:
     void warning(const QString &msg);
 
     void error(const QString &msg);
+
+signals:
+
+    void new_info(QString msg);
+
+private slots:
+
+    void on_info(QString msg);
 
 private:
 

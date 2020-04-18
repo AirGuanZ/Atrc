@@ -64,7 +64,7 @@ ExportRendererSPPM::ExportRendererSPPM(QWidget *parent)
 
     iteration_count_ = new QSpinBox(this);
     iteration_count_->setRange(1, std::numeric_limits<int>::max());
-    iteration_count_->setValue(1000);
+    iteration_count_->setValue(100);
 
     layout->addWidget(new QLabel("Iteration Count"), ++row, 0, 1, 1);
     layout->addWidget(iteration_count_, row, 1, 1, 2);

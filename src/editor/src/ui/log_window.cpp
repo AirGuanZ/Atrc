@@ -39,17 +39,13 @@ LogWidget::LogWidget(QWidget *parent, int max_char_count)
     {
         text_->setPlainText("");
     });
+
+    connect(this, &LogWidget::new_info, this, &LogWidget::on_info);
 }
 
 void LogWidget::info(const QString &msg)
 {
-    QString text = text_->toPlainText() + msg;
-    if(text.length() > max_char_count_)
-        text = text.right(max_char_count_);
-    text_->setPlainText(text);
-
-    text_->verticalScrollBar()->setValue(
-        text_->verticalScrollBar()->maximum());
+    emit new_info(msg);
 }
 
 void LogWidget::warning(const QString &msg)
@@ -60,6 +56,17 @@ void LogWidget::warning(const QString &msg)
 void LogWidget::error(const QString &msg)
 {
     info(msg);
+}
+
+void LogWidget::on_info(QString msg)
+{
+    QString text = text_->toPlainText() + msg;
+    if(text.length() > max_char_count_)
+        text = text.right(max_char_count_);
+    text_->setPlainText(text);
+
+    text_->verticalScrollBar()->setValue(
+        text_->verticalScrollBar()->maximum());
 }
 
 AGZ_EDITOR_END

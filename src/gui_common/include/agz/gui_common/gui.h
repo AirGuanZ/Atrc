@@ -24,6 +24,8 @@ protected:
 
     void closeEvent(QCloseEvent *event) override;
 
+    void resizeEvent(QResizeEvent *event) override;
+
 private slots:
 
     void on_load_config();
@@ -56,6 +58,7 @@ private:
     std::shared_ptr<GUIProgressReporter> reporter_;
 
     QLabel *preview_label_;
+    QPixmap pixmap_;
 
     QProgressBar *pbar_;
 };

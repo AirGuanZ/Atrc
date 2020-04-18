@@ -29,7 +29,7 @@ Offline rendering lab based on ray tracing
 - [x] Component based bsdf
 - [x] Volumetric bidirectional path tracing
 - [x] Support launching GUI renderer in editor
-- [ ] Better GUI renderer (auto resizing)
+- [x] Better GUI renderer (auto resizing)
 - [ ] More sample scenes
 - [ ] Light sampling hints (sample count, user-specified power, env light portal)
 - [ ] Volumetric photon mapping

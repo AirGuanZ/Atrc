@@ -55,7 +55,7 @@ ExportRendererParticle::ExportRendererParticle(QWidget *parent)
     cont_prob_->set_value(real(0.9));
 
     particles_per_task_->setRange(1, (std::numeric_limits<int>::max)());
-    particles_per_task_->setValue(1000);
+    particles_per_task_->setValue(100000);
 
     particle_task_count_->setRange(1, (std::numeric_limits<int>::max)());
     particle_task_count_->setValue(100);

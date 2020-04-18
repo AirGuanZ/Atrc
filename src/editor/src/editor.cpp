@@ -452,8 +452,9 @@ void Editor::init_render_menu()
 
         if(!gui_render_window_)
             gui_render_window_ = newBox<GUI>();
-        
+
         gui_render_window_->setWindowTitle("Atrc Renderer");
+        gui_render_window_->resize(640, 480);
 
         preview_window_->set_realtime_mode(true);
 
@@ -484,6 +485,7 @@ void Editor::init_render_menu()
 
         gui_render_window_->setWindowTitle(
             "Atrc Renderer: " + scene_desc_filename);
+        gui_render_window_->resize(640, 480);
 
         preview_window_->set_realtime_mode(true);
 
