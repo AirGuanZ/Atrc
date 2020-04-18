@@ -1,6 +1,8 @@
 #pragma once
 
 #include <agz/editor/renderer/particle_renderer.h>
+#include <agz/tracer/render/particle_tracing.h>
+#include <agz/tracer/render/path_tracing.h>
 
 AGZ_EDITOR_BEGIN
 

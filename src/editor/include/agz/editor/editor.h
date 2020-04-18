@@ -1,6 +1,5 @@
 #pragma once
 
-#include <QMainWindow>
 #include <QSplitter>
 
 #include <agz/editor/displayer/preview_window.h>
@@ -13,6 +12,8 @@
 #include <agz/editor/scene/scene_mgr.h>
 #include <agz/editor/ui/left_panel.h>
 #include <agz/editor/ui/right_panel.h>
+#include <agz/gui_common/gui.h>
+#include <agz/tracer/create/scene.h>
 #include <agz/utility/misc.h>
 
 AGZ_EDITOR_BEGIN
@@ -80,6 +81,8 @@ private:
 
     void init_save_asset_dialog();
 
+    void init_render_menu();
+
     void redistribute_panels();
 
     // helper
@@ -144,6 +147,8 @@ private:
 
     PreviewWindow *preview_window_ = nullptr;
     QTimer *update_display_timer_ = nullptr;
+
+    Box<GUI> gui_render_window_;
 };
 
 AGZ_EDITOR_END

@@ -3,6 +3,9 @@
 
 #include <agz/editor/displayer/preview_window.h>
 #include <agz/editor/editor.h>
+#include <agz/tracer/create/camera.h>
+#include <agz/tracer/utility/config.h>
+#include <agz/tracer/utility/logger.h>
 
 AGZ_EDITOR_BEGIN
 
@@ -241,6 +244,15 @@ void PreviewWindow::set_preview_image(const Image2D<Spectrum> &img)
 bool PreviewWindow::is_in_realtime_mode() const noexcept
 {
     return in_realtime_mode_;
+}
+
+void PreviewWindow::set_realtime_mode(bool realtime)
+{
+    if(in_realtime_mode_ == realtime)
+        return;
+    in_realtime_mode_ = realtime;
+    emit edit_render_mode();
+    update();
 }
 
 PreviewWindow::MeshID PreviewWindow::generate_mesh_id() noexcept

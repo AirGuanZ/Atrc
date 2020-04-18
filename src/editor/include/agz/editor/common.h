@@ -2,7 +2,7 @@
 
 #include <QColor>
 
-#include <agz/tracer/tracer.h>
+#include <agz/tracer/common.h>
 
 #define AGZ_EDITOR_BEGIN namespace agz::editor {
 #define AGZ_EDITOR_END   }

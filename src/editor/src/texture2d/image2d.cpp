@@ -3,6 +3,7 @@
 
 #include <agz/editor/imexport/json_export_context.h>
 #include <agz/editor/texture2d/image2d.h>
+#include <agz/tracer/create/texture2d.h>
 #include <agz/utility/image.h>
 #include <agz/utility/system.h>
 

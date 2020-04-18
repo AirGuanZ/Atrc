@@ -1,10 +1,9 @@
-#include <QCheckBox>
-
 #include <agz/editor/material/mirror.h>
 #include <agz/editor/material/material_thumbnail.h>
 #include <agz/editor/texture2d/constant2d.h>
 #include <agz/editor/texture2d/range.h>
 #include <agz/editor/ui/utility/collapsible.h>
+#include <agz/tracer/create/material.h>
 
 AGZ_EDITOR_BEGIN
 

@@ -11,7 +11,8 @@
 
 AGZ_EDITOR_BEGIN
 
-void export_json(
+bool export_json_to_file(
+    const std::string &filename,
     SceneManager        *scene_mgr,
     ObjectContext       *obj_ctx,
     EnvirLightSlot      *envir_light,
@@ -23,11 +24,7 @@ void export_json(
 {
     try
     {
-        const QString scene_desc_filename = QFileDialog::getSaveFileName(
-            nullptr, QString(), QString(), "JSON (*.json)");
-        if(scene_desc_filename.isEmpty())
-            return;
-        JSONExportContext ctx(scene_desc_filename.toStdString());
+        JSONExportContext ctx(filename);
 
         tracer::ConfigGroup root_grp;
 
@@ -92,19 +89,44 @@ void export_json(
 
         auto json = tracer::factory::config_to_json(root_grp);
         std::ofstream fout(
-            scene_desc_filename.toStdString(), std::ios::out | std::ios::trunc);
+            filename, std::ios::out | std::ios::trunc);
         if(!fout)
         {
             throw std::runtime_error(
-                "failed to open file " + scene_desc_filename.toStdString());
+                "failed to open file " + filename);
         }
         
         fout << json.dump(4) << std::endl;
+
     }
     catch(const std::exception &e)
     {
         QMessageBox::information(nullptr, "Error", e.what());
+        return false;
     }
+
+    return true;
+}
+
+void export_json(
+    SceneManager        *scene_mgr,
+    ObjectContext       *obj_ctx,
+    EnvirLightSlot      *envir_light,
+    PostProcessorSeq    *post_processors,
+    PreviewWindow       *preview_window,
+    GlobalSettingWidget *global_settings,
+    FilmFilterPanel     *film_filter,
+    RendererPanel       *renderer_panel)
+{
+    const QString scene_desc_filename = QFileDialog::getSaveFileName(
+        nullptr, QString(), QString(), "JSON (*.json)");
+    if(scene_desc_filename.isEmpty())
+        return;
+
+    export_json_to_file(
+        scene_desc_filename.toStdString(),
+        scene_mgr, obj_ctx, envir_light, post_processors,
+        preview_window, global_settings, film_filter, renderer_panel);
 }
 
 AGZ_EDITOR_END

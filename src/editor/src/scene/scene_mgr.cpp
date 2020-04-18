@@ -3,6 +3,8 @@
 #include <agz/editor/geometry/triangle_bvh.h>
 #include <agz/editor/imexport/model_importer.h>
 #include <agz/editor/scene/scene_mgr.h>
+#include <agz/tracer/core/entity.h>
+#include <agz/tracer/create/aggregate.h>
 
 AGZ_EDITOR_BEGIN
 

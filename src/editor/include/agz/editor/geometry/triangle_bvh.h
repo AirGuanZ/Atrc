@@ -2,6 +2,7 @@
 
 #include <agz/editor/geometry/geometry.h>
 #include <agz/editor/ui/utility/elided_label.h>
+#include <agz/utility/mesh.h>
 
 AGZ_EDITOR_BEGIN
 

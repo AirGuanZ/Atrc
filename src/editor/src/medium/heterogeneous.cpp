@@ -1,6 +1,7 @@
 #include <agz/editor/medium/heterogeneous.h>
 #include <agz/editor/texture3d/range3d.h>
 #include <agz/editor/ui/utility/collapsible.h>
+#include <agz/tracer/create/medium.h>
 
 AGZ_EDITOR_BEGIN
 

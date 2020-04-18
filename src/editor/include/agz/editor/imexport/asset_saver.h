@@ -5,6 +5,11 @@
 #include <unordered_set>
 
 #include <agz/editor/imexport/asset_section.h>
+#include <agz/tracer/core/geometry.h>
+#include <agz/tracer/core/light.h>
+#include <agz/tracer/core/material.h>
+#include <agz/tracer/core/medium.h>
+#include <agz/tracer/core/texture3d.h>
 
 AGZ_EDITOR_BEGIN
 

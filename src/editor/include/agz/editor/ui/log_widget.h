@@ -1,5 +1,7 @@
 #pragma once
 
+#include <mutex>
+
 #include <QPlainTextEdit>
 
 #include <agz/editor/common.h>

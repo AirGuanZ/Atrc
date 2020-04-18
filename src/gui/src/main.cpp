@@ -1,6 +1,6 @@
 #include <QApplication>
 
-#include <agz/gui/gui.h>
+#include <agz/gui_common/gui.h>
 
 #if defined(_WIN32) && defined(_DEBUG)
 #include <crtdbg.h>

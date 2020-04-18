@@ -11,6 +11,7 @@
 #include <agz/editor/texture2d/range.h>
 #include <agz/editor/texture2d/texture2d.h>
 #include <agz/editor/ui/utility/collapsible.h>
+#include <agz/tracer/create/material.h>
 
 AGZ_EDITOR_BEGIN
 

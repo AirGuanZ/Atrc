@@ -2,6 +2,7 @@
 
 #include <agz/editor/editor.h>
 #include <agz/editor/resource/pool/image_resource_pool.h>
+#include <agz/tracer/utility/logger.h>
 
 AGZ_EDITOR_BEGIN
 

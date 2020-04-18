@@ -2,6 +2,7 @@
 #include <QLineEdit>
 
 #include <agz/editor/geometry/sphere.h>
+#include <agz/tracer/create/geometry.h>
 
 AGZ_EDITOR_BEGIN
 

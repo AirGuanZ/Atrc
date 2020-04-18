@@ -3,6 +3,7 @@
 #include <agz/editor/displayer/preview_window.h>
 #include <agz/editor/entity/entity.h>
 #include <agz/editor/scene/scene_mgr_ui.h>
+#include <agz/utility/mesh.h>
 
 AGZ_EDITOR_BEGIN
 

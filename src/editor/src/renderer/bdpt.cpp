@@ -1,4 +1,9 @@
 #include <agz/editor/renderer/bdpt.h>
+#include <agz/tracer/core/camera.h>
+#include <agz/tracer/core/sampler.h>
+#include <agz/tracer/core/scene.h>
+#include <agz/tracer/render/path_tracing.h>
+#include <agz/tracer/render/vol_bidir_path_tracing.h>
 
 AGZ_EDITOR_BEGIN
 

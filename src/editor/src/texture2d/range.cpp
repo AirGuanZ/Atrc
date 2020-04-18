@@ -1,6 +1,7 @@
 #include <QEvent>
 
 #include <agz/editor/texture2d/range.h>
+#include <agz/tracer/create/texture2d.h>
 
 AGZ_EDITOR_BEGIN
 

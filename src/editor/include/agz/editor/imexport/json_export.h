@@ -13,6 +13,17 @@ class PreviewWindow;
 class RendererPanel;
 class SceneManager;
 
+bool export_json_to_file(
+    const std::string &filename,
+    SceneManager        *scene_mgr,
+    ObjectContext       *obj_ctx,
+    EnvirLightSlot      *envir_light,
+    PostProcessorSeq    *post_processors,
+    PreviewWindow       *preview_window,
+    GlobalSettingWidget *global_settings,
+    FilmFilterPanel     *film_filter,
+    RendererPanel       *renderer_panel);
+
 void export_json(
     SceneManager        *scene_mgr,
     ObjectContext       *obj_ctx,

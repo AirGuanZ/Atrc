@@ -1,5 +1,7 @@
 #pragma once
 
+#include <thread>
+
 #include <agz/editor/material/material.h>
 
 AGZ_EDITOR_BEGIN

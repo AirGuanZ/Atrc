@@ -1,9 +1,11 @@
 #pragma once
 
 #include <istream>
+#include <map>
 
 #include <agz/editor/imexport/asset_consts.h>
 #include <agz/editor/imexport/asset_section.h>
+#include <agz/tracer/core/material.h>
 
 AGZ_EDITOR_BEGIN
 

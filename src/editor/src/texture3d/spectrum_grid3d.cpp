@@ -6,6 +6,7 @@
 #include <agz/editor/imexport/json_export_context.h>
 #include <agz/editor/texture3d/spectrum_grid3d.h>
 #include <agz/factory/factory.h>
+#include <agz/tracer/create/texture3d.h>
 
 AGZ_EDITOR_BEGIN
 

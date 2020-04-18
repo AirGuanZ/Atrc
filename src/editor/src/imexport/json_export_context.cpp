@@ -1,11 +1,14 @@
 #include <filesystem>
 
 #include <agz/editor/imexport/json_export_context.h>
+#include <agz/utility/file.h>
 
 AGZ_EDITOR_BEGIN
 
 JSONExportContext::JSONExportContext(const std::string &scene_desc_filename)
 {
+    file::create_directory_for_file(scene_desc_filename);
+
     const auto p = absolute(std::filesystem::path(scene_desc_filename));
     scene_asset_dir_ = p.parent_path() / (p.filename().string() + ".asset");
     ref_filename_prefix_ = "${scene-directory}/"

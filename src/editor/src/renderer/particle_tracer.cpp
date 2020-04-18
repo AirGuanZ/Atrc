@@ -1,4 +1,8 @@
 #include <agz/editor/renderer/particle_tracer.h>
+#include <agz/tracer/core/entity.h>
+#include <agz/tracer/core/intersection.h>
+#include <agz/tracer/core/light.h>
+#include <agz/tracer/core/scene.h>
 
 AGZ_EDITOR_BEGIN
 

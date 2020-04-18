@@ -3,6 +3,7 @@
 #include <agz/editor/material/material.h>
 #include <agz/editor/material/normal_map.h>
 #include <agz/editor/texture2d/texture2d.h>
+#include <agz/tracer/utility/config.h>
 
 AGZ_EDITOR_BEGIN
 

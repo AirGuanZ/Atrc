@@ -9,6 +9,8 @@
 #include <agz/editor/renderer/renderer_widget.h>
 #include <agz/editor/ui/global_setting_widget.h>
 #include <agz/editor/ui/log_widget.h>
+#include <agz/tracer/utility/embree.h>
+#include <agz/tracer/utility/logger.h>
 
 #include <agz/utility/file.h>
 
@@ -53,6 +55,10 @@ Editor::Editor()
     AGZ_INFO("initialize asset saving dialog");
 
     init_save_asset_dialog();
+
+    AGZ_INFO("initialize render menu");
+
+    init_render_menu();
 
     AGZ_INFO("initialize global settings");
 
@@ -425,6 +431,64 @@ void Editor::init_save_asset_dialog()
             global_setting_,
             film_filter_.get(),
             renderer_panel_);
+    });
+}
+
+void Editor::init_render_menu()
+{
+    QAction *render_scene = new QAction("Render", this);
+    menuBar()->addAction(render_scene);
+    connect(render_scene, &QAction::triggered, [=]
+    {
+        if(!std::filesystem::exists("./AtrcEditorOutput"))
+            std::filesystem::create_directory("./AtrcEditorOutput");
+
+        if(!export_json_to_file(
+            "./AtrcEditorOutput/scene.json",
+            scene_mgr_.get(), obj_ctx_.get(), envir_light_slot_,
+            pp_seq_.get(), preview_window_, global_setting_, film_filter_.get(),
+            renderer_panel_))
+            return;
+
+        if(!gui_render_window_)
+            gui_render_window_ = newBox<GUI>();
+        
+        gui_render_window_->setWindowTitle("Atrc Renderer");
+
+        preview_window_->set_realtime_mode(true);
+
+        gui_render_window_->showMaximized();
+        gui_render_window_->load_config("./AtrcEditorOutput/scene.json");
+    });
+
+    QAction *render_scene_to = new QAction("Render To", this);
+    menuBar()->addAction(render_scene_to);
+    connect(render_scene_to, &QAction::triggered, [=]
+    {
+        if(!std::filesystem::exists("./AtrcEditorOutput"))
+            std::filesystem::create_directory("./AtrcEditorOutput");
+
+        const QString scene_desc_filename = QFileDialog::getSaveFileName(
+            this, "Output Directory",
+            "./AtrcEditorOutput/scene.json", "JSON (*.json)");
+
+        if(!export_json_to_file(
+            scene_desc_filename.toStdString(),
+            scene_mgr_.get(), obj_ctx_.get(), envir_light_slot_,
+            pp_seq_.get(), preview_window_, global_setting_, film_filter_.get(),
+            renderer_panel_))
+            return;
+
+        if(!gui_render_window_)
+            gui_render_window_ = newBox<GUI>();
+
+        gui_render_window_->setWindowTitle(
+            "Atrc Renderer: " + scene_desc_filename);
+
+        preview_window_->set_realtime_mode(true);
+
+        gui_render_window_->showMaximized();
+        gui_render_window_->load_config(scene_desc_filename.toStdString());
     });
 }
 

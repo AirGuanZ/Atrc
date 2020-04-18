@@ -1,6 +1,7 @@
 #pragma once
 
 #include <agz/editor/renderer/renderer.h>
+#include <agz/tracer/core/render_target.h>
 
 AGZ_EDITOR_BEGIN
 

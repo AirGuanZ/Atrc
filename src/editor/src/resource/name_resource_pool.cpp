@@ -1,5 +1,6 @@
 #include <agz/editor/editor.h>
 #include <agz/editor/resource/pool/name_resource_pool.h>
+#include <agz/tracer/utility/logger.h>
 
 AGZ_EDITOR_BEGIN
 

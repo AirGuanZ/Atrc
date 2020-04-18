@@ -3,6 +3,7 @@
 #include <QWidget>
 
 #include <agz/editor/common.h>
+#include <agz/tracer/utility/config.h>
 
 AGZ_EDITOR_BEGIN
 

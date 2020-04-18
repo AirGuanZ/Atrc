@@ -11,6 +11,7 @@
 #include <agz/editor/displayer/im3d_inst.h>
 #include <agz/editor/resource/entity_interface.h>
 #include <agz/editor/utility/direct_transform3d.h>
+#include <agz/tracer/utility/config.h>
 
 AGZ_EDITOR_BEGIN
 
@@ -35,6 +36,8 @@ public:
     void set_preview_image(const Image2D<Spectrum> &img);
 
     bool is_in_realtime_mode() const noexcept;
+
+    void set_realtime_mode(bool realtime);
 
     // realtime mode
 

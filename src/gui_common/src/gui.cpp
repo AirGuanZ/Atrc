@@ -7,7 +7,7 @@
 #include <QVBoxLayout>
 #include <QWidget>
 
-#include <agz/gui/gui.h>
+#include <agz/gui_common/gui.h>
 #include <agz/tracer/tracer.h>
 #include <agz/utility/file.h>
 #include <agz/utility/misc.h>
@@ -56,22 +56,11 @@ GUI::~GUI()
 #endif
 }
 
-void GUI::closeEvent(QCloseEvent *event)
+void GUI::load_config(const std::string &scene_filename)
 {
-    stop_rendering();
-}
-
-void GUI::on_load_config()
-{
-    stop_rendering();
-
     try
     {
-        const std::string input_filename = QFileDialog::getOpenFileName(
-            this, "Configuration File",
-            QString(), "JSON (*.json)").toStdString();
-        if(!input_filename.empty())
-            start_rendering(input_filename);
+        start_rendering(scene_filename);
     }
     catch(const std::exception &err)
     {
@@ -100,6 +89,22 @@ void GUI::on_load_config()
         mbox.setText("An unknown error occurred");
         mbox.exec();
     }
+}
+
+void GUI::closeEvent(QCloseEvent *event)
+{
+    stop_rendering();
+}
+
+void GUI::on_load_config()
+{
+    stop_rendering();
+
+    const std::string input_filename = QFileDialog::getOpenFileName(
+        this, "Configuration File",
+        QString(), "JSON (*.json)").toStdString();
+    if(!input_filename.empty())
+        load_config(input_filename);
 }
 
 void GUI::on_stop_rendering()

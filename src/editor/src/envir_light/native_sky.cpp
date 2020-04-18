@@ -1,5 +1,6 @@
 #include <agz/editor/envir_light/native_sky.h>
 #include <agz/editor/ui/utility/validator.h>
+#include <agz/tracer/create/envir_light.h>
 
 AGZ_EDITOR_BEGIN
 

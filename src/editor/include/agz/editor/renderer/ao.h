@@ -1,6 +1,7 @@
 #pragma once
 
 #include <agz/editor/renderer/per_pixel_renderer.h>
+#include <agz/tracer/render/path_tracing.h>
 
 AGZ_EDITOR_BEGIN
 

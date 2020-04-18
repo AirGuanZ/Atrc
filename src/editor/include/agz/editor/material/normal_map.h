@@ -3,6 +3,7 @@
 #include <QCheckBox>
 
 #include <agz/editor/texture2d/texture2d.h>
+#include <agz/tracer/core/material.h>
 
 AGZ_EDITOR_BEGIN
 

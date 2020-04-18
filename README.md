@@ -28,12 +28,14 @@ Offline rendering lab based on ray tracing
 
 - [x] Component based bsdf
 - [x] Volumetric bidirectional path tracing
-- [ ] Support launching GUI renderer in editor
+- [x] Support launching GUI renderer in editor
+- [ ] Better GUI renderer (auto resizing)
 - [ ] More sample scenes
 - [ ] Light sampling hints (sample count, user-specified power, env light portal)
 - [ ] Volumetric photon mapping
 - [ ] Vertex connection & merging
 - [ ] Better camera panel in editor
+- [ ] Support BSSRDF in BDPT
 
 ## Documentation
 
@@ -48,6 +50,10 @@ Food (rendered with bdpt) (scene ref [here](https://luxcorerender.org/download/)
 Classroom (rendered with pt) (scene ref [here](https://www.blender.org/download/demo-files/)):
 
 ![pic](./doc/gallery/classroom.png)
+
+Materials: (rendered with pt):
+
+![pic](./doc/gallery/materials.png)
 
 Fog (rendered with vol_bdpt):
 

@@ -1,6 +1,7 @@
 #include <QCheckBox>
 
 #include <agz/editor/texture3d/constant3d.h>
+#include <agz/tracer/create/texture3d.h>
 
 AGZ_EDITOR_BEGIN
 

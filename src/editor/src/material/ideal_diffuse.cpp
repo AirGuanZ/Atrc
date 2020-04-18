@@ -1,6 +1,7 @@
 #include <agz/editor/material/ideal_diffuse.h>
 #include <agz/editor/material/material_thumbnail.h>
 #include <agz/editor/ui/utility/collapsible.h>
+#include <agz/tracer/create/material.h>
 
 AGZ_EDITOR_BEGIN
 

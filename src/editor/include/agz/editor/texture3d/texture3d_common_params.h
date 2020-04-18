@@ -5,6 +5,7 @@
 
 #include <agz/editor/ui/transform3d_seq_widget.h>
 #include <agz/editor/ui/utility/combobox_without_wheel.h>
+#include <agz/tracer/core/texture3d.h>
 
 AGZ_EDITOR_BEGIN
 

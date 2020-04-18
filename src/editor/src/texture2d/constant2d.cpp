@@ -1,6 +1,5 @@
-#include <QCheckBox>
-
 #include <agz/editor/texture2d/constant2d.h>
+#include <agz/tracer/create/texture2d.h>
 
 AGZ_EDITOR_BEGIN
 

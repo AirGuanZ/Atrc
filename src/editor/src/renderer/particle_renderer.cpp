@@ -1,4 +1,8 @@
 #include <agz/editor/renderer/particle_renderer.h>
+#include <agz/tracer/core/camera.h>
+#include <agz/tracer/core/sampler.h>
+#include <agz/tracer/core/scene.h>
+#include <agz/tracer/create/film_filter.h>
 #include <agz/utility/thread.h>
 
 AGZ_EDITOR_BEGIN

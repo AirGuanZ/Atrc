@@ -1,6 +1,7 @@
 #include <QGridLayout>
 
 #include <agz/editor/medium/homogeneous.h>
+#include <agz/tracer/create/medium.h>
 
 AGZ_EDITOR_BEGIN
 

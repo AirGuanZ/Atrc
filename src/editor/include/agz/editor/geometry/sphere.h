@@ -1,6 +1,7 @@
 #pragma once
 
 #include <agz/editor/geometry/geometry.h>
+#include <agz/tracer/utility/config.h>
 
 AGZ_EDITOR_BEGIN
 

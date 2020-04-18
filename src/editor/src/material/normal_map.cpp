@@ -1,5 +1,3 @@
-#include <QCheckBox>
-
 #include <agz/editor/material/normal_map.h>
 
 AGZ_EDITOR_BEGIN

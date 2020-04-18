@@ -1,5 +1,3 @@
-#include <fstream>
-
 #include <QFileDialog>
 #include <QMessageBox>
 
@@ -7,6 +5,7 @@
 #include <agz/editor/imexport/json_export_context.h>
 #include <agz/editor/ui/utility/elided_label.h>
 #include <agz/factory/factory.h>
+#include <agz/tracer/create/geometry.h>
 
 AGZ_EDITOR_BEGIN
 

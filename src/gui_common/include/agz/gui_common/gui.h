@@ -4,7 +4,7 @@
 #include <QMainWindow>
 #include <QProgressBar>
 
-#include <agz/gui/reporter.h>
+#include <agz/gui_common/reporter.h>
 #include <agz/factory/factory.h>
 #include <agz/tracer/tracer.h>
 
@@ -17,6 +17,8 @@ public:
     GUI();
 
     ~GUI();
+
+    void load_config(const std::string &scene_filename);
 
 protected:
 

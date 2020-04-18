@@ -1,4 +1,5 @@
 #include <agz/editor/medium/void.h>
+#include <agz/tracer/create/medium.h>
 
 AGZ_EDITOR_BEGIN
 

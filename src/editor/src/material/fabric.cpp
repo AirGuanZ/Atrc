@@ -2,6 +2,7 @@
 #include <agz/editor/material/material_thumbnail.h>
 #include <agz/editor/texture2d/range.h>
 #include <agz/editor/ui/utility/collapsible.h>
+#include <agz/tracer/create/material.h>
 
 AGZ_EDITOR_BEGIN
 
@@ -91,7 +92,7 @@ RC<tracer::ConfigNode> FabricWidget::to_config(JSONExportContext &ctx) const
     grp->insert_child("roughness", roughness_->to_config(ctx));
     
     if(normal_map_->is_enabled())
-        grp->insert_child("normal", normal_map_->to_config(ctx));
+        grp->insert_child("normal_map", normal_map_->to_config(ctx));
 
     return grp;
 }

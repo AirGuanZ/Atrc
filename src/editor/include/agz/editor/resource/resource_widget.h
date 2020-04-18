@@ -10,6 +10,7 @@
 #include <agz/editor/imexport/asset_saver.h>
 #include <agz/editor/resource/entity_interface.h>
 #include <agz/editor/resource/thumbnail_provider.h>
+#include <agz/tracer/utility/config.h>
 
 AGZ_EDITOR_BEGIN
 

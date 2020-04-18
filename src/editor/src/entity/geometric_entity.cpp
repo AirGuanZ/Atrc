@@ -1,8 +1,9 @@
-#include <QGridLayout>
-
 #include <agz/editor/entity/geometric_entity.h>
 #include <agz/editor/imexport/json_export_context.h>
 #include <agz/editor/ui/utility/collapsible.h>
+#include <agz/tracer/core/medium.h>
+#include <agz/tracer/create/entity.h>
+#include <agz/tracer/create/geometry.h>
 
 AGZ_EDITOR_BEGIN
 
