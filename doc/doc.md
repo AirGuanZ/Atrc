@@ -244,7 +244,7 @@ This section describes the possible type values for fields of type `Scene`.
 | ---------- | --------------- | ---------------- | ------------------------------------------------------------ |
 | entities   | [Entity]        | []               | entities in scene                                            |
 | aggregate  | EntityAggregate | native aggregate | data structure for accelerating ray queries between entities (default is a brute-force one) |
-| env        | NonareaLight    | null             | environment light                                            |
+| env        | EnvirLight      | null             | environment light                                            |
 
 ### EntityAggregate
 
@@ -285,14 +285,15 @@ This section describes the possible type values for fields of type `Camera`.
 
 Ordinary entity with geometry shape, material and mediums.
 
-| Field Name    | Type     | Default Value | Explanation                     |
-| ------------- | -------- | ------------- | ------------------------------- |
-| geometry      | Geometry |               | geometric shape                 |
-| material      | Material |               | surface material                |
-| med_in        | Medium   | void          | outer medium                    |
-| med_out       | Medium   | void          | inner medium                    |
-| emit_radiance | Spectrum | [ 0, 0, 0 ]   | emitted radiance                |
-| no_denoise    | bool     | false         | disable denoiser on this entity |
+| Field Name    | Type     | Default Value | Explanation                                                  |
+| ------------- | -------- | ------------- | ------------------------------------------------------------ |
+| geometry      | Geometry |               | geometric shape                                              |
+| material      | Material |               | surface material                                             |
+| med_in        | Medium   | void          | outer medium                                                 |
+| med_out       | Medium   | void          | inner medium                                                 |
+| emit_radiance | Spectrum | [ 0, 0, 0 ]   | emitted radiance                                             |
+| no_denoise    | bool     | false         | disable denoiser on this entity                              |
+| power         | real     | -1            | sampling weight of this light source; specify -1 to compute it automatically |
 
 ### FilmFilter
 
@@ -551,7 +552,7 @@ Heterogeneous media defined based on 3D textures
 | g                    | real     |               | asymmetry of scattering        |
 | max_scattering_count | int      | INT_MAX       | max continous scattering count |
 
-### NonareaLight
+### EnvirLight
 
 **ibl**
 
@@ -559,9 +560,11 @@ Heterogeneous media defined based on 3D textures
 
 Image based lighting
 
-| Field Name | Type      | Default Value | Explanation                        |
-| ---------- | --------- | ------------- | ---------------------------------- |
-| tex        | Texture2D |               | texture object describing radiance |
+| Field Name             | Type      | Default Value | Explanation                                                  |
+| ---------------------- | --------- | ------------- | ------------------------------------------------------------ |
+| tex                    | Texture2D |               | texture object describing radiance                           |
+| no_importance_sampling | bool      | false         | disable importance sampling                                  |
+| power                  | real      | -1            | sampling weight of this light source; specify -1 to compute it automatically |
 
 **native_sky**
 
@@ -569,10 +572,11 @@ Image based lighting
 
 Environment light that represents a sky with a gradient of color from top to bottom.
 
-| Field Name | Type     | Default Value | Explanation     |
-| ---------- | -------- | ------------- | --------------- |
-| top        | Spectrum |               | top radiance    |
-| bottom     | Spectrum |               | bottom radiance |
+| Field Name | Type     | Default Value | Explanation                                                  |
+| ---------- | -------- | ------------- | ------------------------------------------------------------ |
+| top        | Spectrum |               | top radiance                                                 |
+| bottom     | Spectrum |               | bottom radiance                                              |
+| power      | real     | -1            | sampling weight of this light source; specify -1 to compute it automatically |
 
 ### Post Processor
 

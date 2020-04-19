@@ -11,10 +11,13 @@ class GeometryToDiffuseLight : public AreaLight
 
     Spectrum radiance_;
 
+    real user_specified_power_;
+
 public:
 
     GeometryToDiffuseLight(
-        const Geometry *geometry, const Spectrum &radiance);
+        const Geometry *geometry, const Spectrum &radiance,
+        real user_specified_power);
 
     LightSampleResult sample(
         const Vec3 &ref, const Sample5 &sam) const noexcept override;

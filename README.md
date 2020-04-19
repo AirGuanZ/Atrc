@@ -30,8 +30,9 @@ Offline rendering lab based on ray tracing
 - [x] Volumetric bidirectional path tracing
 - [x] Support launching GUI renderer in editor
 - [x] Better GUI renderer (auto resizing)
-- [ ] More sample scenes
-- [ ] Light sampling hints (sample count, user-specified power, env light portal)
+- [x] More sample scenes
+- [x] Light sampling hints (user-specified power)
+- [ ] Environment light portals
 - [ ] Volumetric photon mapping
 - [ ] Vertex connection & merging
 - [ ] Better camera panel in editor

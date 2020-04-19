@@ -4,6 +4,7 @@
 
 #include <agz/editor/envir_light/envir_light.h>
 #include <agz/editor/texture2d/texture2d.h>
+#include <agz/editor/ui/utility/vec_input.h>
 
 AGZ_EDITOR_BEGIN
 
@@ -33,6 +34,8 @@ private:
 
     Texture2DSlot *tex_                 = nullptr;
     QCheckBox     *importance_sampling_ = nullptr;
+
+    RealInput *power_ = nullptr;
 
     ObjectContext &obj_ctx_;
 };

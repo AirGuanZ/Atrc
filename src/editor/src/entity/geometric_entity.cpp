@@ -1,4 +1,5 @@
 #include <agz/editor/entity/geometric_entity.h>
+#include <agz/editor/imexport/asset_version.h>
 #include <agz/editor/imexport/json_export_context.h>
 #include <agz/editor/ui/utility/collapsible.h>
 #include <agz/tracer/core/medium.h>
@@ -24,6 +25,7 @@ GeometricEntityWidget::GeometricEntityWidget(
     medium_out_    = clone_state.medium_out;
     emit_radiance_ = new SpectrumInput;
     transform_     = new Transform3DWidget(clone_state.transform);
+    power_         = new RealInput(this);
 
     if(!geometry_)
         geometry_ = new GeometrySlot(obj_ctx_, "Triangle Mesh");
@@ -38,6 +40,7 @@ GeometricEntityWidget::GeometricEntityWidget(
         medium_out_ = new MediumSlot(obj_ctx_, "Void");
 
     emit_radiance_->set_value(clone_state.emit_radiance);
+    power_->set_value(clone_state.power);
 
     geometry_->set_dirty_callback([=]
     {
@@ -70,6 +73,11 @@ GeometricEntityWidget::GeometricEntityWidget(
         set_dirty_flag();
     });
 
+    connect(power_, &RealInput::edit_value, [=](real)
+    {
+        set_dirty_flag();
+    });
+
     geometry_section  ->set_content_widget(geometry_);
     transform_section ->set_content_widget(transform_);
     material_section  ->set_content_widget(material_);
@@ -84,9 +92,11 @@ GeometricEntityWidget::GeometricEntityWidget(
     layout->addWidget(transform_section, 1, 0, 1, 2);
     layout->addWidget(new QLabel("   Emit Radiance", this), 2, 0, 1, 1);
     layout->addWidget(emit_radiance_, 2, 1, 1, 1);
-    layout->addWidget(material_section, 3, 0, 1, 2);
-    layout->addWidget(medium_in_section, 4, 0, 1, 2);
-    layout->addWidget(medium_out_section, 5, 0, 1, 2);
+    layout->addWidget(new QLabel("   Emit Weight  ", this), 3, 0, 1, 1);
+    layout->addWidget(power_, 3, 1, 1, 1);
+    layout->addWidget(material_section, 4, 0, 1, 2);
+    layout->addWidget(medium_in_section, 5, 0, 1, 2);
+    layout->addWidget(medium_out_section, 6, 0, 1, 2);
 
     setContentsMargins(0, 0, 0, 0);
     layout->setContentsMargins(0, 0, 0, 0);
@@ -106,6 +116,7 @@ ResourceWidget<tracer::Entity> *GeometricEntityWidget::clone()
     clone_state.material      = material_->clone();
     clone_state.emit_radiance = emit_radiance_->get_value();
     clone_state.transform     = transform_->get_transform();
+    clone_state.power         = power_->get_value();
     return new GeometricEntityWidget(clone_state, obj_ctx_);
 }
 
@@ -117,6 +128,7 @@ void GeometricEntityWidget::save_asset(AssetSaver &saver)
     medium_out_->save_asset(saver);
     saver.write(emit_radiance_->get_value());
     saver.write(transform_->get_transform());
+    saver.write(power_->get_value());
 }
 
 void GeometricEntityWidget::load_asset(AssetLoader &loader)
@@ -127,6 +139,11 @@ void GeometricEntityWidget::load_asset(AssetLoader &loader)
     medium_out_->load_asset(loader);
     emit_radiance_->set_value(loader.read<Spectrum>());
     transform_->set_transform(loader.read<DirectTransform>());
+
+    if(loader.version() >= versions::V2020_0418_2358)
+        power_->set_value(loader.read<real>());
+    else
+        power_->set_value(-1);
 
     do_update_tracer_object();
 }
@@ -147,7 +164,9 @@ RC<tracer::ConfigNode> GeometricEntityWidget::to_config(
     grp->insert_child("med_in",   medium_in_->to_config(ctx));
     grp->insert_child("med_out",  medium_out_->to_config(ctx));
     grp->insert_child(
-        "emit_radiance", tracer::ConfigArray::from_spectrum(emit_radiance_->get_value()));
+        "emit_radiance",
+        tracer::ConfigArray::from_spectrum(emit_radiance_->get_value()));
+    grp->insert_real("power", power_->get_value());
 
     return grp;
 }
@@ -189,7 +208,8 @@ void GeometricEntityWidget::do_update_tracer_object()
         geometry, tracer::Transform3(get_transform().compose()));
 
     tracer_object_ = create_geometric(
-        geometry_wrapper, material, med, emit_radiance, false);
+        geometry_wrapper, material, med,
+        emit_radiance, false, power_->get_value());
 }
 
 ResourceWidget<tracer::Entity> *GeometricEntityWidgetCreator::create_widget(

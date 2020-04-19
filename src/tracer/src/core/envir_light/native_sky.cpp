@@ -8,6 +8,8 @@ class NativeSky : public EnvirLight
     Spectrum top_;
     Spectrum bottom_;
 
+    real user_specified_power_;
+
     Spectrum radiance_impl(const Vec3 &ref_to_light) const noexcept
     {
         const real cos_theta = math::clamp<real>(
@@ -19,14 +21,13 @@ class NativeSky : public EnvirLight
 
 public:
 
-    NativeSky(const Spectrum &top, const Spectrum &bottom)
+    NativeSky(
+        const Spectrum &top, const Spectrum &bottom,
+        real user_specified_power)
     {
-        AGZ_HIERARCHY_TRY
-
         top_    = top;
         bottom_ = bottom;
-
-        AGZ_HIERARCHY_WRAP("in initializing native sky")
+        user_specified_power_ = user_specified_power;
     }
 
     LightSampleResult sample(
@@ -116,6 +117,8 @@ public:
 
     Spectrum power() const noexcept override
     {
+        if(user_specified_power_ > 0)
+            return Spectrum(user_specified_power_);
         const real radius = world_radius_;
         const Spectrum mean_radiance = (top_ + bottom_) * real(0.5);
         return 4 * PI_r * PI_r * radius * radius * mean_radiance;
@@ -130,9 +133,10 @@ public:
 
 RC<EnvirLight> create_native_sky(
     const Spectrum &top,
-    const Spectrum &bottom)
+    const Spectrum &bottom,
+    real user_specified_power)
 {
-    return newRC<NativeSky>(top, bottom);
+    return newRC<NativeSky>(top, bottom, user_specified_power);
 }
 
 AGZ_TRACER_END

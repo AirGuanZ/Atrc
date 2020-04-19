@@ -7,10 +7,12 @@ AGZ_TRACER_BEGIN
 
 RC<EnvirLight> create_ibl_light(
     RC<const Texture2D> tex,
-    bool no_importance_sampling = false);
+    bool no_importance_sampling = false,
+    real user_specified_power = -1);
 
 RC<EnvirLight> create_native_sky(
     const Spectrum &top,
-    const Spectrum &bottom);
+    const Spectrum &bottom,
+    real user_specified_power = -1);
 
 AGZ_TRACER_END

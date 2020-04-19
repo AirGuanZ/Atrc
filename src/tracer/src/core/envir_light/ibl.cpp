@@ -16,11 +16,17 @@ class IBL : public EnvirLight
 
     Box<EnvironmentLightSampler> sampler_;
 
+    real user_specified_power_;
+
 public:
 
-    IBL(RC<const Texture2D> tex, bool no_importance_sampling)
+    IBL(
+        RC<const Texture2D> tex,
+        bool no_importance_sampling,
+        real user_specified_power = -1)
     {
-        tex_     = tex;
+        tex_ = tex;
+        user_specified_power_ = user_specified_power;
 
         if(no_importance_sampling)
             sampler_ = newBox<EnvironmentLightSampler>(
@@ -144,7 +150,8 @@ public:
     Spectrum power() const noexcept override
     {
         const real radius = world_radius_;
-        return avg_rad_ * radius * radius;
+        return user_specified_power_ > 0 ? Spectrum(user_specified_power_)
+                                         : avg_rad_ * radius * radius;
     }
 
     Spectrum radiance(
@@ -161,9 +168,10 @@ public:
 
 RC<EnvirLight> create_ibl_light(
     RC<const Texture2D> tex,
-    bool no_importance_sampling = false)
+    bool no_importance_sampling,
+    real user_specified_power)
 {
-    return newRC<IBL>(tex, no_importance_sampling);
+    return newRC<IBL>(tex, no_importance_sampling, user_specified_power);
 }
 
 AGZ_TRACER_END

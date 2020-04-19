@@ -1,7 +1,9 @@
 #pragma once
 
 #include <agz/editor/envir_light/envir_light.h>
+#include <agz/editor/imexport/asset_version.h>
 #include <agz/editor/ui/utility/color_holder.h>
+#include <agz/editor/ui/utility/vec_input.h>
 
 AGZ_EDITOR_BEGIN
 
@@ -15,6 +17,7 @@ public:
     {
         Spectrum top    = Spectrum(1);
         Spectrum bottom = Spectrum(0);
+        real power      = -1;
     };
 
     explicit NativeSkyWidget(const CloneData &clone_data);
@@ -37,6 +40,8 @@ private:
 
     ColorHolder *top_     = nullptr;
     ColorHolder *bottom_  = nullptr;
+
+    RealInput *power_ = nullptr;
 };
 
 class NativeSkyCreator : public EnvirLightWidgetCreator

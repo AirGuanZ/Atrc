@@ -38,10 +38,10 @@ namespace entity
         RC<Entity> create(
             const ConfigGroup &params, CreatingContext &context) const override
         {
-            const auto geometry = context.create<Geometry>(
+            auto geometry = context.create<Geometry>(
                 params.child_group("geometry"));
 
-            const auto material = context.create<Material>(
+            auto material = context.create<Material>(
                 params.child_group("material"));
 
             const auto medium = create_medium_interface(params, context);
@@ -51,9 +51,11 @@ namespace entity
 
             const auto no_denoise = params.child_int_or("no_denoise", 0);
 
+            const real power = params.child_real_or("power", -1);
+
             return create_geometric(
                 std::move(geometry), std::move(material),
-                medium, emit_rad, no_denoise);
+                medium, emit_rad, no_denoise, power);
         }
     };
 

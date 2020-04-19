@@ -22,7 +22,8 @@ public:
         RC<const Material> material,
         const MediumInterface &med,
         const Spectrum &emit_radiance,
-        bool no_denoise)
+        bool no_denoise,
+        real user_specified_power)
     {
         geometry_ = std::move(geometry);
         material_ = std::move(material);
@@ -33,7 +34,7 @@ public:
         if(!emit_radiance.is_black())
         {
             diffuse_light_ = newBox<GeometryToDiffuseLight>(
-                geometry_.get(), emit_radiance);
+                geometry_.get(), emit_radiance, user_specified_power);
         }
     }
 
@@ -77,11 +78,13 @@ RC<Entity> create_geometric(
     RC<const Material> material,
     const MediumInterface &med,
     const Spectrum &emit_radiance,
-    bool no_denoise)
+    bool no_denoise,
+    real user_specified_power)
 {
     return newRC<GeometricEntity>(
         std::move(geometry), std::move(material),
-        med, emit_radiance, no_denoise);
+        med, emit_radiance, no_denoise,
+        user_specified_power);
 }
 
 AGZ_TRACER_END

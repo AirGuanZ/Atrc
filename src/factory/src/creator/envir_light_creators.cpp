@@ -20,7 +20,11 @@ namespace envir_light
         {
             const auto tex = context.create<Texture2D>(
                 params.child_group("tex"));
-            return create_ibl_light(std::move(tex));
+            const bool no_importance_sampling = params.child_int_or(
+                "no_importance_sampling", 0) != 0;
+            const real power = params.child_real_or("power", -1);
+            return create_ibl_light(
+                std::move(tex), no_importance_sampling, power);
         }
     };
 
@@ -38,7 +42,8 @@ namespace envir_light
         {
             const auto top    = params.child_spectrum("top");
             const auto bottom = params.child_spectrum("bottom");
-            return create_native_sky(top, bottom);
+            const real power = params.child_real_or("power", -1);
+            return create_native_sky(top, bottom, power);
         }
     };
 

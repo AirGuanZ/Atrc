@@ -21,6 +21,7 @@ public:
         MediumSlot *medium_out = nullptr;
         Spectrum emit_radiance;
         DirectTransform transform;
+        real power = -1;
     };
 
     GeometricEntityWidget(const CloneState &clone_state, ObjectContext &obj_ctx);
@@ -57,6 +58,8 @@ private:
     SpectrumInput *emit_radiance_ = nullptr;
 
     Transform3DWidget *transform_ = nullptr;
+
+    RealInput *power_ = nullptr;
 };
 
 class GeometricEntityWidgetCreator : public EntityWidgetCreator
