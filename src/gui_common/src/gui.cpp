@@ -170,6 +170,8 @@ void GUI::on_exec_post_processor()
 
 void GUI::start_rendering(const std::string &input_filename)
 {
+    stop_rendering();
+
     render_context_ = std::make_unique<Context>();
 
     auto path_mapper = std::make_unique<agz::tracer::factory::BasicPathMapper>();
