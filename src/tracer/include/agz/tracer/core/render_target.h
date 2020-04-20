@@ -323,7 +323,7 @@ void FilmFilterApplier::FilmGrid<TexelTypes...>::merge_into_aux(
     {
         for(int x = pixel_range_.low.x, local_x = 0;
             x <= pixel_range_.high.x; ++x, ++local_x)
-            texture.at(y, x) = local_tex(local_y, local_x);
+            texture.at(y, x) += local_tex(local_y, local_x);
     }
 }
 

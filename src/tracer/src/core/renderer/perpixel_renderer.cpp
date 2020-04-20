@@ -11,7 +11,7 @@ AGZ_TRACER_BEGIN
 
 void PerPixelRenderer::render_grid(
     const Scene &scene, Sampler &sampler,
-    Grid &grid, const Vec2i &full_res) const
+    Grid &grid, const Vec2i &full_res, int spp) const
 {
     Arena arena;
     const Camera *camera = scene.get_camera();
@@ -21,7 +21,7 @@ void PerPixelRenderer::render_grid(
     {
         for(int px = sam_bound.low.x; px <= sam_bound.high.x; ++px)
         {
-            for(int i = 0; i < spp_; ++i)
+            for(int i = 0; i < spp; ++i)
             {
                 const Sample2 film_sam = sampler.sample2();
                 const real pixel_x = px + film_sam.u;
@@ -79,69 +79,100 @@ RenderTarget PerPixelRenderer::render_impl(
     for(int i = 0; i < thread_count; ++i)
         perthread_sampler.push_back(sampler_prototype->clone(i, sampler_arena));
 
-    int finished_pixel_count = 0;
     std::mutex reporter_mutex;
 
     reporter.begin();
     reporter.new_stage();
 
+    // rendering iteration
+
+    thread::thread_group_t thread_group(thread_count);
+
+    auto run_iter = [&](double prog_beg, double prog_end, int spp)
+    {
+        int finished_pixel_count = 0;
+
+        parallel_for_2d_grid(
+            thread_count, filter.width(), filter.height(),
+            task_grid_size_, task_grid_size_, thread_group,
+            [&] (int thread_index, const Rect2i &rect)
+        {
+            auto &sampler = perthread_sampler[thread_index];
+
+            auto grid = filter.create_subgrid<
+                Spectrum, real, Spectrum, Vec3, real>(
+                    { rect.low, rect.high - Vec2i(1) });
+
+            render_grid(
+                scene, *sampler, grid,
+                { filter.width(), filter.height() }, spp);
+
+            const int total_pixel_count = filter.width() * filter.height();
+
+            if constexpr(REPORTER_WITH_PREVIEW)
+            {
+                std::lock_guard lk(reporter_mutex);
+                grid.merge_into(
+                    image_buffer.value, image_buffer.weight,
+                    image_buffer.albedo, image_buffer.normal,
+                    image_buffer.denoise);
+
+                finished_pixel_count += (rect.high - rect.low).product();
+                const double percent = math::lerp(
+                    prog_beg, prog_end,
+                    double(finished_pixel_count) / total_pixel_count);
+                reporter.progress(percent, get_img);
+            }
+            else
+            {
+                AGZ_UNACCESSED(get_img);
+
+                grid.merge_into(
+                    image_buffer.value, image_buffer.weight,
+                    image_buffer.albedo, image_buffer.normal,
+                    image_buffer.denoise);
+
+                std::lock_guard lk(reporter_mutex);
+
+                finished_pixel_count += (rect.high - rect.low).product();
+                const double percent = math::lerp(
+                    prog_beg, prog_end,
+                    double(finished_pixel_count) / total_pixel_count);
+                reporter.progress(percent, {});
+            }
+
+            return !stop_rendering_;
+        });
+    };
+
     // start rendering
 
-    parallel_for_2d_grid(
-        thread_count, filter.width(), filter.height(),
-        task_grid_size_, task_grid_size_,
-        [
-            &filter,
-            &scene,
-            &reporter,
-            &reporter_mutex,
-            &image_buffer,
-            &finished_pixel_count,
-            &get_img,
-            &perthread_sampler,
-            this
-        ] (int thread_index, const Rect2i &rect)
+    if(reporter.need_image_preview())
     {
-        auto &sampler = perthread_sampler[thread_index];
+        const double first_iter_prog_end = 100.0 / spp_;
+        run_iter(0, first_iter_prog_end, 1);
 
-        auto grid = filter.create_subgrid<
-            Spectrum, real, Spectrum, Vec3, real>(
-                { rect.low, rect.high - Vec2i(1) });
-
-        render_grid(scene, *sampler, grid, { filter.width(), filter.height() });
-
-        if constexpr(REPORTER_WITH_PREVIEW)
+        const int per_iter_spp = (std::max)(20, spp_ / 20);
+        int finished_spp = 1;
+        while(finished_spp < spp_)
         {
-            std::lock_guard lk(reporter_mutex);
-            grid.merge_into(
-                image_buffer.value, image_buffer.weight,
-                image_buffer.albedo, image_buffer.normal,
-                image_buffer.denoise);
+            if(stop_rendering_)
+                break;
 
-            finished_pixel_count += (rect.high - rect.low).product();
-            const real percent = real(100) * finished_pixel_count
-                               / (filter.width() * filter.height());
-            reporter.progress(percent, get_img);
+            const int new_finished_spp = (std::min)(
+                spp_, finished_spp + per_iter_spp);
+            const int delta_spp = new_finished_spp - finished_spp;
+
+            const double prog_beg = 100.0 * finished_spp / spp_;
+            const double prog_end = 100.0 * new_finished_spp / spp_;
+
+            run_iter(prog_beg, prog_end, delta_spp);
+
+            finished_spp = new_finished_spp;
         }
-        else
-        {
-            AGZ_UNACCESSED(get_img);
-
-            grid.merge_into(
-                image_buffer.value, image_buffer.weight,
-                image_buffer.albedo, image_buffer.normal,
-                image_buffer.denoise);
-
-            std::lock_guard lk(reporter_mutex);
-
-            finished_pixel_count += (rect.high - rect.low).product();
-            const real percent = real(100) * finished_pixel_count
-                               / (filter.width() * filter.height());
-            reporter.progress(percent, {});
-        }
-
-        return !stop_rendering_;
-    });
+    }
+    else
+        run_iter(0, 100, spp_);
 
     reporter.end_stage();
     reporter.end();

@@ -68,8 +68,8 @@ private:
         PreviewWindow::MeshID mesh_id;
     };
 
-    ObjectContext     &obj_ctx_;
-    Editor            *editor_ = nullptr;
+    ObjectContext &obj_ctx_;
+    Editor        *editor_ = nullptr;
 
     PreviewWindow *preview_window_ = nullptr;
 

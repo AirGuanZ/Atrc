@@ -26,7 +26,7 @@ Offline rendering lab based on ray tracing
 
 ## Roadmap
 
-- [x] Component based bsdf
+- [x] Component based BSDF
 - [x] Volumetric bidirectional path tracing
 - [x] Support launching GUI renderer in editor
 - [x] Better GUI renderer (auto resizing)
@@ -35,8 +35,11 @@ Offline rendering lab based on ray tracing
 - [ ] Environment light portals
 - [ ] Volumetric photon mapping
 - [ ] Vertex connection & merging
-- [ ] Better camera panel in editor
+- [x] Better camera panel in editor
 - [ ] Support BSSRDF in BDPT
+- [ ] Variance buffer, fireflies removal & adaptive sampling
+- [ ] Support g-buffer in PSSMLT
+- [ ] Multiple selection in editor
 
 ## Documentation
 

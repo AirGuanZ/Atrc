@@ -174,7 +174,7 @@ void PreviewWindow::init_ui()
 
 RC<tracer::Camera> PreviewWindow::create_camera()
 {
-    const auto &camera_params = camera_panel_->get_preview_params();
+    const auto &camera_params = camera_panel_->get_display_params();
 
     const int film_width = size().width();
     const int film_height = size().height();
@@ -496,7 +496,7 @@ void PreviewWindow::initializeGL()
 
     // im3d
 
-    const auto &cam = get_camera_panel()->get_preview_params();
+    const auto &cam = get_camera_panel()->get_display_params();
     const Vec3 cam_pos = cam.position;
     const Vec3 cam_dir = cam.dir();
     const Vec3 cam_up  = cam.up;
@@ -548,7 +548,7 @@ void PreviewWindow::resizeEvent(QResizeEvent *event)
     update_im3d_camera();
     editor_->on_change_camera();
 
-    get_camera_panel()->set_preview_aspect(
+    get_camera_panel()->set_display_aspect(
         real(event->size().width()) / event->size().height());
 }
 
@@ -567,8 +567,8 @@ void PreviewWindow::mousePressEvent(QMouseEvent *event)
     {
         camera_controller_state_ = CameraControllerState::Rotate;
         press_coord_ = { event->x(), event->y() };
-        press_radian_ = camera_panel_->get_preview_params().radian;
-        press_dst_ = camera_panel_->get_preview_params().look_at;
+        press_radian_ = camera_panel_->get_display_params().radian;
+        press_dst_ = camera_panel_->get_display_params().look_at;
         return;
     }
 
@@ -576,8 +576,8 @@ void PreviewWindow::mousePressEvent(QMouseEvent *event)
     {
         camera_controller_state_ = CameraControllerState::Move;
         press_coord_ = { event->x(), event->y() };
-        press_radian_ = camera_panel_->get_preview_params().radian;
-        press_dst_ = camera_panel_->get_preview_params().look_at;
+        press_radian_ = camera_panel_->get_display_params().radian;
+        press_dst_ = camera_panel_->get_display_params().look_at;
     }
 }
 
@@ -614,14 +614,14 @@ void PreviewWindow::mouseMoveEvent(QMouseEvent *event)
         if(!dx && !dy)
             return;
 
-        const Vec3 dst_to_pos = -camera_panel_->get_preview_params().dir();
+        const Vec3 dst_to_pos = -camera_panel_->get_display_params().dir();
 
         const Vec3 ex = -cross(
-            camera_panel_->get_preview_params().up, dst_to_pos).normalize();
+            camera_panel_->get_display_params().up, dst_to_pos).normalize();
         const Vec3 ey = -cross(dst_to_pos, ex).normalize().normalize();
 
         const Vec3 new_look_at = press_dst_
-                               + panning_speed_ * camera_panel_->get_preview_params().distance
+                               + panning_speed_ * camera_panel_->get_display_params().distance
                                                 * (real(dx) * ex + real(dy) * ey);
         camera_panel_->set_look_at(new_look_at);
 
@@ -650,7 +650,7 @@ void PreviewWindow::mouseReleaseEvent(QMouseEvent *event)
 
 void PreviewWindow::wheelEvent(QWheelEvent *event)
 {
-    real distance = camera_panel_->get_preview_params().distance;
+    real distance = camera_panel_->get_display_params().distance;
     const real delta = real(0.05) * distance;
 
     distance -= delta * event->angleDelta().y() / real(120);
@@ -665,7 +665,7 @@ void PreviewWindow::wheelEvent(QWheelEvent *event)
 void PreviewWindow::update_im3d_camera()
 {
     const real aspect = real(width()) / height();
-    const auto &params = get_camera_panel()->get_preview_params();
+    const auto &params = get_camera_panel()->get_display_params();
 
     QMatrix4x4 proj;
     proj.perspective(params.fov_deg, aspect, real(0.1), real(1000));
@@ -719,7 +719,7 @@ void PreviewWindow::render_preview_image()
 
     if(always_highlight_selected_mesh_->isChecked() && selected_mesh_id_ >= 0)
     {
-        const Vec3 cam_dir = get_camera_panel()->get_preview_params().dir();
+        const Vec3 cam_dir = get_camera_panel()->get_display_params().dir();
 
         const real cam_hori_rad = tracer::local_angle::phi(cam_dir);
         const real cam_vert_rad = tracer::local_angle::theta(cam_dir);
@@ -755,7 +755,7 @@ void PreviewWindow::render_preview_image()
 
 void PreviewWindow::render_entities()
 {
-    const Vec3 cam_dir = get_camera_panel()->get_preview_params().dir();
+    const Vec3 cam_dir = get_camera_panel()->get_display_params().dir();
 
     const real cam_hori_rad = tracer::local_angle::phi(cam_dir);
     const real cam_vert_rad = tracer::local_angle::theta(cam_dir);
@@ -824,7 +824,7 @@ void PreviewWindow::render_renderframe()
     if(!get_camera_panel()->is_export_frame_enabled())
         return;
 
-    const auto &preview_cam = camera_panel_->get_preview_params();
+    const auto &preview_cam = camera_panel_->get_display_params();
     const auto &render_cam  = camera_panel_->get_export_params();
 
     const real preview_aspect = real(width()) / height();
@@ -869,7 +869,7 @@ void PreviewWindow::render_gizmo()
                     cursor_pos_.x     / width(),
                     1 - cursor_pos_.y / height());
 
-                const auto &camera_params = get_camera_panel()->get_preview_params();
+                const auto &camera_params = get_camera_panel()->get_display_params();
 
                 const int film_width = size().width();
                 const int film_height = size().height();
@@ -887,7 +887,7 @@ void PreviewWindow::render_gizmo()
                     + (film_coord.x - real(0.5)) * x_ext * x
                     + (film_coord.y - real(0.5)) * y_ext * y;
 
-                const Vec3 eye = camera_panel_->get_preview_params().position;
+                const Vec3 eye = camera_panel_->get_display_params().position;
                 emit left_click_to_emit_ray(eye, ray_dst - eye);
             }
         }

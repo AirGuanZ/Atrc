@@ -16,7 +16,7 @@ class PerPixelRenderer : public Renderer
 
     void render_grid(
         const Scene &scene, Sampler &sampler,
-        Grid &grid, const Vec2i &full_res) const;
+        Grid &grid, const Vec2i &full_res, int spp) const;
 
     template<bool REPORTER_WITH_PREVIEW>
     RenderTarget render_impl(
