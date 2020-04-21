@@ -157,13 +157,9 @@ namespace
         for(int i = t - 1; i >= 1; --i)
         {
             const real mul = z2o(L[i].pdf_fwd);
-            const real div = z2o(L[i].pdf_bwd);
+            const real div = L[i].is_delta ? real(1) : z2o(L[i].pdf_bwd);
 
             cur_pdf *= mul / div;
-
-            // note that L[t - 1].is_delta shouldn't be considered
-            // however, contrib is always 0 if L[t - 1].is_delta == true,
-            // so we don't need to handle it separately
 
             if(!L[i].is_delta && !L[i - 1].is_delta)
                 sum_pdf += cur_pdf;
@@ -174,7 +170,7 @@ namespace
         if(t >= 1)
         {
             const real mul = z2o(L[0].pdf_fwd);
-            const real div = z2o(L[0].pdf_bwd);
+            const real div = L[0].is_delta ? real(1) : z2o(L[0].pdf_bwd);
 
             cur_pdf *= mul / div;
 
@@ -186,25 +182,12 @@ namespace
 
         cur_pdf = 1;
 
-        // camera end
-
-        if(s >= 2)
-        {
-            const real mul = z2o(C[s - 1].pdf_bwd);
-            const real div = z2o(C[s - 1].pdf_fwd);
-
-            cur_pdf *= mul / div;
-
-            if(!C[s - 2].is_delta)
-                sum_pdf += cur_pdf;
-        }
-
         // camera vertices
 
-        for(int i = s - 2; i >= 1; --i)
+        for(int i = s - 1; i >= 1; --i)
         {
             const real mul = z2o(C[i].pdf_bwd);
-            const real div = z2o(C[i].pdf_fwd);
+            const real div = C[i].is_delta ? real(1) : z2o(C[i].pdf_fwd);
 
             cur_pdf *= mul / div;
 
