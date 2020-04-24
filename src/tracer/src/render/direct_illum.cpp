@@ -52,7 +52,7 @@ Spectrum mis_sample_area_light(
     if(!light_sample.radiance || !light_sample.pdf)
         return {};
 
-    if(scene.visible(light_sample.pos, scattering.pos))
+    if(!scene.visible(light_sample.pos, scattering.pos))
         return {};
 
     const Vec3 inct_to_light = (light_sample.pos - scattering.pos).normalize();
@@ -257,7 +257,7 @@ Spectrum mis_sample_bsdf(
     const EntityIntersection &inct, const ShadingPoint &shd,
     Sampler &sampler)
 {
-    BSDFSampleResult bsdf_sample;
+    BSDFSampleResult bsdf_sample(UNINIT);
     bool has_ent_inct;
     EntityIntersection ent_inct;
     return mis_sample_bsdf(
@@ -270,7 +270,7 @@ Spectrum mis_sample_bsdf(
     const MediumScattering &scattering, const BSDF *phase_function,
     Sampler &sampler)
 {
-    BSDFSampleResult bsdf_sample;
+    BSDFSampleResult bsdf_sample(UNINIT);
     bool has_ent_inct;
     EntityIntersection ent_inct;
     return mis_sample_bsdf(

@@ -84,18 +84,14 @@ public:
         const Vec3 lens_pos = Vec3(
             lens_radius_ * disk_sam.x, lens_radius_ * disk_sam.y, 0);
 
-        CameraSampleWeResult ret;
-        
-        ret.pos_on_cam = camera_to_world_.apply_to_point(lens_pos);
-        ret.throughput = Spectrum(1);
+        const Vec3 pos_on_cam = camera_to_world_.apply_to_point(lens_pos);;
+        const Vec3 pos_to_out = camera_to_world_.apply_to_vector(
+            focal_film_pos - lens_pos).normalize();;
+        const Vec3 nor_on_cam = camera_to_world_
+            .apply_to_vector(Vec3(0, 0, 1)).normalize();;
 
-        ret.pos_to_out = camera_to_world_.apply_to_vector(
-            focal_film_pos - lens_pos).normalize();
-
-        ret.nor_on_cam = camera_to_world_
-            .apply_to_vector(Vec3(0, 0, 1)).normalize();
-
-        return ret;
+        return CameraSampleWeResult(
+            pos_on_cam, pos_to_out, nor_on_cam, Spectrum(1));
     }
 
     CameraEvalWeResult eval_we(
@@ -179,16 +175,15 @@ public:
             real(0.5) + focal_film_pos.y / focal_film_height_
         };
 
-        CameraSampleWiResult ret;
-        ret.pos_on_cam = camera_to_world_.apply_to_point(lens_pos);
-        ret.nor_at_pos = dir_;
-        ret.ref_to_pos = ret.pos_on_cam - ref;
-        ret.we         = this->eval_we(ret.pos_on_cam, -ret.ref_to_pos).we;
-        ret.pdf        = (ret.pos_on_cam - ref).length_square()
+        const Vec3 pos_on_cam = camera_to_world_.apply_to_point(lens_pos);
+        const Vec3 nor_at_pos = dir_;
+        const Vec3 ref_to_pos = pos_on_cam - ref;
+        const Spectrum we = eval_we(pos_on_cam, -ref_to_pos).we;
+        const real pdf = (pos_on_cam - ref).length_square()
                        / (local_dir.z * area_lens_);
-        ret.film_coord = film_coord;
 
-        return ret;
+        return CameraSampleWiResult(
+            pos_on_cam, nor_at_pos, ref_to_pos, we, pdf, film_coord);
     }
 };
 

@@ -11,6 +11,19 @@ AGZ_TRACER_BEGIN
  */
 struct CameraSampleWeResult
 {
+    CameraSampleWeResult(
+        const Vec3 &pos_on_cam,
+        const Vec3 &pos_to_out,
+        const Vec3 &nor_on_cam,
+        const Spectrum &throughput) noexcept
+        : pos_on_cam(pos_on_cam),
+          pos_to_out(pos_to_out),
+          nor_on_cam(nor_on_cam),
+          throughput(throughput)
+    {
+
+    }
+
     Vec3 pos_on_cam;
     Vec3 pos_to_out;
     Vec3 nor_on_cam;
@@ -22,8 +35,14 @@ struct CameraSampleWeResult
  */
 struct CameraWePDFResult
 {
-    real pdf_pos      = 0;
-    real pdf_dir      = 0;
+    CameraWePDFResult(real pdf_pos, real pdf_dir) noexcept
+        : pdf_pos(pdf_pos), pdf_dir(pdf_dir)
+    {
+        
+    }
+
+    real pdf_pos;
+    real pdf_dir;
 };
 
 /**
@@ -31,18 +50,45 @@ struct CameraWePDFResult
  */
 struct CameraEvalWeResult
 {
+    CameraEvalWeResult(
+        const Spectrum &we,
+        const Vec2 &film_coord,
+        const Vec3 &nor_on_cam) noexcept
+        : we(we), film_coord(film_coord), nor_on_cam(nor_on_cam)
+    {
+
+    }
+
     Spectrum we;
     Vec2 film_coord;
     Vec3 nor_on_cam;
 };
 
-inline const CameraEvalWeResult CAMERA_EVAL_WE_RESULT_ZERO = { {}, {}, {} };
+inline const CameraEvalWeResult CAMERA_EVAL_WE_RESULT_ZERO =
+    CameraEvalWeResult({}, {}, {});
 
 /**
  * @brief result of sampling camera wi
  */
 struct CameraSampleWiResult
 {
+    CameraSampleWiResult(
+        const Vec3 &pos_on_cam,
+        const Vec3 &nor_at_pos,
+        const Vec3 &ref_to_pos,
+        const Spectrum &we,
+        real pdf,
+        const Vec2 &film_coord) noexcept
+        : pos_on_cam(pos_on_cam),
+          nor_at_pos(nor_at_pos),
+          ref_to_pos(ref_to_pos),
+          we(we),
+          pdf(pdf),
+          film_coord(film_coord)
+    {
+        
+    }
+
     Vec3 pos_on_cam; // position on camera lens
     Vec3 nor_at_pos; // lens normal
     Vec3 ref_to_pos; // from reference point to position on lens
@@ -52,7 +98,7 @@ struct CameraSampleWiResult
 };
 
 inline const CameraSampleWiResult CAMERA_SAMPLE_WI_RESULT_INVALID =
-    { {}, {}, {}, {}, 0, {} };
+    CameraSampleWiResult({}, {}, {}, {}, 0, {});
 
 /**
  * @brief camera interface

@@ -19,6 +19,16 @@ constexpr uint8_t BSDF_ALL = BSDF_DIFFUSE | BSDF_GLOSSY | BSDF_SPECULAR;
  */
 struct BSDFSampleResult
 {
+    explicit BSDFSampleResult(uninitialized_t) noexcept { }
+
+    constexpr BSDFSampleResult(
+        const Vec3 &dir, const Spectrum &f,
+        real pdf, bool is_delta) noexcept
+        : dir(dir), f(f), pdf(pdf), is_delta(is_delta)
+    {
+
+    }
+
     Vec3          dir;              // scattering direction
     Spectrum      f;                // bsdf value
     real          pdf = 0;          // pdf w.r.t. solid angle
@@ -34,7 +44,7 @@ struct BSDFSampleResult
  * @brief returned value when BSDF sampling fails
  */
 inline const BSDFSampleResult BSDF_SAMPLE_RESULT_INVALID =
-    { {}, {}, 0, false };
+    BSDFSampleResult({}, {}, 0, false);
 
 /**
  * @brief bidirectional scattering distribution function
@@ -146,13 +156,7 @@ protected:
             geometry_coord_, shading_coord_, wi);;
         const Spectrum f = albedo() / PI_r * normal_corr;
 
-        BSDFSampleResult ret;
-        ret.dir      = wi;
-        ret.f        = f;
-        ret.pdf      = pdf;
-        ret.is_delta = false;
-
-        return ret;
+        return BSDFSampleResult(wi, f, pdf, false);
     }
 
     real pdf_for_black_fringes(const Vec3 &in, const Vec3 &out) const noexcept

@@ -57,13 +57,13 @@ public:
             cos_theta
         };
 
-        BSDFSampleResult ret;
-        ret.pdf      = phase_func(u);
-        ret.f        = Spectrum(ret.pdf);
-        ret.dir      = Coord::from_z(wo).local_to_global(local_wi);
-        ret.is_delta = false;
+        const real phase_value = phase_func(u);
 
-        return ret;
+        return BSDFSampleResult(
+            Coord::from_z(wo).local_to_global(local_wi),
+            Spectrum(phase_value),
+            phase_value,
+            false);
     }
 
     real pdf(

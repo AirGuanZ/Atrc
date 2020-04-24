@@ -105,21 +105,16 @@ public:
                 scattering.medium = this;
                 scattering.wr     = (a - b) / t_max;
 
-                SampleOutScatteringResult result;
-                result.scattering_point = scattering;
-                result.throughput       = Spectrum(albedo);
-
-                result.phase_function =
+                auto phase_function =
                     arena.create<HenyeyGreensteinPhaseFunction>(
                         g, Spectrum(albedo));
 
-                return result;
+                return SampleOutScatteringResult(
+                    scattering, Spectrum(albedo), phase_function);
             }
         }
 
-        SampleOutScatteringResult result;
-        result.throughput = Spectrum(1);
-        return result;
+        return SampleOutScatteringResult({}, Spectrum(1), nullptr);
     }
 };
 

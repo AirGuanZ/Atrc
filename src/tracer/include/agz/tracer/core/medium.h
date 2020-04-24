@@ -12,10 +12,21 @@ AGZ_TRACER_BEGIN
  */
 struct SampleOutScatteringResult
 {
+    SampleOutScatteringResult(
+        const MediumScattering &sp,
+        const Spectrum &throughput,
+        const BSDF *phase_function) noexcept
+        : scattering_point(sp),
+          throughput(throughput),
+          phase_function(phase_function)
+    {
+        
+    }
+
     MediumScattering scattering_point;
     Spectrum throughput;
 
-    const BSDF *phase_function = nullptr;
+    const BSDF *phase_function;
 
     bool is_scattering_happened() const noexcept
     {

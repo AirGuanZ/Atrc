@@ -95,7 +95,7 @@ BSDFSampleResult AggregateBSDF<MAX_COMP_CNT>::sample(
 
     const Vec3 lwo = shading_coord_.global_to_local(wo).normalize();
     if(!lwo.z)
-        return {};
+        return BSDF_SAMPLE_RESULT_INVALID;
 
     // compute sum of weights
 
@@ -161,16 +161,8 @@ BSDFSampleResult AggregateBSDF<MAX_COMP_CNT>::sample(
     const real normal_corr_factor = local_angle::normal_corr_factor(
         geometry_coord_, shading_coord_, wi);
 
-    BSDFSampleResult ret;
-    ret.dir      = wi;
-    ret.f        = sam_ret.f * normal_corr_factor;
-    ret.pdf      = sam_ret.pdf;
-    ret.is_delta = false;
-
-    if(ret.pdf < real(0.001))
-        return BSDF_SAMPLE_RESULT_INVALID;
-
-    return ret;
+    return BSDFSampleResult(
+        wi, sam_ret.f * normal_corr_factor, sam_ret.pdf, false);
 }
 
 template<int MAX_COMP_CNT>
@@ -265,7 +257,7 @@ BSDFSampleResult AggregateBSDF<MAX_COMP_CNT>::sample_all(
 
     const Vec3 lwo = shading_coord_.global_to_local(wo).normalize();
     if(!lwo.z)
-        return {};
+        return BSDF_SAMPLE_RESULT_INVALID;
 
     // compute sum of weights
 
@@ -322,17 +314,8 @@ BSDFSampleResult AggregateBSDF<MAX_COMP_CNT>::sample_all(
     const real normal_corr_factor = local_angle::normal_corr_factor(
         geometry_coord_, shading_coord_, wi);
 
-    BSDFSampleResult ret;
-    ret.dir      = wi;
-    ret.f        = sam_ret.f * normal_corr_factor;
-    ret.pdf      = sam_ret.pdf;
-    ret.is_delta = false;
-
-    if(ret.pdf < real(0.001))
-        return BSDF_SAMPLE_RESULT_INVALID;
-
-    return ret;
-
+    return BSDFSampleResult(
+        wi, sam_ret.f * normal_corr_factor, sam_ret.pdf, false);
 }
 
 template<int MAX_COMP_CNT>

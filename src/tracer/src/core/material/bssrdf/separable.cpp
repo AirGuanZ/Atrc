@@ -69,13 +69,11 @@ namespace
 
             const Vec3 dir = coord_.local_to_global(local_dir);
 
-            BSDFSampleResult ret;
-            ret.f        = eval_all(dir, {}, TransMode::Radiance);
-            ret.dir      = dir;
-            ret.is_delta = false;
-            ret.pdf      = pdf;
-
-            return ret;
+            return BSDFSampleResult(
+                dir,
+                eval_all(dir, {}, TransMode::Radiance),
+                pdf,
+                false);
         }
 
         real pdf(const Vec3 &wi, const Vec3&, uint8_t) const noexcept override
@@ -167,7 +165,7 @@ BSSRDFSamplePiResult SeparableBSSRDF::sample_pi(
     const auto sr = sample_r(channel, { sample_u });
     const real r_max = sample_r(channel, { real(0.996) }).distance;
     if(sr.distance <= 0 || sr.distance > r_max)
-        return {};
+        return BSSRDF_SAMPLE_PI_RESULT_INVALID;
     const real phi = 2 * PI_r * sample_v;
 
     // construct inct ray
@@ -216,7 +214,7 @@ BSSRDFSamplePiResult SeparableBSSRDF::sample_pi(
     }
 
     if(!inct_cnt)
-        return {};
+        return BSSRDF_SAMPLE_PI_RESULT_INVALID;
 
     // select an inct
 
@@ -230,7 +228,7 @@ BSSRDFSamplePiResult SeparableBSSRDF::sample_pi(
     }
 
     if(inct_list_entry->inct.material != po_.material)
-        return {};
+        return BSSRDF_SAMPLE_PI_RESULT_INVALID;
 
     // construct ret
 
@@ -242,17 +240,13 @@ BSSRDFSamplePiResult SeparableBSSRDF::sample_pi(
     const real cos_theta_o = cos(po_.wr, po_.geometry_coord.z);
     const real fro = 1 - refl_aux::dielectric_fresnel(eta_, 1, cos_theta_o);
 
-    BSSRDFSamplePiResult ret;
+    EntityIntersection inct = inct_list_entry->inct;
+    inct.material = arena.create<SeparableBSDFMaterial>(bsdf);
 
-    ret.inct          = inct_list_entry->inct;
-    ret.inct.material = arena.create<SeparableBSDFMaterial>(bsdf);
-    ret.coef          = fro * eval_r(distance(ret.inct.pos, po_.pos));
-    ret.pdf           = pdf_radius / (2 * PI_r) / inct_cnt;
+    const Spectrum coef = fro * eval_r(distance(inct.pos, po_.pos));
+    const real pdf = pdf_radius / (2 * PI_r) / inct_cnt;
 
-    if(!ret.coef.is_finite() || ret.pdf < EPS())
-        return {};
-
-    return ret;
+    return BSSRDFSamplePiResult(inct, coef, pdf);
 }
 
 real SeparableBSSRDF::pdf_pi(const EntityIntersection &pi) const

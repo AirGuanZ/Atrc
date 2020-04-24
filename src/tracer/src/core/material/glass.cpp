@@ -63,19 +63,14 @@ namespace
             const Spectrum fr = fresnel_point_->eval(nwo.z);
             if(sam.u < fr.r)
             {
-                BSDFSampleResult ret;
-                const Vec3 local_in = Vec3(-nwo.x, -nwo.y, nwo.z);
-                ret.dir      = shading_coord_.local_to_global(local_in);
-                ret.f        = color_reflection_ * fr / std::abs(local_in.z);
-                ret.pdf      = fr.r;
-                ret.is_delta = true;
+                const Vec3 lwi = Vec3(-nwo.x, -nwo.y, nwo.z);
 
-                ret.f *= local_angle::normal_corr_factor(
-                    geometry_coord_, shading_coord_, ret.dir);
-                if(has_inf(ret.f))
-                    return BSDF_SAMPLE_RESULT_INVALID;
+                const Vec3 wi = shading_coord_.local_to_global(lwi);
+                const Spectrum f = color_reflection_ * fr / std::abs(lwi.z);
+                const real norm_factor = local_angle::normal_corr_factor(
+                    geometry_coord_, shading_coord_, wi);
 
-                return ret;
+                return BSDFSampleResult(wi, f * norm_factor, fr.r, true);
             }
 
             const real eta_i = nwo.z > 0 ? fresnel_point_->eta_o()
@@ -92,19 +87,14 @@ namespace
             const real corr_factor = transport_mode == TransMode::Radiance ?
                                      eta * eta : real(1);
 
-            BSDFSampleResult ret;
-            ret.dir      = shading_coord_.local_to_global(nwi);
-            ret.f        = corr_factor * color_refraction_
-                         * (1 - fr.r) / std::abs(nwi.z);
-            ret.pdf      = 1 - fr.r;
-            ret.is_delta = true;
+            const Vec3 dir = shading_coord_.local_to_global(nwi);
+            const Spectrum f = corr_factor * color_refraction_
+                             * (1 - fr.r) / std::abs(nwi.z);
+            const real pdf = 1 - fr.r;
+            const real norm_factor = local_angle::normal_corr_factor(
+                geometry_coord_, shading_coord_, dir);
 
-            ret.f *= local_angle::normal_corr_factor(
-                geometry_coord_, shading_coord_, ret.dir);
-            if(has_inf(ret.f))
-                return BSDF_SAMPLE_RESULT_INVALID;
-
-            return ret;
+            return BSDFSampleResult(dir, f * norm_factor, pdf, true);
         }
 
         real pdf(const Vec3&, const Vec3&, uint8_t) const noexcept override

@@ -13,44 +13,29 @@ namespace sppm
 {
 
 VisiblePointSearcher::VisiblePointSearcher(
-    const AABB &world_bound, int max_axis_grid_res)
+    const AABB &world_bound,
+    real grid_sidelen,
+    size_t entry_count)
+    : hashed_grid_aux_(world_bound, grid_sidelen, entry_count)
 {
-    world_low_ = world_bound.low;
-
-    // compute grid size & resolution
-
-    const Vec3 extent = world_bound.high - world_bound.low;
-    grid_size_ = extent.max_elem() / real(max_axis_grid_res);
-
-    grid_res_.x = int(std::ceil(extent.x / grid_size_));
-    grid_res_.y = int(std::ceil(extent.y / grid_size_));
-    grid_res_.z = int(std::ceil(extent.z / grid_size_));
-
-    total_grid_count_ = grid_res_.product();
-
-    // create node entries
-
-    node_entry_count_ = grid_res_.product();
+    node_entry_count_ = entry_count;
     node_entries_ = newBox<std::atomic<VPNode*>[]>(node_entry_count_);
-    grid_index_dot_ = {
-        1,
-        grid_res_.x,
-        grid_res_.x * grid_res_.y
-    };
-
+    
     clear();
 }
 
 void VisiblePointSearcher::clear()
 {
-    for(int i = 0; i < node_entry_count_; ++i)
+    for(size_t i = 0; i < node_entry_count_; ++i)
         node_entries_[i] = nullptr;
 }
 
 void VisiblePointSearcher::add_vp(Pixel &pixel, Arena &vp_node_arena)
 {
-    const Vec3i &min_grid = pos_to_grid(pixel.vp.pos - Vec3(pixel.radius));
-    const Vec3i &max_grid = pos_to_grid(pixel.vp.pos + Vec3(pixel.radius));
+    const Vec3i &min_grid = hashed_grid_aux_.pos_to_grid(
+        pixel.vp.pos - Vec3(pixel.radius));
+    const Vec3i &max_grid = hashed_grid_aux_.pos_to_grid(
+        pixel.vp.pos + Vec3(pixel.radius));
 
     for(int z = min_grid.z; z <= max_grid.z; ++z)
     {
@@ -58,7 +43,7 @@ void VisiblePointSearcher::add_vp(Pixel &pixel, Arena &vp_node_arena)
         {
             for(int x = min_grid.x; x <= max_grid.x; ++x)
             {
-                const int entry_idx = grid_to_entry({ x, y, z });
+                const size_t entry_idx = hashed_grid_aux_.grid_to_entry({ x, y, z });
                 auto &entry = node_entries_[entry_idx];
 
                 VPNode *new_node = vp_node_arena.create<VPNode>();
@@ -75,7 +60,7 @@ void VisiblePointSearcher::add_vp(Pixel &pixel, Arena &vp_node_arena)
 void VisiblePointSearcher::add_photon(
     const Vec3 &photon_pos, const Spectrum &phi, const Vec3 &wr)
 {
-    const int entry_index = pos_to_entry(photon_pos);
+    const size_t entry_index = hashed_grid_aux_.pos_to_entry(photon_pos);
     for(VPNode *node = node_entries_[entry_index]; node; node = node->next)
     {
         auto &pixel = *node->pixel;
@@ -92,30 +77,6 @@ void VisiblePointSearcher::add_photon(
             math::atomic_add(pixel.phi[i], delta_phi[i]);
         ++pixel.M;
     }
-}
-
-Vec3i VisiblePointSearcher::pos_to_grid(const Vec3 &pos) const noexcept
-{
-    const Vec3 offset = pos - world_low_;
-    return {
-        static_cast<int>(offset.x / grid_size_),
-        static_cast<int>(offset.y / grid_size_),
-        static_cast<int>(offset.z / grid_size_)
-    };
-}
-
-int VisiblePointSearcher::grid_to_entry(const Vec3i &grid_index) const noexcept
-{
-    assert(grid_index.x >= 0 && grid_index.y >= 0 && grid_index.z >= 0);
-    assert(grid_index.x < grid_res_.x);
-    assert(grid_index.y < grid_res_.y);
-    assert(grid_index.z < grid_res_.z);
-    return dot(grid_index_dot_, grid_index);
-}
-
-int VisiblePointSearcher::pos_to_entry(const Vec3 &pos) const noexcept
-{
-    return grid_to_entry(pos_to_grid(pos));
 }
 
 Pixel::VisiblePoint tracer_vp(

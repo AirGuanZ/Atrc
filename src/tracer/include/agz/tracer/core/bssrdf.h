@@ -6,10 +6,22 @@ AGZ_TRACER_BEGIN
 
 struct BSSRDFSamplePiResult
 {
+    BSSRDFSamplePiResult(
+        const EntityIntersection &inct,
+        const Spectrum &coef,
+        real pdf) noexcept
+        : inct(inct), coef(coef), pdf(pdf)
+    {
+        
+    }
+
     EntityIntersection inct;
     Spectrum           coef;
-    real               pdf = 0;
+    real               pdf;
 };
+
+inline const BSSRDFSamplePiResult BSSRDF_SAMPLE_PI_RESULT_INVALID =
+    BSSRDFSamplePiResult({}, {}, 0);
 
 class BSSRDF : public misc::uncopyable_t
 {

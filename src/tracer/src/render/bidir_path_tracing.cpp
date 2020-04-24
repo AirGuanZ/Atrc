@@ -3,8 +3,9 @@
 #include <agz/tracer/core/entity.h>
 #include <agz/tracer/core/light.h>
 #include <agz/tracer/core/material.h>
-#include <agz/tracer/core/sampler.h>
+#include <agz/tracer/core/medium.h>
 #include <agz/tracer/core/scene.h>
+
 #include <agz/tracer/render/bidir_path_tracing.h>
 
 AGZ_TRACER_RENDER_BEGIN
@@ -14,912 +15,1195 @@ namespace bdpt
 
 namespace
 {
+    using TempAssign = misc::scope_assignment_t<real>;
 
-    using TmpAssign = misc::scope_assignment_t<real>;
-
-    real G(const Vec3 &a, const Vec3 &b,
-           const Vec3 &na, const Vec3 &nb) noexcept
+    real pdf_sa_to_area(
+        real pdf_sa, const Vec3 &this_pos, const Vertex &dst_vtx) noexcept
     {
-        const Vec3 d = a - b;
-        return std::abs(cos(d, na) * cos(d, nb)) / d.length_square();
+        switch(dst_vtx.type)
+        {
+        case VertexType::Camera:
+            {
+                const Vec3 d = dst_vtx.camera.pos - this_pos;
+                const real dst_cos = std::abs(cos(dst_vtx.camera.nor, d));
+                const real dist2 = d.length_square();
+                return pdf_sa * dst_cos / dist2;
+            }
+        case VertexType::EnvLight:
+            return pdf_sa;
+        case VertexType::Medium:
+                return pdf_sa / distance2(dst_vtx.medium.pos, this_pos);
+        case VertexType::AreaLight:
+            {
+                const Vec3 d       = dst_vtx.area_light.pos - this_pos;
+                const real dst_cos = std::abs(cos(dst_vtx.area_light.nor, d));
+                const real dist2   = d.length_square();
+                return pdf_sa * dst_cos / dist2;
+            }
+        default:
+            {
+                const Vec3 d = dst_vtx.surface.pos - this_pos;
+                const real dst_cos = std::abs(cos(dst_vtx.surface.nor, d));
+                const real dist2 = d.length_square();
+                return pdf_sa * dst_cos / dist2;
+            }
+        }
+
+        // misc::unreachable()
+    }
+
+    const Medium *get_vertex_medium(const Vertex &a, const Vertex &b) noexcept
+    {
+        assert(a.is_scattering_type() || b.is_scattering_type());
+
+        if(a.type == VertexType::Medium)
+            return a.medium.med;
+
+        if(a.type == VertexType::Surface)
+        {
+            switch(b.type)
+            {
+            case VertexType::Camera:
+                return a.surface.medium(b.camera.pos - a.surface.pos);
+            case VertexType::AreaLight:
+                return a.surface.medium(b.area_light.pos - a.surface.pos);
+            case VertexType::EnvLight:
+                return a.surface.medium(-b.env_light.light_to_out);
+            case VertexType::Medium:
+                return b.medium.med;
+            case VertexType::Surface:
+                return a.surface.medium(b.surface.pos - a.surface.pos);
+            }
+        }
+
+        assert(b.is_scattering_type());
+
+        return get_vertex_medium(b, a);
+    }
+
+    const BSDF *get_scatter_bsdf(const Vertex &v) noexcept
+    {
+        assert(v.is_scattering_type());
+        if(v.type == VertexType::Surface)
+            return v.surface.bsdf;
+        return v.medium.phase;
+    }
+
+    Vec3 get_scatter_wr(const Vertex &v) noexcept
+    {
+        assert(v.is_scattering_type());
+        if(v.type == VertexType::Surface)
+            return v.surface.wr;
+        return v.medium.wr;
+    }
+
+    Vec3 get_scatter_pos(const Vertex &v) noexcept
+    {
+        assert(v.is_scattering_type());
+        if(v.type == VertexType::Surface)
+            return v.surface.pos;
+        return v.medium.pos;
+    }
+
+    real pdf_to(const Vertex &scattering_vtx, const Vertex &to) noexcept
+    {
+        const Vec3 from_pos = get_scatter_pos(scattering_vtx);
+
+        Vec3 to_dir;
+        switch(to.type)
+        {
+        case VertexType::Camera:
+            to_dir = to.camera.pos - from_pos;
+            break;
+        case VertexType::Medium:
+            to_dir = to.medium.pos - from_pos;
+            break;
+        case VertexType::AreaLight:
+            to_dir = to.area_light.pos - from_pos;
+            break;
+        case VertexType::Surface:
+            to_dir = to.surface.pos - from_pos;
+            break;
+        case VertexType::EnvLight:
+            to_dir = -to.env_light.light_to_out;
+            break;
+        }
+
+        const real pdf_sa = get_scatter_bsdf(scattering_vtx)->pdf_all(
+            to_dir, get_scatter_wr(scattering_vtx));
+
+        return pdf_sa_to_area(pdf_sa, from_pos, to);
     }
 
     real z2o(real x) noexcept
     {
-        return !std::isnan(x) && x > EPS() ? x : real(1);
+        return (!math::is_finite(x) || x <= 0) ? 1 : x;
     }
 
-    Spectrum contrib_s2_t0_path(const ConnectedPath &connected_path);
-
-    Spectrum contrib_s1_tx_path(
-        const ConnectedPath &connected_path, Vec2 *pixel_coord);
-
-    Spectrum contrib_sx_t0_path(const ConnectedPath &connected_path);
-
-    Spectrum contrib_sx_t1_path(const ConnectedPath &connected_path);
-
-    Spectrum contrib_sx_tx_path(const ConnectedPath &connected_path);
-
-    /**
-     * connected_path must contains at least 3 vertices
-     *
-     * pdf_bwd, pdf_fwd and is_delta in all vertices must be filled
-     */
-    real weight_common(
-        const ConnectedPath &connected_path, real G_between_subpaths);
-
-    real weight_s1_tx_path(const ConnectedPath &connected_path);
-
-    real weight_sx_t0_path(const ConnectedPath &connected_path);
-
-    real weight_sx_t1_path(
-        const ConnectedPath &connected_path,
-        const LightSampleResult &lht_sam_wi);
-
-    real weight_sx_tx_path(const ConnectedPath &connected_path);
-
-    Spectrum contrib_s2_t0_path(const ConnectedPath &connected_path)
+    real mis_weight_common(
+        const Vertex *C, int s,
+        const Vertex *L, int t)
     {
-        assert(connected_path.s == 2 && connected_path.t == 0);
-    
-        const BDPTVertex &cam_beg = connected_path.cam_subpath[0];
-        const BDPTVertex &cam_end = connected_path.cam_subpath[1];
-    
-        if(cam_end.is_entity())
-        {
-            const AreaLight *light = cam_end.entity->as_light();
-            if(!light)
-                return {};
-    
-            const Spectrum radiance = light->radiance(
-                cam_end.pos, cam_end.nor,
-                cam_end.uv, cam_beg.pos - cam_end.pos);
-            return radiance * cam_end.accu_bsdf / cam_end.accu_proj_pdf;
-        }
-    
-        Spectrum radiance;
-        if(auto light = connected_path.scene.envir_light())
-            radiance = light->radiance(cam_beg.pos, cam_end.pos);
-    
-        return radiance * cam_end.accu_bsdf / cam_end.accu_proj_pdf;
-    }
-    
-    Spectrum contrib_s1_tx_path(
-        const ConnectedPath &connected_path, Vec2 *pixel_coord)
-    {
-        assert(connected_path.s == 1 && connected_path.t >= 2);
-    
-        const int t = connected_path.t;
-        BDPTVertex &cam_beg = connected_path.cam_subpath[0];
-        const BDPTVertex &lht_end = connected_path.lht_subpath[t - 1];
-        const BDPTVertex &lht_bend = connected_path.lht_subpath[t - 2];
-    
-        const CameraEvalWeResult cam_we = connected_path.camera->eval_we(
-            cam_beg.pos, lht_end.pos - cam_beg.pos);
-        if(!cam_we.we)
-            return {};
-    
-        const Vec2 pixel = {
-            cam_we.film_coord.x * connected_path.full_res.x,
-            cam_we.film_coord.y * connected_path.full_res.y
-        };
-    
-        if(!connected_path.sample_pixel_bound.contains(pixel))
-            return {};
-    
-        if(!connected_path.scene.visible(cam_beg.pos, lht_end.pos))
-            return {};
-    
-        const Spectrum bsdf = lht_end.bsdf->eval_all(
-            lht_bend.pos - lht_end.pos, cam_beg.pos - lht_end.pos,
-            TransMode::Radiance);
-        if(!bsdf)
-            return {};
-    
-        const real G_val = G(cam_beg.pos, lht_end.pos, cam_beg.nor, lht_end.nor);
-        if(G_val < EPS())
-            return {};
-    
-        const Spectrum contrib = cam_we.we * G_val * bsdf * lht_end.accu_bsdf
-                               / (cam_beg.accu_proj_pdf * lht_end.accu_proj_pdf);
-    
-        if(!contrib.is_black())
-        {
-            const real weight = weight_s1_tx_path(connected_path);
-            if(math::is_finite(weight) && contrib.is_finite())
-            {
-                *pixel_coord = { pixel.x, pixel.y };
-                return weight * contrib;
-            }
-        }
-    
-        return {};
-    }
-    
-    Spectrum contrib_sx_t0_path(const ConnectedPath &connected_path)
-    {
-        assert(connected_path.s >= 3);
-        assert(connected_path.t == 0);
-    
-        const int s = connected_path.s;
-        const BDPTVertex &cam_end = connected_path.cam_subpath[s - 1];
-        const BDPTVertex &cam_bend = connected_path.cam_subpath[s - 2];
-    
-        Spectrum contrib;
-    
-        if(cam_end.is_entity())
-        {
-            const AreaLight *light = cam_end.entity->as_light();
-            if(!light)
-                return {};
-    
-            const Spectrum radiance = light->radiance(
-                cam_end.pos, cam_end.nor, cam_end.uv, cam_bend.pos - cam_end.pos);
-            contrib = radiance * cam_end.accu_bsdf / cam_end.accu_proj_pdf;
-        }
-        else
-        {
-            Spectrum radiance;
-            if(auto light = connected_path.scene.envir_light())
-                radiance = light->radiance(cam_bend.pos, cam_end.pos);
-            contrib = radiance * cam_end.accu_bsdf / cam_end.accu_proj_pdf;
-        }
-    
-        if(!contrib || !contrib.is_finite())
-            return {};
-    
-        const real weight = weight_sx_t0_path(connected_path);
-        return weight * contrib;
-    }
-    
-    Spectrum contrib_sx_t1_path(const ConnectedPath &connected_path)
-    {
-        assert(connected_path.s >= 2 && connected_path.t == 1);
-    
-        const int s = connected_path.s;
-        const BDPTVertex &cam_end = connected_path.cam_subpath[s - 1];
-        const BDPTVertex &cam_bend = connected_path.cam_subpath[s - 2];
-    
-        if(!cam_end.is_entity())
-            return {};
-    
-        const auto lht_sam_wi = connected_path.light->sample(
-            cam_end.pos, connected_path.sampler.sample5());
-        if(!lht_sam_wi.radiance)
-            return {};
-    
-        if(!connected_path.scene.visible(cam_end.pos, lht_sam_wi.pos))
-            return {};
-    
-        const Spectrum bsdf = cam_end.bsdf->eval_all(
-            lht_sam_wi.ref_to_light(), cam_bend.pos - cam_end.pos, TransMode::Radiance);
-    
-        const real proj_pdf = lht_sam_wi.pdf
-                            / std::abs(cos(cam_end.nor, lht_sam_wi.ref_to_light()));
-        const Spectrum contrib = bsdf * cam_end.accu_bsdf * lht_sam_wi.radiance
-                               / (connected_path.select_light_pdf
-                                * cam_end.accu_proj_pdf * proj_pdf);
-
-        if(!contrib)
-            return {};
-    
-        const real weight = weight_sx_t1_path(connected_path, lht_sam_wi);
-        return weight * contrib;
-    }
-    
-    Spectrum contrib_sx_tx_path(const ConnectedPath &connected_path)
-    {
-        const int s = connected_path.s;
-        const int t = connected_path.t;
-        assert(s > 1 && t > 1);
-    
-        const BDPTVertex &cam_end = connected_path.cam_subpath[s - 1];
-        const BDPTVertex &lht_end = connected_path.lht_subpath[t - 1];
-        if(!cam_end.is_entity())
-            return {};
-    
-        if(!connected_path.scene.visible(cam_end.pos, lht_end.pos))
-            return {};
-    
-        const BDPTVertex &cam_bend = connected_path.cam_subpath[s - 2];
-        const BDPTVertex &lht_bend = connected_path.lht_subpath[t - 2];
-    
-        const real pdf = cam_end.accu_proj_pdf * lht_end.accu_proj_pdf;
-    
-        const Vec3 cam_end_to_lht_end = lht_end.pos - cam_end.pos;
-        const Spectrum cam_bsdf = cam_end.bsdf->eval_all(
-            cam_end_to_lht_end, cam_bend.pos - cam_end.pos, TransMode::Radiance);
-        const Spectrum lht_bsdf = lht_end.bsdf->eval_all(
-            -cam_end_to_lht_end, lht_bend.pos - lht_end.pos, TransMode::Importance);
-    
-        const real g = G(cam_end.pos, lht_end.pos, cam_end.nor, lht_end.nor);
-        const Spectrum contrib = cam_bsdf * lht_bsdf
-                               * cam_end.accu_bsdf * lht_end.accu_bsdf
-                               * g / pdf;
-    
-        if(contrib.is_black())
-            return {};
-    
-        const real weight = weight_sx_tx_path(connected_path);
-        return contrib * weight;
-    }
-
-    real weight_common(
-        const ConnectedPath &connected_path, real G_between_subpaths)
-    {
-        const int s = connected_path.s;
-        const int t = connected_path.t;
         assert(s >= 1 && s + t >= 3);
-    
-        const BDPTVertex *C = connected_path.cam_subpath;
-        const BDPTVertex *L = connected_path.lht_subpath;
-    
+
         real sum_pdf = 1;
         real cur_pdf = 1;
-    
-        // light end
-        if(t >= 2)
+
+        // ===== process light subpath =====
+
+        //    [..., a] <-> [b, c, ...]
+        // => [..., a, b] <-> [c, ...]
+
+        for(int i = t - 1; i >= 1; --i)
         {
-            const real mul = z2o(L[t - 1].pdf_fwd) * z2o(G_between_subpaths);
-            const real div = z2o(L[t - 1].pdf_bwd) * z2o(L[t - 1].G_with_last);
-    
+            const real mul = z2o(L[i].pdf_fwd);
+            const real div = L[i].is_delta ? real(1) : z2o(L[i].pdf_bwd);
+
             cur_pdf *= mul / div;
-    
-            if(!L[t - 2].is_delta)
-                sum_pdf += cur_pdf;
-        }
-    
-        for(int i = t - 2; i >= 1; --i)
-        {
-            const real mul = z2o(L[i].pdf_fwd) * z2o(L[i + 1].G_with_last);
-            const real div = z2o(L[i].pdf_bwd) * z2o(L[i].G_with_last);
-    
-            cur_pdf *= mul / div;
-    
+
             if(!L[i].is_delta && !L[i - 1].is_delta)
                 sum_pdf += cur_pdf;
         }
-    
+
         // light beg
+
         if(t >= 1)
         {
-            const real mul_G = t == 1 ? G_between_subpaths : L[1].G_with_last;
-            const real mul = z2o(L[0].pdf_fwd) * z2o(mul_G);
-            const real div = z2o(L[0].pdf_bwd);
-    
+            const real mul = z2o(L[0].pdf_fwd);
+            const real div = L[0].is_delta ? real(1) : z2o(L[0].pdf_bwd);
+
             cur_pdf *= mul / div;
-    
+
             if(!L[0].is_delta)
                 sum_pdf += cur_pdf;
         }
-    
+
+        // ===== process camera subpath =====
+
         cur_pdf = 1;
-    
-        // camera end
-        if(s >= 2)
+
+        // camera vertices
+
+        for(int i = s - 1; i >= 1; --i)
         {
-            const real mul = z2o(C[s - 1].pdf_bwd) * z2o(G_between_subpaths);
-            const real div = z2o(C[s - 1].pdf_fwd) * z2o(C[s - 1].G_with_last);
-    
+            const real mul = z2o(C[i].pdf_bwd);
+            const real div = C[i].is_delta ? real(1) : z2o(C[i].pdf_fwd);
+
             cur_pdf *= mul / div;
-    
-            if(!C[s - 2].is_delta)
-                sum_pdf += cur_pdf;
-        }
-    
-        for(int i = s - 2; i >= 1; --i)
-        {
-            const real mul = z2o(C[i].pdf_bwd) * z2o(C[i + 1].G_with_last);
-            const real div = z2o(C[i].pdf_fwd) * z2o(C[i].G_with_last);
-    
-            cur_pdf *= mul / div;
-    
+
             if(!C[i].is_delta && !C[i - 1].is_delta)
                 sum_pdf += cur_pdf;
         }
-    
+
         return 1 / sum_pdf;
     }
-    
-    real weight_s1_tx_path(const ConnectedPath &connected_path)
+
+    Vertex new_camera_vertex(
+        const Vec3 &pos, const Vec3 &nor) noexcept
     {
-        assert(connected_path.s == 1 && connected_path.t >= 2);
-    
-        const int t = connected_path.t;
-        BDPTVertex *lht_subpath = connected_path.lht_subpath;
-        const BDPTVertex &cam_beg = connected_path.cam_subpath[0];
-        BDPTVertex &lht_end = lht_subpath[t - 1];
-    
-        TmpAssign a0;
-        {
-            const Vec3 cam_beg_to_lht_end = lht_end.pos - cam_beg.pos;
-            const CameraWePDFResult cam_we_pdf = connected_path.camera->pdf_we(
-                cam_beg.pos, cam_beg_to_lht_end);
-    
-            a0 = {
-                &lht_end.pdf_fwd,
-                cam_we_pdf.pdf_dir / std::abs(cos(
-                        cam_beg.nor, cam_beg_to_lht_end)) };
-        }
-        AGZ_UNACCESSED(a0);
-    
-        TmpAssign a1;
-        {
-            const Vec3 wo = cam_beg.pos - lht_end.pos;
-            const Vec3 wi = lht_subpath[t - 2].pos - lht_end.pos;
-            const real pdf = lht_end.bsdf->pdf_all(wi, wo);
-            const real proj_pdf = pdf / std::abs(cos(lht_end.nor, wi));
-    
-            a1 = { &lht_subpath[t - 2].pdf_fwd, proj_pdf };
-        }
-        AGZ_UNACCESSED(a1);
-    
-        const real connected_G = G(
-            cam_beg.pos, lht_end.pos, cam_beg.nor, lht_end.nor);
-    
-        return weight_common(connected_path, connected_G);
+        Vertex ret;
+        ret.type       = VertexType::Camera;
+        ret.camera.pos = pos;
+        ret.camera.nor = nor;
+        return ret;
     }
-    
-    real weight_sx_t0_path(const ConnectedPath &connected_path)
+
+    Vertex new_surface_vertex(
+        const Vec3 &pos, const Vec3 &nor, const Vec2 &uv,
+        const Vec3 &wr, const Medium *med_out, const Medium *med_in,
+        const BSDF *bsdf, const Entity *entity)
     {
-        assert(connected_path.s >= 3 && connected_path.t == 0);
-    
-        BDPTVertex *cam_subpath = connected_path.cam_subpath;
-        BDPTVertex &cam_end = cam_subpath[connected_path.s - 1];
-        BDPTVertex &cam_bend = cam_subpath[connected_path.s - 2];
-    
-        if(cam_end.is_entity())
-        {
-            const Vec3 bend_to_end = cam_end.pos - cam_bend.pos;
-    
-            const AreaLight *light = cam_end.entity->as_light();
-            const real select_light_pdf = connected_path.scene.light_pdf(light);
-            const LightEmitPDFResult emit_pdf = light->emit_pdf(
-                cam_end.pos, -bend_to_end, cam_end.nor);
-    
-            TmpAssign a0 = { &cam_end.pdf_bwd, select_light_pdf * emit_pdf.pdf_pos };
-    
-            TmpAssign a1 = {
-                &cam_bend.pdf_bwd,
-                emit_pdf.pdf_dir / std::abs(cos(cam_end.nor, bend_to_end))
-            };
-    
-            return weight_common(connected_path, 1);
-        }
-    
-        const EnvirLight *light = connected_path.scene.envir_light();
-        assert(light != nullptr);
-    
-        const real select_light_pdf = connected_path.scene.light_pdf(light);
-        const LightEmitPDFResult emit_pdf = light->emit_pdf(
-                                                {}, -cam_end.pos, {});
-        const LightEmitPosResult emit_pos = light->emit_pos(
-                                                cam_bend.pos, cam_end.pos);
-    
-        TmpAssign a0 = { &cam_end.pdf_bwd, select_light_pdf * emit_pdf.pdf_pos };
-        TmpAssign a1 = { &cam_bend.pdf_bwd, emit_pdf.pdf_dir };
-        TmpAssign a2 = {
-            &cam_end.G_with_last,
-            G(cam_bend.pos, emit_pos.pos, cam_bend.nor, emit_pos.nor)
-        };
-    
-        return weight_common(connected_path, 1);
+        Vertex ret;
+        ret.type            = VertexType::Surface;
+        ret.surface.pos     = pos;
+        ret.surface.nor     = nor;
+        ret.surface.uv      = uv;
+        ret.surface.wr      = wr;
+        ret.surface.med_out = med_out;
+        ret.surface.med_in  = med_in;
+        ret.surface.bsdf    = bsdf;
+        ret.surface.entity  = entity;
+        return ret;
     }
-    
-    real weight_sx_t1_path(
-        const ConnectedPath &connected_path,
-        const LightSampleResult &lht_sam_wi)
+
+    Vertex new_area_light_vertex(
+        const Vec3 &pos, const Vec3 &nor, const Vec2 &uv,
+        const AreaLight *light)
     {
-        assert(connected_path.s >= 2 && connected_path.t == 1);
-    
-        const int s = connected_path.s;
-        BDPTVertex *cam_subpath = connected_path.cam_subpath;
-        BDPTVertex &cam_end = cam_subpath[s - 1];
-        BDPTVertex &cam_bend = cam_subpath[s - 2];
-        BDPTVertex &lht_vtx = connected_path.lht_subpath[0];
-    
-        const LightEmitPDFResult emit_pdf = connected_path.light->emit_pdf(
-            lht_sam_wi.pos, -lht_sam_wi.ref_to_light(), lht_sam_wi.nor);
-    
-        TmpAssign a0;
-        {
-            const real lht_vtx_pa = connected_path.select_light_pdf
-                                  * emit_pdf.pdf_pos;
-            a0 = { &lht_vtx.pdf_bwd, lht_vtx_pa };
-        }
-        AGZ_UNACCESSED(a0);
-    
-        TmpAssign a1;
-        {
-            const real pdf = cam_end.bsdf->pdf_all(
-                lht_sam_wi.ref_to_light(), cam_bend.pos - cam_end.pos);
-            const real proj_pdf = pdf / std::abs(cos(
-                    cam_end.nor, lht_sam_wi.ref_to_light()));
-            a1 = { &lht_vtx.pdf_fwd, proj_pdf };
-        }
-        AGZ_UNACCESSED(a1);
-    
-        TmpAssign a2;
-        {
-            const real proj_pdf = emit_pdf.pdf_dir
-                                / std::abs(cos(
-                                    lht_sam_wi.nor, -lht_sam_wi.ref_to_light()));
-            a2 = { &cam_end.pdf_bwd, proj_pdf };
-        }
-        AGZ_UNACCESSED(a2);
-    
-        TmpAssign a3;
-        {
-            const real pdf = cam_end.bsdf->pdf_all(
-                cam_bend.pos - cam_end.pos, lht_sam_wi.ref_to_light());
-            const real proj_pdf = pdf / std::abs(cos(
-                                    cam_end.nor, cam_bend.pos - cam_end.pos));
-            a3 = { &cam_bend.pdf_bwd, proj_pdf };
-        }
-        AGZ_UNACCESSED(a3);
-    
-        const real connected_G = G(
-            cam_end.pos, lht_sam_wi.pos, cam_end.nor, lht_sam_wi.nor);
-    
-        return weight_common(connected_path, connected_G);
+        Vertex ret;
+        ret.type             = VertexType::AreaLight;
+        ret.area_light.pos   = pos;
+        ret.area_light.nor   = nor;
+        ret.area_light.uv    = uv;
+        ret.area_light.light = light;
+        return ret;
     }
-    
-    real weight_sx_tx_path(const ConnectedPath &connected_path)
+
+    Vertex new_env_light_vertex(
+        const Vec3 &light_to_out)
     {
-        assert(connected_path.s > 1 && connected_path.t > 1);
-    
-        // ..., a, b | c, d, ...
-    
-        const int s = connected_path.s;
-        const int t = connected_path.t;
-        BDPTVertex *cam_subpath = connected_path.cam_subpath;
-        BDPTVertex *lht_subpath = connected_path.lht_subpath;
-        BDPTVertex &a = cam_subpath[s - 2];
-        BDPTVertex &b = cam_subpath[s - 1];
-        BDPTVertex &c = lht_subpath[t - 1];
-        BDPTVertex &d = lht_subpath[t - 2];
-    
-        TmpAssign a0;
-        {
-            const real pdf = b.bsdf->pdf_all(c.pos - b.pos, a.pos - b.pos);
-            const real proj_pdf = pdf / std::abs(cos(b.nor, c.pos - b.pos));
-            a0 = { &c.pdf_fwd, proj_pdf };
-        }
-        AGZ_UNACCESSED(a0);
-    
-        TmpAssign a1;
-        {
-            const real pdf = c.bsdf->pdf_all(d.pos - c.pos, b.pos - c.pos);
-            const real proj_pdf = pdf / std::abs(cos(c.nor, d.pos - c.pos));
-            a1 = { &d.pdf_fwd, proj_pdf };
-        }
-        AGZ_UNACCESSED(a1);
-    
-        TmpAssign a2;
-        {
-            const real pdf = c.bsdf->pdf_all(b.pos - c.pos, d.pos - c.pos);
-            const real proj_pdf = pdf / std::abs(cos(c.nor, b.pos - c.pos));
-            a2 = { &b.pdf_bwd, proj_pdf };
-        }
-        AGZ_UNACCESSED(a2);
-    
-        TmpAssign a3;
-        {
-            const real pdf = b.bsdf->pdf_all(a.pos - b.pos, c.pos - b.pos);
-            const real proj_pdf = pdf / std::abs(cos(b.nor, a.pos - b.pos));
-            a3 = { &a.pdf_bwd, proj_pdf };
-        }
-        AGZ_UNACCESSED(a3);
-    
-        const real connected_G = G(b.pos, c.pos, b.nor, c.nor);
-    
-        return weight_common(connected_path, connected_G);
+        Vertex ret;
+        ret.type                   = VertexType::EnvLight;
+        ret.env_light.light_to_out = light_to_out;
+        return ret;
+    }
+
+    Vertex new_medium_vertex(
+        const Vec3 &pos, const Vec3 &wr, const Medium *med, const BSDF *phase)
+    {
+        Vertex ret;
+        ret.type         = VertexType::Medium;
+        ret.medium.pos   = pos;
+        ret.medium.wr    = wr;
+        ret.medium.med   = med;
+        ret.medium.phase = phase;
+        return ret;
     }
 
 } // namespace anonymous
 
 CameraSubpath build_camera_subpath(
-    int max_cam_vtx_cnt,
-    int px, int py, const Scene &scene, const Vec2 &full_res,
-    Sampler &sampler, Arena &arena, BDPTVertex *subpath_space)
+    int max_vertex_count, const Ray &ray,
+    const Scene &scene, Sampler &sampler,
+    Arena &arena, Vertex *vertex_space)
 {
-    assert(subpath_space);
+    assert(max_vertex_count >= 1);
 
-    // sample camera ray
+    CameraSubpath subpath;
 
-    const Camera *camera = scene.get_camera();
-    const Sample2 film_sam = sampler.sample2();
+    // initial vertex
 
-    const Vec2 pixel_coord = {
-        px + film_sam.u,
-        py + film_sam.v
-    };
+    auto camera = scene.get_camera();
 
-    const Vec2 film_coord = {
-        pixel_coord.x / full_res.x,
-        pixel_coord.y / full_res.y
-    };
+    const auto cam_we  = camera->eval_we(ray.o, ray.d);
+    const auto cam_pdf = camera->pdf_we(ray.o, ray.d);
 
-    const auto cam_sam = camera->sample_we(film_coord, sampler.sample2());
-    const auto cam_pdf = camera->pdf_we(
-        cam_sam.pos_on_cam, cam_sam.pos_to_out);
+    auto &cam_vtx = vertex_space[0];
 
-    // fill the first vertex
+    cam_vtx = new_camera_vertex(ray.o, cam_we.nor_on_cam);
+    cam_vtx.accu_coef  = Spectrum(1 / cam_pdf.pdf_pos);
+    cam_vtx.pdf_fwd    = cam_pdf.pdf_pos;
+    cam_vtx.is_delta   = false;
 
-    subpath_space[0].pos           = cam_sam.pos_on_cam;
-    subpath_space[0].nor           = cam_sam.nor_on_cam;
-    subpath_space[0].accu_bsdf     = Spectrum(1);
-    subpath_space[0].accu_proj_pdf = cam_pdf.pdf_pos;
-    subpath_space[0].pdf_fwd       = cam_pdf.pdf_pos;
-    subpath_space[0].pdf_bwd       = 0;
-    subpath_space[0].G_with_last   = 1;
+    Spectrum accu_coef = cam_we.we / (cam_pdf.pdf_pos * cam_pdf.pdf_dir);
+    real pdf_fwd       = cam_pdf.pdf_dir;
+    Ray r              = ray;
 
-    // g-buffer pixel
-    CameraSubpath::GPixel gpixel;
+    accu_coef *= std::abs(cos(cam_we.nor_on_cam, ray.d));
 
-    // proj pdf to next vertex
-    real proj_pdf = cam_pdf.pdf_dir
-                  / std::abs(cos(cam_sam.nor_on_cam, cam_sam.pos_to_out));
-
-    // accumulated proj pdf
-    real accu_proj_pdf = cam_pdf.pdf_pos * proj_pdf;
-
-    // accumulated bsdf
-    Spectrum accu_bsdf = camera->eval_we(
-        cam_sam.pos_on_cam, cam_sam.pos_to_out).we;
-
-    // position of last vertex
-    Vec3 last_pos = cam_sam.pos_on_cam;
-
-    // normal at last vertex
-    Vec3 last_nor = cam_sam.nor_on_cam;
-
-    // current tracing ray
-    Ray ray(cam_sam.pos_on_cam, cam_sam.pos_to_out);
-
-    int cam_vtx_cnt = 1;
-    while(cam_vtx_cnt < max_cam_vtx_cnt)
+    int vertex_count = 1;
+    while(vertex_count < max_vertex_count)
     {
-        // find next vertex
+        // find next entity vertex
 
         EntityIntersection inct;
-        if(!scene.closest_intersection(ray, &inct))
+        if(!scene.closest_intersection(r, &inct))
         {
-            // create 'no entity' vertex
+            auto env = scene.envir_light();
+            if(!env)
+                break;
 
-            BDPTVertex end_vertex;
-            end_vertex.pos           = ray.d;
-            end_vertex.accu_bsdf     = accu_bsdf;
-            end_vertex.accu_proj_pdf = accu_proj_pdf;
-            end_vertex.pdf_fwd       = proj_pdf;
-            subpath_space[cam_vtx_cnt++] = end_vertex;
+            auto &new_vtx = vertex_space[vertex_count++];
+            new_vtx = new_env_light_vertex(-r.d);
+            new_vtx.accu_coef              = accu_coef;
+            new_vtx.pdf_fwd                = pdf_fwd;
+            new_vtx.is_delta               = false;
 
             break;
         }
 
-        const ShadingPoint shd = inct.material->shade(inct, arena);
+        // g-pixel
 
-        // fill g-buffer
-
-        if(cam_vtx_cnt == 1)
+        ShadingPoint shd;
+        if(vertex_count == 1)
         {
-            gpixel.albedo = shd.bsdf->albedo();
-            gpixel.normal = shd.shading_normal;
-            gpixel.denoise = inct.entity->get_no_denoise_flag() ?
-                             real(0) : real(1);
+            shd = inct.material->shade(inct, arena);
+
+            subpath.g_albedo  = shd.bsdf->albedo();
+            subpath.g_normal  = shd.shading_normal;
+            subpath.g_denoise = real(inct.entity->get_no_denoise_flag() ? 0 : 1);
         }
 
-        // add new vertex
+        // sample medium
 
-        BDPTVertex vertex;
-        vertex.pos           = inct.pos;
-        vertex.nor           = inct.geometry_coord.z;
-        vertex.accu_bsdf     = accu_bsdf;
-        vertex.accu_proj_pdf = accu_proj_pdf;
-        vertex.pdf_fwd       = proj_pdf;
-        vertex.G_with_last   = G(
-            inct.pos, last_pos, inct.geometry_coord.z, last_nor);
-        vertex.entity        = inct.entity;
-        vertex.uv            = inct.uv;
-        vertex.bsdf          = shd.bsdf;
-        vertex.is_delta      = shd.bsdf->is_delta();
+        auto medium = inct.medium(inct.wr);
+        const auto med_sam = medium->sample_scattering(
+            r.o, inct.pos, sampler, arena);
+        accu_coef *= med_sam.throughput;
 
-        last_pos = vertex.pos;
-        last_nor = vertex.nor;
+        if(med_sam.is_scattering_happened())
+        {
+            // add medium vertex
 
-        subpath_space[cam_vtx_cnt++] = vertex;
+            const auto &sp = med_sam.scattering_point;
 
-        // sample bsdf
+            auto &new_vtx = vertex_space[vertex_count++];
+            new_vtx = new_medium_vertex(
+                sp.pos, inct.wr, medium, med_sam.phase_function);
+            new_vtx.accu_coef    = accu_coef;
+            new_vtx.pdf_fwd      = pdf_fwd / distance2(sp.pos, r.o);
+            new_vtx.is_delta     = false;
 
-        const auto bsdf_sample = shd.bsdf->sample_all(
-            inct.wr, TransMode::Radiance, sampler.sample3());
-        if(!bsdf_sample.f)
-            break;
+            // sample the phase function
 
-        proj_pdf = bsdf_sample.pdf
-                 / std::abs(cos(vertex.nor, bsdf_sample.dir));
+            const auto phase_sample = med_sam.phase_function->sample_all(
+                sp.wr, TransMode::Radiance, sampler.sample3());
+            assert(!phase_sample.invalid());
 
-        accu_bsdf     *= bsdf_sample.f;
-        accu_proj_pdf *= proj_pdf;
+            // update pdf_bwd of last vertex according to phase sample
 
-        ray = Ray(inct.eps_offset(bsdf_sample.dir), bsdf_sample.dir);
+            const real pdf_bwd = med_sam.phase_function->pdf_all(
+                inct.wr, phase_sample.dir);
+            auto &last_vtx = vertex_space[vertex_count - 2];
+            last_vtx.pdf_bwd = pdf_sa_to_area(pdf_bwd, sp.pos, last_vtx);
+
+            // update ray payload
+
+            accu_coef *= phase_sample.f / phase_sample.pdf;
+            pdf_fwd    = phase_sample.pdf;
+            r          = Ray(sp.pos, phase_sample.dir);
+        }
+        else
+        {
+            // add surface vertex
+
+            if(!shd.bsdf)
+                shd = inct.material->shade(inct, arena);
+
+            const real cos_inct = std::abs(cos(inct.geometry_coord.z, inct.wr));
+            const real dist2 = distance2(r.o, inct.pos);
+            const real pdf_area = pdf_fwd * cos_inct / dist2;
+
+            auto &new_vtx = vertex_space[vertex_count++];
+            new_vtx = new_surface_vertex(
+                inct.pos, inct.geometry_coord.z, inct.uv,
+                inct.wr, inct.medium_out, inct.medium_in,
+                shd.bsdf, inct.entity);
+            new_vtx.accu_coef       = accu_coef;
+            new_vtx.pdf_fwd         = pdf_area;
+            new_vtx.is_delta        = shd.bsdf->is_delta();
+
+            // sample bsdf
+
+            const auto bsdf_sample = shd.bsdf->sample_all(
+                inct.wr, TransMode::Radiance, sampler.sample3());
+            if(bsdf_sample.invalid())
+                break;
+
+            // update pdf_bwd of last vertex according to bsdf sample
+
+            const real pdf_bwd = shd.bsdf->pdf_all(
+                inct.wr, bsdf_sample.dir);
+            auto &last_vtx = vertex_space[vertex_count - 2];
+            last_vtx.pdf_bwd = pdf_sa_to_area(pdf_bwd, inct.pos, last_vtx);
+
+            // update ray payload
+
+            const real abscos = std::abs(cos(
+                inct.geometry_coord.z, bsdf_sample.dir));
+
+            accu_coef *= bsdf_sample.f * abscos / bsdf_sample.pdf;
+            pdf_fwd    = bsdf_sample.pdf;
+            r          = Ray(inct.eps_offset(bsdf_sample.dir), bsdf_sample.dir);
+        }
     }
 
-    // fill backward proj pdf
-
-    const int max_bwd_index = subpath_space[cam_vtx_cnt - 1].is_entity() ?
-                              cam_vtx_cnt - 3 : cam_vtx_cnt - 4;
-
-    for(int i = 0; i <= max_bwd_index; ++i)
-    {
-        BDPTVertex &a = subpath_space[i];
-        const BDPTVertex &b = subpath_space[i + 1];
-        const BDPTVertex &c = subpath_space[i + 2];
-
-        // store pdf(c -> b -> a) into a.bwd_pdf
-
-        const real pdf = b.bsdf->pdf_all(c.pos - b.pos, a.pos - b.pos);
-        a.pdf_bwd = pdf / std::abs(cos(b.nor, a.pos - b.pos));
-    }
-
-    if(!subpath_space[cam_vtx_cnt - 1].is_entity() && cam_vtx_cnt >= 3)
-    {
-        // .., a, b, c
-
-        BDPTVertex &a = subpath_space[cam_vtx_cnt - 3];
-        const BDPTVertex &b = subpath_space[cam_vtx_cnt - 2];
-        const BDPTVertex &c = subpath_space[cam_vtx_cnt - 1];
-
-        const real pdf = b.bsdf->pdf_all(c.pos, a.pos - b.pos);
-        a.pdf_bwd = pdf / std::abs(cos(b.nor, a.pos - b.pos));
-    }
-
-    return CameraSubpath{
-        pixel_coord.x, pixel_coord.y,
-        cam_vtx_cnt, subpath_space, gpixel
-    };
+    subpath.vertex_count = vertex_count;
+    subpath.vertices     = vertex_space;
+    return subpath;
 }
 
 LightSubpath build_light_subpath(
-    int max_lht_vtx_cnt, const Scene &scene,
-    Sampler &sampler, Arena &arena, BDPTVertex *subpath_space)
+    int max_vertex_count,
+    const SceneSampleLightResult &select_light,
+    const Scene &scene, Sampler &sampler,
+    Arena &arena, Vertex *vertex_space)
 {
-    assert(subpath_space);
+    assert(max_vertex_count >= 1);
 
-    // sample light emission
+    const Light *light = select_light.light;
+    const real select_light_pdf = select_light.pdf;
 
-    const auto [light, select_light_pdf] = scene.sample_light(sampler.sample1());
-    assert(light);
+    // sample emitter
+
     const auto light_emit = light->sample_emit(sampler.sample5());
-
-    // fill the first vertex
-
-    subpath_space[0].pos           = light_emit.pos;
-    subpath_space[0].nor           = light_emit.nor;
-    subpath_space[0].accu_bsdf     = Spectrum(1);
-    subpath_space[0].accu_proj_pdf = select_light_pdf * light_emit.pdf_pos;
-    subpath_space[0].pdf_fwd       = 0;
-    subpath_space[0].pdf_bwd       = select_light_pdf * light_emit.pdf_pos;
-    subpath_space[0].G_with_last   = 1;
-
-    // proj pdf to next vertex
-    real proj_pdf = light_emit.pdf_dir
-                  / std::abs(cos(light_emit.nor, light_emit.dir));
-
-    // accumulated proj pdf
-    real accu_proj_pdf = select_light_pdf * light_emit.pdf_pos * proj_pdf;
-
-    // accumulated bsdf
-    Spectrum accu_bsdf = light_emit.radiance;
-
-    // position of last vertex
-    Vec3 last_pos = light_emit.pos;
-
-    // normal at last vertex
-    Vec3 last_nor = light_emit.nor;
-
-    // current tracing ray
-    Ray ray(light_emit.pos, light_emit.dir, EPS());
-
-    int lht_vtx_cnt = 1;
-    while(lht_vtx_cnt < max_lht_vtx_cnt)
+    if(!light_emit.radiance)
     {
-        // find next vertex
+        LightSubpath subpath;
+        subpath.vertex_count = 0;
+        return subpath;
+    }
+
+    Spectrum accu_coef;
+    real pdf_bwd;
+
+    // initial vertex
+
+    auto &init_vtx = vertex_space[0];
+    if(light->is_area())
+    {
+        const real init_pdf = light_emit.pdf_pos * select_light_pdf;
+
+        init_vtx = new_area_light_vertex(
+            light_emit.pos, light_emit.nor, light_emit.uv, light->as_area());
+        init_vtx .accu_coef = Spectrum(1 / init_pdf);
+        init_vtx .pdf_bwd   = light_emit.pdf_pos * select_light_pdf;
+        init_vtx .is_delta  = false;
+
+        const real emit_cos = std::abs(cos(light_emit.nor, light_emit.dir));
+        accu_coef = light_emit.radiance * emit_cos
+                  / (select_light_pdf * light_emit.pdf_pos * light_emit.pdf_dir);
+        pdf_bwd = light_emit.pdf_dir;
+    }
+    else
+    {
+        const real init_pdf = light_emit.pdf_dir * select_light_pdf;
+
+        init_vtx = new_env_light_vertex(light_emit.dir);
+        init_vtx.accu_coef              = Spectrum(1 / init_pdf);
+        init_vtx.pdf_bwd                = light_emit.pdf_dir * select_light_pdf;
+        init_vtx.is_delta               = false;
+        
+        accu_coef = light_emit.radiance / (init_pdf * light_emit.pdf_pos);
+        pdf_bwd   = light_emit.pdf_pos; // wrong value. will be corrected
+    }
+
+    Ray r(light_emit.pos, light_emit.dir, EPS());
+
+    int vertex_count = 1;
+    while(vertex_count < max_vertex_count)
+    {
+        // find the closest intersection
 
         EntityIntersection inct;
-        if(!scene.closest_intersection(ray, &inct))
+        if(!scene.closest_intersection(r, &inct))
             break;
 
-        const ShadingPoint shd = inct.material->shade(inct, arena);
+        // sample medium
 
-        // add new vertex
+        const auto medium = inct.medium(inct.wr);
+        const auto med_sam = medium->sample_scattering(
+            r.o, inct.pos, sampler, arena);
+        accu_coef *= med_sam.throughput;
 
-        BDPTVertex vertex;
-        vertex.pos           = inct.pos;
-        vertex.nor           = inct.geometry_coord.z;
-        vertex.accu_bsdf     = accu_bsdf;
-        vertex.accu_proj_pdf = accu_proj_pdf;
-        vertex.pdf_fwd       = 0;
-        vertex.pdf_bwd       = proj_pdf;
-        vertex.G_with_last   = G(
-            inct.pos, last_pos, inct.geometry_coord.z, last_nor);
-        vertex.entity        = inct.entity;
-        vertex.uv            = inct.uv;
-        vertex.bsdf          = shd.bsdf;
-        vertex.is_delta      = shd.bsdf->is_delta();
+        if(med_sam.is_scattering_happened())
+        {
+            // add medium vertex
 
-        last_pos = vertex.pos;
-        last_nor = vertex.nor;
+            auto &sp = med_sam.scattering_point;
 
-        subpath_space[lht_vtx_cnt++] = vertex;
+            auto &new_vtx = vertex_space[vertex_count++];
+            new_vtx = new_medium_vertex(
+                sp.pos, inct.wr, medium, med_sam.phase_function);
+            new_vtx.accu_coef    = accu_coef;
+            new_vtx.pdf_bwd      = pdf_bwd / distance2(r.o, sp.pos);
+            new_vtx.is_delta     = false;
+            
+            // sample phase function
+            // sample the phase function
 
-        // sample bsdf
+            const auto phase_sample = med_sam.phase_function->sample_all(
+                sp.wr, TransMode::Importance, sampler.sample3());
+            assert(!phase_sample.invalid());
 
-        const auto bsdf_sample = shd.bsdf->sample_all(
-            inct.wr, TransMode::Importance, sampler.sample3());
-        if(!bsdf_sample.f)
-            break;
+            // update pdf_bwd of last vertex according to phase sample
 
-        proj_pdf = bsdf_sample.pdf
-                 / std::abs(cos(vertex.nor, bsdf_sample.dir));
+            const real pdf_fwd = med_sam.phase_function->pdf_all(
+                inct.wr, phase_sample.dir);
+            auto &last_vtx = vertex_space[vertex_count - 2];
+            last_vtx.pdf_fwd = pdf_sa_to_area(pdf_fwd, sp.pos, last_vtx);
 
-        accu_bsdf     *= bsdf_sample.f;
-        accu_proj_pdf *= proj_pdf;
+            // update ray payload
 
-        ray = Ray(inct.eps_offset(bsdf_sample.dir), bsdf_sample.dir);
+            accu_coef *= phase_sample.f / phase_sample.pdf;
+            pdf_bwd    = phase_sample.pdf;
+            r          = Ray(sp.pos, phase_sample.dir);
+        }
+        else
+        {
+            // add surface vertex
+
+            const auto shd = inct.material->shade(inct, arena);
+
+            const real cos_inct = std::abs(cos(inct.geometry_coord.z, inct.wr));
+            const real dist2 = distance2(r.o, inct.pos);
+            const real pdf_area = pdf_bwd * cos_inct / dist2;
+
+            auto &new_vtx = vertex_space[vertex_count++];
+            new_vtx = new_surface_vertex(
+                inct.pos, inct.geometry_coord.z, inct.uv, inct.wr,
+                inct.medium_out, inct.medium_in,
+                shd.bsdf, inct.entity);
+            new_vtx.accu_coef       = accu_coef;
+            new_vtx.pdf_bwd         = pdf_area;
+            new_vtx.is_delta        = shd.bsdf->is_delta();
+
+            // sample bsdf
+
+            const auto bsdf_sample = shd.bsdf->sample_all(
+                inct.wr, TransMode::Importance, sampler.sample3());
+            if(bsdf_sample.invalid())
+                break;
+
+            // update pdf_bwd of last vertex according to bsdf sample
+
+            const real pdf_fwd = shd.bsdf->pdf_all(
+                inct.wr, bsdf_sample.dir);
+            auto &last_vtx = vertex_space[vertex_count - 2];
+            last_vtx.pdf_fwd = pdf_sa_to_area(pdf_fwd, inct.pos, last_vtx);
+
+            // update ray payload
+
+            const real abscos = std::abs(cos(
+                inct.geometry_coord.z, bsdf_sample.dir));
+            accu_coef *= bsdf_sample.f * abscos / bsdf_sample.pdf;
+            pdf_bwd    = bsdf_sample.pdf;
+            r          = Ray(inct.eps_offset(bsdf_sample.dir), bsdf_sample.dir);
+        }
     }
 
-    // fill forward proj pdf
-
-    const int max_fwd_index = lht_vtx_cnt - 3;
-
-    for(int i = 1; i <= max_fwd_index; ++i)
+    if(!light->is_area())
     {
-        BDPTVertex &a = subpath_space[i];
-        const BDPTVertex &b = subpath_space[i + 1];
-        const BDPTVertex &c = subpath_space[i + 2];
-
-        // store pdf(c -> b -> a) into a.pdf_fwd
-
-        const real pdf = b.bsdf->pdf_all(c.pos - b.pos, a.pos - b.pos);
-        a.pdf_fwd = pdf / std::abs(cos(b.nor, a.pos - b.pos));
+        if(vertex_count >= 2)
+            vertex_space[1].pdf_bwd = light_emit.pdf_pos;
     }
 
-    // fill subpath_space[0].pdf_fwd
-
-    if(lht_vtx_cnt >= 3)
-    {
-        BDPTVertex &a = subpath_space[0];
-        const BDPTVertex &b = subpath_space[1];
-        const BDPTVertex &c = subpath_space[2];
-
-        const real pdf = b.bsdf->pdf_all(c.pos - b.pos, -light_emit.dir);
-        a.pdf_fwd = pdf / std::abs(cos(b.nor, light_emit.dir));
-    }
-
-    return LightSubpath{
-        lht_vtx_cnt, subpath_space, select_light_pdf, light
-    };
+    LightSubpath subpath;
+    subpath.vertex_count = vertex_count;
+    subpath.vertices     = vertex_space;
+    return subpath;
 }
 
-Spectrum eval_connected_subpath(
-    const ConnectedPath &connected_path, Vec2 *pixel_coord)
+Spectrum contrib_s2_t0(
+    const Scene &scene,
+    const Vertex *camera_subpath)
 {
-    const int s = connected_path.s;
-    const int t = connected_path.t;
-    const int path_vtx_cnt = s + t;
+    const Vertex &cam_beg = camera_subpath[0];
+    const Vertex &cam_end = camera_subpath[1];
 
-    // an valid path contains at least 2 vertices
+    // envir light
 
-    if(path_vtx_cnt < 2)
+    if(cam_end.type == VertexType::EnvLight)
+    {
+        const Spectrum light_radiance = scene.envir_light()->radiance(
+            cam_beg.camera.pos, -cam_end.env_light.light_to_out);
+
+        return cam_end.accu_coef * light_radiance;
+    }
+
+    // medium
+
+    if(cam_end.type == VertexType::Medium)
         return {};
 
-    // use native path tracing for paths with only 2 vertices
+    // area light
 
-    if(path_vtx_cnt == 2)
-        return s == 2 ? contrib_s2_t0_path(connected_path) : Spectrum();
+    assert(cam_end.type == VertexType::Surface);
+    auto light = cam_end.surface.entity->as_light();
+    if(!light)
+        return {};
 
-    if(s == 1)
-    {
-        assert(t >= 2);
-        return contrib_s1_tx_path(connected_path, pixel_coord);
-    }
+    const Spectrum light_radiance = light->radiance(
+        cam_end.surface.pos, cam_end.surface.nor, cam_end.surface.uv,
+        cam_beg.camera.pos - cam_end.surface.pos);
 
-    if(t == 0)
-    {
-        assert(s >= 3);
-        return contrib_sx_t0_path(connected_path);
-    }
-    
-    if(t == 1)
-    {
-        assert(s >= 2);
-        return contrib_sx_t1_path(connected_path);
-    }
-
-    return contrib_sx_tx_path(connected_path);
+    return cam_end.accu_coef * light_radiance;
 }
 
-std::optional<BDPTPixel> trace_bdpt(
-    const BDPTParams &params, const Scene &scene,
-    int px, int py, const Vec2 &full_res,
-    Sampler &sampler, Arena &arena,
-    BDPTVertex *cam_subpath_space,
-    BDPTVertex *lht_subpath_space,
-    FilmFilterApplier::FilmGridView<Spectrum> *particle_film)
+Spectrum unweighted_contrib_sx_t0(
+    const Scene &scene, const Vertex *camera_subpath, int s)
 {
-    if(scene.lights().empty())
-        return std::nullopt;
+    assert(s >= 3);
 
-    const CameraSubpath cam_subpath = build_camera_subpath(
-        params.max_cam_vtx_cnt, px, py, scene, full_res,
-        sampler, arena, cam_subpath_space);
+    // path: ..., a, b
 
-    const LightSubpath lht_subpath = build_light_subpath(
-        params.max_lht_vtx_cnt, scene, sampler, arena, lht_subpath_space);
+    const Vertex &a = camera_subpath[s - 2];
+    const Vertex &b = camera_subpath[s - 1];
 
-    const Rect2i particle_sample_pixels = particle_film->sample_pixels();
-    const Vec2 particle_film_full_res = {
-        real(particle_sample_pixels.high.x - particle_sample_pixels.low.x + 1),
-        real(particle_sample_pixels.high.y - particle_sample_pixels.low.y + 1)
-    };
+    // get position of a
 
-    const Rect2i sample_pixels = particle_film->sample_pixels();
-    const Rect2 sample_pixel_bound = {
-        { real(sample_pixels.low.x), real(sample_pixels.low.y) },
-        {
-            real(sample_pixels.high.x + 1),
-            real(sample_pixels.high.y + 1)
-        }
-    };
+    assert(a.type == VertexType::Surface || a.type == VertexType::Medium);
 
-    ConnectedPath connected_path = {
-        scene, lht_subpath.light, scene.get_camera(),
-        lht_subpath.select_light_pdf,
-        cam_subpath.subpath, 0,
-        lht_subpath.subpath, 0,
-        sampler, sample_pixel_bound, particle_film_full_res
-    };
+    const Vec3 a_pos = a.type == VertexType::Surface ? a.surface.pos
+                                                     : a.medium.pos;
+    
+    // envir light
 
-    connected_path.s = 1;
-    for(int t = 0; t <= lht_subpath.vtx_cnt; ++t)
+    if(b.type == VertexType::EnvLight)
     {
-        connected_path.t = t;
+        const Spectrum light_radiance = scene.envir_light()->radiance(
+            a_pos, -b.env_light.light_to_out);
 
-        Vec2 pixel_coord;
-        const Spectrum rad = eval_connected_subpath(
-            connected_path, &pixel_coord);
-        if(!rad.is_black())
-            particle_film->apply(pixel_coord.x, pixel_coord.y, rad);
+        return b.accu_coef * light_radiance;
     }
 
-    Spectrum radiance;
-    for(int s = 2; s <= cam_subpath.vtx_cnt; ++s)
+    // medium
+
+    if(b.type == VertexType::Medium)
+        return {};
+
+    // area light
+
+    assert(b.type == VertexType::Surface);
+    auto light = b.surface.entity->as_light();
+    if(!light)
+        return {};
+
+    const Spectrum light_radiance = light->radiance(
+        b.surface.pos, b.surface.nor, b.surface.uv,
+        a_pos - b.surface.pos);
+
+    return b.accu_coef * light_radiance;
+}
+
+Spectrum unweighted_contrib_sx_t1(
+    const Scene &scene,
+    const Vertex *camera_subpath, int s,
+    const Vertex *light_subpath,
+    Sampler &sampler)
+{
+    assert(s >= 2);
+
+    auto &cam_end = camera_subpath[s - 1];
+    
+    if(cam_end.type == VertexType::EnvLight)
+        return {};
+
+    assert(cam_end.is_scattering_type());
+
+    // get cam_end.pos
+
+    const Vec3 cam_end_pos = cam_end.type == VertexType::Surface ?
+        cam_end.surface.pos :
+        cam_end.medium.pos;
+
+    const Vertex &light_vtx = light_subpath[0];
+
+    if(light_vtx.type == VertexType::AreaLight)
     {
-        for(int t = 0; t <= lht_subpath.vtx_cnt; ++t)
-        {
-            connected_path.s = s;
-            connected_path.t = t;
-            radiance += eval_connected_subpath(connected_path, nullptr);
-        }
+        if(!scene.visible(cam_end_pos, light_vtx.area_light.pos))
+            return {};
+
+        const Vec3 cam_to_light = light_vtx.area_light.pos - cam_end_pos;
+
+        const Spectrum light_rad = light_vtx.area_light.light->radiance(
+            light_vtx.area_light.pos,
+            light_vtx.area_light.nor,
+            light_vtx.area_light.uv,
+            -cam_to_light);
+
+        const auto bsdf = get_scatter_bsdf(cam_end);
+        Spectrum bsdf_f = bsdf->eval_all(
+            cam_to_light,
+            get_scatter_wr(cam_end),
+            TransMode::Radiance);
+
+        const auto medium = cam_end.type == VertexType::Surface ?
+                            cam_end.surface.medium(cam_to_light) :
+                            cam_end.medium.med;;
+        const Spectrum tr = medium->tr(
+            cam_end_pos, light_vtx.area_light.pos, sampler);
+
+        if(cam_end.type == VertexType::Surface)
+            bsdf_f *= std::abs(cos(cam_end.surface.nor, cam_to_light));
+
+        bsdf_f *= std::abs(cos(light_vtx.area_light.nor, cam_to_light));
+
+        return cam_end.accu_coef * bsdf_f * tr * light_rad
+             / distance2(cam_end_pos, light_vtx.area_light.pos)
+             / light_vtx.pdf_bwd;
     }
 
-    if(radiance.is_finite())
+    assert(light_vtx.type == VertexType::EnvLight);
+    const Vec3 cam_to_light = -light_vtx.env_light.light_to_out;
+
+    const Ray shadow_ray(cam_end_pos, cam_to_light, EPS());
+    if(scene.has_intersection(shadow_ray))
+        return {};
+
+    const Spectrum light_rad = scene.envir_light()->radiance(
+        cam_end_pos, cam_to_light);
+
+    const auto bsdf = get_scatter_bsdf(cam_end);
+    Spectrum bsdf_f = bsdf->eval_all(
+        cam_to_light,
+        get_scatter_wr(cam_end),
+        TransMode::Radiance);
+
+    if(cam_end.type == VertexType::Surface)
+        bsdf_f *= std::abs(cos(cam_end.surface.nor, cam_to_light));
+
+    return cam_end.accu_coef * bsdf_f * light_rad / light_vtx.pdf_bwd;
+}
+
+Spectrum unweighted_contrib_s1_tx(
+    const Scene &scene,
+    const Vertex *camera_subpath,
+    const Vertex *light_subpath, int t,
+    Sampler &sampler,
+    const Rect2 &sample_pixel_bound,
+    const Vec2 &full_res,
+    Vec2 &pixel_coord)
+{
+    assert(t >= 2);
+
+    auto &lht_end = light_subpath[t - 1];
+    assert(lht_end.is_scattering_type());
+
+    // get light end pos
+
+    const Vec3 lht_end_pos = lht_end.type == VertexType::Surface ?
+                             lht_end.surface.pos :
+                             lht_end.medium.pos;
+
+    // eval camera
+
+    const Vec3 cam_pos = camera_subpath[0].camera.pos;
+    const auto cam_we = scene.get_camera()->eval_we(
+        cam_pos, lht_end_pos - cam_pos);
+
+    if(!cam_we.we)
+        return {};
+
+    // check pixel coord
+
+    pixel_coord = {
+        cam_we.film_coord.x * full_res.x,
+        cam_we.film_coord.y * full_res.y
+    };
+
+    if(!sample_pixel_bound.contains(pixel_coord))
+        return {};
+
+    // check visibility
+
+    if(!scene.visible(lht_end_pos, cam_pos))
+        return {};
+
+    // eval bsdf
+
+    const Vec3 lht_to_cam = cam_pos - lht_end_pos;
+
+    const BSDF *bsdf = get_scatter_bsdf(lht_end);
+    const Spectrum f = bsdf->eval_all(
+        lht_to_cam, get_scatter_wr(lht_end),
+        TransMode::Importance);
+    if(!f)
+        return {};
+
+    // eval G
+
+    real G = 1 / distance2(cam_pos, lht_end_pos);
+
+    if(lht_end.type == VertexType::Surface)
+        G *= std::abs(cos(lht_to_cam, lht_end.surface.nor));
+
+    G *= std::abs(cos(lht_to_cam, cam_we.nor_on_cam));
+
+    // eval tr
+
+    const Medium *med = lht_end.type == VertexType::Surface ?
+                        lht_end.surface.medium(lht_to_cam) :
+                        lht_end.medium.med;
+
+    const Spectrum tr = med->tr(cam_pos, lht_end_pos, sampler);
+
+    // eval contrib
+
+    return cam_we.we * tr * G * f * lht_end.accu_coef
+         / camera_subpath[0].pdf_fwd;
+}
+
+Spectrum unweighted_contrib_sx_tx(
+    const Scene &scene,
+    const Vertex *camera_subpath, int s,
+    const Vertex *light_subpath, int t,
+    Sampler &sampler)
+{
+    assert(s >= 2 && t >= 2);
+
+    const Vertex &cam_end = camera_subpath[s - 1];
+    const Vertex &lht_end = light_subpath[t - 1];
+
+    if(cam_end.type == VertexType::EnvLight)
+        return {};
+
+    assert(cam_end.is_scattering_type() && lht_end.is_scattering_type());
+
+    const Vec3 cam_end_pos = get_scatter_pos(cam_end);
+    const Vec3 lht_end_pos = get_scatter_pos(lht_end);
+
+    // visibility
+
+    if(!scene.visible(cam_end_pos, lht_end_pos))
+        return {};
+
+    // bsdf
+
+    const Vec3 cam_to_lht = lht_end_pos - cam_end_pos;
+
+    const BSDF *cam_end_bsdf = get_scatter_bsdf(cam_end);
+    Spectrum cam_bsdf_f = cam_end_bsdf->eval_all(
+        cam_to_lht, get_scatter_wr(cam_end), TransMode::Radiance);
+    if(!cam_bsdf_f)
+        return {};
+
+    const BSDF *lht_end_bsdf = get_scatter_bsdf(lht_end);
+    Spectrum lht_bsdf_f = lht_end_bsdf->eval_all(
+        -cam_to_lht, get_scatter_wr(lht_end), TransMode::Importance);
+    if(!lht_bsdf_f)
+        return {};
+
+    // G
+
+    real G = 1 / distance2(cam_end_pos, lht_end_pos);
+
+    if(cam_end.type == VertexType::Surface)
+        G *= std::abs(cos(cam_end.surface.nor, cam_to_lht));
+
+    if(lht_end.type == VertexType::Surface)
+        G *= std::abs(cos(lht_end.surface.nor, cam_to_lht));
+
+    // tr
+
+    const Medium *medium = get_vertex_medium(cam_end, lht_end);
+    const Spectrum tr = medium->tr(cam_end_pos, lht_end_pos, sampler);
+
+    // eval contrib
+
+    return cam_end.accu_coef * cam_bsdf_f
+         * G * tr
+         * lht_end.accu_coef * lht_bsdf_f;
+}
+
+real mis_weight_sx_t0(
+    const Scene &scene,
+    Vertex *camera_subpath, int s)
+{
+    // ..., a, b
+
+    assert(s >= 3);
+
+    Vertex &b = camera_subpath[s - 1];
+    Vertex &a = camera_subpath[s - 2];
+
+    TempAssign assign_b_pdf_bwd;
+    TempAssign assign_a_pdf_bwd;
+
+    AGZ_UNACCESSED(assign_b_pdf_bwd); // for resharper's warnings
+    AGZ_UNACCESSED(assign_a_pdf_bwd);
+
+    real select_light_pdf;
+    const Light *light;
+
+    if(b.type == VertexType::Surface)
     {
-        return BDPTPixel{
-            cam_subpath.pixel_x, cam_subpath.pixel_y,
-            Pixel{
-                {
-                    cam_subpath.gpixel.albedo,
-                    cam_subpath.gpixel.normal,
-                    cam_subpath.gpixel.denoise
-                },
-                radiance
-            }
+        light = b.surface.entity->as_light();
+        if(!light)
+            return 0;
+
+        select_light_pdf = scene.light_pdf(light);
+        const auto light_pdf = light->emit_pdf(
+            b.surface.pos, b.surface.wr, b.surface.nor);
+
+        assign_b_pdf_bwd = {
+            &b.pdf_bwd,
+            select_light_pdf * light_pdf.pdf_pos
+        };
+
+        assign_a_pdf_bwd = {
+            &a.pdf_bwd,
+            pdf_sa_to_area(light_pdf.pdf_dir, b.surface.pos, a)
+        };
+    }
+    else if(b.type == VertexType::EnvLight)
+    {
+        auto env = scene.envir_light();
+        assert(env);
+
+        select_light_pdf = scene.light_pdf(env);
+        const auto light_pdf = env->emit_pdf({}, b.env_light.light_to_out, {});
+
+        assign_b_pdf_bwd = {
+            &b.pdf_bwd,
+            select_light_pdf * light_pdf.pdf_dir
+        };
+
+        assign_a_pdf_bwd = {
+            &a.pdf_bwd,
+            light_pdf.pdf_pos
+        };
+    }
+    else
+        return 0;
+
+    return mis_weight_common(
+        camera_subpath, s, nullptr, 0);
+}
+
+real mis_weight_sx_t1(
+    const Scene &scene,
+    Vertex *camera_subpath, int s, Vertex *light_subpath)
+{
+    assert(s >= 2);
+
+    // [..., a, b] <-> [c]
+
+    Vertex &a = camera_subpath[s - 2];
+    Vertex &b = camera_subpath[s - 1];
+    Vertex &c = light_subpath[0];
+
+    const Vec3 b_pos = get_scatter_pos(b);
+
+    TempAssign a_pdf_bwd_assign;
+    TempAssign b_pdf_bwd_assign;
+    TempAssign c_pdf_fwd_assign;
+
+    AGZ_UNACCESSED(a_pdf_bwd_assign);
+    AGZ_UNACCESSED(b_pdf_bwd_assign);
+    AGZ_UNACCESSED(c_pdf_fwd_assign);
+
+    if(c.type == VertexType::AreaLight)
+    {
+        const Vec3 b_to_c = c.area_light.pos - b_pos;
+
+        const auto emit_pdf = c.area_light.light->emit_pdf(
+            c.area_light.pos, -b_to_c, c.area_light.nor);
+        b_pdf_bwd_assign = {
+            &b.pdf_bwd,
+            pdf_sa_to_area(emit_pdf.pdf_dir, c.area_light.pos, b)
+        };
+
+        const real a_pdf_bwd_sa = get_scatter_bsdf(b)->pdf_all(
+            get_scatter_wr(b), b_to_c);
+        a_pdf_bwd_assign = {
+            &a.pdf_bwd,
+            pdf_sa_to_area(a_pdf_bwd_sa, b_pos, a)
+        };
+
+        c_pdf_fwd_assign = {
+            &c.pdf_fwd,
+            pdf_to(b, c)
+        };
+    }
+    else
+    {
+        assert(c.type == VertexType::EnvLight);
+
+        const Vec3 b_to_c = -c.env_light.light_to_out;
+
+        const auto emit_pdf = scene.envir_light()->emit_pdf(
+            {}, c.env_light.light_to_out, {});
+        b_pdf_bwd_assign = {
+            &b.pdf_bwd,
+            emit_pdf.pdf_pos
+        };
+
+        const real a_pdf_bwd_sa = get_scatter_bsdf(b)->pdf_all(
+            get_scatter_wr(b), b_to_c);
+        a_pdf_bwd_assign = {
+            &a.pdf_bwd,
+            pdf_sa_to_area(a_pdf_bwd_sa, b_pos, a)
+        };
+
+        c_pdf_fwd_assign = {
+            &c.pdf_fwd,
+            pdf_to(b, c)
         };
     }
 
-    return std::nullopt;
+    return mis_weight_common(
+        camera_subpath, s, light_subpath, 1);
+}
+
+real mis_weight_s1_tx(
+    const Scene &scene,
+    Vertex *camera_subpath,
+    Vertex *light_subpath, int t)
+{
+    assert(t >= 2);
+
+    // [a] <-> [b, c, ...]
+
+    Vertex &a = camera_subpath[0];
+    Vertex &b = light_subpath[t - 1];
+    Vertex &c = light_subpath[t - 2];
+
+    const Vec3 b_pos = get_scatter_pos(b);
+
+    auto cam_pdf = scene.get_camera()->pdf_we(
+        a.camera.pos, b_pos - a.camera.pos);
+    if(!cam_pdf.pdf_pos || !cam_pdf.pdf_dir)
+        return 0;
+
+    Vertex camera_vertex = new_camera_vertex(a.camera.pos, a.camera.nor);
+    camera_vertex.accu_coef  = Spectrum(1);
+    camera_vertex.is_delta   = false;
+    camera_vertex.pdf_fwd    = cam_pdf.pdf_pos;
+    camera_vertex.pdf_bwd    = pdf_to(b, camera_vertex);
+
+    // b.pdf_fwd
+
+    TempAssign b_pdf_fwd_assign = {
+        &b.pdf_fwd,
+        pdf_sa_to_area(cam_pdf.pdf_dir, a.camera.pos, b)
+    };
+
+    // c.pdf_fwd
+
+    const real c_pdf_fwd_sa = get_scatter_bsdf(b)->pdf_all(
+        get_scatter_wr(b), a.camera.pos - b_pos);
+    const real c_pdf_fwd = pdf_sa_to_area(c_pdf_fwd_sa, b_pos, c);
+
+    TempAssign c_pdf_fwd_assign = {
+        &c.pdf_fwd,
+        c_pdf_fwd
+    };
+
+    return mis_weight_common(
+        &camera_vertex, 1, light_subpath, t);
+}
+
+real mis_weight_sx_tx(
+    Vertex *camera_subpath, int s,
+    Vertex *light_subpath, int t)
+{
+    assert(s >= 2 && t >= 2);
+
+    // [..., a, b] <-> [c, d, ...]
+
+    Vertex &a = camera_subpath[s - 2];
+    Vertex &b = camera_subpath[s - 1];
+    Vertex &c = light_subpath[t - 1];
+    Vertex &d = light_subpath[t - 2];
+
+    const Vec3 b_pos = get_scatter_pos(b);
+    const Vec3 c_pos = get_scatter_pos(c);
+
+    const BSDF *b_bsdf = get_scatter_bsdf(b);
+    const BSDF *c_bsdf = get_scatter_bsdf(c);
+
+    const Vec3 b_to_c = c_pos - b_pos;
+
+    // a.pdf_bwd
+
+    const real a_pdf_bwd_sa = b_bsdf->pdf_all(get_scatter_wr(b), b_to_c);
+    const real a_pdf_bwd = pdf_sa_to_area(
+        a_pdf_bwd_sa, b_pos, a);
+
+    TempAssign a_pdf_bwd_assign = {
+        &a.pdf_bwd, a_pdf_bwd
+    };
+
+    // b.pdf_bwd
+
+    const real b_pdf_bwd = pdf_to(c, b);
+
+    TempAssign b_pdf_bwd_assign = {
+        &b.pdf_bwd, b_pdf_bwd
+    };
+
+    // c.pdf_fwd
+
+    const real c_pdf_fwd = pdf_to(b, c);
+
+    TempAssign c_pdf_bwd_assign = {
+        &c.pdf_fwd, c_pdf_fwd
+    };
+
+    // d.pdf_fwd
+
+    const real d_pdf_fwd_sa = c_bsdf->pdf_all(get_scatter_wr(c), -b_to_c);
+    const real d_pdf_fwd = pdf_sa_to_area(
+        d_pdf_fwd_sa, c_pos, d);
+
+    TempAssign d_pdf_fwd_assign = {
+        &d.pdf_fwd, d_pdf_fwd
+    };
+
+    // eventually...
+
+    return mis_weight_common(
+        camera_subpath, s,
+        light_subpath, t);
+}
+
+Spectrum weighted_contrib_sx_t0(
+    const Scene &scene,
+    Vertex *camera_subpath, int s)
+{
+    const Spectrum unweighted_contrib = unweighted_contrib_sx_t0(
+        scene, camera_subpath, s);
+    if(!unweighted_contrib.is_finite())
+        return Spectrum(REAL_INF);
+    if(unweighted_contrib.is_black())
+        return {};
+
+    const real weight = mis_weight_sx_t0(scene, camera_subpath, s);
+
+    return weight * unweighted_contrib;
+}
+
+Spectrum weighted_contrib_sx_t1(
+    const Scene &scene,
+    Vertex *camera_subpath, int s,
+    Vertex *light_subpath,
+    Sampler &sampler)
+{
+    const Spectrum unweighted_contrib = unweighted_contrib_sx_t1(
+        scene, camera_subpath, s, light_subpath, sampler);
+    if(!unweighted_contrib.is_finite())
+        return Spectrum(REAL_INF);
+    if(unweighted_contrib.is_black())
+        return {};
+
+    const real weight = mis_weight_sx_t1(
+        scene, camera_subpath, s, light_subpath);
+
+    return weight * unweighted_contrib;
+}
+
+Spectrum weighted_contrib_s1_tx(
+    const Scene &scene,
+    Vertex *camera_subpath,
+    Vertex *light_subpath, int t,
+    Sampler &sampler,
+    const Rect2 &sample_pixel_bound,
+    const Vec2 &full_res,
+    Vec2 &pixel_coord)
+{
+    const Spectrum unweighted_contrib = unweighted_contrib_s1_tx(
+        scene, camera_subpath, light_subpath, t,
+        sampler, sample_pixel_bound, full_res,
+        pixel_coord);
+    if(!unweighted_contrib.is_finite())
+        return Spectrum(REAL_INF);
+    if(unweighted_contrib.is_black())
+        return {};
+
+    const real weight = mis_weight_s1_tx(
+        scene, camera_subpath, light_subpath, t);
+
+    return weight * unweighted_contrib;
+}
+
+Spectrum weighted_contrib_sx_tx(
+    const Scene &scene,
+    Vertex *camera_subpath, int s,
+    Vertex *light_subpath, int t,
+    Sampler &sampler)
+{
+    const Spectrum unweighted_contrib = unweighted_contrib_sx_tx(
+        scene, camera_subpath, s, light_subpath, t, sampler);
+    if(!unweighted_contrib.is_finite())
+        return Spectrum(REAL_INF);
+    if(unweighted_contrib.is_black())
+        return {};
+
+    const real weight = mis_weight_sx_tx(
+        camera_subpath, s, light_subpath, t);
+
+    return weight * unweighted_contrib;
 }
 
 } // namespace bdpt

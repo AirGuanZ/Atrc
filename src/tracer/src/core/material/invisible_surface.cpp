@@ -34,12 +34,9 @@ namespace
 
             const real cosv = std::abs(cos(geometry_normal_, wo));
 
-            BSDFSampleResult ret;
-            ret.dir      = -wo;
-            ret.f        = Spectrum(1) / (cosv < EPS() ? 1 : cosv);
-            ret.pdf      = 1;
-            ret.is_delta = true;
-            return ret;
+            const Spectrum f = Spectrum(1) / (cosv < EPS() ? 1 : cosv);
+
+            return BSDFSampleResult(-wo, f, 1, true);
         }
 
         real pdf(const Vec3 &wi, const Vec3 &wo, uint8_t) const noexcept override

@@ -69,21 +69,6 @@ struct AORendererParams
 
 RC<Renderer> create_ao_renderer(const AORendererParams &params);
 
-// bidirectional path tracing
-
-struct BDPTRendererParams
-{
-    int worker_count   = 0;
-    int task_grid_size = 32;
-
-    int cam_max_vtx_cnt = 10;
-    int lht_max_vtx_cnt = 10;
-
-    int spp = 1;
-};
-
-RC<Renderer> create_bdpt_renderer(const BDPTRendererParams &params);
-
 // volumetric bidirectional path tracing
 
 struct VolBDPTRendererParams

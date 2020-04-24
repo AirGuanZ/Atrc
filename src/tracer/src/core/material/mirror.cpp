@@ -42,15 +42,17 @@ namespace
                 return BSDF_SAMPLE_RESULT_INVALID;
             
             const Vec3 nwo = local_out.normalize();
-            BSDFSampleResult ret;
-            ret.dir      = shading_coord_.local_to_global(Vec3(0, 0, 2 * nwo.z) - nwo);
-            ret.pdf      = 1;
-            ret.f        = fresnel_point_->eval(nwo.z) * rc_ / std::abs(nwo.z);
-            ret.is_delta = true;
 
-            ret.f *= local_angle::normal_corr_factor(
-                        geometry_coord_, shading_coord_, ret.dir);
-            return ret;
+            const Vec3 dir = shading_coord_.local_to_global(
+                Vec3(0, 0, 2 * nwo.z) - nwo);
+
+            const Spectrum f = fresnel_point_->eval(nwo.z)
+                             * rc_ / std::abs(nwo.z);
+
+            const real norm_factor = local_angle::normal_corr_factor(
+                geometry_coord_, shading_coord_, dir);
+
+            return BSDFSampleResult(dir, f * norm_factor, 1, true);
         }
 
         real pdf(

@@ -45,7 +45,7 @@ Spectrum ParticleTracer::render_pixel(
     using namespace tracer;
 
     for(int i = 0; i < particle_sample_count_; ++i)
-        trace_particle(trace_params_, scene, sampler, particle_film, arena);
+        trace_vol_particle(trace_params_, scene, sampler, particle_film, arena);
     *particle_count += particle_sample_count_;
 
     EntityIntersection inct;

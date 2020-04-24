@@ -4,7 +4,7 @@
 #include <agz/tracer/core/renderer_interactor.h>
 #include <agz/tracer/core/scene.h>
 #include <agz/tracer/create/renderer.h>
-#include <agz/tracer/render/vol_bidir_path_tracing.h>
+#include <agz/tracer/render/bidir_path_tracing.h>
 #include <agz/tracer/utility/parallel_grid.h>
 #include <agz/utility/thread.h>
 
@@ -75,8 +75,8 @@ private:
         Rect2 particle_sample_pixel_bound;
         Rect2i particle_pixel_range;
 
-        render::vol_bdpt::Vertex *camera_subpath_space = nullptr;
-        render::vol_bdpt::Vertex *light_subpath_space  = nullptr;
+        render::bdpt::Vertex *camera_subpath_space = nullptr;
+        render::bdpt::Vertex *light_subpath_space  = nullptr;
     };
 
     template<bool USE_MIS>
@@ -138,14 +138,14 @@ int VolBDPTRenderer::render_bdpt_path(
         params_.lht_max_vtx_cnt, select_light, params.scene,
         sampler, arena, params.light_subpath_space);
 
-    render::vol_bdpt::EvalBDPTPathParams path_params = {
+    render::bdpt::EvalBDPTPathParams path_params = {
         params.scene,
         params.particle_sample_pixel_bound,
         params.full_res,
         sampler
     };
 
-    const Spectrum radiance = render::vol_bdpt::eval_bdpt_path<USE_MIS>(
+    const Spectrum radiance = render::bdpt::eval_bdpt_path<USE_MIS>(
         path_params,
         camera_subpath.vertices, camera_subpath.vertex_count,
         light_subpath.vertices, light_subpath.vertex_count,
@@ -185,8 +185,8 @@ int VolBDPTRenderer::render_grid(
     if(scene.lights().empty())
         return 0;
 
-    std::vector<render::vol_bdpt::Vertex> cam_subpath(params_.cam_max_vtx_cnt);
-    std::vector<render::vol_bdpt::Vertex> lht_subpath(params_.lht_max_vtx_cnt);
+    std::vector<render::bdpt::Vertex> cam_subpath(params_.cam_max_vtx_cnt);
+    std::vector<render::bdpt::Vertex> lht_subpath(params_.lht_max_vtx_cnt);
 
     const Rect2 particle_sample_pixel_bound = {
         { 0, 0 },

@@ -4,7 +4,6 @@
 #include <agz/editor/imexport/asset_saver.h>
 #include <agz/editor/renderer/export/export_renderer.h>
 #include <agz/editor/renderer/export/export_renderer_ao.h>
-#include <agz/editor/renderer/export/export_renderer_bdpt.h>
 #include <agz/editor/renderer/export/export_renderer_particle.h>
 #include <agz/editor/renderer/export/export_renderer_pssmlt_pt.h>
 #include <agz/editor/renderer/export/export_renderer_pt.h>
@@ -20,7 +19,7 @@ namespace
         if(type == "AO")
             return new ExportRendererAO(parent);
         if(type == "BDPT")
-            return new ExportRendererBDPT(parent);
+            return new ExportRendererVolBDPT(parent); // for compatibility
         if(type == "Particle")
             return new ExportRendererParticle(parent);
         if(type == "PSSMLT PT")

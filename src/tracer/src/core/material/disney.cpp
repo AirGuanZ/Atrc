@@ -570,16 +570,11 @@ namespace disney_impl
                 if(!lwi)
                     return BSDF_SAMPLE_RESULT_INVALID;
 
-                BSDFSampleResult ret;
-                ret.dir      = shading_coord_.local_to_global(lwi);
-                ret.f        = eval_all(ret.dir, wo, mode);
-                ret.pdf      = pdf_all(ret.dir, wo);
-                ret.is_delta = false;
+                const Vec3 wi    = shading_coord_.local_to_global(lwi);
+                const Spectrum f = eval_all(wi, wo, mode);
+                const real pdf   = pdf_all(wi, wo);
 
-                if(!ret.f.is_finite() || ret.pdf < EPS())
-                    return BSDF_SAMPLE_RESULT_INVALID;
-
-                return ret;
+                return BSDFSampleResult(wi, f, pdf, false);
             }
 
             // reflection + transmission
@@ -619,16 +614,11 @@ namespace disney_impl
             if(!lwi)
                 return BSDF_SAMPLE_RESULT_INVALID;
             
-            BSDFSampleResult ret;
-            ret.dir      = shading_coord_.local_to_global(lwi);
-            ret.f        = eval(ret.dir, wo, mode, type);
-            ret.pdf      = pdf(ret.dir, wo, type);
-            ret.is_delta = false;
+            const Vec3 wi    = shading_coord_.local_to_global(lwi);
+            const Spectrum f = eval_all(wi, wo, mode);
+            const real pdf   = pdf_all(wi, wo);
 
-            if(!ret.f.is_finite() || ret.pdf < EPS())
-                return BSDF_SAMPLE_RESULT_INVALID;
-
-            return ret;
+            return BSDFSampleResult(wi, f, pdf, false);
         }
 
         real pdf(

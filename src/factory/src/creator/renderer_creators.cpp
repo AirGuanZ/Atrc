@@ -43,36 +43,6 @@ namespace renderer
         }
     };
 
-    class BDPTRendererCreator : public Creator<Renderer>
-    {
-    public:
-
-        std::string name() const override
-        {
-            return "bdpt";
-        }
-
-        RC<Renderer> create(
-            const ConfigGroup &params, CreatingContext &context) const override
-        {
-            BDPTRendererParams bdpt_params;
-
-            bdpt_params.worker_count   =
-                params.child_int_or("worker_count", 0);
-            bdpt_params.task_grid_size =
-                params.child_int_or("task_grid_size", 32);
-
-            bdpt_params.cam_max_vtx_cnt =
-                params.child_int_or("camera_max_depth", 10) + 1;
-            bdpt_params.lht_max_vtx_cnt =
-                params.child_int_or("light_max_depth", 10) + 1;
-            
-            bdpt_params.spp = params.child_int("spp");
-
-            return create_bdpt_renderer(bdpt_params);
-        }
-    };
-
     class VolBDPTRendererCreator : public Creator<Renderer>
     {
     public:
@@ -267,7 +237,6 @@ namespace renderer
 void initialize_renderer_factory(Factory<Renderer> &factory)
 {
     factory.add_creator(newBox<renderer::AORendererCreator>());
-    factory.add_creator(newBox<renderer::BDPTRendererCreator>());
     factory.add_creator(newBox<renderer::ParticleTracingRendererCreator>());
     factory.add_creator(newBox<renderer::PathTracingRendererCreator>());
     factory.add_creator(newBox<renderer::PSSMLTPTCreator>());

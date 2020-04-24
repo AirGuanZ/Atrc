@@ -92,22 +92,25 @@ public:
         pdf /= SPECTRUM_COMPONENT_COUNT;
         pdf = (std::max)(pdf, EPS());
 
-        SampleOutScatteringResult result;
+        Spectrum throughput = tr / pdf;
+        if(sample_medium)
+            throughput *= sigma_s_;
 
         if(sample_medium)
         {
-            result.scattering_point.pos    = lerp(a, b, st / t_max);
-            result.scattering_point.medium = this;
-            result.scattering_point.wr     = (a - b) / t_max;
-            result.phase_function = arena.create<HenyeyGreensteinPhaseFunction>(
+            MediumScattering scattering_point;
+            scattering_point.pos = lerp(a, b, st / t_max);
+            scattering_point.medium = this;
+            scattering_point.wr = (a - b) / t_max;
+
+            auto phase_function = arena.create<HenyeyGreensteinPhaseFunction>(
                 g_, albedo());
+
+            return SampleOutScatteringResult(
+                scattering_point, throughput, phase_function);
         }
 
-        result.throughput = tr / pdf;
-        if(sample_medium)
-            result.throughput *= sigma_s_;
-
-        return result;
+        return SampleOutScatteringResult({}, throughput, nullptr);
     }
 };
 

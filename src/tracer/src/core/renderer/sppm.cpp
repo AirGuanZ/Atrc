@@ -64,11 +64,6 @@ RenderTarget SPPMRenderer::render(
             sppm_pixels(y, x).radius = init_radius;
     }
 
-    // visible point searcher
-
-    render::sppm::VisiblePointSearcher vp_searcher(
-        world_bound, params_.grid_accel_resolution);
-
     // samplers
 
     Arena sampler_arena;
@@ -122,7 +117,10 @@ RenderTarget SPPMRenderer::render(
 
         // clear visible points
 
-        vp_searcher.clear();
+        const real grid_sidelen = real(1.05) * max_radius;
+        render::sppm::VisiblePointSearcher vp_searcher(
+            world_bound, grid_sidelen, 40960);
+
         for(auto &a : perthread_vp_arena)
             a.release();
 

@@ -13,11 +13,19 @@ class EnvirLight;
  */
 struct LightSampleResult
 {
+    LightSampleResult(
+        const Vec3 &ref, const Vec3 &pos, const Vec3 &nor,
+        const Spectrum &rad, real pdf) noexcept
+        : ref(ref), pos(pos), nor(nor), radiance(rad), pdf(pdf)
+    {
+        
+    }
+
     Vec3 ref;
     Vec3 pos;
     Vec3 nor;
     Spectrum radiance;
-    real pdf = 0;
+    real pdf;
 
     bool valid() const noexcept
     {
@@ -41,12 +49,22 @@ inline const LightSampleResult LIGHT_SAMPLE_RESULT_NULL =
  */
 struct LightEmitResult
 {
+    LightEmitResult(
+        const Vec3 &pos, const Vec3 &dir, const Vec3 &nor, const Vec2 &uv,
+        const Spectrum &rad, real pdf_pos, real pdf_dir) noexcept
+        : pos(pos), dir(dir), nor(nor), uv(uv),
+          radiance(rad), pdf_pos(pdf_pos), pdf_dir(pdf_dir)
+    {
+        
+    }
+
     Vec3 pos;          // emitting position
     Vec3 dir;          // emitting direction
     Vec3 nor;          // normal at pos
+    Vec2 uv;
     Spectrum radiance; // emitted radiance
-    real pdf_pos = 0;  // pdf w.r.t. light surface area
-    real pdf_dir = 0;  // pdf w.r.t. solid angle at position
+    real pdf_pos;      // pdf w.r.t. light surface area
+    real pdf_dir;      // pdf w.r.t. solid angle at position
 };
 
 /**
@@ -54,8 +72,14 @@ struct LightEmitResult
  */
 struct LightEmitPDFResult
 {
-    real pdf_pos = 0;
-    real pdf_dir = 0;
+    LightEmitPDFResult (real pdf_pos, real pdf_dir) noexcept
+        : pdf_pos(pdf_pos), pdf_dir(pdf_dir)
+    {
+        
+    }
+
+    real pdf_pos;
+    real pdf_dir;
 };
 
 /**
@@ -63,6 +87,12 @@ struct LightEmitPDFResult
  */
 struct LightEmitPosResult
 {
+    LightEmitPosResult(const Vec3 &pos, const Vec3 &nor) noexcept
+        : pos(pos), nor(nor)
+    {
+        
+    }
+
     Vec3 pos;
     Vec3 nor;
 };

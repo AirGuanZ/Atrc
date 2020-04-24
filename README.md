@@ -5,7 +5,7 @@ Offline rendering lab based on ray tracing
 ## Features
 
 - [x] Volumetric path tracing with next event estimation
-- [x] Adjoint particle tracing
+- [x] Volumetric particle tracing
 - [x] Volumetric bidirectional path tracing
 - [x] Stochastic progressive photon mapping
 - [x] Primary sample space MLT on path tracing

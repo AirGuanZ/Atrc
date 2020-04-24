@@ -35,14 +35,8 @@ public:
     {
         const auto [dir, pdf] = math::distribution::uniform_on_sphere(sam.u, sam.v);
 
-        LightSampleResult ret;
-        ret.ref          = ref;
-        ret.pos          = emit_pos(ref, dir).pos;
-        ret.nor          = -dir;
-        ret.radiance     = radiance_impl(dir);
-        ret.pdf          = pdf;
-
-        return ret;
+        return LightSampleResult(
+            ref, emit_pos(ref, dir).pos, -dir, radiance_impl(dir), pdf);
     }
 
     real pdf(const Vec3 &ref, const Vec3 &) const noexcept override
@@ -61,15 +55,9 @@ public:
         const Vec3 pos        = world_radius_ *
             (disk_sam.x * dir_coord.x + disk_sam.y * dir_coord.y - dir) + world_centre_;
 
-        LightEmitResult ret;
-        ret.pos       = pos;
-        ret.dir       = dir;
-        ret.nor       = dir.normalize();
-        ret.radiance  = radiance_impl(-dir);
-        ret.pdf_pos   = 1 / (PI_r * world_radius_ * world_radius_);
-        ret.pdf_dir   = pdf_dir;
-
-        return ret;
+        return LightEmitResult(
+            pos, dir, dir.normalize(), {}, radiance_impl(-dir),
+            1 / (PI_r * world_radius_ * world_radius_), pdf_dir);
     }
 
     LightEmitPDFResult emit_pdf(

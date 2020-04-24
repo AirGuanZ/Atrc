@@ -271,7 +271,7 @@ private:
                 for(int j = 0; j < params_.particles_per_task; ++j)
                 {
                     ++task_particle_count;
-                    trace_particle(
+                    trace_vol_particle(
                         particle_params_, scene, *sampler, film_grid, arena);
                     arena.release();
 

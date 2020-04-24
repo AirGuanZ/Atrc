@@ -23,15 +23,11 @@ LightSampleResult GeometryToDiffuseLight::sample(
     const Vec3 spt_to_ref = ref - spt.pos;
     const real dist2 = spt_to_ref.length_square();
 
-    LightSampleResult ret;
-    ret.pos      = spt.pos;
-    ret.nor      = spt.geometry_coord.z;
-    ret.ref      = ref;
-    ret.radiance = radiance_;
-    ret.pdf      = pdf_area * dist2
-                 / std::abs(cos(spt.geometry_coord.z, spt_to_ref));
+    const real pdf = pdf_area * dist2
+                   / std::abs(cos(spt.geometry_coord.z, spt_to_ref));
 
-    return ret;
+    return LightSampleResult(
+        ref, spt.pos, spt.geometry_coord.z, radiance_, pdf);
 }
 
 LightEmitResult GeometryToDiffuseLight::sample_emit(
@@ -46,15 +42,10 @@ LightEmitResult GeometryToDiffuseLight::sample_emit(
 
     const Vec3 dir = surface_point.geometry_coord.local_to_global(local_dir);
     
-    LightEmitResult ret;
-    ret.pos       = surface_point.eps_offset(dir);
-    ret.dir       = dir;
-    ret.nor       = surface_point.geometry_coord.z;
-    ret.radiance  = radiance_;
-    ret.pdf_pos   = pdf_pos;
-    ret.pdf_dir   = pdf_dir;
-    
-    return ret;
+    return LightEmitResult(
+        surface_point.eps_offset(dir), dir,
+        surface_point.geometry_coord.z, surface_point.uv,
+        radiance_, pdf_pos, pdf_dir);
 }
 
 LightEmitPDFResult GeometryToDiffuseLight::emit_pdf(

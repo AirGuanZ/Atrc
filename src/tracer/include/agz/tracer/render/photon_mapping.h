@@ -1,6 +1,7 @@
 #pragma once
 
 #include <agz/tracer/render/common.h>
+#include <agz/tracer/utility/hashed_grid_aux.h>
 
 AGZ_TRACER_RENDER_BEGIN
 
@@ -76,7 +77,8 @@ public:
 
     explicit VisiblePointSearcher(
         const AABB &world_bound,
-        int max_axis_grid_res = 128);
+        real grid_sidelen,
+        size_t entry_count);
 
     /**
      * @brief clear all vp records
@@ -99,27 +101,16 @@ public:
 
 private:
 
-    Vec3i pos_to_grid(const Vec3 &pos) const noexcept;
-
-    int grid_to_entry(const Vec3i &grid_index) const noexcept;
-
-    int pos_to_entry(const Vec3 &pos) const noexcept;
-
     struct VPNode
     {
         Pixel *pixel = nullptr;
         VPNode *next = nullptr;
     };
 
-    Vec3i grid_index_dot_;
+    HashedGridAux hashed_grid_aux_;
+
     Box<std::atomic<VPNode*>[]> node_entries_;
-    int node_entry_count_;
-
-    Vec3 world_low_;
-    real grid_size_;
-
-    Vec3i grid_res_;
-    int total_grid_count_;
+    size_t node_entry_count_;
 };
 
 /**

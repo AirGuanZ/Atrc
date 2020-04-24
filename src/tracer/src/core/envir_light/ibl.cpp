@@ -66,14 +66,8 @@ public:
     {
         const auto [dir, pdf] = sampler_->sample({ sam.u, sam.v, sam.w });
 
-        LightSampleResult ret;
-        ret.ref      = ref;
-        ret.pos      = emit_pos(ref, dir).pos;
-        ret.nor      = -dir;
-        ret.radiance = radiance(ref, dir);
-        ret.pdf      = pdf;
-
-        return ret;
+        return LightSampleResult(
+            ref, emit_pos(ref, dir).pos, -dir, radiance(ref, dir), pdf);
     }
 
     real pdf(const Vec3 &ref, const Vec3 &ref_to_light) const noexcept override
@@ -93,15 +87,9 @@ public:
         const Vec3 pos = world_centre_ +
             (disk_sam.x * dir_coord.x + disk_sam.y * dir_coord.y - dir) * world_radius_;
 
-        LightEmitResult ret;
-        ret.pos       = pos;
-        ret.dir       = dir;
-        ret.nor       = dir.normalize();
-        ret.radiance  = radiance(world_centre_, -dir);
-        ret.pdf_pos   = 1 / (PI_r * world_radius_ * world_radius_);
-        ret.pdf_dir   = pdf_dir;
-
-        return ret;
+        return LightEmitResult(
+            pos, dir, dir.normalize(), {}, radiance(world_centre_, -dir),
+            1 / (PI_r * world_radius_ * world_radius_), pdf_dir);
     }
 
     LightEmitPDFResult emit_pdf(

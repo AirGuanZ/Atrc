@@ -3,7 +3,7 @@
 #include <agz/tracer/core/sampler.h>
 #include <agz/tracer/core/scene.h>
 #include <agz/tracer/render/path_tracing.h>
-#include <agz/tracer/render/vol_bidir_path_tracing.h>
+#include <agz/tracer/render/bidir_path_tracing.h>
 
 AGZ_EDITOR_BEGIN
 
@@ -50,9 +50,9 @@ uint64_t BDPTRenderer::exec_render_task(
     uint64_t ret = 0;
 
     Arena arena;
-    std::vector<render::vol_bdpt::Vertex> cam_subpath_space(
+    std::vector<render::bdpt::Vertex> cam_subpath_space(
         params_.max_cam_depth);
-    std::vector<render::vol_bdpt::Vertex> lht_subpath_space(
+    std::vector<render::bdpt::Vertex> lht_subpath_space(
         params_.max_lht_depth);
 
     const Rect2i sam_bound = task.pixel_range;
@@ -65,7 +65,7 @@ uint64_t BDPTRenderer::exec_render_task(
         real(framebuffer_width_), real(framebuffer_height_)
     };
 
-    render::vol_bdpt::EvalBDPTPathParams eval_params = {
+    render::bdpt::EvalBDPTPathParams eval_params = {
         *scene_, particle_film.get_sample_pixel_bound(),
         particle_full_res, sampler
     };
@@ -113,7 +113,7 @@ uint64_t BDPTRenderer::exec_render_task(
 
                 // connect subpaths
 
-                const Spectrum radiance = render::vol_bdpt::eval_bdpt_path<true>(
+                const Spectrum radiance = render::bdpt::eval_bdpt_path<true>(
                     eval_params,
                     camera_subpath.vertices, camera_subpath.vertex_count,
                     light_subpath.vertices, light_subpath.vertex_count,

@@ -20,8 +20,20 @@ class ScatteringPoint;
  */
 struct SceneSampleLightResult
 {
-    const Light *light = nullptr;
-    real pdf           = 0;
+    explicit SceneSampleLightResult(uninitialized_t)
+        : SceneSampleLightResult(nullptr, 0)
+    {
+        
+    }
+
+    SceneSampleLightResult(const Light *light, real pdf) noexcept
+        : light(light), pdf(pdf)
+    {
+        
+    }
+
+    const Light *light;
+    real pdf;
 };
 
 /**
