@@ -41,6 +41,10 @@ Offline rendering lab based on ray tracing
 - [ ] Support g-buffer in PSSMLT
 - [ ] Multiple selection in editor
 
+## Known Issues
+
+- [ ] Inv gamma correction of image texture
+
 ## Documentation
 
 [doc](https://airguanz.github.io/atrc_doc/doc.html)

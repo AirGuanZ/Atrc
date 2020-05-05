@@ -147,6 +147,12 @@ RC<T> newRC(Args&&...args)
 }
 
 template<typename T>
+RC<T> toRC(T &&data)
+{
+    return newRC<T>(std::forward<T>(data));
+}
+
+template<typename T>
 using Box = std::unique_ptr<T>;
 
 template<typename T, typename...Args>

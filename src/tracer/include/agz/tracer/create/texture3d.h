@@ -5,16 +5,28 @@
 
 AGZ_TRACER_BEGIN
 
-RC<Texture3D> create_gray_grid_point3d(
-    const Texture3DCommonParams &common_params,
-    RC<const Image3D<real>> data);
-
-RC<Texture3D> create_spectrum_grid_point3d(
-    const Texture3DCommonParams &common_params,
-    RC<const texture::texture3d_t<Spectrum>> data);
-
 RC<Texture3D> create_constant3d_texture(
     const Texture3DCommonParams &common_params,
     const Spectrum &texel);
+
+RC<Texture3D> create_image3d(
+    const Texture3DCommonParams &common_params,
+    RC<const Image3D<real>> data,
+    bool use_linear_sampler);
+
+RC<Texture3D> create_image3d(
+    const Texture3DCommonParams &common_params,
+    RC<const Image3D<uint8_t>> data,
+    bool use_linear_sampler);
+
+RC<Texture3D> create_image3d(
+    const Texture3DCommonParams &common_params,
+    RC<const Image3D<Spectrum>> data,
+    bool use_linear_sampler);
+
+RC<Texture3D> create_image3d(
+    const Texture3DCommonParams &common_params,
+    RC<const Image3D<math::color3b>> data,
+    bool use_linear_sampler);
 
 AGZ_TRACER_END

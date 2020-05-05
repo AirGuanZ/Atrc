@@ -837,45 +837,21 @@ Constant-valued texture, that is, sampling always results in the same value
 | ---------- | -------- | ------------- | ----------- |
 | texel      | Spectrum |               | texel value |
 
-**gray_grid**
+**image3d**
 
-3D gray-scale grids. the value between grid points is obtained by trilinear interpolation
+3D grid.
 
-| Field Name      | Type     | Default Value | Explanation                              |
-| --------------- | -------- | ------------- | ---------------------------------------- |
-| ascii_filename  | string   |               | file name of voxel data in text format   |
-| binary_filename | string   |               | file name of voxel data in binary format |
-| image_filenames | [string] |               | array of filenames for image slices      |
+| Field Name      | Type     | Default Value | Explanation                                |
+| --------------- | -------- | ------------- | ------------------------------------------ |
+| format          | string   |               | one of { "real", "spec", "gray8", "rgb8" } |
+| ascii_filename  | string   |               | filename of voxel data in text format      |
+| binary_filename | string   |               | filename of voxel data in binary format    |
+| image_filenames | [string] |               | array of filenames for image slices        |
+| sampler         | string   | linear        | one of { "linear", "nearest" }             |
 
-There are three ways to provide voxel data to `gray_grid`, so you only need to fill in one of the three fields in the table above.
+The `format` field determines how voxel data is stored in memory. `real/spec` store one/three float value for each voxel, and `gray8/rgb8` use one/three bytes for each voxel. Note that `real/gray8` format can only store gray value, and `gray8/rgb8` can only store integer between `[0, 255]`  (normalized to `[0, 1]` when sampled).
 
-The format of text voxel data is:
-
-```
-int32 value (texture width)
-int32 value (texture height)
-int32 value (texture depth)
-for z in 0 to texture depth
-    for y in 0 to texture height
-        for x in 0 to texture width
-            float value (voxel value at { x, y, z })
-```
-
-The data arrangement of binary voxel data is similar to the text format, except that all data is stored as binary data in little-endian order.
-
-The file name array of image slices refers to the file names of a series of two-dimensional images obtained by decomposing the voxels in the depth direction. These two-dimensional images must be the same size, the number of which corresponds to the depth value of the texture.
-
-**spectrum_grid**
-
-3D RGB grids. the value between grid points is obtained by trilinear interpolation
-
-| Field Name      | Type     | Default | Explanation                              |
-| --------------- | -------- | ------- | ---------------------------------------- |
-| ascii_filename  | string   |         | file name of voxel data in text format   |
-| binary_filename | string   |         | file name of voxel data in binary format |
-| image_filenames | [string] |         | array of filenames for image slices      |
-
-There are three ways to provide voxel data to `spectrum_grid`, so you only need to fill in one of the three fields in the table above.
+There are three ways to provide voxel data to `spectrum_grid`, one and only one of the three fields (`ascii_filename/binary_filename/image_filenames`) must be specified.
 
 The format of text voxel data is:
 
@@ -886,14 +862,25 @@ int32 value (texture depth)
 for z in 0 to texture depth
     for y in 0 to texture height
         for x in 0 to texture width
-            float value (r value at { x, y, z })
-            float value (g value at { x, y, z })
-            float value (b value at { x, y, z })
+            voxel_value at (x, y, z)
 ```
 
-The data arrangement of binary voxel data is similar to the text format, except that all data is stored as binary data in little-endian order.
+The format of `voxel_value` is determined by `format`:
 
-The file name array of image slices refers to the file names of a series of two-dimensional images obtained by decomposing the voxels in the depth direction. These two-dimensional images must be the same size, the number of which corresponds to the depth value of the texture.
+```
+if format == "real" then:
+	voxel_value is a float
+else if format == "spec" then:
+	voxel_value is 3 float values
+else if format == "gray8" then:
+	voxel_value is a integer between [0, 255]
+else if format == "rgb8" then:
+	voxel_value is 3 integer values (in [0, 255]^3)
+```
+
+The data arrangement of binary voxel data is similar to the text format, except that all data is stored as binary data.
+
+The filename array of image slices refers to the filenames of a series of two-dimensional images obtained by decomposing the voxels in the depth direction. These two-dimensional images must be the same size, and the number of images determines the depth value of the 3d texture.
 
 ### Transform
 

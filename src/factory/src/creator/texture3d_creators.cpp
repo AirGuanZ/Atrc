@@ -33,147 +33,176 @@ namespace
         }
     };
 
-    class GrayGridPoint3DCreator : public Creator<Texture3D>
+    class ImageTexture3DCreator : public Creator<Texture3D>
     {
-        static texture::texture3d_t<real> read_from_ascii(
-            const std::string &filename)
-        {
-            std::ifstream fin(filename, std::ios::in);
-            if(!fin)
-                throw ObjectConstructionException(
-                    "failed to open file: " + filename);
-            return texture3d_load::load_gray_from_ascii(fin);
-        }
-
-        static texture::texture3d_t<real> read_from_binary(
-            const std::string &filename)
-        {
-            std::ifstream fin(filename, std::ios::in | std::ios::binary);
-            if(!fin)
-                throw ObjectConstructionException(
-                    "failed to open file: " + filename);
-            return texture3d_load::load_gray_from_binary(fin);
-        }
-
-        static texture::texture3d_t<real> read_from_images(
-            const ConfigArray &filename_array, const PathMapper &path_mapper)
-        {
-            if(!filename_array.size())
-                throw ObjectConstructionException("empty image filename array");
-
-            std::vector<std::string> filenames(filename_array.size());
-            for(size_t i = 0; i < filename_array.size(); ++i)
-                filenames[i] = filename_array.at_str(i);
-            return texture3d_load::load_gray_from_images(
-                filenames.data(), int(filenames.size()), path_mapper);
-        }
-
     public:
 
         std::string name() const override
         {
-            return "gray_grid";
+            return "image3d";
         }
 
-        RC<Texture3D> create(
+        std::shared_ptr<Texture3D> create(
             const ConfigGroup &params, CreatingContext &context) const override
         {
-            RC<const Image3D<real>> data;
-            if(auto *str_child = params.find_child_value("ascii_filename"))
+            const Texture3DCommonParams common_params = parse_common_params(params);
+            const std::string sampling_strategy = params.child_str_or(
+                "sampler", "linear");
+            const bool use_linear_sampler = sampling_strategy == "linear";
+
+            // format: real/spec/gray8/rgb8
+            const std::string format = params.child_str("format");
+            
+            if(params.find_child("ascii_filename"))
             {
-                std::string filename =
-                    context.path_mapper->map(str_child->as_str());
-                data = newRC<Image3D<real>>(read_from_ascii(filename));
-            }
-            else if(str_child = params.find_child_value("binary_filename");
-                    str_child)
-            {
-                std::string filename =
-                    context.path_mapper->map(str_child->as_str());
-                data = newRC<Image3D<real>>(read_from_binary(filename));
-            }
-            else if(auto arr_child = params.find_child_array("image_filenames"))
-                data = newRC<Image3D<real>>(
-                    read_from_images(*arr_child, *context.path_mapper));
-            else
+                const std::string filename = context.path_mapper->map(
+                    params.child_str("ascii_filename"));
+                std::ifstream fin(filename, std::ios::in);
+                if(!fin)
+                {
+                    throw ObjectConstructionException(
+                        "failed to open file: " + filename);
+                }
+
+                if(format == "real")
+                {
+                    return create_image3d(
+                        common_params,
+                        toRC(texture3d_load::load_real_from_ascii(fin)),
+                        use_linear_sampler);
+                }
+
+                if(format == "spec")
+                {
+                    return create_image3d(
+                        common_params,
+                        toRC(texture3d_load::load_spec_from_ascii(fin)),
+                        use_linear_sampler);
+                }
+
+                if(format == "gray8")
+                {
+                    return create_image3d(
+                        common_params,
+                        toRC(texture3d_load::load_uint8_from_ascii(fin)),
+                        use_linear_sampler);
+                }
+
+                if(format == "rgb8")
+                {
+                    return create_image3d(
+                        common_params,
+                        toRC(texture3d_load::load_uint24_from_ascii(fin)),
+                        use_linear_sampler);
+                }
+
                 throw ObjectConstructionException(
-                    "texel data filename not provided");
-
-            return create_gray_grid_point3d(
-                parse_common_params(params), std::move(data));
-        }
-    };
-
-    class SpectrumGridPoint3DCreator : public Creator<Texture3D>
-    {
-        static texture::texture3d_t<Spectrum> read_from_ascii(
-            const std::string &filename)
-        {
-            std::ifstream fin(filename, std::ios::in);
-            if(!fin)
-                throw ObjectConstructionException(
-                    "failed to open file: " + filename);
-            return texture3d_load::load_rgb_from_ascii(fin);
-        }
-
-        static texture::texture3d_t<Spectrum> read_from_binary(
-            const std::string &filename)
-        {
-            std::ifstream fin(filename, std::ios::in | std::ios::binary);
-            if(!fin)
-                throw ObjectConstructionException(
-                    "failed to open file: " + filename);
-            return texture3d_load::load_rgb_from_binary(fin);
-        }
-
-        static texture::texture3d_t<Spectrum> read_from_images(
-            const ConfigArray &filename_array, const PathMapper &path_mapper)
-        {
-            if(!filename_array.size())
-                throw ObjectConstructionException("empty image filename array");
-
-            std::vector<std::string> filenames(filename_array.size());
-            for(size_t i = 0; i < filename_array.size(); ++i)
-                filenames[i] = filename_array.at_str(i);
-            return texture3d_load::load_rgb_from_images(
-                filenames.data(), int(filenames.size()), path_mapper);
-        }
-
-    public:
-
-        std::string name() const override
-        {
-            return "spectrum_grid";
-        }
-
-        RC<Texture3D> create(
-            const ConfigGroup &params, CreatingContext &context) const override
-        {
-            RC<const texture::texture3d_t<Spectrum>> data;
-            if(auto *str_child = params.find_child_value("ascii_filename"))
-            {
-                data = newBox<Image3D<Spectrum>>(
-                    read_from_ascii(context.path_mapper->map(
-                        str_child->as_str())));
+                    "unknown image3d format: " + format);
             }
-            else if(str_child = params.find_child_value("binary_filename");
-                    str_child)
-            {
-                data = newBox<Image3D<Spectrum>>(
-                    read_from_binary(context.path_mapper->map(
-                        str_child->as_str())));
-            }
-            else if(auto arr_child = params.find_child_array("image_filenames"))
-            {
-                data = newBox<Image3D<Spectrum>>(
-                    read_from_images(*arr_child, *context.path_mapper));
-            }
-            else
-                throw ObjectConstructionException(
-                    "texel data filename not provided");
 
-            return create_spectrum_grid_point3d(
-                parse_common_params(params), std::move(data));
+            if(params.find_child("binary_filename"))
+            {
+                const std::string filename = context.path_mapper->map(
+                    params.child_str("binary_filename"));
+                std::ifstream fin(filename, std::ios::in | std::ios::binary);
+                if(!fin)
+                {
+                    throw ObjectConstructionException(
+                        "failed to open file: " + filename);
+                }
+
+                if(format == "real")
+                {
+                    return create_image3d(
+                        common_params,
+                        toRC(texture3d_load::load_real_from_binary(fin)),
+                        use_linear_sampler);
+                }
+
+                if(format == "spec")
+                {
+                    return create_image3d(
+                        common_params,
+                        toRC(texture3d_load::load_spec_from_binary(fin)),
+                        use_linear_sampler);
+                }
+
+                if(format == "gray8")
+                {
+                    return create_image3d(
+                        common_params,
+                        toRC(texture3d_load::load_uint8_from_binary(fin)),
+                        use_linear_sampler);
+                }
+
+                if(format == "rgb8")
+                {
+                    return create_image3d(
+                        common_params,
+                        toRC(texture3d_load::load_uint24_from_binary(fin)),
+                        use_linear_sampler);
+                }
+
+                throw ObjectConstructionException(
+                    "unknown image3d format: " + format);
+            }
+
+            if(params.find_child("image_filenames"))
+            {
+                const auto &arr = params.child_array("image_filenames");
+                std::vector<std::string> filenames(arr.size());
+                for(size_t i = 0; i < arr.size(); ++i)
+                    filenames[i] = arr.at_str(i);
+
+                if(format == "real")
+                {
+                    return create_image3d(
+                        common_params,
+                        toRC(texture3d_load::load_real_from_images(
+                            filenames.data(),
+                            int(filenames.size()),
+                            *context.path_mapper)),
+                        use_linear_sampler);
+                }
+
+                if(format == "spec")
+                {
+                    return create_image3d(
+                        common_params,
+                        toRC(texture3d_load::load_spec_from_images(
+                            filenames.data(),
+                            int(filenames.size()),
+                            *context.path_mapper)),
+                        use_linear_sampler);
+                }
+
+                if(format == "gray8")
+                {
+                    return create_image3d(
+                        common_params,
+                        toRC(texture3d_load::load_uint8_from_images(
+                            filenames.data(),
+                            int(filenames.size()),
+                            *context.path_mapper)),
+                        use_linear_sampler);
+                }
+
+                if(format == "rgb8")
+                {
+                    return create_image3d(
+                        common_params,
+                        toRC(texture3d_load::load_uint24_from_images(
+                            filenames.data(),
+                            int(filenames.size()),
+                            *context.path_mapper)),
+                        use_linear_sampler);
+                }
+
+                throw ObjectConstructionException(
+                    "unknown image3d format: " + format);
+            }
+
+            throw ObjectConstructionException("input filename is unspecified");
         }
     };
 
@@ -182,8 +211,7 @@ namespace
 void initialize_texture3d_factory(Factory<Texture3D> &factory)
 {
     factory.add_creator(newBox<Constant3DCreator>());
-    factory.add_creator(newBox<GrayGridPoint3DCreator>());
-    factory.add_creator(newBox<SpectrumGridPoint3DCreator>());
+    factory.add_creator(newBox<ImageTexture3DCreator>());
 }
 
 AGZ_TRACER_FACTORY_END

@@ -1,0 +1,9 @@
+﻿/////////////////////////////////// libs ///////////////////////////////////
+
+avir          ./lib/misc/LICENSE-avir
+cxxopts       ./lib/misc/LICENSE-cxxopts
+embree        ./lib/embree/LICENSE.txt
+im3d          ./lib/im3d/LICENSE
+nlohmann json ./lib/misc/LICENSE-json
+spdlog        ./lib/spdlog/LICENSE
+ubuntu font   ./src/editor/ui/style/darkstyle/UBUNTU-FONT-LICENSE

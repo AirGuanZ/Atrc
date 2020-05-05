@@ -5,68 +5,147 @@
 
 AGZ_TRACER_BEGIN
 
-texture::texture3d_t<real> texture3d_load::load_gray_from_ascii(
-    std::ifstream &fin)
+namespace
 {
-    int width, height, depth;
-    fin >> width >> height >> depth;
-    if(!fin)
-        throw ObjectConstructionException(
-            "failed to read width/height/depth from file");
-
-    texture::texture3d_t<real> data(depth, height, width);
-    for(int z = 0; z < depth; ++z)
+    template<typename Texel>
+    texture::texture3d_t<Texel> load_from_binary(std::ifstream &fin)
     {
-        for(int y = 0; y < height; ++y)
+        int32_t width, height, depth;
+        fin.read(reinterpret_cast<char *>(&width), sizeof(width));
+        fin.read(reinterpret_cast<char *>(&height), sizeof(height));
+        fin.read(reinterpret_cast<char *>(&depth), sizeof(depth));
+        if(!fin)
         {
-            for(int x = 0; x < width; ++x)
+            throw ObjectConstructionException(
+                "failed to read width/height/depth from file");
+        }
+
+        texture::texture3d_t<Texel> data(depth, height, width);
+
+        for(int32_t z = 0; z < depth; ++z)
+        {
+            for(int32_t y = 0; y < height; ++y)
             {
-                fin >> data(z, y, x);
-                if(!fin)
-                    throw ObjectConstructionException(
-                        "failed to parse texel data from file");
+                for(int32_t x = 0; x < width; ++x)
+                {
+                    fin.read(
+                        reinterpret_cast<char *>(&data(z, y, x)), sizeof(Texel));
+                }
             }
         }
+
+        return data;
     }
 
-    return data;
-}
-
-texture::texture3d_t<real> texture3d_load::load_gray_from_binary(
-    std::ifstream &fin)
-{
-    int32_t width, height, depth;
-    fin.read(reinterpret_cast<char *>(&width), sizeof(width));
-    fin.read(reinterpret_cast<char *>(&height), sizeof(height));
-    fin.read(reinterpret_cast<char *>(&depth), sizeof(depth));
-    if(!fin)
-        throw ObjectConstructionException(
-            "failed to read width/height/depth from file");
-
-    texture::texture3d_t<real> data(depth, height, width);
-
-    for(int32_t z = 0; z < depth; ++z)
+    template<typename Texel, typename Func>
+    texture::texture3d_t<Texel> load_from_ascii(
+        std::ifstream &fin, const Func &read_texel)
     {
-        for(int32_t y = 0; y < height; ++y)
+        int width, height, depth;
+        fin >> width >> height >> depth;
+        if(!fin)
         {
-            for(int32_t x = 0; x < width; ++x)
+            throw ObjectConstructionException(
+                "failed to read width/height/depth from file");
+        }
+
+        texture::texture3d_t<Texel> data(depth, height, width);
+        for(int z = 0; z < depth; ++z)
+        {
+            for(int y = 0; y < height; ++y)
             {
-                float texel;
-                fin.read(reinterpret_cast<char *>(&texel), sizeof(texel));
-                data(z, y, x) =
-                    misc::to_local_endian<misc::endian_type::little>(texel);
+                for(int x = 0; x < width; ++x)
+                {
+                    data(z, y, x) = read_texel(fin);
+                    if(!fin)
+                    {
+                        throw ObjectConstructionException(
+                            "failed to parse texel data from file");
+                    }
+                }
             }
         }
-    }
 
-    return data;
+        return data;
+    }
 }
 
-texture::texture3d_t<real> texture3d_load::load_gray_from_images(
+namespace texture3d_load
+{
+
+texture::texture3d_t<real> load_real_from_ascii(
+    std::ifstream &fin)
+{
+    return load_from_ascii<real>(fin, [](auto &f)
+    {
+        real ret;
+        f >> ret;
+        return ret;
+    });
+}
+
+texture::texture3d_t<real> load_real_from_binary(
+    std::ifstream &fin)
+{
+    return load_from_binary<real>(fin);
+}
+
+texture::texture3d_t<real> load_real_from_images(
     const std::string *filenames, int image_count,
     const factory::PathMapper &path_mapper)
 {
-    texture::texture3d_t<real> data;
+    return load_uint8_from_images(
+                filenames, image_count, path_mapper)
+           .map([](uint8_t texel) { return texel / real(255); });
+}
+
+texture::texture3d_t<Spectrum> load_spec_from_ascii(
+    std::ifstream &fin)
+{
+    return load_from_ascii<Spectrum>(fin, [](auto &f)
+    {
+        Spectrum ret;
+        for(int i = 0; i < SPECTRUM_COMPONENT_COUNT; ++i)
+            f >> ret[i];
+        return ret;
+    });
+}
+
+texture::texture3d_t<Spectrum> load_spec_from_binary(
+    std::ifstream &fin)
+{
+    return load_from_binary<Spectrum>(fin);
+}
+
+texture::texture3d_t<Spectrum> load_spec_from_images(
+    const std::string *filenames, int image_count,
+    const factory::PathMapper &path_mapper)
+{
+    return load_uint24_from_images(
+                filenames, image_count, path_mapper)
+           .map(math::from_color3b<real>);
+}
+
+texture::texture3d_t<uint8_t> load_uint8_from_ascii(std::ifstream &fin)
+{
+    return load_from_ascii<uint8_t>(fin, [](auto &f)
+    {
+        uint8_t ret;
+        f >> ret;
+        return ret;
+    });
+}
+
+texture::texture3d_t<uint8_t> load_uint8_from_binary(std::ifstream &fin)
+{
+    return load_from_binary<uint8_t>(fin);
+}
+
+texture::texture3d_t<uint8_t> load_uint8_from_images(
+    const std::string *filenames, int image_count,
+    const factory::PathMapper &path_mapper)
+{
+    texture::texture3d_t<uint8_t> data;
 
     int width = -1, height = -1, depth = image_count;
     for(int z = 0; z < depth; ++z)
@@ -74,7 +153,7 @@ texture::texture3d_t<real> texture3d_load::load_gray_from_images(
         const std::string filename = path_mapper.map(filenames[z]);
         const auto slice = img::load_gray_from_file(filename);
 
-        const int new_width = slice.shape()[1];
+        const int new_width  = slice.shape()[1];
         const int new_height = slice.shape()[0];
 
         if(width < 0)
@@ -101,86 +180,35 @@ texture::texture3d_t<real> texture3d_load::load_gray_from_images(
         for(int y = 0; y < height; ++y)
         {
             for(int x = 0; x < width; ++x)
-            {
-                data(z, y, x) = slice(y, x) / 255.0f;
-            }
+                data(z, y, x) = slice(y, x);
         }
     }
 
     return data;
 }
 
-texture::texture3d_t<Spectrum> texture3d_load::load_rgb_from_ascii(
+texture::texture3d_t<math::color3b> load_uint24_from_ascii(
     std::ifstream &fin)
 {
-    int width, height, depth;
-    fin >> width >> height >> depth;
-    if(!fin)
-        throw ObjectConstructionException(
-            "failed to read width/height/depth from file");
-
-    texture::texture3d_t<Spectrum> data(depth, height, width);
-    for(int z = 0; z < depth; ++z)
+    return load_from_ascii<math::color3b>(fin, [](auto &f)
     {
-        for(int y = 0; y < height; ++y)
-        {
-            for(int x = 0; x < width; ++x)
-            {
-                Spectrum spec;
-                for(int c = 0; c < SPECTRUM_COMPONENT_COUNT; ++c)
-                    fin >> spec[c];
-                if(!fin)
-                    throw ObjectConstructionException(
-                        "failed to parse texel data from file");
-                data(z, y, x) = spec;
-            }
-        }
-    }
-
-    return data;
+        math::color3b ret;
+        f >> ret.r >> ret.g >> ret.b;
+        return ret;
+    });
 }
 
-texture::texture3d_t<Spectrum> texture3d_load::load_rgb_from_binary(
+texture::texture3d_t<math::color3b> load_uint24_from_binary(
     std::ifstream &fin)
 {
-    int32_t width, height, depth;
-    fin.read(reinterpret_cast<char *>(&width), sizeof(width));
-    fin.read(reinterpret_cast<char *>(&height), sizeof(height));
-    fin.read(reinterpret_cast<char *>(&depth), sizeof(depth));
-    if(!fin)
-        throw ObjectConstructionException(
-            "failed to read width/height/depth from file");
-
-    texture::texture3d_t<Spectrum> data(depth, height, width);
-
-    for(int32_t z = 0; z < depth; ++z)
-    {
-        for(int32_t y = 0; y < height; ++y)
-        {
-            for(int32_t x = 0; x < width; ++x)
-            {
-                Spectrum texel;
-                for(int c = 0; c < SPECTRUM_COMPONENT_COUNT; ++c)
-                {
-                    real component;
-                    fin.read(
-                        reinterpret_cast<char *>(&component), sizeof(component));
-                    texel[c] =
-                        misc::to_local_endian<misc::endian_type::little>(component);
-                }
-                data(z, y, x) = texel;
-            }
-        }
-    }
-
-    return data;
+    return load_from_binary<math::color3b>(fin);
 }
 
-texture::texture3d_t<Spectrum> texture3d_load::load_rgb_from_images(
+texture::texture3d_t<math::color3b> load_uint24_from_images(
     const std::string *filenames, int image_count,
     const factory::PathMapper &path_mapper)
 {
-    texture::texture3d_t<Spectrum> data;
+    texture::texture3d_t<math::color3b> data;
 
     int width = -1, height = -1, depth = image_count;
     for(int z = 0; z < depth; ++z)
@@ -216,7 +244,7 @@ texture::texture3d_t<Spectrum> texture3d_load::load_rgb_from_images(
         {
             for(int x = 0; x < width; ++x)
             {
-                data(z, y, x) = math::from_color3b<real>(slice(y, x));
+                data(z, y, x) = slice(y, x);
             }
         }
     }
@@ -224,7 +252,7 @@ texture::texture3d_t<Spectrum> texture3d_load::load_rgb_from_images(
     return data;
 }
 
-void texture3d_load::save_gray_to_binary(
+void save_real_to_binary(
     const std::string &filename, const Vec3i &size, const float *data)
 {
     std::ofstream fout(filename, std::ios::trunc | std::ios::binary);
@@ -240,7 +268,7 @@ void texture3d_load::save_gray_to_binary(
         reinterpret_cast<const char *>(data), size.product() * sizeof(float));
 }
 
-void texture3d_load::save_rgb_to_binary(
+void save_spec_to_binary(
     const std::string &filename, const Vec3i &size, const float *data)
 {
     std::ofstream fout(filename, std::ios::trunc | std::ios::binary);
@@ -255,5 +283,39 @@ void texture3d_load::save_rgb_to_binary(
     fout.write(
         reinterpret_cast<const char *>(data), size.product() * sizeof(float) * 3);
 }
+
+void save_uint8_to_binary(
+    const std::string &filename, const Vec3i &size, const uint8_t *data)
+{
+    std::ofstream fout(filename, std::ios::trunc | std::ios::binary);
+    if(!fout)
+        throw std::runtime_error("failed to open file: " + filename);
+
+    int32_t w = size.x, h = size.y, d = size.z;
+    fout.write(reinterpret_cast<const char *>(&w), sizeof(w));
+    fout.write(reinterpret_cast<const char *>(&h), sizeof(h));
+    fout.write(reinterpret_cast<const char *>(&d), sizeof(d));
+
+    fout.write(
+        reinterpret_cast<const char *>(data), size.product() * sizeof(uint8_t));
+}
+
+void save_uint24_to_binary(
+    const std::string &filename, const Vec3i &size, const math::color3b *data)
+{
+    std::ofstream fout(filename, std::ios::trunc | std::ios::binary);
+    if(!fout)
+        throw std::runtime_error("failed to open file: " + filename);
+
+    int32_t w = size.x, h = size.y, d = size.z;
+    fout.write(reinterpret_cast<const char *>(&w), sizeof(w));
+    fout.write(reinterpret_cast<const char *>(&h), sizeof(h));
+    fout.write(reinterpret_cast<const char *>(&d), sizeof(d));
+
+    fout.write(
+        reinterpret_cast<const char *>(data), size.product() * sizeof(math::color3b));
+}
+
+} // namespace texture3d_load
 
 AGZ_TRACER_END

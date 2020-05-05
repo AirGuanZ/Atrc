@@ -40,17 +40,7 @@ public:
         return texel_;
     }
 
-    Spectrum min_spectrum() const noexcept override
-    {
-        return texel_;
-    }
-
     real max_real() const noexcept override
-    {
-        return texel_.r;
-    }
-
-    real min_real() const noexcept override
     {
         return texel_.r;
     }

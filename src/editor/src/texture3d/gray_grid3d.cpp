@@ -151,7 +151,7 @@ RC<tracer::ConfigNode> GrayGrid3DWidget::to_config(JSONExportContext &ctx) const
 
     auto [ref_filename, filename] = ctx.gen_filename(".gray_grid");
 
-    tracer::texture3d_load::save_gray_to_binary(
+    tracer::texture3d_load::save_real_to_binary(
         filename,
         { img_data_->width(), img_data_->height(), img_data_->depth() },
         img_data_->raw_data());
@@ -182,7 +182,7 @@ void GrayGrid3DWidget::browse_filename()
                 return;
 
             std::ifstream fin(filename.toStdString(), std::ios::in);
-            data = tracer::texture3d_load::load_gray_from_ascii(fin);
+            data = tracer::texture3d_load::load_real_from_ascii(fin);
         }
         else if(item == "Binary")
         {
@@ -192,7 +192,7 @@ void GrayGrid3DWidget::browse_filename()
 
             std::ifstream fin(
                 filename.toStdString(), std::ios::in | std::ios::binary);
-            data = tracer::texture3d_load::load_gray_from_binary(fin);
+            data = tracer::texture3d_load::load_real_from_binary(fin);
         }
         else
         {
@@ -205,7 +205,7 @@ void GrayGrid3DWidget::browse_filename()
             for(auto &f : filenames)
                 std_filenames.push_back(f.toStdString());
 
-            data = tracer::texture3d_load::load_gray_from_images(
+            data = tracer::texture3d_load::load_real_from_images(
                 std_filenames.data(), filenames.size(),
                 tracer::factory::BasicPathMapper());
         }
