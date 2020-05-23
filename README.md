@@ -39,11 +39,10 @@ Offline rendering lab based on ray tracing
 - [ ] Support BSSRDF in BDPT
 - [ ] Variance buffer, fireflies removal & adaptive sampling
 - [ ] Support g-buffer in PSSMLT
-- [ ] Multiple selection in editor
 
 ## Known Issues
 
-- [ ] Inv gamma correction of image texture
+- [ ] Relation between inv gamma correction & linear sampler of image texture
 
 ## Documentation
 
