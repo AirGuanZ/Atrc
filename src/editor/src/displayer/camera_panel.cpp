@@ -319,10 +319,18 @@ CameraPanel::CameraPanel(QWidget *parent)
             this, &CameraPanel::change_export_framebuffer_size);
 
     connect(preview_, &CameraParamsWidget::edit_params,
-            [=]{ emit edit_params(); });
+            [=]
+    {
+        update_display_params();
+        emit edit_params();
+    });
     
     connect(export_, &CameraParamsWidget::edit_params,
-            [=]{ emit edit_params(); });
+            [=]
+    {
+        update_display_params();
+        emit edit_params();
+    });
 
     update_display_params();
 }
