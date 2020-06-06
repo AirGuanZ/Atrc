@@ -57,8 +57,6 @@ struct Vertex
     real dVM  = 0;
 };
 
-
-
 } // namespace vcm
 
 AGZ_TRACER_RENDER_END

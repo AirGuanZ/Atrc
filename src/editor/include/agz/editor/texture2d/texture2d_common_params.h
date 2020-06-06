@@ -20,6 +20,8 @@ public:
 
     struct InitData
     {
+        InitData() {} // clang's noexcept bug
+
         bool apply_inv_gamma = false;
         real inv_gamma       = real(2.2);
 

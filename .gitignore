@@ -1,5 +1,6 @@
 build/
 build2017/
+build_clang/
 .vscode/
 asset/
 doc/doc.html

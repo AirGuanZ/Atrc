@@ -1,5 +1,4 @@
 #include <QFormLayout>
-#include <QLabel>
 
 #include <agz/editor/displayer/camera_panel.h>
 #include <agz/editor/imexport/asset_loader.h>

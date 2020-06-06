@@ -146,7 +146,6 @@ ResourceInPool<TracerObject> *NameResourcePool<TracerObject>::add_resource(
     editor_->add_to_resource_panel(raw_panel);
 
     auto record = newBox<Record>();
-    auto raw_record = record.get();
     record->name = name;
     record->rsc = std::move(rsc);
     name2record_[name] = std::move(record);
@@ -178,12 +177,10 @@ void NameResourcePool<TracerObject>::load_asset(AssetLoader &loader)
         rsc->load_asset(*this, loader);
         const QString name = rsc->get_name();
 
-        auto raw_rsc = rsc.get();
         auto raw_panel = rsc->get_panel();
         editor_->add_to_resource_panel(raw_panel);
 
         auto record = newBox<Record>();
-        auto raw_record = record.get();
         record->name = name;
         record->rsc = std::move(rsc);
         name2record_[name] = std::move(record);

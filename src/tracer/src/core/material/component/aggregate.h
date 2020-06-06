@@ -25,15 +25,15 @@ public:
 
     Spectrum eval(
         const Vec3 &wi, const Vec3 &wo,
-        TransMode mode, uint8_t type) const noexcept;
+        TransMode mode, uint8_t type) const noexcept override;
 
     BSDFSampleResult sample(
         const Vec3 &wo, TransMode mode,
-        const Sample3 &sam, uint8_t type) const noexcept;
+        const Sample3 &sam, uint8_t type) const noexcept override;
 
     real pdf(
         const Vec3 &wi, const Vec3 &wo,
-        uint8_t type) const noexcept;
+        uint8_t type) const noexcept override;
 
     Spectrum eval_all(
         const Vec3 &wi, const Vec3 &wo, TransMode mode) const noexcept override;

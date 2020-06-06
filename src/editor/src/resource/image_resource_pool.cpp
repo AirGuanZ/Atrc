@@ -14,7 +14,7 @@ namespace
 template<typename TracerObject>
 ImageResourcePool<TracerObject>::ImageResourcePool(
     ObjectContext &obj_ctx, Editor *editor, const QString &default_type)
-    : obj_ctx_(obj_ctx), editor_(editor), default_type_(default_type)
+    : default_type_(default_type), obj_ctx_(obj_ctx), editor_(editor)
 {
     ui_ = new ImageResourcePoolWidget;
     layout_ = new FlowLayout(ui_->scroll_area_widget);
