@@ -35,7 +35,10 @@ Image3DWidget::Image3DWidget(const InitData &init_data)
 
     common_ = init_data.common;
     if(!common_)
-        common_ = new Texture3DCommonParamsWidget({});
+    {
+        common_ = new Texture3DCommonParamsWidget(
+            Texture3DCommonParamsWidget::InitData{});
+    }
 
     connect(common_, &Texture3DCommonParamsWidget::change_params, [=]
     {

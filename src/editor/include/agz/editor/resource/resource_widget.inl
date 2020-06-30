@@ -8,7 +8,7 @@ inline ResourceObjectException::ResourceObjectException(const QString &msg)
 
 }
 
-inline char const *ResourceObjectException::what() const
+inline char const *ResourceObjectException::what() const noexcept
 {
     return msg_.toStdString().c_str();
 }

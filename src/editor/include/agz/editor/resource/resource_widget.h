@@ -23,7 +23,7 @@ public:
 
     explicit ResourceObjectException(const QString &msg);
 
-    char const *what() const override;
+    char const *what() const noexcept override;
 
     const QString &msg() const noexcept;
 

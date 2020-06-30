@@ -29,63 +29,65 @@ struct Vertex
     bool is_delta = false;
 
     Vertex() { }
+
+
+    struct Camera
+    {
+        Vec3 pos;
+        Vec3 nor;
+    };
+
+    struct Surface
+    {
+        Vec3 pos;
+        Vec3 nor;
+        Vec2 uv;
+
+        Vec3 wr;
+
+        const Medium *med_out = nullptr;
+        const Medium *med_in = nullptr;
+
+        const BSDF   *bsdf   = nullptr;
+        const Entity *entity = nullptr;
+
+        const Medium *medium(const Vec3 &wr) const noexcept
+        {
+            return dot(wr, nor) > 0 ? med_out : med_in;
+        }
+    };
+
+    struct AreaLight
+    {
+        Vec3 pos;
+        Vec3 nor;
+        Vec2 uv;
+
+        const tracer::AreaLight *light = nullptr;
+    };
+
+    struct EnvLight
+    {
+        Vec3 light_to_out;
+    };
+
+    struct Medium
+    {
+        Vec3 pos;
+        Vec3 wr;
+
+        const tracer::Medium *med = nullptr;
+
+        const BSDF *phase = nullptr;
+    };
     
     union
     {
-        struct Camera
-        {
-            Vec3 pos;
-            Vec3 nor;
-
-        } camera;
-
-        struct Surface
-        {
-            Vec3 pos;
-            Vec3 nor;
-            Vec2 uv;
-
-            Vec3 wr;
-
-            const Medium *med_out = nullptr;
-            const Medium *med_in = nullptr;
-
-            const BSDF   *bsdf   = nullptr;
-            const Entity *entity = nullptr;
-
-            const Medium *medium(const Vec3 &wr) const noexcept
-            {
-                return dot(wr, nor) > 0 ? med_out : med_in;
-            }
-
-        } surface;
-
-        struct AreaLight
-        {
-            Vec3 pos;
-            Vec3 nor;
-            Vec2 uv;
-
-            const tracer::AreaLight *light = nullptr;
-
-        } area_light;
-
-        struct EnvLight
-        {
-            Vec3 light_to_out;
-
-        } env_light;
-
-        struct Medium
-        {
-            Vec3 pos;
-            Vec3 wr;
-
-            const tracer::Medium *med = nullptr;
-
-            const BSDF *phase = nullptr;
-
-        } medium;
+        Camera    camera;
+        Surface   surface;
+        AreaLight area_light;
+        EnvLight  env_light;
+        Medium    medium;
     };
 
     bool is_scattering_type() const noexcept
