@@ -16,7 +16,7 @@ namespace
 
     public:
 
-        MirrorBSDF(const Coord &geometry_coord, const Coord &shading_coord,
+        MirrorBSDF(const FCoord &geometry_coord, const FCoord &shading_coord,
                    const ConductorPoint *fresnel_point, const Spectrum &rc) noexcept
             : LocalBSDF(geometry_coord, shading_coord),
               fresnel_point_(fresnel_point), rc_(rc)
@@ -25,26 +25,26 @@ namespace
         }
 
         Spectrum eval(
-            const Vec3 &, const Vec3 &, TransMode, uint8_t type) const noexcept override
+            const FVec3 &, const FVec3 &, TransMode, uint8_t type) const noexcept override
         {
             return Spectrum();
         }
 
         BSDFSampleResult sample(
-            const Vec3 &out_dir, TransMode transport_mode,
+            const FVec3 &out_dir, TransMode transport_mode,
             const Sample3 &sam, uint8_t type) const noexcept override
         {
             if(!(type & BSDF_SPECULAR))
                 return BSDF_SAMPLE_RESULT_INVALID;
 
-            const Vec3 local_out = shading_coord_.global_to_local(out_dir);
+            const FVec3 local_out = shading_coord_.global_to_local(out_dir);
             if(local_out.z <= 0)
                 return BSDF_SAMPLE_RESULT_INVALID;
             
-            const Vec3 nwo = local_out.normalize();
+            const FVec3 nwo = local_out.normalize();
 
-            const Vec3 dir = shading_coord_.local_to_global(
-                Vec3(0, 0, 2 * nwo.z) - nwo);
+            const FVec3 dir = shading_coord_.local_to_global(
+                FVec3(0, 0, 2 * nwo.z) - nwo);
 
             const Spectrum f = fresnel_point_->eval(nwo.z)
                              * rc_ / std::abs(nwo.z);
@@ -56,7 +56,7 @@ namespace
         }
 
         real pdf(
-            const Vec3 &in_dir, const Vec3 &out_dir, uint8_t) const noexcept override
+            const FVec3 &in_dir, const FVec3 &out_dir, uint8_t) const noexcept override
         {
             return 0;
         }

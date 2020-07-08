@@ -133,7 +133,7 @@ public:
         return aggregate_->has_intersection(r);
     }
 
-    bool visible(const Vec3 &A, const Vec3 &B) const noexcept override
+    bool visible(const FVec3 &A, const FVec3 &B) const noexcept override
     {
         const real dis = (A - B).length();
         const Ray shadow_ray(A, (B - A).normalize(), EPS(), dis - EPS());
@@ -153,8 +153,8 @@ public:
             world_bound |= ent->world_bound();
 
         const real diag = (world_bound.high - world_bound.low).length();
-        world_bound.low  -= Vec3(real(0.01) * diag);
-        world_bound.high += Vec3(real(0.01) * diag);
+        world_bound.low  -= FVec3(real(0.01) * diag);
+        world_bound.high += FVec3(real(0.01) * diag);
 
         return world_bound;
     }

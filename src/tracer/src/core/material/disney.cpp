@@ -111,7 +111,7 @@ namespace disney_impl
         }
 
         Spectrum f_trans(
-            const Vec3 &lwi, const Vec3 &lwo, TransMode mode) const noexcept
+            const FVec3 &lwi, const FVec3 &lwo, TransMode mode) const noexcept
         {
             assert(lwi.z * lwo.z < 0);
 
@@ -119,7 +119,7 @@ namespace disney_impl
             const real cos_theta_o = local_angle::cos_theta(lwo);
 
             const real eta = cos_theta_o > 0 ? IOR_ : 1 / IOR_;
-            Vec3 lwh = (lwo + eta * lwi).normalize();
+            FVec3 lwh = (lwo + eta * lwi).normalize();
             if(lwh.z < 0)
                 lwh = -lwh;
 
@@ -164,11 +164,11 @@ namespace disney_impl
             return (1 - metallic_) * trans_factor * sqrtC * std::abs(val);
         }
 
-        Spectrum f_inner_refl(const Vec3 &lwi, const Vec3 &lwo) const noexcept
+        Spectrum f_inner_refl(const FVec3 &lwi, const FVec3 &lwo) const noexcept
         {
             assert(lwi.z < 0 && lwo.z < 0);
             
-            const Vec3 lwh = -(lwi + lwo).normalize();
+            const FVec3 lwh = -(lwi + lwo).normalize();
             assert(lwh.z > 0);
 
             const real cos_theta_d = dot(lwo, lwh);
@@ -202,14 +202,14 @@ namespace disney_impl
             return transmission_ * C_ * std::abs(F * D * G / (4 * lwi.z * lwo.z));
         }
 
-        Spectrum f_specular(const Vec3 &lwi, const Vec3 &lwo) const noexcept
+        Spectrum f_specular(const FVec3 &lwi, const FVec3 &lwo) const noexcept
         {
             assert(lwi.z > 0 && lwo.z > 0);
 
             const real cos_theta_i = local_angle::cos_theta(lwi);
             const real cos_theta_o = local_angle::cos_theta(lwo);
 
-            const Vec3 lwh = (lwi + lwo).normalize();
+            const FVec3 lwh = (lwi + lwo).normalize();
             const real cos_theta_d = dot(lwi, lwh);
 
             const Spectrum Cspec = mix(
@@ -243,43 +243,43 @@ namespace disney_impl
             return F * D * G / std::abs(4 * cos_theta_i * cos_theta_o);
         }
 
-        Vec3 sample_diffuse(const Sample2 &sam) const noexcept
+        FVec3 sample_diffuse(const Sample2 &sam) const noexcept
         {
             return math::distribution::zweighted_on_hemisphere(
                             sam.u, sam.v).first;
         }
 
-        Vec3 sample_specular(const Vec3 &lwo, const Sample2 &sam) const noexcept
+        FVec3 sample_specular(const FVec3 &lwo, const Sample2 &sam) const noexcept
         {
-            const Vec3 lwh = microfacet::sample_anisotropic_gtr2_vnor(
+            const FVec3 lwh = microfacet::sample_anisotropic_gtr2_vnor(
                 lwo, ax_, ay_, sam).normalize();
             if(lwh.z <= 0)
                 return {};
 
-            const Vec3 lwi = (2 * dot(lwo, lwh) * lwh - lwo).normalize();
+            const FVec3 lwi = (2 * dot(lwo, lwh) * lwh - lwo).normalize();
             if(lwi.z <= 0)
                 return {};
 
             return lwi;
         }
 
-        Vec3 sample_clearcoat(const Vec3 &lwo, const Sample2 &sam) const noexcept
+        FVec3 sample_clearcoat(const FVec3 &lwo, const Sample2 &sam) const noexcept
         {
-            const Vec3 lwh = microfacet::sample_gtr1(clearcoat_roughness_, sam);
+            const FVec3 lwh = microfacet::sample_gtr1(clearcoat_roughness_, sam);
             if(lwh.z <= 0)
                 return {};
 
-            const Vec3 lwi = (2 * dot(lwo, lwh) * lwh - lwo).normalize();
+            const FVec3 lwi = (2 * dot(lwo, lwh) * lwh - lwo).normalize();
             if(lwi.z <= 0)
                 return {};
 
             return lwi;
         }
 
-        Vec3 sample_transmission(
-            const Vec3 &lwo, const Sample2 &sam) const noexcept
+        FVec3 sample_transmission(
+            const FVec3 &lwo, const Sample2 &sam) const noexcept
         {
-            const Vec3 lwh = microfacet::sample_anisotropic_gtr2(
+            const FVec3 lwh = microfacet::sample_anisotropic_gtr2(
                 trans_ax_, trans_ay_, sam);
             if(lwh.z <= 0)
                 return {};
@@ -288,46 +288,46 @@ namespace disney_impl
                 return {};
 
             const real eta = lwo.z > 0 ? 1 / IOR_ : IOR_;
-            const Vec3 owh = dot(lwh, lwo) > 0 ? lwh : -lwh;
+            const FVec3 owh = dot(lwh, lwo) > 0 ? lwh : -lwh;
             auto opt_lwi = refl_aux::refract(lwo, owh, eta);
             if(!opt_lwi)
                 return {};
 
-            const Vec3 lwi = opt_lwi->normalize();
+            const FVec3 lwi = opt_lwi->normalize();
             if(lwi.z * lwo.z > 0 || ((lwi.z > 0) != (dot(lwh, lwi) > 0)))
                 return {};
 
             return lwi;
         }
 
-        Vec3 sample_inner_refl(
-            const Vec3 &lwo, const Sample2 &sam) const noexcept
+        FVec3 sample_inner_refl(
+            const FVec3 &lwo, const Sample2 &sam) const noexcept
         {
             assert(lwo.z < 0);
             
-            const Vec3 lwh = microfacet::sample_anisotropic_gtr2(
+            const FVec3 lwh = microfacet::sample_anisotropic_gtr2(
                 trans_ax_, trans_ay_, sam);
             if(lwh.z <= 0)
                 return {};
 
-            const Vec3 lwi = (2 * dot(lwo, lwh) * lwh - lwo);
+            const FVec3 lwi = (2 * dot(lwo, lwh) * lwh - lwo);
             if(lwi.z > 0)
                 return {};
             return lwi.normalize();
         }
 
-        real pdf_diffuse(const Vec3 &lwi, const Vec3 &lwo) const noexcept
+        real pdf_diffuse(const FVec3 &lwi, const FVec3 &lwo) const noexcept
         {
             assert(lwi.z > 0 && lwo.z > 0);
             return math::distribution::zweighted_on_hemisphere_pdf(lwi.z);
         }
 
         std::pair<real, real> pdf_specular_clearcoat(
-            const Vec3 &lwi, const Vec3 &lwo) const noexcept
+            const FVec3 &lwi, const FVec3 &lwo) const noexcept
         {
             assert(lwi.z > 0 && lwo.z > 0);
 
-            const Vec3 lwh = (lwi + lwo).normalize();
+            const FVec3 lwh = (lwi + lwo).normalize();
             const real phi_h       = local_angle::phi(lwh);
             const real sin_phi_h   = std::sin(phi_h);
             const real cos_phi_h   = std::cos(phi_h);
@@ -355,12 +355,12 @@ namespace disney_impl
             return { pdf_specular, pdf_clearcoat };
         }
 
-        real pdf_transmission(const Vec3 &lwi, const Vec3 &lwo) const noexcept
+        real pdf_transmission(const FVec3 &lwi, const FVec3 &lwo) const noexcept
         {
             assert(lwi.z * lwo.z < 0);
 
             const real eta = lwo.z > 0 ? IOR_ : 1 / IOR_;
-            Vec3 lwh = (lwo + eta * lwi).normalize();
+            FVec3 lwh = (lwo + eta * lwi).normalize();
             if(lwh.z < 0)
                 lwh = -lwh;
 
@@ -383,11 +383,11 @@ namespace disney_impl
             return std::abs(dot(lwi, lwh) * D * dwh_to_dwi);
         }
 
-        real pdf_inner_refl(const Vec3 &lwi, const Vec3 &lwo) const noexcept
+        real pdf_inner_refl(const FVec3 &lwi, const FVec3 &lwo) const noexcept
         {
             assert(lwi.z < 0 && lwo.z < 0);
             
-            const Vec3 lwh = -(lwi + lwo).normalize();
+            const FVec3 lwh = -(lwi + lwo).normalize();
             const real phi_h       = local_angle::phi(lwh);
             const real sin_phi_h   = std::sin(phi_h);
             const real cos_phi_h   = std::cos(phi_h);
@@ -403,7 +403,7 @@ namespace disney_impl
 
     public:
 
-        DisneyBSDF(const Coord &geometry_coord, const Coord &shading_coord,
+        DisneyBSDF(const FCoord &geometry_coord, const FCoord &shading_coord,
                    const Spectrum &base_color,
                    real metallic,
                    real roughness,
@@ -458,14 +458,14 @@ namespace disney_impl
         }
 
         Spectrum eval(
-            const Vec3 &wi, const Vec3 &wo,
+            const FVec3 &wi, const FVec3 &wo,
             TransMode mode, uint8_t type) const noexcept override
         {
             if(cause_black_fringes(wi, wo))
                 return eval_black_fringes(wi, wo);
 
-            const Vec3 lwi = shading_coord_.global_to_local(wi).normalize();
-            const Vec3 lwo = shading_coord_.global_to_local(wo).normalize();
+            const FVec3 lwi = shading_coord_.global_to_local(wi).normalize();
+            const FVec3 lwo = shading_coord_.global_to_local(wo).normalize();
 
             if(std::abs(lwi.z) < EPS() || std::abs(lwo.z) < EPS())
                 return {};
@@ -502,7 +502,7 @@ namespace disney_impl
             const real cos_theta_i = local_angle::cos_theta(lwi);
             const real cos_theta_o = local_angle::cos_theta(lwo);
 
-            const Vec3 lwh = (lwi + lwo).normalize();
+            const FVec3 lwh = (lwi + lwo).normalize();
             const real cos_theta_d = dot(lwi, lwh);
 
             Spectrum diffuse, sheen;
@@ -542,13 +542,13 @@ namespace disney_impl
         }
 
         BSDFSampleResult sample(
-            const Vec3 &wo, TransMode mode,
+            const FVec3 &wo, TransMode mode,
             const Sample3 &sam, uint8_t type) const noexcept override
         {
             if(cause_black_fringes(wo))
                 return sample_black_fringes(wo, mode, sam);
 
-            const Vec3 lwo = shading_coord_.global_to_local(wo).normalize();
+            const FVec3 lwo = shading_coord_.global_to_local(wo).normalize();
             if(std::abs(lwo.z) < EPS())
                 return BSDF_SAMPLE_RESULT_INVALID;
 
@@ -559,7 +559,7 @@ namespace disney_impl
                 if(!(type & BSDF_GLOSSY) || !transmission_)
                     return BSDF_SAMPLE_RESULT_INVALID;
 
-                Vec3 lwi;
+                FVec3 lwi;
                 real macro_F = refl_aux::dielectric_fresnel(IOR_, 1, lwo.z);
                 macro_F = math::clamp(macro_F, real(0.1), real(0.9));
                 if(sam.u >= macro_F)
@@ -570,7 +570,7 @@ namespace disney_impl
                 if(!lwi)
                     return BSDF_SAMPLE_RESULT_INVALID;
 
-                const Vec3 wi    = shading_coord_.local_to_global(lwi);
+                const FVec3 wi    = shading_coord_.local_to_global(lwi);
                 const Spectrum f = eval_all(wi, wo, mode);
                 const real pdf   = pdf_all(wi, wo);
 
@@ -590,7 +590,7 @@ namespace disney_impl
                          + sample_w.transmission;
             sam_selector *= pdf_sum;
 
-            Vec3 lwi;
+            FVec3 lwi;
 
             if(type & BSDF_DIFFUSE)
             {
@@ -614,7 +614,7 @@ namespace disney_impl
             if(!lwi)
                 return BSDF_SAMPLE_RESULT_INVALID;
             
-            const Vec3 wi    = shading_coord_.local_to_global(lwi);
+            const FVec3 wi    = shading_coord_.local_to_global(lwi);
             const Spectrum f = eval_all(wi, wo, mode);
             const real pdf   = pdf_all(wi, wo);
 
@@ -622,13 +622,13 @@ namespace disney_impl
         }
 
         real pdf(
-            const Vec3 &wi, const Vec3 &wo, uint8_t type) const noexcept override
+            const FVec3 &wi, const FVec3 &wo, uint8_t type) const noexcept override
         {
             if(cause_black_fringes(wi, wo))
                 return pdf_for_black_fringes(wi, wo);
 
-            const Vec3 lwi = shading_coord_.global_to_local(wi).normalize();
-            const Vec3 lwo = shading_coord_.global_to_local(wo).normalize();
+            const FVec3 lwi = shading_coord_.global_to_local(wi).normalize();
+            const FVec3 lwo = shading_coord_.global_to_local(wo).normalize();
             if(std::abs(lwi.z) < EPS() || std::abs(lwo.z) < EPS())
                 return 0;
 
@@ -770,7 +770,7 @@ public:
         const real     clearcoat              = clearcoat_       ->sample_real(uv);
         const real     clearcoat_gloss        = clearcoat_gloss_ ->sample_real(uv);
 
-        const Coord shading_coord = normal_mapper_->reorient(uv, inct.user_coord);
+        const FCoord shading_coord = normal_mapper_->reorient(uv, inct.user_coord);
         const BSDF *bsdf = arena.create<disney_impl::DisneyBSDF>(
             inct.geometry_coord, shading_coord,
             base_color,

@@ -12,9 +12,9 @@ AGZ_TRACER_BEGIN
 struct CameraSampleWeResult
 {
     CameraSampleWeResult(
-        const Vec3 &pos_on_cam,
-        const Vec3 &pos_to_out,
-        const Vec3 &nor_on_cam,
+        const FVec3 &pos_on_cam,
+        const FVec3 &pos_to_out,
+        const FVec3 &nor_on_cam,
         const Spectrum &throughput) noexcept
         : pos_on_cam(pos_on_cam),
           pos_to_out(pos_to_out),
@@ -24,9 +24,9 @@ struct CameraSampleWeResult
 
     }
 
-    Vec3 pos_on_cam;
-    Vec3 pos_to_out;
-    Vec3 nor_on_cam;
+    FVec3 pos_on_cam;
+    FVec3 pos_to_out;
+    FVec3 nor_on_cam;
     Spectrum throughput;
 };
 
@@ -53,7 +53,7 @@ struct CameraEvalWeResult
     CameraEvalWeResult(
         const Spectrum &we,
         const Vec2 &film_coord,
-        const Vec3 &nor_on_cam) noexcept
+        const FVec3 &nor_on_cam) noexcept
         : we(we), film_coord(film_coord), nor_on_cam(nor_on_cam)
     {
 
@@ -61,7 +61,7 @@ struct CameraEvalWeResult
 
     Spectrum we;
     Vec2 film_coord;
-    Vec3 nor_on_cam;
+    FVec3 nor_on_cam;
 };
 
 inline const CameraEvalWeResult CAMERA_EVAL_WE_RESULT_ZERO =
@@ -73,9 +73,9 @@ inline const CameraEvalWeResult CAMERA_EVAL_WE_RESULT_ZERO =
 struct CameraSampleWiResult
 {
     CameraSampleWiResult(
-        const Vec3 &pos_on_cam,
-        const Vec3 &nor_at_pos,
-        const Vec3 &ref_to_pos,
+        const FVec3 &pos_on_cam,
+        const FVec3 &nor_at_pos,
+        const FVec3 &ref_to_pos,
         const Spectrum &we,
         real pdf,
         const Vec2 &film_coord) noexcept
@@ -89,9 +89,9 @@ struct CameraSampleWiResult
         
     }
 
-    Vec3 pos_on_cam; // position on camera lens
-    Vec3 nor_at_pos; // lens normal
-    Vec3 ref_to_pos; // from reference point to position on lens
+    FVec3 pos_on_cam; // position on camera lens
+    FVec3 nor_at_pos; // lens normal
+    FVec3 ref_to_pos; // from reference point to position on lens
     Spectrum we;     // initial importance function
     real pdf = 0;    // pdf w.r.t. solid angle at ref
     Vec2 film_coord; // where on the film does this sample correspond to 
@@ -123,19 +123,19 @@ public:
      * @brief eval we(pos_on_cam -> pos_to_out)
      */
     virtual CameraEvalWeResult eval_we(
-        const Vec3 &pos_on_cam, const Vec3 &pos_to_out) const noexcept = 0;
+        const FVec3 &pos_on_cam, const FVec3 &pos_to_out) const noexcept = 0;
 
     /**
      * @brief pdf of sample_we
      */
     virtual CameraWePDFResult pdf_we(
-        const Vec3 &pos_on_cam, const Vec3 &pos_to_out) const noexcept = 0;
+        const FVec3 &pos_on_cam, const FVec3 &pos_to_out) const noexcept = 0;
 
     /**
      * @brief sample camera wi
      */
     virtual CameraSampleWiResult sample_wi(
-        const Vec3 &ref, const Sample2 &sam) const noexcept = 0;
+        const FVec3 &ref, const Sample2 &sam) const noexcept = 0;
 };
 
 AGZ_TRACER_END

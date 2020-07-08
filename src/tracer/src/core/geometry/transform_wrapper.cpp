@@ -6,12 +6,12 @@ class TransformWrapper : public Geometry
 {
     RC<const Geometry> internal_;
 
-    Transform3 local_to_world_;
+    FTransform3 local_to_world_;
     real scale_ratio_ = 1;
 
     AABB world_bound_;
 
-    void init_transform(const Transform3 &local_to_world)
+    void init_transform(const FTransform3 &local_to_world)
     {
         local_to_world_ = local_to_world;
         scale_ratio_ = local_to_world_.apply_to_vector({ 0, 0, 1 }).length();
@@ -32,7 +32,7 @@ class TransformWrapper : public Geometry
 public:
 
     TransformWrapper(
-        RC<const Geometry> internal, const Transform3 &local_to_world)
+        RC<const Geometry> internal, const FTransform3 &local_to_world)
         : internal_(std::move(internal))
     {
         init_transform(local_to_world);
@@ -91,7 +91,7 @@ public:
     }
 
     SurfacePoint sample(
-        const Vec3 &ref, real *pdf, const Sample3 &sam) const noexcept override
+        const FVec3 &ref, real *pdf, const Sample3 &sam) const noexcept override
     {
         SurfacePoint spt = internal_->sample(
             local_to_world_.apply_inverse_to_point(ref), pdf, sam);
@@ -105,13 +105,13 @@ public:
         return spt;
     }
 
-    real pdf(const Vec3 &pos) const noexcept override
+    real pdf(const FVec3 &pos) const noexcept override
     {
         return internal_->pdf(local_to_world_.apply_inverse_to_point(pos))
              / (scale_ratio_ * scale_ratio_);
     }
 
-    real pdf(const Vec3 &ref, const Vec3 &pos) const noexcept override
+    real pdf(const FVec3 &ref, const FVec3 &pos) const noexcept override
     {
         return internal_->pdf(
             local_to_world_.apply_inverse_to_point(ref),
@@ -121,7 +121,7 @@ public:
 };
 
 RC<Geometry> create_transform_wrapper(
-    RC<const Geometry> internal, const Transform3 &local_to_world)
+    RC<const Geometry> internal, const FTransform3 &local_to_world)
 {
     return newRC<TransformWrapper>(std::move(internal), local_to_world);
 }

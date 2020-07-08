@@ -18,8 +18,8 @@ namespace
         Spectrum color_reflection_;
         Spectrum color_refraction_;
 
-        static std::optional<Vec3> refr_dir(
-            const Vec3 &nwo, const Vec3 &nor, real eta)
+        static std::optional<FVec3> refr_dir(
+            const FVec3 &nwo, const FVec3 &nor, real eta)
         {
             const real cos_theta_i = std::abs(nwo.z);
             const real sin_theta_i_2 = (std::max)(real(0), 1 - cos_theta_i * cos_theta_i);
@@ -32,7 +32,7 @@ namespace
 
     public:
 
-        GlassBSDF(const Coord &geometry_coord, const Coord &shading_coord,
+        GlassBSDF(const FCoord &geometry_coord, const FCoord &shading_coord,
                   const DielectricFresnelPoint *fresnel_point,
                   const Spectrum &color_reflection,
                   const Spectrum &color_refraction) noexcept
@@ -45,27 +45,27 @@ namespace
         }
 
         Spectrum eval(
-            const Vec3&, const Vec3&, TransMode, uint8_t type) const noexcept override
+            const FVec3 &, const FVec3 &, TransMode, uint8_t type) const noexcept override
         {
             return Spectrum();
         }
 
         BSDFSampleResult sample(
-            const Vec3 &out_dir, TransMode transport_mode,
+            const FVec3 &out_dir, TransMode transport_mode,
             const Sample3 &sam, uint8_t type) const noexcept override
         {
             if(!(type & BSDF_SPECULAR))
                 return BSDF_SAMPLE_RESULT_INVALID;
 
-            const Vec3 nwo = shading_coord_.global_to_local(out_dir).normalize();
-            const Vec3 nor = nwo.z > 0 ? Vec3(0, 0, 1) : Vec3(0, 0, -1);
+            const FVec3 nwo = shading_coord_.global_to_local(out_dir).normalize();
+            const FVec3 nor = nwo.z > 0 ? FVec3(0, 0, 1) : FVec3(0, 0, -1);
 
             const Spectrum fr = fresnel_point_->eval(nwo.z);
             if(sam.u < fr.r)
             {
-                const Vec3 lwi = Vec3(-nwo.x, -nwo.y, nwo.z);
+                const FVec3 lwi = FVec3(-nwo.x, -nwo.y, nwo.z);
 
-                const Vec3 wi = shading_coord_.local_to_global(lwi);
+                const FVec3 wi = shading_coord_.local_to_global(lwi);
                 const Spectrum f = color_reflection_ * fr / std::abs(lwi.z);
                 const real norm_factor = local_angle::normal_corr_factor(
                     geometry_coord_, shading_coord_, wi);
@@ -82,12 +82,12 @@ namespace
             auto opt_wi = refr_dir(nwo, nor, eta);
             if(!opt_wi)
                 return BSDF_SAMPLE_RESULT_INVALID;
-            const Vec3 nwi = opt_wi->normalize();
+            const FVec3 nwi = opt_wi->normalize();
 
             const real corr_factor = transport_mode == TransMode::Radiance ?
                                      eta * eta : real(1);
 
-            const Vec3 dir = shading_coord_.local_to_global(nwi);
+            const FVec3 dir = shading_coord_.local_to_global(nwi);
             const Spectrum f = corr_factor * color_refraction_
                              * (1 - fr.r) / std::abs(nwi.z);
             const real pdf = 1 - fr.r;
@@ -97,7 +97,7 @@ namespace
             return BSDFSampleResult(dir, f * norm_factor, pdf, true);
         }
 
-        real pdf(const Vec3&, const Vec3&, uint8_t) const noexcept override
+        real pdf(const FVec3 &, const FVec3 &, uint8_t) const noexcept override
         {
             return 0;
         }

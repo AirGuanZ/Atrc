@@ -12,7 +12,7 @@ public:
 
     struct SampleResult
     {
-        Vec3 lwi;
+        FVec3 lwi;
         Spectrum f;
         real pdf = 0;
 
@@ -31,12 +31,12 @@ public:
     uint8_t get_component_type() const noexcept;
 
     virtual Spectrum eval(
-        const Vec3 &lwi, const Vec3 &lwo, TransMode mode) const noexcept = 0;
+        const FVec3 &lwi, const FVec3 &lwo, TransMode mode) const noexcept = 0;
 
-    virtual real pdf(const Vec3 &lwi, const Vec3 &lwo) const noexcept = 0;
+    virtual real pdf(const FVec3 &lwi, const FVec3 &lwo) const noexcept = 0;
 
     virtual SampleResult sample(
-        const Vec3 &lwo, TransMode mode, const Sample2 &sam) const noexcept = 0;
+        const FVec3 &lwo, TransMode mode, const Sample2 &sam) const noexcept = 0;
 };
 
 inline BSDFComponent::BSDFComponent(uint8_t type) noexcept

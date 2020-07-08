@@ -104,7 +104,7 @@ public:
     }
 
     // return (ref_to_light, pdf)
-    std::pair<Vec3, real> sample(const Sample3 &sam) const
+    std::pair<FVec3, real> sample(const Sample3 &sam) const
     {
         const int patch_idx = sampler_.sample(sam.u);
         const int patch_y = patch_idx / probs_.width();
@@ -127,7 +127,7 @@ public:
         const real u         = math::mix(u0, u1, sam.v);
         const real phi       = 2 * PI_r * u;
 
-        const Vec3 dir = {
+        const FVec3 dir = {
             sin_theta * std::cos(phi),
             sin_theta * std::sin(phi),
             cos_theta
@@ -137,9 +137,9 @@ public:
         return { dir, patch_pdf * in_patch_pdf };
     }
 
-    real pdf(const Vec3 &ref_to_light) const
+    real pdf(const FVec3 &ref_to_light) const
     {
-        const Vec3 dir = ref_to_light.normalize();
+        const FVec3 dir = ref_to_light.normalize();
         const real cos_theta = local_angle::cos_theta(dir);
         const real theta = std::acos(cos_theta);
         const real phi = local_angle::phi(dir);

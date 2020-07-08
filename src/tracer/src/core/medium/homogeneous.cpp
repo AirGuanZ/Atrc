@@ -46,7 +46,7 @@ public:
     }
 
     Spectrum tr(
-        const Vec3 &a, const Vec3 &b, Sampler &sampler) const noexcept override
+        const FVec3 &a, const FVec3 &b, Sampler &sampler) const noexcept override
     {
         const Spectrum exp = -sigma_t_ * (a - b).length();
         return {
@@ -57,7 +57,7 @@ public:
     }
 
     Spectrum ab(
-        const Vec3 &a, const Vec3 &b, Sampler &sampler) const noexcept override
+        const FVec3 &a, const FVec3 &b, Sampler &sampler) const noexcept override
     {
         const Spectrum exp = -sigma_a_ * (a - b).length();
         return {
@@ -68,7 +68,7 @@ public:
     }
 
     SampleOutScatteringResult sample_scattering(
-        const Vec3 &a, const Vec3 &b,
+        const FVec3 &a, const FVec3 &b,
         Sampler &sampler, Arena &arena) const override
     {
         const Sample1 sam = sampler.sample1();

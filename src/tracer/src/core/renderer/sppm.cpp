@@ -48,8 +48,8 @@ RenderTarget SPPMRenderer::render(
     if(init_radius < 0)
         init_radius = (world_bound.high - world_bound.low).length() / 1000;
 
-    world_bound.low  -= Vec3(init_radius);
-    world_bound.high += Vec3(init_radius);
+    world_bound.low  -= FVec3(init_radius);
+    world_bound.high += FVec3(init_radius);
 
     // initialize pixels
 

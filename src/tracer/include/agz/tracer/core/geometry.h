@@ -54,7 +54,7 @@ public:
     /**
      * @brief pdf of sample
      */
-    virtual real pdf(const Vec3 &pos) const noexcept = 0;
+    virtual real pdf(const FVec3 &pos) const noexcept = 0;
 
     /**
      * @brief sample a point on the geometry object
@@ -63,13 +63,13 @@ public:
      * @param pdf pdf w.r.t. surface area
      */
     virtual SurfacePoint sample(
-        const Vec3 &ref, real *pdf, const Sample3 &sam) const noexcept = 0;
+        const FVec3 &ref, real *pdf, const Sample3 &sam) const noexcept = 0;
 
     /**
      *
      * @brief pdf of sample with ref
      */
-    virtual real pdf(const Vec3 &ref, const Vec3 &pos) const noexcept = 0;
+    virtual real pdf(const FVec3 &ref, const FVec3 &pos) const noexcept = 0;
 };
 
 AGZ_TRACER_END

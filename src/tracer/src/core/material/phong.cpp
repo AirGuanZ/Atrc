@@ -46,7 +46,7 @@ public:
 
         // shading coord
 
-        const Coord shading_coord = nor_map_->reorient(inct.uv, inct.user_coord);
+        const FCoord shading_coord = nor_map_->reorient(inct.uv, inct.user_coord);
 
         // compute diffuse/specular weight
 

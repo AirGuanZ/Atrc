@@ -8,7 +8,7 @@
 AGZ_TRACER_BEGIN
 
 RC<Medium> create_heterogeneous_medium(
-    const Transform3 &local_to_world,
+    const FTransform3 &local_to_world,
     RC<const Texture3D> density,
     RC<const Texture3D> albedo,
     RC<const Texture3D> g,

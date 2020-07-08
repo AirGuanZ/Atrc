@@ -16,7 +16,7 @@ inline std::tuple<real, real, real> get_abc(real radius_square, const Ray &r)
 }
 
 inline void local_geometry_uv_and_coord(
-    const Vec3 &local_pos, Vec2 *uv, Coord *local_coord, real radius) noexcept
+    const FVec3 &local_pos, Vec2 *uv, FCoord *local_coord, real radius) noexcept
 {
     real phi = (!local_pos.x && !local_pos.y) ?
                real(0) : std::atan2(local_pos.y, local_pos.x);
@@ -27,18 +27,18 @@ inline void local_geometry_uv_and_coord(
 
     *uv = Vec2(real(0.5) * invPI_r * phi, invPI_r * theta + real(0.5));
 
-    Vec3 ex, ey, ez = local_pos.normalize();
+    FVec3 ex, ey, ez = local_pos.normalize();
     if(std::abs(ez.z - 1) < EPS())
     {
-        ex = Vec3(1, 0, 0);
-        ey = Vec3(0, 1, 0);
-        ez = Vec3(0, 0, 1);
+        ex = FVec3(1, 0, 0);
+        ey = FVec3(0, 1, 0);
+        ez = FVec3(0, 0, 1);
     }
     else if(std::abs(ez.z + 1) < EPS())
     {
-        ex = Vec3(0, 1, 0);
-        ey = Vec3(1, 0, 0);
-        ez = Vec3(0, 0, -1);
+        ex = FVec3(0, 1, 0);
+        ey = FVec3(1, 0, 0);
+        ez = FVec3(0, 0, -1);
     }
     else
     {
@@ -46,7 +46,7 @@ inline void local_geometry_uv_and_coord(
         ey = cross(ez, ex);
     }
 
-    *local_coord = Coord(ex, ey, ez);
+    *local_coord = FCoord(ex, ey, ez);
 }
 
 inline bool has_intersection(const Ray &r, real radius) noexcept

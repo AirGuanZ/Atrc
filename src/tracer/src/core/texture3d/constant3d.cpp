@@ -45,12 +45,12 @@ public:
         return texel_.r;
     }
 
-    Spectrum sample_spectrum(const Vec3 &uvw) const noexcept override
+    Spectrum sample_spectrum(const FVec3 &uvw) const noexcept override
     {
         return texel_;
     }
 
-    real sample_real(const Vec3 &uvw) const noexcept override
+    real sample_real(const FVec3 &uvw) const noexcept override
     {
         return texel_.r;
     }

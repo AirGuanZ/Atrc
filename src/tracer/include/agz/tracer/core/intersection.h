@@ -9,12 +9,12 @@ AGZ_TRACER_BEGIN
  */
 struct SurfacePoint
 {
-    Vec3 pos;
+    FVec3 pos;
     Vec2 uv;
-    Coord geometry_coord;
-    Coord user_coord;
+    FCoord geometry_coord;
+    FCoord user_coord;
 
-    Vec3 eps_offset(const Vec3 &dir) const noexcept
+    FVec3 eps_offset(const FVec3 &dir) const noexcept
     {
         if(dot(dir, geometry_coord.z) > 0)
             return pos + geometry_coord.z * EPS();
@@ -27,7 +27,7 @@ struct SurfacePoint
  */
 struct MediumPoint
 {
-    Vec3 pos;
+    FVec3 pos;
 };
 
 /**
@@ -36,7 +36,7 @@ struct MediumPoint
 struct GeometryIntersection : SurfacePoint
 {
     real t = -1;
-    Vec3 wr;
+    FVec3 wr;
 };
 
 /**
@@ -59,7 +59,7 @@ struct EntityIntersection : GeometryIntersection
         return dot(wr, geometry_coord.z) >= 0 ? medium_in : medium_out;
     }
 
-    const Medium *medium(const Vec3 &d) const noexcept
+    const Medium *medium(const FVec3 &d) const noexcept
     {
         return dot(d, geometry_coord.z) >= 0 ? medium_out : medium_in;
     }
@@ -71,7 +71,7 @@ struct EntityIntersection : GeometryIntersection
 struct MediumScattering : MediumPoint
 {
     const Medium *medium = nullptr;
-    Vec3 wr;
+    FVec3 wr;
 
     bool invalid() const noexcept
     {
@@ -86,7 +86,7 @@ struct ShadingPoint
 {
     const BSDF *bsdf = nullptr;
 
-    Vec3 shading_normal;
+    FVec3 shading_normal;
 
     // optional bssrdf
     const BSSRDF *bssrdf = nullptr;

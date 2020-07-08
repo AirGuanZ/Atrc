@@ -116,7 +116,7 @@ class EntityBVH : public Aggregate
     }
 
     bool has_intersection_aux(
-        const Vec3 &inv_dir, const Ray &r, const Node &node) const noexcept
+        const FVec3 &inv_dir, const Ray &r, const Node &node) const noexcept
     {
         if(const Leaf *leaf = node.as_if<Leaf>())
         {
@@ -139,7 +139,7 @@ class EntityBVH : public Aggregate
     }
 
     bool closest_intersection_aux(
-        const Vec3 &inv_dir, Ray &r, const Node &node,
+        const FVec3 &inv_dir, Ray &r, const Node &node,
         EntityIntersection *inct) const noexcept
     {
         if(const Leaf *leaf = node.as_if<Leaf>())
@@ -187,7 +187,7 @@ public:
 
         if(entities.empty())
         {
-            nodes_.emplace_back(Leaf{ AABB{ Vec3(0), Vec3(1) }, 0, 0 });
+            nodes_.emplace_back(Leaf{ AABB{ FVec3(0), FVec3(1) }, 0, 0 });
             return;
         }
 
@@ -202,14 +202,14 @@ public:
 
     bool has_intersection(const Ray &r) const noexcept override
     {
-        const Vec3 inv_dir(1 / r.d.x, 1 / r.d.y, 1 / r.d.z);
+        const FVec3 inv_dir(1 / r.d.x, 1 / r.d.y, 1 / r.d.z);
         return has_intersection_aux(inv_dir, r, nodes_[0]);
     }
 
     bool closest_intersection(
         const Ray &r, EntityIntersection *inct) const noexcept override
     {
-        Vec3 inv_dir(1 / r.d.x, 1 / r.d.y, 1 / r.d.z);
+        FVec3 inv_dir(1 / r.d.x, 1 / r.d.y, 1 / r.d.z);
         Ray ray = r;
         return closest_intersection_aux(inv_dir, ray, nodes_[0], inct);
     }

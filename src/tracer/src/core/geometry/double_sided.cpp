@@ -66,7 +66,7 @@ public:
     }
 
     SurfacePoint sample(
-        const Vec3 &ref, real *pdf, const Sample3 &sam) const noexcept override
+        const FVec3 &ref, real *pdf, const Sample3 &sam) const noexcept override
     {
         Sample3 new_sam = sam;
         const bool backface = new_sam.u < real(0.5);
@@ -86,13 +86,13 @@ public:
         return spt;
     }
 
-    real pdf(const Vec3 &sample) const noexcept override
+    real pdf(const FVec3 &sample) const noexcept override
     {
         const real internal_pdf = internal_->pdf(sample);
         return internal_pdf * real(0.5);
     }
 
-    real pdf(const Vec3 &ref, const Vec3 &sample) const noexcept override
+    real pdf(const FVec3 &ref, const FVec3 &sample) const noexcept override
     {
         const real internal_pdf = internal_->pdf(ref, sample);
         return internal_pdf * real(0.5);

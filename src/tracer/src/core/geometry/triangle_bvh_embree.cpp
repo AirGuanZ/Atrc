@@ -145,9 +145,9 @@ namespace tri_bvh_embree_ws
                 indices[i].v1 = static_cast<uint32_t>(j + 1);
                 indices[i].v2 = static_cast<uint32_t>(j + 2);
 
-                const Vec3 n_a = triangle[0].normal.normalize();
-                const Vec3 n_b = triangle[1].normal.normalize();
-                const Vec3 n_c = triangle[2].normal.normalize();
+                const FVec3 n_a = triangle[0].normal.normalize();
+                const FVec3 n_b = triangle[1].normal.normalize();
+                const FVec3 n_c = triangle[2].normal.normalize();
 
                 PrimitiveInfo info;
                 info.n_a = n_a;
@@ -158,10 +158,10 @@ namespace tri_bvh_embree_ws
                 info.t_b_a = triangle[1].tex_coord - triangle[0].tex_coord;
                 info.t_c_a = triangle[2].tex_coord - triangle[0].tex_coord;
 
-                const Vec3 b_a = triangle[1].position - triangle[0].position;
-                const Vec3 c_a = triangle[2].position - triangle[0].position;
+                const FVec3 b_a = triangle[1].position - triangle[0].position;
+                const FVec3 c_a = triangle[2].position - triangle[0].position;
                 info.z = cross(b_a, c_a).normalize();
-                const Vec3 mean_nor = n_a + n_b + n_c;
+                const FVec3 mean_nor = n_a + n_b + n_c;
                 if(dot(info.z, mean_nor) < 0)
                     info.z = -info.z;
                 info.x = dpdu_as_ex(b_a, c_a, info.t_b_a, info.t_c_a, info.z);
@@ -234,11 +234,13 @@ namespace tri_bvh_embree_ws
             const PrimitiveInfo &info = prim_info_[rayhit.hit.primID];
 
             inct->pos = r.at(t_val);
-            inct->geometry_coord = Coord(info.x, cross(info.z, info.x), info.z);
+            inct->geometry_coord = FCoord(info.x, cross(info.z, info.x), info.z);
             inct->uv = info.t_a + u * info.t_b_a + v * info.t_c_a;
             inct->t = t_val;
 
-            const Vec3 user_z = info.n_a + u * info.n_b_a + v * info.n_c_a;
+            const FVec3 user_z = FVec3(info.n_a) +
+                                 u * FVec3(info.n_b_a) +
+                                 v * FVec3(info.n_c_a);
             inct->user_coord = inct->geometry_coord.rotate_to_new_z(user_z);
 
             inct->wr = -r.d;
@@ -259,13 +261,13 @@ namespace tri_bvh_embree_ws
 
             spt.pos = prim.a + uv.x * prim.b_a + uv.y * prim.c_a;
 
-            spt.geometry_coord = Coord(
+            spt.geometry_coord = FCoord(
                 prim_info.x, cross(prim_info.z, prim_info.x), prim_info.z);
 
             spt.uv = prim_info.t_a + uv.x * prim_info.t_b_a + uv.y * prim_info.t_c_a;
 
-            const Vec3 user_z = prim_info.n_a + uv.x * prim_info.n_b_a
-                                              + uv.y * prim_info.n_c_a;
+            const FVec3 user_z = prim_info.n_a + uv.x * FVec3(prim_info.n_b_a)
+                                               + uv.y * FVec3(prim_info.n_c_a);
 
             spt.user_coord = spt.geometry_coord.rotate_to_new_z(user_z);
 
@@ -299,7 +301,7 @@ class TriangleBVHEmbree : public Geometry
 
     static Box<const tri_bvh_embree_ws::UntransformedTriangleBVH> load(
         std::vector<mesh::triangle_t> build_triangles,
-        const Transform3 &local_to_world)
+        const FTransform3 &local_to_world)
     {
         for(auto &tri : build_triangles)
         {
@@ -327,7 +329,7 @@ public:
 
     TriangleBVHEmbree(
         std::vector<mesh::triangle_t> build_triangles,
-        const Transform3 &local_to_world)
+        const FTransform3 &local_to_world)
     {
         AGZ_HIERARCHY_TRY
 
@@ -381,17 +383,17 @@ public:
     }
 
     SurfacePoint sample(
-        const Vec3&, real *pdf, const Sample3 &sam) const noexcept override
+        const FVec3 &, real *pdf, const Sample3 &sam) const noexcept override
     {
         return sample(pdf, sam);
     }
 
-    real pdf(const Vec3&) const noexcept override
+    real pdf(const FVec3 &) const noexcept override
     {
         return 1 / surface_area();
     }
 
-    real pdf(const Vec3&, const Vec3 &sample) const noexcept override
+    real pdf(const FVec3 &, const FVec3 &sample) const noexcept override
     {
         return pdf(sample);
     }
@@ -399,14 +401,14 @@ public:
 
 RC<Geometry> create_triangle_bvh_embree(
     std::vector<mesh::triangle_t> build_triangles,
-    const Transform3 &local_to_world)
+    const FTransform3 &local_to_world)
 {
     return newRC<TriangleBVHEmbree>(std::move(build_triangles), local_to_world);
 }
 
 RC<Geometry> create_triangle_bvh(
     std::vector<mesh::triangle_t> build_triangles,
-    const Transform3 &local_to_world)
+    const FTransform3 &local_to_world)
 {
     return create_triangle_bvh_embree(std::move(build_triangles), local_to_world);
 }

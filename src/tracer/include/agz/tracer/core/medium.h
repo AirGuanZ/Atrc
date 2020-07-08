@@ -54,19 +54,19 @@ public:
      * @brief transmittance between two points
      */
     virtual Spectrum tr(
-        const Vec3 &a, const Vec3 &b, Sampler &sampler) const noexcept = 0;
+        const FVec3 &a, const FVec3 &b, Sampler &sampler) const noexcept = 0;
 
     /**
      * @brief absorbtion between two points
      */
     virtual Spectrum ab(
-        const Vec3 &a, const Vec3 &b, Sampler &sampler) const noexcept = 0;
+        const FVec3 &a, const FVec3 &b, Sampler &sampler) const noexcept = 0;
 
     /**
      * @brief sample out-scattering event from a to b
      */
     virtual SampleOutScatteringResult sample_scattering(
-        const Vec3 &a, const Vec3 &b, Sampler &sampler, Arena &arena) const = 0;
+        const FVec3 &a, const FVec3 &b, Sampler &sampler, Arena &arena) const = 0;
 };
 
 /**

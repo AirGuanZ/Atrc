@@ -37,19 +37,19 @@ namespace
 
     class SeparableBSDF : public BSDF
     {
-        Coord coord_;
+        FCoord coord_;
         real eta_;
 
     public:
 
-        SeparableBSDF(const Coord &coord, real eta)
+        SeparableBSDF(const FCoord &coord, real eta)
             : coord_(coord), eta_(eta)
         {
             
         }
 
         Spectrum eval(
-            const Vec3 &wi, const Vec3&, TransMode, uint8_t) const noexcept override
+            const FVec3 &wi, const FVec3&, TransMode, uint8_t) const noexcept override
         {
             const real cosThetaI = cos(wi, coord_.z);
 
@@ -62,12 +62,12 @@ namespace
         }
 
         BSDFSampleResult sample(
-            const Vec3&, TransMode, const Sample3 &sam, uint8_t) const noexcept override
+            const FVec3&, TransMode, const Sample3 &sam, uint8_t) const noexcept override
         {
             const auto [local_dir, pdf] = math::distribution::
                     zweighted_on_hemisphere(sam.u, sam.v);
 
-            const Vec3 dir = coord_.local_to_global(local_dir);
+            const FVec3 dir = coord_.local_to_global(local_dir);
 
             return BSDFSampleResult(
                 dir,
@@ -76,9 +76,9 @@ namespace
                 false);
         }
 
-        real pdf(const Vec3 &wi, const Vec3&, uint8_t) const noexcept override
+        real pdf(const FVec3 &wi, const FVec3&, uint8_t) const noexcept override
         {
-            const Vec3 lwi = coord_.global_to_local(wi).normalize();
+            const FVec3 lwi = coord_.global_to_local(wi).normalize();
             return math::distribution::zweighted_on_hemisphere_pdf(lwi.z);
         }
 
@@ -139,7 +139,7 @@ BSSRDFSamplePiResult SeparableBSSRDF::sample_pi(
     
     // construct proj coord
 
-    Coord proj_coord;
+    FCoord proj_coord;
 
     real sample_v;
     if(sam.v < 0.5)
@@ -149,13 +149,13 @@ BSSRDFSamplePiResult SeparableBSSRDF::sample_pi(
     }
     else if(sam.v < 0.75)
     {
-        proj_coord = Coord(
+        proj_coord = FCoord(
             po_.geometry_coord.y, po_.geometry_coord.z, po_.geometry_coord.x);
         sample_v = 4 * (sam.v - real(0.5));
     }
     else
     {
-        proj_coord = Coord(
+        proj_coord = FCoord(
             po_.geometry_coord.z, po_.geometry_coord.x, po_.geometry_coord.y);
         sample_v = 4 * (sam.v - real(0.75));
     }
@@ -172,7 +172,7 @@ BSSRDFSamplePiResult SeparableBSSRDF::sample_pi(
 
     const real hl = std::sqrt(std::max(
         real(0), r_max * r_max - sr.distance * sr.distance));
-    Vec3 inct_ray_ori(sr.distance * std::cos(phi), sr.distance * std::sin(phi), hl);
+    FVec3 inct_ray_ori(sr.distance * std::cos(phi), sr.distance * std::sin(phi), hl);
     real inct_ray_len = 2 * hl;
 
     Ray inct_ray(
@@ -251,9 +251,13 @@ BSSRDFSamplePiResult SeparableBSSRDF::sample_pi(
 
 real SeparableBSSRDF::pdf_pi(const EntityIntersection &pi) const
 {
-    const Vec3 ld = po_.geometry_coord.global_to_local(po_.pos - pi.pos);
-    const Vec3 ln = po_.geometry_coord.global_to_local(pi.geometry_coord.z);
-    const real r_proj[] = { ld.yz().length(), ld.zx().length(), ld.xy().length() };
+    const FVec3 ld = po_.geometry_coord.global_to_local(po_.pos - pi.pos);
+    const FVec3 ln = po_.geometry_coord.global_to_local(pi.geometry_coord.z);
+    const real r_proj[] = {
+        Vec2(ld.y, ld.z).length(),
+        Vec2(ld.z, ld.x).length(),
+        Vec2(ld.x, ld.y).length()
+    };
 
     constexpr real AXIS_PDF[] = { real(0.25), real(0.25), real(0.5) };
     constexpr real CHANNEL_PDF = real(1) / SPECTRUM_COMPONENT_COUNT;

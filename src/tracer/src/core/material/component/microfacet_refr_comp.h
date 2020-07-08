@@ -11,13 +11,13 @@ class GGXMicrofacetRefractionComponent : public BSDFComponent
     real ax_;
     real ay_;
 
-    Vec3 sample_trans(const Vec3 &lwo, const Sample2 &sam) const noexcept;
+    FVec3 sample_trans(const FVec3 &lwo, const Sample2 &sam) const noexcept;
 
-    Vec3 sample_inner_refl(const Vec3 &lwo, const Sample2 &sam) const noexcept;
+    FVec3 sample_inner_refl(const FVec3 &lwo, const Sample2 &sam) const noexcept;
 
-    real pdf_trans(const Vec3 &lwi, const Vec3 &lwo) const noexcept;
+    real pdf_trans(const FVec3 &lwi, const FVec3 &lwo) const noexcept;
 
-    real pdf_inner_refl(const Vec3 &lwi, const Vec3 &lwo) const noexcept;
+    real pdf_inner_refl(const FVec3 &lwi, const FVec3 &lwo) const noexcept;
 
 public:
 
@@ -26,15 +26,15 @@ public:
         real roughness, real anisotropic);
 
     Spectrum eval(
-        const Vec3 &lwi, const Vec3 &lwo,
+        const FVec3 &lwi, const FVec3 &lwo,
         TransMode mode) const noexcept override;
 
     SampleResult sample(
-        const Vec3 &lwo, TransMode mode,
+        const FVec3 &lwo, TransMode mode,
         const Sample2 &sam) const noexcept override;
 
     real pdf(
-        const Vec3 &lwi, const Vec3 &lwo) const noexcept override;
+        const FVec3 &lwi, const FVec3 &lwo) const noexcept override;
 };
 
 AGZ_TRACER_END

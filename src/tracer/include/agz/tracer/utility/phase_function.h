@@ -26,7 +26,7 @@ public:
     }
 
     Spectrum eval(
-        const Vec3 &wi, const Vec3 &wo,
+        const FVec3 &wi, const FVec3 &wo,
         TransMode mode, uint8_t) const noexcept override
     {
         const real u = -cos(wi, wo);
@@ -34,7 +34,7 @@ public:
     }
 
     BSDFSampleResult sample(
-        const Vec3 &wo, TransMode,
+        const FVec3 &wo, TransMode,
         const Sample3 &sam, uint8_t) const noexcept override
     {
         const real s = 2 * sam.u - 1;
@@ -51,7 +51,7 @@ public:
         const real sin_theta = local_angle::cos_2_sin(cos_theta);
         const real phi = 2 * PI_r * sam.v;
 
-        const Vec3 local_wi = {
+        const FVec3 local_wi = {
             sin_theta * std::sin(phi),
             sin_theta * std::cos(phi),
             cos_theta
@@ -60,14 +60,14 @@ public:
         const real phase_value = phase_func(u);
 
         return BSDFSampleResult(
-            Coord::from_z(wo).local_to_global(local_wi),
+            FCoord::from_z(wo).local_to_global(local_wi),
             Spectrum(phase_value),
             phase_value,
             false);
     }
 
     real pdf(
-        const Vec3 &wi, const Vec3 &wo, uint8_t) const noexcept override
+        const FVec3 &wi, const FVec3 &wo, uint8_t) const noexcept override
     {
         return phase_func(-cos(wi, wo));
     }

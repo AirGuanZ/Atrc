@@ -24,8 +24,8 @@ struct Pixel
     // visible point
     struct VisiblePoint
     {
-        Vec3 pos;
-        Vec3 wr;
+        FVec3 pos;
+        FVec3 wr;
 
         Spectrum    coef;
         const BSDF *bsdf = nullptr;
@@ -97,7 +97,7 @@ public:
      *
      * parallel 'add_photon' is safe
      */
-    void add_photon(const Vec3 &photon_pos, const Spectrum &phi, const Vec3 &wr);
+    void add_photon(const FVec3 &photon_pos, const Spectrum &phi, const FVec3 &wr);
 
 private:
 

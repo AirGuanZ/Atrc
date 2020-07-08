@@ -73,6 +73,15 @@ using Coord = math::tcoord3<real>;
 using Transform2 = math::ttransform2<real>;
 using Transform3 = math::ttransform3<real>;
 
+using FVec3 = math::float3;
+using FVec4 = math::float4;
+
+using FMat4   = math::float4x4;
+using FTrans4 = math::float4x4::left_transform;
+
+using FCoord      = math::float3_coord;
+using FTransform3 = math::float3_transform;
+
 // world scale/offset
 // object pos = (actual pos - WORLD_OFFSET) * WORLD_SCALE
 
@@ -169,12 +178,12 @@ namespace local_angle
     /**
      * w must be normalized
      */
-    inline real cos_theta(const Vec3 &w) noexcept
+    inline real cos_theta(const FVec3 &w) noexcept
     {
         return w.z;
     }
 
-    inline real abs_cos_theta(const Vec3 &w) noexcept
+    inline real abs_cos_theta(const FVec3 &w) noexcept
     {
         return std::abs(cos_theta(w));
     }
@@ -187,7 +196,7 @@ namespace local_angle
     /**
      * w must be normalized
      */
-    inline real tan_theta(const Vec3 &w)
+    inline real tan_theta(const FVec3 &w)
     {
         const real t = 1 - w.z * w.z;
         if(t <= 0)
@@ -198,7 +207,7 @@ namespace local_angle
     /**
      * w must be normalized
      */
-    inline real tan_theta_2(const Vec3 &w)
+    inline real tan_theta_2(const FVec3 &w)
     {
         const real z2 = w.z * w.z;
         const real t = 1 - z2;
@@ -207,7 +216,7 @@ namespace local_angle
         return t / z2;
     }
 
-    inline real phi(const Vec3 &w) noexcept
+    inline real phi(const FVec3 &w) noexcept
     {
         if(!w.y && !w.x)
             return 0;
@@ -218,7 +227,7 @@ namespace local_angle
     /**
      * w must be normalized
      */
-    inline real theta(const Vec3 &w) noexcept
+    inline real theta(const FVec3 &w) noexcept
     {
         return std::acos(math::clamp<real>(cos_theta(w), -1, 1));
     }
@@ -227,14 +236,14 @@ namespace local_angle
      * @brief correction factor for shading normal
      */
     inline real normal_corr_factor(
-        const Vec3 &geo, const Vec3 &shd, const Vec3 &wi) noexcept
+        const FVec3 &geo, const FVec3 &shd, const FVec3 &wi) noexcept
     {
         const real dem = std::abs(cos(geo, wi));
         return  dem < EPS() ? 1 : std::abs(cos(shd, wi) / dem);
     }
 
     inline real normal_corr_factor(
-        const Coord &geo, const Coord &shd, const Vec3 &wi) noexcept
+        const FCoord &geo, const FCoord &shd, const FVec3 &wi) noexcept
     {
         return normal_corr_factor(geo.z, shd.z, wi);
     }
@@ -247,16 +256,16 @@ class Ray
 {
 public:
 
-    Vec3 o;
-    Vec3 d;
+    FVec3 o;
+    FVec3 d;
     real t_min;
     real t_max;
 
     Ray();
-    Ray(const Vec3 &o, const Vec3 &d,
+    Ray(const FVec3 &o, const FVec3 &d,
         real t_min = 0, real t_max = REAL_INF) noexcept;
 
-    Vec3 at(real t) const noexcept;
+    FVec3 at(real t) const noexcept;
 
     bool between(real t) const noexcept;
 };
@@ -265,44 +274,44 @@ class AABB
 {
 public:
 
-    Vec3 low;
-    Vec3 high;
+    FVec3 low;
+    FVec3 high;
 
     /** @brief defaultly initialized to an invalid aabb */
     AABB() noexcept;
 
-    AABB(const Vec3 &low, const Vec3 &high) noexcept;
+    AABB(const FVec3 &low, const FVec3 &high) noexcept;
 
     explicit AABB(uninitialized_t) noexcept;
 
     AABB &operator|=(const AABB &rhs) noexcept;
 
-    AABB &operator|=(const Vec3 &p) noexcept;
+    AABB &operator|=(const FVec3 &p) noexcept;
 
-    bool contains(const Vec3 &pnt) const noexcept;
+    bool contains(const FVec3 &pnt) const noexcept;
 
     bool intersect(
-        const Vec3 &ori, const Vec3 &inv_dir,
+        const FVec3 &ori, const FVec3 &inv_dir,
         real t_min, real t_max) const noexcept;
 };
 
-static_assert(sizeof(AABB) == 6 * sizeof(real));
+//static_assert(sizeof(AABB) == 6 * sizeof(real));
 
 AABB operator|(const AABB &lhs, const AABB &rhs) noexcept;
 
 inline Ray::Ray()
-    : Ray(Vec3(), Vec3(1, 0, 0))
+    : Ray(FVec3(), FVec3(1, 0, 0))
 {
     
 }
 
-inline Ray::Ray(const Vec3 &o, const Vec3 &d, real t_min, real t_max) noexcept
+inline Ray::Ray(const FVec3 &o, const FVec3 &d, real t_min, real t_max) noexcept
     : o(o), d(d), t_min(t_min), t_max(t_max)
 {
 
 }
 
-inline Vec3 Ray::at(real t) const noexcept
+inline FVec3 Ray::at(real t) const noexcept
 {
     return o + t * d;
 }
@@ -318,7 +327,7 @@ inline AABB::AABB() noexcept
 
 }
 
-inline AABB::AABB(const Vec3 &low, const Vec3 &high) noexcept
+inline AABB::AABB(const FVec3 &low, const FVec3 &high) noexcept
     : low(low), high(high)
 {
 
@@ -343,15 +352,15 @@ inline AABB &AABB::operator|=(const AABB &rhs) noexcept
 
 inline AABB operator|(const AABB &lhs, const AABB &rhs) noexcept
 {
-    return AABB(Vec3((std::min)(lhs.low.x, rhs.low.x),
+    return AABB(FVec3((std::min)(lhs.low.x, rhs.low.x),
         (std::min)(lhs.low.y, rhs.low.y),
         (std::min)(lhs.low.z, rhs.low.z)),
-        Vec3((std::max)(lhs.high.x, rhs.high.x),
+        FVec3((std::max)(lhs.high.x, rhs.high.x),
         (std::max)(lhs.high.y, rhs.high.y),
             (std::max)(lhs.high.z, rhs.high.z)));
 }
 
-inline AABB &AABB::operator|=(const Vec3 &p) noexcept
+inline AABB &AABB::operator|=(const FVec3 &p) noexcept
 {
     low.x = std::min(low.x, p.x);
     low.y = std::min(low.y, p.y);
@@ -364,7 +373,7 @@ inline AABB &AABB::operator|=(const Vec3 &p) noexcept
     return *this;
 }
 
-inline bool AABB::contains(const Vec3 &pnt) const noexcept
+inline bool AABB::contains(const FVec3 &pnt) const noexcept
 {
     return low.x <= pnt.x && pnt.x <= high.x &&
            low.y <= pnt.y && pnt.y <= high.y &&
@@ -372,7 +381,7 @@ inline bool AABB::contains(const Vec3 &pnt) const noexcept
 }
 
 inline bool AABB::intersect(
-    const Vec3 &ori, const Vec3 &inv_dir, real t_min, real t_max) const noexcept
+    const FVec3 &ori, const FVec3 &inv_dir, real t_min, real t_max) const noexcept
 {
     const real nx = inv_dir[0] * (low[0] - ori[0]);
     const real ny = inv_dir[1] * (low[1] - ori[1]);

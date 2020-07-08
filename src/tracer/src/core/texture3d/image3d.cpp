@@ -32,7 +32,7 @@ class ImageTexture3D : public Texture3D
 
 protected:
 
-    real sample_real_impl(const Vec3 &uvw) const noexcept override
+    real sample_real_impl(const FVec3 &uvw) const noexcept override
     {
         auto access_texel = [&](int x, int y, int z)
         {
@@ -53,19 +53,19 @@ protected:
 
         if constexpr(USE_LINEAR_INTERP)
         {
-            return texture::linear_sample3d(
+            return texture::linear_sample3d<real>(
                 uvw, access_texel,
                 data_->width(), data_->height(), data_->depth());
         }
         else
         {
-            return texture::nearest_sample3d(
+            return texture::nearest_sample3d<real>(
                 uvw, access_texel,
                 data_->width(), data_->height(), data_->depth());
         }
     }
 
-    Spectrum sample_spectrum_impl(const Vec3 &uvw) const noexcept override
+    Spectrum sample_spectrum_impl(const FVec3 &uvw) const noexcept override
     {
         auto access_texel = [&](int x, int y, int z)
         {
@@ -86,13 +86,13 @@ protected:
 
         if constexpr(USE_LINEAR_INTERP)
         {
-            return texture::linear_sample3d(
+            return texture::linear_sample3d<real>(
                 uvw, access_texel,
                 data_->width(), data_->height(), data_->depth());
         }
         else
         {
-            return texture::nearest_sample3d(
+            return texture::nearest_sample3d<real>(
                 uvw, access_texel,
                 data_->width(), data_->height(), data_->depth());
         }

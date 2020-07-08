@@ -28,14 +28,14 @@ namespace microfacet
         return 2 / (1 + std::sqrt(1 + root * root));
     }
 
-    Vec3 sample_gtr2(real alpha, const Sample2 &sample) noexcept
+    FVec3 sample_gtr2(real alpha, const Sample2 &sample) noexcept
     {
         const real phi = 2 * PI_r * sample.u;
         const real cos_theta = std::sqrt((1 - sample.v)
                              / (1 + (sqr(alpha) - 1) * sample.v));
         const real sin_theta = local_angle::cos_2_sin(cos_theta);
 
-        return Vec3(
+        return FVec3(
             sin_theta * std::cos(phi),
             sin_theta * std::sin(phi),
             cos_theta).normalize();
@@ -60,7 +60,7 @@ namespace microfacet
         return 1 / (1 + lambda);
     }
 
-    Vec3 sample_anisotropic_gtr2(
+    FVec3 sample_anisotropic_gtr2(
         real ax, real ay, const Sample2 &sample) noexcept
     {
         real sin_phi_h = ay * std::sin(2 * PI_r * sample.u);
@@ -75,7 +75,7 @@ namespace microfacet
         const real sin_theta_h = std::sqrt(
             (std::max<real>)(0, 1 - sqr(cos_theta_h)));
 
-        return Vec3(
+        return FVec3(
             sin_theta_h * cos_phi_h,
             sin_theta_h * sin_phi_h,
             cos_theta_h).normalize();
@@ -89,27 +89,27 @@ namespace microfacet
         return U / (LD * RD);
     }
 
-    Vec3 sample_gtr1(real alpha, const Sample2 &sample) noexcept
+    FVec3 sample_gtr1(real alpha, const Sample2 &sample) noexcept
     {
         const real phi = 2 * PI_r * sample.u;
         const real cos_theta = std::sqrt((std::pow(alpha, 2 - 2 * sample.v) - 1)
                              / (sqr(alpha) - 1));
         const real sin_theta = local_angle::cos_2_sin(cos_theta);
-        return Vec3(
+        return FVec3(
             sin_theta * std::cos(phi),
             sin_theta * std::sin(phi),
             cos_theta).normalize();
     }
 
-    Vec3 sample_anisotropic_gtr2_vnor(
-        const Vec3 &ve, real ax, real ay, const Sample2 &sam) noexcept
+    FVec3 sample_anisotropic_gtr2_vnor(
+        const FVec3 &ve, real ax, real ay, const Sample2 &sam) noexcept
     {
-        const Vec3 vh = Vec3(ax * ve.x, ay * ve.y, ve.z).normalize();
+        const FVec3 vh = FVec3(ax * ve.x, ay * ve.y, ve.z).normalize();
         const real lensq = vh.x * vh.x + vh.y * vh.y;
 
-        const Vec3 t1 = lensq > EPS() ?
-            Vec3(-vh.y, vh.x, 0) / std::sqrt(lensq) : Vec3(1, 0, 0);
-        const Vec3 t2 = cross(vh, t1);
+        const FVec3 t1 = lensq > EPS() ?
+            FVec3(-vh.y, vh.x, 0) / std::sqrt(lensq) : FVec3(1, 0, 0);
+        const FVec3 t2 = cross(vh, t1);
 
         const real r = std::sqrt(sam.u);
         const real phi = 2 * PI_r * sam.v;
@@ -118,10 +118,10 @@ namespace microfacet
         const real s = real(0.5) * (1 + vh.z);
         const real t_2 = (1 - s) * std::sqrt(1 - t_1 * t_1) + s * _t_2;
 
-        const Vec3 nh = t_1 * t1 + t_2 * t2 +
+        const FVec3 nh = t_1 * t1 + t_2 * t2 +
                         std::sqrt((std::max)(real(0),
                                              1 - t_1 * t_1 - t_2 * t_2)) * vh;
-        const Vec3 ne = Vec3(
+        const FVec3 ne = FVec3(
             ax * nh.x, ay * nh.y, (std::max)(real(0), nh.z)).normalize();
 
         return ne;

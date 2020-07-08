@@ -10,7 +10,7 @@ class NativeSky : public EnvirLight
 
     real user_specified_power_;
 
-    Spectrum radiance_impl(const Vec3 &ref_to_light) const noexcept
+    Spectrum radiance_impl(const FVec3 &ref_to_light) const noexcept
     {
         const real cos_theta = math::clamp<real>(
             ref_to_light.normalize().z, -1, 1);
@@ -31,7 +31,7 @@ public:
     }
 
     LightSampleResult sample(
-        const Vec3 &ref, const Sample5 &sam) const noexcept override
+        const FVec3 &ref, const Sample5 &sam) const noexcept override
     {
         const auto [dir, pdf] = math::distribution::uniform_on_sphere(sam.u, sam.v);
 
@@ -39,7 +39,7 @@ public:
             ref, emit_pos(ref, dir).pos, -dir, radiance_impl(dir), pdf);
     }
 
-    real pdf(const Vec3 &ref, const Vec3 &) const noexcept override
+    real pdf(const FVec3 &ref, const FVec3 &) const noexcept override
     {
         return math::distribution::uniform_on_sphere_pdf<real>;
     }
@@ -51,8 +51,8 @@ public:
 
         const Vec2 disk_sam   = math::distribution
                                     ::uniform_on_unit_disk(sam.w, sam.r);
-        const Coord dir_coord = Coord::from_z(dir);
-        const Vec3 pos        = world_radius_ *
+        const FCoord dir_coord = FCoord::from_z(dir);
+        const FVec3 pos        = world_radius_ *
             (disk_sam.x * dir_coord.x + disk_sam.y * dir_coord.y - dir) + world_centre_;
 
         return LightEmitResult(
@@ -61,7 +61,7 @@ public:
     }
 
     LightEmitPDFResult emit_pdf(
-        const Vec3 &pos, const Vec3 &dir, const Vec3 &nor) const noexcept override
+        const FVec3 &pos, const FVec3 &dir, const FVec3 &nor) const noexcept override
     {
         const real pdf_dir = math::distribution::uniform_on_sphere_pdf<real>;
         const real pdf_pos = 1 / (PI_r * world_radius_ * world_radius_);
@@ -69,7 +69,7 @@ public:
     }
 
     LightEmitPosResult emit_pos(
-        const Vec3 &ref, const Vec3 &ref_to_light) const noexcept override
+        const FVec3 &ref, const FVec3 &ref_to_light) const noexcept override
     {
         // o: world_center
         // r: world_radius
@@ -84,12 +84,12 @@ public:
         //       c = -d
         //       m = x - o + r * d
 
-        const auto [ex, ey, d] = Coord::from_z(ref_to_light);
+        const auto [ex, ey, d] = FCoord::from_z(ref_to_light);
 
-        const Vec3 a = world_radius_ * ex;
-        const Vec3 b = world_radius_ * ey;
-        const Vec3 c = -d;
-        const Vec3 m = ref - world_centre_ - world_radius_ * d;
+        const FVec3 a = world_radius_ * ex;
+        const FVec3 b = world_radius_ * ey;
+        const FVec3 c = -d;
+        const FVec3 m = ref - world_centre_ - world_radius_ * d;
 
         const real det  = Mat3::from_cols(a, b, c).det();
         const real tdet = Mat3::from_cols(a, b, m).det();
@@ -98,7 +98,7 @@ public:
             return { world_centre_, -ref_to_light };
 
         const real t = tdet / det;
-        const Vec3 pos = ref + t * d;
+        const FVec3 pos = ref + t * d;
 
         return { pos, c };
     }
@@ -113,7 +113,7 @@ public:
     }
 
     Spectrum radiance(
-        const Vec3 &ref, const Vec3 &ref_to_light) const noexcept override
+        const FVec3 &ref, const FVec3 &ref_to_light) const noexcept override
     {
         return radiance_impl(ref_to_light);
     }

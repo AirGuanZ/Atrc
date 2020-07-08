@@ -388,21 +388,21 @@ Pixel trace_ao(
         return { { {}, {}, 1 }, params.background_color };
 
     Spectrum pixel_albedo = params.high_color;
-    Vec3     pixel_normal = inct.geometry_coord.z;
+    FVec3    pixel_normal = inct.geometry_coord.z;
     real     pixel_denoise = inct.entity->get_no_denoise_flag() ? real(0) : real(1);;
 
-    const Vec3 start_pos = inct.eps_offset(inct.geometry_coord.z);
+    const FVec3 start_pos = inct.eps_offset(inct.geometry_coord.z);
 
     real ao_factor = 0;
     for(int i = 0; i < params.ao_sample_count; ++i)
     {
         const Sample2 sam = sampler.sample2();
-        const Vec3 local_dir = math::distribution
+        const FVec3 local_dir = math::distribution
                                     ::zweighted_on_hemisphere(sam.u, sam.v).first;
-        const Vec3 global_dir = inct.geometry_coord.local_to_global(local_dir)
+        const FVec3 global_dir = inct.geometry_coord.local_to_global(local_dir)
                                                    .normalize();
 
-        const Vec3 end_pos = start_pos + global_dir * params.max_occlusion_distance;
+        const FVec3 end_pos = start_pos + global_dir * params.max_occlusion_distance;
         if(scene.visible(start_pos, end_pos))
             ao_factor += 1;
     }
@@ -439,18 +439,18 @@ Pixel trace_albedo_ao(
     pixel.albedo = shd.bsdf->albedo();
     pixel.denoise = inct.entity->get_no_denoise_flag() ? real(0) : real(1);
 
-    const Vec3 start_pos = inct.eps_offset(inct.geometry_coord.z);
+    const FVec3 start_pos = inct.eps_offset(inct.geometry_coord.z);
 
     real ao_factor = 0;
     for(int i = 0; i < params.ao_sample_count; ++i)
     {
         const Sample2 sam = sampler.sample2();
-        const Vec3 local_dir = math::distribution
+        const FVec3 local_dir = math::distribution
                                     ::zweighted_on_hemisphere(sam.u, sam.v).first;
-        const Vec3 global_dir = inct.geometry_coord.local_to_global(local_dir)
+        const FVec3 global_dir = inct.geometry_coord.local_to_global(local_dir)
                                                    .normalize();
 
-        const Vec3 end_pos = start_pos + global_dir * params.max_occlusion_distance;
+        const FVec3 end_pos = start_pos + global_dir * params.max_occlusion_distance;
         if(scene.visible(start_pos, end_pos))
             ao_factor += 1;
     }

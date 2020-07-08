@@ -8,25 +8,25 @@ namespace
 {
     class InvisibleSurfaceBSDF : public BSDF
     {
-        Vec3 geometry_normal_;
+        FVec3 geometry_normal_;
 
     public:
 
-        explicit InvisibleSurfaceBSDF(const Vec3 &geometry_normal) noexcept
+        explicit InvisibleSurfaceBSDF(const FVec3 &geometry_normal) noexcept
             : geometry_normal_(geometry_normal)
         {
             
         }
 
         Spectrum eval(
-            const Vec3 &wi, const Vec3 &wo,
+            const FVec3 &wi, const FVec3 &wo,
             TransMode mode, uint8_t) const noexcept override
         {
             return {};
         }
 
         BSDFSampleResult sample(
-            const Vec3 &wo, TransMode mode,
+            const FVec3 &wo, TransMode mode,
             const Sample3 &sam, uint8_t type) const noexcept override
         {
             if(!(type & BSDF_SPECULAR))
@@ -39,7 +39,7 @@ namespace
             return BSDFSampleResult(-wo, f, 1, true);
         }
 
-        real pdf(const Vec3 &wi, const Vec3 &wo, uint8_t) const noexcept override
+        real pdf(const FVec3 &wi, const FVec3 &wo, uint8_t) const noexcept override
         {
             return 0;
         }

@@ -84,20 +84,20 @@ namespace
         }
 
         Spectrum eval(
-            const Vec3 &lwi, const Vec3 &lwo,
+            const FVec3 &lwi, const FVec3 &lwo,
             TransMode mode) const noexcept override
         {
             if(lwi.z <= 0 || lwo.z <= 0)
                 return {};
 
-            const Vec3 lwh = (lwi + lwo).normalize();
+            const FVec3 lwh = (lwi + lwo).normalize();
             const real S = std::pow(1 - std::abs(lwh.x), n_);
 
             return color_ * S / Io[n_];
         }
 
         SampleResult sample(
-            const Vec3 &lwo, TransMode mode,
+            const FVec3 &lwo, TransMode mode,
             const Sample2 &sam) const noexcept override
         {
             if(lwo.z <= 0)
@@ -127,13 +127,13 @@ namespace
 
             // compute lwh & wi
 
-            const Vec3 lwh = {
+            const FVec3 lwh = {
                 sin_theta_h,
                 cos_theta_h * std::cos(phi_h),
                 cos_theta_h * std::sin(phi_h)
             };
 
-            const Vec3 lwi = refl_aux::reflect(lwo, lwh);
+            const FVec3 lwi = refl_aux::reflect(lwo, lwh);
             if(lwi.z <= 0)
                 return {};
 
@@ -149,12 +149,12 @@ namespace
             return ret;
         }
 
-        real pdf(const Vec3 &lwi, const Vec3 &lwo) const noexcept override
+        real pdf(const FVec3 &lwi, const FVec3 &lwo) const noexcept override
         {
             if(lwi.z <= 0 || lwo.z <= 0)
                 return 0;
 
-            const Vec3 lwh = (lwi + lwo).normalize();
+            const FVec3 lwh = (lwi + lwo).normalize();
             const real sin_theta_h = lwh.x;
 
             const real S = std::pow(1 - std::abs(sin_theta_h), n_);
@@ -186,7 +186,7 @@ public:
     ShadingPoint shade(
         const EntityIntersection &inct, Arena &arena) const override
     {
-        const Coord shading_coord = normal_mapper_->reorient(
+        const FCoord shading_coord = normal_mapper_->reorient(
             inct.uv, inct.user_coord);
 
         const Spectrum color = color_->sample_spectrum(inct.uv);

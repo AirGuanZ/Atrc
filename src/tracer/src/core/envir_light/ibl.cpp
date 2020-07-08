@@ -62,7 +62,7 @@ public:
     }
 
     LightSampleResult sample(
-        const Vec3 &ref, const Sample5 &sam) const noexcept override
+        const FVec3 &ref, const Sample5 &sam) const noexcept override
     {
         const auto [dir, pdf] = sampler_->sample({ sam.u, sam.v, sam.w });
 
@@ -70,7 +70,7 @@ public:
             ref, emit_pos(ref, dir).pos, -dir, radiance(ref, dir), pdf);
     }
 
-    real pdf(const Vec3 &ref, const Vec3 &ref_to_light) const noexcept override
+    real pdf(const FVec3 &ref, const FVec3 &ref_to_light) const noexcept override
     {
         return sampler_->pdf(ref_to_light);
     }
@@ -82,9 +82,9 @@ public:
 
         const Vec2 disk_sam = math::distribution
                                 ::uniform_on_unit_disk(sam.r, sam.s);
-        const Coord dir_coord = Coord::from_z(dir);
+        const FCoord dir_coord = FCoord::from_z(dir);
         
-        const Vec3 pos = world_centre_ +
+        const FVec3 pos = world_centre_ +
             (disk_sam.x * dir_coord.x + disk_sam.y * dir_coord.y - dir) * world_radius_;
 
         return LightEmitResult(
@@ -93,7 +93,7 @@ public:
     }
 
     LightEmitPDFResult emit_pdf(
-        const Vec3 &pos, const Vec3 &dir, const Vec3 &nor) const noexcept override
+        const FVec3 &pos, const FVec3 &dir, const FVec3 &nor) const noexcept override
     {
         const real pdf_pos = 1 / (PI_r * world_radius_ * world_radius_);
         const real pdf_dir = sampler_->pdf(-dir);
@@ -101,7 +101,7 @@ public:
     }
 
     LightEmitPosResult emit_pos(
-        const Vec3 &ref, const Vec3 &ref_to_light) const noexcept override
+        const FVec3 &ref, const FVec3 &ref_to_light) const noexcept override
     {
         // o: world_center
         // r: world_radius
@@ -116,12 +116,12 @@ public:
         //       c = -d
         //       m = x - o + r * d
 
-        const auto [ex, ey, d] = Coord::from_z(ref_to_light);
+        const auto [ex, ey, d] = FCoord::from_z(ref_to_light);
 
-        const Vec3 a = world_radius_ * ex;
-        const Vec3 b = world_radius_ * ey;
-        const Vec3 c = -d;
-        const Vec3 m = ref - world_centre_ - world_radius_ * d;
+        const FVec3 a = world_radius_ * ex;
+        const FVec3 b = world_radius_ * ey;
+        const FVec3 c = -d;
+        const FVec3 m = ref - world_centre_ - world_radius_ * d;
 
         const real det  = Mat3::from_cols(a, b, c).det();
         const real tdet = Mat3::from_cols(a, b, m).det();
@@ -130,7 +130,7 @@ public:
             return { world_centre_, -ref_to_light };
 
         const real t = tdet / det;
-        const Vec3 pos = ref + t * d;
+        const FVec3 pos = ref + t * d;
 
         return { pos, c };
     }
@@ -143,9 +143,9 @@ public:
     }
 
     Spectrum radiance(
-        const Vec3 &ref, const Vec3 &ref_to_light) const noexcept override
+        const FVec3 &ref, const FVec3 &ref_to_light) const noexcept override
     {
-        const Vec3 dir   = ref_to_light.normalize();
+        const FVec3 dir   = ref_to_light.normalize();
         const real phi   = local_angle::phi(dir);
         const real theta = local_angle::theta(dir);
         const real u     = math::clamp<real>(phi / (2 * PI_r), 0, 1);

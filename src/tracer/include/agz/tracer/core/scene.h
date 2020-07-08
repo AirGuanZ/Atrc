@@ -77,7 +77,7 @@ public:
     /**
      * @brief is there no intersection between two given points
      */
-    virtual bool visible(const Vec3 &A, const Vec3 &B) const noexcept = 0;
+    virtual bool visible(const FVec3 &A, const FVec3 &B) const noexcept = 0;
 
     /**
      * @brief find closest intersection with given ray

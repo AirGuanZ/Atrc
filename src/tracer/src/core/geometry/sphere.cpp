@@ -12,7 +12,7 @@ class Sphere : public TransformedGeometry
 
 public:
 
-    Sphere(real radius, const Transform3 &local_to_world)
+    Sphere(real radius, const FTransform3 &local_to_world)
     {
         AGZ_HIERARCHY_TRY
 
@@ -41,10 +41,10 @@ public:
         if(!sphere::closest_intersection(local_r, &t, radius_))
             return false;
 
-        const Vec3 pos = local_r.at(t);
+        const FVec3 pos = local_r.at(t);
 
         Vec2 geometry_uv(UNINIT);
-        Coord geometry_coord(UNINIT);
+        FCoord geometry_coord(UNINIT);
         sphere::local_geometry_uv_and_coord(
             pos, &geometry_uv, &geometry_coord, radius_);
 
@@ -62,10 +62,10 @@ public:
 
     AABB world_bound() const noexcept override
     {
-        const Vec3 world_origin = local_to_world_.apply_to_point(Vec3(0));
+        const FVec3 world_origin = local_to_world_.apply_to_point(FVec3(0));
         return {
-            world_origin - Vec3(world_radius_ + EPS()),
-            world_origin + Vec3(world_radius_ + EPS())
+            world_origin - FVec3(world_radius_ + EPS()),
+            world_origin + FVec3(world_radius_ + EPS())
         };
     }
 
@@ -81,9 +81,9 @@ public:
         const auto [unit_pos, unit_pdf] = math::distribution
                                             ::uniform_on_sphere(sam.u, sam.v);
         *pdf = unit_pdf / (world_radius_ * world_radius_);
-        const Vec3 pos = radius_ * unit_pos;
+        const FVec3 pos = radius_ * unit_pos;
 
-        Vec2 geometry_uv(UNINIT); Coord geometry_coord(UNINIT);
+        Vec2 geometry_uv(UNINIT); FCoord geometry_coord(UNINIT);
         sphere::local_geometry_uv_and_coord(
             pos, &geometry_uv, &geometry_coord, radius_);
 
@@ -98,9 +98,9 @@ public:
     }
 
     SurfacePoint sample(
-        const Vec3 &ref, real *pdf, const Sample3 &sam) const noexcept override
+        const FVec3 &ref, real *pdf, const Sample3 &sam) const noexcept override
     {
-        const Vec3 local_ref = local_to_world_.apply_inverse_to_point(ref);
+        const FVec3 local_ref = local_to_world_.apply_inverse_to_point(ref);
         const real d = local_ref.length();
         if(d <= radius_)
             return sample(pdf, sam);
@@ -109,10 +109,10 @@ public:
         const auto [dir, l_pdf] = math::distribution
                                     ::uniform_on_cone(cos_theta, sam.u, sam.v);
                                     
-        const Vec3 pos = radius_ *
-                         Coord::from_z(local_ref).local_to_global(dir).normalize();
+        const FVec3 pos = radius_ *
+                         FCoord::from_z(local_ref).local_to_global(dir).normalize();
 
-        Vec2 geometry_uv; Coord geometry_coord;
+        Vec2 geometry_uv; FCoord geometry_coord;
         sphere::local_geometry_uv_and_coord(
             pos, &geometry_uv, &geometry_coord, radius_);
 
@@ -129,14 +129,14 @@ public:
         return spt;
     }
 
-    real pdf(const Vec3 &sample) const noexcept override
+    real pdf(const FVec3 &sample) const noexcept override
     {
         return 1 / surface_area();
     }
 
-    real pdf(const Vec3 &ref, const Vec3 &sample) const noexcept override
+    real pdf(const FVec3 &ref, const FVec3 &sample) const noexcept override
     {
-        const Vec3 local_ref = local_to_world_.apply_inverse_to_point(ref);
+        const FVec3 local_ref = local_to_world_.apply_inverse_to_point(ref);
         const real d = local_ref.length();
         if(d <= radius_)
             return pdf(sample);
@@ -150,7 +150,7 @@ public:
 };
 
 RC<Geometry> create_sphere(
-    real radius, const Transform3 &local_to_world)
+    real radius, const FTransform3 &local_to_world)
 {
     return newRC<Sphere>(radius, local_to_world);
 }

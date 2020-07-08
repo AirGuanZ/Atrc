@@ -12,15 +12,15 @@ public:
     HashedGridAux(
         const AABB &world_bound, real grid_sidelen, size_t entry_count);
 
-    Vec3i pos_to_grid(const Vec3 &world_pos) const noexcept;
+    Vec3i pos_to_grid(const FVec3 &world_pos) const noexcept;
 
     size_t grid_to_entry(const Vec3i &grid) const noexcept;
 
-    size_t pos_to_entry(const Vec3 &world_pos) const noexcept;
+    size_t pos_to_entry(const FVec3 &world_pos) const noexcept;
 
 private:
 
-    Vec3 world_low_;
+    FVec3 world_low_;
     real grid_sidelen_;
     size_t entry_count_;
 };
@@ -35,12 +35,14 @@ inline HashedGridAux::HashedGridAux(
     entry_count_  = entry_count;
 }
 
-inline Vec3i HashedGridAux::pos_to_grid(const Vec3 &world_pos) const noexcept
+inline Vec3i HashedGridAux::pos_to_grid(const FVec3 &world_pos) const noexcept
 {
-    return (world_pos - world_low_).map([=](real v)
-    {
-        return static_cast<int>(std::max<real>(v, 0) / grid_sidelen_);
-    });
+    const auto hd = world_pos - world_low_;
+    return {
+        static_cast<int>(std::max<real>(hd.x, 0) / grid_sidelen_),
+        static_cast<int>(std::max<real>(hd.y, 0) / grid_sidelen_),
+        static_cast<int>(std::max<real>(hd.z, 0) / grid_sidelen_)
+    };
 }
 
 inline size_t HashedGridAux::grid_to_entry(const Vec3i &grid) const noexcept
@@ -52,7 +54,7 @@ inline size_t HashedGridAux::grid_to_entry(const Vec3i &grid) const noexcept
     return ((hash_val << 3) % entry_count_) | low3_bits;
 }
 
-inline size_t HashedGridAux::pos_to_entry(const Vec3 &world_pos) const noexcept
+inline size_t HashedGridAux::pos_to_entry(const FVec3 &world_pos) const noexcept
 {
     return grid_to_entry(pos_to_grid(world_pos));
 }

@@ -10,9 +10,9 @@ public:
 
     struct Params
     {
-        Vec3 A, B, C, D;
+        FVec3 A, B, C, D;
         Vec2 t_a, t_b, t_c, t_d;
-        Transform3 local_to_world;
+        FTransform3 local_to_world;
     };
 
     explicit Quad(const Params &params)
@@ -35,7 +35,7 @@ public:
         if(closest_intersection_with_triangle(r, a_, b_a_, c_a_, &inct_rcd))
         {
             inct->pos            = r.at(inct_rcd.t_ray);
-            inct->geometry_coord = Coord(x_abc_, cross(z_, x_abc_), z_);
+            inct->geometry_coord = FCoord(x_abc_, cross(z_, x_abc_), z_);
             inct->uv             = t_a_ + inct_rcd.uv.x * t_b_a_ + inct_rcd.uv.y * t_c_a_;
             inct->user_coord     = inct->geometry_coord;
             inct->wr             = -r.d;
@@ -46,7 +46,7 @@ public:
         if(closest_intersection_with_triangle(r, a_, c_a_, d_a_, &inct_rcd))
         {
             inct->pos            = r.at(inct_rcd.t_ray);
-            inct->geometry_coord = Coord(x_acd_, cross(z_, x_acd_), z_);
+            inct->geometry_coord = FCoord(x_acd_, cross(z_, x_acd_), z_);
             inct->uv             = t_a_ + inct_rcd.uv.x * t_c_a_ + inct_rcd.uv.y * t_d_a_;
             inct->user_coord     = inct->geometry_coord;
             inct->wr             = -r.d;
@@ -86,7 +86,7 @@ public:
         if(sam.w < sample_abc_prob_)
         {
             spt.pos = a_ + bi_coord.x * b_a_ + bi_coord.y * c_a_;
-            spt.geometry_coord = Coord(x_abc_, cross(z_, x_abc_), z_);
+            spt.geometry_coord = FCoord(x_abc_, cross(z_, x_abc_), z_);
 
             spt.uv = t_a_ + bi_coord.x * t_b_a_ + bi_coord.y * t_c_a_;
             spt.user_coord = spt.geometry_coord;
@@ -94,7 +94,7 @@ public:
         else
         {
             spt.pos = a_ + bi_coord.x * c_a_ + bi_coord.y * d_a_;
-            spt.geometry_coord = Coord(x_acd_, cross(z_, x_acd_), z_);
+            spt.geometry_coord = FCoord(x_acd_, cross(z_, x_acd_), z_);
 
             spt.uv = t_a_ + bi_coord.x * t_c_a_ + bi_coord.y * t_d_a_;
             spt.user_coord = spt.geometry_coord;
@@ -105,30 +105,30 @@ public:
     }
 
     SurfacePoint sample(
-        const Vec3&, real *pdf, const Sample3 &sam) const noexcept override
+        const FVec3 &, real *pdf, const Sample3 &sam) const noexcept override
     {
         return sample(pdf, sam);
     }
 
-    real pdf(const Vec3&) const noexcept override
+    real pdf(const FVec3 &) const noexcept override
     {
         return 1 / surface_area_;
     }
 
-    real pdf(const Vec3&, const Vec3 &sample) const noexcept override
+    real pdf(const FVec3 &, const FVec3 &sample) const noexcept override
     {
         return pdf(sample);
     }
 
 private:
     
-    Vec3 a_;
-    Vec3 b_a_, c_a_, d_a_;
+    FVec3 a_;
+    FVec3 b_a_, c_a_, d_a_;
 
     Vec2 t_a_;
     Vec2 t_b_a_, t_c_a_, t_d_a_;
 
-    Vec3 x_abc_, x_acd_, z_;
+    FVec3 x_abc_, x_acd_, z_;
 
     real surface_area_ = 1;
     real sample_abc_prob_ = 0;
@@ -137,10 +137,10 @@ private:
 
     void init_from_params(const Params &params)
     {
-        const Vec3 a = params.local_to_world.apply_to_point(params.A);
-        const Vec3 b = params.local_to_world.apply_to_point(params.B);
-        const Vec3 c = params.local_to_world.apply_to_point(params.C);
-        const Vec3 d = params.local_to_world.apply_to_point(params.D);
+        const FVec3 a = params.local_to_world.apply_to_point(params.A);
+        const FVec3 b = params.local_to_world.apply_to_point(params.B);
+        const FVec3 c = params.local_to_world.apply_to_point(params.C);
+        const FVec3 d = params.local_to_world.apply_to_point(params.D);
 
         a_ = a;
         b_a_ = b - a;
@@ -165,9 +165,9 @@ private:
 };
 
 RC<Geometry> create_quad(
-    const Vec3 &a, const Vec3 &b, const Vec3 &c, const Vec3 &d,
+    const FVec3 &a, const FVec3 &b, const FVec3 &c, const FVec3 &d,
     const Vec2 &t_a, const Vec2 &t_b, const Vec2 &t_c, const Vec2 &t_d,
-    const Transform3 &local_to_world)
+    const FTransform3 &local_to_world)
 {
     Quad::Params params = { a, b, c, d, t_a, t_b, t_c, t_d, local_to_world };
     return newRC<Quad>(params);

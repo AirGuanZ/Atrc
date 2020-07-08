@@ -8,7 +8,7 @@ AGZ_TRACER_BEGIN
 
 class HeterogeneousMedium : public Medium
 {
-    Transform3 local_to_world_;
+    FTransform3 local_to_world_;
 
     RC<const Texture3D> density_;
     RC<const Texture3D> albedo_;
@@ -22,7 +22,7 @@ class HeterogeneousMedium : public Medium
 public:
 
     HeterogeneousMedium(
-        const Transform3 &local_to_world,
+        const FTransform3 &local_to_world,
         RC<const Texture3D> density,
         RC<const Texture3D> albedo,
         RC<const Texture3D> g,
@@ -47,7 +47,7 @@ public:
     }
 
     Spectrum tr(
-        const Vec3 &a, const Vec3 &b, Sampler &sampler) const noexcept override
+        const FVec3 &a, const FVec3 &b, Sampler &sampler) const noexcept override
     {
         real result = 1;
         real t = 0;
@@ -61,8 +61,8 @@ public:
             if(t >= t_max)
                 break;
 
-            const Vec3 pos = lerp(a, b, t / t_max);
-            const Vec3 unit_pos = local_to_world_.apply_inverse_to_point(pos);
+            const FVec3 pos = lerp(a, b, t / t_max);
+            const FVec3 unit_pos = local_to_world_.apply_inverse_to_point(pos);
             const real density = density_->sample_real(unit_pos);
             result *= 1 - density / max_density_;
         }
@@ -71,14 +71,14 @@ public:
     }
 
     Spectrum ab(
-        const Vec3 &a, const Vec3 &b, Sampler &sampler) const noexcept override
+        const FVec3 &a, const FVec3 &b, Sampler &sampler) const noexcept override
     {
         // FIXME
         return tr(a, b, sampler);
     }
 
     SampleOutScatteringResult sample_scattering(
-        const Vec3 &a, const Vec3 &b,
+        const FVec3 &a, const FVec3 &b,
         Sampler &sampler, Arena &arena) const noexcept override
     {
         const real t_max = distance(a, b);
@@ -92,8 +92,8 @@ public:
             if(t >= t_max)
                 break;
 
-            const Vec3 pos = lerp(a, b, t / t_max);
-            const Vec3 unit_pos = local_to_world_.apply_inverse_to_point(pos);
+            const FVec3 pos = lerp(a, b, t / t_max);
+            const FVec3 unit_pos = local_to_world_.apply_inverse_to_point(pos);
             const real density = density_->sample_real(unit_pos);
             if(sampler.sample1().u < density / max_density_)
             {
@@ -119,7 +119,7 @@ public:
 };
 
 RC<Medium> create_heterogeneous_medium(
-    const Transform3 &local_to_world,
+    const FTransform3 &local_to_world,
     RC<const Texture3D> density,
     RC<const Texture3D> albedo,
     RC<const Texture3D> g,

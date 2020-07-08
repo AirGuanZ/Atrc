@@ -9,7 +9,7 @@ DiffuseComponent::DiffuseComponent(const Spectrum &albedo) noexcept
 }
 
 Spectrum DiffuseComponent::eval(
-    const Vec3 &lwi, const Vec3 &lwo, TransMode mode) const noexcept
+    const FVec3 &lwi, const FVec3 &lwo, TransMode mode) const noexcept
 {
     if(lwi.z <= 0 || lwo.z <= 0)
         return {};
@@ -17,7 +17,7 @@ Spectrum DiffuseComponent::eval(
 }
 
 real DiffuseComponent::pdf(
-    const Vec3 &lwi, const Vec3 &lwo) const noexcept
+    const FVec3 &lwi, const FVec3 &lwo) const noexcept
 {
     if(lwi.z <= 0 || lwo.z <= 0)
         return 0;
@@ -25,7 +25,7 @@ real DiffuseComponent::pdf(
 }
 
 BSDFComponent::SampleResult DiffuseComponent::sample(
-    const Vec3 &lwo, TransMode mode, const Sample2 &sam) const noexcept
+    const FVec3 &lwo, TransMode mode, const Sample2 &sam) const noexcept
 {
     if(lwo.z <= 0)
         return {};

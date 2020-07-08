@@ -113,7 +113,7 @@ void MaterialThumbnailProvider::run_one_iter(int spp)
                 {
                     const real pyf = -std::sqrt(4 - pxf * pxf - pzf * pzf);
 
-                    tracer::Coord coord; Vec2 uv;
+                    tracer::FCoord coord; Vec2 uv;
                     tracer::sphere::local_geometry_uv_and_coord(
                         { pxf, pyf, pzf }, &uv, &coord, 2);
 

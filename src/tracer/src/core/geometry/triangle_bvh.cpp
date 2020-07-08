@@ -171,7 +171,7 @@ namespace
             }
 
             // select the split axis with max extent
-            const Vec3 centroid_delta = centroid_bound.high - centroid_bound.low;
+            const FVec3 centroid_delta = centroid_bound.high - centroid_bound.low;
             const int split_axis = centroid_delta[0] > centroid_delta[1] ?
                 (centroid_delta[0] > centroid_delta[2] ? 0 : 2) :
                 (centroid_delta[1] > centroid_delta[2] ? 1 : 2);
@@ -276,9 +276,9 @@ namespace
                     prim.b_a_ = tri.vtx[1].position - tri.vtx[0].position;
                     prim.c_a_ = tri.vtx[2].position - tri.vtx[0].position;
 
-                    const Vec3 n_a = tri.vtx[0].normal.normalize();
-                    const Vec3 n_b = tri.vtx[1].normal.normalize();
-                    const Vec3 n_c = tri.vtx[2].normal.normalize();
+                    const FVec3 n_a = tri.vtx[0].normal.normalize();
+                    const FVec3 n_b = tri.vtx[1].normal.normalize();
+                    const FVec3 n_c = tri.vtx[2].normal.normalize();
 
                     prim_info.n_a_   = n_a;
                     prim_info.n_b_a_ = n_b - n_a;
@@ -289,7 +289,7 @@ namespace
                     prim_info.t_c_a_ = tri.vtx[2].tex_coord - tri.vtx[0].tex_coord;
 
                     prim_info.z_ = cross(prim.b_a_, prim.c_a_).normalize();
-                    const Vec3 mean_nor = n_a + n_b + n_c;
+                    const FVec3 mean_nor = n_a + n_b + n_c;
                     if(dot(mean_nor, prim_info.z_) < 0)
                         prim_info.z_ = -prim_info.z_;
 
@@ -472,14 +472,14 @@ namespace
             const PrimitiveInfo &prim_info = prim_info_[final_prim_idx];
 
             inct->pos            = r.at(rcd.t_ray);
-            inct->geometry_coord = Coord(prim_info.x_, cross(
+            inct->geometry_coord = FCoord(prim_info.x_, cross(
                 prim_info.z_, prim_info.x_), prim_info.z_);
             inct->uv             = prim_info.t_a_ + rcd.uv.x * prim_info.t_b_a_
                                                   + rcd.uv.y * prim_info.t_c_a_;
             inct->t              = rcd.t_ray;
 
-            const Vec3 user_z = prim_info.n_a_ + rcd.uv.x * prim_info.n_b_a_
-                                               + rcd.uv.y * prim_info.n_c_a_;
+            const FVec3 user_z = prim_info.n_a_ + rcd.uv.x * FVec3(prim_info.n_b_a_)
+                                               + rcd.uv.y * FVec3(prim_info.n_c_a_);
             inct->user_coord = inct->geometry_coord.rotate_to_new_z(user_z);
 
             inct->wr = -r.d;
@@ -503,13 +503,13 @@ namespace
 
             SurfacePoint spt;
             spt.pos            = prim.a_ + uv.x * prim.b_a_ + uv.y * prim.c_a_;
-            spt.geometry_coord = Coord(
+            spt.geometry_coord = FCoord(
                 prim_info.x_, cross(prim_info.z_, prim_info.x_), prim_info.z_);
             spt.uv             = prim_info.t_a_ + uv.x * prim_info.t_b_a_
                                                 + uv.y * prim_info.t_c_a_;
 
-            const Vec3 user_z = prim_info.n_a_ + uv.x * prim_info.n_b_a_
-                                               + uv.y * prim_info.n_c_a_;
+            const FVec3 user_z = prim_info.n_a_ + uv.x * FVec3(prim_info.n_b_a_)
+                                               + uv.y * FVec3(prim_info.n_c_a_);
             spt.user_coord = spt.geometry_coord.rotate_to_new_z(user_z);
 
             *pdf = 1 / surface_area_;
@@ -531,7 +531,7 @@ class TriangleBVH : public Geometry
     AABB world_bound_;
 
     static Box<const UntransformedTriangleBVH> load(
-        std::vector<mesh::triangle_t> build_triangles, const Transform3 &local_to_world)
+        std::vector<mesh::triangle_t> build_triangles, const FTransform3 &local_to_world)
     {
         for(auto &tri : build_triangles)
         {
@@ -561,7 +561,7 @@ public:
 
     TriangleBVH(
         std::vector<mesh::triangle_t> build_triangles,
-        const Transform3 &local_to_world)
+        const FTransform3 &local_to_world)
     {
         AGZ_HIERARCHY_TRY
 
@@ -612,17 +612,17 @@ public:
     }
 
     SurfacePoint sample(
-        const Vec3&, real *pdf, const Sample3 &sam) const noexcept override
+        const FVec3 &, real *pdf, const Sample3 &sam) const noexcept override
     {
         return sample(pdf, sam);
     }
 
-    real pdf(const Vec3&) const noexcept override
+    real pdf(const FVec3 &) const noexcept override
     {
         return 1 / surface_area();
     }
 
-    real pdf(const Vec3&, const Vec3 &sample) const noexcept override
+    real pdf(const FVec3 &, const FVec3 &sample) const noexcept override
     {
         return pdf(sample);
     }
@@ -630,7 +630,7 @@ public:
 
 RC<Geometry> create_triangle_bvh_noembree(
     std::vector<mesh::triangle_t> build_triangles,
-    const Transform3 &local_to_world)
+    const FTransform3 &local_to_world)
 {
     return newRC<TriangleBVH>(std::move(build_triangles), local_to_world);
 }

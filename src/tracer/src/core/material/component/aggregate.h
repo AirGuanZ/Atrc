@@ -18,31 +18,31 @@ class AggregateBSDF : public LocalBSDF
 public:
 
     AggregateBSDF(
-        const Coord &geometry, const Coord &shading,
+        const FCoord &geometry, const FCoord &shading,
         const Spectrum &albedo) noexcept;
 
     void add_component(real weight, const BSDFComponent *component) noexcept;
 
     Spectrum eval(
-        const Vec3 &wi, const Vec3 &wo,
+        const FVec3 &wi, const FVec3 &wo,
         TransMode mode, uint8_t type) const noexcept override;
 
     BSDFSampleResult sample(
-        const Vec3 &wo, TransMode mode,
+        const FVec3 &wo, TransMode mode,
         const Sample3 &sam, uint8_t type) const noexcept override;
 
     real pdf(
-        const Vec3 &wi, const Vec3 &wo,
+        const FVec3 &wi, const FVec3 &wo,
         uint8_t type) const noexcept override;
 
     Spectrum eval_all(
-        const Vec3 &wi, const Vec3 &wo, TransMode mode) const noexcept override;
+        const FVec3 &wi, const FVec3 &wo, TransMode mode) const noexcept override;
 
     BSDFSampleResult sample_all(
-        const Vec3 &wo, TransMode mode,
+        const FVec3 &wo, TransMode mode,
         const Sample3 &sam) const noexcept override;
 
-    real pdf_all(const Vec3 &wi, const Vec3 &wo) const noexcept override;
+    real pdf_all(const FVec3 &wi, const FVec3 &wo) const noexcept override;
 
     bool is_delta() const noexcept override;
 
@@ -53,7 +53,7 @@ public:
 
 template<int MAX_COMP_CNT>
 Spectrum AggregateBSDF<MAX_COMP_CNT>::eval(
-    const Vec3 &wi, const Vec3 &wo,
+    const FVec3 &wi, const FVec3 &wo,
     TransMode mode, uint8_t type) const noexcept
 {
     // process black fringes
@@ -63,8 +63,8 @@ Spectrum AggregateBSDF<MAX_COMP_CNT>::eval(
 
     // compute normalized local wi/wo
 
-    const Vec3 lwi = shading_coord_.global_to_local(wi).normalize();
-    const Vec3 lwo = shading_coord_.global_to_local(wo).normalize();
+    const FVec3 lwi = shading_coord_.global_to_local(wi).normalize();
+    const FVec3 lwo = shading_coord_.global_to_local(wo).normalize();
     if(!lwi.z || !lwo.z)
         return {};
 
@@ -83,7 +83,7 @@ Spectrum AggregateBSDF<MAX_COMP_CNT>::eval(
 
 template<int MAX_COMP_CNT>
 BSDFSampleResult AggregateBSDF<MAX_COMP_CNT>::sample(
-    const Vec3 &wo, TransMode mode, const Sample3 &sam,
+    const FVec3 &wo, TransMode mode, const Sample3 &sam,
     uint8_t type) const noexcept
 {
     // process black fringes
@@ -93,7 +93,7 @@ BSDFSampleResult AggregateBSDF<MAX_COMP_CNT>::sample(
 
     // compute normalized local wo
 
-    const Vec3 lwo = shading_coord_.global_to_local(wo).normalize();
+    const FVec3 lwo = shading_coord_.global_to_local(wo).normalize();
     if(!lwo.z)
         return BSDF_SAMPLE_RESULT_INVALID;
 
@@ -157,7 +157,7 @@ BSDFSampleResult AggregateBSDF<MAX_COMP_CNT>::sample(
 
     // construct sampling result
 
-    const Vec3 wi = shading_coord_.local_to_global(sam_ret.lwi);
+    const FVec3 wi = shading_coord_.local_to_global(sam_ret.lwi);
     const real normal_corr_factor = local_angle::normal_corr_factor(
         geometry_coord_, shading_coord_, wi);
 
@@ -167,7 +167,7 @@ BSDFSampleResult AggregateBSDF<MAX_COMP_CNT>::sample(
 
 template<int MAX_COMP_CNT>
 real AggregateBSDF<MAX_COMP_CNT>::pdf(
-    const Vec3 &wi, const Vec3 &wo, uint8_t type) const noexcept
+    const FVec3 &wi, const FVec3 &wo, uint8_t type) const noexcept
 {
     // handle black fringes
 
@@ -176,8 +176,8 @@ real AggregateBSDF<MAX_COMP_CNT>::pdf(
 
     // compute normalized local wi/wo
     
-    const Vec3 lwi = shading_coord_.global_to_local(wi).normalize();
-    const Vec3 lwo = shading_coord_.global_to_local(wo).normalize();
+    const FVec3 lwi = shading_coord_.global_to_local(wi).normalize();
+    const FVec3 lwo = shading_coord_.global_to_local(wo).normalize();
     if(!lwi.z || !lwo.z)
         return 0;
 
@@ -201,7 +201,7 @@ real AggregateBSDF<MAX_COMP_CNT>::pdf(
 
 template<int MAX_COMP_CNT>
 AggregateBSDF<MAX_COMP_CNT>::AggregateBSDF(
-    const Coord &geometry, const Coord &shading,
+    const FCoord &geometry, const FCoord &shading,
     const Spectrum &albedo) noexcept
     : LocalBSDF(geometry, shading)
 {
@@ -221,7 +221,7 @@ void AggregateBSDF<MAX_COMP_CNT>::add_component(
 
 template<int MAX_COMP_CNT>
 Spectrum AggregateBSDF<MAX_COMP_CNT>::eval_all(
-    const Vec3 &wi, const Vec3 &wo, TransMode mode) const noexcept
+    const FVec3 &wi, const FVec3 &wo, TransMode mode) const noexcept
 {
     // process black fringes
 
@@ -230,8 +230,8 @@ Spectrum AggregateBSDF<MAX_COMP_CNT>::eval_all(
 
     // compute normalized local wi/wo
 
-    const Vec3 lwi = shading_coord_.global_to_local(wi).normalize();
-    const Vec3 lwo = shading_coord_.global_to_local(wo).normalize();
+    const FVec3 lwi = shading_coord_.global_to_local(wi).normalize();
+    const FVec3 lwo = shading_coord_.global_to_local(wo).normalize();
     if(!lwi.z || !lwo.z)
         return {};
 
@@ -246,7 +246,7 @@ Spectrum AggregateBSDF<MAX_COMP_CNT>::eval_all(
 
 template<int MAX_COMP_CNT>
 BSDFSampleResult AggregateBSDF<MAX_COMP_CNT>::sample_all(
-    const Vec3 &wo, TransMode mode, const Sample3 &sam) const noexcept
+    const FVec3 &wo, TransMode mode, const Sample3 &sam) const noexcept
 {
     // process black fringes
 
@@ -255,7 +255,7 @@ BSDFSampleResult AggregateBSDF<MAX_COMP_CNT>::sample_all(
 
     // compute normalized local wo
 
-    const Vec3 lwo = shading_coord_.global_to_local(wo).normalize();
+    const FVec3 lwo = shading_coord_.global_to_local(wo).normalize();
     if(!lwo.z)
         return BSDF_SAMPLE_RESULT_INVALID;
 
@@ -310,7 +310,7 @@ BSDFSampleResult AggregateBSDF<MAX_COMP_CNT>::sample_all(
 
     // construct sampling result
 
-    const Vec3 wi = shading_coord_.local_to_global(sam_ret.lwi);
+    const FVec3 wi = shading_coord_.local_to_global(sam_ret.lwi);
     const real normal_corr_factor = local_angle::normal_corr_factor(
         geometry_coord_, shading_coord_, wi);
 
@@ -320,7 +320,7 @@ BSDFSampleResult AggregateBSDF<MAX_COMP_CNT>::sample_all(
 
 template<int MAX_COMP_CNT>
 real AggregateBSDF<MAX_COMP_CNT>::pdf_all(
-    const Vec3 &wi, const Vec3 &wo) const noexcept
+    const FVec3 &wi, const FVec3 &wo) const noexcept
 {
     // handle black fringes
 
@@ -329,8 +329,8 @@ real AggregateBSDF<MAX_COMP_CNT>::pdf_all(
 
     // compute normalized local wi/wo
     
-    const Vec3 lwi = shading_coord_.global_to_local(wi).normalize();
-    const Vec3 lwo = shading_coord_.global_to_local(wo).normalize();
+    const FVec3 lwi = shading_coord_.global_to_local(wi).normalize();
+    const FVec3 lwo = shading_coord_.global_to_local(wo).normalize();
     if(!lwi.z || !lwo.z)
         return 0;
 

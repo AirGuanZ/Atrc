@@ -5,10 +5,10 @@
 
 AGZ_TRACER_BEGIN
 
-Vec3 GGXMicrofacetRefractionComponent::sample_trans(
-    const Vec3 &lwo, const Sample2 &sam) const noexcept
+FVec3 GGXMicrofacetRefractionComponent::sample_trans(
+    const FVec3 &lwo, const Sample2 &sam) const noexcept
 {
-    const Vec3 lwh = microfacet::sample_anisotropic_gtr2(
+    const FVec3 lwh = microfacet::sample_anisotropic_gtr2(
                                         ax_, ay_, sam);
     if(lwh.z <= 0)
         return {};
@@ -17,41 +17,41 @@ Vec3 GGXMicrofacetRefractionComponent::sample_trans(
         return {};
 
     const real eta = lwo.z > 0 ? 1 / ior_ : ior_;
-    const Vec3 owh = dot(lwh, lwo) > 0 ? lwh : -lwh;
+    const FVec3 owh = dot(lwh, lwo) > 0 ? lwh : -lwh;
     auto opt_lwi = refl_aux::refract(lwo, owh, eta);
     if(!opt_lwi)
         return {};
 
-    const Vec3 lwi = opt_lwi->normalize();
+    const FVec3 lwi = opt_lwi->normalize();
     if(lwi.z * lwo.z > 0 || ((lwi.z > 0) != (dot(lwh, lwi) > 0)))
         return {};
 
     return lwi;
 }
 
-Vec3 GGXMicrofacetRefractionComponent::sample_inner_refl(
-    const Vec3 &lwo, const Sample2 &sam) const noexcept
+FVec3 GGXMicrofacetRefractionComponent::sample_inner_refl(
+    const FVec3 &lwo, const Sample2 &sam) const noexcept
 {
     assert(lwo.z < 0);
 
-    const Vec3 lwh = microfacet::sample_anisotropic_gtr2(
+    const FVec3 lwh = microfacet::sample_anisotropic_gtr2(
                                         ax_, ay_, sam);
     if(lwh.z <= 0)
         return {};
 
-    const Vec3 lwi = (2 * dot(lwo, lwh) * lwh - lwo);
+    const FVec3 lwi = (2 * dot(lwo, lwh) * lwh - lwo);
     if(lwi.z > 0)
         return {};
     return lwi.normalize();
 }
 
 real GGXMicrofacetRefractionComponent::pdf_trans(
-    const Vec3 &lwi, const Vec3 &lwo) const noexcept
+    const FVec3 &lwi, const FVec3 &lwo) const noexcept
 {
     assert(lwi.z * lwo.z < 0);
 
     const real eta = lwo.z > 0 ? ior_ : 1 / ior_;
-    Vec3 lwh = (lwo + eta * lwi).normalize();
+    FVec3 lwh = (lwo + eta * lwi).normalize();
     if(lwh.z < 0)
         lwh = -lwh;
 
@@ -75,11 +75,11 @@ real GGXMicrofacetRefractionComponent::pdf_trans(
 }
 
 real GGXMicrofacetRefractionComponent::pdf_inner_refl(
-    const Vec3 &lwi, const Vec3 &lwo) const noexcept
+    const FVec3 &lwi, const FVec3 &lwo) const noexcept
 {
     assert(lwi.z < 0 && lwo.z < 0);
 
-    const Vec3 lwh = -(lwi + lwo).normalize();
+    const FVec3 lwh = -(lwi + lwo).normalize();
     const real phi_h = local_angle::phi(lwh);
     const real sin_phi_h = std::sin(phi_h);
     const real cos_phi_h = std::cos(phi_h);
@@ -108,7 +108,7 @@ GGXMicrofacetRefractionComponent::GGXMicrofacetRefractionComponent(
 }
 
 Spectrum GGXMicrofacetRefractionComponent::eval(
-    const Vec3 &lwi, const Vec3 &lwo, TransMode mode) const noexcept
+    const FVec3 &lwi, const FVec3 &lwo, TransMode mode) const noexcept
 {
     // reflection
 
@@ -123,7 +123,7 @@ Spectrum GGXMicrofacetRefractionComponent::eval(
         const real cos_theta_o = local_angle::cos_theta(lwo);
 
         const real eta = cos_theta_o > 0 ? ior_ : 1 / ior_;
-        Vec3 lwh = (lwo + eta * lwi).normalize();
+        FVec3 lwh = (lwo + eta * lwi).normalize();
         if(lwh.z < 0)
             lwh = -lwh;
 
@@ -166,7 +166,7 @@ Spectrum GGXMicrofacetRefractionComponent::eval(
 
     // inner reflection
 
-    const Vec3 lwh = -(lwi + lwo).normalize();
+    const FVec3 lwh = -(lwi + lwo).normalize();
     assert(lwh.z > 0);
 
     const real cos_theta_d = dot(lwo, lwh);
@@ -201,13 +201,13 @@ Spectrum GGXMicrofacetRefractionComponent::eval(
 }
 
 BSDFComponent::SampleResult GGXMicrofacetRefractionComponent::sample(
-    const Vec3 &lwo, TransMode mode, const Sample2 &sam) const noexcept
+    const FVec3 &lwo, TransMode mode, const Sample2 &sam) const noexcept
 {
     if(lwo.z > 0)
     {
         // sample transmission
 
-        const Vec3 lwi = sample_trans(lwo, sam);
+        const FVec3 lwi = sample_trans(lwo, sam);
         if(!lwi)
             return {};
 
@@ -225,7 +225,7 @@ BSDFComponent::SampleResult GGXMicrofacetRefractionComponent::sample(
         refl_aux::dielectric_fresnel(ior_, 1, lwo.z),
         real(0.1), real(0.9));
 
-    Vec3 lwi;
+    FVec3 lwi;
     if(sam.u >= macro_F)
     {
         const real new_u = (sam.u - macro_F) / (1 - macro_F);
@@ -249,7 +249,7 @@ BSDFComponent::SampleResult GGXMicrofacetRefractionComponent::sample(
 }
 
 real GGXMicrofacetRefractionComponent::pdf(
-    const Vec3 &lwi, const Vec3 &lwo) const noexcept
+    const FVec3 &lwi, const FVec3 &lwo) const noexcept
 {
     if(lwi.z >= 0 && lwo.z >= 0)
         return 0;

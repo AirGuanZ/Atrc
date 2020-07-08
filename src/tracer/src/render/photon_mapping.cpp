@@ -33,9 +33,9 @@ void VisiblePointSearcher::clear()
 void VisiblePointSearcher::add_vp(Pixel &pixel, Arena &vp_node_arena)
 {
     const Vec3i &min_grid = hashed_grid_aux_.pos_to_grid(
-        pixel.vp.pos - Vec3(pixel.radius));
+        pixel.vp.pos - FVec3(pixel.radius));
     const Vec3i &max_grid = hashed_grid_aux_.pos_to_grid(
-        pixel.vp.pos + Vec3(pixel.radius));
+        pixel.vp.pos + FVec3(pixel.radius));
 
     for(int z = min_grid.z; z <= max_grid.z; ++z)
     {
@@ -58,7 +58,7 @@ void VisiblePointSearcher::add_vp(Pixel &pixel, Arena &vp_node_arena)
 }
 
 void VisiblePointSearcher::add_photon(
-    const Vec3 &photon_pos, const Spectrum &phi, const Vec3 &wr)
+    const FVec3 &photon_pos, const Spectrum &phi, const FVec3 &wr)
 {
     const size_t entry_index = hashed_grid_aux_.pos_to_entry(photon_pos);
     for(VPNode *node = node_entries_[entry_index]; node; node = node->next)

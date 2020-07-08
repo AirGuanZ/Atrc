@@ -16,7 +16,7 @@ namespace microfacet
 
     real smith_gtr2(real tan_theta, real alpha) noexcept;
 
-    Vec3 sample_gtr2(real alpha, const Sample2 &sample) noexcept;
+    FVec3 sample_gtr2(real alpha, const Sample2 &sample) noexcept;
 
     real anisotropic_gtr2(
         real sin_phi_h, real cos_phi_h,
@@ -26,15 +26,15 @@ namespace microfacet
     real smith_anisotropic_gtr2(
         real cos_phi, real sin_phi, real ax, real ay, real tan_theta) noexcept;
 
-    Vec3 sample_anisotropic_gtr2(
+    FVec3 sample_anisotropic_gtr2(
         real ax, real ay, const Sample2 &sample) noexcept;
 
     real gtr1(real sin_theta_h, real cos_theta_h, real alpha) noexcept;
 
-    Vec3 sample_gtr1(real alpha, const Sample2 &sample) noexcept;
+    FVec3 sample_gtr1(real alpha, const Sample2 &sample) noexcept;
 
-    Vec3 sample_anisotropic_gtr2_vnor(
-        const Vec3 &ve, real ax, real ay, const Sample2 &sample) noexcept;
+    FVec3 sample_anisotropic_gtr2_vnor(
+        const FVec3 &ve, real ax, real ay, const Sample2 &sample) noexcept;
 
 } // namespace microfacet
 

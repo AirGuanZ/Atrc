@@ -7,7 +7,7 @@ namespace
 {
     template<bool EVAL, bool PDF>
     void eval_and_pdf(
-        const Vec3 &lwi, const Vec3 &lwo,
+        const FVec3 &lwi, const FVec3 &lwo,
         const FresnelPoint *fresnel, real ax, real ay,
         Spectrum *eval_output, real *pdf_output) noexcept
     {
@@ -23,7 +23,7 @@ namespace
         const real cos_theta_i = local_angle::cos_theta(lwi);
         const real cos_theta_o = local_angle::cos_theta(lwo);
 
-        const Vec3 lwh = (lwi + lwo).normalize();
+        const FVec3 lwh = (lwi + lwo).normalize();
         const real cos_theta_d = dot(lwi, lwh);
 
         const real phi_h       = local_angle::phi(lwh);
@@ -76,7 +76,7 @@ GGXMicrofacetReflectionComponent::GGXMicrofacetReflectionComponent(
 }
 
 Spectrum GGXMicrofacetReflectionComponent::eval(
-    const Vec3 &lwi, const Vec3 &lwo, TransMode mode) const noexcept
+    const FVec3 &lwi, const FVec3 &lwo, TransMode mode) const noexcept
 {
     Spectrum ret;
     eval_and_pdf<true, false>(lwi, lwo, fresnel_, ax_, ay_, &ret, nullptr);
@@ -84,17 +84,17 @@ Spectrum GGXMicrofacetReflectionComponent::eval(
 }
 
 BSDFComponent::SampleResult GGXMicrofacetReflectionComponent::sample(
-    const Vec3 &lwo, TransMode mode, const Sample2 &sam) const noexcept
+    const FVec3 &lwo, TransMode mode, const Sample2 &sam) const noexcept
 {
     if(lwo.z <= 0)
         return {};
 
-    const Vec3 lwh = microfacet::sample_anisotropic_gtr2_vnor(
+    const FVec3 lwh = microfacet::sample_anisotropic_gtr2_vnor(
         lwo, ax_, ay_, sam).normalize();
     if(lwh.z <= 0)
         return {};
 
-    const Vec3 lwi = (2 * dot(lwo, lwh) * lwh - lwo).normalize();
+    const FVec3 lwi = (2 * dot(lwo, lwh) * lwh - lwo).normalize();
     if(lwi.z <= 0)
         return {};
 
@@ -106,7 +106,7 @@ BSDFComponent::SampleResult GGXMicrofacetReflectionComponent::sample(
 }
 
 real GGXMicrofacetReflectionComponent::pdf(
-    const Vec3 &lwi, const Vec3 &lwo) const noexcept
+    const FVec3 &lwi, const FVec3 &lwo) const noexcept
 {
     real ret;
     eval_and_pdf<false, true>(lwi, lwo, fresnel_, ax_, ay_, nullptr, &ret);

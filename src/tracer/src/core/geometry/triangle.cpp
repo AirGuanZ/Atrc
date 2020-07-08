@@ -11,9 +11,9 @@ public:
 
     struct Params
     {
-        Vec3 a, b, c;
+        FVec3 a, b, c;
         Vec2 t_a, t_b, t_c;
-        Transform3 local_to_world;
+        FTransform3 local_to_world;
     };
 
     explicit Triangle(const Params &params)
@@ -38,7 +38,7 @@ public:
             return false;
 
         inct->pos            = local_r.at(inct_rcd.t_ray);
-        inct->geometry_coord = Coord(x_, cross(z_, x_), z_);
+        inct->geometry_coord = FCoord(x_, cross(z_, x_), z_);
         inct->uv             = t_a_ + inct_rcd.uv.x * t_b_a_
                                     + inct_rcd.uv.y * t_c_a_;
         inct->user_coord     = inct->geometry_coord;
@@ -76,7 +76,7 @@ public:
 
         SurfacePoint spt;
         spt.pos            = a_ + bi_coord.x * b_a_ + bi_coord.y * c_a_;
-        spt.geometry_coord = Coord(x_, cross(z_, x_), z_);
+        spt.geometry_coord = FCoord(x_, cross(z_, x_), z_);
         spt.uv             = t_a_ + bi_coord.x * t_b_a_ + bi_coord.y * t_c_a_;
         spt.user_coord     = spt.geometry_coord;
 
@@ -87,17 +87,17 @@ public:
     }
 
     SurfacePoint sample(
-        const Vec3&, real *pdf, const Sample3 &sam) const noexcept override
+        const FVec3 &, real *pdf, const Sample3 &sam) const noexcept override
     {
         return sample(pdf, sam);
     }
 
-    real pdf(const Vec3 &) const noexcept override
+    real pdf(const FVec3 &) const noexcept override
     {
         return 1 / surface_area_;
     }
 
-    real pdf(const Vec3&, const Vec3 &sample) const noexcept override
+    real pdf(const FVec3 &, const FVec3 &sample) const noexcept override
     {
         return pdf(sample);
     }
@@ -119,24 +119,24 @@ private:
         z_ = cross(b_a_, c_a_).normalize();
         x_ = dpdu_as_ex(b_a_, c_a_, t_b_a_, t_c_a_, z_);
 
-        const Vec3 world_b_a = local_to_world_.apply_to_vector(b_a_);
-        const Vec3 world_c_a = local_to_world_.apply_to_vector(c_a_);
+        const FVec3 world_b_a = local_to_world_.apply_to_vector(b_a_);
+        const FVec3 world_c_a = local_to_world_.apply_to_vector(c_a_);
         surface_area_ = triangle_area(world_b_a, world_c_a);
     }
 
     Params params_;
 
-    Vec3 a_, b_a_, c_a_;
+    FVec3 a_, b_a_, c_a_;
     Vec2 t_a_, t_b_a_, t_c_a_;
-    Vec3 x_, z_;
+    FVec3 x_, z_;
     real surface_area_ = 1;
 
 };
 
 RC<Geometry> create_triangle(
-    const Vec3 &a, const Vec3 &b, const Vec3 &c,
+    const FVec3 &a, const FVec3 &b, const FVec3 &c,
     const Vec2 &t_a, const Vec2 &t_b, const Vec2 &t_c,
-    const Transform3 &local_to_world)
+    const FTransform3 &local_to_world)
 {
     Triangle::Params params = { a, b, c, t_a, t_b, t_c, local_to_world };
     return newRC<Triangle>(params);

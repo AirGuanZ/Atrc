@@ -107,7 +107,7 @@ struct CameraSubpath : Subpath
     // gbuffer channels
 
     Spectrum g_albedo;
-    Vec3 g_normal;
+    FVec3 g_normal;
     real g_denoise = 1;
 };
 

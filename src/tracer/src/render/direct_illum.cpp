@@ -22,7 +22,7 @@ Spectrum mis_sample_area_light(
     const real shadow_ray_len = (light_sample.pos - inct.pos).length() - EPS();
     if(shadow_ray_len <= EPS())
         return {};
-    const Vec3 inct_to_light = (light_sample.pos - inct.pos).normalize();
+    const FVec3 inct_to_light = (light_sample.pos - inct.pos).normalize();
     const Ray shadow_ray(inct.pos, inct_to_light, EPS(), shadow_ray_len);
     if(scene.has_intersection(shadow_ray))
         return {};
@@ -55,7 +55,7 @@ Spectrum mis_sample_area_light(
     if(!scene.visible(light_sample.pos, scattering.pos))
         return {};
 
-    const Vec3 inct_to_light = (light_sample.pos - scattering.pos).normalize();
+    const FVec3 inct_to_light = (light_sample.pos - scattering.pos).normalize();
     auto bsdf_f = phase_function->eval_all(
         inct_to_light, scattering.wr, TransMode::Radiance);
     if(!bsdf_f)
@@ -83,7 +83,7 @@ Spectrum mis_sample_envir_light(
     if(!scene.visible(inct.pos, light_sample.pos))
         return {};
 
-    const Vec3 ref_to_light = light_sample.ref_to_light();
+    const FVec3 ref_to_light = light_sample.ref_to_light();
     const Spectrum bsdf_f = shd.bsdf->eval_all(
         ref_to_light, inct.wr, TransMode::Radiance);
     if(!bsdf_f)

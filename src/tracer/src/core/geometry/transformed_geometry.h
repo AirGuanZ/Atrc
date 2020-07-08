@@ -8,7 +8,7 @@ class TransformedGeometry : public Geometry
 {
 protected:
 
-    void init_transform(const Transform3 &local_to_world);
+    void init_transform(const FTransform3 &local_to_world);
 
     void update_ratio() noexcept;
 
@@ -20,7 +20,7 @@ protected:
 
     AABB to_world(const AABB &local_aabb) const noexcept;
 
-    Transform3 local_to_world_;
+    FTransform3 local_to_world_;
     real local_to_world_ratio_ = 1;
 
 public:
@@ -28,7 +28,7 @@ public:
     using Geometry::Geometry;
 };
 
-inline void TransformedGeometry::init_transform(const Transform3 &local_to_world)
+inline void TransformedGeometry::init_transform(const FTransform3 &local_to_world)
 {
     AGZ_HIERARCHY_TRY
 
@@ -45,8 +45,8 @@ inline void TransformedGeometry::update_ratio() noexcept
 
 inline Ray TransformedGeometry::to_local(const Ray &world_ray) const noexcept
 {
-    const Vec3 local_o = local_to_world_.apply_inverse_to_point(world_ray.o);
-    const Vec3 local_d = local_to_world_.apply_inverse_to_vector(world_ray.d);
+    const FVec3 local_o = local_to_world_.apply_inverse_to_point(world_ray.o);
+    const FVec3 local_d = local_to_world_.apply_inverse_to_vector(world_ray.d);
     return Ray(local_o, local_d, world_ray.t_min, world_ray.t_max);
 }
 

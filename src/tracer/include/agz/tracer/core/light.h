@@ -14,16 +14,16 @@ class EnvirLight;
 struct LightSampleResult
 {
     LightSampleResult(
-        const Vec3 &ref, const Vec3 &pos, const Vec3 &nor,
+        const FVec3 &ref, const FVec3 &pos, const FVec3 &nor,
         const Spectrum &rad, real pdf) noexcept
         : ref(ref), pos(pos), nor(nor), radiance(rad), pdf(pdf)
     {
         
     }
 
-    Vec3 ref;
-    Vec3 pos;
-    Vec3 nor;
+    FVec3 ref;
+    FVec3 pos;
+    FVec3 nor;
     Spectrum radiance;
     real pdf;
 
@@ -32,7 +32,7 @@ struct LightSampleResult
         return pdf != 0;
     }
 
-    Vec3 ref_to_light() const noexcept
+    FVec3 ref_to_light() const noexcept
     {
         return (pos - ref).normalize();
     }
@@ -50,7 +50,7 @@ inline const LightSampleResult LIGHT_SAMPLE_RESULT_NULL =
 struct LightEmitResult
 {
     LightEmitResult(
-        const Vec3 &pos, const Vec3 &dir, const Vec3 &nor, const Vec2 &uv,
+        const FVec3 &pos, const FVec3 &dir, const FVec3 &nor, const Vec2 &uv,
         const Spectrum &rad, real pdf_pos, real pdf_dir) noexcept
         : pos(pos), dir(dir), nor(nor), uv(uv),
           radiance(rad), pdf_pos(pdf_pos), pdf_dir(pdf_dir)
@@ -58,9 +58,9 @@ struct LightEmitResult
         
     }
 
-    Vec3 pos;          // emitting position
-    Vec3 dir;          // emitting direction
-    Vec3 nor;          // normal at pos
+    FVec3 pos;          // emitting position
+    FVec3 dir;          // emitting direction
+    FVec3 nor;          // normal at pos
     Vec2 uv;
     Spectrum radiance; // emitted radiance
     real pdf_pos;      // pdf w.r.t. light surface area
@@ -87,14 +87,14 @@ struct LightEmitPDFResult
  */
 struct LightEmitPosResult
 {
-    LightEmitPosResult(const Vec3 &pos, const Vec3 &nor) noexcept
+    LightEmitPosResult(const FVec3 &pos, const FVec3 &nor) noexcept
         : pos(pos), nor(nor)
     {
         
     }
 
-    Vec3 pos;
-    Vec3 nor;
+    FVec3 pos;
+    FVec3 nor;
 };
 
 /**
@@ -127,7 +127,7 @@ public:
      * @brief sample light wi at ref
      */
     virtual LightSampleResult sample(
-        const Vec3 &ref, const Sample5 &sam) const noexcept = 0;
+        const FVec3 &ref, const Sample5 &sam) const noexcept = 0;
 
     /**
      * @brief sample emission
@@ -140,7 +140,7 @@ public:
      * @brief pdf of sample_emit
      */
     virtual LightEmitPDFResult emit_pdf(
-        const Vec3 &pos, const Vec3 &dir, const Vec3 &nor) const noexcept = 0;
+        const FVec3 &pos, const FVec3 &dir, const FVec3 &nor) const noexcept = 0;
 
     /**
      * @brief emission power
@@ -167,8 +167,8 @@ public:
      * @param light_to_out direction from light source to outside
      */
     virtual Spectrum radiance(
-        const Vec3 &pos, const Vec3 &nor, const Vec2 &uv,
-        const Vec3 &light_to_out) const noexcept = 0;
+        const FVec3 &pos, const FVec3 &nor, const Vec2 &uv,
+        const FVec3 &light_to_out) const noexcept = 0;
 
     /**
      * @brief pdf of sample_wi (w.r.t. solid angle)
@@ -178,8 +178,9 @@ public:
      * @param nor surface normal at position
      */
     virtual real pdf(
-        const Vec3 &ref,
-        const Vec3 &pos, const Vec3 &nor) const noexcept = 0;
+        const FVec3 &ref,
+        const FVec3 &pos,
+        const FVec3 &nor) const noexcept = 0;
 };
 
 /**
@@ -190,7 +191,7 @@ class EnvirLight : public Light
 protected:
 
     real world_radius_ = 1;
-    Vec3 world_centre_;
+    FVec3 world_centre_;
 
 public:
 
@@ -206,13 +207,13 @@ public:
      * @return radiance from light source to outside
      */
     virtual Spectrum radiance(
-        const Vec3 &ref, const Vec3 &ref_to_light) const noexcept = 0;
+        const FVec3 &ref, const FVec3 &ref_to_light) const noexcept = 0;
 
     /**
      * @brief pdf of sample_wi (w.r.t. solid angle)
      */
     virtual real pdf(
-        const Vec3 &ref, const Vec3 &ref_to_light) const noexcept = 0;
+        const FVec3 &ref, const FVec3 &ref_to_light) const noexcept = 0;
 
     /**
      * @brief find the emitting pos according to ref point and emitting dir
@@ -220,7 +221,7 @@ public:
      * used in bidirectional rendering algorithms
      */
     virtual LightEmitPosResult emit_pos(
-        const Vec3 &ref, const Vec3 &ref_to_light) const noexcept = 0;
+        const FVec3 &ref, const FVec3 &ref_to_light) const noexcept = 0;
 
     /**
      * @brief preprocess before the rendering start

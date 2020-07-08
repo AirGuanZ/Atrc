@@ -25,7 +25,7 @@ public:
     ShadingPoint shade(const EntityIntersection &inct, Arena &arena) const override
     {
         const Spectrum albedo = albedo_->sample_spectrum(inct.uv);
-        Coord shading_coord = normal_mapper_->reorient(inct.uv, inct.user_coord);
+        FCoord shading_coord = normal_mapper_->reorient(inct.uv, inct.user_coord);
 
         auto bsdf = arena.create<AggregateBSDF<1>>(
             inct.geometry_coord, shading_coord, albedo);

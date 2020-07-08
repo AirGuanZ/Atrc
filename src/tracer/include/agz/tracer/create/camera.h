@@ -6,9 +6,9 @@ AGZ_TRACER_BEGIN
 
 RC<Camera> create_thin_lens_camera(
     real film_aspect,
-    const Vec3 &pos,
-    const Vec3 &dst,
-    const Vec3 &up,
+    const FVec3 &pos,
+    const FVec3 &dst,
+    const FVec3 &up,
     real fov,
     real lens_radius,
     real focal_distance);

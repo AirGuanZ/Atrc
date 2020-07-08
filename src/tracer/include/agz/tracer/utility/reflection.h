@@ -15,7 +15,7 @@ namespace refl_aux
  * 
  * both w and n should be normalized
  */
-inline Vec3 reflect(const Vec3 &w, const Vec3 &n) noexcept
+inline FVec3 reflect(const FVec3 &w, const FVec3 &n) noexcept
 {
     return 2 * dot(w, n) * n - w;
 }
@@ -27,8 +27,8 @@ inline Vec3 reflect(const Vec3 &w, const Vec3 &n) noexcept
  * 
  * both w and n should be normalized
  */
-inline std::optional<Vec3> refract(
-    const Vec3 &w, const Vec3 &n, real eta) noexcept
+inline std::optional<FVec3> refract(
+    const FVec3 &w, const FVec3 &n, real eta) noexcept
 {
     const real cos_theta_i = dot(w, n);
     const real sin2_theta_t = math::sqr(eta) * (1 - math::sqr(cos_theta_i));

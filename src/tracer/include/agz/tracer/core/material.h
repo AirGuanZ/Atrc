@@ -39,19 +39,19 @@ public:
     /**
      * @brief reorient the shading frame
      */
-    Coord reorient(const Vec2 &uv, const Coord &old_user_coord) const noexcept
+    FCoord reorient(const Vec2 &uv, const FCoord &old_user_coord) const noexcept
     {
         if(!normal_map_)
             return old_user_coord;
 
         Spectrum local_nor_spec = normal_map_->sample_spectrum(uv);
-        Vec3 local_nor = {
+        FVec3 local_nor = {
             local_nor_spec.r * 2 - 1,
             local_nor_spec.g * 2 - 1,
             local_nor_spec.b * 2 - 1
         };
 
-        Vec3 world_nor = old_user_coord.local_to_global(local_nor.normalize());
+        FVec3 world_nor = old_user_coord.local_to_global(local_nor.normalize());
         return old_user_coord.rotate_to_new_z(world_nor);
     }
 };

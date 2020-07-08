@@ -18,13 +18,13 @@ namespace
     using TempAssign = misc::scope_assignment_t<real>;
 
     real pdf_sa_to_area(
-        real pdf_sa, const Vec3 &this_pos, const Vertex &dst_vtx) noexcept
+        real pdf_sa, const FVec3 &this_pos, const Vertex &dst_vtx) noexcept
     {
         switch(dst_vtx.type)
         {
         case VertexType::Camera:
             {
-                const Vec3 d = dst_vtx.camera.pos - this_pos;
+                const FVec3 d = dst_vtx.camera.pos - this_pos;
                 const real dst_cos = std::abs(cos(dst_vtx.camera.nor, d));
                 const real dist2 = d.length_square();
                 return pdf_sa * dst_cos / dist2;
@@ -35,14 +35,14 @@ namespace
                 return pdf_sa / distance2(dst_vtx.medium.pos, this_pos);
         case VertexType::AreaLight:
             {
-                const Vec3 d       = dst_vtx.area_light.pos - this_pos;
+                const FVec3 d      = dst_vtx.area_light.pos - this_pos;
                 const real dst_cos = std::abs(cos(dst_vtx.area_light.nor, d));
                 const real dist2   = d.length_square();
                 return pdf_sa * dst_cos / dist2;
             }
         default:
             {
-                const Vec3 d = dst_vtx.surface.pos - this_pos;
+                const FVec3 d = dst_vtx.surface.pos - this_pos;
                 const real dst_cos = std::abs(cos(dst_vtx.surface.nor, d));
                 const real dist2 = d.length_square();
                 return pdf_sa * dst_cos / dist2;
@@ -89,7 +89,7 @@ namespace
         return v.medium.phase;
     }
 
-    Vec3 get_scatter_wr(const Vertex &v) noexcept
+    FVec3 get_scatter_wr(const Vertex &v) noexcept
     {
         assert(v.is_scattering_type());
         if(v.type == VertexType::Surface)
@@ -97,7 +97,7 @@ namespace
         return v.medium.wr;
     }
 
-    Vec3 get_scatter_pos(const Vertex &v) noexcept
+    FVec3 get_scatter_pos(const Vertex &v) noexcept
     {
         assert(v.is_scattering_type());
         if(v.type == VertexType::Surface)
@@ -107,9 +107,9 @@ namespace
 
     real pdf_to(const Vertex &scattering_vtx, const Vertex &to) noexcept
     {
-        const Vec3 from_pos = get_scatter_pos(scattering_vtx);
+        const FVec3 from_pos = get_scatter_pos(scattering_vtx);
 
-        Vec3 to_dir;
+        FVec3 to_dir;
         switch(to.type)
         {
         case VertexType::Camera:
@@ -624,7 +624,7 @@ Spectrum unweighted_contrib_sx_t0(
 
     assert(a.type == VertexType::Surface || a.type == VertexType::Medium);
 
-    const Vec3 a_pos = a.type == VertexType::Surface ? a.surface.pos
+    const FVec3 a_pos = a.type == VertexType::Surface ? a.surface.pos
                                                      : a.medium.pos;
     
     // envir light
@@ -673,7 +673,7 @@ Spectrum unweighted_contrib_sx_t1(
 
     // get cam_end.pos
 
-    const Vec3 cam_end_pos = cam_end.type == VertexType::Surface ?
+    const FVec3 cam_end_pos = cam_end.type == VertexType::Surface ?
         cam_end.surface.pos :
         cam_end.medium.pos;
 
@@ -684,7 +684,7 @@ Spectrum unweighted_contrib_sx_t1(
         if(!scene.visible(cam_end_pos, light_vtx.area_light.pos))
             return {};
 
-        const Vec3 cam_to_light = light_vtx.area_light.pos - cam_end_pos;
+        const FVec3 cam_to_light = light_vtx.area_light.pos - cam_end_pos;
 
         const Spectrum light_rad = light_vtx.area_light.light->radiance(
             light_vtx.area_light.pos,
@@ -715,7 +715,7 @@ Spectrum unweighted_contrib_sx_t1(
     }
 
     assert(light_vtx.type == VertexType::EnvLight);
-    const Vec3 cam_to_light = -light_vtx.env_light.light_to_out;
+    const FVec3 cam_to_light = -light_vtx.env_light.light_to_out;
 
     const Ray shadow_ray(cam_end_pos, cam_to_light, EPS());
     if(scene.has_intersection(shadow_ray))
@@ -752,13 +752,13 @@ Spectrum unweighted_contrib_s1_tx(
 
     // get light end pos
 
-    const Vec3 lht_end_pos = lht_end.type == VertexType::Surface ?
+    const FVec3 lht_end_pos = lht_end.type == VertexType::Surface ?
                              lht_end.surface.pos :
                              lht_end.medium.pos;
 
     // eval camera
 
-    const Vec3 cam_pos = camera_subpath[0].camera.pos;
+    const FVec3 cam_pos = camera_subpath[0].camera.pos;
     const auto cam_we = scene.get_camera()->eval_we(
         cam_pos, lht_end_pos - cam_pos);
 
@@ -782,7 +782,7 @@ Spectrum unweighted_contrib_s1_tx(
 
     // eval bsdf
 
-    const Vec3 lht_to_cam = cam_pos - lht_end_pos;
+    const FVec3 lht_to_cam = cam_pos - lht_end_pos;
 
     const BSDF *bsdf = get_scatter_bsdf(lht_end);
     const Spectrum f = bsdf->eval_all(
@@ -830,8 +830,8 @@ Spectrum unweighted_contrib_sx_tx(
 
     assert(cam_end.is_scattering_type() && lht_end.is_scattering_type());
 
-    const Vec3 cam_end_pos = get_scatter_pos(cam_end);
-    const Vec3 lht_end_pos = get_scatter_pos(lht_end);
+    const FVec3 cam_end_pos = get_scatter_pos(cam_end);
+    const FVec3 lht_end_pos = get_scatter_pos(lht_end);
 
     // visibility
 
@@ -840,7 +840,7 @@ Spectrum unweighted_contrib_sx_tx(
 
     // bsdf
 
-    const Vec3 cam_to_lht = lht_end_pos - cam_end_pos;
+    const FVec3 cam_to_lht = lht_end_pos - cam_end_pos;
 
     const BSDF *cam_end_bsdf = get_scatter_bsdf(cam_end);
     Spectrum cam_bsdf_f = cam_end_bsdf->eval_all(
@@ -953,7 +953,7 @@ real mis_weight_sx_t1(
     Vertex &b = camera_subpath[s - 1];
     Vertex &c = light_subpath[0];
 
-    const Vec3 b_pos = get_scatter_pos(b);
+    const FVec3 b_pos = get_scatter_pos(b);
 
     TempAssign a_pdf_bwd_assign;
     TempAssign b_pdf_bwd_assign;
@@ -965,7 +965,7 @@ real mis_weight_sx_t1(
 
     if(c.type == VertexType::AreaLight)
     {
-        const Vec3 b_to_c = c.area_light.pos - b_pos;
+        const FVec3 b_to_c = c.area_light.pos - b_pos;
 
         const auto emit_pdf = c.area_light.light->emit_pdf(
             c.area_light.pos, -b_to_c, c.area_light.nor);
@@ -990,7 +990,7 @@ real mis_weight_sx_t1(
     {
         assert(c.type == VertexType::EnvLight);
 
-        const Vec3 b_to_c = -c.env_light.light_to_out;
+        const FVec3 b_to_c = -c.env_light.light_to_out;
 
         const auto emit_pdf = scene.envir_light()->emit_pdf(
             {}, c.env_light.light_to_out, {});
@@ -1029,7 +1029,7 @@ real mis_weight_s1_tx(
     Vertex &b = light_subpath[t - 1];
     Vertex &c = light_subpath[t - 2];
 
-    const Vec3 b_pos = get_scatter_pos(b);
+    const FVec3 b_pos = get_scatter_pos(b);
 
     auto cam_pdf = scene.get_camera()->pdf_we(
         a.camera.pos, b_pos - a.camera.pos);
@@ -1077,13 +1077,13 @@ real mis_weight_sx_tx(
     Vertex &c = light_subpath[t - 1];
     Vertex &d = light_subpath[t - 2];
 
-    const Vec3 b_pos = get_scatter_pos(b);
-    const Vec3 c_pos = get_scatter_pos(c);
+    const FVec3 b_pos = get_scatter_pos(b);
+    const FVec3 c_pos = get_scatter_pos(c);
 
     const BSDF *b_bsdf = get_scatter_bsdf(b);
     const BSDF *c_bsdf = get_scatter_bsdf(c);
 
-    const Vec3 b_to_c = c_pos - b_pos;
+    const FVec3 b_to_c = c_pos - b_pos;
 
     // a.pdf_bwd
 

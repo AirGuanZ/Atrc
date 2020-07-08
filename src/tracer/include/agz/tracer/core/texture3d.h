@@ -11,7 +11,7 @@ struct Texture3DCommonParams
     bool inv_v = false;
     bool inv_w = false;
     Vec3i uvw_perm = Vec3i(0, 1, 2);
-    Transform3 transform;
+    FTransform3 transform;
 
     std::string wrap_u = "clamp";
     std::string wrap_v = "clamp";
@@ -19,7 +19,7 @@ struct Texture3DCommonParams
 
     real inv_gamma = 1;
 
-    Transform3 full_transform() const;
+    FTransform3 full_transform() const;
 
     void from_params(const ConfigGroup &params);
 };
@@ -31,7 +31,7 @@ class Texture3D
 {
 protected:
 
-    Transform3 transform_;
+    FTransform3 transform_;
 
     using WrapFuncPtr = real(*)(real);
 
@@ -51,9 +51,9 @@ protected:
 
     void init_common_params(const Texture3DCommonParams &params);
 
-    virtual Spectrum sample_spectrum_impl(const Vec3 &uvw) const noexcept;
+    virtual Spectrum sample_spectrum_impl(const FVec3 &uvw) const noexcept;
 
-    virtual real sample_real_impl(const Vec3 &uvw) const noexcept;
+    virtual real sample_real_impl(const FVec3 &uvw) const noexcept;
 
 public:
 
@@ -62,12 +62,12 @@ public:
     /**
      * @brief sample spectrum value at uv
      */
-    virtual Spectrum sample_spectrum(const Vec3 &uvw) const noexcept;
+    virtual Spectrum sample_spectrum(const FVec3 &uvw) const noexcept;
     
     /**
      * @brief sample real value at uv
      */
-    virtual real sample_real(const Vec3 &uvw) const noexcept;
+    virtual real sample_real(const FVec3 &uvw) const noexcept;
 
     virtual int width() const noexcept = 0;
 
@@ -86,38 +86,38 @@ public:
     virtual real max_real() const noexcept = 0;
 };
 
-inline Transform3 Texture3DCommonParams::full_transform() const
+inline FTransform3 Texture3DCommonParams::full_transform() const
 {
     using Trans4 = Mat4::left_transform;
 
-    Transform3 ret;
+    FTransform3 ret;
     
     if(inv_u)
-        ret *= Transform3(Trans4::translate(1, 0, 0) *
-                          Trans4::scale(-1, 1, 1));
+        ret *= FTransform3(Trans4::translate(1, 0, 0) *
+                           Trans4::scale(-1, 1, 1));
     if(inv_v)
-        ret *= Transform3(Trans4::translate(0, 1, 0) *
-                          Trans4::scale(1, -1, 1));
+        ret *= FTransform3(Trans4::translate(0, 1, 0) *
+                           Trans4::scale(1, -1, 1));
     if(inv_w)
-        ret *= Transform3(Trans4::translate(0, 0, 1) *
-                          Trans4::scale(1, 1, -1));
+        ret *= FTransform3(Trans4::translate(0, 0, 1) *
+                           Trans4::scale(1, 1, -1));
 
     auto perm_to_row = [&](int perm)
     {
         if(perm < 0 || perm >= 3)
             throw ObjectConstructionException("invalid uvw perm value");
-        Vec3 row;
+        FVec3 row;
         row[perm] = 1;
         return row;
     };
-    const Vec3 u_row = perm_to_row(uvw_perm.x);
-    const Vec3 v_row = perm_to_row(uvw_perm.y);
-    const Vec3 w_row = perm_to_row(uvw_perm.z);
+    const FVec3 u_row = perm_to_row(uvw_perm.x);
+    const FVec3 v_row = perm_to_row(uvw_perm.y);
+    const FVec3 w_row = perm_to_row(uvw_perm.z);
 
-    ret *= Transform3(Mat4::from_rows(Vec4(u_row, 0),
-                                      Vec4(v_row, 0),
-                                      Vec4(w_row, 0),
-                                      Vec4(0, 0, 0, 1)));
+    ret *= FTransform3(Mat4::from_rows(Vec4(u_row, 0),
+                                       Vec4(v_row, 0),
+                                       Vec4(w_row, 0),
+                                       Vec4(0, 0, 0, 1)));
 
     ret *= transform;
 
@@ -138,7 +138,7 @@ inline void Texture3DCommonParams::from_params(const ConfigGroup &params)
     if(params.find_child("transform"))
         transform = params.child_transform3("transform");
     else
-        transform = Transform3();
+        transform = FTransform3();
 
     wrap_u = params.child_str_or("wrap_u", "clamp");
     wrap_v = params.child_str_or("wrap_v", "clamp");
@@ -183,23 +183,23 @@ inline void Texture3D::init_common_params(const Texture3DCommonParams &params)
     inv_gamma_ = params.inv_gamma;
 }
 
-inline Spectrum Texture3D::sample_spectrum_impl(const Vec3 &uvw) const noexcept
+inline Spectrum Texture3D::sample_spectrum_impl(const FVec3 &uvw) const noexcept
 {
     return Spectrum(sample_real_impl(uvw));
 }
 
-inline real Texture3D::sample_real_impl(const Vec3 &uvw) const noexcept
+inline real Texture3D::sample_real_impl(const FVec3 &uvw) const noexcept
 {
     return sample_spectrum_impl(uvw).r;
 }
 
-inline Spectrum Texture3D::sample_spectrum(const Vec3 &uvw) const noexcept
+inline Spectrum Texture3D::sample_spectrum(const FVec3 &uvw) const noexcept
 {
-    auto [u, v, w] = transform_.apply_to_point(uvw);
-    u = wrapper_u_(u);
-    v = wrapper_v_(v);
-    w = wrapper_w_(w);
-    auto ret = sample_spectrum_impl({ u, v , w });
+    auto tuvw = transform_.apply_to_point(uvw);
+    tuvw.x = wrapper_u_(tuvw.x);
+    tuvw.y = wrapper_v_(tuvw.y);
+    tuvw.z = wrapper_w_(tuvw.z);
+    auto ret = sample_spectrum_impl(tuvw);
     if(inv_gamma_ != 1)
     {
         for(int i = 0; i < SPECTRUM_COMPONENT_COUNT; ++i)
@@ -208,13 +208,13 @@ inline Spectrum Texture3D::sample_spectrum(const Vec3 &uvw) const noexcept
     return ret;
 }
 
-inline real Texture3D::sample_real(const Vec3 &uvw) const noexcept
+inline real Texture3D::sample_real(const FVec3 &uvw) const noexcept
 {
-    auto [u, v, w] = transform_.apply_to_point(uvw);
-    u = wrapper_u_(u);
-    v = wrapper_v_(v);
-    w = wrapper_w_(w);
-    real ret = sample_real_impl({ u, v , w });
+    auto tuvw = transform_.apply_to_point(uvw);
+    tuvw.x = wrapper_u_(tuvw.x);
+    tuvw.y = wrapper_v_(tuvw.y);
+    tuvw.z = wrapper_w_(tuvw.z);
+    real ret = sample_real_impl(tuvw);
     if(inv_gamma_ != 1)
         ret = std::pow(ret, inv_gamma_);
     return ret;

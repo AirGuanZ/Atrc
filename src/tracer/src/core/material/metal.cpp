@@ -39,7 +39,7 @@ public:
     ShadingPoint shade(
         const EntityIntersection &inct, Arena &arena) const override
     {
-        const Coord shading_coord = normal_mapper_->reorient(
+        const FCoord shading_coord = normal_mapper_->reorient(
             inct.uv, inct.user_coord);
 
         const Spectrum color   = color_->sample_spectrum(inct.uv);
