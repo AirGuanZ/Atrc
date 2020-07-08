@@ -50,6 +50,10 @@ Offline rendering lab based on ray tracing
 
 ## Gallery
 
+Editor:
+
+![pic](./doc/gallery/editor.png)
+
 Food (rendered with bdpt) (scene ref [here](https://luxcorerender.org/download/)):
 
 ![0](./doc/gallery/food.png)

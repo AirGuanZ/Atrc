@@ -16,7 +16,7 @@ int main(int argc, char *argv[])
 
     QApplication app(argc, argv);
 
-    //app.setStyle(new DarkStyle);
+    app.setStyle(new DarkStyle);
     
     const int font_id = QFontDatabase::addApplicationFont(
         ":/darkstyle/Ubuntu-R.ttf");
