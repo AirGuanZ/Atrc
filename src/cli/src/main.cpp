@@ -11,9 +11,6 @@
 #include <agz/utility/misc.h>
 #include <agz/utility/string.h>
 
-#define WORKING_DIR_PATH_NAME "${working-directory}"
-#define SCENE_DESC_PATH_NAME  "${scene-directory}"
-
 void run(int argc, char *argv[])
 {
     auto params = parse_opts(argc, argv);
@@ -33,13 +30,13 @@ void run(int argc, char *argv[])
     {
         const auto working_dir = absolute(
             std::filesystem::current_path()).lexically_normal().string();
-        path_mapper.add_replacer(WORKING_DIR_PATH_NAME, working_dir);
+        path_mapper.add_replacer(AGZ_FACTORY_WORKING_DIR_PATH_NAME, working_dir);
         AGZ_INFO("working directory: {}", working_dir);
 
         const auto scene_dir = absolute(
             std::filesystem::path(params->scene_filename))
                 .parent_path().lexically_normal().string();
-        path_mapper.add_replacer(SCENE_DESC_PATH_NAME, scene_dir);
+        path_mapper.add_replacer(AGZ_FACTORY_SCENE_DESC_PATH_NAME, scene_dir);
         AGZ_INFO("scene directory: {}", scene_dir);
     }
 

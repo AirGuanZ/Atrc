@@ -10,6 +10,7 @@
 #include <agz/editor/renderer/renderer_widget.h>
 #include <agz/editor/resource/resource.h>
 #include <agz/editor/scene/scene_mgr.h>
+#include <agz/editor/ui/down_panel.h>
 #include <agz/editor/ui/left_panel.h>
 #include <agz/editor/ui/right_panel.h>
 #include <agz/gui_common/gui.h>
@@ -63,8 +64,6 @@ private:
 
     void init_panels();
 
-    void init_log_widget();
-
     void init_displayer();
 
     void init_obj_context();
@@ -107,8 +106,8 @@ private:
     // ui
 
     QFrame *up_panel_    = nullptr;
-    QFrame *down_panel_  = nullptr;
-
+    
+    DownPanel  *down_panel_  = nullptr;
     LeftPanel  *left_panel_  = nullptr;
     RightPanel *right_panel_ = nullptr;
 

@@ -8,22 +8,16 @@
 #include <agz/editor/imexport/json_export.h>
 #include <agz/editor/renderer/renderer_widget.h>
 #include <agz/editor/ui/global_setting_widget.h>
-#include <agz/editor/ui/log_widget.h>
 #include <agz/tracer/utility/embree.h>
 #include <agz/tracer/utility/logger.h>
 
 #include <agz/utility/file.h>
-
-#define WORKING_DIR_PATH_NAME "${working-directory}"
-#define SCENE_DESC_PATH_NAME  "${scene-directory}"
 
 AGZ_EDITOR_BEGIN
 
 Editor::Editor()
 {
     init_panels();
-
-    init_log_widget();
 
     AGZ_INFO(">>> Atrc Scene Editor by AirGuanZ <<<");
     
@@ -227,24 +221,13 @@ void Editor::init_panels()
     hori_splitter_->addWidget(right_panel_);
 
     up_panel_   = new QFrame(vert_splitter_);
-    down_panel_ = new QFrame(vert_splitter_);
+    down_panel_ = new DownPanel(vert_splitter_);
 
     up_panel_->setFrameShape(QFrame::Box);
 
     vert_splitter_->setOrientation(Qt::Vertical);
     vert_splitter_->addWidget(up_panel_);
     vert_splitter_->addWidget(down_panel_);
-}
-
-void Editor::init_log_widget()
-{
-    LogWidget *log_widget          = new LogWidget;
-    QVBoxLayout *down_panel_layout = new QVBoxLayout(down_panel_);
-    down_panel_layout->addWidget(log_widget);
-
-    auto sink = newRC<LogWidgetSink>();
-    sink->log_widget = log_widget;
-    spdlog::default_logger()->sinks().push_back(std::move(sink));
 }
 
 void Editor::init_displayer()
@@ -271,19 +254,19 @@ void Editor::init_obj_context()
 {
     obj_ctx_ = newBox<ObjectContext>(this);
 
-    left_panel_->material_tab_layout->addWidget(
+    down_panel_->material_tab_layout->addWidget(
         obj_ctx_->pool<tracer::Material>()->get_widget());
 
-    left_panel_->medium_tab_layout->addWidget(
+    down_panel_->medium_tab_layout->addWidget(
         obj_ctx_->pool<tracer::Medium>()->get_widget());
 
-    left_panel_->texture2d_tab_layout->addWidget(
+    down_panel_->texture2d_tab_layout->addWidget(
         obj_ctx_->pool<tracer::Texture2D>()->get_widget());
 
-    left_panel_->texture3d_tab_layout->addWidget(
+    down_panel_->texture3d_tab_layout->addWidget(
         obj_ctx_->pool<tracer::Texture3D>()->get_widget());
 
-    left_panel_->geometry_tab_layout->addWidget(
+    down_panel_->geometry_tab_layout->addWidget(
         obj_ctx_->pool<tracer::Geometry>()->get_widget());
 }
 
@@ -473,6 +456,9 @@ void Editor::init_render_menu()
             this, "Output Directory",
             "./AtrcEditorOutput/scene.json", "JSON (*.json)");
 
+        if(scene_desc_filename.isEmpty())
+            return;
+
         if(!export_json_to_file(
             scene_desc_filename.toStdString(),
             scene_mgr_.get(), obj_ctx_.get(), envir_light_slot_,
@@ -500,7 +486,7 @@ void Editor::redistribute_panels()
         preview_window_->minimumSizeHint().height(),
         down_panel_->minimumSizeHint().height());
     vert_splitter_->setSizes(QList<int>(
-        { 3 * ver_init_height, ver_init_height }));
+        { 2 * ver_init_height, ver_init_height }));
 
     const int hor_init_width = math::max3(
         left_panel_->minimumSizeHint().width(),

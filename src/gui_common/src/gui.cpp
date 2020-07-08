@@ -14,9 +14,6 @@
 #include <agz/utility/file.h>
 #include <agz/utility/misc.h>
 
-#define WORKING_DIR_PATH_NAME "${working-directory}"
-#define SCENE_DESC_PATH_NAME  "${scene-directory}"
-
 GUI::GUI()
 {
     QAction *load = new QAction("Open Config JSON", this);
@@ -99,9 +96,15 @@ void GUI::resizeEvent(QResizeEvent *event)
     {
         const int label_width  = preview_label_->width();
         const int label_height = preview_label_->height();
-        preview_label_->setPixmap(pixmap_.scaled(
-            label_width, label_height,
-            Qt::KeepAspectRatio, Qt::SmoothTransformation));
+
+        if(label_width < pixmap_.width() || label_height < pixmap_.height())
+        {
+            preview_label_->setPixmap(pixmap_.scaled(
+                label_width, label_height,
+                Qt::KeepAspectRatio, Qt::SmoothTransformation));
+        }
+        else
+            preview_label_->setPixmap(pixmap_);
     }
 }
 
@@ -178,13 +181,13 @@ void GUI::start_rendering(const std::string &input_filename)
     {
         const auto working_dir = absolute(
             std::filesystem::current_path()).lexically_normal().string();
-        path_mapper->add_replacer(WORKING_DIR_PATH_NAME, working_dir);
+        path_mapper->add_replacer(AGZ_FACTORY_WORKING_DIR_PATH_NAME, working_dir);
 
         const auto scene_dir = absolute(
             std::filesystem::path(input_filename))
                 .parent_path().lexically_normal().string();
 
-        path_mapper->add_replacer(SCENE_DESC_PATH_NAME, scene_dir);
+        path_mapper->add_replacer(AGZ_FACTORY_SCENE_DESC_PATH_NAME, scene_dir);
     }
     render_context_->path_mapper = std::move(path_mapper);
     render_context_->context.path_mapper = render_context_->path_mapper.get();
@@ -271,7 +274,13 @@ void GUI::set_preview_img(const agz::tracer::Image2D<agz::tracer::Spectrum> &img
 
     const int label_width  = preview_label_->width();
     const int label_height = preview_label_->height();
-    preview_label_->setPixmap(pixmap_.scaled(
-        label_width, label_height,
-        Qt::KeepAspectRatio, Qt::SmoothTransformation));
+
+    if(label_width < pixmap_.width() || label_height < pixmap_.height())
+    {
+        preview_label_->setPixmap(pixmap_.scaled(
+            label_width, label_height,
+            Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    }
+    else
+        preview_label_->setPixmap(pixmap_);
 }

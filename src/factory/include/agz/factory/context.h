@@ -12,6 +12,9 @@
 
 AGZ_TRACER_FACTORY_BEGIN
 
+#define AGZ_FACTORY_WORKING_DIR_PATH_NAME "${working-directory}"
+#define AGZ_FACTORY_SCENE_DESC_PATH_NAME  "${scene-directory}"
+
 class CreatingContext;
 
 class CreatingObjectException : public std::runtime_error

@@ -30,7 +30,7 @@ void Framebuffer::start()
 {
     output_updater_thread_ = std::thread([this]
     {
-        constexpr std::chrono::milliseconds wait_ms(50);
+        constexpr std::chrono::milliseconds wait_ms(100);
 
         while(!exit_)
         {
@@ -97,7 +97,11 @@ void Framebuffer::merge_tasks(int task_count, Task *tasks)
 
             if(task.pixel_size == 1)
             {
-                task.spp = (std::min)(task.spp + 1, 16);
+                if(task.iter_cnt++ >= 12)
+                    task.spp = (std::min)(task.spp + 1, 16);
+                else
+                    task.spp = 1;
+
                 tasks_.push_back(std::move(task));
                 continue;
             }

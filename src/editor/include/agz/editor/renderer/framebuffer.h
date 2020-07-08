@@ -31,6 +31,7 @@ public:
         int pixel_size = 1;
 
         int spp = 1;
+        int iter_cnt = 0;
     };
 
     Framebuffer(

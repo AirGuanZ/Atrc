@@ -44,11 +44,11 @@ class ThinLensCamera : public Camera
                      PI_r * params.lens_radius * params.lens_radius : 1;
 
         camera_to_world_ = FTransform3(
-            math::float4x4::left_transform::look_at(
+            FTrans4::look_at(
                 params.pos, params.dst, params.up)).inv();
 
         pos_ = params.pos;
-        dir_ = (FVec3(params.dst) - FVec3(params.pos.x)).normalize();
+        dir_ = (params.dst - params.pos).normalize();
 
         lens_radius_ = params.lens_radius;
         focal_distance_ = params.focal_distance;
