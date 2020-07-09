@@ -2,13 +2,13 @@
 
 AGZ_TRACER_BEGIN
 
-DiffuseComponent::DiffuseComponent(const Spectrum &albedo) noexcept
+DiffuseComponent::DiffuseComponent(const FSpectrum &albedo) noexcept
     : BSDFComponent(BSDF_DIFFUSE)
 {
     coef_ = albedo / PI_r;
 }
 
-Spectrum DiffuseComponent::eval(
+FSpectrum DiffuseComponent::eval(
     const FVec3 &lwi, const FVec3 &lwo, TransMode mode) const noexcept
 {
     if(lwi.z <= 0 || lwo.z <= 0)

@@ -90,7 +90,7 @@ public:
             focal_film_pos - lens_pos).normalize();
         
         return CameraSampleWeResult(
-            pos_on_cam, pos_to_out, dir_, Spectrum(1));
+            pos_on_cam, pos_to_out, dir_, FSpectrum(1));
     }
 
     CameraEvalWeResult eval_we(
@@ -118,7 +118,7 @@ public:
                               / (area_focal_film_ * area_lens_
                                * cos2_theta * cos2_theta);
 
-        return { Spectrum(we), film_coord, dir_ };
+        return { FSpectrum(we), film_coord, dir_ };
     }
 
     CameraWePDFResult pdf_we(
@@ -170,7 +170,7 @@ public:
         const FVec3 pos_on_cam = camera_to_world_.apply_to_point(lens_pos);
         const FVec3 nor_at_pos = dir_;
         const FVec3 ref_to_pos = pos_on_cam - ref;
-        const Spectrum we = eval_we(pos_on_cam, -ref_to_pos).we;
+        const FSpectrum we = eval_we(pos_on_cam, -ref_to_pos).we;
         const real pdf = (pos_on_cam - ref).length_square()
                        / (local_dir.z * area_lens_);
 

@@ -14,21 +14,21 @@ public:
     virtual ~FresnelPoint() = default;
 
     // Fr(cos_theta_i)
-    virtual Spectrum eval(real cos_theta_i) const noexcept = 0;
+    virtual FSpectrum eval(real cos_theta_i) const noexcept = 0;
 };
 
 class ConductorPoint : public FresnelPoint
 {
-    Spectrum eta_out_;
-    Spectrum eta_in_;
-    Spectrum k_;
+    FSpectrum eta_out_;
+    FSpectrum eta_in_;
+    FSpectrum k_;
 
-    Spectrum eta_2_, eta_k_2_;
+    FSpectrum eta_2_, eta_k_2_;
 
 public:
 
     ConductorPoint(
-        const Spectrum &eta_out, const Spectrum &eta_in, const Spectrum &k) noexcept
+        const FSpectrum &eta_out, const FSpectrum &eta_in, const FSpectrum &k) noexcept
     {
         eta_out_ = eta_out;
         eta_in_ = eta_in;
@@ -41,26 +41,24 @@ public:
         eta_k_2_ *= eta_k_2_;
     }
 
-    Spectrum eval(real cos_theta_i) const noexcept override
+    FSpectrum eval(real cos_theta_i) const noexcept override
     {
         if(cos_theta_i <= 0)
-            return Spectrum();
+            return FSpectrum();
 
         const real cos2 = cos_theta_i * cos_theta_i;
         const real sin2 = (std::max)(real(0), 1 - cos2);
 
-        real(*p_sqrt)(real) = &std::sqrt;
+        const FSpectrum t0 = eta_2_ - eta_k_2_ - sin2;
+        const FSpectrum a2b2 = sqrt((t0 * t0 + real(4) * eta_2_ * eta_k_2_));
+        const FSpectrum t1 = a2b2 + cos2;
+        const FSpectrum a = sqrt((real(0.5) * (a2b2 + t0)));
+        const FSpectrum t2 = 2 * cos_theta_i * a;
+        const FSpectrum rs = (t1 - t2) / (t1 + t2);
 
-        const Spectrum t0 = eta_2_ - eta_k_2_ - sin2;
-        const Spectrum a2b2 = (t0 * t0 + real(4) * eta_2_ * eta_k_2_).map(p_sqrt);
-        const Spectrum t1 = a2b2 + cos2;
-        const Spectrum a = (real(0.5) * (a2b2 + t0)).map(p_sqrt);
-        const Spectrum t2 = 2 * cos_theta_i * a;
-        const Spectrum rs = (t1 - t2) / (t1 + t2);
-
-        const Spectrum t3 = cos2 * a2b2 + sin2 * sin2;
-        const Spectrum t4 = t2 * sin2;
-        const Spectrum rp = rs * (t3 - t4) / (t3 + t4);
+        const FSpectrum t3 = cos2 * a2b2 + sin2 * sin2;
+        const FSpectrum t4 = t2 * sin2;
+        const FSpectrum rp = rs * (t3 - t4) / (t3 + t4);
 
         return real(0.5) * (rp + rs);
     }
@@ -68,19 +66,19 @@ public:
 
 class ColoredConductorPoint : public ConductorPoint
 {
-    Spectrum color_;
+    FSpectrum color_;
 
 public:
 
     ColoredConductorPoint(
-        const Spectrum &color,
-        const Spectrum &eta_out, const Spectrum &eta_in, const Spectrum &k) noexcept
+        const FSpectrum &color,
+        const FSpectrum &eta_out, const FSpectrum &eta_in, const FSpectrum &k) noexcept
         : ConductorPoint(eta_out, eta_in, k)
     {
         color_ = color;
     }
 
-    Spectrum eval(real cos_theta_i) const noexcept override
+    FSpectrum eval(real cos_theta_i) const noexcept override
     {
         return color_ * ConductorPoint::eval(cos_theta_i);
     }
@@ -98,9 +96,9 @@ public:
         
     }
 
-    Spectrum eval(real cos_theta_i) const noexcept override
+    FSpectrum eval(real cos_theta_i) const noexcept override
     {
-        return Spectrum(refl_aux::dielectric_fresnel(
+        return FSpectrum(refl_aux::dielectric_fresnel(
                     eta_i_, eta_o_, cos_theta_i));
     }
 

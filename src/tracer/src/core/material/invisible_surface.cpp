@@ -18,7 +18,7 @@ namespace
             
         }
 
-        Spectrum eval(
+        FSpectrum eval(
             const FVec3 &wi, const FVec3 &wo,
             TransMode mode, uint8_t) const noexcept override
         {
@@ -34,7 +34,7 @@ namespace
 
             const real cosv = std::abs(cos(geometry_normal_, wo));
 
-            const Spectrum f = Spectrum(1) / (cosv < EPS() ? 1 : cosv);
+            const FSpectrum f = FSpectrum(1) / (cosv < EPS() ? 1 : cosv);
 
             return BSDFSampleResult(-wo, f, 1, true);
         }
@@ -44,9 +44,9 @@ namespace
             return 0;
         }
 
-        Spectrum albedo() const noexcept override
+        FSpectrum albedo() const noexcept override
         {
-            return Spectrum(1);
+            return FSpectrum(1);
         }
 
         bool is_delta() const noexcept override

@@ -48,7 +48,7 @@ namespace
             
         }
 
-        Spectrum eval(
+        FSpectrum eval(
             const FVec3 &wi, const FVec3&, TransMode, uint8_t) const noexcept override
         {
             const real cosThetaI = cos(wi, coord_.z);
@@ -58,7 +58,7 @@ namespace
             const real fr = refl_aux::dielectric_fresnel(eta_, 1, cosThetaI);
             const real val = (1 - fr) / (cI * PI_r);
 
-            return Spectrum(val);
+            return FSpectrum(val);
         }
 
         BSDFSampleResult sample(
@@ -82,7 +82,7 @@ namespace
             return math::distribution::zweighted_on_hemisphere_pdf(lwi.z);
         }
 
-        Spectrum albedo() const noexcept override
+        FSpectrum albedo() const noexcept override
         {
             return {};
         }
@@ -243,7 +243,7 @@ BSSRDFSamplePiResult SeparableBSSRDF::sample_pi(
     EntityIntersection inct = inct_list_entry->inct;
     inct.material = arena.create<SeparableBSDFMaterial>(bsdf);
 
-    const Spectrum coef = fro * eval_r(distance(inct.pos, po_.pos));
+    const FSpectrum coef = fro * eval_r(distance(inct.pos, po_.pos));
     const real pdf = pdf_radius / (2 * PI_r) / inct_cnt;
 
     return BSSRDFSamplePiResult(inct, coef, pdf);

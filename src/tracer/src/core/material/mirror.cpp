@@ -12,22 +12,22 @@ namespace
     class MirrorBSDF : public LocalBSDF
     {
         const ConductorPoint *fresnel_point_;
-        Spectrum rc_;
+        FSpectrum rc_;
 
     public:
 
         MirrorBSDF(const FCoord &geometry_coord, const FCoord &shading_coord,
-                   const ConductorPoint *fresnel_point, const Spectrum &rc) noexcept
+                   const ConductorPoint *fresnel_point, const FSpectrum &rc) noexcept
             : LocalBSDF(geometry_coord, shading_coord),
               fresnel_point_(fresnel_point), rc_(rc)
         {
             
         }
 
-        Spectrum eval(
+        FSpectrum eval(
             const FVec3 &, const FVec3 &, TransMode, uint8_t type) const noexcept override
         {
-            return Spectrum();
+            return FSpectrum();
         }
 
         BSDFSampleResult sample(
@@ -46,7 +46,7 @@ namespace
             const FVec3 dir = shading_coord_.local_to_global(
                 FVec3(0, 0, 2 * nwo.z) - nwo);
 
-            const Spectrum f = fresnel_point_->eval(nwo.z)
+            const FSpectrum f = fresnel_point_->eval(nwo.z)
                              * rc_ / std::abs(nwo.z);
 
             const real norm_factor = local_angle::normal_corr_factor(
@@ -61,7 +61,7 @@ namespace
             return 0;
         }
 
-        Spectrum albedo() const noexcept override
+        FSpectrum albedo() const noexcept override
         {
             return rc_;
         }
@@ -98,12 +98,12 @@ public:
 
     ShadingPoint shade(const EntityIntersection &inct, Arena &arena) const override
     {
-        const Spectrum rc  = rc_map_->sample_spectrum(inct.uv);
-        const Spectrum ior = ior_   ->sample_spectrum(inct.uv);
-        const Spectrum k   = k_     ->sample_spectrum(inct.uv);
+        const FSpectrum rc  = rc_map_->sample_spectrum(inct.uv);
+        const FSpectrum ior = ior_   ->sample_spectrum(inct.uv);
+        const FSpectrum k   = k_     ->sample_spectrum(inct.uv);
 
         const ConductorPoint *fresnel = arena.create<ConductorPoint>(
-                                            ior, Spectrum(1), k);
+                                            ior, FSpectrum(1), k);
 
         ShadingPoint ret;
 

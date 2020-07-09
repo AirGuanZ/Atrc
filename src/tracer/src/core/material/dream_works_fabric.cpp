@@ -69,13 +69,13 @@ namespace
     // see https://research.dreamworks.com/wp-content/uploads/2018/07/38-0045-deshmukh-Edited.pdf
     class FabricBSDFComponent : public BSDFComponent
     {
-        Spectrum color_;
+        FSpectrum color_;
 
         int n_;
 
     public:
 
-        FabricBSDFComponent(const Spectrum &color, real roughness) noexcept
+        FabricBSDFComponent(const FSpectrum &color, real roughness) noexcept
             : BSDFComponent(BSDF_SPECULAR), color_(color)
         {
             n_ = static_cast<int>(std::ceil(
@@ -83,7 +83,7 @@ namespace
             assert(1 <= n_ && n_ <= 30);
         }
 
-        Spectrum eval(
+        FSpectrum eval(
             const FVec3 &lwi, const FVec3 &lwo,
             TransMode mode) const noexcept override
         {
@@ -189,7 +189,7 @@ public:
         const FCoord shading_coord = normal_mapper_->reorient(
             inct.uv, inct.user_coord);
 
-        const Spectrum color = color_->sample_spectrum(inct.uv);
+        const FSpectrum color = color_->sample_spectrum(inct.uv);
         const real roughness = math::saturate(roughness_->sample_real(inct.uv));
 
         const auto bsdf = arena.create<AggregateBSDF<1>>(

@@ -94,7 +94,7 @@ real GGXMicrofacetRefractionComponent::pdf_inner_refl(
 }
 
 GGXMicrofacetRefractionComponent::GGXMicrofacetRefractionComponent(
-    const Spectrum &color, real ior,
+    const FSpectrum &color, real ior,
     real roughness, real anisotropic)
     : BSDFComponent(BSDF_GLOSSY)
 {
@@ -107,7 +107,7 @@ GGXMicrofacetRefractionComponent::GGXMicrofacetRefractionComponent(
     ay_ = std::max(real(0.001), math::sqr(roughness) * aspect);
 }
 
-Spectrum GGXMicrofacetRefractionComponent::eval(
+FSpectrum GGXMicrofacetRefractionComponent::eval(
     const FVec3 &lwi, const FVec3 &lwo, TransMode mode) const noexcept
 {
     // reflection
@@ -161,7 +161,7 @@ Spectrum GGXMicrofacetRefractionComponent::eval(
                        * corr_factor * corr_factor
                        / (cos_theta_i * cos_theta_o * sdem * sdem);
 
-        return Spectrum(std::abs(val));
+        return FSpectrum(std::abs(val));
     }
 
     // inner reflection
@@ -197,7 +197,7 @@ Spectrum GGXMicrofacetRefractionComponent::eval(
                         cos_phi_o, sin_phi_o,
                         ax_, ay_, tan_theta_o);
 
-    return Spectrum(std::abs(F * D * G / (4 * lwi.z * lwo.z)));
+    return FSpectrum(std::abs(F * D * G / (4 * lwi.z * lwo.z)));
 }
 
 BSDFComponent::SampleResult GGXMicrofacetRefractionComponent::sample(

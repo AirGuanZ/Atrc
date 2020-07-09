@@ -18,9 +18,9 @@ struct TraceParams
 
 struct AOParams
 {
-    Spectrum background_color;
-    Spectrum low_color;
-    Spectrum high_color;
+    FSpectrum background_color;
+    FSpectrum low_color;
+    FSpectrum high_color;
 
     int ao_sample_count = 4;
     real max_occlusion_distance = 1;

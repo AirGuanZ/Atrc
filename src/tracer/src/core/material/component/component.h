@@ -13,7 +13,7 @@ public:
     struct SampleResult
     {
         FVec3 lwi;
-        Spectrum f;
+        FSpectrum f;
         real pdf = 0;
 
         bool is_valid() const noexcept
@@ -30,7 +30,7 @@ public:
 
     uint8_t get_component_type() const noexcept;
 
-    virtual Spectrum eval(
+    virtual FSpectrum eval(
         const FVec3 &lwi, const FVec3 &lwo, TransMode mode) const noexcept = 0;
 
     virtual real pdf(const FVec3 &lwi, const FVec3 &lwo) const noexcept = 0;

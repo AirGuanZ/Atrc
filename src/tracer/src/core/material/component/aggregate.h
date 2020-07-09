@@ -13,17 +13,17 @@ class AggregateBSDF : public LocalBSDF
 
     int comp_cnt_;
 
-    Spectrum albedo_;
+    FSpectrum albedo_;
 
 public:
 
     AggregateBSDF(
         const FCoord &geometry, const FCoord &shading,
-        const Spectrum &albedo) noexcept;
+        const FSpectrum &albedo) noexcept;
 
     void add_component(real weight, const BSDFComponent *component) noexcept;
 
-    Spectrum eval(
+    FSpectrum eval(
         const FVec3 &wi, const FVec3 &wo,
         TransMode mode, uint8_t type) const noexcept override;
 
@@ -35,7 +35,7 @@ public:
         const FVec3 &wi, const FVec3 &wo,
         uint8_t type) const noexcept override;
 
-    Spectrum eval_all(
+    FSpectrum eval_all(
         const FVec3 &wi, const FVec3 &wo, TransMode mode) const noexcept override;
 
     BSDFSampleResult sample_all(
@@ -46,13 +46,13 @@ public:
 
     bool is_delta() const noexcept override;
 
-    Spectrum albedo() const noexcept override;
+    FSpectrum albedo() const noexcept override;
 
     bool has_diffuse_component() const noexcept override;
 };
 
 template<int MAX_COMP_CNT>
-Spectrum AggregateBSDF<MAX_COMP_CNT>::eval(
+FSpectrum AggregateBSDF<MAX_COMP_CNT>::eval(
     const FVec3 &wi, const FVec3 &wo,
     TransMode mode, uint8_t type) const noexcept
 {
@@ -70,7 +70,7 @@ Spectrum AggregateBSDF<MAX_COMP_CNT>::eval(
 
     // traversal components
 
-    Spectrum ret;
+    FSpectrum ret;
     for(int i = 0; i < comp_cnt_; ++i)
     {
         const auto comp = comps_[i];
@@ -202,7 +202,7 @@ real AggregateBSDF<MAX_COMP_CNT>::pdf(
 template<int MAX_COMP_CNT>
 AggregateBSDF<MAX_COMP_CNT>::AggregateBSDF(
     const FCoord &geometry, const FCoord &shading,
-    const Spectrum &albedo) noexcept
+    const FSpectrum &albedo) noexcept
     : LocalBSDF(geometry, shading)
 {
     comp_cnt_ = 0;
@@ -220,7 +220,7 @@ void AggregateBSDF<MAX_COMP_CNT>::add_component(
 }
 
 template<int MAX_COMP_CNT>
-Spectrum AggregateBSDF<MAX_COMP_CNT>::eval_all(
+FSpectrum AggregateBSDF<MAX_COMP_CNT>::eval_all(
     const FVec3 &wi, const FVec3 &wo, TransMode mode) const noexcept
 {
     // process black fringes
@@ -237,7 +237,7 @@ Spectrum AggregateBSDF<MAX_COMP_CNT>::eval_all(
 
     // traversal components
 
-    Spectrum ret;
+    FSpectrum ret;
     for(int i = 0; i < comp_cnt_; ++i)
         ret += comps_[i]->eval(lwi, lwo, mode);
 
@@ -355,7 +355,7 @@ bool AggregateBSDF<MAX_COMP_CNT>::is_delta() const noexcept
 }
 
 template<int MAX_COMP_CNT>
-Spectrum AggregateBSDF<MAX_COMP_CNT>::albedo() const noexcept
+FSpectrum AggregateBSDF<MAX_COMP_CNT>::albedo() const noexcept
 {
     return albedo_;
 }

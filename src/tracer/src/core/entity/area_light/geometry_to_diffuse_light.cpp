@@ -3,7 +3,7 @@
 AGZ_TRACER_BEGIN
 
 GeometryToDiffuseLight::GeometryToDiffuseLight(
-    const Geometry *geometry, const Spectrum &radiance,
+    const Geometry *geometry, const FSpectrum &radiance,
     real user_specified_power)
     : geometry_(geometry), radiance_(radiance),
       user_specified_power_(user_specified_power)
@@ -58,18 +58,18 @@ LightEmitPDFResult GeometryToDiffuseLight::emit_pdf(
     return { pdf_pos, pdf_dir };
 }
 
-Spectrum GeometryToDiffuseLight::power() const noexcept
+FSpectrum GeometryToDiffuseLight::power() const noexcept
 {
     if(user_specified_power_ > 0)
-        return Spectrum(user_specified_power_);
+        return FSpectrum(user_specified_power_);
     return PI_r * radiance_ * geometry_->surface_area();
 }
 
-Spectrum GeometryToDiffuseLight::radiance(
+FSpectrum GeometryToDiffuseLight::radiance(
     const FVec3 &pos, const FVec3 &nor, const Vec2 &uv,
     const FVec3 &light_to_out) const noexcept
 {
-    return dot(nor, light_to_out) > 0 ? radiance_ : Spectrum();
+    return dot(nor, light_to_out) > 0 ? radiance_ : FSpectrum();
 }
 
 real GeometryToDiffuseLight::pdf(

@@ -4,12 +4,12 @@ AGZ_TRACER_BEGIN
 
 class Constant2D : public Texture2D
 {
-    Spectrum texel_;
+    FSpectrum texel_;
 
 public:
 
     Constant2D(
-        const Texture2DCommonParams &common_params, const Spectrum &texel)
+        const Texture2DCommonParams &common_params, const FSpectrum &texel)
     {
         init_common_params(common_params);
         texel_ = texel;
@@ -31,7 +31,7 @@ public:
         return 1;
     }
 
-    Spectrum sample_spectrum(const Vec2 &uv) const noexcept override
+    FSpectrum sample_spectrum(const Vec2 &uv) const noexcept override
     {
         return texel_;
     }
@@ -44,7 +44,7 @@ public:
 
 RC<Texture2D> create_constant2d_texture(
     const Texture2DCommonParams &common_params,
-    const Spectrum &texel)
+    const FSpectrum &texel)
 {
     return newRC<Constant2D>(common_params, texel);
 }
@@ -53,7 +53,7 @@ RC<Texture2D> create_constant2d_texture(
     const Texture2DCommonParams &common_params,
     real texel)
 {
-    return create_constant2d_texture(common_params, Spectrum(texel));
+    return create_constant2d_texture(common_params, FSpectrum(texel));
 }
 
 AGZ_TRACER_END

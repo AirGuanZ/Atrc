@@ -285,9 +285,9 @@ CameraSubpath build_camera_subpath(
     cam_vtx.pdf_fwd    = cam_pdf.pdf_pos;
     cam_vtx.is_delta   = false;
 
-    Spectrum accu_coef = cam_we.we / (cam_pdf.pdf_pos * cam_pdf.pdf_dir);
-    real pdf_fwd       = cam_pdf.pdf_dir;
-    Ray r              = ray;
+    FSpectrum accu_coef = cam_we.we / (cam_pdf.pdf_pos * cam_pdf.pdf_dir);
+    real pdf_fwd        = cam_pdf.pdf_dir;
+    Ray r               = ray;
 
     accu_coef *= std::abs(cos(cam_we.nor_on_cam, ray.d));
 
@@ -434,7 +434,7 @@ LightSubpath build_light_subpath(
         return subpath;
     }
 
-    Spectrum accu_coef;
+    FSpectrum accu_coef;
     real pdf_bwd;
 
     // initial vertex
@@ -446,9 +446,9 @@ LightSubpath build_light_subpath(
 
         init_vtx = new_area_light_vertex(
             light_emit.pos, light_emit.nor, light_emit.uv, light->as_area());
-        init_vtx .accu_coef = Spectrum(1 / init_pdf);
-        init_vtx .pdf_bwd   = light_emit.pdf_pos * select_light_pdf;
-        init_vtx .is_delta  = false;
+        init_vtx.accu_coef = Spectrum(1 / init_pdf);
+        init_vtx.pdf_bwd   = light_emit.pdf_pos * select_light_pdf;
+        init_vtx.is_delta  = false;
 
         const real emit_cos = std::abs(cos(light_emit.nor, light_emit.dir));
         accu_coef = light_emit.radiance * emit_cos
@@ -460,9 +460,9 @@ LightSubpath build_light_subpath(
         const real init_pdf = light_emit.pdf_dir * select_light_pdf;
 
         init_vtx = new_env_light_vertex(light_emit.dir);
-        init_vtx.accu_coef              = Spectrum(1 / init_pdf);
-        init_vtx.pdf_bwd                = light_emit.pdf_dir * select_light_pdf;
-        init_vtx.is_delta               = false;
+        init_vtx.accu_coef = Spectrum(1 / init_pdf);
+        init_vtx.pdf_bwd   = light_emit.pdf_dir * select_light_pdf;
+        init_vtx.is_delta  = false;
         
         accu_coef = light_emit.radiance / (init_pdf * light_emit.pdf_pos);
         pdf_bwd   = light_emit.pdf_pos; // wrong value. will be corrected
@@ -574,7 +574,7 @@ LightSubpath build_light_subpath(
     return subpath;
 }
 
-Spectrum contrib_s2_t0(
+FSpectrum contrib_s2_t0(
     const Scene &scene,
     const Vertex *camera_subpath)
 {
@@ -585,7 +585,7 @@ Spectrum contrib_s2_t0(
 
     if(cam_end.type == VertexType::EnvLight)
     {
-        const Spectrum light_radiance = scene.envir_light()->radiance(
+        const FSpectrum light_radiance = scene.envir_light()->radiance(
             cam_beg.camera.pos, -cam_end.env_light.light_to_out);
 
         return cam_end.accu_coef * light_radiance;
@@ -603,14 +603,14 @@ Spectrum contrib_s2_t0(
     if(!light)
         return {};
 
-    const Spectrum light_radiance = light->radiance(
+    const FSpectrum light_radiance = light->radiance(
         cam_end.surface.pos, cam_end.surface.nor, cam_end.surface.uv,
         cam_beg.camera.pos - cam_end.surface.pos);
 
     return cam_end.accu_coef * light_radiance;
 }
 
-Spectrum unweighted_contrib_sx_t0(
+FSpectrum unweighted_contrib_sx_t0(
     const Scene &scene, const Vertex *camera_subpath, int s)
 {
     assert(s >= 3);
@@ -631,7 +631,7 @@ Spectrum unweighted_contrib_sx_t0(
 
     if(b.type == VertexType::EnvLight)
     {
-        const Spectrum light_radiance = scene.envir_light()->radiance(
+        const FSpectrum light_radiance = scene.envir_light()->radiance(
             a_pos, -b.env_light.light_to_out);
 
         return b.accu_coef * light_radiance;
@@ -649,14 +649,14 @@ Spectrum unweighted_contrib_sx_t0(
     if(!light)
         return {};
 
-    const Spectrum light_radiance = light->radiance(
+    const FSpectrum light_radiance = light->radiance(
         b.surface.pos, b.surface.nor, b.surface.uv,
         a_pos - b.surface.pos);
 
     return b.accu_coef * light_radiance;
 }
 
-Spectrum unweighted_contrib_sx_t1(
+FSpectrum unweighted_contrib_sx_t1(
     const Scene &scene,
     const Vertex *camera_subpath, int s,
     const Vertex *light_subpath,
@@ -686,14 +686,14 @@ Spectrum unweighted_contrib_sx_t1(
 
         const FVec3 cam_to_light = light_vtx.area_light.pos - cam_end_pos;
 
-        const Spectrum light_rad = light_vtx.area_light.light->radiance(
+        const FSpectrum light_rad = light_vtx.area_light.light->radiance(
             light_vtx.area_light.pos,
             light_vtx.area_light.nor,
             light_vtx.area_light.uv,
             -cam_to_light);
 
         const auto bsdf = get_scatter_bsdf(cam_end);
-        Spectrum bsdf_f = bsdf->eval_all(
+        FSpectrum bsdf_f = bsdf->eval_all(
             cam_to_light,
             get_scatter_wr(cam_end),
             TransMode::Radiance);
@@ -701,7 +701,7 @@ Spectrum unweighted_contrib_sx_t1(
         const auto medium = cam_end.type == VertexType::Surface ?
                             cam_end.surface.medium(cam_to_light) :
                             cam_end.medium.med;;
-        const Spectrum tr = medium->tr(
+        const FSpectrum tr = medium->tr(
             cam_end_pos, light_vtx.area_light.pos, sampler);
 
         if(cam_end.type == VertexType::Surface)
@@ -721,11 +721,11 @@ Spectrum unweighted_contrib_sx_t1(
     if(scene.has_intersection(shadow_ray))
         return {};
 
-    const Spectrum light_rad = scene.envir_light()->radiance(
+    const FSpectrum light_rad = scene.envir_light()->radiance(
         cam_end_pos, cam_to_light);
 
     const auto bsdf = get_scatter_bsdf(cam_end);
-    Spectrum bsdf_f = bsdf->eval_all(
+    FSpectrum bsdf_f = bsdf->eval_all(
         cam_to_light,
         get_scatter_wr(cam_end),
         TransMode::Radiance);
@@ -736,7 +736,7 @@ Spectrum unweighted_contrib_sx_t1(
     return cam_end.accu_coef * bsdf_f * light_rad / light_vtx.pdf_bwd;
 }
 
-Spectrum unweighted_contrib_s1_tx(
+FSpectrum unweighted_contrib_s1_tx(
     const Scene &scene,
     const Vertex *camera_subpath,
     const Vertex *light_subpath, int t,
@@ -785,7 +785,7 @@ Spectrum unweighted_contrib_s1_tx(
     const FVec3 lht_to_cam = cam_pos - lht_end_pos;
 
     const BSDF *bsdf = get_scatter_bsdf(lht_end);
-    const Spectrum f = bsdf->eval_all(
+    const FSpectrum f = bsdf->eval_all(
         lht_to_cam, get_scatter_wr(lht_end),
         TransMode::Importance);
     if(!f)
@@ -806,7 +806,7 @@ Spectrum unweighted_contrib_s1_tx(
                         lht_end.surface.medium(lht_to_cam) :
                         lht_end.medium.med;
 
-    const Spectrum tr = med->tr(cam_pos, lht_end_pos, sampler);
+    const FSpectrum tr = med->tr(cam_pos, lht_end_pos, sampler);
 
     // eval contrib
 
@@ -814,7 +814,7 @@ Spectrum unweighted_contrib_s1_tx(
          / camera_subpath[0].pdf_fwd;
 }
 
-Spectrum unweighted_contrib_sx_tx(
+FSpectrum unweighted_contrib_sx_tx(
     const Scene &scene,
     const Vertex *camera_subpath, int s,
     const Vertex *light_subpath, int t,
@@ -843,13 +843,13 @@ Spectrum unweighted_contrib_sx_tx(
     const FVec3 cam_to_lht = lht_end_pos - cam_end_pos;
 
     const BSDF *cam_end_bsdf = get_scatter_bsdf(cam_end);
-    Spectrum cam_bsdf_f = cam_end_bsdf->eval_all(
+    FSpectrum cam_bsdf_f = cam_end_bsdf->eval_all(
         cam_to_lht, get_scatter_wr(cam_end), TransMode::Radiance);
     if(!cam_bsdf_f)
         return {};
 
     const BSDF *lht_end_bsdf = get_scatter_bsdf(lht_end);
-    Spectrum lht_bsdf_f = lht_end_bsdf->eval_all(
+    FSpectrum lht_bsdf_f = lht_end_bsdf->eval_all(
         -cam_to_lht, get_scatter_wr(lht_end), TransMode::Importance);
     if(!lht_bsdf_f)
         return {};
@@ -867,7 +867,7 @@ Spectrum unweighted_contrib_sx_tx(
     // tr
 
     const Medium *medium = get_vertex_medium(cam_end, lht_end);
-    const Spectrum tr = medium->tr(cam_end_pos, lht_end_pos, sampler);
+    const FSpectrum tr = medium->tr(cam_end_pos, lht_end_pos, sampler);
 
     // eval contrib
 
@@ -1128,14 +1128,14 @@ real mis_weight_sx_tx(
         light_subpath, t);
 }
 
-Spectrum weighted_contrib_sx_t0(
+FSpectrum weighted_contrib_sx_t0(
     const Scene &scene,
     Vertex *camera_subpath, int s)
 {
-    const Spectrum unweighted_contrib = unweighted_contrib_sx_t0(
+    const FSpectrum unweighted_contrib = unweighted_contrib_sx_t0(
         scene, camera_subpath, s);
     if(!unweighted_contrib.is_finite())
-        return Spectrum(REAL_INF);
+        return FSpectrum(REAL_INF);
     if(unweighted_contrib.is_black())
         return {};
 
@@ -1144,16 +1144,16 @@ Spectrum weighted_contrib_sx_t0(
     return weight * unweighted_contrib;
 }
 
-Spectrum weighted_contrib_sx_t1(
+FSpectrum weighted_contrib_sx_t1(
     const Scene &scene,
     Vertex *camera_subpath, int s,
     Vertex *light_subpath,
     Sampler &sampler)
 {
-    const Spectrum unweighted_contrib = unweighted_contrib_sx_t1(
+    const FSpectrum unweighted_contrib = unweighted_contrib_sx_t1(
         scene, camera_subpath, s, light_subpath, sampler);
     if(!unweighted_contrib.is_finite())
-        return Spectrum(REAL_INF);
+        return FSpectrum(REAL_INF);
     if(unweighted_contrib.is_black())
         return {};
 
@@ -1163,7 +1163,7 @@ Spectrum weighted_contrib_sx_t1(
     return weight * unweighted_contrib;
 }
 
-Spectrum weighted_contrib_s1_tx(
+FSpectrum weighted_contrib_s1_tx(
     const Scene &scene,
     Vertex *camera_subpath,
     Vertex *light_subpath, int t,
@@ -1172,12 +1172,12 @@ Spectrum weighted_contrib_s1_tx(
     const Vec2 &full_res,
     Vec2 &pixel_coord)
 {
-    const Spectrum unweighted_contrib = unweighted_contrib_s1_tx(
+    const FSpectrum unweighted_contrib = unweighted_contrib_s1_tx(
         scene, camera_subpath, light_subpath, t,
         sampler, sample_pixel_bound, full_res,
         pixel_coord);
     if(!unweighted_contrib.is_finite())
-        return Spectrum(REAL_INF);
+        return FSpectrum(REAL_INF);
     if(unweighted_contrib.is_black())
         return {};
 
@@ -1187,16 +1187,16 @@ Spectrum weighted_contrib_s1_tx(
     return weight * unweighted_contrib;
 }
 
-Spectrum weighted_contrib_sx_tx(
+FSpectrum weighted_contrib_sx_tx(
     const Scene &scene,
     Vertex *camera_subpath, int s,
     Vertex *light_subpath, int t,
     Sampler &sampler)
 {
-    const Spectrum unweighted_contrib = unweighted_contrib_sx_tx(
+    const FSpectrum unweighted_contrib = unweighted_contrib_sx_tx(
         scene, camera_subpath, s, light_subpath, t, sampler);
     if(!unweighted_contrib.is_finite())
-        return Spectrum(REAL_INF);
+        return FSpectrum(REAL_INF);
     if(unweighted_contrib.is_black())
         return {};
 

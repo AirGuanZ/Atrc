@@ -44,7 +44,7 @@ public:
         if(!normal_map_)
             return old_user_coord;
 
-        Spectrum local_nor_spec = normal_map_->sample_spectrum(uv);
+        FSpectrum local_nor_spec = normal_map_->sample_spectrum(uv);
         FVec3 local_nor = {
             local_nor_spec.r * 2 - 1,
             local_nor_spec.g * 2 - 1,

@@ -8,7 +8,7 @@ struct BSSRDFSamplePiResult
 {
     BSSRDFSamplePiResult(
         const EntityIntersection &inct,
-        const Spectrum &coef,
+        const FSpectrum &coef,
         real pdf) noexcept
         : inct(inct), coef(coef), pdf(pdf)
     {
@@ -16,7 +16,7 @@ struct BSSRDFSamplePiResult
     }
 
     EntityIntersection inct;
-    Spectrum           coef;
+    FSpectrum          coef;
     real               pdf;
 };
 

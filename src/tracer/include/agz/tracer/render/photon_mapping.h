@@ -27,7 +27,7 @@ struct Pixel
         FVec3 pos;
         FVec3 wr;
 
-        Spectrum    coef;
+        FSpectrum   coef;
         const BSDF *bsdf = nullptr;
 
         bool is_valid() const noexcept
@@ -64,11 +64,11 @@ struct Pixel
     std::atomic<int>  M = 0;
 
     real N = 0;
-    Spectrum tau;
+    FSpectrum tau;
 
     // direct illumination
 
-    Spectrum direct_illum;
+    FSpectrum direct_illum;
 };
 
 class VisiblePointSearcher
@@ -97,7 +97,7 @@ public:
      *
      * parallel 'add_photon' is safe
      */
-    void add_photon(const FVec3 &photon_pos, const Spectrum &phi, const FVec3 &wr);
+    void add_photon(const FVec3 &photon_pos, const FSpectrum &phi, const FVec3 &wr);
 
 private:
 
@@ -125,9 +125,9 @@ private:
  */
 Pixel::VisiblePoint tracer_vp(
     int max_fwd_depth, int direct_illum_spv,
-    const Scene &scene, const Ray &r, const Spectrum &init_coef,
+    const Scene &scene, const Ray &r, const FSpectrum &init_coef,
     Arena &arena, Sampler &sampler,
-    GBufferPixel *gpixel, Spectrum &direct_illum);
+    GBufferPixel *gpixel, FSpectrum &direct_illum);
 
 /**
  * trace a photon from light source and
@@ -140,7 +140,7 @@ void trace_photon(
 
 void update_pixel_params(real alpha, Pixel &pixel);
 
-Spectrum compute_pixel_radiance(
+FSpectrum compute_pixel_radiance(
     int direct_illum_N, uint64_t photon_N, const Pixel &pixel);
 
 } // namespace sppm

@@ -58,11 +58,11 @@ struct AORendererParams
     int task_grid_size  = 32;
     int ao_sample_count = 5;
 
-    Spectrum low_color  = Spectrum(0);
-    Spectrum high_color = Spectrum(1);
+    FSpectrum low_color  = FSpectrum(0);
+    FSpectrum high_color = FSpectrum(1);
     real max_occlusion_distance = 1;
 
-    Spectrum background_color = Spectrum(0);
+    FSpectrum background_color = FSpectrum(0);
 
     int spp = 1;
 };

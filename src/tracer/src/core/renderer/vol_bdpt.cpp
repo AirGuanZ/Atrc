@@ -28,7 +28,7 @@ namespace
                 channels[i] = s.channels[i].load();
         }
 
-        void add(const Spectrum &s) noexcept
+        void add(const FSpectrum &s) noexcept
         {
             for(int i = 0; i < SPECTRUM_COMPONENT_COUNT; ++i)
                 math::atomic_add(channels[i], s[i]);
@@ -145,11 +145,11 @@ int VolBDPTRenderer::render_bdpt_path(
         sampler
     };
 
-    const Spectrum radiance = render::bdpt::eval_bdpt_path<USE_MIS>(
+    const FSpectrum radiance = render::bdpt::eval_bdpt_path<USE_MIS>(
         path_params,
         camera_subpath.vertices, camera_subpath.vertex_count,
         light_subpath.vertices, light_subpath.vertex_count,
-        select_light, [&](const Vec2 &particle_coord, const Spectrum &rad)
+        select_light, [&](const Vec2 &particle_coord, const FSpectrum &rad)
     {
         if(rad.is_finite())
         {

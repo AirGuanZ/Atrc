@@ -7,12 +7,12 @@ class CheckerBoard : public Texture2D
 {
     real grid_size_ = 1;
 
-    Spectrum color_1_ = Spectrum(0, 0, 0);
-    Spectrum color_2_ = Spectrum(1, 1, 1);
+    FSpectrum color_1_ = FSpectrum(0, 0, 0);
+    FSpectrum color_2_ = FSpectrum(1, 1, 1);
 
 protected:
 
-    Spectrum sample_spectrum_impl(const Vec2& uv) const noexcept override
+    FSpectrum sample_spectrum_impl(const Vec2& uv) const noexcept override
     {
         const int u_idx = static_cast<int>(math::saturate(uv.x) / grid_size_);
         const int v_idx = static_cast<int>(math::saturate(uv.y) / grid_size_);
@@ -25,7 +25,7 @@ public:
 
     CheckerBoard(
         const Texture2DCommonParams &common_params,
-        int grid_count, const Spectrum &color1, const Spectrum &color2)
+        int grid_count, const FSpectrum &color1, const FSpectrum &color2)
     {
         init_common_params(common_params);
 
@@ -51,7 +51,7 @@ public:
 
 RC<Texture2D> create_checker_board(
     const Texture2DCommonParams &common_params,
-    int grid_count, const Spectrum &color1, const Spectrum &color2)
+    int grid_count, const FSpectrum &color1, const FSpectrum &color2)
 {
     return newRC<CheckerBoard>(common_params, grid_count, color1, color2);
 }

@@ -4,11 +4,11 @@ AGZ_TRACER_BEGIN
 
 class Constant3D : public Texture3D
 {
-    Spectrum texel_;
+    FSpectrum texel_;
 
 public:
 
-    Constant3D(const Texture3DCommonParams &common_params, const Spectrum &texel)
+    Constant3D(const Texture3DCommonParams &common_params, const FSpectrum &texel)
         : texel_(texel)
     {
         init_common_params(common_params);
@@ -35,7 +35,7 @@ public:
         return 1;
     }
 
-    Spectrum max_spectrum() const noexcept override
+    FSpectrum max_spectrum() const noexcept override
     {
         return texel_;
     }
@@ -45,7 +45,7 @@ public:
         return texel_.r;
     }
 
-    Spectrum sample_spectrum(const FVec3 &uvw) const noexcept override
+    FSpectrum sample_spectrum(const FVec3 &uvw) const noexcept override
     {
         return texel_;
     }
@@ -58,7 +58,7 @@ public:
 
 RC<Texture3D> create_constant3d_texture(
     const Texture3DCommonParams &common_params,
-    const Spectrum &texel)
+    const FSpectrum &texel)
 {
     return newRC<Constant3D>(common_params, texel);
 }

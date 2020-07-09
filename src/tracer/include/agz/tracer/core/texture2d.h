@@ -113,9 +113,9 @@ protected:
         inv_gamma_ = params.inv_gamma;
     }
 
-    virtual Spectrum sample_spectrum_impl(const Vec2 &uv) const noexcept
+    virtual FSpectrum sample_spectrum_impl(const Vec2 &uv) const noexcept
     {
-        return Spectrum(sample_real_impl(uv));
+        return FSpectrum(sample_real_impl(uv));
     }
 
     virtual real sample_real_impl(const Vec2 &uv) const noexcept
@@ -130,12 +130,12 @@ public:
     /**
      * @brief sample spectrum value at uv
      */
-    virtual Spectrum sample_spectrum(const Vec2 &uv) const noexcept
+    virtual FSpectrum sample_spectrum(const Vec2 &uv) const noexcept
     {
         const Vec2 uv1 = transform_.apply_to_point(uv);
         const real u = wrapper_u_(uv1.x);
         const real v = wrapper_v_(uv1.y);
-        Spectrum ret = sample_spectrum_impl({ u, v });
+        FSpectrum ret = sample_spectrum_impl({ u, v });
         if(inv_gamma_ != 1)
         {
             for(int i = 0; i < SPECTRUM_COMPONENT_COUNT; ++i)

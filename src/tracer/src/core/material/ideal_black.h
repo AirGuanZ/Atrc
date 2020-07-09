@@ -11,10 +11,10 @@ class IdealBlack : public Material
     {
     public:
 
-        Spectrum eval(
+        FSpectrum eval(
             const FVec3 &, const FVec3 &, TransMode, uint8_t) const noexcept override
         {
-            return Spectrum();
+            return FSpectrum();
         }
 
         BSDFSampleResult sample(
@@ -28,9 +28,9 @@ class IdealBlack : public Material
             return 0;
         }
 
-        Spectrum albedo() const noexcept override
+        FSpectrum albedo() const noexcept override
         {
-            return Spectrum();
+            return FSpectrum();
         }
 
         bool is_delta() const noexcept override

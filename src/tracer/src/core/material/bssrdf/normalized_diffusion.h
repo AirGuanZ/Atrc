@@ -7,14 +7,14 @@ AGZ_TRACER_BEGIN
 // See http://graphics.pixar.com/library/ApproxBSSRDF/paper.pdf
 class NormalizedDiffusionBSSRDF : public SeparableBSSRDF
 {
-    Spectrum A_;
-    Spectrum s_;
-    Spectrum l_;
-    Spectrum d_;
+    FSpectrum A_;
+    FSpectrum s_;
+    FSpectrum l_;
+    FSpectrum d_;
 
 protected:
 
-    Spectrum eval_r(real distance) const override;
+    FSpectrum eval_r(real distance) const override;
 
     SampleRResult sample_r(int channel, Sample1 sam) const override;
 
@@ -24,7 +24,7 @@ public:
 
     NormalizedDiffusionBSSRDF(
         const EntityIntersection &inct, real eta,
-        const Spectrum &A, const Spectrum &dmfp) noexcept;
+        const FSpectrum &A, const FSpectrum &dmfp) noexcept;
 };
 
 AGZ_TRACER_END

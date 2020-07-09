@@ -9,7 +9,7 @@ namespace
     void eval_and_pdf(
         const FVec3 &lwi, const FVec3 &lwo,
         const FresnelPoint *fresnel, real ax, real ay,
-        Spectrum *eval_output, real *pdf_output) noexcept
+        FSpectrum *eval_output, real *pdf_output) noexcept
     {
         if(lwi.z <= 0 || lwo.z <= 0)
         {
@@ -50,7 +50,7 @@ namespace
                 cos_phi_i, sin_phi_i, ax, ay, tan_theta_i);
             const real G = Gi * Go;
 
-            const Spectrum F = fresnel->eval(cos_theta_d);
+            const FSpectrum F = fresnel->eval(cos_theta_d);
 
             *eval_output = F * D * G / std::abs(4 * cos_theta_i * cos_theta_o);
         }
@@ -75,10 +75,10 @@ GGXMicrofacetReflectionComponent::GGXMicrofacetReflectionComponent(
     ay_ = std::max(real(0.001), math::sqr(roughness) * aspect);
 }
 
-Spectrum GGXMicrofacetReflectionComponent::eval(
+FSpectrum GGXMicrofacetReflectionComponent::eval(
     const FVec3 &lwi, const FVec3 &lwo, TransMode mode) const noexcept
 {
-    Spectrum ret;
+    FSpectrum ret;
     eval_and_pdf<true, false>(lwi, lwo, fresnel_, ax_, ay_, &ret, nullptr);
     return ret;
 }

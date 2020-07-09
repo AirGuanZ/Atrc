@@ -21,7 +21,7 @@ public:
         RC<const Geometry> geometry,
         RC<const Material> material,
         const MediumInterface &med,
-        const Spectrum &emit_radiance,
+        const FSpectrum &emit_radiance,
         bool no_denoise,
         real user_specified_power)
     {
@@ -77,7 +77,7 @@ RC<Entity> create_geometric(
     RC<const Geometry> geometry,
     RC<const Material> material,
     const MediumInterface &med,
-    const Spectrum &emit_radiance,
+    const FSpectrum &emit_radiance,
     bool no_denoise,
     real user_specified_power)
 {

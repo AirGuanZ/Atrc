@@ -15,8 +15,8 @@ RC<Medium> create_heterogeneous_medium(
     int max_scattering_count);
 
 RC<Medium> create_homogeneous_medium(
-    const Spectrum &sigma_a,
-    const Spectrum &sigma_s,
+    const FSpectrum &sigma_a,
+    const FSpectrum &sigma_s,
     real g,
     int max_scattering_count);
 

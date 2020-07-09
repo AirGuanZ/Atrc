@@ -106,7 +106,7 @@ struct CameraSubpath : Subpath
 {
     // gbuffer channels
 
-    Spectrum g_albedo;
+    FSpectrum g_albedo;
     FVec3 g_normal;
     real g_denoise = 1;
 };
@@ -127,21 +127,21 @@ LightSubpath build_light_subpath(
     const Scene &scene, Sampler &sampler,
     Arena &arena, Vertex *vertex_space);
 
-Spectrum contrib_s2_t0(
+FSpectrum contrib_s2_t0(
     const Scene &scene,
     const Vertex *camera_subpath);
 
-Spectrum unweighted_contrib_sx_t0(
+FSpectrum unweighted_contrib_sx_t0(
     const Scene &scene,
     const Vertex *camera_subpath, int s);
 
-Spectrum unweighted_contrib_sx_t1(
+FSpectrum unweighted_contrib_sx_t1(
     const Scene &scene,
     const Vertex *camera_subpath, int s,
     const Vertex *light_subpath,
     Sampler &sampler);
 
-Spectrum unweighted_contrib_s1_tx(
+FSpectrum unweighted_contrib_s1_tx(
     const Scene &scene,
     const Vertex *camera_subpath,
     const Vertex *light_subpath, int t,
@@ -150,7 +150,7 @@ Spectrum unweighted_contrib_s1_tx(
     const Vec2 &full_res,
     Vec2 &pixel_coord);
 
-Spectrum unweighted_contrib_sx_tx(
+FSpectrum unweighted_contrib_sx_tx(
     const Scene &scene,
     const Vertex *camera_subpath, int s,
     const Vertex *light_subpath, int t,
@@ -174,17 +174,17 @@ real mis_weight_sx_tx(
     Vertex *camera_subpath, int s,
     Vertex *light_subpath, int t);
 
-Spectrum weighted_contrib_sx_t0(
+FSpectrum weighted_contrib_sx_t0(
     const Scene &scene,
     Vertex *camera_subpath, int s);
 
-Spectrum weighted_contrib_sx_t1(
+FSpectrum weighted_contrib_sx_t1(
     const Scene &scene,
     Vertex *camera_subpath, int s,
     Vertex *light_subpath,
     Sampler &sampler);
 
-Spectrum weighted_contrib_s1_tx(
+FSpectrum weighted_contrib_s1_tx(
     const Scene &scene,
     Vertex *camera_subpath,
     Vertex *light_subpath, int t,
@@ -193,7 +193,7 @@ Spectrum weighted_contrib_s1_tx(
     const Vec2 &full_res,
     Vec2 &pixel_coord);
 
-Spectrum weighted_contrib_sx_tx(
+FSpectrum weighted_contrib_sx_tx(
     const Scene &scene,
     Vertex *camera_subpath, int s,
     Vertex *light_subpath, int t,
@@ -208,14 +208,14 @@ struct EvalBDPTPathParams
 };
 
 template<bool UseMIS, typename ParticleFunc>
-Spectrum eval_bdpt_path(
+FSpectrum eval_bdpt_path(
     const EvalBDPTPathParams &params,
     Vertex *camera_subpath, int camera_vertex_count,
     Vertex *light_subpath, int light_vertex_count,
     const SceneSampleLightResult &select_light,
     ParticleFunc &&particle_func)
 {
-    Spectrum ret;
+    FSpectrum ret;
 
     for(int s = 1; s <= camera_vertex_count; ++s)
     {
@@ -241,7 +241,7 @@ Spectrum eval_bdpt_path(
 
                 Vec2 particle_pixel_coord;
 
-                Spectrum particle_rad;
+                FSpectrum particle_rad;
 
                 if constexpr(UseMIS)
                 {

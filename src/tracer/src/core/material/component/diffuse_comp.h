@@ -6,13 +6,13 @@ AGZ_TRACER_BEGIN
 
 class DiffuseComponent : public BSDFComponent
 {
-    Spectrum coef_; // albedo / pi
+    FSpectrum coef_; // albedo / pi
 
 public:
 
-    explicit DiffuseComponent(const Spectrum &albedo) noexcept;
+    explicit DiffuseComponent(const FSpectrum &albedo) noexcept;
 
-    Spectrum eval(
+    FSpectrum eval(
         const FVec3 &lwi, const FVec3 &lwo,
         TransMode mode) const noexcept override;
 

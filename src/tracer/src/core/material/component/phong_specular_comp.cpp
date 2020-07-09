@@ -22,14 +22,14 @@ real PhongSpecularComponent::pow_cos_on_hemisphere_pdf(real e, real cos_theta) c
     return (e + 1) / (2 * PI_r) * std::pow(cos_theta, e);
 }
 
-PhongSpecularComponent::PhongSpecularComponent(const Spectrum &s, real ns) noexcept
+PhongSpecularComponent::PhongSpecularComponent(const FSpectrum &s, real ns) noexcept
     : BSDFComponent(BSDF_GLOSSY)
 {
     s_ = s;
     ns_ = ns;
 }
 
-Spectrum PhongSpecularComponent::eval(
+FSpectrum PhongSpecularComponent::eval(
     const FVec3 &lwi, const FVec3 &lwo,
     TransMode mode) const noexcept
 {

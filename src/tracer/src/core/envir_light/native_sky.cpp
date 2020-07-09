@@ -5,12 +5,12 @@ AGZ_TRACER_BEGIN
 
 class NativeSky : public EnvirLight
 {
-    Spectrum top_;
-    Spectrum bottom_;
+    FSpectrum top_;
+    FSpectrum bottom_;
 
     real user_specified_power_;
 
-    Spectrum radiance_impl(const FVec3 &ref_to_light) const noexcept
+    FSpectrum radiance_impl(const FVec3 &ref_to_light) const noexcept
     {
         const real cos_theta = math::clamp<real>(
             ref_to_light.normalize().z, -1, 1);
@@ -22,7 +22,7 @@ class NativeSky : public EnvirLight
 public:
 
     NativeSky(
-        const Spectrum &top, const Spectrum &bottom,
+        const FSpectrum &top, const FSpectrum &bottom,
         real user_specified_power)
     {
         top_    = top;
@@ -103,16 +103,16 @@ public:
         return { pos, c };
     }
 
-    Spectrum power() const noexcept override
+    FSpectrum power() const noexcept override
     {
         if(user_specified_power_ > 0)
-            return Spectrum(user_specified_power_);
+            return FSpectrum(user_specified_power_);
         const real radius = world_radius_;
-        const Spectrum mean_radiance = (top_ + bottom_) * real(0.5);
+        const FSpectrum mean_radiance = (top_ + bottom_) * real(0.5);
         return 4 * PI_r * PI_r * radius * radius * mean_radiance;
     }
 
-    Spectrum radiance(
+    FSpectrum radiance(
         const FVec3 &ref, const FVec3 &ref_to_light) const noexcept override
     {
         return radiance_impl(ref_to_light);
@@ -120,8 +120,8 @@ public:
 };
 
 RC<EnvirLight> create_native_sky(
-    const Spectrum &top,
-    const Spectrum &bottom,
+    const FSpectrum &top,
+    const FSpectrum &bottom,
     real user_specified_power)
 {
     return newRC<NativeSky>(top, bottom, user_specified_power);

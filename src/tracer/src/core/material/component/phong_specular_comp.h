@@ -6,7 +6,7 @@ AGZ_TRACER_BEGIN
 
 class PhongSpecularComponent : public BSDFComponent
 {
-    Spectrum s_;
+    FSpectrum s_;
     real ns_;
 
     FVec3 sample_pow_cos_on_hemisphere(
@@ -16,9 +16,9 @@ class PhongSpecularComponent : public BSDFComponent
 
 public:
 
-    PhongSpecularComponent(const Spectrum &s, real ns) noexcept;
+    PhongSpecularComponent(const FSpectrum &s, real ns) noexcept;
 
-    Spectrum eval(
+    FSpectrum eval(
         const FVec3 &lwi, const FVec3 &lwo,
         TransMode mode) const noexcept override;
 

@@ -12,23 +12,23 @@ public:
         return (std::numeric_limits<int>::max)();
     }
 
-    Spectrum tr(
+    FSpectrum tr(
         const FVec3 &a, const FVec3 &b, Sampler &sampler) const noexcept override
     {
-        return Spectrum(1);
+        return FSpectrum(1);
     }
 
-    Spectrum ab(
+    FSpectrum ab(
         const FVec3 &a, const FVec3 &b, Sampler &sampler) const noexcept override
     {
-        return Spectrum(1);
+        return FSpectrum(1);
     }
 
     SampleOutScatteringResult sample_scattering(
         const FVec3 &a, const FVec3 &b,
         Sampler &sampler, Arena &arena) const override
     {
-        return { { }, Spectrum(1), nullptr };
+        return { { }, FSpectrum(1), nullptr };
     }
 };
 

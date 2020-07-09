@@ -12,7 +12,7 @@ class IBL : public EnvirLight
 {
     RC<const Texture2D> tex_;
 
-    Spectrum avg_rad_;
+    FSpectrum avg_rad_;
 
     Box<EnvironmentLightSampler> sampler_;
 
@@ -30,13 +30,13 @@ public:
 
         if(no_importance_sampling)
             sampler_ = newBox<EnvironmentLightSampler>(
-                create_constant2d_texture({}, Spectrum(1)));
+                create_constant2d_texture({}, FSpectrum(1)));
         else
             sampler_ = newBox<EnvironmentLightSampler>(tex_);
 
         if(no_importance_sampling)
         {
-            avg_rad_ = Spectrum(1);
+            avg_rad_ = FSpectrum(1);
         }
         else
         {
@@ -135,14 +135,14 @@ public:
         return { pos, c };
     }
 
-    Spectrum power() const noexcept override
+    FSpectrum power() const noexcept override
     {
         const real radius = world_radius_;
-        return user_specified_power_ > 0 ? Spectrum(user_specified_power_)
+        return user_specified_power_ > 0 ? FSpectrum(user_specified_power_)
                                          : avg_rad_ * radius * radius;
     }
 
-    Spectrum radiance(
+    FSpectrum radiance(
         const FVec3 &ref, const FVec3 &ref_to_light) const noexcept override
     {
         const FVec3 dir   = ref_to_light.normalize();

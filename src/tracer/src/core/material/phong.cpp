@@ -32,8 +32,8 @@ public:
 
     ShadingPoint shade(const EntityIntersection &inct, Arena &arena) const override
     {
-        Spectrum d = d_->sample_spectrum(inct.uv);
-        Spectrum s = s_->sample_spectrum(inct.uv);
+        FSpectrum d = d_->sample_spectrum(inct.uv);
+        FSpectrum s = s_->sample_spectrum(inct.uv);
         const real ns = ns_->sample_real(inct.uv);
 
         // ensure energy conservation

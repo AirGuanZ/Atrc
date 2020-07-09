@@ -7,7 +7,7 @@ AGZ_TRACER_BEGIN
 
 RC<Texture3D> create_constant3d_texture(
     const Texture3DCommonParams &common_params,
-    const Spectrum &texel);
+    const FSpectrum &texel);
 
 RC<Texture3D> create_image3d(
     const Texture3DCommonParams &common_params,

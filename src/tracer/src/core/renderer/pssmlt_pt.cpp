@@ -24,7 +24,7 @@ namespace
                 channels[i] = s.channels[i].load();
         }
 
-        void add(const Spectrum &rhs) noexcept
+        void add(const FSpectrum &rhs) noexcept
         {
             for(int i = 0; i < SPECTRUM_COMPONENT_COUNT; ++i)
                 math::atomic_add(channels[i], rhs[i]);
@@ -50,7 +50,7 @@ class PSSMLTPTRenderer : public Renderer
 
     render::TraceParams trace_params_;
 
-    Spectrum eval_path(
+    FSpectrum eval_path(
         const Scene &scene, const Vec2 &film_coord,
         Arena &arena, render::pssmlt::PSSMLTSampler &sampler) const;
 
@@ -68,7 +68,7 @@ RC<Renderer> create_pssmlt_pt_renderer(const PSSMLTPTRendererParams &params)
     return newRC<PSSMLTPTRenderer>(params);
 }
 
-Spectrum PSSMLTPTRenderer::eval_path(
+FSpectrum PSSMLTPTRenderer::eval_path(
     const Scene &scene, const Vec2 &film_coord,
     Arena &arena, render::pssmlt::PSSMLTSampler &sampler) const
 {
@@ -76,7 +76,7 @@ Spectrum PSSMLTPTRenderer::eval_path(
         scene.get_camera()->sample_we(film_coord, sampler.sample2());
     const Ray ray(cam_sam.pos_on_cam, cam_sam.pos_to_out);
 
-    const Spectrum radiance = trace_func_(
+    const FSpectrum radiance = trace_func_(
         trace_params_, scene, ray, sampler, arena).value;
 
     return cam_sam.throughput * radiance;
@@ -216,7 +216,7 @@ RenderTarget PSSMLTPTRenderer::render(
             init_film_coord.y * filter.height()
         };
 
-        Spectrum current_spectrum = eval_path(
+        FSpectrum current_spectrum = eval_path(
             scene, init_film_coord, local_arena, mlt_sampler);
 
         // do mutations
@@ -241,7 +241,7 @@ RenderTarget PSSMLTPTRenderer::render(
                 proposed_film_coord.y * filter.height()
             };
 
-            Spectrum proposed_spectrum = eval_path(
+            FSpectrum proposed_spectrum = eval_path(
                 scene, proposed_film_coord, local_arena, mlt_sampler);
 
             // compute accept prob
@@ -253,7 +253,7 @@ RenderTarget PSSMLTPTRenderer::render(
 
             if(accept_prob > 0)
             {
-                const Spectrum proposed_add =
+                const FSpectrum proposed_add =
                     proposed_spectrum * accept_prob / proposed_spectrum.lum();
 
                 if(proposed_add.is_finite())
@@ -268,7 +268,7 @@ RenderTarget PSSMLTPTRenderer::render(
                 }
             }
 
-            const Spectrum current_add =
+            const FSpectrum current_add =
                 current_spectrum * (1 - accept_prob) / current_spectrum.lum();
 
             if(current_add.is_finite())

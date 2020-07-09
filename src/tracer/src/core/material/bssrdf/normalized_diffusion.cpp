@@ -354,10 +354,10 @@ namespace
     };
 }
 
-Spectrum NormalizedDiffusionBSSRDF::eval_r(real distance) const
+FSpectrum NormalizedDiffusionBSSRDF::eval_r(real distance) const
 {
-    return A_ * (math::exp(-Spectrum(distance) / d_) +
-                 math::exp(-Spectrum(distance) / (real(3) * d_)))
+    return A_ * (math::exp(-FSpectrum(distance) / d_) +
+                 math::exp(-FSpectrum(distance) / (real(3) * d_)))
          / (8 * PI_r * d_);
 }
 
@@ -386,10 +386,10 @@ real NormalizedDiffusionBSSRDF::pdf_r(int channel, real distance) const
 
 NormalizedDiffusionBSSRDF::NormalizedDiffusionBSSRDF(
     const EntityIntersection &inct, real eta,
-    const Spectrum &A, const Spectrum &dmfp) noexcept
+    const FSpectrum &A, const FSpectrum &dmfp) noexcept
     : SeparableBSSRDF(inct, eta), A_(A), l_(dmfp)
 {
-    s_ = A.map([](real c)
+    s_ = Spectrum(A).map([](real c)
     {
         const real t = c - real(0.33);
         return real(3.5) + 100 * t * t * t * t;
@@ -416,9 +416,9 @@ public:
 
     BSSRDF *create(const EntityIntersection &inct, Arena &arena) const override
     {
-        const Spectrum A    = A_->sample_spectrum(inct.uv);
-        const Spectrum dmfp = dmfp_->sample_spectrum(inct.uv);
-        const real eta      = eta_->sample_real(inct.uv);
+        const FSpectrum A    = A_->sample_spectrum(inct.uv);
+        const FSpectrum dmfp = dmfp_->sample_spectrum(inct.uv);
+        const real eta       = eta_->sample_real(inct.uv);
         return arena.create<NormalizedDiffusionBSSRDF>(inct, eta, A, dmfp);
     }
 };

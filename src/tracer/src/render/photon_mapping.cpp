@@ -58,7 +58,7 @@ void VisiblePointSearcher::add_vp(Pixel &pixel, Arena &vp_node_arena)
 }
 
 void VisiblePointSearcher::add_photon(
-    const FVec3 &photon_pos, const Spectrum &phi, const FVec3 &wr)
+    const FVec3 &photon_pos, const FSpectrum &phi, const FVec3 &wr)
 {
     const size_t entry_index = hashed_grid_aux_.pos_to_entry(photon_pos);
     for(VPNode *node = node_entries_[entry_index]; node; node = node->next)
@@ -67,7 +67,7 @@ void VisiblePointSearcher::add_photon(
         if(distance2(pixel.vp.pos, photon_pos) > pixel.radius * pixel.radius)
             continue;
 
-        const Spectrum delta_phi = phi * pixel.vp.bsdf->eval_all(
+        const FSpectrum delta_phi = phi * pixel.vp.bsdf->eval_all(
             wr, pixel.vp.wr, TransMode::Radiance);
 
         if(!delta_phi.is_finite())
@@ -81,11 +81,11 @@ void VisiblePointSearcher::add_photon(
 
 Pixel::VisiblePoint tracer_vp(
     int max_fwd_depth, int direct_illum_spv,
-    const Scene &scene, const Ray &r, const Spectrum &init_coef,
+    const Scene &scene, const Ray &r, const FSpectrum &init_coef,
     Arena &arena, Sampler &sampler,
-    GBufferPixel *gpixel, Spectrum &direct_illum)
+    GBufferPixel *gpixel, FSpectrum &direct_illum)
 {
-    Spectrum coef = init_coef;
+    FSpectrum coef = init_coef;
 
     Ray ray = r;
     for(int depth = 0; depth < max_fwd_depth; ++depth)
@@ -128,7 +128,7 @@ Pixel::VisiblePoint tracer_vp(
 
         // direct illumination from next vertex
 
-        Spectrum sum_di;
+        FSpectrum sum_di;
         for(int i = 0; i < direct_illum_spv; ++i)
         {
             for(auto l : scene.lights())
@@ -184,7 +184,7 @@ void trace_photon(
     if(!emit.radiance)
         return;
 
-    Spectrum coef = emit.radiance * std::abs(cos(emit.nor, emit.dir))
+    FSpectrum coef = emit.radiance * std::abs(cos(emit.nor, emit.dir))
                   / (select_light_pdf * emit.pdf_pos * emit.pdf_dir);
 
     Ray ray(emit.pos, emit.dir, EPS());
@@ -237,7 +237,7 @@ void update_pixel_params(real alpha, Pixel &pixel)
         real new_N = pixel.N + alpha * pixel.M;
         real new_R = pixel.radius * std::sqrt(new_N / (pixel.N + pixel.M));
 
-        Spectrum phi;
+        FSpectrum phi;
         for(int i = 0; i < SPECTRUM_COMPONENT_COUNT; ++i)
             phi[i] = pixel.phi[i];
 
@@ -252,17 +252,17 @@ void update_pixel_params(real alpha, Pixel &pixel)
             pixel.phi[i] = 0;
     }
 
-    pixel.vp.coef = Spectrum(0);
+    pixel.vp.coef = FSpectrum(0);
     pixel.vp.bsdf = nullptr;
 }
 
-Spectrum compute_pixel_radiance(
+FSpectrum compute_pixel_radiance(
     int direct_illum_N, uint64_t photon_N, const Pixel &pixel)
 {
-    const Spectrum direct_illum = pixel.direct_illum / real(direct_illum_N);
+    const FSpectrum direct_illum = pixel.direct_illum / real(direct_illum_N);
 
     const real dem = photon_N * PI_r * pixel.radius * pixel.radius;
-    const Spectrum photon_illum = pixel.tau / dem;
+    const FSpectrum photon_illum = pixel.tau / dem;
 
     return direct_illum + photon_illum;
 }

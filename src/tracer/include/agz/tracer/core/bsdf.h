@@ -22,15 +22,15 @@ struct BSDFSampleResult
     explicit BSDFSampleResult(uninitialized_t) noexcept { }
 
     BSDFSampleResult(
-        const FVec3 &dir, const Spectrum &f,
+        const FVec3 &dir, const FSpectrum &f,
         real pdf, bool is_delta) noexcept
         : dir(dir), f(f), pdf(pdf), is_delta(is_delta)
     {
 
     }
 
-    FVec3          dir;             // scattering direction
-    Spectrum      f;                // bsdf value
+    FVec3         dir;             // scattering direction
+    FSpectrum     f;                // bsdf value
     real          pdf = 0;          // pdf w.r.t. solid angle
     bool          is_delta = false; // is f/pdf delta function?
 
@@ -58,12 +58,12 @@ public:
     /**
      * @brief eval f(in, out) or f*(in, out)
      */
-    virtual Spectrum eval_all(
+    virtual FSpectrum eval_all(
         const FVec3 &wi, const FVec3 &wo, TransMode mode) const noexcept;
     /**
      * @brief eval f(in, out) or f*(in, out)
      */
-    virtual Spectrum eval(
+    virtual FSpectrum eval(
         const FVec3 &wi, const FVec3 &wo,
         TransMode mode, uint8_t type) const noexcept = 0;
 
@@ -95,7 +95,7 @@ public:
     /**
      * @brief material albedo
      */
-    virtual Spectrum albedo() const noexcept = 0;
+    virtual FSpectrum albedo() const noexcept = 0;
 
     /**
      * @brief is this a delta function?
@@ -132,11 +132,11 @@ protected:
         return cause_black_fringes(w1) || cause_black_fringes(w2);
     }
 
-    Spectrum eval_black_fringes(const FVec3 &in, const FVec3 &out) const noexcept
+    FSpectrum eval_black_fringes(const FVec3 &in, const FVec3 &out) const noexcept
     {
         if(!geometry_coord_.in_positive_z_hemisphere(in) ||
            !geometry_coord_.in_positive_z_hemisphere(out))
-            return Spectrum();
+            return FSpectrum();
         return albedo() / PI_r;
     }
 
@@ -154,7 +154,7 @@ protected:
         const FVec3 wi = geometry_coord_.local_to_global(lwi).normalize();
         const real normal_corr = local_angle::normal_corr_factor(
             geometry_coord_, shading_coord_, wi);;
-        const Spectrum f = albedo() / PI_r * normal_corr;
+        const FSpectrum f = albedo() / PI_r * normal_corr;
 
         return BSDFSampleResult(wi, f, pdf, false);
     }
@@ -183,7 +183,7 @@ public:
     }
 };
 
-inline Spectrum BSDF::eval_all(
+inline FSpectrum BSDF::eval_all(
     const FVec3 &wi, const FVec3 &wo, TransMode mode) const noexcept
 {
     return eval(wi, wo, mode, BSDF_ALL);

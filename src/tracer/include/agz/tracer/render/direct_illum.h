@@ -7,42 +7,42 @@
 
 AGZ_TRACER_BEGIN
 
-Spectrum mis_sample_area_light(
+FSpectrum mis_sample_area_light(
     const Scene &scene,
     const AreaLight *light,
     const EntityIntersection &inct,
     const ShadingPoint &shd,
     Sampler &sampler);
 
-Spectrum mis_sample_area_light(
+FSpectrum mis_sample_area_light(
     const Scene &scene,
     const AreaLight *light,
     const MediumScattering &scattering,
     const BSDF *phase_function,
     Sampler &sampler);
 
-Spectrum mis_sample_envir_light(
+FSpectrum mis_sample_envir_light(
     const Scene &scene,
     const EnvirLight *light,
     const EntityIntersection &inct,
     const ShadingPoint &shd,
     Sampler &sampler);
 
-Spectrum mis_sample_envir_light(
+FSpectrum mis_sample_envir_light(
     const Scene &scene,
     const EnvirLight *light,
     const MediumScattering &scattering,
     const BSDF *phase_function,
     Sampler &sampler);
 
-Spectrum mis_sample_light(
+FSpectrum mis_sample_light(
     const Scene &scene,
     const Light *lht,
     const EntityIntersection &inct,
     const ShadingPoint &shd,
     Sampler &sampler);
 
-Spectrum mis_sample_light(
+FSpectrum mis_sample_light(
     const Scene &scene,
     const Light *lht,
     const MediumScattering &scattering,
@@ -54,7 +54,7 @@ Spectrum mis_sample_light(
  *
  * the last 3 parameters are used for receiving the BSDF sampling result
  */
-Spectrum mis_sample_bsdf(
+FSpectrum mis_sample_bsdf(
     const Scene &scene,
     const EntityIntersection &inct,
     const ShadingPoint &shd,
@@ -63,7 +63,7 @@ Spectrum mis_sample_bsdf(
     bool &has_ent_inct,
     EntityIntersection &ent_inct);
 
-Spectrum mis_sample_bsdf(
+FSpectrum mis_sample_bsdf(
     const Scene &scene,
     const EntityIntersection &inct,
     const ShadingPoint &shd,
@@ -74,7 +74,7 @@ Spectrum mis_sample_bsdf(
  *
  * the last 3 parameters are receiver of the phase function sampling result
  */
-Spectrum mis_sample_bsdf(
+FSpectrum mis_sample_bsdf(
     const Scene &scene,
     const MediumScattering &scattering,
     const BSDF *phase_function,
@@ -82,7 +82,7 @@ Spectrum mis_sample_bsdf(
     BSDFSampleResult &bsdf_sample,
     bool &has_ent_inct, EntityIntersection &ent_inct);
 
-Spectrum mis_sample_bsdf(
+FSpectrum mis_sample_bsdf(
     const Scene &scene,
     const MediumScattering &scattering,
     const BSDF *phase_function,

@@ -6,22 +6,22 @@ AGZ_TRACER_BEGIN
 
 class HomogeneousMedium : public Medium
 {
-    Spectrum sigma_a_;
-    Spectrum sigma_s_;
-    Spectrum sigma_t_;
+    FSpectrum sigma_a_;
+    FSpectrum sigma_s_;
+    FSpectrum sigma_t_;
     real g_ = 0;
 
     int max_scattering_count_;
 
-    Spectrum albedo() const
+    FSpectrum albedo() const
     {
-        return !sigma_t_ ? Spectrum(1) : sigma_s_ / sigma_t_;
+        return !sigma_t_ ? FSpectrum(1) : sigma_s_ / sigma_t_;
     }
 
 public:
 
     HomogeneousMedium(
-        const Spectrum &sigma_a, const Spectrum &sigma_s, real g,
+        const FSpectrum &sigma_a, const FSpectrum &sigma_s, real g,
         int max_scattering_count)
     {
         AGZ_HIERARCHY_TRY
@@ -45,10 +45,10 @@ public:
         return max_scattering_count_;
     }
 
-    Spectrum tr(
+    FSpectrum tr(
         const FVec3 &a, const FVec3 &b, Sampler &sampler) const noexcept override
     {
-        const Spectrum exp = -sigma_t_ * (a - b).length();
+        const FSpectrum exp = -sigma_t_ * (a - b).length();
         return {
             std::exp(exp.r),
             std::exp(exp.g),
@@ -56,10 +56,10 @@ public:
         };
     }
 
-    Spectrum ab(
+    FSpectrum ab(
         const FVec3 &a, const FVec3 &b, Sampler &sampler) const noexcept override
     {
-        const Spectrum exp = -sigma_a_ * (a - b).length();
+        const FSpectrum exp = -sigma_a_ * (a - b).length();
         return {
             std::exp(exp.r),
             std::exp(exp.g),
@@ -81,10 +81,10 @@ public:
         const real st = -std::log(new_sam) / sigma_t_[color_channel];
 
         const bool sample_medium = st < t_max;
-        Spectrum tr;
+        FSpectrum tr;
         for(int i = 0; i < SPECTRUM_COMPONENT_COUNT; ++i)
             tr[i] = std::exp(-sigma_t_[i] * (std::min)(st, t_max));
-        const Spectrum density = sample_medium ? sigma_s_ * tr : tr;
+        const FSpectrum density = sample_medium ? sigma_s_ * tr : tr;
 
         real pdf = 0;
         for(int i = 0; i < SPECTRUM_COMPONENT_COUNT; ++i)
@@ -92,7 +92,7 @@ public:
         pdf /= SPECTRUM_COMPONENT_COUNT;
         pdf = (std::max)(pdf, EPS());
 
-        Spectrum throughput = tr / pdf;
+        FSpectrum throughput = tr / pdf;
         if(sample_medium)
             throughput *= sigma_s_;
 
@@ -115,8 +115,8 @@ public:
 };
 
 RC<Medium> create_homogeneous_medium(
-    const Spectrum &sigma_a,
-    const Spectrum &sigma_s,
+    const FSpectrum &sigma_a,
+    const FSpectrum &sigma_s,
     real g,
     int max_scattering_count)
 {

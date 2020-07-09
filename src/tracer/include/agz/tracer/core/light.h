@@ -15,7 +15,7 @@ struct LightSampleResult
 {
     LightSampleResult(
         const FVec3 &ref, const FVec3 &pos, const FVec3 &nor,
-        const Spectrum &rad, real pdf) noexcept
+        const FSpectrum &rad, real pdf) noexcept
         : ref(ref), pos(pos), nor(nor), radiance(rad), pdf(pdf)
     {
         
@@ -24,7 +24,7 @@ struct LightSampleResult
     FVec3 ref;
     FVec3 pos;
     FVec3 nor;
-    Spectrum radiance;
+    FSpectrum radiance;
     real pdf;
 
     bool valid() const noexcept
@@ -51,7 +51,7 @@ struct LightEmitResult
 {
     LightEmitResult(
         const FVec3 &pos, const FVec3 &dir, const FVec3 &nor, const Vec2 &uv,
-        const Spectrum &rad, real pdf_pos, real pdf_dir) noexcept
+        const FSpectrum &rad, real pdf_pos, real pdf_dir) noexcept
         : pos(pos), dir(dir), nor(nor), uv(uv),
           radiance(rad), pdf_pos(pdf_pos), pdf_dir(pdf_dir)
     {
@@ -62,9 +62,9 @@ struct LightEmitResult
     FVec3 dir;          // emitting direction
     FVec3 nor;          // normal at pos
     Vec2 uv;
-    Spectrum radiance; // emitted radiance
-    real pdf_pos;      // pdf w.r.t. light surface area
-    real pdf_dir;      // pdf w.r.t. solid angle at position
+    FSpectrum radiance; // emitted radiance
+    real pdf_pos;       // pdf w.r.t. light surface area
+    real pdf_dir;       // pdf w.r.t. solid angle at position
 };
 
 /**
@@ -145,7 +145,7 @@ public:
     /**
      * @brief emission power
      */
-    virtual Spectrum power() const noexcept = 0;
+    virtual FSpectrum power() const noexcept = 0;
 };
 
 /**
@@ -166,7 +166,7 @@ public:
      * @param nor normal at pos
      * @param light_to_out direction from light source to outside
      */
-    virtual Spectrum radiance(
+    virtual FSpectrum radiance(
         const FVec3 &pos, const FVec3 &nor, const Vec2 &uv,
         const FVec3 &light_to_out) const noexcept = 0;
 
@@ -206,7 +206,7 @@ public:
      * @param ref_to_light direction from outside to light source
      * @return radiance from light source to outside
      */
-    virtual Spectrum radiance(
+    virtual FSpectrum radiance(
         const FVec3 &ref, const FVec3 &ref_to_light) const noexcept = 0;
 
     /**

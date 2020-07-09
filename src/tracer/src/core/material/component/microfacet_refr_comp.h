@@ -6,7 +6,7 @@ AGZ_TRACER_BEGIN
 
 class GGXMicrofacetRefractionComponent : public BSDFComponent
 {
-    Spectrum color_;
+    FSpectrum color_;
     real ior_;
     real ax_;
     real ay_;
@@ -22,10 +22,10 @@ class GGXMicrofacetRefractionComponent : public BSDFComponent
 public:
 
     GGXMicrofacetRefractionComponent(
-        const Spectrum &color, real ior,
+        const FSpectrum &color, real ior,
         real roughness, real anisotropic);
 
-    Spectrum eval(
+    FSpectrum eval(
         const FVec3 &lwi, const FVec3 &lwo,
         TransMode mode) const noexcept override;
 

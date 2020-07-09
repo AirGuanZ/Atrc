@@ -94,11 +94,17 @@ void set_world_scale(real scale) noexcept;
 
 // spectrum
 
-using Spectrum = math::tcolor3<real>;
+using Spectrum  = math::tcolor3<real>;
+using FSpectrum = math::_simd_float3_t;
 
 constexpr int SPECTRUM_COMPONENT_COUNT = 3;
 
 inline bool has_inf(const Spectrum &s) noexcept
+{
+    return std::isinf(s.r) || std::isinf(s.g) || std::isinf(s.b);
+}
+
+inline bool has_inf(const FSpectrum &s) noexcept
 {
     return std::isinf(s.r) || std::isinf(s.g) || std::isinf(s.b);
 }

@@ -46,7 +46,7 @@ public:
         return max_scattering_count_;
     }
 
-    Spectrum tr(
+    FSpectrum tr(
         const FVec3 &a, const FVec3 &b, Sampler &sampler) const noexcept override
     {
         real result = 1;
@@ -67,10 +67,10 @@ public:
             result *= 1 - density / max_density_;
         }
 
-        return Spectrum(result);
+        return FSpectrum(result);
     }
 
-    Spectrum ab(
+    FSpectrum ab(
         const FVec3 &a, const FVec3 &b, Sampler &sampler) const noexcept override
     {
         // FIXME
@@ -97,7 +97,7 @@ public:
             const real density = density_->sample_real(unit_pos);
             if(sampler.sample1().u < density / max_density_)
             {
-                const Spectrum albedo = albedo_->sample_spectrum(unit_pos);
+                const FSpectrum albedo = albedo_->sample_spectrum(unit_pos);
                 const real     g      = g_->sample_real(unit_pos);
 
                 MediumScattering scattering;
@@ -107,14 +107,14 @@ public:
 
                 auto phase_function =
                     arena.create<HenyeyGreensteinPhaseFunction>(
-                        g, Spectrum(albedo));
+                        g, FSpectrum(albedo));
 
                 return SampleOutScatteringResult(
-                    scattering, Spectrum(albedo), phase_function);
+                    scattering, FSpectrum(albedo), phase_function);
             }
         }
 
-        return SampleOutScatteringResult({}, Spectrum(1), nullptr);
+        return SampleOutScatteringResult({}, FSpectrum(1), nullptr);
     }
 };
 

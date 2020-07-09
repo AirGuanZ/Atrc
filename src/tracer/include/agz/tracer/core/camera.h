@@ -15,7 +15,7 @@ struct CameraSampleWeResult
         const FVec3 &pos_on_cam,
         const FVec3 &pos_to_out,
         const FVec3 &nor_on_cam,
-        const Spectrum &throughput) noexcept
+        const FSpectrum &throughput) noexcept
         : pos_on_cam(pos_on_cam),
           pos_to_out(pos_to_out),
           nor_on_cam(nor_on_cam),
@@ -27,7 +27,7 @@ struct CameraSampleWeResult
     FVec3 pos_on_cam;
     FVec3 pos_to_out;
     FVec3 nor_on_cam;
-    Spectrum throughput;
+    FSpectrum throughput;
 };
 
 /**
@@ -51,7 +51,7 @@ struct CameraWePDFResult
 struct CameraEvalWeResult
 {
     CameraEvalWeResult(
-        const Spectrum &we,
+        const FSpectrum &we,
         const Vec2 &film_coord,
         const FVec3 &nor_on_cam) noexcept
         : we(we), film_coord(film_coord), nor_on_cam(nor_on_cam)
@@ -59,7 +59,7 @@ struct CameraEvalWeResult
 
     }
 
-    Spectrum we;
+    FSpectrum we;
     Vec2 film_coord;
     FVec3 nor_on_cam;
 };
@@ -76,7 +76,7 @@ struct CameraSampleWiResult
         const FVec3 &pos_on_cam,
         const FVec3 &nor_at_pos,
         const FVec3 &ref_to_pos,
-        const Spectrum &we,
+        const FSpectrum &we,
         real pdf,
         const Vec2 &film_coord) noexcept
         : pos_on_cam(pos_on_cam),
@@ -92,9 +92,9 @@ struct CameraSampleWiResult
     FVec3 pos_on_cam; // position on camera lens
     FVec3 nor_at_pos; // lens normal
     FVec3 ref_to_pos; // from reference point to position on lens
-    Spectrum we;     // initial importance function
-    real pdf = 0;    // pdf w.r.t. solid angle at ref
-    Vec2 film_coord; // where on the film does this sample correspond to 
+    FSpectrum we;     // initial importance function
+    real pdf = 0;     // pdf w.r.t. solid angle at ref
+    Vec2 film_coord;  // where on the film does this sample correspond to 
 };
 
 inline const CameraSampleWiResult CAMERA_SAMPLE_WI_RESULT_INVALID =

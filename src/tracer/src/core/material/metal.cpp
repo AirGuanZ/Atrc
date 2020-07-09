@@ -42,14 +42,14 @@ public:
         const FCoord shading_coord = normal_mapper_->reorient(
             inct.uv, inct.user_coord);
 
-        const Spectrum color   = color_->sample_spectrum(inct.uv);
-        const Spectrum k       = k_->sample_spectrum(inct.uv);
-        const Spectrum eta     = eta_->sample_spectrum(inct.uv);
+        const FSpectrum color   = color_->sample_spectrum(inct.uv);
+        const FSpectrum k       = k_->sample_spectrum(inct.uv);
+        const FSpectrum eta     = eta_->sample_spectrum(inct.uv);
         const real roughness   = roughness_->sample_real(inct.uv);
         const real anisotropic = anisotropic_->sample_real(inct.uv);
 
         const auto fresnel = arena.create<ColoredConductorPoint>(
-            color, Spectrum(1), eta, k);
+            color, FSpectrum(1), eta, k);
 
         auto *bsdf = arena.create<AggregateBSDF<1>>(
             inct.geometry_coord, shading_coord, color);

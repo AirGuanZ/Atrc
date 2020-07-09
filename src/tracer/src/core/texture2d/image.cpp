@@ -13,7 +13,7 @@ class ImageTexture : public Texture2D
 {
     RC<const Image2D<math::color3b>> data_;
 
-    static Spectrum nearest_sample_impl(
+    static FSpectrum nearest_sample_impl(
         const texture::texture2d_t<math::color3b> *data, const Vec2 &uv) noexcept
     {
         const auto tex = [&t = *data](int x, int y)
@@ -21,7 +21,7 @@ class ImageTexture : public Texture2D
         return texture::nearest_sample2d(uv, tex, data->width(), data->height());
     }
 
-    static Spectrum linear_sample_impl(
+    static FSpectrum linear_sample_impl(
         const texture::texture2d_t<math::color3b> *data, const Vec2 &uv) noexcept
     {
         const auto tex = [&t = *data](int x, int y)
@@ -29,13 +29,13 @@ class ImageTexture : public Texture2D
         return texture::linear_sample2d(uv, tex, data->width(), data->height());
     }
 
-    using SampleImplFuncPtr = Spectrum(*)(
+    using SampleImplFuncPtr = FSpectrum(*)(
         const texture::texture2d_t<math::color3b>*, const Vec2&);
     SampleImplFuncPtr sample_impl_ = linear_sample_impl;
 
 protected:
 
-    Spectrum sample_spectrum_impl(const Vec2 &uv) const noexcept override
+    FSpectrum sample_spectrum_impl(const Vec2 &uv) const noexcept override
     {
         return sample_impl_(data_.get(), uv.saturate());
     }

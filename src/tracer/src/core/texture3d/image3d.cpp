@@ -27,7 +27,7 @@ class ImageTexture3D : public Texture3D
 {
     RC<const Image3D<ElemType>> data_;
 
-    Spectrum max_spec_;
+    FSpectrum max_spec_;
     real max_real_;
 
 protected:
@@ -65,16 +65,16 @@ protected:
         }
     }
 
-    Spectrum sample_spectrum_impl(const FVec3 &uvw) const noexcept override
+    FSpectrum sample_spectrum_impl(const FVec3 &uvw) const noexcept override
     {
         auto access_texel = [&](int x, int y, int z)
         {
             SWITCH_ET(
             {
-                return Spectrum(data_->at(z, y, x));
+                return FSpectrum(data_->at(z, y, x));
             },
             {
-                return Spectrum(data_->at(z, y, x) / real(255));
+                return FSpectrum(data_->at(z, y, x) / real(255));
             },
             {
                 return data_->at(z, y, x);
@@ -107,7 +107,7 @@ public:
         init_common_params(common_params);
         data_ = std::move(data);
 
-        max_spec_ = Spectrum(REAL_MIN);
+        max_spec_ = FSpectrum(REAL_MIN);
         max_real_ = REAL_MIN;
 
         for(int z = 0; z < data_->depth(); ++z)
@@ -124,13 +124,13 @@ public:
                         max_real_ = (std::max)(max_real_, data_->at(z, y, x) / real(255));
                     },
                     {
-                        const Spectrum e = data_->at(z, y, x);
+                        const FSpectrum e = data_->at(z, y, x);
                         max_spec_.r = (std::max)(max_spec_.r, e.r);
                         max_spec_.g = (std::max)(max_spec_.g, e.g);
                         max_spec_.b = (std::max)(max_spec_.b, e.b);
                     },
                     {
-                        const Spectrum e = math::from_color3b<real>(data_->at(z, y, x));
+                        const FSpectrum e = math::from_color3b<real>(data_->at(z, y, x));
                         max_spec_.r = (std::max)(max_spec_.r, e.r);
                         max_spec_.g = (std::max)(max_spec_.g, e.g);
                         max_spec_.b = (std::max)(max_spec_.b, e.b);
@@ -140,8 +140,8 @@ public:
         }
 
         SWITCH_ET(
-            { max_spec_ = Spectrum(max_real_); },
-            { max_spec_ = Spectrum(max_real_); },
+            { max_spec_ = FSpectrum(max_real_); },
+            { max_spec_ = FSpectrum(max_real_); },
             { max_real_ = max_spec_.r; },
             { max_real_ = max_spec_.r; });
     }
@@ -161,7 +161,7 @@ public:
         return data_->depth();
     }
 
-    Spectrum max_spectrum() const noexcept override
+    FSpectrum max_spectrum() const noexcept override
     {
         return max_spec_;
     }

@@ -6,11 +6,11 @@ AGZ_TRACER_BEGIN
 
 RC<Texture2D> create_checker_board(
     const Texture2DCommonParams &common_params,
-    int grid_count, const Spectrum &color1, const Spectrum &color2);
+    int grid_count, const FSpectrum &color1, const FSpectrum &color2);
 
 RC<Texture2D> create_constant2d_texture(
     const Texture2DCommonParams &common_params,
-    const Spectrum &texel);
+    const FSpectrum &texel);
 
 RC<Texture2D> create_constant2d_texture(
     const Texture2DCommonParams &common_params,

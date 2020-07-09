@@ -11,8 +11,8 @@ RC<EnvirLight> create_ibl_light(
     real user_specified_power = -1);
 
 RC<EnvirLight> create_native_sky(
-    const Spectrum &top,
-    const Spectrum &bottom,
+    const FSpectrum &top,
+    const FSpectrum &bottom,
     real user_specified_power = -1);
 
 AGZ_TRACER_END

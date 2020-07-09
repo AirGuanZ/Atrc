@@ -17,12 +17,12 @@ namespace disney_impl
 
     class DisneyBSDF : public LocalBSDF
     {
-        Spectrum C_;
-        Spectrum Ctint_;
+        FSpectrum C_;
+        FSpectrum Ctint_;
 
         real metallic_;
         real roughness_;
-        Spectrum specular_scale_;
+        FSpectrum specular_scale_;
         real specular_tint_;
         real anisotropic_;
         real sheen_;
@@ -59,9 +59,9 @@ namespace disney_impl
             return sqr(eta - 1) / sqr(eta + 1);
         }
 
-        static Spectrum schlick(const Spectrum &R0, real cos_theta) noexcept
+        static FSpectrum schlick(const FSpectrum &R0, real cos_theta) noexcept
         {
-            return R0 + (Spectrum(1) - R0) * one_minus_5(cos_theta);
+            return R0 + (FSpectrum(1) - R0) * one_minus_5(cos_theta);
         }
 
         static real schlick(const real &R0, real cos_theta) noexcept
@@ -69,33 +69,33 @@ namespace disney_impl
             return R0 + (1 - R0) * one_minus_5(cos_theta);
         }
 
-        static Spectrum to_tint(const Spectrum &base_color) noexcept
+        static FSpectrum to_tint(const FSpectrum &base_color) noexcept
         {
             const real lum = base_color.lum();
-            return lum > 0 ? base_color / lum : Spectrum(1);
+            return lum > 0 ? base_color / lum : FSpectrum(1);
         }
 
-        Spectrum f_diffuse(
+        FSpectrum f_diffuse(
             real cos_theta_i, real cos_theta_o, real cos_theta_d) const noexcept
         {
-            const Spectrum f_lambert = C_ / PI_r;
+            const FSpectrum f_lambert = C_ / PI_r;
             const real FL = one_minus_5(cos_theta_i);
             const real FV = one_minus_5(cos_theta_o);
             const real RR = 2 * roughness_ * cos_theta_d * cos_theta_d;
-            const Spectrum F_retro_refl =
+            const FSpectrum F_retro_refl =
                 C_ / PI_r * RR * (FL + FV + FL * FV * (RR - 1));
 
             return f_lambert * (1 - real(0.5) * FL) * (1 - real(0.5) * FV)
                  + F_retro_refl;
         }
 
-        Spectrum f_sheen(real cos_theta_d) const noexcept
+        FSpectrum f_sheen(real cos_theta_d) const noexcept
         {
-            return 4 * sheen_ * mix(Spectrum(1), Ctint_, sheen_tint_)
+            return 4 * sheen_ * mix(FSpectrum(1), Ctint_, sheen_tint_)
                               * one_minus_5(cos_theta_d);
         }
 
-        Spectrum f_clearcoat(
+        FSpectrum f_clearcoat(
             real cos_theta_i, real cos_theta_o,
             real tan_theta_i, real tan_theta_o,
             real sin_theta_h, real cos_theta_h, real cos_theta_d) const noexcept
@@ -106,11 +106,11 @@ namespace disney_impl
             const real F = schlick(real(0.04), cos_theta_d);
             const real G = microfacet::smith_gtr2(tan_theta_i, real(0.25))
                          * microfacet::smith_gtr2(tan_theta_o, real(0.25));
-            return Spectrum(
+            return FSpectrum(
                 clearcoat_ * D * F * G / std::abs(4 * cos_theta_i * cos_theta_o));
         }
 
-        Spectrum f_trans(
+        FSpectrum f_trans(
             const FVec3 &lwi, const FVec3 &lwo, TransMode mode) const noexcept
         {
             assert(lwi.z * lwo.z < 0);
@@ -152,8 +152,7 @@ namespace disney_impl
             const real sdem = cos_theta_d + eta * dot(lwi, lwh);
             const real corr_factor = mode == TransMode::Radiance ? 1 / eta : 1;
 
-            real(*std_sqrt)(real) = std::sqrt;
-            const Spectrum sqrtC = C_.map(std_sqrt);
+            const FSpectrum sqrtC = sqrt(C_);
 
             const real val = (1 - F) * D * G * eta * eta
                            * dot(lwi, lwh) * dot(lwo, lwh)
@@ -164,7 +163,7 @@ namespace disney_impl
             return (1 - metallic_) * trans_factor * sqrtC * std::abs(val);
         }
 
-        Spectrum f_inner_refl(const FVec3 &lwi, const FVec3 &lwo) const noexcept
+        FSpectrum f_inner_refl(const FVec3 &lwi, const FVec3 &lwo) const noexcept
         {
             assert(lwi.z < 0 && lwo.z < 0);
             
@@ -202,7 +201,7 @@ namespace disney_impl
             return transmission_ * C_ * std::abs(F * D * G / (4 * lwi.z * lwo.z));
         }
 
-        Spectrum f_specular(const FVec3 &lwi, const FVec3 &lwo) const noexcept
+        FSpectrum f_specular(const FVec3 &lwi, const FVec3 &lwo) const noexcept
         {
             assert(lwi.z > 0 && lwo.z > 0);
 
@@ -212,13 +211,13 @@ namespace disney_impl
             const FVec3 lwh = (lwi + lwo).normalize();
             const real cos_theta_d = dot(lwi, lwh);
 
-            const Spectrum Cspec = mix(
-                mix(Spectrum(1), Ctint_, specular_tint_),
+            const FSpectrum Cspec = mix(
+                mix(FSpectrum(1), Ctint_, specular_tint_),
                 C_, metallic_);
-            const Spectrum dielectric_fresnel = Cspec
+            const FSpectrum dielectric_fresnel = Cspec
                 * refl_aux::dielectric_fresnel(IOR_, 1, cos_theta_d);
-            const Spectrum conductor_fresnel = schlick(Cspec, cos_theta_d);
-            const Spectrum F = mix(
+            const FSpectrum conductor_fresnel = schlick(Cspec, cos_theta_d);
+            const FSpectrum F = mix(
                 specular_scale_ * dielectric_fresnel, conductor_fresnel, metallic_);
             
             const real phi_h       = local_angle::phi(lwh);
@@ -404,10 +403,10 @@ namespace disney_impl
     public:
 
         DisneyBSDF(const FCoord &geometry_coord, const FCoord &shading_coord,
-                   const Spectrum &base_color,
+                   const FSpectrum &base_color,
                    real metallic,
                    real roughness,
-                   const Spectrum &specular_scale,
+                   const FSpectrum &specular_scale,
                    real specular_tint,
                    real anisotropic,
                    real sheen,
@@ -457,7 +456,7 @@ namespace disney_impl
             sample_w.clearcoat    = B * clearcoat_ / (2 + clearcoat_);
         }
 
-        Spectrum eval(
+        FSpectrum eval(
             const FVec3 &wi, const FVec3 &wo,
             TransMode mode, uint8_t type) const noexcept override
         {
@@ -477,7 +476,7 @@ namespace disney_impl
                 if(!(type & BSDF_GLOSSY) || !transmission_)
                     return {};
 
-                const Spectrum value = f_trans(lwi, lwo, mode);
+                const FSpectrum value = f_trans(lwi, lwo, mode);
                 return value * local_angle::normal_corr_factor(
                     geometry_coord_, shading_coord_, wi);
             }
@@ -489,7 +488,7 @@ namespace disney_impl
                 if(!(type & BSDF_GLOSSY) || !transmission_)
                     return {};
 
-                const Spectrum value = f_inner_refl(lwi, lwo);
+                const FSpectrum value = f_inner_refl(lwi, lwo);
                 return value * local_angle::normal_corr_factor(
                     geometry_coord_, shading_coord_, wi);
             }
@@ -505,7 +504,7 @@ namespace disney_impl
             const FVec3 lwh = (lwi + lwo).normalize();
             const real cos_theta_d = dot(lwi, lwh);
 
-            Spectrum diffuse, sheen;
+            FSpectrum diffuse, sheen;
             if(metallic_ < 1)
             {
                 if(type & BSDF_DIFFUSE)
@@ -515,11 +514,11 @@ namespace disney_impl
                     sheen = f_sheen(cos_theta_d);
             }
 
-            Spectrum specular;
+            FSpectrum specular;
             if(type & BSDF_GLOSSY)
                 specular = f_specular(lwi, lwo);
 
-            Spectrum clearcoat;
+            FSpectrum clearcoat;
             if(clearcoat_ > 0 && (type & BSDF_GLOSSY))
             {
                 const real tan_theta_i = local_angle::tan_theta(lwi);
@@ -532,7 +531,7 @@ namespace disney_impl
                     sin_theta_h, cos_theta_h, cos_theta_d);
             }
 
-            const Spectrum value = (1 - metallic_) * (1 - transmission_)
+            const FSpectrum value = (1 - metallic_) * (1 - transmission_)
                                  * (diffuse + sheen) + specular + clearcoat;
 
             const real normal_corr_factor = local_angle::normal_corr_factor(
@@ -571,7 +570,7 @@ namespace disney_impl
                     return BSDF_SAMPLE_RESULT_INVALID;
 
                 const FVec3 wi    = shading_coord_.local_to_global(lwi);
-                const Spectrum f = eval_all(wi, wo, mode);
+                const FSpectrum f = eval_all(wi, wo, mode);
                 const real pdf   = pdf_all(wi, wo);
 
                 return BSDFSampleResult(wi, f, pdf, false);
@@ -615,7 +614,7 @@ namespace disney_impl
                 return BSDF_SAMPLE_RESULT_INVALID;
             
             const FVec3 wi    = shading_coord_.local_to_global(lwi);
-            const Spectrum f = eval_all(wi, wo, mode);
+            const FSpectrum f = eval_all(wi, wo, mode);
             const real pdf   = pdf_all(wi, wo);
 
             return BSDFSampleResult(wi, f, pdf, false);
@@ -679,7 +678,7 @@ namespace disney_impl
                   + sample_w.clearcoat * clearcoat) / pdf_sum;
         }
 
-        Spectrum albedo() const noexcept override
+        FSpectrum albedo() const noexcept override
         {
             return C_;
         }
@@ -756,13 +755,13 @@ public:
     ShadingPoint shade(const EntityIntersection &inct, Arena &arena) const override
     {
         const Vec2 uv = inct.uv;
-        const Spectrum base_color             = base_color_      ->sample_spectrum(uv);
+        const FSpectrum base_color             = base_color_      ->sample_spectrum(uv);
         const real     metallic               = metallic_        ->sample_real(uv);
         const real     roughness              = roughness_       ->sample_real(uv);
         const real     transmission           = transmission_    ->sample_real(uv);
         const real     transmission_roughness = transmission_roughness_->sample_real(uv);
         const real     ior                    = IOR_             ->sample_real(uv);
-        const Spectrum specular_scale         = specular_scale_  ->sample_spectrum(uv);
+        const FSpectrum specular_scale         = specular_scale_  ->sample_spectrum(uv);
         const real     specular_tint          = specular_tint_   ->sample_real(uv);
         const real     anisotropic            = anisotropic_     ->sample_real(uv);
         const real     sheen                  = sheen_           ->sample_real(uv);

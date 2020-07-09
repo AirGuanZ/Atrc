@@ -16,7 +16,7 @@ Pixel trace_std(
     const TraceParams &params, const Scene &scene, const Ray &ray,
     Sampler &sampler, Arena &arena)
 {
-    Spectrum coef(1);
+    FSpectrum coef(1);
     Ray r = ray;
 
     Pixel pixel;
@@ -82,7 +82,7 @@ Pixel trace_std(
 
                 // compute direct illumination
 
-                Spectrum direct_illum;
+                FSpectrum direct_illum;
                 for(int i = 0; i < params.direct_illum_sample_count; ++i)
                 {
                     for(auto light : scene.lights())
@@ -112,7 +112,7 @@ Pixel trace_std(
         {
             // continus scattering count is too large
             // only account absorbtion here
-            const Spectrum ab = medium->ab(r.o, ent_inct.pos, sampler);
+            const FSpectrum ab = medium->ab(r.o, ent_inct.pos, sampler);
             coef *= ab;
         }
 
@@ -131,7 +131,7 @@ Pixel trace_std(
 
         // direct illumination
 
-        Spectrum direct_illum;
+        FSpectrum direct_illum;
         for(int i = 0; i < params.direct_illum_sample_count; ++i)
         {
             for(auto light : scene.lights())
@@ -190,7 +190,7 @@ Pixel trace_std(
             auto &new_inct = bssrdf_sample.inct;
             auto new_shd = new_inct.material->shade(new_inct, arena);
 
-            Spectrum new_direct_illum;
+            FSpectrum new_direct_illum;
             for(int i = 0; i < params.direct_illum_sample_count; ++i)
             {
                 for(auto light : scene.lights())
@@ -228,7 +228,7 @@ Pixel trace_nomis(
     const TraceParams &params, const Scene &scene, const Ray &ray,
     Sampler &sampler, Arena &arena)
 {
-    Spectrum coef(1);
+    FSpectrum coef(1);
     Ray r = ray;
 
     Pixel pixel;
@@ -302,7 +302,7 @@ Pixel trace_nomis(
         {
             // continus scattering count is too large
             // only account absorbtion here
-            const Spectrum ab = medium->ab(r.o, ent_inct.pos, sampler);
+            const FSpectrum ab = medium->ab(r.o, ent_inct.pos, sampler);
             coef *= ab;
         }
 
@@ -387,8 +387,8 @@ Pixel trace_ao(
     if(!scene.closest_intersection(ray, &inct))
         return { { {}, {}, 1 }, params.background_color };
 
-    Spectrum pixel_albedo = params.high_color;
-    FVec3    pixel_normal = inct.geometry_coord.z;
+    FSpectrum pixel_albedo = params.high_color;
+    FVec3    pixel_normal  = inct.geometry_coord.z;
     real     pixel_denoise = inct.entity->get_no_denoise_flag() ? real(0) : real(1);;
 
     const FVec3 start_pos = inct.eps_offset(inct.geometry_coord.z);
@@ -428,12 +428,12 @@ Pixel trace_albedo_ao(
         return pixel;
     }
 
-    Spectrum le;
+    FSpectrum le;
     if(const AreaLight *light = inct.entity->as_light())
         le = light->radiance(inct.pos, inct.geometry_coord.z, inct.uv, inct.wr);
 
     const ShadingPoint shd = inct.material->shade(inct, arena);
-    const Spectrum albedo = shd.bsdf->albedo();
+    const FSpectrum albedo = shd.bsdf->albedo();
 
     pixel.normal = inct.geometry_coord.z;
     pixel.albedo = shd.bsdf->albedo();

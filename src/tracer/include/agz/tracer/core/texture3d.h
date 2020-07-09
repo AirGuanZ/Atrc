@@ -51,7 +51,7 @@ protected:
 
     void init_common_params(const Texture3DCommonParams &params);
 
-    virtual Spectrum sample_spectrum_impl(const FVec3 &uvw) const noexcept;
+    virtual FSpectrum sample_spectrum_impl(const FVec3 &uvw) const noexcept;
 
     virtual real sample_real_impl(const FVec3 &uvw) const noexcept;
 
@@ -62,7 +62,7 @@ public:
     /**
      * @brief sample spectrum value at uv
      */
-    virtual Spectrum sample_spectrum(const FVec3 &uvw) const noexcept;
+    virtual FSpectrum sample_spectrum(const FVec3 &uvw) const noexcept;
     
     /**
      * @brief sample real value at uv
@@ -78,7 +78,7 @@ public:
     /**
      * @brief element-wise maximal spectrum value
      */
-    virtual Spectrum max_spectrum() const noexcept = 0;
+    virtual FSpectrum max_spectrum() const noexcept = 0;
 
     /**
      * @brief maximal real value
@@ -183,9 +183,9 @@ inline void Texture3D::init_common_params(const Texture3DCommonParams &params)
     inv_gamma_ = params.inv_gamma;
 }
 
-inline Spectrum Texture3D::sample_spectrum_impl(const FVec3 &uvw) const noexcept
+inline FSpectrum Texture3D::sample_spectrum_impl(const FVec3 &uvw) const noexcept
 {
-    return Spectrum(sample_real_impl(uvw));
+    return FSpectrum(sample_real_impl(uvw));
 }
 
 inline real Texture3D::sample_real_impl(const FVec3 &uvw) const noexcept
@@ -193,7 +193,7 @@ inline real Texture3D::sample_real_impl(const FVec3 &uvw) const noexcept
     return sample_spectrum_impl(uvw).r;
 }
 
-inline Spectrum Texture3D::sample_spectrum(const FVec3 &uvw) const noexcept
+inline FSpectrum Texture3D::sample_spectrum(const FVec3 &uvw) const noexcept
 {
     auto tuvw = transform_.apply_to_point(uvw);
     tuvw.x = wrapper_u_(tuvw.x);

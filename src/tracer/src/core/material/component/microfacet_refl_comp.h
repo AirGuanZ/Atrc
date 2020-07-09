@@ -17,7 +17,7 @@ public:
         const FresnelPoint *fresnel,
         real roughness, real anisotropic) noexcept;
 
-    Spectrum eval(
+    FSpectrum eval(
         const FVec3 &lwi, const FVec3 &lwo,
         TransMode mode) const noexcept override;
 

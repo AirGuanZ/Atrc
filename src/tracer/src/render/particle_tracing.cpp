@@ -23,7 +23,7 @@ void trace_particle(
 
     const Camera *camera = scene.get_camera();
 
-    Spectrum coef = emit_result.radiance /
+    FSpectrum coef = emit_result.radiance /
         (select_light_pdf * emit_result.pdf_pos * emit_result.pdf_dir);
     coef *= std::abs(cos(emit_result.dir, emit_result.nor));
 
@@ -53,7 +53,7 @@ void trace_particle(
         {
             if(scene.visible(camera_sample.pos_on_cam, inct.pos))
             {
-                const Spectrum bsdf_f = shd.bsdf->eval_all(
+                const FSpectrum bsdf_f = shd.bsdf->eval_all(
                     inct.wr, camera_sample.ref_to_pos, TransMode::Radiance);
                 if(!bsdf_f.is_black())
                 {
@@ -64,7 +64,7 @@ void trace_particle(
 
                     const real abscos = std::abs(cos(
                         inct.geometry_coord.z, camera_sample.ref_to_pos));
-                    const Spectrum f = coef * bsdf_f * abscos
+                    const FSpectrum f = coef * bsdf_f * abscos
                         * camera_sample.we / camera_sample.pdf;
                     film.apply(pixel_x, pixel_y, f);
                 }
@@ -100,7 +100,7 @@ void trace_vol_particle(
 
     const Camera *camera = scene.get_camera();
 
-    Spectrum coef = emit_result.radiance /
+    FSpectrum coef = emit_result.radiance /
         (select_light_pdf * emit_result.pdf_pos * emit_result.pdf_dir);
     coef *= std::abs(cos(emit_result.dir, emit_result.nor));
 
@@ -137,7 +137,7 @@ void trace_vol_particle(
             {
                 if(scene.visible(cam_sam.pos_on_cam, scatter.pos))
                 {
-                    const Spectrum bsdf_f = med_sam.phase_function->eval_all(
+                    const FSpectrum bsdf_f = med_sam.phase_function->eval_all(
                         scatter.wr, cam_sam.ref_to_pos, TransMode::Radiance);
                     if(!bsdf_f.is_black())
                     {
@@ -146,10 +146,10 @@ void trace_vol_particle(
                         const real pixel_y = cam_sam.film_coord.y
                             * params.film_res.y;
 
-                        const Spectrum tr = medium->tr(
+                        const FSpectrum tr = medium->tr(
                             cam_sam.pos_on_cam, scatter.pos, sampler);
 
-                        const Spectrum f = coef * bsdf_f * tr
+                        const FSpectrum f = coef * bsdf_f * tr
                                          * cam_sam.we / cam_sam.pdf;
                         film.apply(pixel_x, pixel_y, f);
                     }
@@ -179,7 +179,7 @@ void trace_vol_particle(
         {
             if(scene.visible(camera_sample.pos_on_cam, inct.pos))
             {
-                const Spectrum bsdf_f = shd.bsdf->eval_all(
+                const FSpectrum bsdf_f = shd.bsdf->eval_all(
                     inct.wr, camera_sample.ref_to_pos, TransMode::Radiance);
                 if(!bsdf_f.is_black())
                 {
@@ -191,10 +191,10 @@ void trace_vol_particle(
                     const real abscos = std::abs(cos(
                         inct.geometry_coord.z, camera_sample.ref_to_pos));
 
-                    const Spectrum tr = medium->tr(
+                    const FSpectrum tr = medium->tr(
                         camera_sample.pos_on_cam, inct.pos, sampler);
 
-                    const Spectrum f = coef * bsdf_f * abscos * tr
+                    const FSpectrum f = coef * bsdf_f * abscos * tr
                                      * camera_sample.we / camera_sample.pdf;
                     film.apply(pixel_x, pixel_y, f);
                 }

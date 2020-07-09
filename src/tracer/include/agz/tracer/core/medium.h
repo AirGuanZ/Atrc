@@ -14,7 +14,7 @@ struct SampleOutScatteringResult
 {
     SampleOutScatteringResult(
         const MediumScattering &sp,
-        const Spectrum &throughput,
+        const FSpectrum &throughput,
         const BSDF *phase_function) noexcept
         : scattering_point(sp),
           throughput(throughput),
@@ -24,7 +24,7 @@ struct SampleOutScatteringResult
     }
 
     MediumScattering scattering_point;
-    Spectrum throughput;
+    FSpectrum throughput;
 
     const BSDF *phase_function;
 
@@ -53,13 +53,13 @@ public:
     /**
      * @brief transmittance between two points
      */
-    virtual Spectrum tr(
+    virtual FSpectrum tr(
         const FVec3 &a, const FVec3 &b, Sampler &sampler) const noexcept = 0;
 
     /**
      * @brief absorbtion between two points
      */
-    virtual Spectrum ab(
+    virtual FSpectrum ab(
         const FVec3 &a, const FVec3 &b, Sampler &sampler) const noexcept = 0;
 
     /**
