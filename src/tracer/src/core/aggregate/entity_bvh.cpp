@@ -215,7 +215,16 @@ public:
     }
 };
 
+#ifndef USE_EMBREE
+
 RC<Aggregate> create_entity_bvh(int max_leaf_size)
+{
+    return newRC<EntityBVH>(max_leaf_size);
+}
+
+#endif
+
+RC<Aggregate> create_entity_bvh_noembree(int max_leaf_size)
 {
     return newRC<EntityBVH>(max_leaf_size);
 }

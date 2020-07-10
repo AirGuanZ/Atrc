@@ -76,7 +76,7 @@ public:
         // x: ref
         // d: ref_to_light.normalize()
         // o + r * (u * ex + v * ey + d) = x + d * t
-        // solve [u, v, t] and ans = ref + ref_to_light * t
+        // solve [u, v, t] and ans = x + d * t
 
         // => [a b c][u v t]^T = m
         // where a = r * ex
@@ -91,11 +91,12 @@ public:
         const FVec3 c = -d;
         const FVec3 m = ref - world_centre_ - world_radius_ * d;
 
-        const real det  = Mat3::from_cols(a, b, c).det();
-        const real tdet = Mat3::from_cols(a, b, m).det();
+        const real D0 = a[1] * b[2] - a[2] * b[1];
+        const real D1 = a[0] * b[2] - a[2] * b[0];
+        const real D2 = a[0] * b[1] - a[1] * b[0];
 
-        if(std::abs(det) < EPS())
-            return { world_centre_, -ref_to_light };
+        const real det  = c[0] * D0 - c[1] * D1 + c[2] * D2;
+        const real tdet = m[0] * D0 - m[1] * D1 + m[2] * D2;
 
         const real t = tdet / det;
         const FVec3 pos = ref + t * d;

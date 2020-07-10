@@ -389,23 +389,14 @@ inline bool AABB::contains(const FVec3 &pnt) const noexcept
 inline bool AABB::intersect(
     const FVec3 &ori, const FVec3 &inv_dir, real t_min, real t_max) const noexcept
 {
-    const real nx = inv_dir[0] * (low[0] - ori[0]);
-    const real ny = inv_dir[1] * (low[1] - ori[1]);
-    const real nz = inv_dir[2] * (low[2] - ori[2]);
+    const FVec3 n = inv_dir * (low  - ori);
+    const FVec3 f = inv_dir * (high - ori);
 
-    const real fx = inv_dir[0] * (high[0] - ori[0]);
-    const real fy = inv_dir[1] * (high[1] - ori[1]);
-    const real fz = inv_dir[2] * (high[2] - ori[2]);
+    const FVec3 min_nf = elem_min(n, f);
+    const FVec3 max_nf = elem_max(n, f);
 
-    t_min = (std::max)(t_min, (std::min)(nx, fx));
-    t_min = (std::max)(t_min, (std::min)(ny, fy));
-    t_min = (std::max)(t_min, (std::min)(nz, fz));
-
-    t_max = (std::min)(t_max, (std::max)(nx, fx));
-    t_max = (std::min)(t_max, (std::max)(ny, fy));
-    t_max = (std::min)(t_max, (std::max)(nz, fz));
-
-    return t_min <= t_max;
+    return elem_max(FVec3(t_min), min_nf).max_elem() <=
+           elem_min(FVec3(t_max), max_nf).min_elem();
 }
 
 AGZ_TRACER_END

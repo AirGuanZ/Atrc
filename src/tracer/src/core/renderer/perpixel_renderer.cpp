@@ -152,7 +152,7 @@ RenderTarget PerPixelRenderer::render_impl(
         const double first_iter_prog_end = 100.0 / spp_;
         run_iter(0, first_iter_prog_end, 1);
 
-        const int per_iter_spp = (std::max)(20, spp_ / 20);
+        const int per_iter_spp = (std::max)(6, spp_ / 20);
         int finished_spp = 1;
         while(finished_spp < spp_)
         {

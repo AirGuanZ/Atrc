@@ -140,6 +140,7 @@ void Im3d::Scale(float _x, float _y, float _z)
 	ctx.setMatrix(ctx.getMatrix() * Mat4(Scale(Vec3(_x, _y, _z))));
 }
 
+
 void Im3d::DrawXyzAxes()
 {
 	Context& ctx = GetContext();

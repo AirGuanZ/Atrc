@@ -3,6 +3,8 @@
 #include <chrono>
 #include <random>
 
+#include <pcg_random.hpp>
+
 #include <agz/tracer/common.h>
 
 AGZ_TRACER_BEGIN
@@ -24,7 +26,7 @@ class NativeSampler : public Sampler
 {
 public:
 
-    using rng_t = std::minstd_rand;
+    using rng_t = pcg32;// std::mt19937_64;
     using seed_t = rng_t::result_type;
 
     NativeSampler(int seed, bool use_time_seed);
@@ -50,7 +52,7 @@ private:
 };
 
 inline NativeSampler::NativeSampler(int seed, bool use_time_seed)
-    : rng_(seed)
+    : seed_(0), rng_(seed)
 {
     if(use_time_seed)
     {
@@ -66,12 +68,15 @@ inline NativeSampler::NativeSampler(int seed, bool use_time_seed)
 
 inline NativeSampler *NativeSampler::clone(int seed, Arena &arena) const
 {
-    seed_t new_seed;
+    std::seed_seq::result_type new_seed;
     {
-        std::seed_seq seed_gen = { seed_, seed_t(seed) };
+        std::seed_seq seed_gen = {
+            std::seed_seq::result_type(seed_),
+            std::seed_seq::result_type(seed)
+        };
         seed_gen.generate(&new_seed, &new_seed + 1);
     }
-    return arena.create<NativeSampler >(new_seed, false);
+    return arena.create<NativeSampler>(int(new_seed), false);
 }
 
 inline Sample1 NativeSampler::sample1()
