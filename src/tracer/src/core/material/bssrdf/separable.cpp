@@ -202,6 +202,7 @@ BSSRDFSamplePiResult SeparableBSSRDF::sample_pi(
 
         if(new_inct.material == po_.material)
         {
+            static_assert(std::is_trivially_destructible_v<InctListNode>);
             auto nNode = arena.create<InctListNode>();
             nNode->inct = new_inct;
             nNode->next = inct_list_entry;
@@ -234,14 +235,14 @@ BSSRDFSamplePiResult SeparableBSSRDF::sample_pi(
 
     const real pdf_radius = pdf_pi(inct_list_entry->inct);
 
-    const BSDF *bsdf = arena.create<SeparableBSDF>(
+    const BSDF *bsdf = arena.create_nodestruct<SeparableBSDF>(
         inct_list_entry->inct.geometry_coord, eta_);
 
     const real cos_theta_o = cos(po_.wr, po_.geometry_coord.z);
     const real fro = 1 - refl_aux::dielectric_fresnel(eta_, 1, cos_theta_o);
 
     EntityIntersection inct = inct_list_entry->inct;
-    inct.material = arena.create<SeparableBSDFMaterial>(bsdf);
+    inct.material = arena.create_nodestruct<SeparableBSDFMaterial>(bsdf);
 
     const FSpectrum coef = fro * eval_r(distance(inct.pos, po_.pos));
     const real pdf = pdf_radius / (2 * PI_r) / inct_cnt;

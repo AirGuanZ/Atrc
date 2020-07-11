@@ -329,6 +329,9 @@ RenderTarget VolBDPTRenderer::render_impl(
 
         const int preview_spp_interval = (std::max)(1, (params_.spp - 1) / 25);
 
+        uint64_t finished_sam = filter.width() * filter.height();
+        const uint64_t total_sam = params_.spp * finished_sam;
+
         int finished_spp = 1;
         while(finished_spp < params_.spp)
         {
@@ -357,6 +360,10 @@ RenderTarget VolBDPTRenderer::render_impl(
                     view, particle_image, filter, delta_spp);
 
                 particle_count += delta_pc;
+
+                std::lock_guard lk(reporter_mutex);
+                finished_sam += delta_spp * (grid.high - grid.low).product();
+                reporter.progress(100.0 * finished_sam / total_sam, {});
 
                 return !stop_rendering_;
             });

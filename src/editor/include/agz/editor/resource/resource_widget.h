@@ -29,6 +29,7 @@ public:
 
 private:
 
+    std::string stdmsg_;
     QString msg_;
 };
 

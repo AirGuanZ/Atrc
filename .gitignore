@@ -1,7 +1,11 @@
+.idea/
+.vscode/
 build/
 build2017/
 build_clang/
-.vscode/
+cmake-build-release
+cmake-build-debug/
+cmake-build-relwithdebinfo
 asset/
 doc/doc.html
 doc/doc-cn.html

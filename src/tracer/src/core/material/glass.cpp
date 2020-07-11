@@ -153,7 +153,7 @@ public:
         const DielectricFresnelPoint *fresnel_point =
             arena.create<DielectricFresnelPoint>(ior, real(1));
 
-        ret.bsdf = arena.create<GlassBSDF>(
+        ret.bsdf = arena.create_nodestruct<GlassBSDF>(
             inct.geometry_coord, inct.user_coord, fresnel_point,
             color_reflection, color_refraction);
         ret.shading_normal = inct.user_coord.z;

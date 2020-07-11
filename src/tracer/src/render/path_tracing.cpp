@@ -424,7 +424,7 @@ Pixel trace_albedo_ao(
     if(!scene.closest_intersection(ray, &inct))
     {
         const EnvirLight *env = scene.envir_light();
-        pixel.value = env ? env->radiance(ray.o, ray.d) : Spectrum();
+        pixel.value = env ? env->radiance(ray.o, ray.d) : FSpectrum();
         return pixel;
     }
 

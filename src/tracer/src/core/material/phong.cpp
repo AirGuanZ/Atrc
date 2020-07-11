@@ -63,12 +63,13 @@ public:
 
         // construct bsdf
 
-        auto bsdf = arena.create<AggregateBSDF<2>>(
+        auto bsdf = arena.create_nodestruct<AggregateBSDF<2>>(
             inct.geometry_coord, shading_coord, d + s);
         bsdf->add_component(
-            diffuse_weight, arena.create<DiffuseComponent>(d));
+            diffuse_weight, arena.create_nodestruct<DiffuseComponent>(d));
         bsdf->add_component(
-            specular_weight, arena.create<PhongSpecularComponent>(s, ns));
+            specular_weight, arena.create_nodestruct<PhongSpecularComponent>(
+                s, ns));
 
         ShadingPoint shd;
         shd.bsdf = bsdf;

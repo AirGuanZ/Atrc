@@ -27,7 +27,7 @@ public:
         const FSpectrum albedo = albedo_->sample_spectrum(inct.uv);
         FCoord shading_coord = normal_mapper_->reorient(inct.uv, inct.user_coord);
 
-        auto bsdf = arena.create<AggregateBSDF<1>>(
+        auto bsdf = arena.create_nodestruct<AggregateBSDF<1>>(
             inct.geometry_coord, shading_coord, albedo);
         bsdf->add_component(1, arena.create<DiffuseComponent>(albedo));
 

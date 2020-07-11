@@ -3,14 +3,14 @@
 AGZ_EDITOR_BEGIN
 
 inline ResourceObjectException::ResourceObjectException(const QString &msg)
-    : msg_(msg)
+    : stdmsg_(msg.toStdString()), msg_(msg)
 {
 
 }
 
 inline char const *ResourceObjectException::what() const noexcept
 {
-    return msg_.toStdString().c_str();
+    return stdmsg_.c_str();
 }
 
 inline const QString &ResourceObjectException::msg() const noexcept

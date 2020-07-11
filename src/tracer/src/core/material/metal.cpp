@@ -48,7 +48,7 @@ public:
         const real roughness   = roughness_->sample_real(inct.uv);
         const real anisotropic = anisotropic_->sample_real(inct.uv);
 
-        const auto fresnel = arena.create<ColoredConductorPoint>(
+        const auto fresnel = arena.create_nodestruct<ColoredConductorPoint>(
             color, FSpectrum(1), eta, k);
 
         auto *bsdf = arena.create<AggregateBSDF<1>>(

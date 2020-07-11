@@ -102,12 +102,12 @@ public:
         const FSpectrum ior = ior_   ->sample_spectrum(inct.uv);
         const FSpectrum k   = k_     ->sample_spectrum(inct.uv);
 
-        const ConductorPoint *fresnel = arena.create<ConductorPoint>(
+        const ConductorPoint *fresnel = arena.create_nodestruct<ConductorPoint>(
                                             ior, FSpectrum(1), k);
 
         ShadingPoint ret;
 
-        const BSDF *bsdf = arena.create<MirrorBSDF>(
+        const BSDF *bsdf = arena.create_nodestruct<MirrorBSDF>(
             inct.geometry_coord, inct.user_coord, fresnel, rc);
         ret.bsdf = bsdf;
         ret.shading_normal = inct.user_coord.z;

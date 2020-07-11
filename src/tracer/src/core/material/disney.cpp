@@ -770,7 +770,7 @@ public:
         const real     clearcoat_gloss        = clearcoat_gloss_ ->sample_real(uv);
 
         const FCoord shading_coord = normal_mapper_->reorient(uv, inct.user_coord);
-        const BSDF *bsdf = arena.create<disney_impl::DisneyBSDF>(
+        const BSDF *bsdf = arena.create_nodestruct<disney_impl::DisneyBSDF>(
             inct.geometry_coord, shading_coord,
             base_color,
             metallic,

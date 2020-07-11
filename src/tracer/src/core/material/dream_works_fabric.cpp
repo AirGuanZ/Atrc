@@ -192,7 +192,7 @@ public:
         const FSpectrum color = color_->sample_spectrum(inct.uv);
         const real roughness = math::saturate(roughness_->sample_real(inct.uv));
 
-        const auto bsdf = arena.create<AggregateBSDF<1>>(
+        const auto bsdf = arena.create_nodestruct<AggregateBSDF<1>>(
             inct.geometry_coord, shading_coord, color);
         bsdf->add_component(1, arena.create<FabricBSDFComponent>(
             color, roughness));
