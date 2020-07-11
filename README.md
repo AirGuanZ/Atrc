@@ -58,7 +58,7 @@ Food (rendered with bdpt) (scene ref [here](https://luxcorerender.org/download/)
 
 ![0](./doc/gallery/food.png)
 
-Classroom (rendered with pt) (scene ref [here](https://www.blender.org/download/demo-files/)):
+Classroom (rendered with vol_bdpt) (scene ref [here](https://www.blender.org/download/demo-files/)):
 
 ![pic](./doc/gallery/classroom.png)
 
