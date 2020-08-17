@@ -58,6 +58,10 @@ Food (rendered with bdpt) (scene ref [here](https://luxcorerender.org/download/)
 
 ![0](./doc/gallery/food.png)
 
+Juice (rendered with vol_bdpt) (scene ref [here](https://luxcorerender.org/download/)):
+
+![pic](./doc/gallery/juice.png)
+
 Classroom (rendered with vol_bdpt) (scene ref [here](https://www.blender.org/download/demo-files/)):
 
 ![pic](./doc/gallery/classroom.png)
