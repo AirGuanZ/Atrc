@@ -288,6 +288,41 @@ namespace material
         }
     };
 
+    class PaperCreator : public Creator<Material>
+    {
+    public:
+
+        std::string name() const override
+        {
+            return "paper";
+        }
+
+        std::shared_ptr<Material> create(
+            const ConfigGroup &params, CreatingContext &context) const override
+        {
+            auto color = context.create<Texture2D>(params.child_group("color"));
+            const real gf = params.child_real("gf");
+            const real wf = params.child_real("wf");
+            const real gb = params.child_real("gb");
+            const real wb = params.child_real("wb");
+            const real front_eta = params.child_real("front_eta");
+            const real back_eta = params.child_real("back_eta");
+            const real d = params.child_real("d");
+            const real sigma_s = params.child_real("sigma_s");
+            const real sigma_a = params.child_real("sigma_a");
+            const real front_roughness = params.child_real("front_roughness");
+            const real back_roughness = params.child_real("back_roughness");
+
+            auto normal_mapper = init_normal_mapper(params, context);
+
+            return create_paper(
+                std::move(color), gf, gb, wf, wb, front_eta, back_eta, d,
+                sigma_s, sigma_a,
+                front_roughness, back_roughness,
+                std::move(normal_mapper));
+        }
+    };
+
     class PhongCreator : public Creator<Material>
     {
     public:
@@ -321,6 +356,7 @@ void initialize_material_factory(Factory<Material> &factory)
     factory.add_creator(newBox<material::InvisibleSurfaceCreator>());
     factory.add_creator(newBox<material::MetalCreator>());
     factory.add_creator(newBox<material::MirrorCreator>());
+    factory.add_creator(newBox<material::PaperCreator>());
     factory.add_creator(newBox<material::PhongCreator>());
 }
 

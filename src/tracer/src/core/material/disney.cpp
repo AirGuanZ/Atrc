@@ -154,7 +154,7 @@ namespace disney_impl
 
             const FSpectrum sqrtC = sqrt(C_);
 
-            const real val = (1 - F) * D * G /** eta * eta*/
+            const real val = (1 - F) * D * G * eta * eta
                            * dot(lwi, lwh) * dot(lwo, lwh)
                            * corr_factor * corr_factor
                            / (cos_theta_i * cos_theta_o * sdem * sdem);

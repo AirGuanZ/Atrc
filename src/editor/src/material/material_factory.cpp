@@ -5,6 +5,7 @@
 #include <agz/editor/material/invisible_surface.h>
 #include <agz/editor/material/metal.h>
 #include <agz/editor/material/mirror.h>
+#include <agz/editor/material/paper.h>
 #include <agz/editor/material/phong.h>
 
 #include <agz/editor/material/material_factory.h>
@@ -20,6 +21,7 @@ void init_material_factory(MaterialWidgetFactory &factory)
     factory.add_creator(newBox<InvisibleSurfaceWidgetCreator>());
     factory.add_creator(newBox<MetalWidgetCreator>());
     factory.add_creator(newBox<MirrorWidgetCreator>());
+    factory.add_creator(newBox<PaperWidgetCreator>());
     factory.add_creator(newBox<PhongWidgetCreator>());
 }
 

@@ -56,6 +56,14 @@ RC<Material> create_mirror(
     RC<const Texture2D> eta,
     RC<const Texture2D> k);
 
+RC<Material> create_paper(
+    RC<const Texture2D> color,
+    real gf, real gb, real wf, real wb,
+    real front_eta, real back_eta,
+    real d, real sigma_s, real sigma_a,
+    real front_roughness, real back_roughness,
+    Box<const NormalMapper> normal_mapper);
+
 RC<Material> create_phong(
     RC<const Texture2D> d,
     RC<const Texture2D> s,
