@@ -7,6 +7,10 @@
 #include <agz/editor/post_processor/post_processor_seq.h>
 #include <agz/editor/renderer/renderer_widget.h>
 #include <agz/editor/scene/scene_mgr.h>
+#include <agz/tracer/core/geometry.h>
+#include <agz/tracer/core/light.h>
+#include <agz/tracer/core/medium.h>
+#include <agz/tracer/core/texture3d.h>
 
 AGZ_EDITOR_BEGIN
 

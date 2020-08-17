@@ -19,10 +19,10 @@ ExportRendererVolBDPT::ExportRendererVolBDPT(QWidget *parent)
     worker_count_   = new QSpinBox(this);
     task_grid_size_ = new QSpinBox(this);
 
-    cam_max_vtx_cnt_->setRange(2, 20);
+    cam_max_vtx_cnt_->setRange(2, 200);
     cam_max_vtx_cnt_->setValue(6);
 
-    lht_max_vtx_cnt_->setRange(2, 20);
+    lht_max_vtx_cnt_->setRange(2, 200);
     lht_max_vtx_cnt_->setValue(6);
 
     use_mis_->setChecked(true);

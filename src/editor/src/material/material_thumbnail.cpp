@@ -2,6 +2,7 @@
 #include <agz/tracer/core/intersection.h>
 #include <agz/tracer/core/bsdf.h>
 #include <agz/tracer/core/light.h>
+#include <agz/tracer/core/sampler.h>
 #include <agz/tracer/create/envir_light.h>
 #include <agz/tracer/create/texture2d.h>
 #include <agz/tracer/utility/sphere_aux.h>

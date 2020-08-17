@@ -8,6 +8,7 @@
 #include <agz/editor/scene/scene_mgr.h>
 #include <agz/editor/ui/global_setting_widget.h>
 #include <agz/factory/factory.h>
+#include <agz/tracer/core/light.h>
 
 AGZ_EDITOR_BEGIN
 

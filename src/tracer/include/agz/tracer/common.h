@@ -82,16 +82,6 @@ using FTrans4 = math::float4x4::left_transform;
 using FCoord      = math::float3_coord;
 using FTransform3 = math::float3_transform;
 
-// world scale/offset
-// object pos = (actual pos - WORLD_OFFSET) * WORLD_SCALE
-
-real WORLD_SCALE() noexcept;
-const Vec3 &WORLD_OFFSET() noexcept;
-
-void set_world_offset(const Vec3 &offset) noexcept;
-
-void set_world_scale(real scale) noexcept;
-
 // spectrum
 
 using Spectrum  = math::tcolor3<real>;

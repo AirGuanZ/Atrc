@@ -10,6 +10,7 @@
 #include <agz/editor/resource/object_context.h>
 #include <agz/editor/renderer/renderer_widget.h>
 #include <agz/editor/scene/scene_mgr.h>
+#include <agz/tracer/core/light.h>
 
 AGZ_EDITOR_BEGIN
 
