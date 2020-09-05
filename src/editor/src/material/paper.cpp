@@ -146,7 +146,7 @@ RC<tracer::ConfigNode> PaperWidget::to_config(JSONExportContext &ctx) const
     grp->insert_real("wb", 1 - real(wf_->value()));
     grp->insert_real("front_eta", real(front_eta_->value()));
     grp->insert_real("back_eta", real(back_eta_->value()));
-    grp->insert_real("thickness", real(thickness_->value()));
+    grp->insert_real("d", real(thickness_->value()));
     grp->insert_real("sigma_s", real(sigma_s_->value()));
     grp->insert_real("sigma_a", real(sigma_a_->value()));
     grp->insert_real("front_roughness", real(front_roughness_->value()));
