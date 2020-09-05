@@ -5,6 +5,7 @@
 #include <agz/tracer/create/renderer.h>
 #include <agz/tracer/render/photon_mapping.h>
 #include <agz/tracer/utility/parallel_grid.h>
+#include <agz/tracer/utility/perthread_samplers.h>
 #include <agz/utility/thread.h>
 
 AGZ_TRACER_BEGIN
@@ -66,12 +67,9 @@ RenderTarget SPPMRenderer::render(
 
     // samplers
 
-    Arena sampler_arena;
     auto sampler_prototype = newRC<NativeSampler>(42, false);
 
-    std::vector<Sampler *> perthread_sampler;
-    for(int i = 0; i < thread_count; ++i)
-        perthread_sampler.push_back(sampler_prototype->clone(i, sampler_arena));
+    PerThreadNativeSamplers perthread_sampler(thread_count, *sampler_prototype);
 
     // vp arenas
 
@@ -135,7 +133,7 @@ RenderTarget SPPMRenderer::render(
             [&](int thread_index, const Rect2i &grid)
         {
             auto camera    = scene.get_camera();
-            auto sampler   = perthread_sampler [thread_index];
+            auto sampler   = perthread_sampler.get_sampler(thread_index);
             auto &vp_arena = perthread_vp_arena[thread_index];
 
             for(int y = grid.low.y; y < grid.high.y; ++y)
@@ -196,7 +194,7 @@ RenderTarget SPPMRenderer::render(
             thread_group,
             [&](int thread_index, int beg, int end)
         {
-            auto sampler = perthread_sampler[thread_index];
+            auto sampler = perthread_sampler.get_sampler(thread_index);
             Arena local_arena;
             for(int i = beg; i < end; ++i)
             {

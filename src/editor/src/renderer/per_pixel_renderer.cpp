@@ -2,6 +2,7 @@
 #include <agz/tracer/core/camera.h>
 #include <agz/tracer/core/sampler.h>
 #include <agz/tracer/core/scene.h>
+#include <agz/tracer/utility/perthread_samplers.h>
 #include <agz/utility/thread.h>
 
 AGZ_EDITOR_BEGIN
@@ -52,11 +53,16 @@ Image2D<Spectrum> PerPixelRenderer::start()
 
     auto ret = do_fast_rendering();
 
-    const auto sampler_prototype = newRC<tracer::NativeSampler>(0, true);
     const int worker_count = thread::actual_worker_count(worker_count_);
+
+    const auto sampler_prototype = newRC<tracer::NativeSampler>(0, true);
+    auto perthread_samplers =
+        sampler_arena_.create<tracer::PerThreadNativeSamplers>(
+            worker_count, *sampler_prototype);
+
     for(int i = 0; i < worker_count; ++i)
     {
-        auto sampler = sampler_prototype->clone(i, sampler_arena_);
+        auto sampler = perthread_samplers->get_sampler(i);
         threads_.emplace_back(render_func, sampler);
     }
 
@@ -149,11 +155,13 @@ Image2D<Spectrum> PerPixelRenderer::do_fast_rendering()
     const int worker_count = thread::actual_worker_count(worker_count_);
     auto sampler_prototype = newRC<NativeSampler>(42, true);
 
-    Arena sampler_arena;
+    PerThreadNativeSamplers perthread_samplers(
+        worker_count, *sampler_prototype);
+
     std::vector<std::thread> threads;
     for(int i = 0; i < worker_count; ++i)
     {
-        Sampler *sampler = sampler_prototype->clone(i, sampler_arena);
+        auto sampler = perthread_samplers[i];
         threads.emplace_back(render_func, sampler);
     }
 

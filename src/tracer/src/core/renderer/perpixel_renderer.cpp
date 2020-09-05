@@ -3,6 +3,7 @@
 #include <agz/tracer/core/sampler.h>
 #include <agz/tracer/core/scene.h>
 #include <agz/tracer/utility/parallel_grid.h>
+#include <agz/tracer/utility/perthread_samplers.h>
 #include <agz/utility/thread.h>
 
 #include "perpixel_renderer.h"
@@ -73,11 +74,10 @@ RenderTarget PerPixelRenderer::render_impl(
 
     // create per-thread samplers
 
-    Arena sampler_arena;
     auto sampler_prototype = newRC<NativeSampler>(42, false);
-    std::vector<Sampler *> perthread_sampler;
-    for(int i = 0; i < thread_count; ++i)
-        perthread_sampler.push_back(sampler_prototype->clone(i, sampler_arena));
+
+    PerThreadNativeSamplers perthread_sampler(
+        thread_count, *sampler_prototype);
 
     std::mutex reporter_mutex;
 
@@ -97,7 +97,7 @@ RenderTarget PerPixelRenderer::render_impl(
             task_grid_size_, task_grid_size_, thread_group,
             [&] (int thread_index, const Rect2i &rect)
         {
-            auto &sampler = perthread_sampler[thread_index];
+            auto sampler = perthread_sampler.get_sampler(thread_index);
 
             auto grid = filter.create_subgrid<
                 Spectrum, real, Spectrum, Vec3, real>(

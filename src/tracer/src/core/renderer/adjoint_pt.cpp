@@ -14,6 +14,7 @@
 #include <agz/tracer/create/renderer.h>
 #include <agz/tracer/render/particle_tracing.h>
 #include <agz/tracer/utility/parallel_grid.h>
+#include <agz/tracer/utility/perthread_samplers.h>
 #include <agz/utility/thread.h>
 
 AGZ_TRACER_BEGIN
@@ -121,11 +122,9 @@ private:
             params_.worker_count);
 
         auto sampler_prototype = newRC<NativeSampler >(42, false);
-        Arena sampler_arena;
 
-        std::vector<Sampler *> perthread_sampler;
-        for(int i = 0; i < thread_count; ++i)
-            perthread_sampler.push_back(sampler_prototype->clone(i, sampler_arena));
+        PerThreadNativeSamplers perthread_sampler(
+            thread_count, *sampler_prototype);
 
         std::mutex reporter_mutex;
         int finished_pixel_count = 0;
@@ -323,8 +322,6 @@ private:
             }
         };
 
-        Arena sampler_arena;
-
         std::vector<std::thread> threads;
         std::vector<Image2D<Spectrum>> images;
 
@@ -341,9 +338,12 @@ private:
 
         auto particle_sampler_prototype = newRC<NativeSampler>(42, false);
 
+        PerThreadNativeSamplers perthread_sampler(
+            worker_count, *particle_sampler_prototype);;
+
         for(int i = 0; i < worker_count; ++i)
         {
-            auto sampler = particle_sampler_prototype->clone(i, sampler_arena);
+            auto sampler = perthread_sampler.get_sampler(i);
             threads.emplace_back(backward_func, sampler, &images[i], i);
         }
 

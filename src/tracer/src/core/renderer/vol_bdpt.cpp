@@ -6,6 +6,7 @@
 #include <agz/tracer/create/renderer.h>
 #include <agz/tracer/render/bidir_path_tracing.h>
 #include <agz/tracer/utility/parallel_grid.h>
+#include <agz/tracer/utility/perthread_samplers.h>
 #include <agz/utility/thread.h>
 
 AGZ_TRACER_BEGIN
@@ -255,14 +256,10 @@ RenderTarget VolBDPTRenderer::render_impl(
 
     // per-thread samplers
 
-    Arena sampler_arena;
     auto sampler_prototype = newBox<NativeSampler>(42, false);
-    std::vector<NativeSampler *> perthread_samplers;
-    for(int i = 0; i < thread_count; ++i)
-    {
-        perthread_samplers.push_back(
-            sampler_prototype->clone(i, sampler_arena));
-    }
+
+    PerThreadNativeSamplers perthread_samplers(
+        thread_count, *sampler_prototype);
 
     // reporter
 

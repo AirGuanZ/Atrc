@@ -44,6 +44,8 @@ public:
 
     rng_t &rng() noexcept { return rng_; }
 
+    seed_t get_seed() const noexcept { return seed_; }
+
 private:
 
     seed_t seed_;
