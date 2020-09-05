@@ -137,10 +137,11 @@ public:
 
     real get_value(const FVec3 &lwi) const noexcept
     {
-        real theta = local_angle::theta(lwi);
-        if(theta < 0)
-            theta += 2 * PI_r;
-        const real u = math::saturate(theta / (2 * PI_r));
+        //real theta = local_angle::theta(lwi.z > 0 ? lwi : -lwi);
+        real theta = std::asin(math::saturate(std::abs(lwi.z)));
+        //if(theta < 0)
+        //    theta += 2 * PI_r;
+        const real u = math::saturate(theta / (0.5f * PI_r));
         return texture::linear_sample3d(
             Vec3(u, v_, w_),
             [&](int x, int y, int z) { return precomputedRhoDtTable.table(z, y, x); },
@@ -191,7 +192,7 @@ public:
         const float D = microfacet::gtr2(local_angle::cos_theta(lwh), alpha_);
 
         const float F = refl_aux::dielectric_fresnel(
-            eta_, 1, local_angle::abs_cos_theta(lwi));
+            eta_, 1, dot(lwi, lwh));
 
         const float G =
             microfacet::smith_gtr2(local_angle::tan_theta(lwi), alpha_) *
@@ -371,7 +372,7 @@ public:
 
         if(std::abs(lwi.z + lwo.z) < EPS())
         {
-            const real e = std::exp(-tau_d_ / lwo.z);
+            const real e = std::exp(-tau_d_ / std::abs(lwo.z));
             return color_ * std::abs(atti * atto * alpha_ * tau_d_ * p * e
                                                  / (lwi.z * lwo.z));
         }
@@ -664,7 +665,7 @@ public:
                 gf_, wf_, gb_, wb_, alpha_, tau_d_);
 
             const auto [Rd, Td] = computeRdAndTd(
-                1, color, sigma_s_, sigma_a_, d_, gf_, gb_, wf_, wb_);
+                4, color, sigma_s_, sigma_a_, d_, gf_, gb_, wf_, wb_);
 
             auto multi_refl = arena.create<MultiScatteringReflection>(
                 color, frontRhoDt_.get(), Rd);
@@ -700,7 +701,7 @@ public:
             gf_, wf_, gb_, wb_, alpha_, tau_d_);
 
         const auto [Rd, Td] = computeRdAndTd(
-            1, color, sigma_s_, sigma_a_, d_, gf_, gb_, wf_, wb_);
+            4, color, sigma_s_, sigma_a_, d_, gf_, gb_, wf_, wb_);
 
         auto multi_refl = arena.create<MultiScatteringReflection>(
             color, backRhoDt_.get(), Rd);

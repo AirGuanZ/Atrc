@@ -115,6 +115,10 @@ void Editor::on_change_camera()
 
 void Editor::on_change_aggregate()
 {
+    if(!is_aggregate_dirty_)
+        return;
+    is_aggregate_dirty_ = false;
+
     auto old_camera = scene_->get_shared_camera();
 
     renderer_.reset();
@@ -277,8 +281,13 @@ void Editor::init_scene_mgr()
 
     connect(scene_mgr_.get(), &SceneManager::change_scene, [=]
     {
-        on_change_aggregate();
+        is_aggregate_dirty_ = true;
+        emit change_aggregate();
+        //on_change_aggregate();
     });
+
+    connect(this, &Editor::change_aggregate,
+            this, &Editor::on_change_aggregate, Qt::QueuedConnection);
 }
 
 void Editor::init_renderer_panel()

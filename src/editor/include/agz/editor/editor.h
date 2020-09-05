@@ -34,6 +34,8 @@ public:
 
     ~Editor();
 
+public slots:
+
     void on_change_camera();
 
     void on_change_aggregate();
@@ -49,6 +51,8 @@ public:
 signals:
 
     void change_envir_light();
+
+    void change_aggregate();
 
 private:
 
@@ -102,6 +106,8 @@ private:
     RC<tracer::Scene> scene_;
 
     Box<SceneManager> scene_mgr_;
+
+    bool is_aggregate_dirty_ = false;
 
     // ui
 
