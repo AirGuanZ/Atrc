@@ -698,7 +698,7 @@ void PreviewWindow::render_preview_image()
     glDepthMask(GL_FALSE);
 
     glClearColor(0, 0, 0, 0);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT);
 
     preview_shader_->bind();
     preview_vao_.bind();
@@ -714,6 +714,9 @@ void PreviewWindow::render_preview_image()
 
     glEnable(GL_DEPTH_TEST);
     glDepthMask(GL_TRUE);
+
+    glClearDepthf(1);
+    glClear(GL_DEPTH_BUFFER_BIT);
 
     entity_shader_->bind();
 
