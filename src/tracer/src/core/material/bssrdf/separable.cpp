@@ -53,12 +53,12 @@ namespace
         {
             const real cosThetaI = cos(wi, coord_.z);
 
-            const real cI = 1 - 2 * fresnel_moment(eta_);
+            const real cI = 1 - 2 * fresnel_moment(1 / eta_);
 
             const real fr = refl_aux::dielectric_fresnel(eta_, 1, cosThetaI);
             const real val = (1 - fr) / (cI * PI_r);
 
-            return FSpectrum(val);
+            return FSpectrum(val) * eta_ * eta_;
         }
 
         BSDFSampleResult sample(
