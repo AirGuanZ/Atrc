@@ -603,7 +603,7 @@ namespace disney_impl
             {
                 if(sam_selector < sample_w.transmission)
                     lwi = sample_transmission(lwo, new_sam);
-                else if(sam_selector -= sample_w.specular;
+                else if(sam_selector -= sample_w.transmission;
                         sam_selector < sample_w.specular)
                     lwi = sample_specular(lwo, new_sam);
                 else

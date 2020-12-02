@@ -291,7 +291,11 @@ void Image3DWidget::browse_filename()
                 if(new_filename.isEmpty())
                     return;
 
-                std::ifstream fin(new_filename.toStdString(), std::ios::in);
+                std::ifstream fin(new_filename.toStdString());
+                if(!fin)
+                    throw tracer::ObjectConstructionException(
+                        "failed to open file: " + new_filename.toStdString());
+
                 new_real_data = tracer::toRC(
                     tracer::texture3d_load::load_real_from_ascii(fin));
 

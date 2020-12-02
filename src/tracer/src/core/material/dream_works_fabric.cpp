@@ -91,7 +91,7 @@ namespace
                 return {};
 
             const FVec3 lwh = (lwi + lwo).normalize();
-            const real S = std::pow(1 - std::abs(lwh.x), n_);
+            const real S = std::pow(1 - std::abs(lwh.x), static_cast<real>(n_));
 
             return color_ * S / Io[n_];
         }
@@ -139,7 +139,8 @@ namespace
 
             // construct result
 
-            const real S = std::pow(1 - std::abs(sin_theta_h), n_);
+            const real S = std::pow(
+                1 - std::abs(sin_theta_h), static_cast<real>(n_));
 
             SampleResult ret;
             ret.f   = color_ * S / Io[n_];
@@ -157,7 +158,8 @@ namespace
             const FVec3 lwh = (lwi + lwo).normalize();
             const real sin_theta_h = lwh.x;
 
-            const real S = std::pow(1 - std::abs(sin_theta_h), n_);
+            const real S = std::pow(
+                1 - std::abs(sin_theta_h), static_cast<real>(n_));
 
             return real(n_ + 1) * S / (8 * PI_r * dot(lwi, lwh));
         }

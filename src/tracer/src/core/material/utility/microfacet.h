@@ -10,7 +10,7 @@ namespace microfacet
     inline real one_minus_5(real x) noexcept
     {
         real t = 1 - x, t2 = t * t; return t2 * t2 * t;
-        }
+    }
 
     real gtr2(real cos_theta_h, real alpha) noexcept;
 
