@@ -147,10 +147,10 @@ public:
         const real u = phi / (2 * PI_r);
         const real v = theta / PI_r;
 
-        const int patch_x = (std::min)(probs_.width() - 1,
-                                       int(std::floor(u * probs_.width())));
-        const int patch_y = (std::min)(probs_.height() - 1,
-                                       int(std::floor(v * probs_.height())));
+        const int patch_x = math::clamp(
+            int(std::floor(u * probs_.width())), 0, probs_.width() - 1);
+        const int patch_y = math::clamp(
+            int(std::floor(v * probs_.height())), 0, probs_.height() - 1);
 
         const real patch_pdf = probs_(patch_y, patch_x);
 
