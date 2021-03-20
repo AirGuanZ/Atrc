@@ -24,22 +24,6 @@ Offline rendering lab based on ray tracing
 - [x] (Optional) Integrated Embree library
 - [x] Interactive scene editor
 
-## Roadmap
-
-- [x] Component based BSDF
-- [x] Volumetric bidirectional path tracing
-- [x] Support launching GUI renderer in editor
-- [x] Better GUI renderer (auto resizing)
-- [x] More sample scenes
-- [x] Light sampling hints (user-specified power)
-- [ ] Environment light portals
-- [ ] Volumetric photon mapping
-- [ ] Vertex connection & merging
-- [x] Better camera panel in editor
-- [ ] Support BSSRDF in BDPT
-- [ ] Variance buffer, fireflies removal & adaptive sampling
-- [ ] Support g-buffer in PSSMLT
-
 ## Known Issues
 
 - [ ] Relation between inv gamma correction & linear sampler of image texture
