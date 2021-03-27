@@ -4,7 +4,7 @@
 #include <agz/tracer/core/scene.h>
 #include <agz/tracer/utility/parallel_grid.h>
 #include <agz/tracer/utility/perthread_samplers.h>
-#include <agz/utility/thread.h>
+#include <agz-utils/thread.h>
 
 #include "perpixel_renderer.h"
 

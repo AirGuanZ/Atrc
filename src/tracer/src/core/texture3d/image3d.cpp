@@ -1,5 +1,5 @@
 #include <agz/tracer/core/texture3d.h>
-#include <agz/utility/texture.h>
+#include <agz-utils/texture.h>
 
 AGZ_TRACER_BEGIN
 

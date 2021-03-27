@@ -1,8 +1,8 @@
 #include <agz/tracer/core/post_processor.h>
 #include <agz/tracer/utility/logger.h>
-#include <agz/utility/file.h>
-#include <agz/utility/image.h>
-#include <agz/utility/misc.h>
+#include <agz-utils/file.h>
+#include <agz-utils/image.h>
+#include <agz-utils/misc.h>
 
 AGZ_TRACER_BEGIN
 

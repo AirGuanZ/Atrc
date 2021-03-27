@@ -6,7 +6,7 @@
 #include <QPushButton>
 
 #include <agz/editor/ui/utility/elided_label.h>
-#include <agz/utility/mesh.h>
+#include <agz-utils/mesh.h>
 
 AGZ_EDITOR_BEGIN
 

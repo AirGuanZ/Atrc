@@ -7,8 +7,8 @@
 #include <unordered_map>
 
 #include <agz/tracer/utility/config.h>
-#include <agz/utility/misc.h>
-#include <agz/utility/string.h>
+#include <agz-utils/misc.h>
+#include <agz-utils/string.h>
 
 AGZ_TRACER_FACTORY_BEGIN
 

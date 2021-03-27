@@ -1,7 +1,7 @@
 #pragma once
 
 #include <agz/tracer/core/geometry.h>
-#include <agz/utility/mesh.h>
+#include <agz-utils/mesh.h>
 
 AGZ_TRACER_BEGIN
 

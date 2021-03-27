@@ -1,9 +1,9 @@
 #include <agz/tracer/core/post_processor.h>
 #include <agz/tracer/utility/logger.h>
-#include <agz/utility/file.h>
-#include <agz/utility/image.h>
-#include <agz/utility/misc.h>
-#include <agz/utility/system.h>
+#include <agz-utils/file.h>
+#include <agz-utils/image.h>
+#include <agz-utils/misc.h>
+#include <agz-utils/system.h>
 
 AGZ_TRACER_BEGIN
 
@@ -35,7 +35,7 @@ public:
             throw ObjectConstructionException(
                 "invalid gamma value: " + std::to_string(gamma_));
 
-        AGZ_HIERARCHY_WRAP("in initializing save_to_png post processor")
+        AGZ_HIERARCHY_WRAP("in initializing save_to_img post processor")
     }
 
     void process(RenderTarget &render_target) override
@@ -44,7 +44,9 @@ public:
 
         AGZ_INFO("saving image to {}", filename_);
 
-        const auto imgu8 = render_target.image.flip_vertically()
+        const auto flipped_image = render_target.image.flip_vertically();
+
+        const auto imgu8 = flipped_image
             .get_data().map([gamma = gamma_](const Spectrum &s)
         {
             return s.map([gamma = gamma](real c)
@@ -58,7 +60,7 @@ public:
         else if(save_ext_ == "jpg")
             img::save_rgb_to_jpg_file(filename_, imgu8);
         else if(save_ext_ == "hdr")
-            img::save_rgb_to_hdr_file(filename_, render_target.image.get_data());
+            img::save_rgb_to_hdr_file(filename_, flipped_image.get_data());
 
         if(open_after_saved_)
             sys::open_with_default_app(filename_);

@@ -8,7 +8,7 @@
 #include <agz/tracer/core/scene.h>
 #include <agz/tracer/create/renderer.h>
 #include <agz/tracer/render/path_tracing.h>
-#include <agz/utility/thread.h>
+#include <agz-utils/thread.h>
 
 #include "./perpixel_renderer.h"
 

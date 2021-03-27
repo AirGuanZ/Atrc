@@ -15,7 +15,7 @@
 #include <agz/editor/ui/right_panel.h>
 #include <agz/gui_common/gui.h>
 #include <agz/tracer/create/scene.h>
-#include <agz/utility/misc.h>
+#include <agz-utils/misc.h>
 
 AGZ_EDITOR_BEGIN
 

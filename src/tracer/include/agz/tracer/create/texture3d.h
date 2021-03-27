@@ -1,7 +1,7 @@
 #pragma once
 
 #include <agz/tracer/core/texture3d.h>
-#include <agz/utility/texture/texture3d.h>
+#include <agz-utils/texture/texture3d.h>
 
 AGZ_TRACER_BEGIN
 

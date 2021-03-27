@@ -8,8 +8,8 @@
 #include <agz/tracer/utility/embree.h>
 #include <agz/tracer/utility/logger.h>
 #include <agz/tracer/utility/triangle_aux.h>
-#include <agz/utility/mesh.h>
-#include <agz/utility/misc.h>
+#include <agz-utils/mesh.h>
+#include <agz-utils/misc.h>
 
 AGZ_TRACER_BEGIN
 

@@ -1,7 +1,7 @@
 #include <agz/factory/context.h>
 #include <agz/factory/utility/texture3d_loader.h>
-#include <agz/utility/image.h>
-#include <agz/utility/misc.h>
+#include <agz-utils/image.h>
+#include <agz-utils/misc.h>
 
 AGZ_TRACER_BEGIN
 

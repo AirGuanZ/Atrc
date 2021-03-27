@@ -4,7 +4,7 @@
 
 #include <agz/editor/imexport/model_importer.h>
 #include <agz/editor/scene/scene_mgr.h>
-#include <agz/utility/string.h>
+#include <agz-utils/string.h>
 
 AGZ_EDITOR_BEGIN
 

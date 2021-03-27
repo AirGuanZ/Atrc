@@ -1,7 +1,7 @@
 #include <random>
 
 #include <agz/tracer/core/film_filter.h>
-#include <agz/utility/misc.h>
+#include <agz-utils/misc.h>
 
 AGZ_TRACER_BEGIN
 

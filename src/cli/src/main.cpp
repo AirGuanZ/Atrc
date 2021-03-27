@@ -8,8 +8,8 @@
 #include <agz/factory/factory.h>
 #include <agz/tracer/tracer.h>
 
-#include <agz/utility/misc.h>
-#include <agz/utility/string.h>
+#include <agz-utils/misc.h>
+#include <agz-utils/string.h>
 
 void run(int argc, char *argv[])
 {

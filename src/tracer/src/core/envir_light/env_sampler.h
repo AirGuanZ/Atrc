@@ -4,8 +4,8 @@
 #include <vector>
 
 #include <agz/tracer/core/texture2d.h>
-#include <agz/utility/texture.h>
-#include <agz/utility/thread.h>
+#include <agz-utils/texture.h>
+#include <agz-utils/thread.h>
 
 AGZ_TRACER_BEGIN
 

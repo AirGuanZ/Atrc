@@ -1,6 +1,6 @@
 #include <agz/tracer/core/renderer_interactor.h>
 #include <agz/tracer/utility/logger.h>
-#include <agz/utility/console.h>
+#include <agz-utils/console.h>
 
 AGZ_TRACER_BEGIN
 

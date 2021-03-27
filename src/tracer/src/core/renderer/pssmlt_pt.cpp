@@ -6,7 +6,7 @@
 #include <agz/tracer/render/path_tracing.h>
 #include <agz/tracer/render/pssmlt.h>
 #include <agz/tracer/utility/parallel_grid.h>
-#include <agz/utility/thread.h>
+#include <agz-utils/thread.h>
 
 AGZ_TRACER_BEGIN
 

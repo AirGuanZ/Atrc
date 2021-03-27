@@ -1,6 +1,6 @@
 #include <agz/tracer/core/bsdf.h>
 #include <agz/tracer/core/material.h>
-#include <agz/utility/misc.h>
+#include <agz-utils/misc.h>
 
 #include "ideal_black.h"
 

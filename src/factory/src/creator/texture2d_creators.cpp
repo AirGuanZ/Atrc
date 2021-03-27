@@ -1,6 +1,6 @@
 #include <agz/factory/creator/texture2d_creators.h>
 #include <agz/tracer/create/texture2d.h>
-#include <agz/utility/image.h>
+#include <agz-utils/image.h>
 
 AGZ_TRACER_FACTORY_BEGIN
 

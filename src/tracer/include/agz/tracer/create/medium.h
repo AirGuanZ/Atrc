@@ -1,6 +1,6 @@
 #pragma once
 
-#include <agz/utility/texture.h>
+#include <agz-utils/texture.h>
 
 #include <agz/tracer/core/medium.h>
 #include <agz/tracer/core/texture3d.h>

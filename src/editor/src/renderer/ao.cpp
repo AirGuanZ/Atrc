@@ -1,6 +1,6 @@
 #include <agz/editor/renderer/ao.h>
 #include <agz/tracer/tracer.h>
-#include <agz/utility/thread.h>
+#include <agz-utils/thread.h>
 
 AGZ_EDITOR_BEGIN
 

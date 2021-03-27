@@ -6,7 +6,7 @@
 #include <agz/tracer/create/envir_light.h>
 #include <agz/tracer/create/texture2d.h>
 #include <agz/tracer/utility/sphere_aux.h>
-#include <agz/utility/image.h>
+#include <agz-utils/image.h>
 
 AGZ_EDITOR_BEGIN
 

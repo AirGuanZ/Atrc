@@ -1,8 +1,8 @@
 #include <agz/tracer/core/medium.h>
 #include <agz/tracer/core/texture3d.h>
 #include <agz/tracer/utility/phase_function.h>
-#include <agz/utility/misc.h>
-#include <agz/utility/texture.h>
+#include <agz-utils/misc.h>
+#include <agz-utils/texture.h>
 
 AGZ_TRACER_BEGIN
 

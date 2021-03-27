@@ -15,7 +15,7 @@
 #include <agz/tracer/render/particle_tracing.h>
 #include <agz/tracer/utility/parallel_grid.h>
 #include <agz/tracer/utility/perthread_samplers.h>
-#include <agz/utility/thread.h>
+#include <agz-utils/thread.h>
 
 AGZ_TRACER_BEGIN
 

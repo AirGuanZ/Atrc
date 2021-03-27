@@ -3,9 +3,9 @@
 
 #include <agz/tracer/core/texture2d.h>
 #include <agz/tracer/utility/logger.h>
-#include <agz/utility/image.h>
-#include <agz/utility/misc.h>
-#include <agz/utility/texture.h>
+#include <agz-utils/image.h>
+#include <agz-utils/misc.h>
+#include <agz-utils/texture.h>
 
 AGZ_TRACER_BEGIN
 

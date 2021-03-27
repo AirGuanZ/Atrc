@@ -1,7 +1,7 @@
 #include <agz/tracer/core/bsdf.h>
 #include <agz/tracer/core/material.h>
 #include <agz/tracer/core/texture2d.h>
-#include <agz/utility/misc.h>
+#include <agz-utils/misc.h>
 
 #include "./utility/fresnel_point.h"
 

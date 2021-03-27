@@ -3,7 +3,7 @@
 #include <agz/tracer/core/sampler.h>
 #include <agz/tracer/core/scene.h>
 #include <agz/tracer/utility/perthread_samplers.h>
-#include <agz/utility/thread.h>
+#include <agz-utils/thread.h>
 
 AGZ_EDITOR_BEGIN
 

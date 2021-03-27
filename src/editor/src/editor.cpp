@@ -11,7 +11,7 @@
 #include <agz/tracer/utility/embree.h>
 #include <agz/tracer/utility/logger.h>
 
-#include <agz/utility/file.h>
+#include <agz-utils/file.h>
 
 AGZ_EDITOR_BEGIN
 

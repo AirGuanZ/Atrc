@@ -1,5 +1,5 @@
 #include <agz/tracer/core/geometry.h>
-#include <agz/utility/misc.h>
+#include <agz-utils/misc.h>
 
 AGZ_TRACER_BEGIN
 

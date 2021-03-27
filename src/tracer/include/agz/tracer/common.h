@@ -2,8 +2,8 @@
 
 #include <stdexcept>
 
-#include <agz/utility/alloc.h>
-#include <agz/utility/texture.h>
+#include <agz-utils/alloc.h>
+#include <agz-utils/texture.h>
 
 #define AGZ_TRACER_BEGIN namespace agz::tracer {
 #define AGZ_TRACER_END   }

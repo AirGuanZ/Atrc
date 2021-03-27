@@ -1,6 +1,6 @@
 #include <agz/tracer/core/material.h>
 #include <agz/tracer/core/texture2d.h>
-#include <agz/utility/misc.h>
+#include <agz-utils/misc.h>
 
 #include "./component/aggregate.h"
 #include "./component/diffuse_comp.h"

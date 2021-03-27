@@ -11,8 +11,8 @@
 
 #include <agz/gui_common/gui.h>
 #include <agz/tracer/tracer.h>
-#include <agz/utility/file.h>
-#include <agz/utility/misc.h>
+#include <agz-utils/file.h>
+#include <agz-utils/misc.h>
 
 GUI::GUI()
 {

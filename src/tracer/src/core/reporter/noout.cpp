@@ -1,7 +1,7 @@
 #include <iostream>
 
 #include <agz/tracer/core/renderer_interactor.h>
-#include <agz/utility/misc.h>
+#include <agz-utils/misc.h>
 
 AGZ_TRACER_BEGIN
 

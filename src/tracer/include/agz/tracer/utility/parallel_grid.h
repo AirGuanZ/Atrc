@@ -1,7 +1,7 @@
 #pragma once
 
 #include <agz/tracer/common.h>
-#include <agz/utility/thread.h>
+#include <agz-utils/thread.h>
 
 AGZ_TRACER_BEGIN
 

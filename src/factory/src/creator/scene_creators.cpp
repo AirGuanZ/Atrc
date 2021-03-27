@@ -5,7 +5,7 @@
 #include <agz/tracer/create/aggregate.h>
 #include <agz/tracer/create/scene.h>
 #include <agz/tracer/utility/logger.h>
-#include <agz/utility/string.h>
+#include <agz-utils/string.h>
 
 AGZ_TRACER_FACTORY_BEGIN
 

@@ -2,7 +2,7 @@
 
 #include <agz/tracer/core/framebuffer.h>
 #include <agz/tracer/core/film_filter.h>
-#include <agz/utility/texture.h>
+#include <agz-utils/texture.h>
 
 AGZ_TRACER_BEGIN
 
