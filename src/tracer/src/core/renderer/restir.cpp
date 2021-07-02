@@ -131,6 +131,12 @@ class ReSTIRRenderer : public Renderer
             return;
         }
 
+        if(auto light = inct.entity->as_light())
+        {
+            pixel.value += light->radiance(
+                inct.pos, inct.geometry_coord.z, inct.uv, inct.wr);
+        }
+
         const auto shading_point = inct.material->shade(inct, bsdf_arena);
 
         // fill gbuffer
