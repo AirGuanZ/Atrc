@@ -7,6 +7,7 @@
 #include <agz/editor/renderer/export/export_renderer_particle.h>
 #include <agz/editor/renderer/export/export_renderer_pssmlt_pt.h>
 #include <agz/editor/renderer/export/export_renderer_pt.h>
+#include <agz/editor/renderer/export/export_renderer_restir.h>
 #include <agz/editor/renderer/export/export_renderer_sppm.h>
 #include <agz/editor/renderer/export/export_renderer_vol_bdpt.h>
 
@@ -26,6 +27,8 @@ namespace
             return new ExportRendererPSSMLTPT(parent);
         if(type == "PT")
             return new ExportRendererPT(parent);
+        if(type == "ReSTIR")
+            return new ExportRendererReSTIR(parent);
         if(type == "SPPM")
             return new ExportRendererSPPM(parent);
         if(type == "VolBDPT")
@@ -40,7 +43,7 @@ ExportRendererPanel::ExportRendererPanel()
     type_selector_->addItems(
         {
             "AO", "BDPT", "Particle", "PSSMLT PT",
-            "PT", "SPPM", "VolBDPT"
+            "PT", "ReSTIR", "SPPM", "VolBDPT"
         });
     type_selector_->setCurrentText("PT");
 

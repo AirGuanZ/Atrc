@@ -14,9 +14,9 @@ class EnvirLight;
 struct LightSampleResult
 {
     LightSampleResult(
-        const FVec3 &ref, const FVec3 &pos, const FVec3 &nor,
+        const FVec3 &ref, const FVec3 &pos, const FVec3 &nor, const Vec2 &uv,
         const FSpectrum &rad, real pdf) noexcept
-        : ref(ref), pos(pos), nor(nor), radiance(rad), pdf(pdf)
+        : ref(ref), pos(pos), nor(nor), uv(uv), radiance(rad), pdf(pdf)
     {
         
     }
@@ -24,6 +24,7 @@ struct LightSampleResult
     FVec3 ref;
     FVec3 pos;
     FVec3 nor;
+    Vec2  uv;
     FSpectrum radiance;
     real pdf;
 
@@ -42,7 +43,7 @@ struct LightSampleResult
  * @brief return value when sampling light wi fails
  */
 inline const LightSampleResult LIGHT_SAMPLE_RESULT_NULL =
-    { { }, { }, { }, { }, 0 };
+    { { }, { }, { }, { }, { }, 0 };
 
 /**
  * @brief result of sampling light emission
@@ -61,7 +62,7 @@ struct LightEmitResult
     FVec3 pos;          // emitting position
     FVec3 dir;          // emitting direction
     FVec3 nor;          // normal at pos
-    Vec2 uv;
+    Vec2  uv;
     FSpectrum radiance; // emitted radiance
     real pdf_pos;       // pdf w.r.t. light surface area
     real pdf_dir;       // pdf w.r.t. solid angle at position

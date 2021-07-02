@@ -9,6 +9,7 @@ Offline rendering lab based on ray tracing
 - [x] Volumetric bidirectional path tracing
 - [x] Stochastic progressive photon mapping
 - [x] Primary sample space MLT on path tracing
+- [x] ReSTIR renderer
 - [x] Various material models: Disney principled BSDF, phong, DreamWorks fabric ...
 - [x] Homogeneous/heterogeneous participating medium
 - [x] Normalized diffusion BSSRDF
@@ -69,5 +70,4 @@ Bedroom (rendered with pt) (scene ref [here](https://benedikt-bitterli.me/resour
 Dining Room (rendered with bdpt) (scene ref [here](https://www.blendswap.com/blends/view/86457)):
 
 ![2](./doc/gallery/dining.png)
-
 

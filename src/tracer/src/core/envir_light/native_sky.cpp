@@ -36,7 +36,7 @@ public:
         const auto [dir, pdf] = math::distribution::uniform_on_sphere(sam.u, sam.v);
 
         return LightSampleResult(
-            ref, emit_pos(ref, dir).pos, -dir, radiance_impl(dir), pdf);
+            ref, emit_pos(ref, dir).pos, -dir, {}, radiance_impl(dir), pdf);
     }
 
     real pdf(const FVec3 &ref, const FVec3 &) const noexcept override

@@ -232,6 +232,29 @@ namespace renderer
         }
     };
 
+    class ReSTIRRendererCreator : public Creator<Renderer>
+    {
+    public:
+
+        std::string name() const override
+        {
+            return "restir";
+        }
+
+        std::shared_ptr<Renderer> create(
+            const ConfigGroup &params, CreatingContext &context) const override
+        {
+            ReSTIRParams ps;
+            ps.spp                  = params.child_int_or("spp",                  ps.spp);
+            ps.M                    = params.child_int_or("M",                    ps.M);
+            //ps.I                    = params.child_int_or("I",                    ps.I);
+            ps.worker_count         = params.child_int_or("worker_count",         ps.worker_count);
+            ps.spatial_reuse_radius = params.child_int_or("spatial_reuse_radius", ps.spatial_reuse_radius);
+            ps.spatial_reuse_count  = params.child_int_or("spatial_reuse_count",  ps.spatial_reuse_count);
+            return create_restir_renderer(ps);
+        }
+    };
+
 } // namespace renderer
 
 void initialize_renderer_factory(Factory<Renderer> &factory)
@@ -240,6 +263,7 @@ void initialize_renderer_factory(Factory<Renderer> &factory)
     factory.add_creator(newBox<renderer::ParticleTracingRendererCreator>());
     factory.add_creator(newBox<renderer::PathTracingRendererCreator>());
     factory.add_creator(newBox<renderer::PSSMLTPTCreator>());
+    factory.add_creator(newBox<renderer::ReSTIRRendererCreator>());
     factory.add_creator(newBox<renderer::SPPMRendererCreator>());
     factory.add_creator(newBox<renderer::VolBDPTRendererCreator>());
 }

@@ -27,7 +27,7 @@ LightSampleResult GeometryToDiffuseLight::sample(
                    / std::abs(cos(spt.geometry_coord.z, spt_to_ref));
 
     return LightSampleResult(
-        ref, spt.pos, spt.geometry_coord.z, radiance_, pdf);
+        ref, spt.pos, spt.geometry_coord.z, spt.uv, radiance_, pdf);
 }
 
 LightEmitResult GeometryToDiffuseLight::sample_emit(

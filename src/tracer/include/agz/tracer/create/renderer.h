@@ -138,4 +138,19 @@ struct PSSMLTPTRendererParams
 
 RC<Renderer> create_pssmlt_pt_renderer(const PSSMLTPTRendererParams &params);
 
+// restir
+
+struct ReSTIRParams
+{
+    int worker_count = 0;
+
+    int M                    = 32;
+    int spatial_reuse_radius = 20;
+    int spatial_reuse_count  = 16;
+    
+    int spp = 1;
+};
+
+RC<Renderer> create_restir_renderer(const ReSTIRParams &params);
+
 AGZ_TRACER_END

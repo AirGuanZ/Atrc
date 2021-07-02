@@ -67,7 +67,7 @@ public:
         const auto [dir, pdf] = sampler_->sample({ sam.u, sam.v, sam.w });
 
         return LightSampleResult(
-            ref, emit_pos(ref, dir).pos, -dir, radiance(ref, dir), pdf);
+            ref, emit_pos(ref, dir).pos, -dir, {}, radiance(ref, dir), pdf);
     }
 
     real pdf(const FVec3 &ref, const FVec3 &ref_to_light) const noexcept override
@@ -146,7 +146,7 @@ public:
     FSpectrum radiance(
         const FVec3 &ref, const FVec3 &ref_to_light) const noexcept override
     {
-        const FVec3 dir   = ref_to_light.normalize();
+        const FVec3 dir  = ref_to_light.normalize();
         const real phi   = local_angle::phi(dir);
         const real theta = local_angle::theta(dir);
         const real u     = math::clamp<real>(phi / (2 * PI_r), 0, 1);
