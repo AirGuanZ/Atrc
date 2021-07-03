@@ -331,7 +331,7 @@ CameraPanel::CameraPanel(QWidget *parent)
         emit edit_params();
     });
 
-    update_display_params();
+    editing_export_->setChecked(true);
 }
 
 void CameraPanel::set_display_aspect(real aspect) noexcept

@@ -50,8 +50,6 @@ namespace
         Vec2 light_uv;
 
         const Light *light = nullptr;
-        
-        Vec2i pixel_coord;
     };
 
 } // namespace anonymous
@@ -94,10 +92,8 @@ class ReSTIRRenderer : public Renderer
         auto &reservoir = image_reservoirs(pixel_coord.y, pixel_coord.x);
 
         pixel.bsdf = nullptr;
-
         reservoir.clear();
-        reservoir.data.pixel_coord = pixel_coord;
-
+        
         // generate ray
 
         const Vec2 film_coord =
@@ -185,8 +181,7 @@ class ReSTIRRenderer : public Renderer
                     light->is_area() ? light_sample.pos : wi,
                     light_sample.nor,
                     light_sample.uv,
-                    light,
-                    pixel_coord
+                    light
                 },
                 p_hat / p, sampler.sample1().u);
         }
@@ -350,6 +345,7 @@ class ReSTIRRenderer : public Renderer
             output.M += nei_reservoir.M;
         }
 
+        float p_hat_sum = 0, pstar = 0;
         int Z = 0;
         for(auto &nei_coord : nei_coords)
         {
@@ -363,10 +359,15 @@ class ReSTIRRenderer : public Renderer
             if(p_hat <= 0)
                 continue;
 
+            p_hat_sum += p_hat;
+            if(nei_coord == pixel_coord)
+                pstar = p_hat;
+
             Z += nei_reservoir.M;
         }
 
-        const real m = Z > 0 ? real(1) / Z : real(0);
+        const real m = p_hat_sum > 0 ? pstar / p_hat_sum / params_.M : real(0);
+        //const real m = Z > 0 ? real(1) / Z : real(0);
         output.W = m * output.wsum / output.data.ideal_pdf;
     }
 
@@ -447,9 +448,11 @@ public:
         Scene              &scene,
         RendererInteractor &reporter) override
     {
-        ImageBuffer     image_buffer      (filter.height(), filter.width());
-        ImageReservoirs image_reservoirs_a(filter.height(), filter.width());
-        ImageReservoirs image_reservoirs_b(filter.height(), filter.width());
+        const int w = filter.width(), h = filter.height();
+
+        ImageBuffer     image_buffer      (h, w);
+        ImageReservoirs image_reservoirs_a(h, w);
+        ImageReservoirs image_reservoirs_b(h, w);
 
         std::vector<NativeSampler> thread_samplers;
         std::vector<Arena>         thread_bsdf_arenas(params_.worker_count);
@@ -485,23 +488,16 @@ public:
             if(stop_rendering_)
                 break;
 
-            auto src_reservoirs = &image_reservoirs_a;
-            auto dst_reservoirs = &image_reservoirs_b;
-            //for(int j = 0; j < params_.I; ++j)
-            //{
-                reuse_spatial(
-                    scene, threads, image_buffer,
-                    *src_reservoirs, *dst_reservoirs,
-                    thread_samplers.data());
-                std::swap(src_reservoirs, dst_reservoirs);
-            //}
-            auto &image_reservoirs = *src_reservoirs;
-
+            reuse_spatial(
+                scene, threads, image_buffer,
+                image_reservoirs_a, image_reservoirs_b,
+                thread_samplers.data());
+            
             auto resolve_thread_func = [&](int thread_idx, int y)
             {
-                for(int x = 0; x < filter.width(); ++x)
+                for(int x = 0; x < w; ++x)
                 {
-                    auto &reservoir = image_reservoirs(y, x);
+                    auto &reservoir = image_reservoirs_b(y, x);
                     auto &pixel     = image_buffer(y, x);
 
                     const FSpectrum value = resolve_pixel(scene, pixel, reservoir);
@@ -525,9 +521,33 @@ public:
         reporter.end_stage();
         reporter.end();
 
+        auto ratio = image_buffer.map([](const Pixel &p)
+        {
+            return p.weight > 0 ? 1 / p.weight : real(0);
+        });
+
         RenderTarget render_target;
-        render_target.image = get_img();
-        
+        render_target.image  .initialize(h, w);
+        render_target.albedo .initialize(h, w);
+        render_target.normal .initialize(h, w);
+        render_target.denoise.initialize(h, w);
+
+        for(int y = 0; y < h; ++y)
+        {
+            for(int x = 0; x < w; ++x)
+            {
+                auto &p = image_buffer(y, x);
+                if(!p.weight)
+                    continue;
+
+                const real r = 1 / p.weight;
+                render_target.image(y, x)   = r * p.value;
+                render_target.albedo(y, x)  = r * p.albedo;
+                render_target.normal(y, x)  = r * p.normal;
+                render_target.denoise(y, x) = r * p.denoise;
+            }
+        }
+
         return render_target;
     }
 };
