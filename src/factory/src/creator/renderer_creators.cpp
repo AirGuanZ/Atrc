@@ -247,7 +247,7 @@ namespace renderer
             ReSTIRParams ps;
             ps.spp                  = params.child_int_or("spp",                  ps.spp);
             ps.M                    = params.child_int_or("M",                    ps.M);
-            //ps.I                    = params.child_int_or("I",                    ps.I);
+            ps.I                    = params.child_int_or("I",                    ps.I);
             ps.worker_count         = params.child_int_or("worker_count",         ps.worker_count);
             ps.spatial_reuse_radius = params.child_int_or("spatial_reuse_radius", ps.spatial_reuse_radius);
             ps.spatial_reuse_count  = params.child_int_or("spatial_reuse_count",  ps.spatial_reuse_count);

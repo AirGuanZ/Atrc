@@ -9,38 +9,13 @@
 #include <agz/tracer/core/render_target.h>
 #include <agz/tracer/core/sampler.h>
 #include <agz/tracer/core/scene.h>
+#include <agz/tracer/utility/reservoir.h>
 #include <agz-utils/thread.h>
 
 AGZ_TRACER_BEGIN
 
-namespace
+class ReSTIRRenderer : public Renderer
 {
-
-    template<typename T>
-    struct Reservoir
-    {
-        T data;
-        
-        real wsum = 0;
-        real W    = 0;
-        int  M    = 0;
-
-        void update(const T &new_data, real w, real rnd)
-        {
-            wsum += w;
-            if(w > 0 && rnd <= w / wsum)
-                data = new_data;
-            ++M;
-        }
-
-        void clear()
-        {
-            wsum = 0;
-            W    = 0;
-            M    = 0;
-        }
-    };
-
     struct ReservoirData
     {
         real ideal_pdf = 0;
@@ -52,10 +27,6 @@ namespace
         const Light *light = nullptr;
     };
 
-} // namespace anonymous
-
-class ReSTIRRenderer : public Renderer
-{
     struct Pixel
     {
         // accumulated data
@@ -159,6 +130,7 @@ class ReSTIRRenderer : public Renderer
                 light->sample(inct.pos, sampler.sample5());
             if(!light_sample.valid())
                 continue;
+
             const FVec3 wi = light_sample.ref_to_light();
 
             // compute actual/ideal pdf
@@ -206,12 +178,15 @@ class ReSTIRRenderer : public Renderer
         const Scene &scene, const Vec3 &pos, const ReservoirData &red) const
     {
         if(red.light->is_area())
-            return scene.visible(pos, red.light_pos_or_wi);
+            return scene.visible(pos, red.light_pos_or_wi + EPS() * red.light_nor);
         return !scene.has_intersection(Ray(pos, red.light_pos_or_wi, EPS()));
     }
 
     real compute_ideal_pdf(const Pixel &pixel, const ReservoirData &data) const
     {
+        if(!data.light)
+            return 0;
+
         const FVec3 wi = data.light->is_area() ?
             (data.light_pos_or_wi - pixel.visible_pos) : data.light_pos_or_wi;
 
@@ -299,8 +274,7 @@ class ReSTIRRenderer : public Renderer
         static thread_local std::vector<Vec2i> nei_coords;
         
         nei_coords.clear();
-        if(input.wsum)
-            nei_coords.push_back(pixel_coord);
+        nei_coords.push_back(pixel_coord);
 
         for(int i = 0; i < params_.spatial_reuse_count; ++i)
         {
@@ -317,8 +291,7 @@ class ReSTIRRenderer : public Renderer
                 continue;
 
             auto &nei_reservoir = input_reservoirs(sam_y, sam_x);
-            if(nei_reservoir.wsum)
-                nei_coords.push_back({ sam_x, sam_y });
+            nei_coords.push_back({ sam_x, sam_y });
         }
 
         for(auto &nei_coord : nei_coords)
@@ -335,7 +308,7 @@ class ReSTIRRenderer : public Renderer
                 sampler.sample1().u);
         }
 
-        if(!output.wsum)
+        if(!output.data.light)
             return;
 
         output.M = 0;
@@ -345,8 +318,7 @@ class ReSTIRRenderer : public Renderer
             output.M += nei_reservoir.M;
         }
 
-        float p_hat_sum = 0, pstar = 0;
-        int Z = 0;
+        /*float p_hat_sum = 0, pstar = 0;
         for(auto &nei_coord : nei_coords)
         {
             auto &nei_reservoir = input_reservoirs(nei_coord.y, nei_coord.x);
@@ -359,16 +331,21 @@ class ReSTIRRenderer : public Renderer
             if(p_hat <= 0)
                 continue;
 
-            p_hat_sum += p_hat;
+            p_hat_sum += p_hat * nei_reservoir.M;
             if(nei_coord == pixel_coord)
                 pstar = p_hat;
+        }*/
 
-            Z += nei_reservoir.M;
+        if(output.data.ideal_pdf < EPS())
+        {
+            output.W = 0;
         }
-
-        const real m = p_hat_sum > 0 ? pstar / p_hat_sum / params_.M : real(0);
-        //const real m = Z > 0 ? real(1) / Z : real(0);
-        output.W = m * output.wsum / output.data.ideal_pdf;
+        else
+        {
+            const real m = real(1) / output.M;
+            //const real m = p_hat_sum > 0 ? pstar / p_hat_sum : real(0);
+            output.W = m * output.wsum / output.data.ideal_pdf;
+        }
     }
 
     void reuse_spatial(
@@ -400,7 +377,7 @@ class ReSTIRRenderer : public Renderer
         const Pixel                    &pixel,
         const Reservoir<ReservoirData> &reservoir)
     {
-        if(!reservoir.wsum)
+        if(!reservoir.wsum || !reservoir.data.light)
             return {};
         assert(pixel.bsdf);
 
@@ -488,21 +465,31 @@ public:
             if(stop_rendering_)
                 break;
 
-            reuse_spatial(
-                scene, threads, image_buffer,
-                image_reservoirs_a, image_reservoirs_b,
-                thread_samplers.data());
-            
+            auto src = &image_reservoirs_a;
+            auto dst = &image_reservoirs_b;
+
+            for(int i = 0; i < params_.I; ++i)
+            {
+                reuse_spatial(
+                    scene, threads, image_buffer,
+                    *src, *dst,
+                    thread_samplers.data());
+
+                std::swap(src, dst);
+            }
+
             auto resolve_thread_func = [&](int thread_idx, int y)
             {
                 for(int x = 0; x < w; ++x)
                 {
-                    auto &reservoir = image_reservoirs_b(y, x);
+                    auto &reservoir = (*src)(y, x);
                     auto &pixel     = image_buffer(y, x);
 
                     const FSpectrum value = resolve_pixel(scene, pixel, reservoir);
                     if(value.is_finite())
                         image_buffer(y, x).value += value;
+                    else
+                        printf("fuck\n");
 
                     if(stop_rendering_)
                         break;

@@ -145,8 +145,9 @@ struct ReSTIRParams
     int worker_count = 0;
 
     int M                    = 32;
+    int I                    = 2;
     int spatial_reuse_radius = 20;
-    int spatial_reuse_count  = 16;
+    int spatial_reuse_count  = 5;
     
     int spp = 1;
 };

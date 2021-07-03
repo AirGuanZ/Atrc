@@ -23,7 +23,7 @@ private:
 
     QSpinBox *spp_                = nullptr;
     QSpinBox *M_                  = nullptr;
-    //QSpinBox *I_                  = nullptr;
+    QSpinBox *I_                  = nullptr;
     QSpinBox *spatialReuseRadius_ = nullptr;
     QSpinBox *spatialReuseCount_  = nullptr;
     QSpinBox *worker_count_       = nullptr;
