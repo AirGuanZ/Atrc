@@ -158,7 +158,7 @@ void AssetSaveDialog::ok()
     if(save_filename.isEmpty())
         return;
 
-    AGZ_SCOPE_GUARD({ this->close(); });
+    AGZ_SCOPE_EXIT{ this->close(); };
 
     std::ofstream fout(
         save_filename.toStdString(), std::ios::binary | std::ios::trunc);

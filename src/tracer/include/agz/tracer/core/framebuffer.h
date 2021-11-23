@@ -63,14 +63,14 @@ void apply_image_filter(
     real y_rel = std::abs(y_min + real(0.5) - sample.y);
     for(int y = y_min; y <= y_max; ++y)
     {
-        AGZ_SCOPE_GUARD({ y_rel += 1; });
+        AGZ_SCOPE_EXIT{ y_rel += 1; };
         if(y_rel > filter_radius)
             continue;
 
         real x_rel = std::abs(x_min + real(0.5) - sample.x);
         for(int x = x_min; x <= x_max; ++x)
         {
-            AGZ_SCOPE_GUARD({ x_rel += 1; });
+            AGZ_SCOPE_EXIT{ x_rel += 1; };
             if(x_rel > filter_radius)
                 continue;
 

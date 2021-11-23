@@ -154,4 +154,24 @@ struct ReSTIRParams
 
 RC<Renderer> create_restir_renderer(const ReSTIRParams &params);
 
+// restir gi
+
+struct ReSTIRGIParams
+{
+    int worker_count = 0;
+
+    int I                    = 2;
+    int spatial_reuse_radius = 20;
+    int spatial_reuse_count  = 5;
+
+    int spp = 1;
+
+    int  min_depth      = 5;
+    int  max_depth      = 10;
+    int  specular_depth = 20;
+    real cont_prob = real(0.9);
+};
+
+RC<Renderer> create_restir_gi_renderer(const ReSTIRGIParams &params);
+
 AGZ_TRACER_END

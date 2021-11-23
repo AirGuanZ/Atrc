@@ -92,9 +92,9 @@ Editor::~Editor()
     obj_ctx_.reset();
 
 #ifdef USE_EMBREE
-    AGZ_SCOPE_GUARD({
+    AGZ_SCOPE_EXIT{
         agz::tracer::destroy_embree_device();
-    });
+    };
 #endif
 }
 

@@ -82,7 +82,7 @@ void Framebuffer::merge_tasks(int task_count, Task *tasks)
 {
     {
         es_mutex_.lock_shared();
-        AGZ_SCOPE_GUARD({ es_mutex_.unlock_shared(); });
+        AGZ_SCOPE_EXIT{ es_mutex_.unlock_shared(); };
 
         for(int i = 0; i < task_count; ++i)
             merge_single_task(tasks[i]);

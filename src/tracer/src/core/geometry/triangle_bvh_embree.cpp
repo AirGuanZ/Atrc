@@ -102,7 +102,7 @@ namespace tri_bvh_embree_ws
             RTCGeometry mesh = rtcNewGeometry(device, RTC_GEOMETRY_TYPE_TRIANGLE);
             if(!mesh)
                 throw_embree_error();
-            AGZ_SCOPE_GUARD({ rtcReleaseGeometry(mesh); });
+            AGZ_SCOPE_EXIT{ rtcReleaseGeometry(mesh); };
 
             const size_t vertex_count = triangle_count * 3;
             const auto vertices = static_cast<EmbreeVertex*>(

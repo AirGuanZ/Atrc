@@ -98,7 +98,7 @@ protected:
 
     void mouseReleaseEvent(QMouseEvent *event) override
     {
-        AGZ_SCOPE_GUARD({ update_background_color(); });
+        AGZ_SCOPE_EXIT{ update_background_color(); };
 
         if(!is_pressed_)
             return;

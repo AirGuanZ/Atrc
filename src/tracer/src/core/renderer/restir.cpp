@@ -56,7 +56,6 @@ class ReSTIRRenderer : public Renderer
         ImageReservoirs &image_reservoirs,
         const Scene     &scene,
         NativeSampler   &sampler,
-        Arena           &general_arena,
         Arena           &bsdf_arena) const
     {
         auto &pixel     = image_buffer(pixel_coord.y, pixel_coord.x);
@@ -162,7 +161,7 @@ class ReSTIRRenderer : public Renderer
 
         // test visibility and compute corr factor
 
-        if(reservoir.wsum)
+        if(reservoir.wsum > real(0))
         {
             if(!test_visibility(scene, inct.pos, reservoir.data))
                 reservoir.W = 0;
@@ -221,16 +220,11 @@ class ReSTIRRenderer : public Renderer
             NativeSampler &sampler    = thread_samplers[thread_idx];
             Arena         &bsdf_arena = thread_bsdf_arena[thread_idx];
 
-            Arena general_arena;
-
             for(int x = 0; x < image_reservoirs.width(); ++x)
             {
                 create_pixel_reservoir(
                     { x, y }, image_buffer, image_reservoirs, scene,
-                    sampler, general_arena, bsdf_arena);
-
-                if(general_arena.used_bytes() > 4 * 1024 * 1024)
-                    general_arena.release();
+                    sampler, bsdf_arena);
 
                 if(stop_rendering_)
                     return;
@@ -262,7 +256,6 @@ class ReSTIRRenderer : public Renderer
             input_reservoirs.height(),
             pixel_coord.y + params_.spatial_reuse_radius + 1);
 
-        auto &input  = input_reservoirs (pixel_coord.y, pixel_coord.x);
         auto &output = output_reservoirs(pixel_coord.y, pixel_coord.x);
 
         output.clear();
@@ -290,7 +283,6 @@ class ReSTIRRenderer : public Renderer
             if(dot(nei_pixel.curr_normal, pixel.curr_normal) < 0.93f)
                 continue;
 
-            auto &nei_reservoir = input_reservoirs(sam_y, sam_x);
             nei_coords.push_back({ sam_x, sam_y });
         }
 
@@ -377,7 +369,7 @@ class ReSTIRRenderer : public Renderer
         const Pixel                    &pixel,
         const Reservoir<ReservoirData> &reservoir)
     {
-        if(!reservoir.wsum || !reservoir.data.light)
+        if(reservoir.wsum <= real(0) || !reservoir.data.light)
             return {};
         assert(pixel.bsdf);
 
@@ -468,7 +460,7 @@ public:
             auto src = &image_reservoirs_a;
             auto dst = &image_reservoirs_b;
 
-            for(int i = 0; i < params_.I; ++i)
+            for(int j = 0; j < params_.I; ++j)
             {
                 reuse_spatial(
                     scene, threads, image_buffer,
@@ -488,8 +480,6 @@ public:
                     const FSpectrum value = resolve_pixel(scene, pixel, reservoir);
                     if(value.is_finite())
                         image_buffer(y, x).value += value;
-                    else
-                        printf("fuck\n");
 
                     if(stop_rendering_)
                         break;
@@ -508,11 +498,6 @@ public:
         reporter.end_stage();
         reporter.end();
 
-        auto ratio = image_buffer.map([](const Pixel &p)
-        {
-            return p.weight > 0 ? 1 / p.weight : real(0);
-        });
-
         RenderTarget render_target;
         render_target.image  .initialize(h, w);
         render_target.albedo .initialize(h, w);
@@ -524,7 +509,7 @@ public:
             for(int x = 0; x < w; ++x)
             {
                 auto &p = image_buffer(y, x);
-                if(!p.weight)
+                if(p.weight <= real(0))
                     continue;
 
                 const real r = 1 / p.weight;

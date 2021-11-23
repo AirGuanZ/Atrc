@@ -20,12 +20,16 @@ struct Reservoir
         M    = 0;
     }
 
-    void update(const T &new_data, real new_weight, real rnd)
+    bool update(const T &new_data, real new_weight, real rnd)
     {
         wsum += new_weight;
-        if(new_weight > 0 && rnd <= new_weight / wsum)
-            data = new_data;
         ++M;
+        if(new_weight > 0 && rnd <= new_weight / wsum)
+        {
+            data = new_data;
+            return true;
+        }
+        return false;
     }
 
     void merge(const Reservoir<T> &other, real p_hat, real rnd)

@@ -17,9 +17,9 @@ int main(int argc, char *argv[])
 #endif
 
 #ifdef USE_EMBREE
-    AGZ_SCOPE_GUARD({
+    AGZ_SCOPE_EXIT{
         agz::tracer::destroy_embree_device();
-    });
+    };
 #endif
 
     QApplication app(argc, argv);

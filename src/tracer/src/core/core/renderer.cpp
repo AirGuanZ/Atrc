@@ -10,7 +10,7 @@ void Renderer::render_async(
     async_thread_ = std::async(
         std::launch::async, [this, filter, &scene, &reporter]()
     {
-        AGZ_SCOPE_GUARD({ doing_rendering_ = false; });
+        AGZ_SCOPE_EXIT{ doing_rendering_ = false; };
         return this->render(std::move(filter), scene, reporter);
     });
     is_waitable_ = true;
@@ -31,7 +31,7 @@ void Renderer::stop_async()
 RenderTarget Renderer::wait_async()
 {
     assert(is_waitable_);
-    AGZ_SCOPE_GUARD({ is_waitable_ = false; });
+    AGZ_SCOPE_EXIT{ is_waitable_ = false; };
     return async_thread_.get();
 }
 

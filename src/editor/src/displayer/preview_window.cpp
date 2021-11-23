@@ -862,14 +862,14 @@ void PreviewWindow::render_renderframe()
 
 void PreviewWindow::render_gizmo()
 {
-    AGZ_SCOPE_GUARD({
+    AGZ_SCOPE_EXIT{
         if(is_left_button_just_down_)
         {
             is_left_button_just_down_ = false;
             if(Im3d::GetContext().m_hotDepth == (std::numeric_limits<float>::max)())
             {
                 const Vec2 film_coord(
-                    cursor_pos_.x     / width(),
+                    cursor_pos_.x / width(),
                     1 - cursor_pos_.y / height());
 
                 const auto &camera_params = get_camera_panel()->get_display_params();
@@ -894,7 +894,7 @@ void PreviewWindow::render_gizmo()
                 emit left_click_to_emit_ray(eye, ray_dst - eye);
             }
         }
-        });
+    };
 
     if(selected_mesh_id_ < 0)
         return;

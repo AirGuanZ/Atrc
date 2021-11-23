@@ -95,7 +95,7 @@ void AssetLoadDialog::ok()
     if(load_filename.isEmpty())
         return;
 
-    AGZ_SCOPE_GUARD({ this->close(); });
+    AGZ_SCOPE_EXIT{ this->close(); };
 
     std::ifstream fin(
         load_filename.toStdString(), std::ios::in | std::ios::binary);

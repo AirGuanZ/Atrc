@@ -20,10 +20,10 @@ void run(int argc, char *argv[])
 #ifdef USE_EMBREE
         AGZ_INFO("initializing embree device");
         agz::tracer::init_embree_device();
-        AGZ_SCOPE_GUARD({
+        AGZ_SCOPE_EXIT{
             AGZ_INFO("destroying embree device");
             agz::tracer::destroy_embree_device();
-        });
+        };
 #endif
 
     agz::tracer::factory::BasicPathMapper path_mapper;

@@ -195,10 +195,10 @@ RC<tracer::ConfigNode> Image3DWidget::to_config(
     else
     {
         assert(uint24_data_);
-        tracer::texture3d_load::save_uint8_to_binary(
+        tracer::texture3d_load::save_uint24_to_binary(
             filename,
             uint24_data_->size(),
-            &uint24_data_->raw_data()->r);
+            uint24_data_->raw_data());
         format = "rgb8";
     }
 

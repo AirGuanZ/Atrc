@@ -255,6 +255,32 @@ namespace renderer
         }
     };
 
+    class ReSTIRGIRendererCreator : public Creator<Renderer>
+    {
+    public:
+
+        std::string name() const override
+        {
+            return "restir-gi";
+        }
+
+        RC<Renderer> create(
+            const ConfigGroup &params, CreatingContext &context) const override
+        {
+            ReSTIRGIParams ps;
+            ps.worker_count         = params.child_int_or("worker_count", ps.worker_count);
+            ps.I                    = params.child_int_or("I", ps.I);
+            ps.spatial_reuse_count  = params.child_int_or("spatial_reuse_count", ps.spatial_reuse_count);
+            ps.spatial_reuse_radius = params.child_int_or("spatial_reuse_radius", ps.spatial_reuse_radius);
+            ps.spp                  = params.child_int_or("spp", ps.spp);
+            ps.min_depth            = params.child_int_or("min_depth", ps.min_depth);
+            ps.max_depth            = params.child_int_or("max_depth", ps.max_depth);
+            ps.specular_depth       = params.child_int_or("specular_depth", ps.specular_depth);
+            ps.cont_prob            = params.child_real_or("cont_prob", ps.cont_prob);
+            return create_restir_gi_renderer(ps);
+        }
+    };
+
 } // namespace renderer
 
 void initialize_renderer_factory(Factory<Renderer> &factory)
@@ -264,6 +290,7 @@ void initialize_renderer_factory(Factory<Renderer> &factory)
     factory.add_creator(newBox<renderer::PathTracingRendererCreator>());
     factory.add_creator(newBox<renderer::PSSMLTPTCreator>());
     factory.add_creator(newBox<renderer::ReSTIRRendererCreator>());
+    factory.add_creator(newBox<renderer::ReSTIRGIRendererCreator>());
     factory.add_creator(newBox<renderer::SPPMRendererCreator>());
     factory.add_creator(newBox<renderer::VolBDPTRendererCreator>());
 }
