@@ -370,7 +370,7 @@ class ReSTIRGIRenderer : public Renderer
             return;
 
         const auto f = eval<true>(scene, pixel, reservoir.data);
-        if(f.is_finite() && isfinite(reservoir.W))
+        if(f.is_finite() && std::isfinite(reservoir.W))
             pixel.accu_value += f * reservoir.W;
     }
 

@@ -153,13 +153,13 @@ Pixel trace_std(
             return pixel;
 
         bool is_new_sample_delta = bsdf_sample.is_delta;
-        AGZ_SCOPE_GUARD({
+        AGZ_SCOPE_EXIT{
             if(is_new_sample_delta && depth >= 2 && s_depth <= params.specular_depth)
             {
                 --depth;
                 ++s_depth;
             }
-        });
+        };
 
         const real abscos = std::abs(cos(
             ent_inct.geometry_coord.z, bsdf_sample.dir));
@@ -330,14 +330,14 @@ Pixel trace_nomis(
         r = Ray(ent_inct.eps_offset(bsdf_sample.dir), bsdf_sample.dir);
 
         bool is_new_sample_specular = bsdf_sample.is_delta;
-        AGZ_SCOPE_GUARD({
+        AGZ_SCOPE_EXIT{
             if(is_new_sample_specular && depth >= 2 &&
                s_depth <= params.specular_depth)
             {
                 --depth;
                 ++s_depth;
             }
-        });
+        };
 
         // bssrdf
 
