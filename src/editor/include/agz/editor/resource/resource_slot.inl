@@ -88,6 +88,15 @@ RC<TracerObject> ResourceSlot<TracerObject>::get_tracer_object()
 }
 
 template<typename TracerObject>
+Box<ResourceThumbnailProvider> ResourceSlot<TracerObject>::get_thumbnail(int width, int height)
+{
+    if(reference_)
+        return reference_->get_resource()->get_thumbnail(width, height);
+    assert(owned_panel_);
+    return owned_panel_->get_thumbnail(width, height);
+}
+
+template<typename TracerObject>
 ResourceSlot<TracerObject> *ResourceSlot<TracerObject>::clone() const
 {
     Box<ResourceReference<TracerObject>> reference;

@@ -24,4 +24,6 @@ RC<Texture2D> create_image_texture(
     const Texture2DCommonParams &common_params,
     RC<const Image2D<math::color3b>> data, const std::string &sampler);
 
+RC<Texture2D> create_solid_image_texture(RC<const Texture3D> tex3d);
+
 AGZ_TRACER_END

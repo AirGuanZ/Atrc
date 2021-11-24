@@ -1,5 +1,6 @@
 #include <agz/factory/creator/texture2d_creators.h>
 #include <agz/tracer/create/texture2d.h>
+#include <agz/tracer/create/texture3d.h>
 #include <agz-utils/image.h>
 
 AGZ_TRACER_FACTORY_BEGIN
@@ -144,6 +145,23 @@ namespace texture
         }
     };
 
+    class SolidImageCreator : public Creator<Texture2D>
+    {
+    public:
+
+        std::string name() const override
+        {
+            return "solid_image";
+        }
+
+        RC<Texture2D> create(
+            const ConfigGroup &params, CreatingContext &context) const override
+        {
+            auto tex3d = context.create<Texture3D>(params.child_group("tex3d"));
+            return create_solid_image_texture(std::move(tex3d));
+        }
+    };
+
 } // namespace texture
 
 void initialize_texture2d_factory(Factory<Texture2D> &factory)
@@ -152,6 +170,7 @@ void initialize_texture2d_factory(Factory<Texture2D> &factory)
     factory.add_creator(newBox<texture::ConstantCreator>());
     factory.add_creator(newBox<texture::HDRCreator>());
     factory.add_creator(newBox<texture::ImageCreator>());
+    factory.add_creator(newBox<texture::SolidImageCreator>());
 }
 
 AGZ_TRACER_FACTORY_END

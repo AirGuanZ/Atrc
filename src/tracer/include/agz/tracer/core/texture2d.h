@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include <agz/tracer/common.h>
+#include <agz/tracer/core/intersection.h>
 #include <agz/tracer/utility/config.h>
 
 AGZ_TRACER_BEGIN
@@ -156,6 +156,16 @@ public:
         if(inv_gamma_ != 1)
             ret = std::pow(ret, inv_gamma_);
         return ret;
+    }
+
+    virtual FSpectrum sample_spectrum(const EntityIntersection &inct) const noexcept
+    {
+        return sample_spectrum(inct.uv);
+    }
+
+    virtual real sample_real(const EntityIntersection &inct) const noexcept
+    {
+        return sample_real(inct.uv);
     }
 
     virtual int width() const noexcept = 0;

@@ -37,6 +37,8 @@ public:
 
     RC<TracerObject> get_tracer_object();
 
+    Box<ResourceThumbnailProvider> get_thumbnail(int width, int height);
+
     ResourceSlot<TracerObject> *clone() const;
 
     void save_asset(AssetSaver &saver) const;
