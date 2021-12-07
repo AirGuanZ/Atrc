@@ -66,7 +66,11 @@ public:
      * @brief sample out-scattering event from a to b
      */
     virtual SampleOutScatteringResult sample_scattering(
-        const FVec3 &a, const FVec3 &b, Sampler &sampler, Arena &arena) const = 0;
+        const FVec3 &a,
+        const FVec3 &b,
+        Sampler     &sampler,
+        Arena       &arena,
+        bool         indirect_scattering = false) const = 0;
 };
 
 /**

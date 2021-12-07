@@ -12,7 +12,8 @@ RC<Medium> create_heterogeneous_medium(
     RC<const Texture3D> density,
     RC<const Texture3D> albedo,
     RC<const Texture3D> g,
-    int max_scattering_count);
+    int max_scattering_count,
+    bool white_for_indirect);
 
 RC<Medium> create_homogeneous_medium(
     const FSpectrum &sigma_a,

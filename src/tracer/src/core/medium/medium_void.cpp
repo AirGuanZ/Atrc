@@ -26,7 +26,7 @@ public:
 
     SampleOutScatteringResult sample_scattering(
         const FVec3 &a, const FVec3 &b,
-        Sampler &sampler, Arena &arena) const override
+        Sampler &sampler, Arena &arena, bool) const override
     {
         return { { }, FSpectrum(1), nullptr };
     }

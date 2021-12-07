@@ -18,6 +18,7 @@ class HeterogeneousMedium : public Medium
     real inv_max_density_;
 
     int max_scattering_count_;
+    bool white_for_indiect_;
 
 public:
 
@@ -26,7 +27,8 @@ public:
         RC<const Texture3D> density,
         RC<const Texture3D> albedo,
         RC<const Texture3D> g,
-        int max_scattering_count)
+        int max_scattering_count,
+        bool white_for_indirect)
     {
         local_to_world_ = local_to_world;
 
@@ -39,6 +41,7 @@ public:
         inv_max_density_ = 1 / max_density_;
 
         max_scattering_count_ = max_scattering_count;
+        white_for_indiect_ = white_for_indirect;
     }
 
     int get_max_scattering_count() const noexcept override
@@ -79,7 +82,8 @@ public:
 
     SampleOutScatteringResult sample_scattering(
         const FVec3 &a, const FVec3 &b,
-        Sampler &sampler, Arena &arena) const noexcept override
+        Sampler &sampler, Arena &arena,
+        bool indirect_scattering) const noexcept override
     {
         const real t_max = distance(a, b);
         real t = 0;
@@ -97,7 +101,9 @@ public:
             const real density = density_->sample_real(unit_pos);
             if(sampler.sample1().u < density / max_density_)
             {
-                const FSpectrum albedo = albedo_->sample_spectrum(unit_pos);
+                const FSpectrum albedo =
+                    white_for_indiect_ && indirect_scattering ?
+                    FSpectrum(1) : albedo_->sample_spectrum(unit_pos);
                 const real     g      = g_->sample_real(unit_pos);
 
                 MediumScattering scattering;
@@ -106,11 +112,10 @@ public:
                 scattering.wr     = (a - b) / t_max;
 
                 auto phase_function =
-                    arena.create<HenyeyGreensteinPhaseFunction>(
-                        g, FSpectrum(albedo));
+                    arena.create<HenyeyGreensteinPhaseFunction>(g, albedo);
 
                 return SampleOutScatteringResult(
-                    scattering, FSpectrum(albedo), phase_function);
+                    scattering, albedo, phase_function);
             }
         }
 
@@ -123,11 +128,13 @@ RC<Medium> create_heterogeneous_medium(
     RC<const Texture3D> density,
     RC<const Texture3D> albedo,
     RC<const Texture3D> g,
-    int max_scattering_count)
+    int max_scattering_count,
+    bool white_for_indirect)
 {
     return newRC<HeterogeneousMedium>(
         local_to_world, std::move(density),
-        std::move(albedo), std::move(g), max_scattering_count);
+        std::move(albedo), std::move(g),
+        max_scattering_count, white_for_indirect);
 }
 
 AGZ_TRACER_END

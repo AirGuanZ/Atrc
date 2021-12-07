@@ -66,7 +66,7 @@ Pixel trace_std(
         if(scattering_count < medium->get_max_scattering_count())
         {
             const auto medium_sample = medium->sample_scattering(
-                r.o, ent_inct.pos, sampler, arena);
+                r.o, ent_inct.pos, sampler, arena, scattering_count > 0);
 
             // tr is accounted here
             coef *= medium_sample.throughput;
@@ -275,7 +275,7 @@ Pixel trace_nomis(
         if(scattering_count < medium->get_max_scattering_count())
         {
             const auto medium_sample = medium->sample_scattering(
-                r.o, ent_inct.pos, sampler, arena);
+                r.o, ent_inct.pos, sampler, arena, scattering_count > 0);
             coef *= medium_sample.throughput;
 
             // process medium scattering

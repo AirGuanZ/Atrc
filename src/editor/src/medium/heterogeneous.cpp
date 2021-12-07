@@ -1,3 +1,4 @@
+#include <agz/editor/imexport/asset_version.h>
 #include <agz/editor/medium/heterogeneous.h>
 #include <agz/editor/texture3d/range3d.h>
 #include <agz/editor/ui/utility/collapsible.h>
@@ -17,6 +18,9 @@ HeterogeneousWidget::HeterogeneousWidget(
     max_scattering_count_ = new QSpinBox(this);
     max_scattering_count_->setRange(1, (std::numeric_limits<int>::max)());
     max_scattering_count_->setValue(init_data.max_scattering_count);
+
+    white_for_indirect_ = new QCheckBox(this);
+    white_for_indirect_->setChecked(init_data.white_for_indirect);
 
     if(!transform_)
         transform_ = new Transform3DSeqWidget;
@@ -59,6 +63,12 @@ HeterogeneousWidget::HeterogeneousWidget(
         set_dirty_flag();
     });
 
+    connect(white_for_indirect_, &QCheckBox::stateChanged,
+        [=](int)
+    {
+        set_dirty_flag();
+    });
+
     Collapsible *trans_sec   = new Collapsible(this, "Transform");
     Collapsible *density_sec = new Collapsible(this, "Density");
     Collapsible *albedo_sec  = new Collapsible(this, "Albedo");
@@ -81,6 +91,8 @@ HeterogeneousWidget::HeterogeneousWidget(
     layout->addWidget(g_sec,       3, 0, 1, 2);
     layout->addWidget(new QLabel("Max Scattering Count"), 4, 0, 1, 1);
     layout->addWidget(max_scattering_count_, 4, 1, 1, 1);
+    layout->addWidget(new QLabel("White For Indirect"), 5, 0, 1, 1);
+    layout->addWidget(white_for_indirect_, 5, 1, 1, 1);
 
     setContentsMargins(0, 0, 0, 0);
     layout->setContentsMargins(0, 0, 0, 0);
@@ -96,6 +108,7 @@ ResourceWidget<tracer::Medium> *HeterogeneousWidget::clone()
     init_data.albedo    = albedo_->clone();
     init_data.g         = g_->clone();
     init_data.max_scattering_count = max_scattering_count_->value();
+    init_data.white_for_indirect = white_for_indirect_->isChecked();
     return new HeterogeneousWidget(init_data, obj_ctx_);
 }
 
@@ -114,6 +127,7 @@ void HeterogeneousWidget::save_asset(AssetSaver &saver)
     g_      ->save_asset(saver);
 
     saver.write(uint32_t(max_scattering_count_->value()));
+    saver.write(uint32_t(white_for_indirect_->isChecked()));
 }
 
 void HeterogeneousWidget::load_asset(AssetLoader &loader)
@@ -125,6 +139,9 @@ void HeterogeneousWidget::load_asset(AssetLoader &loader)
     g_      ->load_asset(loader);
 
     max_scattering_count_->setValue(int(loader.read<uint32_t>()));
+
+    if(loader.version() >= versions::V2021_1129_0709)
+        white_for_indirect_->setChecked(loader.read<uint32_t>() != 0);
 
     do_update_tracer_object();
 }
@@ -141,6 +158,7 @@ RC<tracer::ConfigNode> HeterogeneousWidget::to_config(
     grp->insert_child("g", g_->to_config(ctx));
 
     grp->insert_int("max_scattering_count", max_scattering_count_->value());
+    grp->insert_int("white_for_indirect", white_for_indirect_->isChecked() ? 1 : 0);
 
     return grp;
 }
@@ -157,9 +175,11 @@ void HeterogeneousWidget::do_update_tracer_object()
     auto albedo    = albedo_->get_tracer_object();
     auto g         = g_->get_tracer_object();
     const int max_scattering_count = max_scattering_count_->value();
+    const bool white_for_indirect = white_for_indirect_->isChecked() ? 1 : 0;
 
     tracer_object_ = create_heterogeneous_medium(
-        transform, density, albedo, g, max_scattering_count);
+        transform, density, albedo, g,
+        max_scattering_count, white_for_indirect);
 }
 
 ResourceWidget<tracer::Medium> *HeterogeneousWidgetCreator::create_widget(

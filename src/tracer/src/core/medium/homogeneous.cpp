@@ -69,7 +69,7 @@ public:
 
     SampleOutScatteringResult sample_scattering(
         const FVec3 &a, const FVec3 &b,
-        Sampler &sampler, Arena &arena) const override
+        Sampler &sampler, Arena &arena, bool) const override
     {
         const Sample1 sam = sampler.sample1();
         if(!sigma_s_)

@@ -146,9 +146,19 @@ public:
     {
         ShadingPoint ret;
 
-        const real     ior               = ior_->sample_real(inct);
-        const FSpectrum color_reflection = color_reflection_map_->sample_spectrum(inct);
-        const FSpectrum color_refraction = color_refraction_map_->sample_spectrum(inct);
+        const real ior = ior_->sample_real(inct);
+
+        FSpectrum color_reflection = color_reflection_map_->sample_spectrum(inct);
+        FSpectrum color_refraction;
+        if(color_refraction_map_ == color_reflection_map_)
+        {
+            color_reflection = sqrt(color_reflection);
+            color_refraction = color_reflection;
+        }
+        else
+        {
+            color_refraction = color_refraction_map_->sample_spectrum(inct);
+        }
 
         const DielectricFresnelPoint *fresnel_point =
             arena.create<DielectricFresnelPoint>(ior, real(1));

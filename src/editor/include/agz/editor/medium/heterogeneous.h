@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QCheckBox>
 #include <QSpinBox>
 
 #include <agz/editor/medium/medium.h>
@@ -21,6 +22,7 @@ public:
         Texture3DSlot *g       = nullptr;
 
         int max_scattering_count = (std::numeric_limits<int>::max)();
+        bool white_for_indirect = false;
     };
 
     HeterogeneousWidget(const InitData &init_data, ObjectContext &obj_ctx);
@@ -53,6 +55,7 @@ private:
     Texture3DSlot *g_       = nullptr;
 
     QSpinBox *max_scattering_count_ = nullptr;
+    QCheckBox *white_for_indirect_ = nullptr;
 };
 
 class HeterogeneousWidgetCreator : public MediumWidgetCreator

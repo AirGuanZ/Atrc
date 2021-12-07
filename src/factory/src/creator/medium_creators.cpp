@@ -28,10 +28,13 @@ namespace medium
 
             const int max_scat_count = params.child_int_or(
                 "max_scattering_count", (std::numeric_limits<int>::max)());
+            const bool white_for_indirect =
+                params.child_int_or("white_for_indirect", 0) != 0;
 
             return create_heterogeneous_medium(
                 local_to_world, std::move(density),
-                std::move(albedo), std::move(g), max_scat_count);
+                std::move(albedo), std::move(g),
+                max_scat_count, white_for_indirect);
         }
     };
 

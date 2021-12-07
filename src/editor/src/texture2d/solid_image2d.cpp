@@ -15,16 +15,13 @@ SolidImage2DWidget::SolidImage2DWidget(
     if(!tex3d_)
         tex3d_ = new Texture3DSlot(object_context, "Constant");
 
-    auto tex3d_text = new QLabel("Texture3D", this);
-
     tex3d_->set_dirty_callback([=]
     {
         set_dirty_flag();
     });
 
-    QGridLayout *layout = new QGridLayout(this);
-    layout->addWidget(tex3d_text, 0, 0);
-    layout->addWidget(tex3d_, 0, 1);
+    auto layout = new QGridLayout(this);
+    layout->addWidget(tex3d_, 0, 0);
 
     setContentsMargins(0, 0, 0, 0);
     layout->setContentsMargins(0, 0, 0, 0);
@@ -53,6 +50,7 @@ void SolidImage2DWidget::save_asset(AssetSaver &saver)
 void SolidImage2DWidget::load_asset(AssetLoader &loader)
 {
     tex3d_->load_asset(loader);
+    do_update_tracer_object();
 }
 
 RC<tracer::ConfigNode> SolidImage2DWidget::to_config(
@@ -72,7 +70,7 @@ void SolidImage2DWidget::update_tracer_object_impl()
 void SolidImage2DWidget::do_update_tracer_object()
 {
     auto tex3d = tex3d_->get_tracer_object();
-    tracer_object_ = tracer::create_solid_image_texture(std::move(tex3d));
+    tracer_object_ = create_solid_image_texture(std::move(tex3d));
 }
 
 ResourceWidget<tracer::Texture2D> *SolidImage2DCreator::create_widget(
