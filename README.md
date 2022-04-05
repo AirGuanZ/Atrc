@@ -2,6 +2,8 @@
 
 Offline rendering lab based on ray tracing
 
+**Note**. [GPU version](https://github.com/AirGuanZ/Btrc) is in development...
+
 ## Features
 
 - [x] Volumetric path tracing with next event estimation
