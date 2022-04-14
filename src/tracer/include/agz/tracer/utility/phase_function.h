@@ -10,7 +10,7 @@ class HenyeyGreensteinPhaseFunction : public BSDF
     real g_ = 0;
     FSpectrum albedo_;
 
-    real phase_func(real u) const noexcept
+    real phase_func(real u) const
     {
         const real g2 = g_ * g_;
         const real dem = 1 + g2 - 2 * g_ * u;
@@ -19,23 +19,19 @@ class HenyeyGreensteinPhaseFunction : public BSDF
 
 public:
 
-    HenyeyGreensteinPhaseFunction(real g, const FSpectrum &albedo) noexcept
+    HenyeyGreensteinPhaseFunction(real g, const FSpectrum &albedo)
         : g_(g), albedo_(albedo)
     {
 
     }
 
-    FSpectrum eval(
-        const FVec3 &wi, const FVec3 &wo,
-        TransMode mode, uint8_t) const noexcept override
+    FSpectrum eval(const FVec3 &wi, const FVec3 &wo, TransMode mode) const override
     {
         const real u = -cos(wi, wo);
         return FSpectrum(phase_func(u));
     }
 
-    BSDFSampleResult sample(
-        const FVec3 &wo, TransMode,
-        const Sample3 &sam, uint8_t) const noexcept override
+    BSDFSampleResult sample(const FVec3 &wo, TransMode, const Sample3 &sam) const override
     {
         const real s = 2 * sam.u - 1;
         real u;
@@ -66,23 +62,28 @@ public:
             false);
     }
 
-    real pdf(
-        const FVec3 &wi, const FVec3 &wo, uint8_t) const noexcept override
+    BSDFBidirSampleResult sample_bidir(const FVec3 &wo, TransMode mode, const Sample3 &sam) const override
+    {
+        auto t = sample(wo, mode, sam);
+        return BSDFBidirSampleResult(t.dir, t.f, t.pdf, pdf(wo, t.dir), t.is_delta);
+    }
+
+    real pdf(const FVec3 &wi, const FVec3 &wo) const override
     {
         return phase_func(-cos(wi, wo));
     }
 
-    FSpectrum albedo() const noexcept override
+    FSpectrum albedo() const override
     {
         return albedo_;
     }
 
-    bool is_delta() const noexcept override
+    bool is_delta() const override
     {
         return false;
     }
 
-    bool has_diffuse_component() const noexcept override
+    bool has_diffuse_component() const override
     {
         return true;
     }

@@ -5,8 +5,7 @@
 
 AGZ_TRACER_BEGIN
 
-FVec3 GGXMicrofacetRefractionComponent::sample_trans(
-    const FVec3 &lwo, const Sample2 &sam) const noexcept
+FVec3 GGXMicrofacetRefractionComponent::sample_trans(const FVec3 &lwo, const Sample2 &sam) const
 {
     const FVec3 lwh = microfacet::sample_anisotropic_gtr2(
                                         ax_, ay_, sam);
@@ -29,8 +28,7 @@ FVec3 GGXMicrofacetRefractionComponent::sample_trans(
     return lwi;
 }
 
-FVec3 GGXMicrofacetRefractionComponent::sample_inner_refl(
-    const FVec3 &lwo, const Sample2 &sam) const noexcept
+FVec3 GGXMicrofacetRefractionComponent::sample_inner_refl(const FVec3 &lwo, const Sample2 &sam) const
 {
     assert(lwo.z < 0);
 
@@ -45,8 +43,7 @@ FVec3 GGXMicrofacetRefractionComponent::sample_inner_refl(
     return lwi.normalize();
 }
 
-real GGXMicrofacetRefractionComponent::pdf_trans(
-    const FVec3 &lwi, const FVec3 &lwo) const noexcept
+real GGXMicrofacetRefractionComponent::pdf_trans(const FVec3 &lwi, const FVec3 &lwo) const
 {
     assert(lwi.z * lwo.z < 0);
 
@@ -74,8 +71,7 @@ real GGXMicrofacetRefractionComponent::pdf_trans(
     return std::abs(dot(lwi, lwh) * D * dwh_to_dwi);
 }
 
-real GGXMicrofacetRefractionComponent::pdf_inner_refl(
-    const FVec3 &lwi, const FVec3 &lwo) const noexcept
+real GGXMicrofacetRefractionComponent::pdf_inner_refl(const FVec3 &lwi, const FVec3 &lwo) const
 {
     assert(lwi.z < 0 && lwo.z < 0);
 
@@ -94,9 +90,7 @@ real GGXMicrofacetRefractionComponent::pdf_inner_refl(
 }
 
 GGXMicrofacetRefractionComponent::GGXMicrofacetRefractionComponent(
-    const FSpectrum &color, real ior,
-    real roughness, real anisotropic)
-    : BSDFComponent(BSDF_GLOSSY)
+    const FSpectrum &color, real ior, real roughness, real anisotropic)
 {
     color_ = color;
     ior_ = ior;
@@ -107,8 +101,7 @@ GGXMicrofacetRefractionComponent::GGXMicrofacetRefractionComponent(
     ay_ = std::max(real(0.001), math::sqr(roughness) * aspect);
 }
 
-FSpectrum GGXMicrofacetRefractionComponent::eval(
-    const FVec3 &lwi, const FVec3 &lwo, TransMode mode) const noexcept
+FSpectrum GGXMicrofacetRefractionComponent::eval(const FVec3 &lwi, const FVec3 &lwo, TransMode mode) const
 {
     // reflection
 
@@ -201,7 +194,7 @@ FSpectrum GGXMicrofacetRefractionComponent::eval(
 }
 
 BSDFComponent::SampleResult GGXMicrofacetRefractionComponent::sample(
-    const FVec3 &lwo, TransMode mode, const Sample2 &sam) const noexcept
+    const FVec3 &lwo, TransMode mode, const Sample2 &sam) const
 {
     if(lwo.z > 0)
     {
@@ -248,8 +241,22 @@ BSDFComponent::SampleResult GGXMicrofacetRefractionComponent::sample(
     return ret;
 }
 
-real GGXMicrofacetRefractionComponent::pdf(
-    const FVec3 &lwi, const FVec3 &lwo) const noexcept
+BSDFComponent::BidirSampleResult GGXMicrofacetRefractionComponent::sample_bidir(
+    const FVec3 &lwo, TransMode mode, const Sample2 &sam) const
+{
+    auto t = sample(lwo, mode, sam);
+    BidirSampleResult ret = {};
+    if(t.is_valid())
+    {
+        ret.lwi = t.lwi;
+        ret.f = t.f;
+        ret.pdf = t.pdf;
+        ret.pdf_rev = pdf(lwo, ret.lwi);
+    }
+    return ret;
+}
+
+real GGXMicrofacetRefractionComponent::pdf(const FVec3 &lwi, const FVec3 &lwo) const
 {
     if(lwi.z >= 0 && lwo.z >= 0)
         return 0;
@@ -268,6 +275,11 @@ real GGXMicrofacetRefractionComponent::pdf(
     if(lwi.z > 0)
         return (1 - macro_F) * pdf_trans(lwi, lwo);
     return macro_F * pdf_inner_refl(lwi, lwo);
+}
+
+bool GGXMicrofacetRefractionComponent::has_diffuse_component() const
+{
+    return false;
 }
 
 AGZ_TRACER_END

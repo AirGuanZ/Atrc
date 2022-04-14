@@ -94,7 +94,7 @@ class ReSTIRGIRenderer : public Renderer
 
             // sample bsdf
 
-            auto bsdf_sample = ent_shd.bsdf->sample_all(
+            auto bsdf_sample = ent_shd.bsdf->sample(
                 ent_inct.wr, TransMode::Radiance, sampler.sample3());
             if(!bsdf_sample.f || bsdf_sample.pdf < EPS())
                 return pixel;
@@ -139,12 +139,12 @@ class ReSTIRGIRenderer : public Renderer
 
         const Vec3 vp_to_sp = resData.sample_point - pixel.visible_point;
 
-        const Spectrum f_vp = pixel.visible_bsdf->eval_all(
+        const Spectrum f_vp = pixel.visible_bsdf->eval(
             vp_to_sp, pixel.visible_wr, TransMode::Radiance);
 
         const real absdot_vp = std::abs(cos(vp_to_sp, pixel.visible_normal));
 
-        const Spectrum f_sp = resData.sample_bsdf->eval_all(
+        const Spectrum f_sp = resData.sample_bsdf->eval(
             resData.sample_wi, -vp_to_sp, TransMode::Radiance);
 
         return f_vp * absdot_vp * f_sp * resData.sample_incident_radiance;
@@ -170,7 +170,7 @@ class ReSTIRGIRenderer : public Renderer
 
         const Vec3 vp_to_sp = res_data.sample_point - pixel.visible_point;
         
-        const Spectrum f_sp = res_data.sample_bsdf->eval_all(
+        const Spectrum f_sp = res_data.sample_bsdf->eval(
             res_data.sample_wi, -vp_to_sp, TransMode::Radiance);
 
         return f_sp.lum() * res_data.sample_incident_radiance.lum();
@@ -280,7 +280,7 @@ class ReSTIRGIRenderer : public Renderer
         const Vec3 global_sp_dir =
             inct.geometry_coord.local_to_global(local_sp_dir);
 
-        const Spectrum sp_f = second_shader.bsdf->eval_all(
+        const Spectrum sp_f = second_shader.bsdf->eval(
             global_sp_dir, inct.wr, TransMode::Radiance);
 
         if(!sp_f)
@@ -309,7 +309,7 @@ class ReSTIRGIRenderer : public Renderer
 
         const real p = vp_dir_pdf * sp_dir_pdf;
         const real p_hat =
-            first_shader.bsdf->eval_all(
+            first_shader.bsdf->eval(
                 pixel.visible_wr, global_vp_dir, TransMode::Radiance).lum() *
             std::abs(cos(pixel.visible_normal, global_vp_dir)) *
             sp_f.lum() *

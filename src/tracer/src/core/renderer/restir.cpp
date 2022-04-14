@@ -136,7 +136,7 @@ class ReSTIRRenderer : public Renderer
 
             const real p = select_light_pdf * light_sample.pdf;
             
-            const FSpectrum bsdf = shading_point.bsdf->eval_all(
+            const FSpectrum bsdf = shading_point.bsdf->eval(
                 wi, inct.wr, TransMode::Radiance);
 
             const real absdot = std::abs(cos(wi, inct.geometry_coord.z));
@@ -190,7 +190,7 @@ class ReSTIRRenderer : public Renderer
             (data.light_pos_or_wi - pixel.visible_pos) : data.light_pos_or_wi;
 
         const Spectrum bsdf =
-            pixel.bsdf->eval_all(wi, pixel.wr, TransMode::Radiance);
+            pixel.bsdf->eval(wi, pixel.wr, TransMode::Radiance);
 
         const real abscos = std::abs(cos(wi, pixel.curr_normal));
 
@@ -381,7 +381,7 @@ class ReSTIRRenderer : public Renderer
             reservoir.data.light_pos_or_wi;
 
         const FSpectrum bsdf =
-            pixel.bsdf->eval_all(wi, pixel.wr, TransMode::Radiance);
+            pixel.bsdf->eval(wi, pixel.wr, TransMode::Radiance);
 
         const real absdot = abs(cos(pixel.curr_normal, wi));
 

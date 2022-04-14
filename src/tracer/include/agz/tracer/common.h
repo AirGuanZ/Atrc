@@ -110,6 +110,11 @@ enum class TransMode
     Importance = 1  // light -> camera
 };
 
+inline TransMode operator!(TransMode mode)
+{
+    return mode == TransMode::Radiance ? TransMode::Importance : TransMode::Radiance;
+}
+
 // image
 
 template<typename T>

@@ -98,7 +98,7 @@ Pixel trace_std(
 
                 // sample phase function
 
-                const auto bsdf_sample = phase_function->sample_all(
+                const auto bsdf_sample = phase_function->sample(
                     scattering_point.wr, TransMode::Radiance, sampler.sample3());
                 if(!bsdf_sample.f || bsdf_sample.pdf < EPS())
                     return pixel;
@@ -147,7 +147,7 @@ Pixel trace_std(
 
         // sample bsdf
 
-        auto bsdf_sample = ent_shd.bsdf->sample_all(
+        auto bsdf_sample = ent_shd.bsdf->sample(
             ent_inct.wr, TransMode::Radiance, sampler.sample3());
         if(!bsdf_sample.f || bsdf_sample.pdf < EPS())
             return pixel;
@@ -205,7 +205,7 @@ Pixel trace_std(
             pixel.value += real(1) / params.direct_illum_sample_count
                          * new_direct_illum;
 
-            const auto new_bsdf_sample = new_shd.bsdf->sample_all(
+            const auto new_bsdf_sample = new_shd.bsdf->sample(
                 new_inct.wr, TransMode::Radiance, sampler.sample3());
             if(!new_bsdf_sample.f)
                 return pixel;
@@ -287,7 +287,7 @@ Pixel trace_nomis(
                 const auto &scattering_point = medium_sample.scattering_point;
                 const auto phase_function = medium_sample.phase_function;
 
-                const auto phase_sample = phase_function->sample_all(
+                const auto phase_sample = phase_function->sample(
                     ent_inct.wr, TransMode::Radiance, sampler.sample3());
                 if(!phase_sample.f)
                     return pixel;
@@ -319,7 +319,7 @@ Pixel trace_nomis(
                 ent_inct.uv, ent_inct.wr);
         }
 
-        const auto bsdf_sample = ent_shd.bsdf->sample_all(
+        const auto bsdf_sample = ent_shd.bsdf->sample(
             ent_inct.wr, TransMode::Radiance, sampler.sample3());
         if(!bsdf_sample.f)
             return pixel;
@@ -361,7 +361,7 @@ Pixel trace_nomis(
             auto &new_inct = bssrdf_sample.inct;
             auto new_shd = new_inct.material->shade(new_inct, arena);
 
-            const auto new_bsdf_sample = new_shd.bsdf->sample_all(
+            const auto new_bsdf_sample = new_shd.bsdf->sample(
                 new_inct.wr, TransMode::Radiance, sampler.sample3());
             if(!new_bsdf_sample.f)
                 return pixel;

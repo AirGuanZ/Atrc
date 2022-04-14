@@ -163,7 +163,7 @@ real P(real cos_io, real gf, real gb, real wf, real wb) noexcept
     return wf * HG(cos_io, gf) + wb * HG(cos_io, gb);
 }
 
-class GGXReflection : public BSDFComponent
+class GGXReflection final : public BSDFComponent
 {
     FSpectrum color_;
 
@@ -173,17 +173,13 @@ class GGXReflection : public BSDFComponent
 public:
 
     GGXReflection(const FSpectrum &color, float alpha, float eta)
-        : BSDFComponent(BSDF_GLOSSY)
     {
         color_ = color;
         alpha_ = alpha;
         eta_   = eta;
     }
 
-    FSpectrum eval(
-        const FVec3 &lwi,
-        const FVec3 &lwo,
-        TransMode    mode) const noexcept override
+    FSpectrum eval(const FVec3 &lwi, const FVec3 &lwo, TransMode mode) const override
     {
         if(lwi.z < EPS() || lwo.z < EPS())
             return {};
@@ -203,10 +199,12 @@ public:
                            * local_angle::cos_theta(lwo)));
     }
 
-    SampleResult sample(
-        const FVec3   &lwo,
-        TransMode      mode,
-        const Sample2 &sam) const noexcept override
+    SampleResult sample(const FVec3 &lwo, TransMode mode, const Sample2 &sam) const override
+    {
+        return discard_pdf_rev(sample_bidir(lwo, mode, sam));
+    }
+
+    BidirSampleResult sample_bidir(const FVec3 &lwo, TransMode mode, const Sample2 &sam) const override
     {
         if(lwo.z < EPS())
             return {};
@@ -230,17 +228,18 @@ public:
 
         const FSpectrum f = color_ * (
             D * F * G / (4 * local_angle::cos_theta(lwi)
-                           * local_angle::cos_theta(lwo)));
+                * local_angle::cos_theta(lwo)));
 
-        SampleResult ret;
+        BidirSampleResult ret;
         ret.lwi = lwi;
-        ret.f   = f;
+        ret.f = f;
         ret.pdf = local_angle::cos_theta(lwh) * D / (4 * dot(lwo, lwh));
+        ret.pdf_rev = local_angle::cos_theta(lwh) * D / (4 * dot(lwi, lwh));
 
         return ret;
     }
-
-    real pdf(const FVec3 &lwi, const FVec3 &lwo) const noexcept override
+    
+    real pdf(const FVec3 &lwi, const FVec3 &lwo) const override
     {
         if(lwi.z < EPS() || lwo.z < EPS())
             return 0;
@@ -250,9 +249,14 @@ public:
 
         return local_angle::cos_theta(lwh) * D / (4 * dot(lwo, lwh));
     }
+
+    bool has_diffuse_component() const override
+    {
+        return false;
+    }
 };
 
-class SingleScatteredReflection : public BSDFComponent
+class SingleScatteredReflection final : public BSDFComponent
 {
     FSpectrum color_;
 
@@ -267,7 +271,6 @@ public:
         const RhoDtTable *rhoDt,
         real gf, real wf, real gb, real wb,
         real alpha, real tau_d) noexcept
-        : BSDFComponent(BSDF_DIFFUSE)
     {
         color_ = color;
         rhoDt_ = rhoDt;
@@ -279,10 +282,7 @@ public:
         tau_d_ = tau_d;
     }
 
-    FSpectrum eval(
-        const FVec3 &lwi,
-        const FVec3 &lwo,
-        TransMode    mode) const noexcept override
+    FSpectrum eval(const FVec3 &lwi, const FVec3 &lwo, TransMode mode) const override
     {
         if(lwi.z < EPS() || lwo.z < EPS())
             return {};
@@ -297,16 +297,12 @@ public:
             atti * atto * (alpha_ * p * (1 - e)) / dem);
     }
 
-    SampleResult sample(
-        const FVec3   &lwo,
-        TransMode      mode,
-        const Sample2 &sam) const noexcept override
+    SampleResult sample(const FVec3 &lwo, TransMode mode, const Sample2 &sam) const override
     {
         if(lwo.z < EPS())
             return {};
 
-        auto [lwi, pdf] = math::distribution::zweighted_on_hemisphere(
-                                                    sam.u, sam.v);
+        auto [lwi, pdf] = math::distribution::zweighted_on_hemisphere(sam.u, sam.v);
 
         const FSpectrum f = eval(lwi, lwo, mode);
 
@@ -318,15 +314,38 @@ public:
         return ret;
     }
 
-    real pdf(const FVec3 &lwi, const FVec3 &lwo) const noexcept override
+    BidirSampleResult sample_bidir(const FVec3 &lwo, TransMode mode, const Sample2 &sam) const override
+    {
+        if(lwo.z < EPS())
+            return {};
+
+        auto [lwi, pdf] = math::distribution::zweighted_on_hemisphere(sam.u, sam.v);
+
+        const FSpectrum f = eval(lwi, lwo, mode);
+
+        BidirSampleResult ret;
+        ret.pdf = pdf;
+        ret.pdf_rev = math::distribution::zweighted_on_hemisphere_pdf(lwo.z);
+        ret.f = f;
+        ret.lwi = lwi;
+
+        return ret;
+    }
+
+    real pdf(const FVec3 &lwi, const FVec3 &lwo) const override
     {
         if(lwi.z < EPS() || lwo.z < EPS())
             return 0;
         return math::distribution::zweighted_on_hemisphere_pdf(lwi.z);
     }
+
+    bool has_diffuse_component() const override
+    {
+        return true;
+    }
 };
 
-class SingleScatteredTransmission : public BSDFComponent
+class SingleScatteredTransmission final : public BSDFComponent
 {
     FSpectrum color_;
 
@@ -344,7 +363,6 @@ public:
         const RhoDtTable *backRhoDt,
         real gf, real wf, real gb, real wb,
         real alpha, real tau_d) noexcept
-        : BSDFComponent(BSDF_DIFFUSE)
     {
         color_ = color;
         frontRhoDt_ = frontRhoDt;
@@ -357,10 +375,7 @@ public:
         tau_d_ = tau_d;
     }
 
-    FSpectrum eval(
-        const FVec3 &lwi,
-        const FVec3 &lwo,
-        TransMode    mode) const noexcept override
+    FSpectrum eval(const FVec3 &lwi, const FVec3 &lwo, TransMode mode) const override
     {
         if(lwi.z * lwo.z > 0)
             return {};
@@ -387,10 +402,7 @@ public:
         return color_ * val;
     }
 
-    SampleResult sample(
-        const FVec3   &lwo,
-        TransMode      mode,
-        const Sample2 &sam) const noexcept override
+    SampleResult sample(const FVec3 &lwo, TransMode mode, const Sample2 &sam) const override
     {
         auto [lwi, pdf] = math::distribution::zweighted_on_hemisphere(
                                                     sam.u, sam.v);
@@ -407,15 +419,38 @@ public:
         return ret;
     }
 
-    real pdf(const FVec3 &lwi, const FVec3 &lwo) const noexcept override
+    BidirSampleResult sample_bidir(const FVec3 &lwo, TransMode mode, const Sample2 &sam) const override
+    {
+        auto [lwi, pdf] = math::distribution::zweighted_on_hemisphere(
+            sam.u, sam.v);
+        if(lwo.z > 0)
+            lwi.z = -lwi.z;
+
+        const FSpectrum f = eval(lwi, lwo, mode);
+
+        BidirSampleResult ret;
+        ret.pdf = pdf;
+        ret.pdf_rev = math::distribution::zweighted_on_hemisphere_pdf(std::abs(lwo.z));
+        ret.f = f;
+        ret.lwi = lwi;
+
+        return ret;
+    }
+
+    real pdf(const FVec3 &lwi, const FVec3 &lwo) const override
     {
         if(lwo.z * lwi.z >= 0)
             return 0;
         return math::distribution::zweighted_on_hemisphere_pdf(std::abs(lwi.z));
     }
+
+    bool has_diffuse_component() const override
+    {
+        return false;
+    }
 };
 
-class MultiScatteringReflection : public BSDFComponent
+class MultiScatteringReflection final : public BSDFComponent
 {
     FSpectrum color_;
     const RhoDtTable *rhoDt_;
@@ -423,20 +458,14 @@ class MultiScatteringReflection : public BSDFComponent
 
 public:
 
-    MultiScatteringReflection(
-        const FSpectrum &color,
-        const RhoDtTable *rhoDt, const FSpectrum &Rd) noexcept
-        : BSDFComponent(BSDF_DIFFUSE)
+    MultiScatteringReflection(const FSpectrum &color, const RhoDtTable *rhoDt, const FSpectrum &Rd)
     {
         color_ = color;
         rhoDt_ = rhoDt;
         Rd_ = Rd;
     }
 
-    FSpectrum eval(
-        const FVec3 &lwi,
-        const FVec3 &lwo,
-        TransMode    mode) const noexcept override
+    FSpectrum eval(const FVec3 &lwi, const FVec3 &lwo, TransMode mode) const override
     {
         if(lwi.z < EPS() || lwo.z < EPS())
             return {};
@@ -447,10 +476,7 @@ public:
         return color_ * atti * (Rd_ / PI_r) * atto;
     }
 
-    SampleResult sample(
-        const FVec3 &lwo,
-        TransMode      mode,
-        const Sample2 &sam) const noexcept override
+    SampleResult sample(const FVec3 &lwo, TransMode mode, const Sample2 &sam) const override
     {
         if(lwo.z < EPS())
             return {};
@@ -468,15 +494,39 @@ public:
         return ret;
     }
 
-    real pdf(const FVec3 &lwi, const FVec3 &lwo) const noexcept override
+    BidirSampleResult sample_bidir(const FVec3 &lwo, TransMode mode, const Sample2 &sam) const override
+    {
+        if(lwo.z < EPS())
+            return {};
+
+        auto [lwi, pdf] = math::distribution::zweighted_on_hemisphere(
+            sam.u, sam.v);
+
+        const FSpectrum f = eval(lwi, lwo, mode);
+
+        BidirSampleResult ret;
+        ret.pdf = pdf;
+        ret.pdf_rev = math::distribution::zweighted_on_hemisphere_pdf(lwo.z);
+        ret.f = f;
+        ret.lwi = lwi;
+
+        return ret;
+    }
+
+    real pdf(const FVec3 &lwi, const FVec3 &lwo) const override
     {
         if(lwi.z < EPS() || lwo.z < EPS())
             return 0;
         return math::distribution::zweighted_on_hemisphere_pdf(lwi.z);
     }
+
+    bool has_diffuse_component() const override
+    {
+        return true;
+    }
 };
 
-class MultiScatteringTransmission : public BSDFComponent
+class MultiScatteringTransmission final : public BSDFComponent
 {
     FSpectrum color_;
     const RhoDtTable *frontRhoDt_;
@@ -489,7 +539,6 @@ public:
         const FSpectrum &color,
         const RhoDtTable *frontRhoDt, const RhoDtTable *backRhoDt,
         const FSpectrum &Td) noexcept
-        : BSDFComponent(BSDF_DIFFUSE)
     {
         color_ = color;
         frontRhoDt_ = frontRhoDt;
@@ -497,10 +546,7 @@ public:
         Td_         = Td;
     }
 
-    FSpectrum eval(
-        const FVec3 &lwi,
-        const FVec3 &lwo,
-        TransMode mode) const noexcept override
+    FSpectrum eval(const FVec3 &lwi, const FVec3 &lwo, TransMode mode) const override
     {
         if(lwi.z * lwo.z >= 0)
             return {};
@@ -511,10 +557,7 @@ public:
         return color_ * atti * (Td_ / PI_r) * atto;
     }
     
-    SampleResult sample(
-        const FVec3   &lwo,
-        TransMode      mode,
-        const Sample2 &sam) const noexcept override
+    SampleResult sample(const FVec3 &lwo, TransMode mode, const Sample2 &sam) const override
     {
         auto [lwi, pdf] = math::distribution::zweighted_on_hemisphere(
                                                     sam.u, sam.v);
@@ -531,11 +574,33 @@ public:
         return ret;
     }
 
-    real pdf(const FVec3 &lwi, const FVec3 &lwo) const noexcept override
+    BidirSampleResult sample_bidir(const FVec3 &lwo, TransMode mode, const Sample2 &sam) const override
+    {
+        auto [lwi, pdf] = math::distribution::zweighted_on_hemisphere(sam.u, sam.v);
+        if(lwo.z > 0)
+            lwi.z = -lwi.z;
+
+        const FSpectrum f = eval(lwi, lwo, mode);
+
+        BidirSampleResult ret;
+        ret.pdf = pdf;
+        ret.pdf_rev = math::distribution::zweighted_on_hemisphere_pdf(std::abs(lwo.z));
+        ret.f = f;
+        ret.lwi = lwi;
+
+        return ret;
+    }
+
+    real pdf(const FVec3 &lwi, const FVec3 &lwo) const override
     {
         if(lwo.z * lwi.z >= 0)
             return 0;
         return math::distribution::zweighted_on_hemisphere_pdf(std::abs(lwi.z));
+    }
+
+    bool has_diffuse_component() const override
+    {
+        return true;
     }
 };
 

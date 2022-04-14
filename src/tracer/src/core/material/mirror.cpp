@@ -9,7 +9,7 @@ AGZ_TRACER_BEGIN
 
 namespace
 {
-    class MirrorBSDF : public LocalBSDF
+    class MirrorBSDF final : public LocalBSDF
     {
         const ConductorPoint *fresnel_point_;
         FSpectrum rc_;
@@ -24,19 +24,13 @@ namespace
             
         }
 
-        FSpectrum eval(
-            const FVec3 &, const FVec3 &, TransMode, uint8_t type) const noexcept override
+        FSpectrum eval(const FVec3 &, const FVec3 &, TransMode) const noexcept override
         {
             return FSpectrum();
         }
 
-        BSDFSampleResult sample(
-            const FVec3 &out_dir, TransMode transport_mode,
-            const Sample3 &sam, uint8_t type) const noexcept override
+        BSDFSampleResult sample(const FVec3 &out_dir, TransMode, const Sample3 &sam) const noexcept override
         {
-            if(!(type & BSDF_SPECULAR))
-                return BSDF_SAMPLE_RESULT_INVALID;
-
             const FVec3 local_out = shading_coord_.global_to_local(out_dir);
             if(local_out.z <= 0)
                 return BSDF_SAMPLE_RESULT_INVALID;
@@ -55,8 +49,13 @@ namespace
             return BSDFSampleResult(dir, f * norm_factor, 1, true);
         }
 
-        real pdf(
-            const FVec3 &in_dir, const FVec3 &out_dir, uint8_t) const noexcept override
+        BSDFBidirSampleResult sample_bidir(const FVec3 &wo, TransMode mode, const Sample3 &sam) const override
+        {
+            auto t = sample(wo, mode, sam);
+            return BSDFBidirSampleResult(t.dir, t.f, t.pdf, t.pdf, t.is_delta);
+        }
+
+        real pdf(const FVec3 &in_dir, const FVec3 &out_dir) const noexcept override
         {
             return 0;
         }

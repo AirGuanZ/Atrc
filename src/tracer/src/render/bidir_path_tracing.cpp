@@ -17,8 +17,7 @@ namespace
 {
     using TempAssign = misc::scope_assignment_t<real>;
 
-    real pdf_sa_to_area(
-        real pdf_sa, const FVec3 &this_pos, const Vertex &dst_vtx) noexcept
+    real pdf_sa_to_area(real pdf_sa, const FVec3 &this_pos, const Vertex &dst_vtx) noexcept
     {
         switch(dst_vtx.type)
         {
@@ -129,7 +128,7 @@ namespace
             break;
         }
 
-        const real pdf_sa = get_scatter_bsdf(scattering_vtx)->pdf_all(
+        const real pdf_sa = get_scatter_bsdf(scattering_vtx)->pdf(
             to_dir, get_scatter_wr(scattering_vtx));
 
         return pdf_sa_to_area(pdf_sa, from_pos, to);
@@ -263,9 +262,7 @@ namespace
 } // namespace anonymous
 
 CameraSubpath build_camera_subpath(
-    int max_vertex_count, const Ray &ray,
-    const Scene &scene, Sampler &sampler,
-    Arena &arena, Vertex *vertex_space)
+    int max_vertex_count, const Ray &ray, const Scene &scene, Sampler &sampler, Arena &arena, Vertex *vertex_space)
 {
     assert(max_vertex_count >= 1);
 
@@ -346,14 +343,15 @@ CameraSubpath build_camera_subpath(
 
             // sample the phase function
 
-            const auto phase_sample = med_sam.phase_function->sample_all(
+            const auto phase_sample = med_sam.phase_function->sample_bidir(
                 sp.wr, TransMode::Radiance, sampler.sample3());
             assert(!phase_sample.invalid());
 
             // update pdf_bwd of last vertex according to phase sample
 
-            const real pdf_bwd = med_sam.phase_function->pdf_all(
-                inct.wr, phase_sample.dir);
+            //const real pdf_bwd = med_sam.phase_function->pdf(
+            //    inct.wr, phase_sample.dir);
+            const real pdf_bwd = phase_sample.pdf_rev;
             auto &last_vtx = vertex_space[vertex_count - 2];
             last_vtx.pdf_bwd = pdf_sa_to_area(pdf_bwd, sp.pos, last_vtx);
 
@@ -385,15 +383,16 @@ CameraSubpath build_camera_subpath(
 
             // sample bsdf
 
-            const auto bsdf_sample = shd.bsdf->sample_all(
+            const auto bsdf_sample = shd.bsdf->sample_bidir(
                 inct.wr, TransMode::Radiance, sampler.sample3());
             if(bsdf_sample.invalid())
                 break;
 
             // update pdf_bwd of last vertex according to bsdf sample
 
-            const real pdf_bwd = shd.bsdf->pdf_all(
-                inct.wr, bsdf_sample.dir);
+            //const real pdf_bwd = shd.bsdf->pdf(
+            //    inct.wr, bsdf_sample.dir);
+            const real pdf_bwd = bsdf_sample.pdf_rev;
             auto &last_vtx = vertex_space[vertex_count - 2];
             last_vtx.pdf_bwd = pdf_sa_to_area(pdf_bwd, inct.pos, last_vtx);
 
@@ -414,10 +413,8 @@ CameraSubpath build_camera_subpath(
 }
 
 LightSubpath build_light_subpath(
-    int max_vertex_count,
-    const SceneSampleLightResult &select_light,
-    const Scene &scene, Sampler &sampler,
-    Arena &arena, Vertex *vertex_space)
+    int max_vertex_count, const SceneSampleLightResult &select_light,
+    const Scene &scene, Sampler &sampler, Arena &arena, Vertex *vertex_space)
 {
     assert(max_vertex_count >= 1);
 
@@ -502,14 +499,15 @@ LightSubpath build_light_subpath(
             // sample phase function
             // sample the phase function
 
-            const auto phase_sample = med_sam.phase_function->sample_all(
+            const auto phase_sample = med_sam.phase_function->sample_bidir(
                 sp.wr, TransMode::Importance, sampler.sample3());
             assert(!phase_sample.invalid());
 
             // update pdf_bwd of last vertex according to phase sample
 
-            const real pdf_fwd = med_sam.phase_function->pdf_all(
-                inct.wr, phase_sample.dir);
+            //const real pdf_fwd = med_sam.phase_function->pdf(
+            //    inct.wr, phase_sample.dir);
+            const real pdf_fwd = phase_sample.pdf_rev;
             auto &last_vtx = vertex_space[vertex_count - 2];
             last_vtx.pdf_fwd = pdf_sa_to_area(pdf_fwd, sp.pos, last_vtx);
 
@@ -540,15 +538,16 @@ LightSubpath build_light_subpath(
 
             // sample bsdf
 
-            const auto bsdf_sample = shd.bsdf->sample_all(
+            const auto bsdf_sample = shd.bsdf->sample_bidir(
                 inct.wr, TransMode::Importance, sampler.sample3());
             if(bsdf_sample.invalid())
                 break;
 
             // update pdf_bwd of last vertex according to bsdf sample
 
-            const real pdf_fwd = shd.bsdf->pdf_all(
-                inct.wr, bsdf_sample.dir);
+            //const real pdf_fwd = shd.bsdf->pdf(
+            //    inct.wr, bsdf_sample.dir);
+            const real pdf_fwd = bsdf_sample.pdf_rev;
             auto &last_vtx = vertex_space[vertex_count - 2];
             last_vtx.pdf_fwd = pdf_sa_to_area(pdf_fwd, inct.pos, last_vtx);
 
@@ -574,9 +573,7 @@ LightSubpath build_light_subpath(
     return subpath;
 }
 
-FSpectrum contrib_s2_t0(
-    const Scene &scene,
-    const Vertex *camera_subpath)
+FSpectrum contrib_s2_t0(const Scene &scene, const Vertex *camera_subpath)
 {
     const Vertex &cam_beg = camera_subpath[0];
     const Vertex &cam_end = camera_subpath[1];
@@ -610,8 +607,7 @@ FSpectrum contrib_s2_t0(
     return cam_end.accu_coef * light_radiance;
 }
 
-FSpectrum unweighted_contrib_sx_t0(
-    const Scene &scene, const Vertex *camera_subpath, int s)
+FSpectrum unweighted_contrib_sx_t0(const Scene &scene, const Vertex *camera_subpath, int s)
 {
     assert(s >= 3);
 
@@ -657,10 +653,7 @@ FSpectrum unweighted_contrib_sx_t0(
 }
 
 FSpectrum unweighted_contrib_sx_t1(
-    const Scene &scene,
-    const Vertex *camera_subpath, int s,
-    const Vertex *light_subpath,
-    Sampler &sampler)
+    const Scene &scene, const Vertex *camera_subpath, int s, const Vertex *light_subpath, Sampler &sampler)
 {
     assert(s >= 2);
 
@@ -693,14 +686,13 @@ FSpectrum unweighted_contrib_sx_t1(
             -cam_to_light);
 
         const auto bsdf = get_scatter_bsdf(cam_end);
-        FSpectrum bsdf_f = bsdf->eval_all(
+        FSpectrum bsdf_f = bsdf->eval(
             cam_to_light,
             get_scatter_wr(cam_end),
             TransMode::Radiance);
 
         const auto medium = cam_end.type == VertexType::Surface ?
-                            cam_end.surface.medium(cam_to_light) :
-                            cam_end.medium.med;;
+            cam_end.surface.medium(cam_to_light) : cam_end.medium.med;
         const FSpectrum tr = medium->tr(
             cam_end_pos, light_vtx.area_light.pos, sampler);
 
@@ -725,7 +717,7 @@ FSpectrum unweighted_contrib_sx_t1(
         cam_end_pos, cam_to_light);
 
     const auto bsdf = get_scatter_bsdf(cam_end);
-    FSpectrum bsdf_f = bsdf->eval_all(
+    FSpectrum bsdf_f = bsdf->eval(
         cam_to_light,
         get_scatter_wr(cam_end),
         TransMode::Radiance);
@@ -737,13 +729,8 @@ FSpectrum unweighted_contrib_sx_t1(
 }
 
 FSpectrum unweighted_contrib_s1_tx(
-    const Scene &scene,
-    const Vertex *camera_subpath,
-    const Vertex *light_subpath, int t,
-    Sampler &sampler,
-    const Rect2 &sample_pixel_bound,
-    const Vec2 &full_res,
-    Vec2 &pixel_coord)
+    const Scene &scene, const Vertex *camera_subpath, const Vertex *light_subpath, int t,
+    Sampler &sampler, const Rect2 &sample_pixel_bound, const Vec2 &full_res, Vec2 &pixel_coord)
 {
     assert(t >= 2);
 
@@ -785,7 +772,7 @@ FSpectrum unweighted_contrib_s1_tx(
     const FVec3 lht_to_cam = cam_pos - lht_end_pos;
 
     const BSDF *bsdf = get_scatter_bsdf(lht_end);
-    const FSpectrum f = bsdf->eval_all(
+    const FSpectrum f = bsdf->eval(
         lht_to_cam, get_scatter_wr(lht_end),
         TransMode::Importance);
     if(!f)
@@ -815,10 +802,7 @@ FSpectrum unweighted_contrib_s1_tx(
 }
 
 FSpectrum unweighted_contrib_sx_tx(
-    const Scene &scene,
-    const Vertex *camera_subpath, int s,
-    const Vertex *light_subpath, int t,
-    Sampler &sampler)
+    const Scene &scene, const Vertex *camera_subpath, int s, const Vertex *light_subpath, int t, Sampler &sampler)
 {
     assert(s >= 2 && t >= 2);
 
@@ -843,13 +827,13 @@ FSpectrum unweighted_contrib_sx_tx(
     const FVec3 cam_to_lht = lht_end_pos - cam_end_pos;
 
     const BSDF *cam_end_bsdf = get_scatter_bsdf(cam_end);
-    FSpectrum cam_bsdf_f = cam_end_bsdf->eval_all(
+    FSpectrum cam_bsdf_f = cam_end_bsdf->eval(
         cam_to_lht, get_scatter_wr(cam_end), TransMode::Radiance);
     if(!cam_bsdf_f)
         return {};
 
     const BSDF *lht_end_bsdf = get_scatter_bsdf(lht_end);
-    FSpectrum lht_bsdf_f = lht_end_bsdf->eval_all(
+    FSpectrum lht_bsdf_f = lht_end_bsdf->eval(
         -cam_to_lht, get_scatter_wr(lht_end), TransMode::Importance);
     if(!lht_bsdf_f)
         return {};
@@ -876,9 +860,7 @@ FSpectrum unweighted_contrib_sx_tx(
          * lht_end.accu_coef * lht_bsdf_f;
 }
 
-real mis_weight_sx_t0(
-    const Scene &scene,
-    Vertex *camera_subpath, int s)
+real mis_weight_sx_t0(const Scene &scene, Vertex *camera_subpath, int s)
 {
     // ..., a, b
 
@@ -941,9 +923,7 @@ real mis_weight_sx_t0(
         camera_subpath, s, nullptr, 0);
 }
 
-real mis_weight_sx_t1(
-    const Scene &scene,
-    Vertex *camera_subpath, int s, Vertex *light_subpath)
+real mis_weight_sx_t1(const Scene &scene, Vertex *camera_subpath, int s, Vertex *light_subpath)
 {
     assert(s >= 2);
 
@@ -974,7 +954,7 @@ real mis_weight_sx_t1(
             pdf_sa_to_area(emit_pdf.pdf_dir, c.area_light.pos, b)
         };
 
-        const real a_pdf_bwd_sa = get_scatter_bsdf(b)->pdf_all(
+        const real a_pdf_bwd_sa = get_scatter_bsdf(b)->pdf(
             get_scatter_wr(b), b_to_c);
         a_pdf_bwd_assign = {
             &a.pdf_bwd,
@@ -999,7 +979,7 @@ real mis_weight_sx_t1(
             emit_pdf.pdf_pos
         };
 
-        const real a_pdf_bwd_sa = get_scatter_bsdf(b)->pdf_all(
+        const real a_pdf_bwd_sa = get_scatter_bsdf(b)->pdf(
             get_scatter_wr(b), b_to_c);
         a_pdf_bwd_assign = {
             &a.pdf_bwd,
@@ -1016,10 +996,7 @@ real mis_weight_sx_t1(
         camera_subpath, s, light_subpath, 1);
 }
 
-real mis_weight_s1_tx(
-    const Scene &scene,
-    Vertex *camera_subpath,
-    Vertex *light_subpath, int t)
+real mis_weight_s1_tx(const Scene &scene, Vertex *camera_subpath, Vertex *light_subpath, int t)
 {
     assert(t >= 2);
 
@@ -1033,7 +1010,7 @@ real mis_weight_s1_tx(
 
     auto cam_pdf = scene.get_camera()->pdf_we(
         a.camera.pos, b_pos - a.camera.pos);
-    if(!cam_pdf.pdf_pos || !cam_pdf.pdf_dir)
+    if(cam_pdf.pdf_pos <= 0.0f || cam_pdf.pdf_dir <= 0.0f)
         return 0;
 
     Vertex camera_vertex = new_camera_vertex(a.camera.pos, a.camera.nor);
@@ -1051,7 +1028,7 @@ real mis_weight_s1_tx(
 
     // c.pdf_fwd
 
-    const real c_pdf_fwd_sa = get_scatter_bsdf(b)->pdf_all(
+    const real c_pdf_fwd_sa = get_scatter_bsdf(b)->pdf(
         get_scatter_wr(b), a.camera.pos - b_pos);
     const real c_pdf_fwd = pdf_sa_to_area(c_pdf_fwd_sa, b_pos, c);
 
@@ -1064,9 +1041,7 @@ real mis_weight_s1_tx(
         &camera_vertex, 1, light_subpath, t);
 }
 
-real mis_weight_sx_tx(
-    Vertex *camera_subpath, int s,
-    Vertex *light_subpath, int t)
+real mis_weight_sx_tx(Vertex *camera_subpath, int s, Vertex *light_subpath, int t)
 {
     assert(s >= 2 && t >= 2);
 
@@ -1087,7 +1062,7 @@ real mis_weight_sx_tx(
 
     // a.pdf_bwd
 
-    const real a_pdf_bwd_sa = b_bsdf->pdf_all(get_scatter_wr(b), b_to_c);
+    const real a_pdf_bwd_sa = b_bsdf->pdf(get_scatter_wr(b), b_to_c);
     const real a_pdf_bwd = pdf_sa_to_area(
         a_pdf_bwd_sa, b_pos, a);
 
@@ -1113,7 +1088,7 @@ real mis_weight_sx_tx(
 
     // d.pdf_fwd
 
-    const real d_pdf_fwd_sa = c_bsdf->pdf_all(get_scatter_wr(c), -b_to_c);
+    const real d_pdf_fwd_sa = c_bsdf->pdf(get_scatter_wr(c), -b_to_c);
     const real d_pdf_fwd = pdf_sa_to_area(
         d_pdf_fwd_sa, c_pos, d);
 

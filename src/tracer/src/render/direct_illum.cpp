@@ -29,14 +29,14 @@ FSpectrum mis_sample_area_light(
 
     const auto med = inct.medium(inct_to_light);
 
-    const auto bsdf_f = shd.bsdf->eval_all(inct_to_light, inct.wr, TransMode::Radiance);
+    const auto bsdf_f = shd.bsdf->eval(inct_to_light, inct.wr, TransMode::Radiance);
     if(!bsdf_f)
         return {};
 
     const FSpectrum f = med->tr(light_sample.pos, inct.pos, sampler)
                      * light_sample.radiance * bsdf_f
                      * std::abs(cos(inct_to_light, inct.geometry_coord.z));
-    const real bsdf_pdf = shd.bsdf->pdf_all(inct_to_light, inct.wr);
+    const real bsdf_pdf = shd.bsdf->pdf(inct_to_light, inct.wr);
 
     return f / (light_sample.pdf + bsdf_pdf);
 }
@@ -56,7 +56,7 @@ FSpectrum mis_sample_area_light(
         return {};
 
     const FVec3 inct_to_light = (light_sample.pos - scattering.pos).normalize();
-    auto bsdf_f = phase_function->eval_all(
+    auto bsdf_f = phase_function->eval(
         inct_to_light, scattering.wr, TransMode::Radiance);
     if(!bsdf_f)
         return {};
@@ -64,7 +64,7 @@ FSpectrum mis_sample_area_light(
     const auto med = scattering.medium;
     const FSpectrum f = med->tr(scattering.pos, light_sample.pos, sampler)
                      * light_sample.radiance * bsdf_f;
-    const real bsdf_pdf = phase_function->pdf_all(inct_to_light, scattering.wr);
+    const real bsdf_pdf = phase_function->pdf(inct_to_light, scattering.wr);
 
     return f / (light_sample.pdf + bsdf_pdf);
 }
@@ -84,7 +84,7 @@ FSpectrum mis_sample_envir_light(
         return {};
 
     const FVec3 ref_to_light = light_sample.ref_to_light();
-    const FSpectrum bsdf_f = shd.bsdf->eval_all(
+    const FSpectrum bsdf_f = shd.bsdf->eval(
         ref_to_light, inct.wr, TransMode::Radiance);
     if(!bsdf_f)
         return {};
@@ -93,7 +93,7 @@ FSpectrum mis_sample_envir_light(
 
     const FSpectrum f = light_sample.radiance
                      * bsdf_f * std::abs(cos(ref_to_light, inct.geometry_coord.z));
-    const real bsdf_pdf = shd.bsdf->pdf_all(ref_to_light, inct.wr);
+    const real bsdf_pdf = shd.bsdf->pdf(ref_to_light, inct.wr);
 
     return f / (light_sample.pdf + bsdf_pdf);
 }
@@ -134,7 +134,7 @@ FSpectrum mis_sample_bsdf(
     const Sample3 sam = sampler.sample3();
     has_ent_inct = false;
 
-    bsdf_sample = shd.bsdf->sample_all(inct.wr, TransMode::Radiance, sam);
+    bsdf_sample = shd.bsdf->sample(inct.wr, TransMode::Radiance, sam);
     if(!bsdf_sample.f)
         return {};
     bsdf_sample.dir = bsdf_sample.dir.normalize();
@@ -198,7 +198,7 @@ FSpectrum mis_sample_bsdf(
     const Sample3 sam = sampler.sample3();
     has_ent_inct = false;
 
-    bsdf_sample = phase_function->sample_all(scattering.wr, TransMode::Radiance, sam);
+    bsdf_sample = phase_function->sample(scattering.wr, TransMode::Radiance, sam);
     if(!bsdf_sample.f)
         return {};
     bsdf_sample.dir = bsdf_sample.dir.normalize();

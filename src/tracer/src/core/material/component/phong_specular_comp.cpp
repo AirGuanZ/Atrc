@@ -4,8 +4,7 @@
 
 AGZ_TRACER_BEGIN
 
-FVec3 PhongSpecularComponent::sample_pow_cos_on_hemisphere(
-    real e, const Sample2 &sam) const noexcept
+FVec3 PhongSpecularComponent::sample_pow_cos_on_hemisphere(real e, const Sample2 &sam) const
 {
     const real cos_theta_h = std::pow(sam.u, 1 / (e + 1));
     const real sin_theta_h = local_angle::cos_2_sin(cos_theta_h);
@@ -17,21 +16,18 @@ FVec3 PhongSpecularComponent::sample_pow_cos_on_hemisphere(
         cos_theta_h).normalize();
 }
 
-real PhongSpecularComponent::pow_cos_on_hemisphere_pdf(real e, real cos_theta) const noexcept
+real PhongSpecularComponent::pow_cos_on_hemisphere_pdf(real e, real cos_theta) const
 {
     return (e + 1) / (2 * PI_r) * std::pow(cos_theta, e);
 }
 
 PhongSpecularComponent::PhongSpecularComponent(const FSpectrum &s, real ns) noexcept
-    : BSDFComponent(BSDF_GLOSSY)
 {
     s_ = s;
     ns_ = ns;
 }
 
-FSpectrum PhongSpecularComponent::eval(
-    const FVec3 &lwi, const FVec3 &lwo,
-    TransMode mode) const noexcept
+FSpectrum PhongSpecularComponent::eval(const FVec3 &lwi, const FVec3 &lwo, TransMode mode) const
 {
     if(lwi.z <= 0 || lwo.z <= 0)
         return {};
@@ -42,8 +38,7 @@ FSpectrum PhongSpecularComponent::eval(
 }
 
 PhongSpecularComponent::SampleResult PhongSpecularComponent::sample(
-    const FVec3 &lwo, TransMode mode,
-    const Sample2 &sam) const noexcept
+    const FVec3 &lwo, TransMode mode, const Sample2 &sam) const
 {
     if(lwo.z <= 0)
         return {};
@@ -65,8 +60,22 @@ PhongSpecularComponent::SampleResult PhongSpecularComponent::sample(
     return ret;
 }
 
-real PhongSpecularComponent::pdf(
-    const FVec3 &lwi, const FVec3 &lwo) const noexcept
+BSDFComponent::BidirSampleResult PhongSpecularComponent::sample_bidir(
+    const FVec3 &lwo, TransMode mode, const Sample2 &sam) const
+{
+    auto t = sample(lwo, mode, sam);
+    BidirSampleResult ret = {};
+    if(t.is_valid())
+    {
+        ret.lwi = t.lwi;
+        ret.f = t.f;
+        ret.pdf = t.pdf;
+        ret.pdf_rev = pdf(lwo, ret.lwi);
+    }
+    return ret;
+}
+
+real PhongSpecularComponent::pdf(const FVec3 &lwi, const FVec3 &lwo) const
 {
     if(lwi.z <= 0 || lwo.z <= 0)
         return 0;
@@ -77,6 +86,11 @@ real PhongSpecularComponent::pdf(
     if(local_lwi.z <= 0)
         return 0;
     return pow_cos_on_hemisphere_pdf(ns_, local_lwi.normalize().z);
+}
+
+bool PhongSpecularComponent::has_diffuse_component() const
+{
+    return false;
 }
 
 AGZ_TRACER_END

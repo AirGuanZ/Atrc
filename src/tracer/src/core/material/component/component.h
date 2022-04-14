@@ -6,8 +6,6 @@ AGZ_TRACER_BEGIN
 
 class BSDFComponent : public misc::uncopyable_t
 {
-    uint8_t type_;
-
 public:
 
     struct SampleResult
@@ -16,43 +14,45 @@ public:
         FSpectrum f;
         real pdf = 0;
 
-        bool is_valid() const noexcept
+        bool is_valid() const
         {
-            return pdf != 0;
+            return pdf > 0;
         }
     };
 
-    explicit BSDFComponent(uint8_t type) noexcept;
+    struct BidirSampleResult
+    {
+        FVec3 lwi;
+        FSpectrum f;
+        real pdf = 0;
+        real pdf_rev = 0;
+
+        bool is_valid() const
+        {
+            return pdf > 0;
+        }
+    };
 
     virtual ~BSDFComponent() = default;
 
-    bool is_contained_in(uint8_t type) const noexcept;
+    virtual FSpectrum eval(const FVec3 &lwi, const FVec3 &lwo, TransMode mode) const = 0;
 
-    uint8_t get_component_type() const noexcept;
+    virtual real pdf(const FVec3 &lwi, const FVec3 &lwo) const = 0;
 
-    virtual FSpectrum eval(
-        const FVec3 &lwi, const FVec3 &lwo, TransMode mode) const noexcept = 0;
+    virtual SampleResult sample(const FVec3 &lwo, TransMode mode, const Sample2 &sam) const = 0;
 
-    virtual real pdf(const FVec3 &lwi, const FVec3 &lwo) const noexcept = 0;
+    virtual BidirSampleResult sample_bidir(const FVec3 &lwo, TransMode mode, const Sample2 &sam) const = 0;
 
-    virtual SampleResult sample(
-        const FVec3 &lwo, TransMode mode, const Sample2 &sam) const noexcept = 0;
+    virtual bool has_diffuse_component() const = 0;
 };
 
-inline BSDFComponent::BSDFComponent(uint8_t type) noexcept
-    : type_(type)
+inline BSDFComponent::SampleResult discard_pdf_rev(const BSDFComponent::BidirSampleResult &sample_result)
 {
-
-}
-
-inline bool BSDFComponent::is_contained_in(uint8_t type) const noexcept
-{
-    return (type_ & type) == type_;
-}
-
-inline uint8_t BSDFComponent::get_component_type() const noexcept
-{
-    return type_;
+    BSDFComponent::SampleResult result;
+    result.lwi = sample_result.lwi;
+    result.f = sample_result.f;
+    result.pdf = sample_result.pdf;
+    return result;
 }
 
 AGZ_TRACER_END

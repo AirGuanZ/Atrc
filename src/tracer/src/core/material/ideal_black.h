@@ -5,40 +5,43 @@
 
 AGZ_TRACER_BEGIN
 
-class IdealBlack : public Material
+class IdealBlack final : public Material
 {
     class IdealBlackBSDF : public BSDF
     {
     public:
 
-        FSpectrum eval(
-            const FVec3 &, const FVec3 &, TransMode, uint8_t) const noexcept override
+        FSpectrum eval(const FVec3 &, const FVec3 &, TransMode) const override
         {
             return FSpectrum();
         }
 
-        BSDFSampleResult sample(
-            const FVec3 &, TransMode mode, const Sample3&, uint8_t) const noexcept override
+        BSDFSampleResult sample(const FVec3 &, TransMode mode, const Sample3&) const override
         {
             return BSDF_SAMPLE_RESULT_INVALID;
         }
 
-        real pdf(const FVec3 &, const FVec3 &, uint8_t) const noexcept override
+        BSDFBidirSampleResult sample_bidir(const FVec3 &wo, TransMode mode, const Sample3 &sam) const override
+        {
+            return BSDF_BIDIR_SAMPLE_RESULT_INVALID;
+        }
+
+        real pdf(const FVec3 &, const FVec3 &) const override
         {
             return 0;
         }
 
-        FSpectrum albedo() const noexcept override
+        FSpectrum albedo() const override
         {
             return FSpectrum();
         }
 
-        bool is_delta() const noexcept override
+        bool is_delta() const override
         {
             return false;
         }
 
-        bool has_diffuse_component() const noexcept override
+        bool has_diffuse_component() const override
         {
             return false;
         }

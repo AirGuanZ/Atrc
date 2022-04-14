@@ -36,8 +36,7 @@ public:
         normal_mapper_.swap(normal_mapper);
     }
 
-    ShadingPoint shade(
-        const EntityIntersection &inct, Arena &arena) const override
+    ShadingPoint shade(const EntityIntersection &inct, Arena &arena) const override
     {
         const FCoord shading_coord = normal_mapper_->reorient(
             inct.uv, inct.user_coord);

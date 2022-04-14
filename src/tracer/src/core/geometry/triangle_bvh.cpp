@@ -639,7 +639,7 @@ RC<Geometry> create_triangle_bvh_noembree(
 
 RC<Geometry> create_triangle_bvh(
     std::vector<mesh::triangle_t> build_triangles,
-    const Transform3 &local_to_world)
+    const FTransform3 &local_to_world)
 {
     return create_triangle_bvh_noembree(
         std::move(build_triangles), local_to_world);

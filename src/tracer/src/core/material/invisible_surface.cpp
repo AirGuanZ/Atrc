@@ -12,56 +12,54 @@ namespace
 
     public:
 
-        explicit InvisibleSurfaceBSDF(const FVec3 &geometry_normal) noexcept
+        explicit InvisibleSurfaceBSDF(const FVec3 &geometry_normal)
             : geometry_normal_(geometry_normal)
         {
             
         }
 
-        FSpectrum eval(
-            const FVec3 &wi, const FVec3 &wo,
-            TransMode mode, uint8_t) const noexcept override
+        FSpectrum eval(const FVec3 &wi, const FVec3 &wo, TransMode mode) const override
         {
             return {};
         }
 
-        BSDFSampleResult sample(
-            const FVec3 &wo, TransMode mode,
-            const Sample3 &sam, uint8_t type) const noexcept override
+        BSDFSampleResult sample(const FVec3 &wo, TransMode mode, const Sample3 &sam) const override
         {
-            if(!(type & BSDF_SPECULAR))
-                return BSDF_SAMPLE_RESULT_INVALID;
-
             const real cosv = std::abs(cos(geometry_normal_, wo));
-
             const FSpectrum f = FSpectrum(1) / (cosv < EPS() ? 1 : cosv);
-
             return BSDFSampleResult(-wo, f, 1, true);
         }
 
-        real pdf(const FVec3 &wi, const FVec3 &wo, uint8_t) const noexcept override
+        BSDFBidirSampleResult sample_bidir(const FVec3 &wo, TransMode mode, const Sample3 &sam) const override
+        {
+            const real cosv = std::abs(cos(geometry_normal_, wo));
+            const FSpectrum f = FSpectrum(1) / (cosv < EPS() ? 1 : cosv);
+            return BSDFBidirSampleResult(-wo, f, 1, 1, true);
+        }
+
+        real pdf(const FVec3 &wi, const FVec3 &wo) const override
         {
             return 0;
         }
 
-        FSpectrum albedo() const noexcept override
+        FSpectrum albedo() const override
         {
             return FSpectrum(1);
         }
 
-        bool is_delta() const noexcept override
+        bool is_delta() const override
         {
             return true;
         }
 
-        bool has_diffuse_component() const noexcept override
+        bool has_diffuse_component() const override
         {
             return false;
         }
     };
 }
 
-class InvisibleSurfaceMaterial : public Material
+class InvisibleSurfaceMaterial final : public Material
 {
     RC<const BSSRDFSurface> bssrdf_;
 

@@ -38,12 +38,11 @@ namespace
 
     Spectrum illum(
         const Vec3 &wo, const Vec3 &nor, const tracer::BSDF *bsdf,
-        const MaterialThumbnailEnvLight &light,
-        tracer::Sampler &sampler)
+        const MaterialThumbnailEnvLight &light, tracer::Sampler &sampler)
     {
         Spectrum bsdf_illum, light_illum;
 
-        const auto bsdf_sample = bsdf->sample_all(
+        const auto bsdf_sample = bsdf->sample(
             wo, tracer::TransMode::Radiance, sampler.sample3());
         if(!bsdf_sample.f.is_black())
         {
@@ -64,9 +63,9 @@ namespace
         if(!light_sample.radiance.is_black())
         {
             const Vec3 wi = light_sample.ref_to_light();
-            const Spectrum f = bsdf->eval_all(wi, wo, tracer::TransMode::Radiance);
+            const Spectrum f = bsdf->eval(wi, wo, tracer::TransMode::Radiance);
             const real cos_v = std::abs(cos(wi, nor));
-            const real bsdf_pdf = bsdf->pdf_all(wi, wo);
+            const real bsdf_pdf = bsdf->pdf(wi, wo);
 
             light_illum = light_sample.radiance * f * cos_v
                         / (light_sample.pdf + bsdf_pdf);

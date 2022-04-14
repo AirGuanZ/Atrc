@@ -53,7 +53,7 @@ void trace_particle(
         {
             if(scene.visible(camera_sample.pos_on_cam, inct.pos))
             {
-                const FSpectrum bsdf_f = shd.bsdf->eval_all(
+                const FSpectrum bsdf_f = shd.bsdf->eval(
                     inct.wr, camera_sample.ref_to_pos, TransMode::Radiance);
                 if(!bsdf_f.is_black())
                 {
@@ -73,7 +73,7 @@ void trace_particle(
 
         // sample bsdf & construct next ray
 
-        const auto bsdf_sample = shd.bsdf->sample_all(
+        const auto bsdf_sample = shd.bsdf->sample(
             inct.wr, TransMode::Importance, sampler.sample3());
         if(!bsdf_sample.f)
             return;
@@ -137,7 +137,7 @@ void trace_vol_particle(
             {
                 if(scene.visible(cam_sam.pos_on_cam, scatter.pos))
                 {
-                    const FSpectrum bsdf_f = med_sam.phase_function->eval_all(
+                    const FSpectrum bsdf_f = med_sam.phase_function->eval(
                         scatter.wr, cam_sam.ref_to_pos, TransMode::Radiance);
                     if(!bsdf_f.is_black())
                     {
@@ -158,7 +158,7 @@ void trace_vol_particle(
 
             // sample phase function
 
-            const auto phase_sample = med_sam.phase_function->sample_all(
+            const auto phase_sample = med_sam.phase_function->sample(
                 scatter.wr, TransMode::Importance, sampler.sample3());
             if(!phase_sample.f)
                 return;
@@ -179,7 +179,7 @@ void trace_vol_particle(
         {
             if(scene.visible(camera_sample.pos_on_cam, inct.pos))
             {
-                const FSpectrum bsdf_f = shd.bsdf->eval_all(
+                const FSpectrum bsdf_f = shd.bsdf->eval(
                     inct.wr, camera_sample.ref_to_pos, TransMode::Radiance);
                 if(!bsdf_f.is_black())
                 {
@@ -203,7 +203,7 @@ void trace_vol_particle(
 
         // sample bsdf & construct next ray
 
-        const auto bsdf_sample = shd.bsdf->sample_all(
+        const auto bsdf_sample = shd.bsdf->sample(
             inct.wr, TransMode::Importance, sampler.sample3());
         if(!bsdf_sample.f)
             return;

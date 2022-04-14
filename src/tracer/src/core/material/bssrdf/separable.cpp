@@ -48,8 +48,7 @@ namespace
             
         }
 
-        FSpectrum eval(
-            const FVec3 &wi, const FVec3&, TransMode, uint8_t) const noexcept override
+        FSpectrum eval(const FVec3 &wi, const FVec3&, TransMode) const override
         {
             const real cosThetaI = cos(wi, coord_.z);
 
@@ -61,38 +60,37 @@ namespace
             return FSpectrum(val) * eta_ * eta_;
         }
 
-        BSDFSampleResult sample(
-            const FVec3&, TransMode, const Sample3 &sam, uint8_t) const noexcept override
+        BSDFSampleResult sample(const FVec3&, TransMode, const Sample3 &sam) const override
         {
             const auto [local_dir, pdf] = math::distribution::
                     zweighted_on_hemisphere(sam.u, sam.v);
-
             const FVec3 dir = coord_.local_to_global(local_dir);
-
-            return BSDFSampleResult(
-                dir,
-                eval_all(dir, {}, TransMode::Radiance),
-                pdf,
-                false);
+            return BSDFSampleResult(dir, eval(dir, {}, TransMode::Radiance), pdf, false);
         }
 
-        real pdf(const FVec3 &wi, const FVec3&, uint8_t) const noexcept override
+        BSDFBidirSampleResult sample_bidir(const FVec3 &wo, TransMode mode, const Sample3 &sam) const override
+        {
+            // unreachable
+            std::abort();
+        }
+
+        real pdf(const FVec3 &wi, const FVec3&) const override
         {
             const FVec3 lwi = coord_.global_to_local(wi).normalize();
             return math::distribution::zweighted_on_hemisphere_pdf(lwi.z);
         }
 
-        FSpectrum albedo() const noexcept override
+        FSpectrum albedo() const override
         {
             return {};
         }
 
-        bool is_delta() const noexcept override
+        bool is_delta() const override
         {
             return false;
         }
 
-        bool has_diffuse_component() const noexcept override
+        bool has_diffuse_component() const override
         {
             return true;
         }

@@ -76,16 +76,14 @@ namespace
     public:
 
         FabricBSDFComponent(const FSpectrum &color, real roughness) noexcept
-            : BSDFComponent(BSDF_SPECULAR), color_(color)
+            : color_(color)
         {
             n_ = static_cast<int>(std::ceil(
                 1 + 29 * (1 - roughness) * (1 - roughness)));
             assert(1 <= n_ && n_ <= 30);
         }
 
-        FSpectrum eval(
-            const FVec3 &lwi, const FVec3 &lwo,
-            TransMode mode) const noexcept override
+        FSpectrum eval(const FVec3 &lwi, const FVec3 &lwo, TransMode mode) const override
         {
             if(lwi.z <= 0 || lwo.z <= 0)
                 return {};
@@ -96,9 +94,7 @@ namespace
             return color_ * S / Io[n_];
         }
 
-        SampleResult sample(
-            const FVec3 &lwo, TransMode mode,
-            const Sample2 &sam) const noexcept override
+        SampleResult sample(const FVec3 &lwo, TransMode mode, const Sample2 &sam) const override
         {
             if(lwo.z <= 0)
                 return { {}, {}, 0 };
@@ -150,7 +146,20 @@ namespace
             return ret;
         }
 
-        real pdf(const FVec3 &lwi, const FVec3 &lwo) const noexcept override
+        BidirSampleResult sample_bidir(const FVec3 &lwo, TransMode mode, const Sample2 &sam) const override
+        {
+            auto t = sample(lwo, mode, sam);
+            if(!t.is_valid())
+                return {};
+            BidirSampleResult ret;
+            ret.lwi = t.lwi;
+            ret.f = t.f;
+            ret.pdf = t.pdf;
+            ret.pdf_rev = pdf(lwo, ret.lwi);
+            return ret;
+        }
+
+        real pdf(const FVec3 &lwi, const FVec3 &lwo) const override
         {
             if(lwi.z <= 0 || lwo.z <= 0)
                 return 0;
@@ -162,6 +171,11 @@ namespace
                 1 - std::abs(sin_theta_h), static_cast<real>(n_));
 
             return real(n_ + 1) * S / (8 * PI_r * dot(lwi, lwh));
+        }
+
+        bool has_diffuse_component() const override
+        {
+            return false;
         }
     };
 }
