@@ -379,7 +379,7 @@ namespace disney_impl
             const real D = microfacet::anisotropic_gtr2(
                 sin_phi_h, cos_phi_h,
                 sin_theta_h, cos_theta_h, trans_ax_, trans_ay_);
-            return std::abs(dot(lwi, lwh) * D * dwh_to_dwi);
+            return std::abs(cos_theta_h * D * dwh_to_dwi);
         }
 
         real pdf_inner_refl(const FVec3 &lwi, const FVec3 &lwo) const noexcept
