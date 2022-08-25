@@ -84,7 +84,7 @@ public:
         FSpectrum tr;
         for(int i = 0; i < SPECTRUM_COMPONENT_COUNT; ++i)
             tr[i] = std::exp(-sigma_t_[i] * (std::min)(st, t_max));
-        const FSpectrum density = sample_medium ? sigma_s_ * tr : tr;
+        const FSpectrum density = sample_medium ? sigma_t_ * tr : tr;
 
         real pdf = 0;
         for(int i = 0; i < SPECTRUM_COMPONENT_COUNT; ++i)
