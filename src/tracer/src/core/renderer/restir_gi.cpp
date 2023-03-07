@@ -123,31 +123,31 @@ class ReSTIRGIRenderer : public Renderer
     Spectrum eval(
         const Scene         &scene,
         const Pixel         &pixel,
-        const ReservoirData &resData) const
+        const ReservoirData &res_data) const
     {
         assert(pixel.visible_bsdf);
-        assert(resData.sample_bsdf);
+        assert(res_data.sample_bsdf);
 
         if constexpr(Vis)
         {
-            if(!scene.visible(pixel.visible_point, resData.sample_point))
+            if(!scene.visible(pixel.visible_point, res_data.sample_point))
                 return {};
         }
 
-        if(!resData.sample_wi)
+        if(!res_data.sample_wi)
             return {};
 
-        const Vec3 vp_to_sp = resData.sample_point - pixel.visible_point;
+        const Vec3 vp_to_sp = res_data.sample_point - pixel.visible_point;
 
         const Spectrum f_vp = pixel.visible_bsdf->eval(
             vp_to_sp, pixel.visible_wr, TransMode::Radiance);
 
         const real absdot_vp = std::abs(cos(vp_to_sp, pixel.visible_normal));
 
-        const Spectrum f_sp = resData.sample_bsdf->eval(
-            resData.sample_wi, -vp_to_sp, TransMode::Radiance);
+        const Spectrum f_sp = res_data.sample_bsdf->eval(
+            res_data.sample_wi, -vp_to_sp, TransMode::Radiance);
 
-        return f_vp * absdot_vp * f_sp * resData.sample_incident_radiance;
+        return f_vp * absdot_vp * f_sp * res_data.sample_incident_radiance;
     }
 
     template<bool Vis>
@@ -157,7 +157,7 @@ class ReSTIRGIRenderer : public Renderer
         const ReservoirData &res_data) const
     {
         assert(pixel.visible_bsdf);
-        assert(resData.sample_bsdf);
+        assert(res_data.sample_bsdf);
 
         if constexpr(Vis)
         {
